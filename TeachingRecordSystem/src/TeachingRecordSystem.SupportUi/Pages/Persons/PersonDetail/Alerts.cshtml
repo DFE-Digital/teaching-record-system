@@ -38,7 +38,7 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>
-                            @if (!string.IsNullOrEmpty(alert.ExternalLink))
+                            @if (alert.ExternalLink is not null)
                             {
                                 <a href="@alert.ExternalLink" rel="noopener noreferrer" class="govuk-link">@alert.ExternalLink</a>
                             }

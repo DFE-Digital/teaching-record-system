@@ -58,9 +58,9 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (string.IsNullOrEmpty(JourneyInstance!.State.Details))
+        if (JourneyInstance!.State.AddLink is null)
         {
-            context.Result = Redirect(linkGenerator.AlertAddDetails(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.AlertAddLink(PersonId, JourneyInstance.InstanceId));
             return;
         }
 

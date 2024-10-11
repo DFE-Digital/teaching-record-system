@@ -9,8 +9,13 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -24,11 +29,14 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
+        // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -46,10 +54,12 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details"
         });
 
@@ -67,11 +77,13 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
         var link = TestData.GenerateUrl();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
             Link = link
         });
@@ -91,8 +103,14 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details"
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -108,10 +126,12 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid()
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -125,23 +145,52 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WithInvalidLinkUrl_ReturnsError()
+    public async Task Post_AddLinkNotAnswered_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details"
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "AddLink", "Select yes if you want to add a link to a panel outcome");
+    }
+
+    [Fact]
+    public async Task Post_WithInvalidLinkUrl_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details"
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["Link"] = "bob"
-            })
+                { "AddLink", bool.TrueString },
+                { "Link", "badurl" }
+            }
         };
 
         // Act
@@ -151,26 +200,29 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasError(response, "Link", "Enter a valid URL");
     }
 
-    [Theory]
-    [InlineData("http://example.com")]
-    [InlineData("")]
-    public async Task Post_ValidInput_RedirectsToStartDatePage(string linkUrl)
+    [Fact]
+    public async Task Post_WithLink_UpdatesStateAndRedirectsToStartDatePage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details"
         });
 
+        var link = "http://example.com";
+
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["Link"] = linkUrl
-            })
+                { "AddLink", bool.TrueString },
+                { "Link", link }
+            }
         };
 
         // Act
@@ -179,6 +231,44 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.State.AddLink);
+        Assert.Equal(link, journeyInstance.State.Link);
+    }
+
+    [Fact]
+    public async Task Post_WithNoLink_UpdatesStateAndRedirectsToStartDatePage()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details"
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "AddLink", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.False(journeyInstance.State.AddLink);
+        Assert.Null(journeyInstance.State.Link);
     }
 
     [Fact]
@@ -186,10 +276,12 @@ public class LinkTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details"
         });
 

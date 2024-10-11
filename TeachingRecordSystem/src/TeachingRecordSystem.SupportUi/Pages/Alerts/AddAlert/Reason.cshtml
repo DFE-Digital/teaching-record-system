@@ -1,7 +1,7 @@
 @page "/alerts/add/reason/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert.ReasonModel
 @{
-    ViewBag.Title = "Reason";
+    ViewBag.Title = "Why are you adding this alert?";
 }
 
 @section BeforeContent {
@@ -12,11 +12,37 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-character-count asp-for="Detail" max-length="4000">
-                <govuk-character-count-label class="govuk-label--l" is-page-heading="true" />
-                <govuk-character-count-hint>Optional</govuk-character-count-hint>
-            </govuk-character-count>
+            <govuk-radios asp-for="AddReason">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-item value="@AddAlertReasonOption.RoutineNotificationFromStakeholder">
+                        @AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder">
+                        @AddAlertReasonOption.IdentifiedDuringDataReconciliationWithStakeholder.GetDisplayName()
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@AddAlertReasonOption.AnotherReason">
+                        @AddAlertReasonOption.AnotherReason.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <govuk-radios asp-for="HaveAdditionalReasonDetail">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-item value="@true">
+                        Yes
+                        <govuk-radios-item-conditional>
+                            <govuk-character-count asp-for="AddReasonDetail" max-length="4000" />
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
 
             <govuk-radios asp-for="UploadEvidence" data-testid="upload-evidence-options">
                 <govuk-radios-fieldset>

@@ -47,7 +47,8 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
         {
-            AlertTypeId = alertType.AlertTypeId
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -67,15 +68,16 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
         var journeyInstance = await CreateJourneyInstance(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["AlertTypeId"] = Guid.NewGuid().ToString()
-            })
+                { "AlertTypeId", alertType.AlertTypeId }
+            }
         };
 
         // Act
@@ -103,7 +105,7 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_ValidInput_RedirectsToDetailsPage()
+    public async Task Post_ValidInput_UpdatesStateAndRedirectsToDetailsPage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
@@ -113,10 +115,10 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new FormUrlEncodedContentBuilder()
             {
-                ["AlertTypeId"] = alertType.AlertTypeId.ToString()
-            })
+                { "AlertTypeId", alertType.AlertTypeId }
+            }
         };
 
         // Act
@@ -125,6 +127,9 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(alertType.AlertTypeId, journeyInstance.State.AlertTypeId);
     }
 
     [Fact]

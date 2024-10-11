@@ -671,6 +671,7 @@ public partial class TestData
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _endDate;
         private Option<string?> _reason;
+        private Option<string?> _reasonDetail;
         private Option<EventModels.RaisedByUserInfo> _createdByUser;
         private Option<DateTime?> _createdUtc;
 
@@ -716,9 +717,10 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonAlertBuilder WithCreatedReason(string? reason)
+        public CreatePersonAlertBuilder WithAddReason(string? reason, string? reasonDetail)
         {
             _reason = Option.Some(reason);
+            _reasonDetail = Option.Some(reasonDetail);
             return this;
         }
 
@@ -748,7 +750,8 @@ public partial class TestData
             var externalLink = _externalLink.ValueOr((string?)null);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
             var endDate = _endDate.ValueOr((DateOnly?)null);
-            var reason = _reason.ValueOr(testData.GenerateLoremIpsum());
+            var reason = _reason.ValueOr("Another reason");
+            var reasonDetail = _reasonDetail.ValueOr(testData.GenerateLoremIpsum());
             var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
@@ -772,9 +775,10 @@ public partial class TestData
                 EventId = Guid.NewGuid(),
                 CreatedUtc = createdUtc!.Value,
                 RaisedBy = createdByUser,
-                Alert = TeachingRecordSystem.Core.Events.Models.Alert.FromModel(alert),
+                Alert = EventModels.Alert.FromModel(alert),
                 PersonId = personId,
-                AddReasonDetail = reason,
+                AddReason = reason,
+                AddReasonDetail = reasonDetail,
                 EvidenceFile = null
             };
 

@@ -18,9 +18,11 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public string? PersonName { get; set; }
 
+    public string? AlertTypeName { get; set; }
+
     [BindProperty]
     [Required(ErrorMessage = "Enter details")]
-    [Display(Name = "Enter details")]
+    [Display(Description = "For example, include any restrictions it places on a teacher.")]
     public string? Details { get; set; }
 
     public void OnGet()
@@ -62,5 +64,6 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonName = personInfo.Name;
+        AlertTypeName = JourneyInstance.State.AlertTypeName;
     }
 }

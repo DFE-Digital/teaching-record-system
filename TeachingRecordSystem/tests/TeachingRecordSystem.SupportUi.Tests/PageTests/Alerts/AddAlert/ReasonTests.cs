@@ -9,12 +9,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
-            StartDate = new DateOnly(2022, 1, 1),
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -27,52 +30,18 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
+    public async Task Get_MissingDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var reason = "My Reason";
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "evidence.jpg";
-        var evidenceFileSizeDescription = "1 MB";
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
-            StartDate = new DateOnly(2021, 1, 1),
-            Reason = reason,
-            UploadEvidence = true,
-            EvidenceFileId = evidenceFileId,
-            EvidenceFileName = evidenceFileName,
-            EvidenceFileSizeDescription = evidenceFileSizeDescription
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(reason, doc.GetElementById("Detail")?.TextContent);
-        var radioButtons = doc.GetElementsByName("UploadEvidence");
-        var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
-        Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
-        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
-        Assert.NotNull(uploadedEvidenceLink);
-        Assert.Equal($"{evidenceFileName} ({evidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
-    }
-
-    [Fact]
-    public async Task Get_MissingDataInJourneyState_RedirectsToEndDatePage()
-    {
-        var person = await TestData.CreatePerson();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
-        {
-            AlertTypeId = Guid.NewGuid(),
-            Details = "Details"
+            AddLink = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -90,11 +59,14 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
@@ -108,25 +80,80 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var reason = AddAlertReasonOption.AnotherReason;
+        var reasonDetail = "My Reason";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileSizeDescription = "1 MB";
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1),
+            AddReason = reason,
+            HaveAdditionalReasonDetail = true,
+            AddReasonDetail = reasonDetail,
+            UploadEvidence = true,
+            EvidenceFileId = evidenceFileId,
+            EvidenceFileName = evidenceFileName,
+            EvidenceFileSizeDescription = evidenceFileSizeDescription
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+
+        AssertCheckedRadioOption("AddReason", reason.ToString());
+        AssertCheckedRadioOption("HaveAdditionalReasonDetail", bool.TrueString);
+        AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
+
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        Assert.NotNull(uploadedEvidenceLink);
+        Assert.Equal($"{evidenceFileName} ({evidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
+
+        void AssertCheckedRadioOption(string name, string expectedCheckedValue)
+        {
+            var selectedOption = doc.GetElementsByName(name).SingleOrDefault(r => r.HasAttribute("checked"));
+            Assert.Equal(expectedCheckedValue, selectedOption?.GetAttribute("value"));
+        }
+    }
+
+    [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
         // Arrange
         var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new MultipartFormDataContentBuilder()
             {
-                ["Reason"] = "Reason",
-                ["UploadEvidence"] = "False"
-            })
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "UploadEvidence", bool.FalseString }
+            }
         };
 
         // Act
@@ -137,24 +164,92 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
+    public async Task Post_WhenNoReasonIsSelected_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new MultipartFormDataContentBuilder()
             {
-                ["Reason"] = "Reason"
-            })
+                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "UploadEvidence", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "AddReason", "Select a reason");
+    }
+
+    [Fact]
+    public async Task Post_WhenNoHaveAdditionalReasonDetailIsSelected_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "UploadEvidence", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "HaveAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this alert");
+    }
+
+    [Fact]
+    public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HaveAdditionalReasonDetail", bool.FalseString }
+            }
         };
 
         // Act
@@ -169,21 +264,25 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new MultipartFormDataContentBuilder()
             {
-                ["Reason"] = "Reason",
-                ["UploadEvidence"] = "True"
-            })
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "UploadEvidence", bool.TrueString }
+            }
         };
 
         // Act
@@ -198,21 +297,26 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
-        var multipartContent = CreateFormFileUpload(".cs");
-        multipartContent.Add(new StringContent("My reason to add an alert"), "Reason");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
-
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = multipartContent
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "UploadEvidence", bool.TrueString },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(), "badfile.exe"}
+            }
         };
 
         // Act
@@ -223,25 +327,29 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_ValidInput_RedirectsToCheckAnswersPage()
+    public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
-        var multipartContent = CreateFormFileUpload(".pdf");
-        multipartContent.Add(new StringContent("My reason to add an alert"), "Reason");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
-
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = multipartContent
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "UploadEvidence", bool.FalseString }
+            }
         };
 
         // Act
@@ -250,6 +358,52 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/add/check-answers?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.EvidenceFileName);
+        Assert.Null(journeyInstance.State.EvidenceFileId);
+        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+    }
+
+    [Fact]
+    public async Task Post_ValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var evidenceFileName = "evidence.pdf";
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "UploadEvidence", bool.TrueString },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName}
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/alerts/add/check-answers?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
+        Assert.NotNull(journeyInstance.State.EvidenceFileId);
+        Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
     [Fact]
@@ -257,11 +411,14 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
         {
-            AlertTypeId = Guid.NewGuid(),
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
             Details = "Details",
+            AddLink = false,
             StartDate = new DateOnly(2022, 1, 1)
         });
 
@@ -277,17 +434,11 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
+    private static HttpContent CreateEvidenceFileBinaryContent()
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
-
-        var multipartContent = new MultipartFormDataContent
-        {
-            { byteArrayContent, "EvidenceFile", $"evidence{fileExtension}" }
-        };
-
-        return multipartContent;
+        return byteArrayContent;
     }
 
     private async Task<JourneyInstance<AddAlertState>> CreateJourneyInstance(Guid personId, AddAlertState? state = null) =>

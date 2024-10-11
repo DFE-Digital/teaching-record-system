@@ -8,6 +8,7 @@ public record class AlertCreatedEvent : EventBase, IEventWithPersonId, IEventWit
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }
     public required Alert Alert { get; init; }
+    public required string? AddReason { get; init; }
     public required string? AddReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
 }
