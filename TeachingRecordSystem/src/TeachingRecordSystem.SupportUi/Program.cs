@@ -4,12 +4,13 @@ using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
@@ -25,6 +26,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Infrastructure.Redis;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Pages;
 using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.UiCommon.Filters;
@@ -88,85 +90,7 @@ builder.Services.AddAuthorizationBuilder()
             .RequireRole(UserRoles.Administrator));
 
 builder.Services
-    .AddRazorPages(options =>
-    {
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Persons/PersonDetail",
-            model =>
-            {
-                model.Filters.Add(new CheckPersonExistsFilterFactory());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts",
-            model =>
-            {
-                model.Filters.Add(new RequireFeatureEnabledFilterFactory(FeatureNames.Alerts));
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts/AddAlert",
-            model =>
-            {
-                model.Filters.Add(new CheckPersonExistsFilterFactory());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts/EditAlert",
-            model =>
-            {
-                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts/CloseAlert",
-            model =>
-            {
-                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts/ReopenAlert",
-            model =>
-            {
-                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Alerts/DeleteAlert",
-            model =>
-            {
-                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Mqs/AddMq",
-            model =>
-            {
-                model.Filters.Add(new CheckPersonExistsFilterFactory());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Mqs/DeleteMq",
-            model =>
-            {
-                model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>());
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/Mqs/EditMq",
-            model =>
-            {
-                model.Filters.Add(new ServiceFilterAttribute<CheckMandatoryQualificationExistsFilter>() { Order = -200 });
-            });
-
-        options.Conventions.AddFolderApplicationModelConvention(
-            "/SupportTasks/ConnectOneLoginUser",
-            model =>
-            {
-                model.Filters.Add(new CheckSupportTaskExistsFilterFactory(openOnly: true, supportTaskType: SupportTaskType.ConnectOneLoginUser));
-            });
-    })
+    .AddRazorPages()
     .AddMvcOptions(options =>
     {
         var policy = new AuthorizationPolicyBuilder()
@@ -184,6 +108,11 @@ builder.Services
     {
         options.Cookie.Name = "trs-tempdata";
     });
+
+builder.Services.Scan(s => s.FromAssemblyOf<Program>()
+    .AddClasses(f => f.AssignableTo<IConfigureFolderConventions>())
+    .As<IConfigureOptions<RazorPagesOptions>>()
+    .WithTransientLifetime());
 
 builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
