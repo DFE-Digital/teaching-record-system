@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts;
 
-[ServiceFilter(typeof(CheckAlertExistsFilter)), RequireClosedAlertFilter]
+[ServiceFilter(typeof(CheckAlertExistsFilter)), ServiceFilter(typeof(RequireClosedAlertFilter))]
 public class AlertDetailModel(TrsDbContext dbContext) : PageModel
 {
     [FromRoute]
