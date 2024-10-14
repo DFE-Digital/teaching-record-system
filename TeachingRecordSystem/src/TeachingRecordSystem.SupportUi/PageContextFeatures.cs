@@ -12,6 +12,15 @@ public static class HttpContextExtensions
     public static void SetCurrentPersonFeature(this HttpContext context, CurrentPersonFeature currentPersonInfo) =>
         context.Features.Set(currentPersonInfo);
 
+    public static void SetCurrentPersonFeature(this HttpContext context, Person person) =>
+        SetCurrentPersonFeature(
+            context,
+            new CurrentPersonFeature(
+                person.PersonId,
+                person.FirstName,
+                person.MiddleName,
+                person.LastName));
+
     public static void SetCurrentPersonFeature(this HttpContext context, ContactDetail contactDetail) =>
         SetCurrentPersonFeature(
             context,

@@ -58,6 +58,8 @@ public partial class TestData
                         LastName = _updatedName.Value.LastName
                     }
                 });
+
+                await testData.SyncConfiguration.SyncIfEnabled(helper => helper.SyncPerson(_personId.Value, ignoreInvalid: false));
             }
         }
     }

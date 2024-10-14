@@ -22,11 +22,8 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 public class CheckPersonExistsFilter(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
-    IBackgroundJobScheduler backgroundJobScheduler,
-    bool requireQts = false) : IAsyncResourceFilter
+    IBackgroundJobScheduler backgroundJobScheduler) : IAsyncResourceFilter
 {
-    private readonly bool _requireQts = requireQts;
-
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
         var personIdParam = context.RouteData.Values["personId"] as string ?? context.HttpContext.Request.Query["personId"];
@@ -36,48 +33,52 @@ public class CheckPersonExistsFilter(
             return;
         }
 
-        var person = await crmQueryDispatcher.ExecuteQuery(
-            new GetActiveContactDetailByIdQuery(
-                personId,
-                new ColumnSet(
-                    Contact.Fields.Id,
-                    Contact.Fields.FirstName,
-                    Contact.Fields.MiddleName,
-                    Contact.Fields.LastName,
-                    Contact.Fields.dfeta_StatedFirstName,
-                    Contact.Fields.dfeta_StatedLastName,
-                    Contact.Fields.dfeta_StatedMiddleName,
-                    Contact.Fields.dfeta_QTSDate)));
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == personId);
 
-        if (person is null)
+        if (person is not null)
         {
-            context.Result = new NotFoundResult();
-            return;
+            context.HttpContext.SetCurrentPersonFeature(person);
         }
-        else if (_requireQts && person.Contact.dfeta_QTSDate is null)
+        else
         {
-            context.Result = new BadRequestResult();
-            return;
-        }
+            // If person isn't in the TRS DB it may be because we haven't synced it yet..
 
-        context.HttpContext.SetCurrentPersonFeature(person);
+            var dqtContact = await crmQueryDispatcher.ExecuteQuery(
+                new GetActiveContactDetailByIdQuery(
+                    personId,
+                    new ColumnSet(
+                        Contact.Fields.Id,
+                        Contact.Fields.FirstName,
+                        Contact.Fields.MiddleName,
+                        Contact.Fields.LastName,
+                        Contact.Fields.dfeta_StatedFirstName,
+                        Contact.Fields.dfeta_StatedLastName,
+                        Contact.Fields.dfeta_StatedMiddleName,
+                        Contact.Fields.dfeta_QTSDate)));
 
-        // Ensure we've synced this person into the TRS DB at least once
-        if (!await dbContext.Persons.AnyAsync(p => p.PersonId == personId))
-        {
-            await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncPerson(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None));
+            if (dqtContact is not null)
+            {
+                context.HttpContext.SetCurrentPersonFeature(dqtContact);
+
+                await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncPerson(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None));
+            }
+            else
+            {
+                context.Result = new NotFoundResult();
+                return;
+            }
         }
 
         await next();
     }
 }
 
-public class CheckPersonExistsFilterFactory(bool requireQts = false) : IFilterFactory, IOrderedFilter
+public class CheckPersonExistsFilterFactory : IFilterFactory, IOrderedFilter
 {
     public bool IsReusable => false;
 
     public int Order => -200;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
-        ActivatorUtilities.CreateInstance<CheckPersonExistsFilter>(serviceProvider, requireQts);
+        ActivatorUtilities.CreateInstance<CheckPersonExistsFilter>(serviceProvider);
 }
