@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Alerts;
+namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class RequireClosedAlertFilterAttribute : Attribute, IResourceFilter, IOrderedFilter
+public class RequireClosedAlertFilter : IResourceFilter, IOrderedFilter
 {
     public int Order => 1;  // After CheckAlertExistsFilter
 

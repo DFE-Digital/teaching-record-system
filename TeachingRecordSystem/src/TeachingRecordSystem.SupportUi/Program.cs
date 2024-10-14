@@ -145,26 +145,26 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     }
 }
 
-builder.Services
-    .AddTrsBaseServices()
-    .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
-    .AddTransient<CheckMandatoryQualificationExistsFilter>()
-    .AddTransient<CheckAlertExistsFilter>()
-    .AddFormFlow()
-    .AddFormFlowJourneyDescriptors(typeof(Program).Assembly);
-
 builder.AddBlobStorage();
 
 builder.Services
-    .AddTransient<TrsLinkGenerator>()
-    .AddTransient<CheckUserExistsFilter>()
+    .AddTrsBaseServices()
+    .AddPersonMatching()
     .AddSupportUiServices(builder.Configuration, builder.Environment)
+    .AddFormFlow()
+    .AddFormFlowJourneyDescriptors(typeof(Program).Assembly)
+    .AddFileService()
+    .AddTransient<TrsLinkGenerator>()
+    .AddSingleton<FeatureProvider>()
+    .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
+    .AddTransient<CheckMandatoryQualificationExistsFilter>()
+    .AddTransient<CheckAlertExistsFilter>()
+    .AddTransient<CheckUserExistsFilter>()
+    .AddTransient<RequireClosedAlertFilter>()
+    .AddTransient<RequireOpenAlertFilter>()
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
-    .AddSingleton<FeatureProvider>()
-    .AddFileService()
-    .AddPersonMatching();
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
 
 var app = builder.Build();
 
