@@ -68,10 +68,18 @@ public class ApiKeyAuthenticationHandler(
             return AuthenticateResult.Fail($"API key is expired.");
         }
 
-        var principal = CreatePrincipal(apiKey.ApplicationUserId.ToString(), apiKey.ApplicationUser.Name, apiKey.ApplicationUser.ApiRoles ?? []);
+        var applicationUser = apiKey.ApplicationUser;
+
+        var principal = CreatePrincipal(applicationUser.UserId.ToString(), applicationUser.Name, applicationUser.ApiRoles ?? []);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-        LogContext.PushProperty("ClientId", apiKey.ApplicationUser.UserId);
+        LogContext.PushProperty("ApplicationUserId", applicationUser.UserId);
+
+        SentrySdk.ConfigureScope(scope => scope.User = new SentryUser()
+        {
+            Id = applicationUser.UserId.ToString(),
+            Username = applicationUser.Name
+        });
 
         return AuthenticateResult.Success(ticket);
     }
