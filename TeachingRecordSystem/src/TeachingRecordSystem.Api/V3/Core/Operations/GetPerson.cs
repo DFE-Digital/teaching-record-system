@@ -379,6 +379,7 @@ public class GetPersonHandler(
                         Provider = MapIttProvider(i),
                         Subjects = MapSubjects(i)
                     })
+                    .OrderByDescending(i => i.StartDate)
                     .AsReadOnly()) :
                 default,
             NpqQualifications = command.Include.HasFlag(GetPersonCommandIncludes.NpqQualifications) ?
