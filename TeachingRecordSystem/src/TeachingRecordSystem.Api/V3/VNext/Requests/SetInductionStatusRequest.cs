@@ -6,5 +6,5 @@ public record SetInductionStatusRequest
 {
     public required InductionStatus InductionStatus { get; init; }
     public required DateOnly StartDate { get; init; }
-    public required DateOnly? CompletionDate { get; init; }
+    public DateOnly? CompletionDate { get; init; }
 }
