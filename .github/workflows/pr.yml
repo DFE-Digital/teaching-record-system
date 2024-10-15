@@ -45,7 +45,7 @@ jobs:
             echo "::notice::Linting changed files only"
           fi
 
-          dotnet format --no-restore --verify-no-changes $INCLUDE_ARG
+          dotnet format --verify-no-changes $INCLUDE_ARG
         working-directory: TeachingRecordSystem
 
   validate_terraform:

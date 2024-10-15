@@ -35,7 +35,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
     {
         var contacts = await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactsByTrnsQuery(
-                command.Persons.Select(p => p.Trn).Distinct(),
+                command.Persons.Select(p => p.Trn).Where(trn => !string.IsNullOrEmpty(trn)).Distinct(),
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
                     Contact.Fields.BirthDate,
