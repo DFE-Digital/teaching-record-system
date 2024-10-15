@@ -12,6 +12,13 @@ public class GetActiveContactsByTrnsHandler :
         GetActiveContactsByTrnsQuery query,
         IOrganizationServiceAsync organizationService)
     {
+        var trns = query.Trns.ToArray();
+
+        if (trns.Length == 0)
+        {
+            return new Dictionary<string, Contact?>();
+        }
+
         var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = query.ColumnSet,
@@ -20,7 +27,7 @@ public class GetActiveContactsByTrnsHandler :
                 Conditions =
                 {
                     new ConditionExpression(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active),
-                    new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.In, query.Trns.ToArray())
+                    new ConditionExpression(Contact.Fields.dfeta_TRN, ConditionOperator.In, trns)
                 }
             }
         };
