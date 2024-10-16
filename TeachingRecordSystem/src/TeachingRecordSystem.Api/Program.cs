@@ -12,6 +12,7 @@ using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
 using TeachingRecordSystem.Api.Infrastructure.Json;
+using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
@@ -46,7 +47,10 @@ public class Program
         var env = builder.Environment;
         var configuration = builder.Configuration;
 
-        builder.ConfigureLogging();
+        builder.ConfigureLogging((config, services) =>
+        {
+            config.Enrich.With(ActivatorUtilities.CreateInstance<AddUserIdLogEventEnricher>(services));
+        });
 
         services.AddAuthentication(ApiKeyAuthenticationHandler.AuthenticationScheme)
             .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationHandler.AuthenticationScheme, _ => { })

@@ -11,7 +11,7 @@ namespace TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder, Action<LoggerConfiguration, IServiceProvider>? configureLogger = null)
     {
         if (builder.Environment.IsProduction())
         {
@@ -33,6 +33,8 @@ public static class WebApplicationBuilderExtensions
             config.ConfigureSerilog(ctx.HostingEnvironment, ctx.Configuration, services);
 
             config.Enrich.With(services.GetRequiredService<RemoveRedactedUrlParametersEnricher>());
+
+            configureLogger?.Invoke(config, services);
         });
 
         return builder;
