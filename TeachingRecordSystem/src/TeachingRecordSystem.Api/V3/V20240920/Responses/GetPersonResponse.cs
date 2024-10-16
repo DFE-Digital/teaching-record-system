@@ -35,13 +35,13 @@ public partial record GetPersonResponseInitialTeacherTraining
     [ValueConverter(typeof(WrapWithOptionValueConverter<DateOnly?>))]
     public required Option<DateOnly?> EndDate { get; init; }
 
-    [ValueConverter(typeof(WrapWithOptionValueConverter<Core.SharedModels.IttProgrammeType, IttProgrammeType>))]
+    [ValueConverter(typeof(WrapWithOptionValueConverter<Core.SharedModels.IttProgrammeType?, IttProgrammeType?>))]
     public required Option<IttProgrammeType?> ProgrammeType { get; init; }
 
     [ValueConverter(typeof(WrapWithOptionValueConverter<string?>))]
     public required Option<string?> ProgrammeTypeDescription { get; init; }
 
-    [ValueConverter(typeof(WrapWithOptionValueConverter<Core.SharedModels.IttOutcome, IttOutcome>))]
+    [ValueConverter(typeof(WrapWithOptionValueConverter<Core.SharedModels.IttOutcome?, IttOutcome?>))]
     public required Option<IttOutcome?> Result { get; init; }
 
     [ValueConverter(typeof(WrapWithOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetPersonResponseInitialTeacherTrainingAgeRange>))]
