@@ -42,3 +42,9 @@ resource "azurerm_storage_container" "uploads" {
   storage_account_name  = azurerm_storage_account.app_storage.name
   container_access_type = "private"
 }
+
+resource "azurerm_storage_container" "dqt-integrations" {
+  name                  = "dqt-integrations"
+  storage_account_name  = azurerm_storage_account.app_storage.name
+  container_access_type = "private"
+}
