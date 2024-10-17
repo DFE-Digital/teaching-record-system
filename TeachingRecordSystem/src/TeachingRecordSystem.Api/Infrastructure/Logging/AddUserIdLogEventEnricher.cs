@@ -8,7 +8,13 @@ public class AddUserIdLogEventEnricher(IHttpContextAccessor httpContextAccessor)
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        var httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext.");
+        var httpContext = httpContextAccessor.HttpContext;
+
+        if (httpContext is null)
+        {
+            return;
+        }
+
         var principal = httpContext.User;
 
         if (principal?.Identity is null || !principal.Identity.IsAuthenticated)
