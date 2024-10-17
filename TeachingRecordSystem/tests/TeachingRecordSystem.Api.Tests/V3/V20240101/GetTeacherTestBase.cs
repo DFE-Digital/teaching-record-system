@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
@@ -403,92 +402,6 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
         Assert.True(jsonResponse.RootElement.GetProperty("pendingDateOfBirthChange").GetBoolean());
     }
 
-    protected async Task ValidRequestWithSanctions_ReturnsExpectedSanctionsContent(
-        HttpClient httpClient,
-        string baseUrl,
-        Contact contact)
-    {
-        // Arrange
-        var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
-        {
-            new("A18", null),
-            new("A21B", new DateOnly(2022, 4, 1)),
-        };
-        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.LegacyExposableSanctionCodes.Contains));
-
-        await ConfigureMocks(contact, sanctions: sanctions);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Sanctions");
-
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
-        var responseSanctions = jsonResponse.RootElement.GetProperty("sanctions");
-
-        AssertEx.JsonObjectEquals(
-            new[]
-            {
-                new
-                {
-                    code = sanctions[0].SanctionCode,
-                    startDate = sanctions[0].StartDate
-                },
-                new
-                {
-                    code = sanctions[1].SanctionCode,
-                    startDate = sanctions[1].StartDate
-                }
-            },
-            responseSanctions);
-    }
-
-    protected async Task ValidRequestWithAlerts_ReturnsExpectedSanctionsContent(
-        HttpClient httpClient,
-        string baseUrl,
-        Contact contact)
-    {
-        // Arrange
-        var sanctions = new (string SanctionCode, DateOnly? StartDate)[]
-        {
-            new("A21B", null),
-            new("A21B", new DateOnly(2022, 4, 1)),
-        };
-        Debug.Assert(sanctions.Select(s => s.SanctionCode).All(TeachingRecordSystem.Api.V3.Constants.LegacyProhibitionSanctionCodes.Contains));
-
-        await ConfigureMocks(contact, sanctions: sanctions);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Alerts");
-
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
-        var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
-
-        AssertEx.JsonObjectEquals(
-            new[]
-            {
-                new
-                {
-                    alertType = "Prohibition",
-                    dqtSanctionCode = sanctions[0].SanctionCode,
-                    startDate = sanctions[0].StartDate,
-                    endDate = (DateOnly?)null
-                },
-                new
-                {
-                    alertType = "Prohibition",
-                    dqtSanctionCode = sanctions[1].SanctionCode,
-                    startDate = sanctions[1].StartDate,
-                    endDate = (DateOnly?)null
-                }
-            },
-            responseAlerts);
-    }
-
     protected async Task ValidRequestWithPreviousNames_ReturnsExpectedPreviousNamesContent(
         HttpClient httpClient,
         string baseUrl,
@@ -568,7 +481,6 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
         dfeta_qualification[]? qualifications = null,
         Incident[]? incidents = null,
         (string FirstName, string? MiddleName, string LastName)[]? updatedNames = null,
-        (string SanctionCode, DateOnly? StartDate)[]? sanctions = null,
         QtsRegistration[]? qtsRegistrations = null)
     {
         DataverseAdapterMock
@@ -647,20 +559,6 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
                 CreatedOn = qtsRegistration.CreatedOn,
                 dfeta_TeacherStatusId = teacherStatus?.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
                 dfeta_EarlyYearsStatusId = eytsStatus?.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName),
-            });
-        }
-
-        foreach (var sanction in sanctions ?? Array.Empty<(string, DateOnly?)>())
-        {
-            var sanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByValue(sanction.SanctionCode);
-
-            await TestData.OrganizationService.CreateAsync(new dfeta_sanction()
-            {
-                Id = Guid.NewGuid(),
-                dfeta_PersonId = contact.Id.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
-                dfeta_Spent = false,
-                dfeta_StartDate = sanction.StartDate?.ToDateTimeWithDqtBstFix(isLocalTime: true)
             });
         }
 

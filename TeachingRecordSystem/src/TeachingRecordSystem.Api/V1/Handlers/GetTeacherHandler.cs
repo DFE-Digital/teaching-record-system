@@ -3,6 +3,7 @@ using MediatR;
 using TeachingRecordSystem.Api.V1.Requests;
 using TeachingRecordSystem.Api.V1.Responses;
 using TeachingRecordSystem.Api.V2.ApiModels;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
@@ -11,10 +12,12 @@ namespace TeachingRecordSystem.Api.V1.Handlers;
 public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherResponse>
 {
     private readonly IDataverseAdapter _dataverseAdapter;
+    private readonly TrsDbContext _dbContext;
 
-    public GetTeacherHandler(IDataverseAdapter dataverseAdapter)
+    public GetTeacherHandler(IDataverseAdapter dataverseAdapter, TrsDbContext dbContext)
     {
         _dataverseAdapter = dataverseAdapter;
+        _dbContext = dbContext;
     }
 
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
@@ -66,11 +69,13 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             teacher.dfeta_contact_dfeta_qualification = qualifications;
         }
 
-        var response = MapContactToResponse(teacher);
+        var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
+
+        var response = MapContactToResponse(teacher, hasActiveAlert);
         return response;
     }
 
-    internal static GetTeacherResponse MapContactToResponse(Contact teacher)
+    internal static GetTeacherResponse MapContactToResponse(Contact teacher, bool hasActiveAlert)
     {
         return new GetTeacherResponse()
         {
@@ -82,7 +87,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             Qualifications = MapQualifications(),
             Name = teacher.FullName,
             DateOfBirth = teacher.BirthDate,
-            ActiveAlert = teacher.dfeta_ActiveSanctions,
+            ActiveAlert = hasActiveAlert,
             State = teacher.StateCode.Value,
             StateName = teacher.FormattedValues[Contact.Fields.StateCode]
         };

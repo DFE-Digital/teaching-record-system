@@ -152,11 +152,10 @@ public class CreateContactTests : IAsyncLifetime
             Trn = trn2,
             PotentialDuplicates =
             [
-                new FindPotentialDuplicateContactsResult()
+                (Duplicate: new FindPotentialDuplicateContactsResult()
                 {
                     ContactId = createdTeacherId1,
                     MatchedAttributes = [Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName],
-                    HasActiveSanctions = false,
                     HasEytsDate = false,
                     HasQtsDate = false,
                     FirstName = firstName,
@@ -164,7 +163,8 @@ public class CreateContactTests : IAsyncLifetime
                     LastName = lastName,
                     DateOfBirth = dob,
                     EmailAddress = email
-                }
+                },
+                HasActiveAlert: false)
             ]
         };
         var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query2);
