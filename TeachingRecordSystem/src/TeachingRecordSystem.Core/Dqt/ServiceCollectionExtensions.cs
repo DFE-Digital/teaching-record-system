@@ -21,12 +21,37 @@ public static partial class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddPooledDefaultServiceClient(
+        this IServiceCollection services,
+        ServiceClient baseServiceClient,
+        int size)
+    {
+        services.AddKeyedSingleton(serviceKey: null, PooledOrganizationService.Create(baseServiceClient, size));
+
+        services.AddDefaultServiceClient(ServiceLifetime.Singleton, sp => sp.GetRequiredKeyedService<PooledOrganizationService>(serviceKey: null));
+
+        return services;
+    }
+
+    public static IServiceCollection AddPooledNamedServiceClient(
+        this IServiceCollection services,
+        string name,
+        ServiceClient baseServiceClient,
+        int size)
+    {
+        services.AddKeyedSingleton(name, PooledOrganizationService.Create(baseServiceClient, size));
+
+        services.AddNamedServiceClient(name, ServiceLifetime.Singleton, sp => sp.GetRequiredKeyedService<PooledOrganizationService>(name));
+
+        return services;
+    }
+
     public static IServiceCollection AddDefaultServiceClient(
         this IServiceCollection services,
         ServiceLifetime lifetime,
-        Func<IServiceProvider, IOrganizationServiceAsync2> createServiceClient)
+        Func<IServiceProvider, IOrganizationServiceAsync2> getServiceClient)
     {
-        services.AddServiceClient(name: null, lifetime, createServiceClient);
+        services.AddServiceClient(name: null, lifetime, getServiceClient);
 
         services.AddSingleton<ReferenceDataCache>();
 
@@ -37,9 +62,9 @@ public static partial class ServiceCollectionExtensions
         this IServiceCollection services,
         string name,
         ServiceLifetime lifetime,
-        Func<IServiceProvider, IOrganizationServiceAsync2> createServiceClient)
+        Func<IServiceProvider, IOrganizationServiceAsync2> getServiceClient)
     {
-        return AddServiceClient(services, name, lifetime, createServiceClient);
+        return AddServiceClient(services, name, lifetime, getServiceClient);
     }
 
     public static IServiceCollection AddCrmEntityChangesService(
@@ -73,14 +98,14 @@ public static partial class ServiceCollectionExtensions
         this IServiceCollection services,
         string? name,
         ServiceLifetime lifetime,
-        Func<IServiceProvider, IOrganizationServiceAsync2> createServiceClient)
+        Func<IServiceProvider, IOrganizationServiceAsync2> getServiceClient)
     {
         services.TryAddSingleton<ICrmServiceClientProvider, CrmServiceClientProvider>();
 
         services.Add(ServiceDescriptor.DescribeKeyed(
             typeof(IOrganizationServiceAsync2),
             name,
-            implementationFactory: (IServiceProvider serviceProvider, object? key) => createServiceClient(serviceProvider),
+            implementationFactory: (IServiceProvider serviceProvider, object? key) => getServiceClient(serviceProvider),
             lifetime));
 
         services.Add(ServiceDescriptor.DescribeKeyed(

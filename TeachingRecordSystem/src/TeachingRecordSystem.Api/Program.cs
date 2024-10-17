@@ -220,7 +220,7 @@ public class Program
         {
             var crmServiceClient = GetCrmServiceClient();
             services.AddTrnGenerationApi(configuration);
-            services.AddDefaultServiceClient(ServiceLifetime.Transient, _ => crmServiceClient.Clone());
+            services.AddPooledDefaultServiceClient(crmServiceClient, size: 200);
             services.AddTransient<IDataverseAdapter, DataverseAdapter>();
 
             services.AddHealthChecks()
