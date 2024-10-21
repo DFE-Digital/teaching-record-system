@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.ServiceModel;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -29,9 +30,24 @@ internal sealed class PooledOrganizationService : IOrganizationServiceAsync2, ID
     private async Task<TResult> WithPooledConnectionAsync<TResult>(Func<IOrganizationServiceAsync2, Task<TResult>> action, CancellationToken cancellationToken = default)
     {
         var client = _pool.Take(cancellationToken);
+
         try
         {
-            return await action(client);
+            var attempts = 0;
+
+            do
+            {
+                try
+                {
+                    attempts++;
+                    return await action(client);
+                }
+                catch (CommunicationException ex) when (ex.Message == "An error occurred while sending the request." && attempts < 2)
+                {
+                    continue;
+                }
+            }
+            while (true);
         }
         finally
         {
@@ -46,18 +62,8 @@ internal sealed class PooledOrganizationService : IOrganizationServiceAsync2, ID
             return 1;
         });
 
-    private TResult WithPooledConnection<TResult>(Func<IOrganizationServiceAsync2, TResult> action)
-    {
-        var client = _pool.Take();
-        try
-        {
-            return action(client);
-        }
-        finally
-        {
-            _pool.Add(client);
-        }
-    }
+    private TResult WithPooledConnection<TResult>(Func<IOrganizationServiceAsync2, TResult> action) =>
+        WithPooledConnectionAsync<TResult>(client => Task.FromResult(action(client))).GetAwaiter().GetResult();
 
     private void WithPooledConnection(Action<IOrganizationServiceAsync2> action) =>
         WithPooledConnection(client =>
