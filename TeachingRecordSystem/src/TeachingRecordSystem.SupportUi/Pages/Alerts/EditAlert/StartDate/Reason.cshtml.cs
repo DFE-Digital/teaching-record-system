@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
+    public const int ChangeReasonDetailMaxLength = 4000;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -33,11 +34,17 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public AlertChangeStartDateReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
+    [Display(Name = "Do you want to add additional detail?")]
+    [Required(ErrorMessage = "Select yes if you want to add additional detail")]
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    [BindProperty]
     [Display(Name = "Enter details")]
+    [MaxLength(ChangeReasonDetailMaxLength, ErrorMessage = "Details must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Upload evidence")]
+    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 
@@ -57,6 +64,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public async Task OnGet()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
+        HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
@@ -69,9 +77,9 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public async Task<IActionResult> OnPost()
     {
-        if (ChangeReason == AlertChangeStartDateReasonOption.AnotherReason && string.IsNullOrWhiteSpace(ChangeReasonDetail))
+        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
         {
-            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter details");
+            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
 
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
@@ -117,6 +125,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
+            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail = ChangeReasonDetail;
             state.UploadEvidence = UploadEvidence;
         });
@@ -132,7 +141,8 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.StartDate is null)
+        if (JourneyInstance!.State.StartDate is null ||
+            JourneyInstance.State.StartDate == JourneyInstance.State.CurrentStartDate)
         {
             context.Result = Redirect(linkGenerator.AlertEditStartDate(AlertId, JourneyInstance.InstanceId));
             return;

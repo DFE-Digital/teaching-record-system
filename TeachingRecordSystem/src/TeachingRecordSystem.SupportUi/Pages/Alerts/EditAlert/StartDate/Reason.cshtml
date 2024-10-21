@@ -25,9 +25,21 @@
                     </govuk-radios-item>
                     <govuk-radios-item value="@AlertChangeStartDateReasonOption.AnotherReason">
                         @AlertChangeStartDateReasonOption.AnotherReason.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <govuk-radios asp-for="HasAdditionalReasonDetail">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-item value="@true">
+                        Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count asp-for="ChangeReasonDetail" label-class="govuk-label--m" max-length="4000" />
+                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="4000" />
                         </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>

@@ -206,6 +206,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = originalAlert.StartDate,
                     EndDate = null
                 },
+                ChangeReason = null,
                 ChangeReasonDetail = changeReason == CloseAlertReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
                 EvidenceFile = new()
                 {

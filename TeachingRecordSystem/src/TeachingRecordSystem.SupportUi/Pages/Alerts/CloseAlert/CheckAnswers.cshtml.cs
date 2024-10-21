@@ -65,7 +65,8 @@ public class CheckAnswersModel(
             PersonId = PersonId,
             Alert = EventModels.Alert.FromModel(alert),
             OldAlert = oldAlertEventModel,
-            ChangeReasonDetail = ChangeReason,
+            ChangeReason = null!,
+            ChangeReasonDetail = ChangeReason,  // FIXME
             EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
             new EventModels.File()
             {

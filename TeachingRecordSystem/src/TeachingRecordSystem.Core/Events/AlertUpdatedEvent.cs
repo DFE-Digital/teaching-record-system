@@ -9,6 +9,7 @@ public record class AlertUpdatedEvent : EventBase, IEventWithPersonId, IEventWit
     public required Guid PersonId { get; init; }
     public required Alert Alert { get; init; }
     public required Alert OldAlert { get; init; }
+    public required string? ChangeReason { get; init; }
     public required string? ChangeReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
     public required AlertUpdatedEventChanges Changes { get; init; }

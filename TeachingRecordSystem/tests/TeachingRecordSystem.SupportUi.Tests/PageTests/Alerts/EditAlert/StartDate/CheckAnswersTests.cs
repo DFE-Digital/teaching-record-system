@@ -54,13 +54,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileName = "test.pdf";
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
         var alertId = person.Alerts.Single().AlertId;
+
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             new EditAlertStartDateState()
             {
                 Initialized = true,
+                CurrentStartDate = databaseStartDate,
                 StartDate = journeyStartDate,
                 ChangeReason = changeReason,
+                HasAdditionalReasonDetail = populateOptional,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = populateOptional ? true : false,
                 EvidenceFileId = populateOptional ? evidenceFileId : null,
@@ -74,17 +77,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(journeyStartDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("new-start-date")!.TextContent);
-        Assert.Equal(databaseStartDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("current-start-date")!.TextContent);
-        if (changeReason == AlertChangeStartDateReasonOption.AnotherReason)
-        {
-            Assert.Equal(changeReasonDetail, doc.GetElementByTestId("change-reason")!.TextContent);
-        }
-        else
-        {
-            Assert.Equal(changeReason.GetDisplayName(), doc.GetElementByTestId("change-reason")!.TextContent);
-        }
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetElementByTestId("uploaded-evidence-link")!.TextContent);
+        Assert.Equal(journeyStartDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("New start date"));
+        Assert.Equal(databaseStartDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Current start date"));
+        Assert.Equal(changeReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
+        Assert.Equal(populateOptional ? changeReasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]
@@ -146,8 +143,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditAlertStartDateState()
             {
                 Initialized = true,
+                CurrentStartDate = databaseStartDate,
                 StartDate = journeyStartDate,
                 ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = true,
                 EvidenceFileId = evidenceFileId,
@@ -198,7 +197,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = databaseStartDate,
                     EndDate = originalAlert.EndDate
                 },
-                ChangeReasonDetail = changeReason == AlertChangeStartDateReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
+                ChangeReason = changeReason.GetDisplayName(),
+                ChangeReasonDetail = changeReasonDetail,
                 EvidenceFile = new()
                 {
                     FileId = evidenceFileId,
@@ -227,13 +227,16 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileName = "test.pdf";
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
         var alertId = person.Alerts.Single().AlertId;
+
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             new EditAlertStartDateState()
             {
                 Initialized = true,
+                CurrentStartDate = databaseStartDate,
                 StartDate = journeyStartDate,
                 ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = true,
                 EvidenceFileId = evidenceFileId,

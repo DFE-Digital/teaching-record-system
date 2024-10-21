@@ -21,7 +21,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter a new start date")]
+    [Display(Name = "Start date")]  // https://github.com/gunndabad/govuk-frontend-aspnetcore/issues/282
     public DateOnly? StartDate { get; set; }
 
     public DateOnly? CurrentStartDate { get; set; }
@@ -67,12 +67,6 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
-        if (alertInfo.Alert.EndDate is not null)
-        {
-            context.Result = BadRequest();
-            return;
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         JourneyInstance!.State.EnsureInitialized(alertInfo);
