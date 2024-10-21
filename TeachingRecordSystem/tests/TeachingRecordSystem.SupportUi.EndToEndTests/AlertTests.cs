@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
@@ -107,8 +108,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnEditAlertStartDateChangeReasonPage(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
-        await page.Locator("div.govuk-form-group:has-text('Do you want to add additional detail?')").Locator("label:text-is('Yes')").CheckAsync();
-        await page.FillAsync("label:text-is('Enter details')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the start date?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")
@@ -174,6 +175,69 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.ClickContinueButton();
 
         await page.AssertOnEditAlertEndDateCheckAnswersPage(alertId);
+
+        await page.ClickConfirmChangeButton();
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.AssertFlashMessage("Alert changed");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EditAlertLink(bool hasCurrentLink)
+    {
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var link = hasCurrentLink ? TestData.GenerateUrl() : null;
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithExternalLink(link)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts.First().AlertId;
+        var newLink = TestData.GenerateUrl();
+        var changeReason = AlertChangeLinkReasonOption.ChangeOfLink;
+        var changeReasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertLinkPage(alertId);
+
+        await page.AssertOnEditAlertLinkPage(alertId);
+
+        if (hasCurrentLink)
+        {
+            await page.CheckAsync("label:text-is('Change link')");
+        }
+        else
+        {
+            await page.CheckAsync("label:text-is('Yes')");
+        }
+
+        await page.FillAsync("label:text-is('Enter link to panel outcome')", newLink);
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditAlertLinkChangeReasonPage(alertId);
+
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the panel outcome link?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditAlertLinkCheckAnswersPage(alertId);
 
         await page.ClickConfirmChangeButton();
 
