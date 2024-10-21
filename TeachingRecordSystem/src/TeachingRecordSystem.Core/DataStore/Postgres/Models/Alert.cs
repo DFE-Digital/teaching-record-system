@@ -13,6 +13,7 @@ public class Alert
     public AlertType AlertType { get; } = null!;
     public required Guid AlertTypeId { get; init; }
     public required Guid PersonId { get; init; }
+    public Person Person { get; } = null!;
     public required string? Details { get; init; }
     public required string? ExternalLink { get; set; }
     public required DateOnly? StartDate { get; set; }

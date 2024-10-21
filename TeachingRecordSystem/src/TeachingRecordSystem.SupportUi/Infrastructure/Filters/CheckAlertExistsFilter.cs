@@ -10,10 +10,9 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// <remarks>
 /// <para>Returns a <see cref="StatusCodes.Status400BadRequest"/> response if the request is missing the alertId route value.</para>
 /// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no alert with the specified ID exists.</para>
-/// <para>Assigns the <see cref="CurrentMandatoryQualificationFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
+/// <para>Assigns the <see cref="CurrentAlertFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
-public class CheckAlertExistsFilter(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher) :
-    AssignCurrentPersonInfoFilterBase(crmQueryDispatcher), IAsyncResourceFilter
+public class CheckAlertExistsFilter(TrsDbContext dbContext) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -26,6 +25,7 @@ public class CheckAlertExistsFilter(TrsDbContext dbContext, ICrmQueryDispatcher 
 
         var currentAlert = await dbContext.Alerts
             .Include(a => a.AlertType)
+            .Include(a => a.Person)
             .SingleOrDefaultAsync(a => a.AlertId == alertId);
 
         if (currentAlert is null)
@@ -35,8 +35,7 @@ public class CheckAlertExistsFilter(TrsDbContext dbContext, ICrmQueryDispatcher 
         }
 
         context.HttpContext.SetCurrentAlertFeature(new(currentAlert));
-
-        await TryAssignCurrentPersonInfo(currentAlert.PersonId, context.HttpContext);
+        context.HttpContext.SetCurrentPersonFeature(currentAlert.Person);
 
         await next();
     }
