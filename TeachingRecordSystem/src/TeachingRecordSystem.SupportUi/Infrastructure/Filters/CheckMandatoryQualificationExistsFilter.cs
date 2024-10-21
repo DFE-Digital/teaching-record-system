@@ -12,8 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no Mandatory Qualification with the specified ID exists.</para>
 /// <para>Assigns the <see cref="CurrentMandatoryQualificationFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
-public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher) :
-    AssignCurrentPersonInfoFilterBase(crmQueryDispatcher), IAsyncResourceFilter
+public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -26,6 +25,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext, ICr
 
         var currentMq = await dbContext.MandatoryQualifications
             .Include(mq => mq.Provider)
+            .Include(mq => mq.Person)
             .SingleOrDefaultAsync(mq => mq.QualificationId == qualificationId);
 
         if (currentMq is null)
@@ -35,8 +35,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext, ICr
         }
 
         context.HttpContext.SetCurrentMandatoryQualificationFeature(new(currentMq));
-
-        await TryAssignCurrentPersonInfo(currentMq.PersonId, context.HttpContext);
+        context.HttpContext.SetCurrentPersonFeature(currentMq.Person);
 
         await next();
     }

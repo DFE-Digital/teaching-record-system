@@ -10,6 +10,7 @@ public abstract class Qualification
     public DateTime? DeletedOn { get; set; }
     public QualificationType QualificationType { get; }
     public required Guid PersonId { get; init; }
+    public Person Person { get; } = null!;
 
     public Guid? DqtQualificationId { get; set; }
     public DateTime? DqtFirstSync { get; set; }

@@ -2756,7 +2756,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_alerts_alert_type");
 
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany("Alerts")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2764,6 +2764,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_alerts_person");
 
                     b.Navigation("AlertType");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.AlertType", b =>
@@ -2860,12 +2862,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Qualification", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
                         .WithMany("Qualifications")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_qualifications_person");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTask", b =>
