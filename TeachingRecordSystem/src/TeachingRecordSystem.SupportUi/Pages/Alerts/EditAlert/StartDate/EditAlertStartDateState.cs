@@ -19,6 +19,8 @@ public class EditAlertStartDateState : IRegisterJourney
 
     public AlertChangeStartDateReasonOption? ChangeReason { get; set; }
 
+    public bool? HasAdditionalReasonDetail { get; set; }
+
     public string? ChangeReasonDetail { get; set; }
 
     public bool? UploadEvidence { get; set; }
@@ -30,10 +32,10 @@ public class EditAlertStartDateState : IRegisterJourney
     public string? EvidenceFileSizeDescription { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(StartDate), nameof(ChangeReason), nameof(UploadEvidence), nameof(EvidenceFileId))]
-    public bool IsComplete => StartDate is not null &&
+    [MemberNotNullWhen(true, nameof(StartDate), nameof(ChangeReason), nameof(HasAdditionalReasonDetail), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    public bool IsComplete => StartDate is not null && StartDate != CurrentStartDate &&
         ChangeReason.HasValue &&
-        (ChangeReason.Value == AlertChangeStartDateReasonOption.AnotherReason ? !string.IsNullOrWhiteSpace(ChangeReasonDetail) : true) &&
+        HasAdditionalReasonDetail.HasValue &&
         UploadEvidence.HasValue &&
         (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 

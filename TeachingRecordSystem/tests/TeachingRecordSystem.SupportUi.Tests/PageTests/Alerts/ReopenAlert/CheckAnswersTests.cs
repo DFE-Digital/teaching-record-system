@@ -173,7 +173,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await WithDbContext(async dbContext =>
         {
-            var updatedAlert = await dbContext.Alerts.FirstOrDefaultAsync(a => a.AlertId == alertId);
+            var updatedAlert = await dbContext.Alerts.SingleAsync(a => a.AlertId == alertId);
             Assert.Null(updatedAlert!.EndDate);
         });
 
@@ -203,6 +203,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                     StartDate = originalAlert.StartDate,
                     EndDate = originalAlert.EndDate
                 },
+                ChangeReason = null,
                 ChangeReasonDetail = changeReason == ReopenAlertReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
                 EvidenceFile = new()
                 {

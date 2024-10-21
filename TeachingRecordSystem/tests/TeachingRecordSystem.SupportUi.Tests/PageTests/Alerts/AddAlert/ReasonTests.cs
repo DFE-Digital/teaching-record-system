@@ -376,12 +376,15 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             StartDate = new DateOnly(2022, 1, 1)
         });
 
+        var reason = AddAlertReasonOption.AnotherReason;
+        var hasAdditionalReasonDetail = false;
+
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HasAdditionalReasonDetail", bool.FalseString },
+                { "AddReason", reason },
+                { "HasAdditionalReasonDetail", hasAdditionalReasonDetail },
                 { "UploadEvidence", bool.FalseString }
             }
         };
@@ -394,6 +397,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.StartsWith($"/alerts/add/check-answers?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(reason, journeyInstance.State.AddReason);
+        Assert.Equal(hasAdditionalReasonDetail, journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Null(journeyInstance.State.AddReasonDetail);
         Assert.Null(journeyInstance.State.EvidenceFileName);
         Assert.Null(journeyInstance.State.EvidenceFileId);
         Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
@@ -405,7 +411,6 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePerson();
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-        var evidenceFileName = "evidence.pdf";
 
         var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
         {
@@ -416,14 +421,18 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             StartDate = new DateOnly(2022, 1, 1)
         });
 
+        var reason = AddAlertReasonOption.AnotherReason;
+        var hasAdditionalReasonDetail = false;
+        var evidenceFileName = "evidence.pdf";
+
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HasAdditionalReasonDetail", bool.FalseString },
+                { "AddReason", reason },
+                { "HasAdditionalReasonDetail", hasAdditionalReasonDetail },
                 { "UploadEvidence", bool.TrueString },
-                { "EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName}
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName }
             }
         };
 
@@ -435,6 +444,9 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.StartsWith($"/alerts/add/check-answers?personId={person.PersonId}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(reason, journeyInstance.State.AddReason);
+        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Null(journeyInstance.State.AddReasonDetail);
         Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
         Assert.NotNull(journeyInstance.State.EvidenceFileId);
         Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
