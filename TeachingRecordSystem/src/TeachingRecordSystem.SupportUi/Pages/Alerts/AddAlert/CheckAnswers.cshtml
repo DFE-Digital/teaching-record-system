@@ -19,14 +19,14 @@
                     <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.AlertTypeName</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddType(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddType(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="alert type">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value><multi-line-text text="@Model.Details" /></govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -42,21 +42,21 @@
                     }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddLink(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddLink(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.StartDate.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for adding</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.AddReason.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for adding">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -72,7 +72,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -88,7 +88,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertAddReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>
