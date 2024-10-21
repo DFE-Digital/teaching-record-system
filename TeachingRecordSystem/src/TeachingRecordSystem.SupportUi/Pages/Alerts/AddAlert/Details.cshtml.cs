@@ -8,6 +8,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 {
+    public const int DetailsMaxLength = 4000;
+
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -23,6 +25,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
     [BindProperty]
     [Required(ErrorMessage = "Enter details")]
     [Display(Description = "For example, include any restrictions it places on a teacher.")]
+    [MaxLength(DetailsMaxLength, ErrorMessage = "Details must be 4000 characters or less")]
     public string? Details { get; set; }
 
     public void OnGet()

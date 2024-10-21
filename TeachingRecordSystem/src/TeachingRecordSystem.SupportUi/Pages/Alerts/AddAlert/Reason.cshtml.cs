@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
+    public const int AddReasonDetailMaxLength = 4000;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -33,10 +34,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     [BindProperty]
     [Display(Name = "Do you want to add more information about why you’re adding this alert?")]
     [Required(ErrorMessage = "Select yes if you want to add more information about why you’re adding this alert")]
-    public bool? HaveAdditionalReasonDetail { get; set; }
+    public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
+    [MaxLength(AddReasonDetailMaxLength, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? AddReasonDetail { get; set; }
 
     [BindProperty]
@@ -60,7 +62,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public async Task OnGet()
     {
         AddReason = JourneyInstance!.State.AddReason;
-        HaveAdditionalReasonDetail = JourneyInstance!.State.HaveAdditionalReasonDetail;
+        HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         AddReasonDetail = JourneyInstance!.State.AddReasonDetail;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
@@ -70,7 +72,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public async Task<IActionResult> OnPost()
     {
-        if (HaveAdditionalReasonDetail == true && AddReasonDetail is null)
+        if (HasAdditionalReasonDetail == true && AddReasonDetail is null)
         {
             ModelState.AddModelError(nameof(AddReasonDetail), "Enter additional detail");
         }
@@ -118,7 +120,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.AddReason = AddReason;
-            state.HaveAdditionalReasonDetail = HaveAdditionalReasonDetail;
+            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.AddReasonDetail = AddReasonDetail;
             state.UploadEvidence = UploadEvidence;
         });

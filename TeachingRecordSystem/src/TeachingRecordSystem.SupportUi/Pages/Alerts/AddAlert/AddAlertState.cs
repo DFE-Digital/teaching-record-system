@@ -25,7 +25,7 @@ public class AddAlertState : IRegisterJourney
 
     public AddAlertReasonOption? AddReason { get; set; }
 
-    public bool? HaveAdditionalReasonDetail { get; set; }
+    public bool? HasAdditionalReasonDetail { get; set; }
 
     public string? AddReasonDetail { get; set; }
 
@@ -45,7 +45,7 @@ public class AddAlertState : IRegisterJourney
         AddLink.HasValue &&
         StartDate.HasValue &&
         AddReason.HasValue &&
-        HaveAdditionalReasonDetail.HasValue &&
+        HasAdditionalReasonDetail.HasValue &&
         UploadEvidence.HasValue &&
         (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 }
