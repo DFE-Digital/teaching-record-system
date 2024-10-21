@@ -155,6 +155,34 @@ public class DetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_DetailsAreTooLong_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "Details", new string('x', 4001) }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "Details", "Details must be 4000 characters or less");
+    }
+
+    [Fact]
     public async Task Post_ValidInput_UpdatesStateAndRedirectsToLinkPage()
     {
         // Arrange

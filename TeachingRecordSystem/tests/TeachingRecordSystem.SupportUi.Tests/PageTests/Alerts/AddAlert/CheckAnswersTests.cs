@@ -19,7 +19,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             AddLink = false,
             StartDate = new DateOnly(2022, 1, 1),
             AddReason = AddAlertReasonOption.AnotherReason,
-            HaveAdditionalReasonDetail = false
+            HasAdditionalReasonDetail = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -82,7 +82,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Link = link,
             StartDate = startDate,
             AddReason = reason,
-            HaveAdditionalReasonDetail = reasonDetail is not null,
+            HasAdditionalReasonDetail = reasonDetail is not null,
             AddReasonDetail = reasonDetail,
             UploadEvidence = evidenceFileId is not null,
             EvidenceFileId = evidenceFileId,
@@ -120,7 +120,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             AddLink = false,
             StartDate = new DateOnly(2022, 1, 1),
             AddReason = AddAlertReasonOption.AnotherReason,
-            HaveAdditionalReasonDetail = false
+            HasAdditionalReasonDetail = false
         });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -158,7 +158,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Link = link,
             StartDate = startDate,
             AddReason = reason,
-            HaveAdditionalReasonDetail = true,
+            HasAdditionalReasonDetail = true,
             AddReasonDetail = reasonDetail,
             UploadEvidence = true,
             EvidenceFileId = evidenceFileId,
@@ -233,7 +233,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             Link = link,
             StartDate = startDate,
             AddReason = reason,
-            HaveAdditionalReasonDetail = false,
+            HasAdditionalReasonDetail = false,
             UploadEvidence = false
         });
 

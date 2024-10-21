@@ -99,7 +99,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             AddLink = false,
             StartDate = new DateOnly(2022, 1, 1),
             AddReason = reason,
-            HaveAdditionalReasonDetail = true,
+            HasAdditionalReasonDetail = true,
             AddReasonDetail = reasonDetail,
             UploadEvidence = true,
             EvidenceFileId = evidenceFileId,
@@ -116,7 +116,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponse(response);
 
         AssertCheckedRadioOption("AddReason", reason.ToString());
-        AssertCheckedRadioOption("HaveAdditionalReasonDetail", bool.TrueString);
+        AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
         AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
@@ -151,7 +151,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder()
             {
                 { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.FalseString }
             }
         };
@@ -183,7 +183,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.FalseString }
             }
         };
@@ -196,7 +196,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenNoHaveAdditionalReasonDetailIsSelected_ReturnsError()
+    public async Task Post_WhenNoHasAdditionalReasonDetailIsSelected_ReturnsError()
     {
         // Arrange
         var person = await TestData.CreatePerson();
@@ -224,7 +224,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HaveAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this alert");
+        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this alert");
     }
 
     [Fact]
@@ -248,7 +248,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder()
             {
                 { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HaveAdditionalReasonDetail", bool.FalseString }
+                { "HasAdditionalReasonDetail", bool.FalseString }
             }
         };
 
@@ -280,7 +280,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder()
             {
                 { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.TrueString }
             }
         };
@@ -313,7 +313,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder()
             {
                 { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.TrueString },
                 { "EvidenceFile", CreateEvidenceFileBinaryContent(), "badfile.exe"}
             }
@@ -324,6 +324,40 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+    }
+
+    [Fact]
+    public async Task Post_AdditionalReasonIsTooLong_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "AddReason", AddAlertReasonOption.AnotherReason },
+                { "HasAdditionalReasonDetail", bool.TrueString },
+                { "AddReasonDetail", new string('x', 4001) },
+                { "UploadEvidence", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "AddReasonDetail", "Additional detail must be 4000 characters or less");
     }
 
     [Fact]
@@ -347,7 +381,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder()
             {
                 { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.FalseString }
             }
         };
@@ -387,7 +421,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new MultipartFormDataContentBuilder()
             {
                 { "AddReason", AddAlertReasonOption.AnotherReason },
-                { "HaveAdditionalReasonDetail", bool.FalseString },
+                { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.TrueString },
                 { "EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName}
             }
