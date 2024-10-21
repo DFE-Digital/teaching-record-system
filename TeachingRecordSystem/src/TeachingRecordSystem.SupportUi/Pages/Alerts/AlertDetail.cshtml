@@ -22,9 +22,12 @@
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action href="@LinkGenerator.AlertReopen(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Remove</govuk-summary-list-row-action>
-            <govuk-summary-list-row-action href="@LinkGenerator.AlertEditEndDate(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
+        @if (Model.CanEdit)
+        {
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action href="@LinkGenerator.AlertReopen(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Remove</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action href="@LinkGenerator.AlertEditEndDate(Model.Alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        }
     </govuk-summary-list-row>
 </govuk-summary-list>

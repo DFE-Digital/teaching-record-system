@@ -2,8 +2,33 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests : TestBase
 {
+    public IndexTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
@@ -80,6 +105,35 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"{journeyStartDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyStartDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyStartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = Clock.Today.AddDays(-20);
+        var newStartDate = Clock.Today.AddDays(-18);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "StartDate.Day", newStartDate.Day },
+                { "StartDate.Month", newStartDate.Month },
+                { "StartDate.Year", newStartDate.Year },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

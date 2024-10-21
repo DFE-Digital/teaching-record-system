@@ -2,8 +2,42 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests : TestBase
 {
+    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1),
+            AddReason = AddAlertReasonOption.AnotherReason,
+            HasAdditionalReasonDetail = false
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -103,6 +137,43 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Start date"));
         Assert.Equal(reason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for adding"));
         Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).Where(a => a.IsActive).RandomOne();
+        var details = "Some details";
+        var link = TestData.GenerateUrl();
+        var startDate = new DateOnly(2021, 1, 1);
+        var reason = AddAlertReasonOption.AnotherReason;
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = details,
+            AddLink = true,
+            Link = link,
+            StartDate = startDate,
+            AddReason = reason,
+            HasAdditionalReasonDetail = false,
+            UploadEvidence = false
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

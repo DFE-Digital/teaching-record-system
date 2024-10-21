@@ -2,8 +2,13 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests : TestBase
 {
+    public IndexTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {

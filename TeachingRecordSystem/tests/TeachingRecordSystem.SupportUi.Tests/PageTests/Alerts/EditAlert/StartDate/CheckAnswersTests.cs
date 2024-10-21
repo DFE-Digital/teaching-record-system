@@ -2,8 +2,49 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CheckAnswersTests : TestBase
 {
+    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var journeyStartDate = new DateOnly(2021, 10, 6);
+        var changeReason = AlertChangeStartDateReasonOption.AnotherReason;
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
+        var alertId = person.Alerts.Single().AlertId;
+
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new EditAlertStartDateState()
+            {
+                Initialized = true,
+                CurrentStartDate = databaseStartDate,
+                StartDate = journeyStartDate,
+                ChangeReason = changeReason,
+                HasAdditionalReasonDetail = false,
+                ChangeReasonDetail = null,
+                UploadEvidence = false,
+                EvidenceFileId = null,
+                EvidenceFileName = null
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
@@ -213,6 +254,45 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var journeyStartDate = new DateOnly(2021, 10, 6);
+        var changeReason = AlertChangeStartDateReasonOption.IncorrectStartDate;
+        var changeReasonDetail = "Some reason or other";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "test.pdf";
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
+        var alertId = person.Alerts.Single().AlertId;
+
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new EditAlertStartDateState()
+            {
+                Initialized = true,
+                CurrentStartDate = databaseStartDate,
+                StartDate = journeyStartDate,
+                ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = true,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = evidenceFileName
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

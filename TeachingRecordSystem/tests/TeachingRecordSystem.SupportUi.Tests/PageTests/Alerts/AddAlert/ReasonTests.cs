@@ -2,8 +2,40 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests : TestBase
 {
+    public ReasonTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var personId = Guid.NewGuid();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -128,6 +160,33 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             var selectedOption = doc.GetElementsByName(name).SingleOrDefault(r => r.HasAttribute("checked"));
             Assert.Equal(expectedCheckedValue, selectedOption?.GetAttribute("value"));
         }
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson();
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState
+        {
+            AlertTypeId = alertType.AlertTypeId,
+            AlertTypeName = alertType.Name,
+            Details = "Details",
+            AddLink = false,
+            StartDate = new DateOnly(2022, 1, 1)
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -12,7 +11,7 @@ public class Conventions : IConfigureFolderConventions
             this.GetFolderPathFromNamespace(),
             model =>
             {
-                model.Filters.Add(new ServiceFilterAttribute<CheckAlertExistsFilter>());
+                model.Filters.Add(new CheckAlertExistsFilterFactory(requiredPermission: Permissions.Alerts.Write));
             });
     }
 }

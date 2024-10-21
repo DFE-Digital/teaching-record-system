@@ -1,24 +1,27 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts;
 
-[ServiceFilter(typeof(CheckAlertExistsFilter)), ServiceFilter(typeof(RequireClosedAlertFilter))]
-public class AlertDetailModel(TrsDbContext dbContext) : PageModel
+[CheckAlertExistsFilterFactory(requiredPermission: Permissions.Alerts.Read), ServiceFilter(typeof(RequireClosedAlertFilter))]
+public class AlertDetailModel(IAuthorizationService authorizationService) : PageModel
 {
-    [FromRoute]
-    public Guid AlertId { get; set; }
-
     public Alert? Alert { get; set; }
+
+    public bool CanEdit { get; set; }
 
     public async Task OnGet()
     {
-        Alert = await dbContext.Alerts
-            .Include(a => a.AlertType)
-            .ThenInclude(at => at.AlertCategory)
-            .SingleAsync(a => a.AlertId == AlertId);
+        Alert = HttpContext.Features.GetRequiredFeature<CurrentAlertFeature>().Alert;
+
+        CanEdit = (await authorizationService.AuthorizeForAlertTypeAsync(
+            User,
+            Alert.AlertTypeId,
+            Permissions.Alerts.Write)) is { Succeeded: true };
     }
 }

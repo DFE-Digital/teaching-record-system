@@ -1,7 +1,14 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts;
 
-public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class AlertDetailsTests : TestBase
 {
+    public AlertDetailsTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsReader);
+    }
+
     [Fact]
     public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
@@ -58,5 +65,151 @@ public class AlertDetailsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
         Assert.Equal(alert.StartDate?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Start date"));
         Assert.Equal(alert.EndDate?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("End date"));
+    }
+
+    [Fact]
+    public async Task Get_AlertIsDbsAlertAndUserDoesNotHavePermissionToRead_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToRead_ReturnsOk()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertReader);
+
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToReadAndWrite_ReturnsOk()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertWriter);
+
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_DbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertReader);
+
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
+    }
+
+    [Fact]
+    public async Task Get_DbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertWriter);
+
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
+    }
+
+    [Fact]
+    public async Task Get_NonDbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
+    }
+
+    [Fact]
+    public async Task Get_NonDbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NonDbsAlertWriter);
+
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePerson(b => b
+            .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
+
+        var alert = person.Alerts.Single();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
     }
 }

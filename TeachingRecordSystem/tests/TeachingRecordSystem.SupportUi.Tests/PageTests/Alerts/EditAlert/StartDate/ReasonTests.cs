@@ -3,8 +3,34 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests : TestBase
 {
+    public ReasonTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var journeyStartDate = new DateOnly(2021, 10, 6);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate, newStartDate: journeyStartDate);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
@@ -132,6 +158,40 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             var selectedOption = doc.GetElementsByName(name).SingleOrDefault(r => r.HasAttribute("checked"));
             Assert.Equal(expectedCheckedValue, selectedOption?.GetAttribute("value"));
         }
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var journeyStartDate = new DateOnly(2021, 10, 6);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate, newStartDate: journeyStartDate);
+
+        var reason = AlertChangeStartDateReasonOption.AnotherReason;
+        var HasAdditionalReasonDetail = true;
+        var reasonDetail = "More details";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "ChangeReason", reason },
+                { "HasAdditionalReasonDetail", HasAdditionalReasonDetail },
+                { "ChangeReasonDetail", reasonDetail },
+                { "UploadEvidence", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

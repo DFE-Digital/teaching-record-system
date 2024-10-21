@@ -1,9 +1,34 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class TypeTests : TestBase
 {
+    public TypeTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -39,6 +64,92 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsRole()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertWriter);
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
+        Assert.Contains(AlertType.DbsAlertTypeId, alertTypeOptions);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_ShowsDbsRole()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NonDbsAlertWriter);
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
+        Assert.DoesNotContain(AlertType.DbsAlertTypeId, alertTypeOptions);
+    }
+
+    [Fact]
+    public async Task Get_UserHasAlertsReadWriteRole_ShowsAllNonDbsRoles()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NonDbsAlertWriter);
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
+        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).Where(t => !t.IsDbsAlertType);
+        Assert.True(alertTypeOptions.SequenceEqualIgnoringOrder(nonDbsAlertTypes.Select(t => t.AlertTypeId)));
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHaveAlertsReadWriteRole_DoesNotShowAnyNonDbsRoles()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertWriter);
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
+        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).Where(t => !t.IsDbsAlertType);
+        Assert.True(nonDbsAlertTypes.All(t => !alertTypeOptions.Contains(t.AlertTypeId)));
+    }
+
+    [Fact]
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
@@ -61,6 +172,25 @@ public class TypeTests(HostFixture hostFixture) : TestBase(hostFixture)
         var radioButtons = doc.GetElementsByName("AlertTypeId");
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal(alertType.AlertTypeId.ToString(), selectedRadioButton.GetAttribute("value"));
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson();
+
+        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

@@ -2,8 +2,38 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
-public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ConfirmTests : TestBase
 {
+    public ConfirmTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson(b => b.WithAlert());
+        var alert = person.Alerts.Single();
+
+        var journeyInstance = await CreateJourneyInstance(
+            alert.AlertId,
+            new DeleteAlertState
+            {
+                ConfirmDelete = true
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
@@ -77,6 +107,31 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : "-", doc.GetElementByTestId("link")!.TextContent);
         Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
         Assert.Equal(populateOptional ? endDate?.ToString("d MMMM yyyy") : "-", doc.GetElementByTestId("end-date")!.TextContent);
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson(b => b.WithAlert());
+        var alert = person.Alerts.Single();
+
+        var journeyInstance = await CreateJourneyInstance(
+            alert.AlertId,
+            new DeleteAlertState
+            {
+                ConfirmDelete = true
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
