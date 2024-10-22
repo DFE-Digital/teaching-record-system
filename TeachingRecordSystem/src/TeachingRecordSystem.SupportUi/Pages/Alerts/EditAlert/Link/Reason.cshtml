@@ -1,41 +1,41 @@
-@page "/alerts/{alertId}/start-date/change-reason/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate.ReasonModel
+@page "/alerts/{alertId}/link/change-reason/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link.ReasonModel
 @{
-    ViewBag.Title = "Why are you changing the start date?";
+    ViewBag.Title = "Why are you changing the panel outcome link?";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertEditStartDateCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.AlertEditStartDate(Model.AlertId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertEditLinkCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : LinkGenerator.AlertEditLink(Model.AlertId, Model.JourneyInstance!.InstanceId))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.AlertEditStartDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
+        <form action="@LinkGenerator.AlertEditLinkReason(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
             <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-radios asp-for="ChangeReason" data-testid="change-reason-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
-                    <govuk-radios-item value="@AlertChangeStartDateReasonOption.IncorrectStartDate">
-                        @AlertChangeStartDateReasonOption.IncorrectStartDate.GetDisplayName()
+                    <govuk-radios-item value="@AlertChangeLinkReasonOption.IncorrectLink">
+                        @AlertChangeLinkReasonOption.IncorrectLink.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@AlertChangeStartDateReasonOption.ChangeOfStartDate">
-                        @AlertChangeStartDateReasonOption.ChangeOfStartDate.GetDisplayName()
+                    <govuk-radios-item value="@AlertChangeLinkReasonOption.ChangeOfLink">
+                        @AlertChangeLinkReasonOption.ChangeOfLink.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@AlertChangeStartDateReasonOption.AnotherReason">
-                        @AlertChangeStartDateReasonOption.AnotherReason.GetDisplayName()
+                    <govuk-radios-item value="@AlertChangeLinkReasonOption.AnotherReason">
+                        @AlertChangeLinkReasonOption.AnotherReason.GetDisplayName()                        
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <govuk-radios asp-for="HasAdditionalReasonDetail">
+            <govuk-radios asp-for="HasAdditionalReasonDetail" data-testid="has-additional-reason_detail-options">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="@ReasonModel.ChangeReasonDetailMaxLength" />
+                            <govuk-character-count asp-for="ChangeReasonDetail" label-class="govuk-label--m" max-length="@ReasonModel.ChangeReasonDetailMaxLength" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">
@@ -70,8 +70,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <govuk-button formaction="@LinkGenerator.AlertEditStartDateReasonCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button formaction="@LinkGenerator.AlertEditLinkReasonCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
-</div>

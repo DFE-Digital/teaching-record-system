@@ -13,6 +13,7 @@ public static class JourneyNames
     public const string AddAlert = nameof(AddAlert);
     public const string EditAlertStartDate = nameof(EditAlertStartDate);
     public const string EditAlertEndDate = nameof(EditAlertEndDate);
+    public const string EditAlertLink = nameof(EditAlertLink);
     public const string CloseAlert = nameof(CloseAlert);
     public const string ReopenAlert = nameof(ReopenAlert);
     public const string DeleteAlert = nameof(DeleteAlert);

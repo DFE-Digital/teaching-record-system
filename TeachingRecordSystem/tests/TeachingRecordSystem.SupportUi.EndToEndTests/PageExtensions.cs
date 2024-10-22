@@ -46,6 +46,11 @@ public static class PageExtensions
         await page.GotoAsync($"/alerts/{alertId}/end-date");
     }
 
+    public static async Task GoToEditAlertLinkPage(this IPage page, Guid alertId)
+    {
+        await page.GotoAsync($"/alerts/{alertId}/link");
+    }
+
     public static async Task GoToCloseAlertPage(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/close");
@@ -210,6 +215,21 @@ public static class PageExtensions
     public static async Task AssertOnEditAlertEndDateCheckAnswersPage(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/check-answers");
+    }
+
+    public static async Task AssertOnEditAlertLinkPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/link");
+    }
+
+    public static async Task AssertOnEditAlertLinkChangeReasonPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/link/change-reason");
+    }
+
+    public static async Task AssertOnEditAlertLinkCheckAnswersPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/link/check-answers");
     }
 
     public static async Task AssertOnAlertDetailPage(this IPage page, Guid alertId)

@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
+namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
-[Journey(JourneyNames.EditAlertStartDate), RequireJourneyInstance]
+[Journey(JourneyNames.EditAlertLink), RequireJourneyInstance]
 public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
@@ -16,7 +16,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
-    public JourneyInstance<EditAlertStartDateState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditAlertLinkState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
@@ -31,11 +31,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     [BindProperty]
     [Display(Name = "Select a reason")]
     [Required(ErrorMessage = "Select a reason")]
-    public AlertChangeStartDateReasonOption? ChangeReason { get; set; }
+    public AlertChangeLinkReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to add more information about why you’re changing the start date?")]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re changing the start date")]
+    [Display(Name = "Do you want to add more information about why you’re changing the panel outcome link?")]
+    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re changing the panel outcome link")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
@@ -65,7 +65,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
         HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
-        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
+        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
@@ -77,7 +77,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public async Task<IActionResult> OnPost()
     {
-        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
+        if (HasAdditionalReasonDetail == true && string.IsNullOrEmpty(ChangeReasonDetail))
         {
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
@@ -126,11 +126,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         {
             state.ChangeReason = ChangeReason;
             state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail = ChangeReasonDetail;
+            state.ChangeReasonDetail = HasAdditionalReasonDetail!.Value ? ChangeReasonDetail : null;
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(linkGenerator.AlertEditStartDateCheckAnswers(AlertId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.AlertEditLinkCheckAnswers(AlertId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancel()
@@ -141,10 +141,9 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.StartDate is null ||
-            JourneyInstance.State.StartDate == JourneyInstance.State.CurrentStartDate)
+        if (JourneyInstance!.State.AddLink is null)
         {
-            context.Result = Redirect(linkGenerator.AlertEditStartDate(AlertId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.AlertEditLink(AlertId, JourneyInstance.InstanceId));
             return;
         }
 
