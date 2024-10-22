@@ -55,31 +55,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             return NotFound();
         }
 
-        var response = mapper.Map<GetPersonResponse>(result);
-
-        if (User.IsInRole(ApiRoles.AppropriateBody))
-        {
-            response = response with
-            {
-                InitialTeacherTraining = response.InitialTeacherTraining
-                    .Map(itts => itts
-                        .Select(itt => new GetPersonResponseInitialTeacherTraining()
-                        {
-                            Provider = itt.Provider,
-                            Qualification = default,
-                            StartDate = default,
-                            EndDate = default,
-                            ProgrammeType = default,
-                            ProgrammeTypeDescription = default,
-                            Result = default,
-                            AgeRange = default,
-                            Subjects = default
-                        })
-                        .Where(itt => itt.Provider is not null)
-                        .AsReadOnly())
-            };
-        }
-
+        var response = GetPersonResponse.Map(result, mapper, User.IsInRole(ApiRoles.AppropriateBody));
         return Ok(response);
     }
 
