@@ -15,6 +15,36 @@ public partial record GetPersonResponse
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<GetPersonResponseInduction?> Induction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
+
+    public static GetPersonResponse Map(GetPersonResult result, IMapper mapper, bool userHasAppropriateBodyRole)
+    {
+        var response = mapper.Map<GetPersonResponse>(result);
+
+        if (userHasAppropriateBodyRole)
+        {
+            response = response with
+            {
+                InitialTeacherTraining = response.InitialTeacherTraining
+                    .Map(itts => itts
+                        .Select(itt => new GetPersonResponseInitialTeacherTraining()
+                        {
+                            Provider = itt.Provider,
+                            Qualification = default,
+                            StartDate = default,
+                            EndDate = default,
+                            ProgrammeType = default,
+                            ProgrammeTypeDescription = default,
+                            Result = default,
+                            AgeRange = default,
+                            Subjects = default
+                        })
+                        .Where(itt => itt.Provider is not null)
+                        .AsReadOnly())
+            };
+        }
+
+        return response;
+    }
 }
 
 [AutoMap(typeof(GetPersonResultInduction))]
