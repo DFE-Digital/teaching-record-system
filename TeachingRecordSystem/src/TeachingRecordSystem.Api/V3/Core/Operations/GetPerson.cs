@@ -9,7 +9,12 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Api.V3.Core.Operations;
 
-public record GetPersonCommand(string Trn, GetPersonCommandIncludes Include, DateOnly? DateOfBirth, bool ApplyLegacyAlertsBehavior);
+public record GetPersonCommand(
+    string Trn,
+    GetPersonCommandIncludes Include,
+    DateOnly? DateOfBirth,
+    bool ApplyLegacyAlertsBehavior,
+    string? NationalInsuranceNumber = null);
 
 [Flags]
 public enum GetPersonCommandIncludes
@@ -162,6 +167,7 @@ public class GetPersonHandler(
                     Contact.Fields.dfeta_StatedLastName,
                     Contact.Fields.BirthDate,
                     Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.dfeta_NINumber,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.EMailAddress1,
@@ -173,11 +179,32 @@ public class GetPersonHandler(
             return null;
         }
 
-        // If a DateOfBirth was provided, ensure the date of birth of the person we've retrieved matches it
+        // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
         if (command.DateOfBirth is DateOnly dateOfBirth &&
             contactDetail.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dateOfBirth)
         {
             return null;
+        }
+        if (command.NationalInsuranceNumber is not null)
+        {
+            // Check the NINO in DQT first. If that fails, check workforce data in TRS (which may have different NINO(s) for the person).
+
+            var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
+            var dqtNino = contactDetail.Contact.dfeta_NINumber;
+
+            if (string.IsNullOrEmpty(dqtNino) || !dqtNino.Equals(normalizedNino, StringComparison.OrdinalIgnoreCase))
+            {
+                var employmentNinos = await dbContext.TpsEmployments
+                    .Where(e => e.PersonId == contactDetail.Contact.Id && e.NationalInsuranceNumber != null)
+                    .Select(e => e.NationalInsuranceNumber)
+                    .Distinct()
+                    .ToArrayAsync();
+
+                if (!employmentNinos.Any(n => n!.Equals(normalizedNino, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return null;
+                }
+            }
         }
 
         // DataverseAdapter operations share an IOrganizationService, which is not thread-safe in our setup.
