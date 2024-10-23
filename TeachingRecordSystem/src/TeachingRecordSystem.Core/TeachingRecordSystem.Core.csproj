@@ -64,6 +64,7 @@
     <None Remove="Services\DqtReporting\Migrations\0029_TrsPersons.sql" />
     <None Remove="Services\DqtReporting\Migrations\0030_TrsAlerts.sql" />
     <None Remove="Services\DqtReporting\Migrations\0031_TrsAlertsSyncMetadata.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0032_AddMissingProgrammeTypes.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -126,6 +127,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0029_TrsPersons.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0030_TrsAlerts.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0031_TrsAlertsSyncMetadata.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0032_AddMissingProgrammeTypes.sql" />
   </ItemGroup>
 
   <ItemGroup>
