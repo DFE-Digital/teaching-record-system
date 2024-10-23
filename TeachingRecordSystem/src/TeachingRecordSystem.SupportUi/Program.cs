@@ -53,7 +53,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     var graphApiScopes = new[] { "User.Read", "User.ReadBasic.All" };
 
     builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd")
+        .AddMicrosoftIdentityWebApp(builder.Configuration, "AzureAd", cookieScheme: CookieAuthenticationDefaults.AuthenticationScheme)
         .EnableTokenAcquisitionToCallDownstreamApi(initialScopes: graphApiScopes)
         .AddDistributedTokenCaches()
         .AddMicrosoftGraph(defaultScopes: graphApiScopes);
@@ -63,6 +63,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     builder.Services.Configure<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.Cookie.Name = "trs-auth";
+        options.Cookie.MaxAge = TimeSpan.FromHours(8);
 
         options.Events.OnSigningOut = ctx =>
         {
