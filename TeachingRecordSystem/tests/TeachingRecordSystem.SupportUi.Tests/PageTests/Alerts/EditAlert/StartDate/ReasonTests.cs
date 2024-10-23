@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests(HostFixture hostFixture) : StartDateTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()

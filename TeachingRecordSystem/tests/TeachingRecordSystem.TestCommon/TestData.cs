@@ -228,6 +228,8 @@ public partial class TestData
 
     public Contact_GenderCode GenerateGender() => Faker.Enum.Random<Contact_GenderCode>();
 
+    public DateOnly GenerateDate() => GenerateDate(min: new DateOnly(1990, 1, 1), max: new DateOnly(2030, 1, 1));
+
     public DateOnly GenerateDate(DateOnly min, DateOnly? max = null)
     {
         if (max is not null && max <= min)

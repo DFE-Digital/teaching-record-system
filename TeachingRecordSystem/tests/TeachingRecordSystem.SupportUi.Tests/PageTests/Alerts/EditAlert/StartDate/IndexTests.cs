@@ -2,14 +2,17 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests(HostFixture hostFixture) : StartDateTestBase(hostFixture)
 {
+    private const string ThisStep = JourneySteps.Index;
+    private const string PreviousStep = JourneySteps.New;
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -26,11 +29,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -44,11 +47,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -66,11 +69,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var journeyStartDate = new DateOnly(2021, 10, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: journeyStartDate);
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -87,9 +90,12 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = GetPostContent(newStartDate: TestData.GenerateDate())
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -105,10 +111,13 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var databaseEndDate = new DateOnly(2022, 11, 6);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = GetPostContent(newStartDate: databaseStartDate.AddDays(1))
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -118,15 +127,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
+    public async Task Post_NoStartDateIsEntered_ReturnsError()
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate);
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = GetPostContent(newStartDate: null)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -136,23 +148,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenStartDateIsInTheFuture_ReturnsError()
+    public async Task Post_StartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var futureDate = Clock.Today.AddDays(2);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate);
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", $"{futureDate:%d}" },
-                { "StartDate.Month", $"{futureDate:%M}" },
-                { "StartDate.Year", $"{futureDate:yyyy}" },
-            }
+            Content = GetPostContent(newStartDate: futureDate)
         };
 
         // Act
@@ -163,23 +170,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenStartDateIsUnchanged_ReturnsError()
+    public async Task Post_StartDateIsUnchanged_ReturnsError()
     {
         // Arrange
         var databaseStartDate = Clock.Today;
-        var newStartDate = databaseStartDate;
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate);
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", newStartDate.Day },
-                { "StartDate.Month", newStartDate.Month },
-                { "StartDate.Year", newStartDate.Year },
-            }
+            Content = GetPostContent(newStartDate: databaseStartDate)
         };
 
         // Act
@@ -190,23 +191,18 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenStartDateIsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
+    public async Task Post_ValidStartDateIsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
         var databaseStartDate = Clock.Today.AddDays(-20);
         var newStartDate = Clock.Today.AddDays(-18);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate);
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", newStartDate.Day },
-                { "StartDate.Month", newStartDate.Month },
-                { "StartDate.Year", newStartDate.Year },
-            }
+            Content = GetPostContent(newStartDate: newStartDate)
         };
 
         // Act
@@ -214,7 +210,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/start-date/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/start-date/change-reason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(newStartDate, journeyInstance.State.StartDate);
@@ -227,7 +223,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
         var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentStartDate: databaseStartDate);
+        var alert = person.Alerts.Single();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -242,19 +239,17 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstance(Guid alertId, DateOnly currentStartDate) =>
-        CreateJourneyInstance(
-            alertId,
-            new EditAlertStartDateState()
-            {
-                Initialized = true,
-                CurrentStartDate = currentStartDate,
-                StartDate = currentStartDate
-            });
+    private static FormUrlEncodedContentBuilder GetPostContent(DateOnly? newStartDate)
+    {
+        var builder = new FormUrlEncodedContentBuilder();
 
-    private async Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstance(Guid alertId, EditAlertStartDateState state) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditAlertStartDate,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+        if (newStartDate is DateOnly date)
+        {
+            builder.Add("StartDate.Day", date.Day);
+            builder.Add("StartDate.Month", date.Month);
+            builder.Add("StartDate.Year", date.Year);
+        }
+
+        return builder;
+    }
 }
