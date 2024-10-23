@@ -37,6 +37,7 @@ public static class HostApplicationBuilderExtensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+
                 builder.Services.AddTransient<SendQtsAwardedEmailJob>();
                 builder.Services.AddTransient<QtsAwardedEmailJobDispatcher>();
                 builder.Services.AddTransient<SendInternationalQtsAwardedEmailJob>();
@@ -46,6 +47,7 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<SendInductionCompletedEmailJob>();
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
+                builder.Services.AddHttpClient<EWCWalesImportJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {

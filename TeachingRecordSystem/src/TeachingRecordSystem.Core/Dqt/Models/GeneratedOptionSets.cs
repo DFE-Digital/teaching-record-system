@@ -1989,6 +1989,96 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_IntegrationInterface
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Appropriate Body Import", 7)]
+		AppropriateBodyImport = 389040001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Capita Export Amend", 10)]
+		CapitaExportAmend = 389040004,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Capita Export New", 9)]
+		CapitaExportNew = 389040003,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Capita Import", 8)]
+		CapitaImport = 389040002,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("DMS Export QTS Date", 15)]
+		DMSExportQTSDate = 389040009,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("DMS Export TRN", 14)]
+		DMSExportTRN = 389040008,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("DMS Import", 13)]
+		DMSImport = 389040007,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("DMS Import TTR1", 0)]
+		DMSImportTTR1 = 389040014,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("DMS Import TTR4\\TTR5", 1)]
+		DMSImportTTR4TTR5 = 389040015,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Edubase", 11)]
+		Edubase = 389040005,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Edubase Links", 12)]
+		EdubaseLinks = 389040006,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("GTC Wales Import", 4)]
+		GTCWalesImport = 389040011,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("HESA Export", 3)]
+		HESAExport = 389040012,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("HESA Import", 6)]
+		HESAImport = 389040000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("ITTPUpdate", 2)]
+		ITTPUpdate = 389040013,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQ Export", 17, "#0000ff")]
+		NPQExport = 389040017,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("NPQ Import", 16, "#0000ff")]
+		NPQImport = 389040016,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Training Provider Import", 5)]
+		TrainingProviderImport = 389040010,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_integrationtransaction_StatusCode
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Active", 0)]
+		Active = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Inactive", 1)]
+		Inactive = 2,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ITTProgrammeType
 	{
 		
@@ -3726,6 +3816,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Large", 2, "#0000ff")]
 		Large = 200000002,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum credential_UsageType
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Connection", 0, null, "authorize this credential in connection", "connection")]
+		Connection = 280920000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("DesktopScript", 1, null, "authorize this credential in power automate for desktop script", "DesktopScript")]
+		DesktopScript = 280920001,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]

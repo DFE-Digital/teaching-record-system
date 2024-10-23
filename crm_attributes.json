@@ -347,5 +347,21 @@
     "statecode",
     "subject",
     "dfeta_EmailAddress"
+  ],
+  "dfeta_integrationtransaction": [
+    "createdby",
+    "createdon",
+    "dfeta_enddate",
+    "dfeta_failurecount",
+    "dfeta_failuremessage",
+    "dfeta_filename",
+    "dfeta_id",
+    "dfeta_interface",
+    "dfeta_startdate",
+    "dfeta_successcount",
+    "dfeta_duplicatecount",
+    "dfeta_importorganisation",
+    "dfeta_integrationtransactionid",
+    "dfeta_totalcount"
   ]
 }
