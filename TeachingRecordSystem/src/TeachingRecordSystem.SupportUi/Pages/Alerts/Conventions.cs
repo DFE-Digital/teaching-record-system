@@ -11,7 +11,7 @@ public class Conventions : IConfigureFolderConventions
             this.GetFolderPathFromNamespace(),
             model =>
             {
-                model.Filters.Add(new RequireFeatureEnabledFilterFactory(FeatureNames.Alerts));
+                model.Filters.Add(new RequireFeatureEnabledFilterFactoryAttribute(FeatureNames.Alerts));
             });
     }
 }

@@ -160,7 +160,6 @@ builder.Services
     .AddSingleton<FeatureProvider>()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
-    .AddTransient<CheckAlertExistsFilter>()
     .AddTransient<CheckUserExistsFilter>()
     .AddTransient<RequireClosedAlertFilter>()
     .AddTransient<RequireOpenAlertFilter>()
