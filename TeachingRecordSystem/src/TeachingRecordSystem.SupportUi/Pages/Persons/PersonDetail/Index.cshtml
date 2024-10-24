@@ -7,6 +7,16 @@
     ViewBag.SelectedTab = PersonSubNavigationTab.General;
 }
 
+@if (FeatureProvider.IsEnabled(FeatureNames.Alerts) && Model.HasOpenAlert)
+{
+    <govuk-notification-banner data-testid="OpenAlertNotification">
+        <p class="govuk-notification-banner__heading">
+            Alert on record.
+            <a class="govuk-notification-banner__link" href="@LinkGenerator.PersonAlerts(Model.PersonId)">View alerts.</a>
+        </p>
+    </govuk-notification-banner>
+}
+
 @{
     var personDetailModel = new PersonDetailViewModel()
     {

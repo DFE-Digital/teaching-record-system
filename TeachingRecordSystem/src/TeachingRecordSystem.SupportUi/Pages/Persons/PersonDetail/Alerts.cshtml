@@ -14,9 +14,22 @@
 <div>
     <h2 class="govuk-heading-m">Open alerts</h2>
 
+    @if (Model.ShowOpenAlertFlag)
+    {
+        <govuk-notification-banner data-testid="OpenAlertFlag">
+            <p class="govuk-notification-banner__heading">
+                This person has another alert on their record that is not shown here.
+                Contact the <a class="govuk-notification-banner__link" href="#">TRA</a> for more information.
+            </p>
+        </govuk-notification-banner>
+    }
+
     @if (Model.OpenAlerts!.Length == 0)
     {
-        <p class="govuk-body" data-testid="no-open-alerts">No open alerts</p>
+        if (!Model.ShowOpenAlertFlag)
+        {
+            <p class="govuk-body" data-testid="no-open-alerts">No open alerts</p>
+        }
     }
     else
     {

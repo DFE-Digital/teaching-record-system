@@ -435,4 +435,61 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var actionColumn = row.QuerySelectorAll("td").Last();
         Assert.Equal("Delete alert", actionColumn.TextContent.Trim());
     }
+
+    [Fact]
+    public async Task Get_PersonHasOpenDbsAlertButUserCannotRead_ShowsFlagMessage()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson(p => p
+            .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.NotNull(doc.GetElementByTestId("OpenAlertFlag"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasClosedDbsAlertAndUserCannotRead_DoesNotShowFlagMessage()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var person = await TestData.CreatePerson(p => p
+            .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasOpenDbsAlertAndUserCanRead_DoesNotShowFlagMessage()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.DbsAlertReader);
+
+        var person = await TestData.CreatePerson(p => p
+            .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
+    }
 }

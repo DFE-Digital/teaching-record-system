@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class IndexTests : TestBase
@@ -83,5 +85,56 @@ public class IndexTests : TestBase
         Assert.Equal("-", doc.GetSummaryListValueForKey("Email"));
         Assert.Equal("-", doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal("-", doc.GetSummaryListValueForKey("Mobile number"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasOpenAlert_ShowsAlertNotification()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(p => p
+            .WithAlert(a => a.WithEndDate(null)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.NotNull(doc.GetElementByTestId("OpenAlertNotification"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasNoAlert_DoesNotShowAlertNotification()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        Debug.Assert(person.Alerts.Count == 0);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
+    }
+
+    [Fact]
+    public async Task Get_PersonHasClosedAlertButNoOpenAlert_DoesNotShowAlertNotification()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson(p => p
+            .WithAlert(a => a.WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
     }
 }
