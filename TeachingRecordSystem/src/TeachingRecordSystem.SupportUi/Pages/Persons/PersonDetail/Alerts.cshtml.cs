@@ -18,6 +18,8 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
 
     public bool CanAddAlert { get; set; }
 
+    public bool ShowOpenAlertFlag { get; set; }
+
     public async Task OnGet()
     {
         var alerts = await dbContext.Alerts
@@ -32,6 +34,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
             .ToAsyncEnumerable()
             .SelectAwait(async id => (
                 AlertTypeId: id,
+                CanFlag: await authorizationService.AuthorizeForAlertTypeAsync(User, id, Permissions.Alerts.Flag) is { Succeeded: true },
                 CanRead: await authorizationService.AuthorizeForAlertTypeAsync(User, id, Permissions.Alerts.Read) is { Succeeded: true },
                 CanWrite: await authorizationService.AuthorizeForAlertTypeAsync(User, id, Permissions.Alerts.Write) is { Succeeded: true }))
             .ToDictionaryAsync(t => t.AlertTypeId);
@@ -46,6 +49,8 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
         CanAddAlert = await (await referenceDataCache.GetAlertTypes(activeOnly: true))
             .ToAsyncEnumerable()
             .AnyAwaitAsync(async at => (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true });
+
+        ShowOpenAlertFlag = alerts.Any(a => a.IsOpen && alertTypePermissions[a.AlertTypeId] is { CanFlag: true, CanRead: false });
     }
 
     public record AlertWithPermissions(Alert Alert, bool CanWrite);

@@ -1,12 +1,14 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class IndexModel(
+    TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     PreviousNameHelper previousNameHelper) : PageModel
 {
@@ -23,6 +25,8 @@ public class IndexModel(
     public ContactSearchSortByOption? SortBy { get; set; }
 
     public PersonInfo? Person { get; set; }
+
+    public bool HasOpenAlert { get; set; }
 
     public async Task OnGet()
     {
@@ -62,6 +66,8 @@ public class IndexModel(
                 .Select(name => GetFullName(name.FirstName, name.MiddleName, name.LastName))
                 .ToArray()
         };
+
+        HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
     }
 
     private static string GetFullName(string? firstName, string? middleName, string? lastName)
