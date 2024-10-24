@@ -20,20 +20,26 @@
     }
     else
     {
-        @foreach (var alert in Model.OpenAlerts)
+        @foreach (var (alert, canWrite) in Model.OpenAlerts)
         {
             <govuk-summary-card data-testid="open-alert">
                 <govuk-summary-card-title heading-level="3">@alert.AlertType.Name</govuk-summary-card-title>
-                <govuk-summary-card-actions>
-                    <govuk-summary-card-action href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)">Delete alert</govuk-summary-card-action>
-                </govuk-summary-card-actions>
+                @if (canWrite)
+                {
+                    <govuk-summary-card-actions>
+                        <govuk-summary-card-action href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)">Delete alert</govuk-summary-card-action>
+                    </govuk-summary-card-actions>
+                }
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@alert.Details</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="#" visually-hidden-text="details">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                        @if (canWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action href="#" visually-hidden-text="details">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
@@ -43,16 +49,22 @@
                                 <a href="@alert.ExternalLink" rel="noopener noreferrer" class="govuk-link">@alert.ExternalLink</a>
                             }
                         </govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="#" visually-hidden-text="link">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                        @if (canWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action href="#" visually-hidden-text="link">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDate(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
+                        @if (canWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDate(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
@@ -63,7 +75,10 @@
         }
     }
 
-    <govuk-button-link href="@LinkGenerator.AlertAdd(person.PersonId, journeyInstanceId: null)" class="govuk-!-margin-bottom-0">Add an alert</govuk-button-link>
+    @if (Model.CanAddAlert)
+    {
+        <govuk-button-link href="@LinkGenerator.AlertAdd(person.PersonId, journeyInstanceId: null)" class="govuk-!-margin-bottom-0" data-testid="AddAnAlertBtn">Add an alert</govuk-button-link>
+    }
 </div>
 
 <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
@@ -87,13 +102,18 @@
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
-                @foreach (var alert in Model.ClosedAlerts!)
+                @foreach (var (alert, canWrite) in Model.ClosedAlerts!)
                 {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType.Name</a></td>
                         <td class="govuk-table__cell">@alert.StartDate?.ToString("d MMMM yyyy")</td>
                         <td class="govuk-table__cell">@alert.EndDate?.ToString("d MMMM yyyy")</td>
-                        <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a></td>
+                        <td class="govuk-table__cell">
+                            @if (canWrite)
+                            {
+                                <a href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)" class="govuk-link">Delete <span class="govuk-visually-hidden">alert</span></a>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
