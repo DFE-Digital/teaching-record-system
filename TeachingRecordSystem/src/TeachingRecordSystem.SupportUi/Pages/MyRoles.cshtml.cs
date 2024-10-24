@@ -3,15 +3,19 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.SwitchRoles)]
-public class MyRolesModel : PageModel
+public class MyRolesModel(TrsDbContext dbContext) : PageModel
 {
-    public IReadOnlyCollection<string> AllRoles => UserRoles.All;
+    private string[]? _dbRoles;
+
+    public IReadOnlyCollection<string>? AvailableRoles { get; set; }
 
     [Display(Name = "My roles")]
     [BindProperty]
@@ -22,10 +26,19 @@ public class MyRolesModel : PageModel
         MyRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray();
     }
 
-    public async Task<IActionResult> OnPost()
+    public Task<IActionResult> OnPost()
     {
-        var newRoles = MyRoles ?? [];
+        var newRoles = (MyRoles ?? []).Intersect(AvailableRoles!);
+        return SetRoles(newRoles);
+    }
 
+    public Task<IActionResult> OnPostReset()
+    {
+        return SetRoles(_dbRoles!);
+    }
+
+    private async Task<IActionResult> SetRoles(IEnumerable<string> roles)
+    {
         var identity = (ClaimsIdentity)User.Identity!;
 
         // Remove any existing Role claims
@@ -35,7 +48,7 @@ public class MyRolesModel : PageModel
         }
 
         // Add a Role claim for every selected role
-        foreach (var role in newRoles)
+        foreach (var role in roles)
         {
             identity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
@@ -50,5 +63,17 @@ public class MyRolesModel : PageModel
             User,
             properties,
             authenticationScheme: CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        _dbRoles = (await dbContext.Users.SingleAsync(u => u.UserId == User.GetUserId())).Roles;
+
+        // Only make Administrator available to actual admins
+        AvailableRoles = (_dbRoles.Contains(UserRoles.Administrator) ?
+            UserRoles.All :
+            UserRoles.All.Except([UserRoles.Administrator])).ToArray();
+
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

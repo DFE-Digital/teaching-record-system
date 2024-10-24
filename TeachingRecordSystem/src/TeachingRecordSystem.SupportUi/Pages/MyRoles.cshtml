@@ -10,14 +10,17 @@
             <govuk-checkboxes asp-for="MyRoles">
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--l" />
-                    @foreach (var role in Model.AllRoles)
+                    @foreach (var role in Model.AvailableRoles!)
                     {
                         <govuk-checkboxes-item value="@role">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
                     }
                 </govuk-checkboxes-fieldset>
             </govuk-checkboxes>
 
-            <govuk-button type="submit">Save</govuk-button>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Save</govuk-button>
+                <govuk-button type="submit" class="govuk-button--secondary" formaction="@Url.Page("MyRoles", pageHandler: "Reset")">Reset</govuk-button>
+            </div>
         </form>
     </div>
 </div>
