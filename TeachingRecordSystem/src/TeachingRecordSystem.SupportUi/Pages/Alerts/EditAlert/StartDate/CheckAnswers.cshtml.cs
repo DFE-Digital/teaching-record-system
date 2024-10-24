@@ -70,12 +70,12 @@ public class CheckAnswersModel(
                 ChangeReason = ChangeReason.GetDisplayName(),
                 ChangeReasonDetail = ChangeReasonDetail,
                 EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                new EventModels.File()
-                {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
-                } :
-                null,
+                    new EventModels.File()
+                    {
+                        FileId = fileId,
+                        Name = JourneyInstance.State.EvidenceFileName!
+                    } :
+                    null,
                 Changes = changes
             };
 

@@ -64,7 +64,7 @@ public class TypeTests : TestBase
     }
 
     [Fact]
-    public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsRole()
+    public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsAlertType()
     {
         // Arrange
         SetCurrentUser(TestUsers.DbsAlertWriter);
@@ -85,7 +85,7 @@ public class TypeTests : TestBase
     }
 
     [Fact]
-    public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_ShowsDbsRole()
+    public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_DoesNotShowDbsAlertType()
     {
         // Arrange
         SetCurrentUser(TestUsers.NonDbsAlertWriter);

@@ -1,6 +1,6 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
 public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -10,12 +10,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.NoRoles);
 
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var originalAlert = person.Alerts.Single();
         var alertId = originalAlert.AlertId;
-        var changeReason = AlertChangeLinkReasonOption.IncorrectLink;
+        var changeReason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var hasAdditionalReasonDetail = true;
         var changeReasonDetail = "My Reason";
         var uploadEvidence = true;
@@ -28,9 +28,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink,
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails,
                 ChangeReason = changeReason,
                 HasAdditionalReasonDetail = hasAdditionalReasonDetail,
                 ChangeReasonDetail = changeReasonDetail,
@@ -40,7 +39,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EvidenceFileSizeDescription = evidenceFileSizeDescription
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -56,7 +55,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -75,7 +74,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -92,14 +91,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -107,11 +106,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public async Task Get_WithValidJourneyState_ReturnsOk(bool populateOptional)
     {
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = populateOptional ? TestData.GenerateUrl() : null;
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = populateOptional ? TestData.GenerateLoremIpsum() : null;
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
-        var reason = AlertChangeLinkReasonOption.IncorrectLink;
+        var reason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var hasAdditionalReasonDetail = populateOptional;
         var reasonDetail = "My Reason";
         var evidenceFileId = Guid.NewGuid();
@@ -121,9 +120,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstance(alertId, state: new()
         {
             Initialized = true,
-            AddLink = populateOptional ? true : false,
-            CurrentLink = databaseLink,
-            Link = journeyLink,
+            Details = journeyDetails,
+            CurrentDetails = databaseDetails,
             ChangeReason = reason,
             HasAdditionalReasonDetail = hasAdditionalReasonDetail,
             ChangeReasonDetail = populateOptional ? reasonDetail : null,
@@ -133,15 +131,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             EvidenceFileSizeDescription = populateOptional ? evidenceFileSizeDescription : null
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(populateOptional ? $"{journeyLink} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("New link"));
-        Assert.Equal($"{databaseLink} (opens in new tab)", doc.GetSummaryListValueForKey("Current link"));
+        Assert.Equal(journeyDetails, doc.GetSummaryListValueForKey("New details"));
+        Assert.Equal(populateOptional ? databaseDetails : "-", doc.GetSummaryListValueForKey("Current details"));
         Assert.Equal(reason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
         Assert.Equal(populateOptional ? reasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
         Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
@@ -153,12 +151,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.NoRoles);
 
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var originalAlert = person.Alerts.Single();
         var alertId = originalAlert.AlertId;
-        var changeReason = AlertChangeLinkReasonOption.IncorrectLink;
+        var changeReason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var hasAdditionalReasonDetail = true;
         var changeReasonDetail = "My Reason";
         var uploadEvidence = true;
@@ -166,14 +164,15 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileName = "evidence.jpg";
         var evidenceFileSizeDescription = "1 MB";
 
+        EventPublisher.Clear();
+
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink,
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails,
                 ChangeReason = changeReason,
                 HasAdditionalReasonDetail = hasAdditionalReasonDetail,
                 ChangeReasonDetail = changeReasonDetail,
@@ -183,7 +182,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EvidenceFileSizeDescription = evidenceFileSizeDescription
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -199,7 +198,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -218,7 +217,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -235,14 +234,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -250,12 +249,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(false)]
     public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
     {
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = populateOptional ? TestData.GenerateUrl() : null;
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = populateOptional ? TestData.GenerateLoremIpsum() : null;
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var originalAlert = person.Alerts.Single();
         var alertId = originalAlert.AlertId;
-        var changeReason = AlertChangeLinkReasonOption.IncorrectLink;
+        var changeReason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var hasAdditionalReasonDetail = populateOptional;
         var changeReasonDetail = populateOptional ? "My Reason" : null;
         var uploadEvidence = populateOptional ? true : false;
@@ -270,9 +269,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state: new()
             {
                 Initialized = true,
-                AddLink = populateOptional ? true : false,
-                CurrentLink = databaseLink,
-                Link = journeyLink,
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails,
                 ChangeReason = changeReason,
                 HasAdditionalReasonDetail = hasAdditionalReasonDetail,
                 ChangeReasonDetail = changeReasonDetail,
@@ -282,7 +280,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EvidenceFileSizeDescription = evidenceFileSizeDescription
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -306,8 +304,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 {
                     AlertId = alertId,
                     AlertTypeId = originalAlert.AlertTypeId,
-                    Details = originalAlert.Details,
-                    ExternalLink = journeyLink,
+                    Details = journeyDetails,
+                    ExternalLink = originalAlert.ExternalLink,
                     StartDate = originalAlert.StartDate,
                     EndDate = originalAlert.EndDate
                 },
@@ -315,8 +313,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 {
                     AlertId = alertId,
                     AlertTypeId = originalAlert.AlertTypeId,
-                    Details = originalAlert.Details,
-                    ExternalLink = databaseLink,
+                    Details = databaseDetails,
+                    ExternalLink = originalAlert.ExternalLink,
                     StartDate = originalAlert.StartDate,
                     EndDate = originalAlert.EndDate
                 },
@@ -329,7 +327,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                         Name = evidenceFileName!
                     }
                     : null,
-                Changes = AlertUpdatedEventChanges.ExternalLink
+                Changes = AlertUpdatedEventChanges.Details
             };
 
             var actualAlertUpdatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
@@ -343,12 +341,12 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var originalAlert = person.Alerts.Single();
         var alertId = originalAlert.AlertId;
-        var changeReason = AlertChangeLinkReasonOption.IncorrectLink;
+        var changeReason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var hasAdditionalReasonDetail = true;
         var changeReasonDetail = "My Reason";
         var uploadEvidence = true;
@@ -363,9 +361,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink,
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails,
                 ChangeReason = changeReason,
                 HasAdditionalReasonDetail = hasAdditionalReasonDetail,
                 ChangeReasonDetail = changeReasonDetail,
@@ -375,7 +372,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
                 EvidenceFileSizeDescription = evidenceFileSizeDescription
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -388,19 +385,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, string? currentLink) =>
+    private Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, string currentDetails) =>
         CreateJourneyInstance(
             alertId,
-            new EditAlertLinkState()
+            new EditAlertDetailsState()
             {
                 Initialized = true,
-                CurrentLink = currentLink,
-                Link = currentLink
+                CurrentDetails = currentDetails,
+                Details = currentDetails
             });
 
-    private async Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, EditAlertLinkState state) =>
+    private async Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, EditAlertDetailsState state) =>
         await CreateJourneyInstance(
-            JourneyNames.EditAlertLink,
+            JourneyNames.EditAlertDetails,
             state,
             new KeyValuePair<string, object>("alertId", alertId));
 }

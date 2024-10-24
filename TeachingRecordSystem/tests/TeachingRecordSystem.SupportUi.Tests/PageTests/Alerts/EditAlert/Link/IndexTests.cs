@@ -2,8 +2,33 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests : TestBase
 {
+    public IndexTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
@@ -76,6 +101,35 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var link = TestData.GenerateUrl();
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var newLink = TestData.GenerateUrl();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "AddLink", bool.TrueString },
+                { "Link", newLink }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]

@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
+namespace TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 
-[Journey(JourneyNames.EditAlertEndDate), RequireJourneyInstance]
+[Journey(JourneyNames.EditAlertDetails), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
@@ -15,7 +15,7 @@ public class CheckAnswersModel(
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
-    public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditAlertDetailsState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid AlertId { get; set; }
@@ -27,11 +27,13 @@ public class CheckAnswersModel(
 
     public string? PersonName { get; set; }
 
-    public DateOnly? NewEndDate { get; set; }
+    public string? NewDetails { get; set; }
 
-    public DateOnly? CurrentEndDate { get; set; }
+    public string? CurrentDetails { get; set; }
 
-    public string? ChangeReason { get; set; }
+    public AlertChangeDetailsReasonOption ChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
 
     public string? EvidenceFileName { get; set; }
 
@@ -46,15 +48,15 @@ public class CheckAnswersModel(
         var alert = await dbContext.Alerts
             .SingleAsync(a => a.AlertId == AlertId);
 
-        var changes = NewEndDate != alert.EndDate ?
-            AlertUpdatedEventChanges.EndDate :
+        var changes = NewDetails != alert.Details ?
+            AlertUpdatedEventChanges.Details :
             AlertUpdatedEventChanges.None;
 
         if (changes != AlertUpdatedEventChanges.None)
         {
             var oldAlertEventModel = EventModels.Alert.FromModel(alert);
 
-            alert.EndDate = NewEndDate;
+            alert.Details = NewDetails;
             alert.UpdatedOn = now;
 
             var updatedEvent = new AlertUpdatedEvent()
@@ -65,8 +67,8 @@ public class CheckAnswersModel(
                 PersonId = PersonId,
                 Alert = EventModels.Alert.FromModel(alert),
                 OldAlert = oldAlertEventModel,
-                ChangeReason = null!,
-                ChangeReasonDetail = ChangeReason,  // FIXME
+                ChangeReason = ChangeReason!.GetDisplayName(),
+                ChangeReasonDetail = ChangeReasonDetail,
                 EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                     new EventModels.File()
                     {
@@ -91,14 +93,14 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostCancel()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.AlertDetail(AlertId));
+        return Redirect(linkGenerator.PersonAlerts(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!JourneyInstance!.State.IsComplete)
         {
-            context.Result = Redirect(linkGenerator.AlertEditEndDate(AlertId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.AlertEditDetails(AlertId, JourneyInstance.InstanceId));
             return;
         }
 
@@ -107,11 +109,10 @@ public class CheckAnswersModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        NewEndDate = JourneyInstance!.State.EndDate;
-        CurrentEndDate = alertInfo.Alert.EndDate;
-        ChangeReason = JourneyInstance.State.ChangeReason != AlertChangeEndDateReasonOption.AnotherReason ?
-            JourneyInstance.State.ChangeReason!.GetDisplayName() :
-            JourneyInstance!.State.ChangeReasonDetail;
+        NewDetails = JourneyInstance!.State.Details;
+        CurrentDetails = alertInfo.Alert.Details;
+        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :

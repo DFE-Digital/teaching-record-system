@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
@@ -79,6 +80,58 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.AssertOnPersonAlertsPage(personId);
 
         await page.AssertFlashMessage("Alert added");
+    }
+
+    [Fact]
+    public async Task EditAlertDetails()
+    {
+        var startDate = new DateOnly(2023, 1, 1);
+        var details = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithDetails(details)));
+        var personId = person.PersonId;
+        var alertId = person.Alerts.First().AlertId;
+        var newDetails = TestData.GenerateLoremIpsum();
+        var reason = AlertChangeDetailsReasonOption.ChangeOfDetails;
+        var reasonDetail = TestData.GenerateLoremIpsum();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileMimeType = "image/jpeg";
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToEditAlertDetailsPage(alertId);
+
+        await page.AssertOnEditAlertDetailsPage(alertId);
+
+        await page.FillAsync("label:text-is('Change details')", newDetails);
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditAlertDetailsChangeReasonPage(alertId);
+
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the alert details?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page
+            .GetByLabel("Upload a file")
+            .SetInputFilesAsync(
+                new FilePayload()
+                {
+                    Name = evidenceFileName,
+                    MimeType = evidenceFileMimeType,
+                    Buffer = TestData.JpegImage
+                });
+
+        await page.ClickContinueButton();
+
+        await page.AssertOnEditAlertDetailsCheckAnswersPage(alertId);
+
+        await page.ClickConfirmChangeButton();
+
+        await page.AssertOnPersonAlertsPage(personId);
+
+        await page.AssertFlashMessage("Alert changed");
     }
 
     [Fact]

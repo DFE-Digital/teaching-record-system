@@ -14,7 +14,7 @@ public class Alert
     public required Guid AlertTypeId { get; init; }
     public required Guid PersonId { get; init; }
     public Person Person { get; } = null!;
-    public required string? Details { get; init; }
+    public required string? Details { get; set; }
     public required string? ExternalLink { get; set; }
     public required DateOnly? StartDate { get; set; }
     public required DateOnly? EndDate { get; set; }

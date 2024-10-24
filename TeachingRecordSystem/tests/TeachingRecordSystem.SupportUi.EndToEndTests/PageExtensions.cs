@@ -36,6 +36,11 @@ public static class PageExtensions
         await page.GotoAsync($"/alerts/add?personId={personId}");
     }
 
+    public static async Task GoToEditAlertDetailsPage(this IPage page, Guid alertId)
+    {
+        await page.GotoAsync($"/alerts/{alertId}/details");
+    }
+
     public static async Task GoToEditAlertStartDatePage(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/start-date");
@@ -185,6 +190,21 @@ public static class PageExtensions
     public static async Task AssertOnAddAlertCheckAnswersPage(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/check-answers");
+    }
+
+    public static async Task AssertOnEditAlertDetailsPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/details");
+    }
+
+    public static async Task AssertOnEditAlertDetailsChangeReasonPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/details/change-reason");
+    }
+
+    public static async Task AssertOnEditAlertDetailsCheckAnswersPage(this IPage page, Guid alertId)
+    {
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/details/check-answers");
     }
 
     public static async Task AssertOnEditAlertStartDatePage(this IPage page, Guid alertId)
@@ -356,7 +376,6 @@ public static class PageExtensions
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/change-reason");
     }
-
 
     public static async Task AssertOnEditMqStartDateConfirmPage(this IPage page, Guid qualificationId)
     {
