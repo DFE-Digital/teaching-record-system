@@ -70,6 +70,12 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
             ctx.Response.Redirect("/signed-out");
             return Task.CompletedTask;
         };
+
+        options.Events.OnRedirectToAccessDenied = ctx =>
+        {
+            ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        };
     });
 }
 

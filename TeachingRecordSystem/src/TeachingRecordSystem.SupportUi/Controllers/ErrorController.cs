@@ -20,13 +20,13 @@ public class ErrorController : Controller
 
         var statusCode = code ?? 500;
 
-        // Treat Forbidden as NotFound so we don't give away our internal URLs
-        if (code == 403)
+        var viewName = statusCode switch
         {
-            statusCode = 404;
-        }
+            403 => "Forbidden",
+            404 => "NotFound",
+            _ => "GenericError"
+        };
 
-        var viewName = statusCode == 404 ? "NotFound" : "GenericError";
         var result = View(viewName);
         result.StatusCode = statusCode;
         return result;
