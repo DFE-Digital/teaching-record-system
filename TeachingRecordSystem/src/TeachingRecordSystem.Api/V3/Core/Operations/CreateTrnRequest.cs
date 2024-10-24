@@ -1,6 +1,7 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
@@ -20,6 +21,7 @@ public record CreateTrnRequestCommand
 }
 
 public class CreateTrnRequestHandler(
+    TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     TrnRequestHelper trnRequestHelper,
     ICurrentClientProvider currentClientProvider,
@@ -59,6 +61,13 @@ public class CreateTrnRequestHandler(
             trn = await trnGenerationApiClient.GenerateTrn();
         }
 
+        var potentialDuplicatePersonIds = potentialDuplicates.Select(d => d.ContactId).ToList();
+        var resultsWithActiveAlerts = await dbContext.Alerts
+            .Where(a => potentialDuplicatePersonIds.Contains(a.PersonId) && a.IsOpen)
+            .Select(a => a.PersonId)
+            .Distinct()
+            .ToArrayAsync();
+
         var emailAddress = command.EmailAddresses?.FirstOrDefault();
 
         var contactId = await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
@@ -72,7 +81,7 @@ public class CreateTrnRequestHandler(
             DateOfBirth = command.DateOfBirth,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
-            PotentialDuplicates = potentialDuplicates,
+            PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentClientId, command.RequestId),
         });
