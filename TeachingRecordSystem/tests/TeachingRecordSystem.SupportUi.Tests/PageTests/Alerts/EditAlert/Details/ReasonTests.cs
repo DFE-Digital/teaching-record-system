@@ -1,34 +1,30 @@
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
-using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
-public class ReasonTests : TestBase
+public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    public ReasonTests(HostFixture hostFixture) : base(hostFixture)
-    {
-        SetCurrentUser(TestUsers.AllAlertsWriter);
-    }
-
     [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
         SetCurrentUser(TestUsers.NoRoles);
 
-        var person = await TestData.CreatePerson(b => b.WithAlert());
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                Link = TestData.GenerateUrl()
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -41,11 +37,10 @@ public class ReasonTests : TestBase
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -64,7 +59,7 @@ public class ReasonTests : TestBase
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -81,32 +76,34 @@ public class ReasonTests : TestBase
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
     public async Task Get_ValidRequest_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithAlert());
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                Link = TestData.GenerateUrl()
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -118,11 +115,11 @@ public class ReasonTests : TestBase
     [Fact]
     public async Task Get_ValidRequestWithReasonPopulatedDataInJourneyState_ReturnsExpectedContent()
     {
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
-        var reason = AlertChangeLinkReasonOption.IncorrectLink;
+        var reason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var reasonDetail = "My Reason";
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "evidence.jpg";
@@ -131,9 +128,8 @@ public class ReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstance(alertId, state: new()
         {
             Initialized = true,
-            AddLink = true,
-            CurrentLink = databaseLink,
-            Link = journeyLink,
+            CurrentDetails = databaseDetails,
+            Details = journeyDetails,
             ChangeReason = reason,
             HasAdditionalReasonDetail = true,
             ChangeReasonDetail = reasonDetail,
@@ -143,7 +139,7 @@ public class ReasonTests : TestBase
             EvidenceFileSizeDescription = evidenceFileSizeDescription,
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -172,25 +168,24 @@ public class ReasonTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.NoRoles);
 
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
         var reason = AlertChangeDetailsReasonOption.AnotherReason;
         var HasAdditionalReasonDetail = true;
         var reasonDetail = "More details";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
@@ -212,11 +207,10 @@ public class ReasonTests : TestBase
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
         var alertId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -235,7 +229,7 @@ public class ReasonTests : TestBase
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -252,7 +246,7 @@ public class ReasonTests : TestBase
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(alertId, state: new());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
@@ -267,28 +261,27 @@ public class ReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
     public async Task Post_WhenNoChangeReasonIsSelected_ReturnsError()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
@@ -308,25 +301,24 @@ public class ReasonTests : TestBase
     public async Task Post_WhenNoHasAdditionalReasonDetailOptionIsSelected_ReturnsError()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "ChangeReason", AlertChangeLinkReasonOption.ChangeOfLink },
+                { "ChangeReason", AlertChangeDetailsReasonOption.ChangeOfDetails },
                 { "UploadEvidence", bool.FalseString }
             }
         };
@@ -335,32 +327,31 @@ public class ReasonTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re changing the panel outcome link");
+        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re changing the alert details");
     }
 
     [Fact]
     public async Task Post_WhenHasAdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "ChangeReason", AlertChangeLinkReasonOption.ChangeOfLink },
+                { "ChangeReason", AlertChangeDetailsReasonOption.ChangeOfDetails },
                 { "HasAdditionalReasonDetail", bool.TrueString },
                 { "UploadEvidence", bool.FalseString }
             }
@@ -377,25 +368,24 @@ public class ReasonTests : TestBase
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "ChangeReason", AlertChangeLinkReasonOption.ChangeOfLink },
+                { "ChangeReason", AlertChangeDetailsReasonOption.ChangeOfDetails },
                 { "HasAdditionalReasonDetail", bool.FalseString },
                 { "UploadEvidence", bool.TrueString }
             }
@@ -412,25 +402,24 @@ public class ReasonTests : TestBase
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
-                { "ChangeReason", AlertChangeLinkReasonOption.ChangeOfLink },
+                { "ChangeReason", AlertChangeDetailsReasonOption.ChangeOfDetails },
                 { "HasAdditionalReasonDetail", bool.FalseString },
                 { "EvidenceFile", CreateEvidenceFileBinaryContent(), "invalidfile.cs" }
             }
@@ -447,25 +436,24 @@ public class ReasonTests : TestBase
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var reason = AlertChangeLinkReasonOption.AnotherReason;
+        var reason = AlertChangeDetailsReasonOption.IncorrectDetails;
         var HasAdditionalReasonDetail = true;
         var reasonDetail = "More details";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
@@ -481,7 +469,7 @@ public class ReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
@@ -496,25 +484,24 @@ public class ReasonTests : TestBase
     public async Task Post_WhenValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var reason = AlertChangeLinkReasonOption.AnotherReason;
+        var reason = AlertChangeDetailsReasonOption.AnotherReason;
         var HasAdditionalReasonDetail = false;
         var evidenceFileName = "evidence.pdf";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
             {
@@ -530,7 +517,7 @@ public class ReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(reason, journeyInstance.State.ChangeReason);
@@ -545,21 +532,20 @@ public class ReasonTests : TestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
+        var databaseDetails = TestData.GenerateLoremIpsum();
+        var journeyDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithDetails(databaseDetails)));
         var alertId = person.Alerts.Single().AlertId;
         var journeyInstance = await CreateJourneyInstance(
             alertId,
             state: new()
             {
                 Initialized = true,
-                AddLink = true,
-                CurrentLink = databaseLink,
-                Link = journeyLink
+                Details = journeyDetails,
+                CurrentDetails = databaseDetails
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/change-reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/change-reason/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -579,19 +565,19 @@ public class ReasonTests : TestBase
         return byteArrayContent;
     }
 
-    private Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, string? currentLink) =>
+    private Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, string currentDetails) =>
         CreateJourneyInstance(
             alertId,
-            new EditAlertLinkState()
+            new EditAlertDetailsState()
             {
                 Initialized = true,
-                CurrentLink = currentLink,
-                Link = currentLink
+                CurrentDetails = currentDetails,
+                Details = currentDetails
             });
 
-    private async Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, EditAlertLinkState state) =>
+    private async Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, EditAlertDetailsState state) =>
         await CreateJourneyInstance(
-            JourneyNames.EditAlertLink,
+            JourneyNames.EditAlertDetails,
             state,
             new KeyValuePair<string, object>("alertId", alertId));
 }
