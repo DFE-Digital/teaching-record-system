@@ -18,7 +18,8 @@ public class RequireFeatureEnabledFilter(FeatureProvider featureProvider, string
     }
 }
 
-public class RequireFeatureEnabledFilterFactory(string featureName) : IFilterFactory, IOrderedFilter
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public class RequireFeatureEnabledFilterFactoryAttribute(string featureName) : Attribute, IFilterFactory, IOrderedFilter
 {
     public bool IsReusable => false;
 

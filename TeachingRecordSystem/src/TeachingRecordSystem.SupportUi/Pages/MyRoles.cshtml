@@ -1,0 +1,23 @@
+@page "/my-roles"
+@model TeachingRecordSystem.SupportUi.Pages.MyRolesModel
+@{
+    ViewBag.Title = Html.DisplayNameFor(m => m.MyRoles);
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form asp-page="MyRoles" method="post">
+            <govuk-checkboxes asp-for="MyRoles">
+                <govuk-checkboxes-fieldset>
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--l" />
+                    @foreach (var role in Model.AllRoles)
+                    {
+                        <govuk-checkboxes-item value="@role">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
+                    }
+                </govuk-checkboxes-fieldset>
+            </govuk-checkboxes>
+
+            <govuk-button type="submit">Save</govuk-button>
+        </form>
+    </div>
+</div>
