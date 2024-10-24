@@ -88,7 +88,8 @@ builder.Services.AddAuthorizationBuilder()
         AuthorizationPolicies.Hangfire,
         policy => policy
             .RequireAuthenticatedUser()
-            .RequireRole(UserRoles.Administrator));
+            .RequireRole(UserRoles.Administrator))
+    .AddAlertPolicies();
 
 builder.Services
     .AddRazorPages()

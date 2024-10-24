@@ -11,10 +11,22 @@ public static class UserRoles
     [Display(Name = "Helpdesk")]
     public const string Helpdesk = "Helpdesk";
 
+    [Display(Name = "Alerts - read & write")]
+    public const string AlertsReadWrite = "AlertsReadWrite";
+
+    [Display(Name = "DBS alerts - read only")]
+    public const string DbsAlertsReadOnly = "DbsAlertsReadOnly";
+
+    [Display(Name = "DBS alerts - read & write")]
+    public const string DbsAlertsReadWrite = "DbsAlertsReadWrite";
+
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
         Administrator,
-        Helpdesk
+        Helpdesk,
+        AlertsReadWrite,
+        DbsAlertsReadOnly,
+        DbsAlertsReadWrite,
     };
 
     public static string GetDisplayNameForRole(string role)

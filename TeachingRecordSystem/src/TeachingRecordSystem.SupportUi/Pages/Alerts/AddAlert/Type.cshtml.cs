@@ -1,14 +1,17 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class TypeModel(
     TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+    ReferenceDataCache referenceDataCache,
+    IAuthorizationService authorizationService) : PageModel
 {
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
@@ -68,7 +71,11 @@ public class TypeModel(
         PersonName = personInfo.Name;
 
         var alertTypes = await referenceDataCache.GetAlertTypes(activeOnly: true);
-        AlertTypes = alertTypes.Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue)).ToArray();
+        AlertTypes = await alertTypes
+            .ToAsyncEnumerable()
+            .WhereAwait(async t => (await authorizationService.AuthorizeForAlertTypeAsync(User, t.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true })
+            .Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue))
+            .ToArrayAsync();
 
         var categories = await referenceDataCache.GetAlertCategories();
         Categories = categories.Select(

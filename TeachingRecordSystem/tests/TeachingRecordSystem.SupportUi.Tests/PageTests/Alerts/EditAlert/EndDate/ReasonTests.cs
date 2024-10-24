@@ -2,8 +2,13 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
-public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ReasonTests : TestBase
 {
+    public ReasonTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
     [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
