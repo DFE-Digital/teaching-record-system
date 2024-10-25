@@ -8,6 +8,8 @@ public class TestUsers(IDbContextFactory<TrsDbContext> dbContextFactory)
 {
     private readonly Dictionary<HashSet<string>, User> _users = new(new RoleSetEqualityComparer());
 
+    public User GetUser(string? role) => GetUser(role is not null ? [role] : []);
+
     public User GetUser(params string[] roles) => GetUser(roles.AsEnumerable());
 
     public User GetUser(IEnumerable<string> roles)
