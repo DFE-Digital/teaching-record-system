@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
@@ -7,6 +8,34 @@ public class ReasonTests : TestBase
     public ReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.AllAlertsWriter);
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var databaseEndDate = TestData.Clock.Today.AddDays(-10);
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new EditAlertEndDateState()
+            {
+                Initialized = true,
+                EndDate = journeyEndDate
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
@@ -45,7 +74,7 @@ public class ReasonTests : TestBase
     }
 
     [Fact]
-    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsOK()
+    public async Task Get_ValidRequest_ReturnsOK()
     {
         // Arrange
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -68,6 +97,98 @@ public class ReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithReasonPopulatedDataInJourneyState_ReturnsExpectedContent()
+    {
+        // Arrange
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var databaseEndDate = TestData.Clock.Today.AddDays(-10);
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var reason = AlertChangeEndDateReasonOption.AnotherReason;
+        var reasonDetail = "My Reason";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "evidence.jpg";
+        var evidenceFileSizeDescription = "1 MB";
+
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new()
+        {
+            Initialized = true,
+            CurrentEndDate = databaseEndDate,
+            EndDate = journeyEndDate,
+            ChangeReason = reason,
+            HasAdditionalReasonDetail = true,
+            ChangeReasonDetail = reasonDetail,
+            UploadEvidence = true,
+            EvidenceFileId = evidenceFileId,
+            EvidenceFileName = evidenceFileName,
+            EvidenceFileSizeDescription = evidenceFileSizeDescription,
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+
+        AssertCheckedRadioOption("ChangeReason", reason.ToString());
+        AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
+        AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
+
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        Assert.NotNull(uploadedEvidenceLink);
+        Assert.Equal($"{evidenceFileName} ({evidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
+
+        void AssertCheckedRadioOption(string name, string expectedCheckedValue)
+        {
+            var selectedOption = doc.GetElementsByName(name).SingleOrDefault(r => r.HasAttribute("checked"));
+            Assert.Equal(expectedCheckedValue, selectedOption?.GetAttribute("value"));
+        }
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.NoRoles);
+
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var databaseEndDate = TestData.Clock.Today.AddDays(-10);
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new()
+        {
+            Initialized = true,
+            CurrentEndDate = databaseEndDate,
+            EndDate = journeyEndDate
+        });
+
+        var reason = AlertChangeStartDateReasonOption.AnotherReason;
+        var HasAdditionalReasonDetail = true;
+        var reasonDetail = "More details";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "ChangeReason", reason },
+                { "HasAdditionalReasonDetail", HasAdditionalReasonDetail },
+                { "ChangeReasonDetail", reasonDetail },
+                { "UploadEvidence", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
@@ -126,6 +247,7 @@ public class ReasonTests : TestBase
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
+                ["HasAdditionalReasonDetail"] = bool.FalseString,
                 ["UploadEvidence"] = "False"
             })
         };
@@ -138,7 +260,7 @@ public class ReasonTests : TestBase
     }
 
     [Fact]
-    public async Task Post_WhenChangeReasonAnotherReasonIsSelectedAndDetailsAreEmpty_ReturnsError()
+    public async Task Post_WhenNoHasAdditionalReasonDetailIsSelected_ReturnsError()
     {
         // Arrange
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -151,24 +273,59 @@ public class ReasonTests : TestBase
             new EditAlertEndDateState()
             {
                 Initialized = true,
+                CurrentEndDate = databaseEndDate,
                 EndDate = journeyEndDate
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new MultipartFormDataContentBuilder()
             {
-                ["ChangeReason"] = "AnotherReason",
-                ["ChangeReasonDetail"] = "",
-                ["UploadEvidence"] = "False"
-            })
+                { "ChangeReason", AlertChangeEndDateReasonOption.IncorrectEndDate },
+                { "UploadEvidence", bool.FalseString }
+            }
         };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "ChangeReasonDetail", "Enter details");
+        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re changing the end date");
+    }
+
+    [Fact]
+    public async Task Post_WhenAdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError()
+    {
+        // Arrange
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var databaseEndDate = TestData.Clock.Today.AddDays(-10);
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new EditAlertEndDateState()
+            {
+                Initialized = true,
+                CurrentEndDate = databaseEndDate,
+                EndDate = journeyEndDate
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "ChangeReason", AlertChangeEndDateReasonOption.IncorrectEndDate },
+                { "HasAdditionalReasonDetail", bool.TrueString },
+                { "UploadEvidence", bool.FalseString }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
     [Fact]
@@ -185,17 +342,18 @@ public class ReasonTests : TestBase
             new EditAlertEndDateState()
             {
                 Initialized = true,
+                CurrentEndDate = databaseEndDate,
                 EndDate = journeyEndDate
             });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            Content = new MultipartFormDataContentBuilder()
             {
-                ["ChangeReason"] = "AnotherReason",
-                ["ChangeReasonDetail"] = "Some details",
-                ["UploadEvidence"] = "True"
-            })
+                { "ChangeReason", AlertChangeEndDateReasonOption.IncorrectEndDate },
+                { "HasAdditionalReasonDetail", bool.TrueString },
+                { "UploadEvidence", bool.TrueString }
+            }
         };
 
         // Act
@@ -219,17 +377,19 @@ public class ReasonTests : TestBase
             new EditAlertEndDateState()
             {
                 Initialized = true,
+                CurrentEndDate = databaseEndDate,
                 EndDate = journeyEndDate
             });
 
-        var multipartContent = CreateFormFileUpload(".cs");
-        multipartContent.Add(new StringContent(AlertChangeEndDateReasonOption.AnotherReason.ToString()), "ChangeReason");
-        multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
-
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = multipartContent
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "ChangeReason", AlertChangeEndDateReasonOption.IncorrectEndDate },
+                { "HasAdditionalReasonDetail", bool.TrueString },
+                { "UploadEvidence", bool.TrueString },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(), "invalidfile.cs" }
+            }
         };
 
         // Act
@@ -240,7 +400,7 @@ public class ReasonTests : TestBase
     }
 
     [Fact]
-    public async Task Post_WhenValidInput_RedirectsToCheckAnswersPage()
+    public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -253,17 +413,23 @@ public class ReasonTests : TestBase
             new EditAlertEndDateState()
             {
                 Initialized = true,
+                CurrentEndDate = databaseEndDate,
                 EndDate = journeyEndDate
             });
 
-        var multipartContent = CreateFormFileUpload(".pdf");
-        multipartContent.Add(new StringContent(AlertChangeEndDateReasonOption.AnotherReason.ToString()), "ChangeReason");
-        multipartContent.Add(new StringContent("My change reason detail"), "ChangeReasonDetail");
-        multipartContent.Add(new StringContent("True"), "UploadEvidence");
+        var reason = AlertChangeEndDateReasonOption.ChangeOfEndDate;
+        var HasAdditionalReasonDetail = true;
+        var reasonDetail = "More details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = multipartContent
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "ChangeReason", reason },
+                { "HasAdditionalReasonDetail", HasAdditionalReasonDetail },
+                { "ChangeReasonDetail", reasonDetail },
+                { "UploadEvidence", bool.FalseString }
+            }
         };
 
         // Act
@@ -272,7 +438,65 @@ public class ReasonTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/alerts/{alertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(reason, journeyInstance.State.ChangeReason);
+        Assert.True(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Equal(reasonDetail, journeyInstance.State.ChangeReasonDetail);
+        Assert.Null(journeyInstance.State.EvidenceFileName);
+        Assert.Null(journeyInstance.State.EvidenceFileId);
+        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
     }
+
+    [Fact]
+    public async Task Post_WhenValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
+    {
+        // Arrange
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var databaseEndDate = TestData.Clock.Today.AddDays(-10);
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new EditAlertEndDateState()
+            {
+                Initialized = true,
+                CurrentEndDate = databaseEndDate,
+                EndDate = journeyEndDate
+            });
+
+        var reason = AlertChangeEndDateReasonOption.ChangeOfEndDate;
+        var HasAdditionalReasonDetail = false;
+        var evidenceFileName = "evidence.pdf";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+            {
+                { "ChangeReason", reason },
+                { "HasAdditionalReasonDetail", HasAdditionalReasonDetail },
+                { "UploadEvidence", bool.TrueString },
+                { "EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/alerts/{alertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(reason, journeyInstance.State.ChangeReason);
+        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Null(journeyInstance.State.ChangeReasonDetail);
+        Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
+        Assert.NotNull(journeyInstance.State.EvidenceFileId);
+        Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
+    }
+
 
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
@@ -287,6 +511,7 @@ public class ReasonTests : TestBase
             new EditAlertEndDateState()
             {
                 Initialized = true,
+                CurrentEndDate = databaseEndDate,
                 EndDate = journeyEndDate
             });
 
@@ -303,18 +528,13 @@ public class ReasonTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    private MultipartFormDataContent CreateFormFileUpload(string fileExtension)
+    private static HttpContent CreateEvidenceFileBinaryContent()
     {
-        var byteArrayContent = new ByteArrayContent(new byte[] { });
+        var byteArrayContent = new ByteArrayContent([]);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
-
-        var multipartContent = new MultipartFormDataContent
-        {
-            { byteArrayContent, "EvidenceFile", $"evidence{fileExtension}" }
-        };
-
-        return multipartContent;
+        return byteArrayContent;
     }
+
     private async Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstance(Guid alertId, EditAlertEndDateState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditAlertEndDate,

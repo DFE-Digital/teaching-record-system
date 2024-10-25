@@ -31,7 +31,9 @@ public class CheckAnswersModel(
 
     public DateOnly? CurrentEndDate { get; set; }
 
-    public string? ChangeReason { get; set; }
+    public AlertChangeEndDateReasonOption ChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
 
     public string? EvidenceFileName { get; set; }
 
@@ -65,8 +67,8 @@ public class CheckAnswersModel(
                 PersonId = PersonId,
                 Alert = EventModels.Alert.FromModel(alert),
                 OldAlert = oldAlertEventModel,
-                ChangeReason = null!,
-                ChangeReasonDetail = ChangeReason,  // FIXME
+                ChangeReason = ChangeReason.GetDisplayName(),
+                ChangeReasonDetail = ChangeReasonDetail,
                 EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                     new EventModels.File()
                     {
@@ -109,9 +111,8 @@ public class CheckAnswersModel(
         PersonName = personInfo.Name;
         NewEndDate = JourneyInstance!.State.EndDate;
         CurrentEndDate = alertInfo.Alert.EndDate;
-        ChangeReason = JourneyInstance.State.ChangeReason != AlertChangeEndDateReasonOption.AnotherReason ?
-            JourneyInstance.State.ChangeReason!.GetDisplayName() :
-            JourneyInstance!.State.ChangeReasonDetail;
+        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
