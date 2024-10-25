@@ -1,6 +1,7 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 
@@ -194,7 +195,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var newEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReason = TestData.GenerateLoremIpsum();
+        var reason = AlertChangeEndDateReasonOption.AnotherReason;
+        var reasonDetail = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
 
@@ -211,10 +213,10 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertEndDateChangeReasonPage(alertId);
 
-        await page.CheckAsync("label:text-is('Another reason')");
-        await page.FillAsync("label:text-is('Enter details')", changeReason);
-
-        await page.CheckAsync("label:text-is('Yes')");
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the end date?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")
             .SetInputFilesAsync(
