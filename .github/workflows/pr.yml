@@ -126,8 +126,23 @@ jobs:
       - name: Install tools
         run: just install-tools
 
+      - name: Restore cached packages
+        id: cache-packages-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/packages.lock.json') }}
+
       - name: Restore
         run: just restore
+
+      - name: Cache restored packages
+        id: cache-packages-save
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ steps.cache-packages-restore.outputs.cache-primary-key }}
+        if: steps.cache-packages-restore.outputs.cache-hit != 'true'
 
       - name: Build project
         run: dotnet build -c Release --no-restore

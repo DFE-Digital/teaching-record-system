@@ -4,6 +4,7 @@
     <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
     <IsSourceGeneratorProject Condition="'$(IsSourceGeneratorProject)' == '' and $(MSBuildProjectName.EndsWith('Generator'))">true</IsSourceGeneratorProject>
