@@ -16,7 +16,7 @@ public class CheckUserExistsFilter : IAsyncResourceFilter, IOrderedFilter
             var viewResult = new ViewResult()
             {
                 StatusCode = StatusCodes.Status403Forbidden,
-                ViewName = "NoRoles"
+                ViewName = "NoAccount"
             };
 
             context.Result = viewResult;
