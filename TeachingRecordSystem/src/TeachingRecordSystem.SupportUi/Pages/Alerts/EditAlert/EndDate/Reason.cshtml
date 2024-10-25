@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.AlertEditEndDateReason(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
-            <span class="govuk-caption-l">Change previous alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Change closed alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-radios asp-for="ChangeReason" data-testid="change-reason-options">
