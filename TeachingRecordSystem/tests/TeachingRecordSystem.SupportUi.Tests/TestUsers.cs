@@ -1,106 +1,75 @@
+using System.Diagnostics.CodeAnalysis;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 
-public static class TestUsers
+public class TestUsers(IDbContextFactory<TrsDbContext> dbContextFactory)
 {
-    public static User Administrator { get; } = new()
-    {
-        Active = true,
-        Name = "Test administrator",
-        Roles = [UserRoles.Administrator],
-        UserId = Guid.NewGuid(),
-        Email = "test.administrator@localhost"
-    };
+    private readonly Dictionary<HashSet<string>, User> _users = new(new RoleSetEqualityComparer());
 
-    public static User Helpdesk { get; } = new()
-    {
-        Active = true,
-        Name = "Test helpdesk user",
-        Roles = [UserRoles.Helpdesk],
-        UserId = Guid.NewGuid(),
-        Email = "test.helpdesk@localhost"
-    };
+    public User GetUser(params string[] roles) => GetUser(roles.AsEnumerable());
 
-    public static User UnusedRole { get; } = new()
+    public User GetUser(IEnumerable<string> roles)
     {
-        Active = true,
-        Name = "Test other user",
-        Roles = ["UnusedRole"],
-        UserId = Guid.NewGuid(),
-        Email = "test.other@localhost"
-    };
+        // Note this method is synchronous so that it can be called from test class constructors
 
-    public static User AllAlertsWriter { get; } = new()
-    {
-        Active = true,
-        Name = "Test all alerts writer",
-        Roles = [UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite],
-        UserId = Guid.NewGuid(),
-        Email = "test.alert-writer@localhost"
-    };
+        var rolesSet = new HashSet<string>(roles);
 
-    public static User AllAlertsReader { get; } = new()
-    {
-        Active = true,
-        Name = "Test all alerts reader",
-        Roles = [UserRoles.DbsAlertsReadOnly],
-        UserId = Guid.NewGuid(),
-        Email = "test.alert-reader@localhost"
-    };
-
-    public static User NonDbsAlertWriter { get; } = new()
-    {
-        Active = true,
-        Name = "Test non-DBS alert writer",
-        Roles = [UserRoles.AlertsReadWrite],
-        UserId = Guid.NewGuid(),
-        Email = "test.non-dbs-alert-writer@localhost"
-    };
-
-    public static User DbsAlertReader { get; } = new()
-    {
-        Active = true,
-        Name = "Test DBS alert reader",
-        Roles = [UserRoles.DbsAlertsReadOnly],
-        UserId = Guid.NewGuid(),
-        Email = "test.dbs-alert-reader@localhost"
-    };
-
-    public static User DbsAlertWriter { get; } = new()
-    {
-        Active = true,
-        Name = "Test DBS alert reader",
-        Roles = [UserRoles.DbsAlertsReadWrite],
-        UserId = Guid.NewGuid(),
-        Email = "test.dbs-alert-writer@localhost"
-    };
-
-    public static User NoRoles { get; } = new()
-    {
-        Active = true,
-        Name = "No roles",
-        Roles = [],
-        UserId = Guid.NewGuid(),
-        Email = "test.empty@localhost"
-    };
-
-    public class CreateUsersStartupTask(TrsDbContext trsDbContext) : IStartupTask
-    {
-        public Task Execute()
+        lock (_users)
         {
-            trsDbContext.Users.Add(Administrator);
-            trsDbContext.Users.Add(Helpdesk);
-            trsDbContext.Users.Add(UnusedRole);
-            trsDbContext.Users.Add(AllAlertsWriter);
-            trsDbContext.Users.Add(AllAlertsReader);
-            trsDbContext.Users.Add(NonDbsAlertWriter);
-            trsDbContext.Users.Add(DbsAlertReader);
-            trsDbContext.Users.Add(DbsAlertWriter);
-            trsDbContext.Users.Add(NoRoles);
+            if (_users.TryGetValue(rolesSet, out var user))
+            {
+                return user;
+            }
 
-            return trsDbContext.SaveChangesAsync();
+            using var dbContext = dbContextFactory.CreateDbContext();
+
+            var userNumber = _users.Count + 1;
+
+            user = new User()
+            {
+                Active = true,
+                Email = $"test.user.{userNumber}@localhost",
+                Name = $"Test User {userNumber}",
+                Roles = roles.ToArray(),
+                UserId = Guid.NewGuid()
+            };
+
+            dbContext.Users.Add(user);
+
+            dbContext.SaveChanges();
+
+            _users.Add(rolesSet, user);
+            return user;
+        }
+    }
+
+    private class RoleSetEqualityComparer : IEqualityComparer<HashSet<string>>
+    {
+        public bool Equals(HashSet<string>? x, HashSet<string>? y)
+        {
+            if (x is null && y is null)
+            {
+                return true;
+            }
+
+            if (x is null || y is null)
+            {
+                return false;
+            }
+
+            return x.SetEquals(y);
+        }
+
+        public int GetHashCode([DisallowNull] HashSet<string> obj)
+        {
+            var hashCode = new HashCode();
+            foreach (var entry in obj)
+            {
+                hashCode.Add(entry.GetHashCode());
+            }
+            return hashCode.ToHashCode();
         }
     }
 }

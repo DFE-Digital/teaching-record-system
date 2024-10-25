@@ -12,7 +12,7 @@ public class UsersTests : TestBase
     public async Task Get_UserWithOutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 
@@ -46,7 +46,6 @@ public class UsersTests : TestBase
     {
         // Arrange
         var user = await TestData.CreateUser(roles: new[] { UserRoles.Administrator });
-        SetCurrentUser(TestUsers.Administrator);
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 

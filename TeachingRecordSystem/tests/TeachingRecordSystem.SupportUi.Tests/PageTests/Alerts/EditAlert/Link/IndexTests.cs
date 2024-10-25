@@ -6,14 +6,14 @@ public class IndexTests : TestBase
 {
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.AllAlertsWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
     [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
@@ -107,7 +107,7 @@ public class IndexTests : TestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var databaseStartDate = new DateOnly(2021, 10, 5);
         var link = TestData.GenerateUrl();

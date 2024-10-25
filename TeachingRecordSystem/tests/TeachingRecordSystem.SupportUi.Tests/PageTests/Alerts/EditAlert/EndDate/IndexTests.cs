@@ -6,7 +6,7 @@ public class IndexTests : TestBase
 {
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.AllAlertsWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
     [Fact]

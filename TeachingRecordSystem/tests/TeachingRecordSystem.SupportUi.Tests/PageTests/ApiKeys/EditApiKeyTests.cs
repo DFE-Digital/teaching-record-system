@@ -6,7 +6,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var applicationUser = await TestData.CreateApplicationUser();
         var apiKey = await TestData.CreateApiKey(applicationUser.UserId);
@@ -90,7 +90,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task PostExpire_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var applicationUser = await TestData.CreateApplicationUser();
         var apiKey = await TestData.CreateApiKey(applicationUser.UserId, expired: false);

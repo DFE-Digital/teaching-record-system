@@ -9,7 +9,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var databaseDetails = TestData.GenerateLoremIpsum();
         var journeyDetails = TestData.GenerateLoremIpsum();
@@ -166,7 +166,7 @@ public class ReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var databaseDetails = TestData.GenerateLoremIpsum();
         var journeyDetails = TestData.GenerateLoremIpsum();

@@ -47,8 +47,7 @@ public class HostFixture : WebApplicationFactory<Program>
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
             services.AddSingleton<CurrentUserProvider>();
-            services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
-
+            services.AddSingleton<TestUsers>();
             services.AddSingleton<IEventPublisher>(_ => new ForwardToTestScopedEventPublisher());
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
