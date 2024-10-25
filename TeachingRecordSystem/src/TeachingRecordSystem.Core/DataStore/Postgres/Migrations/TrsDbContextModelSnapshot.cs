@@ -2145,8 +2145,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
-                    b.Property<JsonDocument>("_data")
-                        .IsRequired()
+                    b.Property<JsonElement>("_data")
                         .HasColumnType("jsonb")
                         .HasColumnName("data");
 

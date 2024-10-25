@@ -55,12 +55,12 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         return results switch
         {
-            [MatchQueryResult r] => new MatchResult(r.person_id, r.trn, MapMatchedAttrs(r.matched_attrs)),
+            [MatchQueryResult r] => new MatchResult(r.person_id, r.trn, MapMatchedAttrs(r.GetMatchedAttributes())),
             _ => null
         };
 
-        static IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>> MapMatchedAttrs(JsonDocument doc) =>
-            doc.Deserialize<MatchedAttribute[]>()!
+        static IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>> MapMatchedAttrs(MatchedAttribute[] matchedAttributes) =>
+            matchedAttributes
                 .Select(a => new KeyValuePair<OneLoginUserMatchedAttribute, string>(
                     Enum.Parse<OneLoginUserMatchedAttribute>(a.attribute_type),
                     a.attribute_value))
@@ -199,7 +199,10 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         NationalInsuranceNumberHelper.Normalize(value);
 
 #pragma warning disable IDE1006 // Naming Styles
-    private record MatchQueryResult(Guid person_id, string trn, JsonDocument matched_attrs);
+    private record MatchQueryResult(Guid person_id, string trn, JsonElement matched_attrs)
+    {
+        public MatchedAttribute[] GetMatchedAttributes() => matched_attrs.Deserialize<MatchedAttribute[]>()!;
+    }
 
     private record MatchedAttribute(string attribute_type, string attribute_value);
 

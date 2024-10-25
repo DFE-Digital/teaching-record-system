@@ -24,7 +24,7 @@ public static partial class AssertEx
         ArgumentNullException.ThrowIfNull(response);
         ArgumentNullException.ThrowIfNull(expected);
 
-        var jsonDocument = await JsonResponse(response, expectedStatusCode);
+        using var jsonDocument = await JsonResponse(response, expectedStatusCode);
 
         JsonObjectEquals(expected, jsonDocument);
     }

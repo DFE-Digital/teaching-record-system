@@ -26,7 +26,7 @@ internal class WorkforceDataExportConfigureOptions : IConfigureOptions<Workforce
 
         if (!string.IsNullOrEmpty(credentialsJson))
         {
-            var credentialsJsonDoc = JsonDocument.Parse(credentialsJson);
+            using var credentialsJsonDoc = JsonDocument.Parse(credentialsJson);
 
             if (credentialsJsonDoc.RootElement.TryGetProperty("private_key", out _))
             {

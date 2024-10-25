@@ -7,7 +7,7 @@ public record SupportTask
 {
     [JsonInclude]
     [JsonPropertyName("Data")]
-    private JsonDocument _data = null!;
+    private JsonElement _data;
 
     public required string SupportTaskReference { get; init; }
     public required SupportTaskType SupportTaskType { get; init; }
@@ -19,7 +19,7 @@ public record SupportTask
     public object Data
     {
         get => JsonSerializer.Deserialize(_data, DataStore.Postgres.Models.SupportTask.GetDataType(SupportTaskType), DataStore.Postgres.Models.SupportTask.SerializerOptions)!;
-        init => _data = JsonSerializer.SerializeToDocument(value, DataStore.Postgres.Models.SupportTask.GetDataType(SupportTaskType), DataStore.Postgres.Models.SupportTask.SerializerOptions);
+        init => _data = JsonSerializer.SerializeToElement(value, DataStore.Postgres.Models.SupportTask.GetDataType(SupportTaskType), DataStore.Postgres.Models.SupportTask.SerializerOptions);
     }
 
     public static SupportTask FromModel(DataStore.Postgres.Models.SupportTask model) => new()

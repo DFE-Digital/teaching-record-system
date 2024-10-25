@@ -63,8 +63,8 @@ public partial class TestData
 
     public string CreateOneLoginUserSubject() => Guid.NewGuid().ToString("N");
 
-    public JsonDocument CreateOneLoginCoreIdentityVc(string firstName, string lastName, DateOnly dateOfBirth) =>
-        JsonDocument.Parse(
+    public JsonElement CreateOneLoginCoreIdentityVc(string firstName, string lastName, DateOnly dateOfBirth) =>
+        JsonSerializer.SerializeToElement(
             new JsonObject
             {
                 ["type"] = new JsonArray(

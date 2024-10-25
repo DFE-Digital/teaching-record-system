@@ -10,7 +10,7 @@ public class SupportTask
     internal static readonly JsonSerializerOptions SerializerOptions = new();
     private static readonly char[] _validReferenceChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray();
 
-    private JsonDocument _data = null!;
+    private JsonElement _data;
 
     public required string SupportTaskReference { get; set; }
     public required DateTime CreatedOn { get; init; }
@@ -23,7 +23,7 @@ public class SupportTask
     public required object Data
     {
         get => JsonSerializer.Deserialize(_data, GetDataType(), SerializerOptions)!;
-        set => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
+        set => _data = JsonSerializer.SerializeToElement(value, GetDataType(), SerializerOptions);
     }
 
     public static string GenerateSupportTaskReference()
