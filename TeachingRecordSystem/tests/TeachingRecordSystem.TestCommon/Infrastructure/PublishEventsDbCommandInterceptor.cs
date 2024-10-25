@@ -18,7 +18,14 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        throw new NotImplementedException();
+        var events = eventData.Context!.ChangeTracker.Entries<Event>();
+
+        if (events.Any())
+        {
+            throw new NotSupportedException();
+        }
+
+        return base.SavingChanges(eventData, result);
     }
 
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)

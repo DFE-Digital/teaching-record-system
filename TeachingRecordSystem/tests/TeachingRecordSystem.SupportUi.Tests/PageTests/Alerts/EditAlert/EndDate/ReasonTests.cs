@@ -7,14 +7,14 @@ public class ReasonTests : TestBase
 {
     public ReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.AllAlertsWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
     [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var startDate = TestData.Clock.Today.AddDays(-50);
         var databaseEndDate = TestData.Clock.Today.AddDays(-10);
@@ -155,7 +155,7 @@ public class ReasonTests : TestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var startDate = TestData.Clock.Today.AddDays(-50);
         var databaseEndDate = TestData.Clock.Today.AddDays(-10);

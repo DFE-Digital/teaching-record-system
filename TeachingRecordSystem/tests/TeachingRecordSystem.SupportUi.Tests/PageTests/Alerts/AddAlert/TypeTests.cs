@@ -7,14 +7,14 @@ public class TypeTests : TestBase
 {
     public TypeTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.AllAlertsWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
     [Fact]
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var person = await TestData.CreatePerson();
 
@@ -67,7 +67,7 @@ public class TypeTests : TestBase
     public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsAlertType()
     {
         // Arrange
-        SetCurrentUser(TestUsers.DbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
         var person = await TestData.CreatePerson();
 
@@ -88,7 +88,7 @@ public class TypeTests : TestBase
     public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_DoesNotShowDbsAlertType()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NonDbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
         var person = await TestData.CreatePerson();
 
@@ -109,7 +109,7 @@ public class TypeTests : TestBase
     public async Task Get_UserHasAlertsReadWriteRole_ShowsAllNonDbsRoles()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NonDbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
         var person = await TestData.CreatePerson();
 
@@ -131,7 +131,7 @@ public class TypeTests : TestBase
     public async Task Get_UserDoesNotHaveAlertsReadWriteRole_DoesNotShowAnyNonDbsRoles()
     {
         // Arrange
-        SetCurrentUser(TestUsers.DbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
         var person = await TestData.CreatePerson();
 
@@ -178,7 +178,7 @@ public class TypeTests : TestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var person = await TestData.CreatePerson();
 

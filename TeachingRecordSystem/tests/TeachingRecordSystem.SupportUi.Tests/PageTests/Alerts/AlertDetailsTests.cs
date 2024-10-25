@@ -6,7 +6,7 @@ public class AlertDetailsTests : TestBase
 {
     public AlertDetailsTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.AllAlertsReader);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_AlertIsDbsAlertAndUserDoesNotHavePermissionToRead_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var person = await TestData.CreatePerson(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
@@ -91,7 +91,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToRead_ReturnsOk()
     {
         // Arrange
-        SetCurrentUser(TestUsers.DbsAlertReader);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
         var person = await TestData.CreatePerson(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
@@ -111,7 +111,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_AlertIsDbsAlertAndUserDoesHavePermissionToReadAndWrite_ReturnsOk()
     {
         // Arrange
-        SetCurrentUser(TestUsers.DbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
         var person = await TestData.CreatePerson(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
@@ -131,7 +131,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_DbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
-        SetCurrentUser(TestUsers.DbsAlertReader);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
         var person = await TestData.CreatePerson(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
@@ -152,7 +152,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_DbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
     {
         // Arrange
-        SetCurrentUser(TestUsers.DbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
         var person = await TestData.CreatePerson(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
@@ -173,7 +173,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_NonDbsAlertAndUserDoesNotHaveWritePermission_DoesNotShowChangeLinks()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePerson(b => b
@@ -195,7 +195,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_NonDbsAlertAndUserDoesHaveWritePermission_DoesShowChangeLinks()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NonDbsAlertWriter);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
         var person = await TestData.CreatePerson(b => b

@@ -21,7 +21,7 @@ public abstract class TestBase : IDisposable
         HostFixture = hostFixture;
 
         _testServices = TestScopedServices.Reset();
-        SetCurrentUser(TestUsers.Administrator);
+        SetCurrentUser(TestUsers.GetUser(UserRoles.Administrator));
 
         HttpClient = hostFixture.CreateClient(new()
         {
@@ -52,6 +52,8 @@ public abstract class TestBase : IDisposable
     public HttpClient HttpClient { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    public TestUsers TestUsers => HostFixture.Services.GetRequiredService<TestUsers>();
 
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 

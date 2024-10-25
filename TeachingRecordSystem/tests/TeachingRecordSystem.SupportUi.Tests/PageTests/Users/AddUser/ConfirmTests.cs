@@ -10,7 +10,7 @@ public class ConfirmTests : TestBase
     public async Task Get_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
@@ -139,7 +139,7 @@ public class ConfirmTests : TestBase
     public async Task Post_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();

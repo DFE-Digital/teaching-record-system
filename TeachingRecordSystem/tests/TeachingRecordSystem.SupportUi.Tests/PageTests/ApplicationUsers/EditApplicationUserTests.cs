@@ -9,7 +9,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
 
@@ -80,7 +80,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
         var originalName = applicationUser.Name;
