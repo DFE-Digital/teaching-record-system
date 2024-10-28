@@ -194,4 +194,114 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(expectedSummaryText, item.GetElementByTestId("timeline-item-summary")?.TextContent.Trim());
             });
     }
+
+    [Fact]
+    public async Task Get_OutOfBoundsPageNumber_RedirectsToPage1()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/change-history?pageNumber=1", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Get_SinglePage_DoesNotShowPagination()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Empty(doc.GetElementsByClassName("govuk-pagination"));
+    }
+
+    [Fact]
+    public async Task Get_PageIsNotLastPage_ShowsNextPageLink()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        await CreateTasks(person.PersonId, 11);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=1");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.NotEmpty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "next"));
+    }
+
+    [Fact]
+    public async Task Get_PageIsLastPage_DoesNotShowNextPageLink()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        await CreateTasks(person.PersonId, 11);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Empty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "next"));
+    }
+
+    [Fact]
+    public async Task Get_PageIsNotFirstPage_ShowsPreviousPageLink()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        await CreateTasks(person.PersonId, 11);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.NotEmpty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "prev"));
+    }
+
+    [Fact]
+    public async Task Get_PageIsFirstPage_DoesNotShowPreviousPageLink()
+    {
+        // Arrange
+        var person = await TestData.CreatePerson();
+        await CreateTasks(person.PersonId, 11);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=1");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponse(response);
+        Assert.Empty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "prev"));
+    }
+
+    private async Task CreateTasks(Guid personId, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            await TestData.CreateCrmTask(b => b.WithPersonId(personId).WithCompletedStatus());
+        }
+    }
 }
