@@ -44,18 +44,6 @@ public abstract class StartDateTestBase(HostFixture hostFixture) : TestBase(host
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert()
-    {
-        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(null)));
-        return (person, person.Alerts.Single());
-    }
-
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert()
-    {
-        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(Clock.Today.AddDays(-1))));
-        return (person, person.Alerts.Single());
-    }
-
     private Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstance(Guid alertId, EditAlertStartDateState state) =>
         CreateJourneyInstance(
             JourneyNames.EditAlertStartDate,

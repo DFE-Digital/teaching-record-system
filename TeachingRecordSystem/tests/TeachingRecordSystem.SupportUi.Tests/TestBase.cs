@@ -124,6 +124,18 @@ public abstract class TestBase : IDisposable
             return 0;
         });
 
+    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert()
+    {
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(null)));
+        return (person, person.Alerts.Single());
+    }
+
+    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert()
+    {
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(Clock.Today.AddDays(-1))));
+        return (person, person.Alerts.Single());
+    }
+
     protected static HttpContent CreateEvidenceFileBinaryContent(byte[]? content = null)
     {
         var byteArrayContent = new ByteArrayContent(content ?? []);
