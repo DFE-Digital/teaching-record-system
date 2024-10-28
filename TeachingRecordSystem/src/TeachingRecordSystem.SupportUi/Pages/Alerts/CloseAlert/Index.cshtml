@@ -10,7 +10,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.AlertClose(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
-            <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Close an alert - @Model.PersonName</span>
 
             <govuk-date-input asp-for="EndDate">
                 <govuk-date-input-fieldset>
