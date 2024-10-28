@@ -1,13 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class ChangeHistoryModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsDbContext dbContext,
+    ReferenceDataCache referenceDataCache,
+    IAuthorizationService authorizationService,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 10;
 
@@ -50,7 +57,24 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbCon
             nameof(MandatoryQualificationCreatedEvent),
             nameof(MandatoryQualificationDqtImportedEvent),
             nameof(MandatoryQualificationMigratedEvent),
+            nameof(AlertCreatedEvent),
+            nameof(AlertUpdatedEvent),
+            nameof(AlertDeletedEvent),
+            nameof(AlertDqtDeactivatedEvent),
+            nameof(AlertDqtImportedEvent),
+            nameof(AlertDqtReactivatedEvent),
         };
+
+        var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
+
+        var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypes(activeOnly: false)
+            .ToAsyncEnumerable()
+            .SelectAwait(async at => (
+                AlertType: at,
+                CanRead: (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Read)) is { Succeeded: true }))
+            .Where(t => t.CanRead)
+            .Select(t => t.AlertType.AlertTypeId)
+            .ToArrayAsync();
 
         var eventsWithUser = await dbContext.Database
             .SqlQuery<EventWithUser>($"""
@@ -72,6 +96,7 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbCon
                 WHERE
                     e.person_id = {PersonId}
                     AND e.event_name = any ({eventTypes})
+                    AND (NOT (e.event_name = any({alertEventTypes})) OR (e.payload #>> Array['Alert','AlertTypeId'])::uuid = any({alertTypesWithReadPermission}))
                 """)
             .ToListAsync();
 
