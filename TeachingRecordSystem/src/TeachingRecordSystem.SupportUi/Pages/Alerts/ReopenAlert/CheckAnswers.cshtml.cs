@@ -11,8 +11,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
-    IClock clock,
-    ReferenceDataCache referenceDataCache) : PageModel
+    IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -36,7 +35,9 @@ public class CheckAnswersModel(
 
     public DateOnly? StartDate { get; set; }
 
-    public string? ChangeReason { get; set; }
+    public ReopenAlertReasonOption ChangeReason { get; set; }
+
+    public string? ChangeReasonDetail { get; set; }
 
     public string? EvidenceFileName { get; set; }
 
@@ -63,8 +64,8 @@ public class CheckAnswersModel(
             PersonId = PersonId,
             Alert = EventModels.Alert.FromModel(alert),
             OldAlert = oldAlertEventModel,
-            ChangeReason = null!,
-            ChangeReasonDetail = ChangeReason,  // FIXME
+            ChangeReason = ChangeReason.GetDisplayName(),
+            ChangeReasonDetail = ChangeReasonDetail,
             EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                 new EventModels.File()
                 {
@@ -101,17 +102,15 @@ public class CheckAnswersModel(
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
-        var alertType = await referenceDataCache.GetAlertTypeById(alertInfo.Alert.AlertTypeId);
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        AlertTypeName = alertType.Name;
+        AlertTypeName = alertInfo.Alert.AlertType.Name;
         Details = alertInfo.Alert.Details;
         Link = alertInfo.Alert.ExternalLink;
         StartDate = alertInfo.Alert.StartDate;
-        ChangeReason = JourneyInstance.State.ChangeReason != ReopenAlertReasonOption.AnotherReason ?
-            JourneyInstance.State.ChangeReason!.GetDisplayName() :
-            JourneyInstance!.State.ChangeReasonDetail;
+        ChangeReason = JourneyInstance.State.ChangeReason!.Value;
+        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :

@@ -12,6 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
     public const int MaxFileSizeMb = 50;
+    public const int ChangeReasonDetailMaxLength = 4000;
 
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -33,11 +34,17 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     public ReopenAlertReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
-    [Display(Name = "Enter details")]
+    [Display(Name = "Do you want to add more information about why you’re removing the end date?")]
+    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re removing the end date")]
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Add additional detail")]
+    [MaxLength(ChangeReasonDetailMaxLength, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Upload evidence")]
+    [Display(Name = "Do you want to upload evidence?")]
     [Required(ErrorMessage = "Select yes if you want to upload evidence")]
     public bool? UploadEvidence { get; set; }
 
@@ -57,11 +64,9 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
     public async Task OnGet()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
+        HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
-        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
@@ -69,9 +74,9 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     public async Task<IActionResult> OnPost()
     {
-        if (ChangeReason == ReopenAlertReasonOption.AnotherReason && string.IsNullOrWhiteSpace(ChangeReasonDetail))
+        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
         {
-            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter details");
+            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
 
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
@@ -117,6 +122,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
+            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail = ChangeReasonDetail;
             state.UploadEvidence = UploadEvidence;
         });
@@ -132,16 +138,12 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var alertInfo = context.HttpContext.GetCurrentAlertFeature();
-        if (alertInfo.Alert.EndDate is null)
-        {
-            context.Result = BadRequest(); ;
-            return;
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
     }
 }

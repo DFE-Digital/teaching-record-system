@@ -11,8 +11,7 @@ public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
-    IClock clock,
-    ReferenceDataCache referenceDataCache) : PageModel
+    IClock clock) : PageModel
 {
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
@@ -105,11 +104,10 @@ public class CheckAnswersModel(
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
-        var alertType = await referenceDataCache.GetAlertTypeById(alertInfo.Alert.AlertTypeId);
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        AlertTypeName = alertType.Name;
+        AlertTypeName = alertInfo.Alert.AlertType.Name;
         Details = alertInfo.Alert.Details;
         Link = alertInfo.Alert.ExternalLink;
         StartDate = alertInfo.Alert.StartDate;

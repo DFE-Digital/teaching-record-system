@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -12,6 +13,7 @@ public class Conventions : IConfigureFolderConventions
             model =>
             {
                 model.Filters.Add(new CheckAlertExistsFilterFactory(requiredPermission: Permissions.Alerts.Write));
+                model.Filters.Add(new ServiceFilterAttribute<RequireClosedAlertFilter>());
             });
     }
 }

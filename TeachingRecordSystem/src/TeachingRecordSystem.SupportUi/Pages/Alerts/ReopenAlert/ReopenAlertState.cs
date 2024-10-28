@@ -13,6 +13,8 @@ public class ReopenAlertState : IRegisterJourney
 
     public ReopenAlertReasonOption? ChangeReason { get; set; }
 
+    public bool? HasAdditionalReasonDetail { get; set; }
+
     public string? ChangeReasonDetail { get; set; }
 
     public bool? UploadEvidence { get; set; }
@@ -24,9 +26,11 @@ public class ReopenAlertState : IRegisterJourney
     public string? EvidenceFileSizeDescription { get; set; }
 
     [JsonIgnore]
-    [MemberNotNullWhen(true, nameof(ChangeReason), nameof(UploadEvidence), nameof(EvidenceFileId))]
-    public bool IsComplete => ChangeReason.HasValue &&
-        (ChangeReason.Value == ReopenAlertReasonOption.AnotherReason ? !string.IsNullOrWhiteSpace(ChangeReasonDetail) : true) &&
+    [MemberNotNullWhen(true, nameof(ChangeReason), nameof(HasAdditionalReasonDetail), nameof(UploadEvidence), nameof(EvidenceFileId))]
+    public bool IsComplete =>
+        ChangeReason.HasValue &&
+        HasAdditionalReasonDetail.HasValue &&
+        (!HasAdditionalReasonDetail.Value || (HasAdditionalReasonDetail.Value && !string.IsNullOrWhiteSpace(ChangeReasonDetail))) &&
         UploadEvidence.HasValue &&
         (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 }
