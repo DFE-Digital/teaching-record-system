@@ -10,6 +10,50 @@ public class CheckAnswersTests : TestBase
     }
 
     [Fact]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(roles: []));
+
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var details = "Some details";
+        var link = TestData.GenerateUrl();
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var changeReason = CloseAlertReasonOption.EndDateSet;
+        var changeReasonDetail = "Some details";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "test.pdf";
+        var person = await TestData.CreatePerson(
+            b => b.WithAlert(
+                a => a.WithAlertTypeId(alertType.AlertTypeId)
+                    .WithDetails(details)
+                    .WithExternalLink(link)
+                    .WithStartDate(startDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new CloseAlertState()
+            {
+                EndDate = journeyEndDate,
+                ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = true,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = evidenceFileName
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
@@ -24,6 +68,25 @@ public class CheckAnswersTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_WithClosedAlert_ReturnsBadRequest()
+    {
+        // Arrange
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var databaseEndDate = new DateOnly(2022, 11, 6);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
     [Fact]
@@ -55,7 +118,7 @@ public class CheckAnswersTests : TestBase
         var details = "Some details";
         var link = populateOptional ? TestData.GenerateUrl() : null;
         var journeyEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReason = populateOptional ? CloseAlertReasonOption.AnotherReason : CloseAlertReasonOption.EndDateSet;
+        var changeReason = CloseAlertReasonOption.EndDateSet;
         var changeReasonDetail = populateOptional ? "Some details" : null;
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
@@ -72,6 +135,7 @@ public class CheckAnswersTests : TestBase
             {
                 EndDate = journeyEndDate,
                 ChangeReason = changeReason,
+                HasAdditionalReasonDetail = populateOptional,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = populateOptional ? true : false,
                 EvidenceFileId = populateOptional ? evidenceFileId : null,
@@ -85,20 +149,14 @@ public class CheckAnswersTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(alertType.Name, doc.GetElementByTestId("alert-type")!.TextContent);
-        Assert.Equal(details, doc.GetElementByTestId("details")!.TextContent);
-        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : "-", doc.GetElementByTestId("link")!.TextContent);
-        Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
-        Assert.Equal(journeyEndDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("end-date")!.TextContent);
-        if (changeReason == CloseAlertReasonOption.AnotherReason)
-        {
-            Assert.Equal(changeReasonDetail, doc.GetElementByTestId("change-reason")!.TextContent);
-        }
-        else
-        {
-            Assert.Equal(changeReason.GetDisplayName(), doc.GetElementByTestId("change-reason")!.TextContent);
-        }
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetElementByTestId("uploaded-evidence-link")!.TextContent);
+        Assert.Equal(alertType.Name, doc.GetSummaryListValueForKey("Alert type"));
+        Assert.Equal(details, doc.GetSummaryListValueForKey("Details"));
+        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Link"));
+        Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Start date"));
+        Assert.Equal(journeyEndDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("End date"));
+        Assert.Equal(changeReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
+        Assert.Equal(populateOptional ? changeReasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]
@@ -116,6 +174,25 @@ public class CheckAnswersTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WithClosedAlert_ReturnsBadRequest()
+    {
+        // Arrange
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var databaseEndDate = new DateOnly(2022, 11, 6);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
     [Fact]
@@ -161,6 +238,7 @@ public class CheckAnswersTests : TestBase
             {
                 EndDate = journeyEndDate,
                 ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = true,
                 EvidenceFileId = evidenceFileId,
@@ -211,8 +289,8 @@ public class CheckAnswersTests : TestBase
                     StartDate = originalAlert.StartDate,
                     EndDate = null
                 },
-                ChangeReason = null,
-                ChangeReasonDetail = changeReason == CloseAlertReasonOption.AnotherReason ? changeReasonDetail : changeReason.GetDisplayName(),
+                ChangeReason = changeReason.GetDisplayName(),
+                ChangeReasonDetail = changeReasonDetail,
                 EvidenceFile = new()
                 {
                     FileId = evidenceFileId,
@@ -227,6 +305,50 @@ public class CheckAnswersTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(roles: []));
+
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
+        var startDate = TestData.Clock.Today.AddDays(-50);
+        var details = "Some details";
+        var link = TestData.GenerateUrl();
+        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
+        var changeReason = CloseAlertReasonOption.EndDateSet;
+        var changeReasonDetail = "Some details";
+        var evidenceFileId = Guid.NewGuid();
+        var evidenceFileName = "test.pdf";
+        var person = await TestData.CreatePerson(
+            b => b.WithAlert(
+                a => a.WithAlertTypeId(alertType.AlertTypeId)
+                    .WithDetails(details)
+                    .WithExternalLink(link)
+                    .WithStartDate(startDate)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new CloseAlertState()
+            {
+                EndDate = journeyEndDate,
+                ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
+                ChangeReasonDetail = changeReasonDetail,
+                UploadEvidence = true,
+                EvidenceFileId = evidenceFileId,
+                EvidenceFileName = evidenceFileName
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
@@ -247,6 +369,7 @@ public class CheckAnswersTests : TestBase
             {
                 EndDate = journeyEndDate,
                 ChangeReason = changeReason,
+                HasAdditionalReasonDetail = true,
                 ChangeReasonDetail = changeReasonDetail,
                 UploadEvidence = true,
                 EvidenceFileId = evidenceFileId,

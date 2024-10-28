@@ -11,7 +11,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.AlertCloseReason(Model.AlertId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
-            <span class="govuk-caption-l">Change previous alert - @Model.PersonName</span>
+            <span class="govuk-caption-l">Close an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-radios asp-for="ChangeReason" data-testid="change-reason-options">
@@ -28,9 +28,21 @@
                     </govuk-radios-item>
                     <govuk-radios-item value="@CloseAlertReasonOption.AnotherReason">
                         @CloseAlertReasonOption.AnotherReason.GetDisplayName()
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <govuk-radios asp-for="HasAdditionalReasonDetail">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-item value="@true">
+                        Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count asp-for="ChangeReasonDetail" label-class="govuk-label--m" max-length="4000" />
+                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="@ReasonModel.ChangeReasonDetailMaxLength" />
                         </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>

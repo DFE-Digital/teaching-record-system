@@ -67,9 +67,6 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
-        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
             await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
@@ -152,5 +149,8 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
+        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
     }
 }

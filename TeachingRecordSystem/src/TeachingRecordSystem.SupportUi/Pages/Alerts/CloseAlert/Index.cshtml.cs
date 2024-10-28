@@ -67,12 +67,6 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var alertInfo = context.HttpContext.GetCurrentAlertFeature();
-        if (alertInfo.Alert.EndDate is not null)
-        {
-            context.Result = BadRequest();
-            return;
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
 
         PersonId = personInfo.PersonId;

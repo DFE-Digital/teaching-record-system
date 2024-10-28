@@ -490,6 +490,36 @@ public class ReasonTests : TestBase
         Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
     }
 
+    [Fact]
+    public async Task Post_Cancel_DeletesJourneyAndRedirects()
+    {
+        // Arrange
+        var databaseStartDate = new DateOnly(2021, 10, 5);
+        var journeyStartDate = new DateOnly(2021, 10, 6);
+        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
+        var alertId = person.Alerts.Single().AlertId;
+        var journeyInstance = await CreateJourneyInstance(
+            alertId,
+            new EditAlertStartDateState()
+            {
+                Initialized = true,
+                CurrentStartDate = databaseStartDate,
+                StartDate = journeyStartDate
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/start-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
+    }
+
     private static HttpContent CreateEvidenceFileBinaryContent()
     {
         var byteArrayContent = new ByteArrayContent([]);
