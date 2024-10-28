@@ -408,13 +408,6 @@ public class ReasonTests : StartDateTestBase
         Assert.Null(journeyInstance);
     }
 
-    private static HttpContent CreateEvidenceFileBinaryContent()
-    {
-        var byteArrayContent = new ByteArrayContent([]);
-        byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
-        return byteArrayContent;
-    }
-
     private static MultipartFormDataContentBuilder CreateMinimumValidPostContent() =>
         CreatePostContent(
             changeReason: AlertChangeStartDateReasonOption.AnotherReason,

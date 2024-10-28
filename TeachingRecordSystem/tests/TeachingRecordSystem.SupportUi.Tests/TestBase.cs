@@ -123,4 +123,11 @@ public abstract class TestBase : IDisposable
             await action(dbContext);
             return 0;
         });
+
+    protected static HttpContent CreateEvidenceFileBinaryContent(byte[]? content = null)
+    {
+        var byteArrayContent = new ByteArrayContent(content ?? []);
+        byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
+        return byteArrayContent;
+    }
 }

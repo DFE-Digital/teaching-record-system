@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartDate;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert;
 
 public class RolesWithoutAlertWritePermissionDataAttribute : RoleNamesData
 {
