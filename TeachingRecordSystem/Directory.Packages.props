@@ -2,6 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+    <DefaultItemExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);packages.lock.json</DefaultItemExcludesInProjectFolder>  <!-- https://github.com/dotnet/sdk/issues/25294 -->
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AngleSharp" Version="1.1.2" />
