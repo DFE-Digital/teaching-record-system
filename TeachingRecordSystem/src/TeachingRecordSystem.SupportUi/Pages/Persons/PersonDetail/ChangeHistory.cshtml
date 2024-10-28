@@ -31,4 +31,22 @@ else
             <partial name="@viewName" for="@timelineItem" />
         }
     </div>
+
+    @if (Model.PaginationPages!.Length > 1)
+    {
+        <govuk-pagination>
+            @if (Model.GotPreviousPage)
+            {
+                <govuk-pagination-previous href="@LinkGenerator.PersonChangeHistory(Model.PersonId, Model.PageNumber - 1)" />
+            }
+            @foreach (var page in Model.PaginationPages!)
+            {
+                <govuk-pagination-item href="@LinkGenerator.PersonChangeHistory(Model.PersonId, page)" is-current="false">@(page)</govuk-pagination-item>
+            }
+            @if (Model.GotNextPage)
+            {
+                <govuk-pagination-next href="@LinkGenerator.PersonChangeHistory(Model.PersonId, Model.PageNumber + 1)" />
+            }
+        </govuk-pagination>
+    }
 }

@@ -7,13 +7,12 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbContextFactory<TrsDbContext> dbContextFactory) : PageModel
+public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
+    private const int PageSize = 10;
+
     [FromRoute]
     public Guid PersonId { get; set; }
-
-    [FromQuery]
-    public string? Search { get; set; }
 
     [FromQuery]
     public int? PageNumber { get; set; }
@@ -23,13 +22,35 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbConte
 
     public TimelineItem[]? TimelineItems { get; set; }
 
+    public int[]? PaginationPages { get; set; }
+
+    public bool GotPreviousPage { get; set; }
+
+    public bool GotNextPage { get; set; }
+
     public async Task<IActionResult> OnGet()
     {
+        PageNumber ??= 1;
+
+        if (PageNumber < 1)
+        {
+            return BadRequest();
+        }
+
         var personInfo = HttpContext.GetCurrentPersonFeature();
 
         var notesResult = await crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(PersonId));
 
-        using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        var eventTypes = new[]
+        {
+            nameof(MandatoryQualificationDeletedEvent),
+            nameof(MandatoryQualificationDqtDeactivatedEvent),
+            nameof(MandatoryQualificationUpdatedEvent),
+            nameof(MandatoryQualificationDqtReactivatedEvent),
+            nameof(MandatoryQualificationCreatedEvent),
+            nameof(MandatoryQualificationDqtImportedEvent),
+            nameof(MandatoryQualificationMigratedEvent),
+        };
 
         var eventsWithUser = await dbContext.Database
             .SqlQuery<EventWithUser>($"""
@@ -50,18 +71,11 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbConte
                             END = u.user_id
                 WHERE
                     e.person_id = {PersonId}
-                    AND e.event_name in
-                        ('MandatoryQualificationDeletedEvent',
-                        'MandatoryQualificationDqtDeactivatedEvent',
-                        'MandatoryQualificationUpdatedEvent',
-                        'MandatoryQualificationDqtReactivatedEvent',
-                        'MandatoryQualificationCreatedEvent',
-                        'MandatoryQualificationDqtImportedEvent',
-                        'MandatoryQualificationMigratedEvent')
+                    AND e.event_name = any ({eventTypes})
                 """)
             .ToListAsync();
 
-        TimelineItems = notesResult
+        var allResults = notesResult
             .Annotations.Select(n => (TimelineItem)new TimelineItem<Annotation>(
                 TimelineItemType.Annotation,
                 n.ModifiedOn!.Value.ToLocal(),
@@ -77,6 +91,22 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, IDbConte
             .Concat(eventsWithUser.Select(MapTimelineEvent))
             .OrderByDescending(i => i.Timestamp)
             .ToArray();
+
+        TimelineItems = allResults
+            .Skip((PageNumber!.Value - 1) * PageSize)
+            .Take(PageSize)
+            .ToArray();
+
+        // If an 'out of bounds' page was requested, redirect to the first page
+        if (TimelineItems.Length == 0 && PageNumber > 1)
+        {
+            return Redirect(linkGenerator.PersonChangeHistory(PersonId, pageNumber: 1));
+        }
+
+        var totalPages = (int)Math.Ceiling(allResults.Length / (decimal)PageSize);
+        PaginationPages = Enumerable.Range(1, totalPages).ToArray();
+        GotPreviousPage = PageNumber.Value > 1;
+        GotNextPage = PageNumber.Value < totalPages;
 
         return Page();
     }

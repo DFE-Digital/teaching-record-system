@@ -294,8 +294,8 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string PersonAlerts(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId });
 
-    public string PersonChangeHistory(Guid personId) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/ChangeHistory", routeValues: new { personId });
+    public string PersonChangeHistory(Guid personId, int? pageNumber = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/ChangeHistory", routeValues: new { personId, pageNumber });
 
     public string PersonEditName(Guid personId, JourneyInstanceId? journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
