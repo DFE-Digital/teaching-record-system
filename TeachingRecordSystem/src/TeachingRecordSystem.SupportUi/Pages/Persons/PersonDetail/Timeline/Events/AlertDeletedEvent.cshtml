@@ -1,0 +1,67 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<AlertDeletedEvent>>
+@{
+    var deletedEvent = Model.ItemModel.Event;
+    var alert = deletedEvent.Alert;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
+    var evidenceFileUrl = deletedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(deletedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Alert deleted</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="alert-type" use-empty-fallback>@alertType?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="start-date">@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Reason for deletion</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Deletion details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (deletedEvent.DeletionReasonDetail is not null)
+                            {
+                                <multi-line-text text="@deletedEvent.DeletionReasonDetail" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{deletedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>

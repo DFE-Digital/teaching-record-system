@@ -1,0 +1,79 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<AlertCreatedEvent>>
+@{
+    var createdEvent = Model.ItemModel.Event;
+    var alert = createdEvent.Alert;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
+    var evidenceFileUrl = createdEvent.EvidenceFile is not null ? await FileService.GetFileUrl(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-created-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Alert added</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            @if (alertType is not null)
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="alert-type" use-empty-fallback>@alertType?.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            else
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="sanction-code" use-empty-fallback>@alert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="sanction-name" use-empty-fallback>@alert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="start-date">@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Reason for adding alert</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@createdEvent.AddReason</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (createdEvent.AddReasonDetail is not null)
+                            {
+                                <multi-line-text text="@createdEvent.AddReasonDetail" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    @if (evidenceFileUrl is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="evidence"><a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{createdEvent.EvidenceFile!.Name} (opens in new tab)")</a></govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>        
+    </div>
+</div>

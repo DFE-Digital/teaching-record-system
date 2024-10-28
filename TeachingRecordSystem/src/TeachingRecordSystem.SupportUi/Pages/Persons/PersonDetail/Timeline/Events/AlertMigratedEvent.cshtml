@@ -1,0 +1,20 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<AlertMigratedEvent>>
+@{
+    var migratedEvent = Model.ItemModel.Event;
+    var alert = migratedEvent.Alert;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Alert migrated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+</div>

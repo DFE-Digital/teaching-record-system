@@ -1,0 +1,56 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<AlertDqtDeactivatedEvent>>
+@{
+    var dqtDeactivatedEvent = Model.ItemModel.Event;
+    var alert = dqtDeactivatedEvent.Alert;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Alert deactivated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+</div>
+<div class="moj-timeline__description">
+    <govuk-details class="govuk-!-margin-bottom-2">
+        <govuk-details-summary>Deactivated data</govuk-details-summary>
+        <govuk-details-text>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="sanction-code" use-empty-fallback>@alert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="sanction-name" use-empty-fallback>@alert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details" use-empty-fallback>@alert.Details</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="external-link" use-empty-fallback>@alert.ExternalLink</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>DQT spent</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="dqt-spent" use-empty-fallback>@alert.DqtSpent</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+        </govuk-details-text>
+    </govuk-details>
+</div>
