@@ -124,15 +124,15 @@ public abstract class TestBase : IDisposable
             return 0;
         });
 
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert()
+    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert(bool populateOptional = true)
     {
-        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(null)));
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(null).WithExternalLink(populateOptional ? TestData.GenerateUrl() : null)));
         return (person, person.Alerts.Single());
     }
 
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert()
+    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true)
     {
-        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(Clock.Today.AddDays(-1))));
+        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(Clock.Today.AddDays(-1)).WithExternalLink(populateOptional ? TestData.GenerateUrl() : null)));
         return (person, person.Alerts.Single());
     }
 
