@@ -63,7 +63,7 @@ public static class PageExtensions
 
     public static async Task GoToReopenAlertPage(this IPage page, Guid alertId)
     {
-        await page.GotoAsync($"/alerts/{alertId}/reopen");
+        await page.GotoAsync($"/alerts/{alertId}/re-open");
     }
 
     public static async Task GoToDeleteAlertPage(this IPage page, Guid alertId)
@@ -274,12 +274,12 @@ public static class PageExtensions
 
     public static async Task AssertOnReopenAlertPage(this IPage page, Guid alertId)
     {
-        await page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen");
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/re-open");
     }
 
     public static async Task AssertOnReopenAlertCheckAnswersPage(this IPage page, Guid alertId)
     {
-        await page.WaitForUrlPathAsync($"/alerts/{alertId}/reopen/check-answers");
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/re-open/check-answers");
     }
 
     public static async Task AssertOnDeleteAlertPage(this IPage page, Guid alertId)
