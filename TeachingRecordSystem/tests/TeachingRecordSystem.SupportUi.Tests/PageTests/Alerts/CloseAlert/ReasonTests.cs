@@ -13,7 +13,7 @@ public class ReasonTests : TestBase
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var startDate = TestData.Clock.Today.AddDays(-50);
         var journeyEndDate = TestData.Clock.Today.AddDays(-5);
@@ -166,7 +166,7 @@ public class ReasonTests : TestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var startDate = TestData.Clock.Today.AddDays(-50);
         var journeyEndDate = TestData.Clock.Today.AddDays(-5);

@@ -13,7 +13,7 @@ public class CheckAnswersTests : TestBase
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
         var startDate = TestData.Clock.Today.AddDays(-50);
@@ -311,7 +311,7 @@ public class CheckAnswersTests : TestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
         var startDate = TestData.Clock.Today.AddDays(-50);

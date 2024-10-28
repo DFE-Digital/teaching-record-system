@@ -13,7 +13,7 @@ public class IndexTests : TestBase
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var startDate = Clock.Today.AddDays(-50);
         var endDate = Clock.Today.AddDays(-10);
@@ -115,7 +115,7 @@ public class IndexTests : TestBase
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.NoRoles);
+        SetCurrentUser(TestUsers.GetUser(roles: []));
 
         var startDate = Clock.Today.AddDays(-50);
         var newEndDate = Clock.Today.AddDays(-5);
