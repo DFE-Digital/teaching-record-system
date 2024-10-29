@@ -6,4 +6,5 @@ public class RecurringJobsOptions
     public required BatchSendInternationalQtsAwardedEmailsJobOptions BatchSendInternationalQtsAwardedEmails { get; init; }
     public required BatchSendEytsAwardedEmailsJobOptions BatchSendEytsAwardedEmails { get; init; }
     public required BatchSendInductionCompletedEmailsJobOptions BatchSendInductionCompletedEmails { get; init; }
+    public required EWCWalesImportJobOptions EWCWalesImport { get; init; }
 }

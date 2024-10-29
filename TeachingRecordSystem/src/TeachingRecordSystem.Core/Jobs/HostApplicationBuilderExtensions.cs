@@ -37,6 +37,10 @@ public static class HostApplicationBuilderExtensions
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
+                builder.Services.AddOptions<EWCWalesImportJobOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:EWCWalesImport"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
                 builder.Services.AddTransient<SendQtsAwardedEmailJob>();
                 builder.Services.AddTransient<QtsAwardedEmailJobDispatcher>();
@@ -47,32 +51,38 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<SendInductionCompletedEmailJob>();
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
-                builder.Services.AddHttpClient<EWCWalesImportJob>();
+                builder.Services.AddTransient<EWCWalesImportJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
                     var recurringJobManager = sp.GetRequiredService<IRecurringJobManager>();
                     var options = sp.GetRequiredService<IOptions<RecurringJobsOptions>>().Value;
 
-                    recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(
-                        nameof(BatchSendQtsAwardedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
-                        options.BatchSendQtsAwardedEmails.JobSchedule);
+                    //recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(
+                    //    nameof(BatchSendQtsAwardedEmailsJob),
+                    //    job => job.Execute(CancellationToken.None),
+                    //    options.BatchSendQtsAwardedEmails.JobSchedule);
 
-                    recurringJobManager.AddOrUpdate<BatchSendInternationalQtsAwardedEmailsJob>(
-                        nameof(BatchSendInternationalQtsAwardedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
-                        options.BatchSendInternationalQtsAwardedEmails.JobSchedule);
+                    //recurringJobManager.AddOrUpdate<BatchSendInternationalQtsAwardedEmailsJob>(
+                    //    nameof(BatchSendInternationalQtsAwardedEmailsJob),
+                    //    job => job.Execute(CancellationToken.None),
+                    //    options.BatchSendInternationalQtsAwardedEmails.JobSchedule);
 
-                    recurringJobManager.AddOrUpdate<BatchSendEytsAwardedEmailsJob>(
-                        nameof(BatchSendEytsAwardedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
-                        options.BatchSendEytsAwardedEmails.JobSchedule);
+                    //recurringJobManager.AddOrUpdate<BatchSendEytsAwardedEmailsJob>(
+                    //    nameof(BatchSendEytsAwardedEmailsJob),
+                    //    job => job.Execute(CancellationToken.None),
+                    //    options.BatchSendEytsAwardedEmails.JobSchedule);
 
-                    recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
-                        nameof(BatchSendInductionCompletedEmailsJob),
+                    //recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
+                    //    nameof(BatchSendInductionCompletedEmailsJob),
+                    //    job => job.Execute(CancellationToken.None),
+                    //    options.BatchSendInductionCompletedEmails.JobSchedule);
+
+
+                    recurringJobManager.AddOrUpdate<EWCWalesImportJob>(
+                        nameof(EWCWalesImportJob),
                         job => job.Execute(CancellationToken.None),
-                        options.BatchSendInductionCompletedEmails.JobSchedule);
+                        options.EWCWalesImport.JobSchedule);
 
                     return Task.CompletedTask;
                 });
