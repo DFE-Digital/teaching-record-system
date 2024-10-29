@@ -362,6 +362,25 @@
     "dfeta_duplicatecount",
     "dfeta_importorganisation",
     "dfeta_integrationtransactionid",
-    "dfeta_totalcount"
+    "dfeta_totalcount",
+    "statecode"
+  ],
+  "dfeta_integrationtransactionrecord" : [
+    "dfeta_id",
+    "dfeta_filename",
+    "dfeta_personid",
+    "dfeta_organisationid",
+    "dfeta_inductionperiodid",
+    "dfeta_inductionid",
+    "dfeta_initialteachertrainingid",
+    "dfeta_duplicatestatus",
+    "dfeta_trefno",
+    "dfeta_failuremessage",
+    "dfeta_integrationtransactionrecordid",
+    "dfeta_integrationtransactionid",
+    "dfeta_qualificationid",
+    "dfeta_rowdata",
+    "dfeta_ukprn",
+    "statecode"
   ]
 }

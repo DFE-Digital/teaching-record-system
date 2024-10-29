@@ -2079,6 +2079,44 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_integrationtransactionrecord_dfeta_DuplicateStatus
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Duplicate", 0)]
+		Duplicate = 389040000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Duplicate Resolved", 1)]
+		DuplicateResolved = 389040002,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Not Applicable", 3)]
+		NotApplicable = 389040003,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Third Party Notified", 2)]
+		ThirdPartyNotified = 389040001,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_integrationtransactionrecord_StatusCode
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Fail", 1)]
+		Fail = 389040000,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Inactive", 2)]
+		Inactive = 2,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Success", 0)]
+		Success = 1,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum dfeta_ITTProgrammeType
 	{
 		

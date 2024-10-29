@@ -2,7 +2,9 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Azure.Storage.Blobs;
 using CsvHelper;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -28,15 +30,45 @@ public class EWCWalesImportJob(ICrmQueryDispatcher crmQueryDispatcher, Reference
                 using (var reader = new StreamReader(downloadStream))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
+                    var integrationJob = new CreateIntegrationTransactionQuery()
+                    {
+                        StartDate = DateTime.Now,
+                        TypeId = (int)dfeta_IntegrationInterface.GTCWalesImport
+                    };
+                    var integrationId = await crmQueryDispatcher.ExecuteQuery(integrationJob);
+
                     await foreach(var record in csv.GetRecordsAsync<ImportFileData>())
                     {
+                        var importType = record.FileName.ToLower() switch
+                        {
+                            var filename when filename.Contains("Ind", StringComparison.OrdinalIgnoreCase) => EWCWalesImportFileType.Induction,
+                            _ => EWCWalesImportFileType.Qualification
+                        };
 
+                        if(importType == EWCWalesImportFileType.Induction)
+                        {
+                            await ImportInduction();
+                        }
+                        else
+                        {
+                            await ImportQualification();
+                        }
                     }
+
+                    var updateQuery = new UpdateIntegrationTransactionQuery()
+                    {
+                        EndDate = DateTime.Now,
+                        TotalCount = 0,
+                        SuccessCount = 0,
+                        FailureCount = 0,
+                        DuplicateCount = 0,
+                        FailureMessage = ""
+                    };
+                    await crmQueryDispatcher.ExecuteQuery(updateQuery);
+
                 }
             }
         }
-        //Download Files From Storage Container
-        
     }
 
     public Task ImportInduction()
@@ -44,58 +76,63 @@ public class EWCWalesImportJob(ICrmQueryDispatcher crmQueryDispatcher, Reference
         return Task.CompletedTask;
     }
 
-    public Task Import()
+    public Task ImportQualification()
     {
         return Task.CompletedTask;
     }
-
-    //ValidateInduction
-    //Validate
 }
+
+
+public enum EWCWalesImportFileType
+{
+    Induction = 1,
+    Qualification = 2
+}
+
 
 public class ImportFileData
 {
-    public string FileName { get; set; }
+    public string FileName { get; init; }
     // Common columns
-    public string Forename { get; set; }
-    public string Surname { get; set; }
-    public string DateOfBirth { get; set; }
-    public string Gender { get; set; }
-    public string QtsRefNo { get; set; }
-    public string QtsStatus { get; set; }
+    public string Forename { get; init; }
+    public string Surname { get; init; }
+    public string DateOfBirth { get; init; }
+    public string Gender { get; init; }
+    public string QtsRefNo { get; init; }
+    public string QtsStatus { get; init; }
     public string QtsDate { get; set; }
 
     // ITT entity columns
-    public string IttStartMonth { get; set; }
-    public string IttStartYear { get; set; }
-    public string IttEndDate { get; set; }
-    public string IttCourseLength { get; set; }
-    public string IttEstabLeaCode { get; set; }
-    public string IttEstabCode { get; set; }
-    public string IttQualCode { get; set; }
-    public string IttClassCode { get; set; }
-    public string IttSubjectCode1 { get; set; }
-    public string IttSubjectCode2 { get; set; }
-    public string IttMinAgeRange { get; set; }
-    public string IttMaxAgeRange { get; set; }
-    public string IttMinSpAgeRange { get; set; }
-    public string IttMaxSpAgeRange { get; set; }
+    public string IttStartMonth { get; init; }
+    public string IttStartYear { get; init; }
+    public string IttEndDate { get; init; }
+    public string IttCourseLength { get; init; }
+    public string IttEstabLeaCode { get; init; }
+    public string IttEstabCode { get; init; }
+    public string IttQualCode { get; init; }
+    public string IttClassCode { get; init; }
+    public string IttSubjectCode1 { get; init; }
+    public string IttSubjectCode2 { get; init; }
+    public string IttMinAgeRange { get; init; }
+    public string IttMaxAgeRange { get; init; }
+    public string IttMinSpAgeRange { get; init; }
+    public string IttMaxSpAgeRange { get; init; }
     // Qualification entity columns
-    public string PqCourseLength { get; set; }
-    public string PqYearOfAward { get; set; }
-    public string PqCountry { get; set; }
-    public string PqEstabCode { get; set; }
-    public string PqQualCode { get; set; }
-    public string PqHonours { get; set; }
-    public string PqClassCode { get; set; }
-    public string PqSubjectCode1 { get; set; }
-    public string PqSubjectCode2 { get; set; }
-    public string PqSubjectCode3 { get; set; }
+    public string PqCourseLength { get; init; }
+    public string PqYearOfAward { get; init; }
+    public string PqCountry { get; init; }
+    public string PqEstabCode { get; init; }
+    public string PqQualCode { get; init; }
+    public string PqHonours { get; init; }
+    public string PqClassCode { get; init; }
+    public string PqSubjectCode1 { get; init; }
+    public string PqSubjectCode2 { get; init; }
+    public string PqSubjectCode3 { get; init; }
     // Induction entity columns
-    public string InductionStartDate { get; set; }
-    public string InductionPassedDate { get; set; }
-    public string InductionLeaName { get; set; }
-    public string InductionBodyCode { get; set; }
+    public string InductionStartDate { get; init; }
+    public string InductionPassedDate { get; init; }
+    public string InductionLeaName { get; init; }
+    public string InductionBodyCode { get; init; }
 }
 
 
