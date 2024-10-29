@@ -15,6 +15,7 @@ public class Person
     public string? NationalInsuranceNumber { get; set; }
     public ICollection<Qualification> Qualifications { get; } = new List<Qualification>();
     public ICollection<Alert> Alerts { get; } = new List<Alert>();
+    public ICollection<Route> Routes { get; } = new List<Route>();
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }

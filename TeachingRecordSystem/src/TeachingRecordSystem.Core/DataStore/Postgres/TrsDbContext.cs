@@ -87,6 +87,14 @@ public class TrsDbContext : DbContext
 
     public DbSet<AlertCategory> AlertCategories => Set<AlertCategory>();
 
+    public DbSet<QualifiedTeacherStatusQualification> QualifiedTeacherStatusQualifications => Set<QualifiedTeacherStatusQualification>();
+
+    public DbSet<EarlyYearsTeacherStatusQualification> EarlyYearsTeacherStatusQualifications => Set<EarlyYearsTeacherStatusQualification>();
+
+    public DbSet<Country> Countries => Set<Country>();
+
+    public DbSet<Route> Routes => Set<Route>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

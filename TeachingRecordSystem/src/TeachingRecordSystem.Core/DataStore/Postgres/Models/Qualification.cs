@@ -11,6 +11,7 @@ public abstract class Qualification
     public QualificationType QualificationType { get; }
     public required Guid PersonId { get; init; }
     public Person Person { get; } = null!;
+    public Route? Route { get; }
 
     public Guid? DqtQualificationId { get; set; }
     public DateTime? DqtFirstSync { get; set; }
