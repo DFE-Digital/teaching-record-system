@@ -1,7 +1,6 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
@@ -23,15 +22,11 @@ public class CreateIntegrationTransactionRecordHandler : ICrmQueryHandler<Create
             dfeta_QualificationId = query.QualificationId.HasValue ? new EntityReference(dfeta_qualification.EntityLogicalName, query.QualificationId.Value) : null,
             dfeta_InductionId = query.InductionId.HasValue ? new EntityReference(dfeta_induction.EntityLogicalName, query.InductionId.Value) : null,
             dfeta_InductionPeriodId = query.InductionPeriodId.HasValue ? new EntityReference(dfeta_inductionperiod.EntityLogicalName, query.InductionPeriodId.Value) : null,
-            //dfeta_DuplicateStatus = query.Duplicate == true ? new OptionSetValue((int)query.Duplicate)
-
+            dfeta_DuplicateStatus = query.Duplicate == true ? dfeta_integrationtransactionrecord_dfeta_DuplicateStatus.Duplicate : null
         };
         requestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = integrationTransaction });
         await requestBuilder.Execute();
 
         return id;
-
-        //if (duplicate)
-        //    item.Attributes.Add(IntegrationTransactionRecord.Attributes.DuplicateStatus, new OptionSetValue((int)DuplicateStatus.Duplicate));
     }
 }

@@ -118,6 +118,7 @@ public partial class TestData
             Guid? appropriateBodyOrgId = null)
         {
             var inductionId = Guid.NewGuid();
+            var inductionPeriodId = Guid.NewGuid();
             if (inductionStatus == dfeta_InductionStatus.Exempt && inductionExemptionReason == null)
             {
                 throw new InvalidOperationException("WithInduction must provide InductionExemptionReason if InductionStatus is Exempt");
@@ -131,7 +132,7 @@ public partial class TestData
             }
             if (appropriateBodyOrgId.HasValue)
             {
-                _inductionPeriods.Add(new InductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
+                _inductionPeriods.Add(new InductionPeriod(inductionPeriodId,inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
             }
             return this;
         }
@@ -532,7 +533,7 @@ public partial class TestData
                 {
                     Target = new dfeta_inductionperiod()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = inductionperiod!.InductionPeriodId,
                         dfeta_InductionId = inductionperiod!.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
                         dfeta_StartDate = inductionperiod.startDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
                         dfeta_EndDate = inductionperiod.endDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
@@ -1008,7 +1009,7 @@ public partial class TestData
 
     public record Induction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
 
-    public record InductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
+    public record InductionPeriod(Guid InductionPeriodId, Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
 
