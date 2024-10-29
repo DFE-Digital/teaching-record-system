@@ -157,17 +157,17 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertReopenCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/ReopenAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertDelete(Guid alertId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/Alerts/DeleteAlert/Index", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string AlertDelete(Guid alertId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/Index", routeValues: new { alertId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string AlertDeleteCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/DeleteAlert/Index", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertDeleteConfirm(Guid alertId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Alerts/DeleteAlert/Confirm", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string AlertDeleteCheckAnswers(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
-    public string AlertDeleteConfirmCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/Alerts/DeleteAlert/Confirm", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
+    public string AlertDeleteCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 

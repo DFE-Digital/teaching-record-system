@@ -1,57 +1,55 @@
 @page "/alerts/{alertId}/delete/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert.IndexModel
 @{
-    ViewBag.Title = "Delete this alert";
+    ViewBag.Title = $"Delete {Model.AlertTypeName} alert";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.EndDate is null ? LinkGenerator.PersonAlerts(Model.PersonId) : LinkGenerator.AlertDetail(Model.AlertId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.AlertDeleteCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId) : Model.EndDate is null ? LinkGenerator.PersonAlerts(Model.PersonId) : LinkGenerator.AlertDetail(Model.AlertId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post" enctype="multipart/form-data">
             <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
-            <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="alert-type">@Model.AlertTypeName</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" data-testid="details" /></govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
-                        @if (Model.Link is not null)
-                        {
-                            <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Link} (opens in new tab)")</a>
-                        }
-                        else
-                        {
-                            <span data-testid="link" use-empty-fallback></span>
-                        }
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            </govuk-summary-list>
-
-            <govuk-radios asp-for="ConfirmDelete">
+            <govuk-radios asp-for="HasAdditionalReasonDetail">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
-                    <govuk-radios-hint>If you delete this alert it will be permanently removed from the database</govuk-radios-hint>
-                    <govuk-radios-item value="@true">Yes, I want to delete this alert</govuk-radios-item>
-                    <govuk-radios-item value="@false">No, I want to keep this alert</govuk-radios-item>
+                    <govuk-radios-item value="@true">
+                        Yes
+                        <govuk-radios-item-conditional>
+                            <govuk-character-count asp-for="DeleteReasonDetail" max-length="@IndexModel.DeleteReasonDetailMaxLength" />
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <govuk-radios asp-for="UploadEvidence" data-testid="upload-evidence-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    <govuk-radios-item value="@true">
+                        Yes
+                        <govuk-radios-item-conditional>
+                            @if (Model.EvidenceFileId is not null)
+                            {
+                                <span class="govuk-caption-m">Currently uploaded file</span>
+                                <p class="govuk-body">
+                                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
+                                </p>
+                            }
+                            <govuk-file-upload asp-for="EvidenceFile" input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
+                                <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
+                            </govuk-file-upload>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
 

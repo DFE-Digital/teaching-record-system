@@ -1,24 +1,24 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
-public class IndexTests : TestBase
+public class IndexTests : DeleteAlertTestBase
 {
+    private const string PreviousStep = JourneySteps.New;
+    private const string ThisStep = JourneySteps.Index;
+
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
-    [Fact]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson(b => b.WithAlert());
-        var alert = person.Alerts.Single();
-
-        var journeyInstance = await CreateJourneyInstance(alert.AlertId);
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -30,12 +30,11 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
+    public async Task Get_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -46,18 +45,14 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Get_ValidRequest_ReturnsOk(bool isOpenAlert)
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithAlert());
-        var alert = person.Alerts.Single();
-        var journeyInstance = await CreateJourneyInstance(
-            alert.AlertId,
-            new DeleteAlertState
-            {
-                ConfirmDelete = true
-            });
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -65,37 +60,18 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
-        var radioButtons = doc.GetElementsByName("ConfirmDelete");
-        var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
-        Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
     }
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task Get_ValidRequest_RendersPageAsExpected(bool populateOptional)
+    public async Task Get_ValidRequestWithPopulatedDataInJourneyState_ReturnsExpectedContent(bool isOpenAlert)
     {
         // Arrange
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var details = "Some details";
-        var link = populateOptional ? TestData.GenerateUrl() : null;
-        var endDate = populateOptional ? TestData.Clock.Today.AddDays(-5) : (DateOnly?)null;
-        var person = await TestData.CreatePerson(
-            b => b.WithAlert(
-                a => a.WithAlertTypeId(alertType.AlertTypeId)
-                    .WithDetails(details)
-                    .WithExternalLink(link)
-                    .WithStartDate(startDate)
-                    .WithEndDate(endDate)));
-        var alert = person.Alerts.Single();
-        var journeyInstance = await CreateJourneyInstance(
-            alert.AlertId,
-            new DeleteAlertState
-            {
-                ConfirmDelete = true
-            });
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -104,46 +80,50 @@ public class IndexTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(alertType.Name, doc.GetElementByTestId("alert-type")!.TextContent);
-        Assert.Equal(details, doc.GetElementByTestId("details")!.TextContent);
-        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : "-", doc.GetElementByTestId("link")!.TextContent);
-        Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
-        Assert.Equal(populateOptional ? endDate?.ToString("d MMMM yyyy") : "-", doc.GetElementByTestId("end-date")!.TextContent);
+
+        AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
+        Assert.Equal(journeyInstance.State.DeleteReasonDetail, doc.GetElementsByName("DeleteReasonDetail")[0].TextContent);
+        AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
+
+        var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
+        Assert.NotNull(uploadedEvidenceLink);
+        Assert.Equal($"{journeyInstance.State.EvidenceFileName} ({journeyInstance.State.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
+
+        void AssertCheckedRadioOption(string name, string expectedCheckedValue)
+        {
+            var selectedOption = doc.GetElementsByName(name).SingleOrDefault(r => r.HasAttribute("checked"));
+            Assert.Equal(expectedCheckedValue, selectedOption?.GetAttribute("value"));
+        }
     }
 
-    [Fact]
-    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson(b => b.WithAlert());
-        var alert = person.Alerts.Single();
-
-        var journeyInstance = await CreateJourneyInstance(alert.AlertId);
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "ConfirmDelete", bool.TrueString }
-            }
+            Content = CreateMinimumValidPostContent()
         };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode); ;
     }
 
     [Fact]
-    public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
+    public async Task Post_AlertDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -154,63 +134,118 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
     }
 
-    [Fact]
-    public async Task Post_WhenNoConfirmDeleteOptionIsSelected_ReturnsError()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_NoHasAdditionalReasonDetailIsSelected_ReturnsError(bool isOpenAlert)
     {
         // Arrange
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var details = "Some details";
-        var link = TestData.GenerateUrl();
-        var endDate = TestData.Clock.Today.AddDays(-5);
-        var person = await TestData.CreatePerson(
-            b => b.WithAlert(
-                a => a.WithAlertTypeId(alertType.AlertTypeId)
-                    .WithDetails(details)
-                    .WithExternalLink(link)
-                    .WithStartDate(startDate)
-                    .WithEndDate(endDate)));
-        var alert = person.Alerts.Single();
-        var journeyInstance = await CreateJourneyInstance(alert.AlertId);
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(
+                uploadEvidence: false)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "ConfirmDelete", "Confirm you want to delete this alert");
+        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add why you are deleting this alert");
     }
 
     [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
-    public async Task Post_ValidInput_RedirectsToAppropriatePage(bool confirmDelete, bool isActive)
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_AdditionalDetailIsYesButAdditionalDetailsAreEmpty_ReturnsError(bool isOpenAlert)
     {
         // Arrange
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var details = "Some details";
-        var link = TestData.GenerateUrl();
-        var endDate = isActive ? (DateOnly?)null : TestData.Clock.Today.AddDays(-5);
-        var person = await TestData.CreatePerson(
-            b => b.WithAlert(
-                a => a.WithAlertTypeId(alertType.AlertTypeId)
-                    .WithDetails(details)
-                    .WithExternalLink(link)
-                    .WithStartDate(startDate)
-                    .WithEndDate(endDate)));
-        var alert = person.Alerts.Single();
-        var journeyInstance = await CreateJourneyInstance(alert.AlertId);
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["ConfirmDelete"] = confirmDelete ? "True" : "False"
-            })
+            Content = CreatePostContent(
+                hasAdditionalReasonDetail: true,
+                deleteReasonDetail: null,
+                uploadEvidence: false)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "DeleteReasonDetail", "Enter additional detail");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError(bool isOpenAlert)
+    {
+        // Arrange
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(
+                hasAdditionalReasonDetail: false,
+                uploadEvidence: true,
+                evidenceFile: null)
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "Select a file");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError(bool isOpenAlert)
+    {
+        // Arrange
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(
+                hasAdditionalReasonDetail: false,
+                uploadEvidence: true,
+                evidenceFile: (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage(bool isOpenAlert)
+    {
+        // Arrange
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+
+        var hasAdditionalReasonDetail = true;
+        var reasonDetail = "More details";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(
+                hasAdditionalReasonDetail: hasAdditionalReasonDetail,
+                deleteReasonDetail: reasonDetail,
+                uploadEvidence: false)
         };
 
         // Act
@@ -218,26 +253,113 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        if (confirmDelete)
+        Assert.StartsWith($"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(hasAdditionalReasonDetail, journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Equal(reasonDetail, journeyInstance.State.DeleteReasonDetail);
+        Assert.Null(journeyInstance.State.EvidenceFileName);
+        Assert.Null(journeyInstance.State.EvidenceFileId);
+        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_ValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage(bool isOpenAlert)
+    {
+        // Arrange
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+
+        var hasAdditionalReasonDetail = false;
+        var evidenceFileName = "evidence.pdf";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Assert.StartsWith($"/alerts/{alert.AlertId}/delete/confirm", response.Headers.Location!.OriginalString);
+            Content = CreatePostContent(
+                hasAdditionalReasonDetail: hasAdditionalReasonDetail,
+                uploadEvidence: true,
+                evidenceFile: (CreateEvidenceFileBinaryContent(), evidenceFileName))
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Null(journeyInstance.State.DeleteReasonDetail);
+        Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
+        Assert.NotNull(journeyInstance.State.EvidenceFileId);
+        Assert.NotNull(journeyInstance.State.EvidenceFileSizeDescription);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_Cancel_DeletesJourneyAndRedirects(bool isOpenAlert)
+    {
+        // Arrange
+        var (person, alert) = isOpenAlert ? await CreatePersonWithOpenAlert() : await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/delete/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        if (isOpenAlert)
+        {
+            Assert.Equal($"/persons/{person.PersonId}/alerts", response.Headers.Location!.OriginalString);
         }
         else
         {
-            if (isActive)
-            {
-                Assert.StartsWith($"/persons/{person.PersonId}/alerts", response.Headers.Location!.OriginalString);
-            }
-            else
-            {
-                Assert.StartsWith($"/alerts/{alert.AlertId}", response.Headers.Location!.OriginalString);
-            }
+            Assert.Equal($"/alerts/{alert.AlertId}", response.Headers.Location!.OriginalString);
         }
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstance(Guid alertId, DeleteAlertState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.DeleteAlert,
-            state ?? new DeleteAlertState(),
-            new KeyValuePair<string, object>("alertId", alertId));
+    private static MultipartFormDataContentBuilder CreateMinimumValidPostContent() =>
+        CreatePostContent(
+            hasAdditionalReasonDetail: false,
+            uploadEvidence: false);
+
+    private static MultipartFormDataContentBuilder CreatePostContent(
+        bool? hasAdditionalReasonDetail = null,
+        string? deleteReasonDetail = null,
+        bool? uploadEvidence = null,
+        (HttpContent Content, string FileName)? evidenceFile = null)
+    {
+        var builder = new MultipartFormDataContentBuilder();
+
+        if (hasAdditionalReasonDetail is not null)
+        {
+            builder.Add("HasAdditionalReasonDetail", hasAdditionalReasonDetail);
+        }
+
+        if (deleteReasonDetail is not null)
+        {
+            builder.Add("DeleteReasonDetail", deleteReasonDetail);
+        }
+
+        if (uploadEvidence is not null)
+        {
+            builder.Add("UploadEvidence", uploadEvidence);
+        }
+
+        if (evidenceFile is not null)
+        {
+            builder.Add("EvidenceFile", evidenceFile.Value.Content, evidenceFile.Value.FileName);
+        }
+
+        return builder;
+    }
 }

@@ -1,15 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 
 [Journey(JourneyNames.DeleteAlert), RequireJourneyInstance]
-public class ConfirmModel(
+public class CheckAnswersModel(
     TrsDbContext dbContext,
     TrsLinkGenerator linkGenerator,
     IFileService fileService,
@@ -38,49 +36,17 @@ public class ConfirmModel(
 
     public DateOnly? EndDate { get; set; }
 
-    [BindProperty]
-    [Display(Name = "Do you want to add additional detail?")]
-    [Required(ErrorMessage = "Select yes if you want to add additional detail")]
-    public bool? HasAdditionalDetail { get; set; }
+    public string? DeleteReasonDetail { get; set; }
 
-    [BindProperty]
-    [Display(Name = "Add additional detail")]
-    public string? AdditionalDetail { get; set; }
+    public string? EvidenceFileName { get; set; }
 
-    [BindProperty]
-    [Display(Name = "Upload evidence")]
-    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
-    public bool? UploadEvidence { get; set; }
+    public string? EvidenceFileSizeDescription { get; set; }
 
-    [BindProperty]
-    [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
-    public IFormFile? EvidenceFile { get; set; }
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public async Task<IActionResult> OnPost()
     {
-        if (HasAdditionalDetail == true && AdditionalDetail is null)
-        {
-            ModelState.AddModelError(nameof(AdditionalDetail), "Add additional detail");
-        }
-
-        if (UploadEvidence == true && EvidenceFile is null)
-        {
-            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return this.PageWithErrors();
-        }
-
         var now = clock.UtcNow;
-        Guid? evidenceFileId = null;
-        if (UploadEvidence == true)
-        {
-            using var stream = EvidenceFile!.OpenReadStream();
-            evidenceFileId = await fileService.UploadFile(stream, EvidenceFile.ContentType);
-        }
 
         var alert = await dbContext.Alerts
             .SingleAsync(a => a.AlertId == AlertId);
@@ -95,15 +61,15 @@ public class ConfirmModel(
             CreatedUtc = now,
             RaisedBy = User.GetUserId(),
             PersonId = PersonId,
-            Alert = EventModels.Alert.FromModel(alert),
-            DeletionReasonDetail = HasAdditionalDetail == true ? AdditionalDetail : null,
-            EvidenceFile = evidenceFileId is Guid fileId ?
+            Alert = oldAlertEventModel,
+            DeletionReasonDetail = DeleteReasonDetail,
+            EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                 new EventModels.File()
                 {
                     FileId = fileId,
-                    Name = EvidenceFile!.FileName
+                    Name = JourneyInstance.State.EvidenceFileName!
                 } :
-                null
+                null,
         };
 
         dbContext.AddEvent(deletedEvent);
@@ -124,7 +90,7 @@ public class ConfirmModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (JourneyInstance!.State.ConfirmDelete is null)
+        if (!JourneyInstance!.State.IsComplete)
         {
             context.Result = Redirect(linkGenerator.AlertDelete(AlertId, JourneyInstance.InstanceId));
             return;
@@ -140,6 +106,11 @@ public class ConfirmModel(
         Link = alertInfo.Alert.ExternalLink;
         StartDate = alertInfo.Alert.StartDate;
         EndDate = alertInfo.Alert.EndDate;
+        DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
+        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
+        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
+            await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
+            null;
 
         await next();
     }
