@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241029120016_AddQtsAndEytsQualificationTypes")]
+    partial class AddQtsAndEytsQualificationTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1027,25 +1030,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.ToTable("api_keys", (string)null);
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Country", b =>
-                {
-                    b.Property<string>("CountryId")
-                        .HasMaxLength(4)
-                        .HasColumnType("character varying(4)")
-                        .HasColumnName("country_id");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("name");
-
-                    b.HasKey("CountryId")
-                        .HasName("pk_countries");
-
-                    b.ToTable("countries", (string)null);
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EntityChangesJournal", b =>
                 {
                     b.Property<string>("Key")
@@ -2025,79 +2009,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Route", b =>
-                {
-                    b.Property<Guid>("RouteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("route_id");
-
-                    b.Property<int?>("AgeRangeFrom")
-                        .HasColumnType("integer")
-                        .HasColumnName("age_range_from");
-
-                    b.Property<int?>("AgeRangeTo")
-                        .HasColumnType("integer")
-                        .HasColumnName("age_range_to");
-
-                    b.Property<string>("CountryId")
-                        .HasColumnType("character varying(4)")
-                        .HasColumnName("country_id");
-
-                    b.Property<string>("ExternalReference")
-                        .HasColumnType("text")
-                        .HasColumnName("external_reference");
-
-                    b.Property<int?>("InductionExemptionReason")
-                        .HasColumnType("integer")
-                        .HasColumnName("induction_exemption_reason");
-
-                    b.Property<Guid?>("IttProviderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("itt_provider_id");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("person_id");
-
-                    b.Property<DateOnly?>("ProgrammeEndDate")
-                        .HasColumnType("date")
-                        .HasColumnName("programme_end_date");
-
-                    b.Property<DateOnly?>("ProgrammeStartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("programme_start_date");
-
-                    b.Property<Guid?>("QualificationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("qualification_id");
-
-                    b.Property<int>("QualificationType")
-                        .HasColumnType("integer")
-                        .HasColumnName("qualification_type");
-
-                    b.Property<int>("RouteStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("route_status");
-
-                    b.Property<int>("RouteType")
-                        .HasColumnType("integer")
-                        .HasColumnName("route_type");
-
-                    b.Property<List<Guid>>("Subjects")
-                        .IsRequired()
-                        .HasColumnType("uuid[]")
-                        .HasColumnName("subjects");
-
-                    b.HasKey("RouteId")
-                        .HasName("pk_routes");
-
-                    b.HasIndex("PersonId")
-                        .HasDatabaseName("ix_routes_person_id");
-
-                    b.ToTable("routes", (string)null);
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTask", b =>
                 {
                     b.Property<string>("SupportTaskReference")
@@ -2994,28 +2905,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("Person");
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Route", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Country", null)
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .HasConstraintName("fk_routes_countries_country_id");
-
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
-                        .WithMany("Routes")
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_routes_persons_person_id");
-
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Qualification", "Qualification")
-                        .WithOne("Route")
-                        .HasForeignKey("TeachingRecordSystem.Core.DataStore.Postgres.Models.Route", "QualificationId")
-                        .HasConstraintName("fk_routes_qualifications_qualification_id");
-
-                    b.Navigation("Qualification");
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTask", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", null)
@@ -3120,18 +3009,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("Alerts");
 
                     b.Navigation("Qualifications");
-
-                    b.Navigation("Routes");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.QtsAwardedEmailsJob", b =>
                 {
                     b.Navigation("JobItems");
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Qualification", b =>
-                {
-                    b.Navigation("Route");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApplicationUser", b =>
