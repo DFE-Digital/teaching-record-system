@@ -3726,3 +3726,18 @@ create table [transactioncurrency] (
 )
 
 
+CREATE TABLE [dbo].[GlobalOptionSetMetadata](
+    [OptionSetName] [nvarchar](64) NOT NULL,
+    [Option] [int] NOT NULL,
+    [IsUserLocalizedLabel] [bit] NOT NULL,
+    [LocalizedLabelLanguageCode] [int] NOT NULL,
+    [LocalizedLabel] [nvarchar](350) NULL,
+    PRIMARY KEY CLUSTERED 
+    (
+        [OptionSetName] ASC,
+        [Option] ASC,
+        [IsUserLocalizedLabel] ASC,
+        [LocalizedLabelLanguageCode] ASC
+    )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+
