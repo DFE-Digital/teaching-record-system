@@ -287,9 +287,9 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete");
     }
 
-    public static async Task AssertOnDeleteAlertConfirmPage(this IPage page, Guid alertId)
+    public static async Task AssertOnDeleteAlertCheckAnswersPage(this IPage page, Guid alertId)
     {
-        await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/confirm");
+        await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/check-answers");
     }
 
     public static async Task AssertOnPersonEditNamePage(this IPage page, Guid personId)

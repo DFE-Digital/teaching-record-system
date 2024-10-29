@@ -1,0 +1,91 @@
+@page "/alerts/{alertId}/delete/check-answers/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert.CheckAnswersModel
+@{
+    ViewBag.Title = "Check details and delete alert";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full-from-desktop">
+        <form action="@LinkGenerator.AlertDeleteCheckAnswers(Model.AlertId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Delete an alert - @Model.PersonName</span>
+            <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
+
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="alert-type">@Model.AlertTypeName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value><multi-line-text text="@Model.Details" data-testid="details" /></govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.Link is not null)
+                        {
+                            <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Link} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="link" use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@Model.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason for deleting alert</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.DeleteReasonDetail is not null)
+                        {
+                            <multi-line-text text="@Model.DeleteReasonDetail" />
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.UploadedEvidenceFileUrl is not null)
+                        {
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertDelete(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
+            <h2 class="govuk-heading-m">Are you sure you want to delete this alert?</h2>
+            <div class="govuk-body">
+                <span class="govuk-caption-m">Deleting this alert will permanently remove it from the database</span>
+            </div>            
+            <div class="govuk-button-group">
+                <govuk-button class="govuk-button--warning" type="submit">Delete alert</govuk-button>
+                <govuk-button formaction="@LinkGenerator.AlertDeleteCheckAnswersCancel(Model.AlertId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>                                
+        </form>
+    </div>
+</div>

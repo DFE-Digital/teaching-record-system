@@ -407,7 +407,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
-        var deleteReason = TestData.GenerateLoremIpsum();
+        var deleteReasonDetails = TestData.GenerateLoremIpsum();
         var evidenceFileName = "evidence.jpg";
         var evidenceFileMimeType = "image/jpeg";
 
@@ -417,18 +417,10 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await page.GoToDeleteAlertPage(alertId);
 
         await page.AssertOnDeleteAlertPage(alertId);
-        await page.CheckAsync("label:text-is('Yes, I want to delete this alert')");
 
-        await page.ClickContinueButton();
-
-        await page.AssertOnDeleteAlertConfirmPage(alertId);
-
-        await page.CheckAsync(":nth-match(label:text-is('Yes'), 1)");
-
-        await page.FillAsync("label:text-is('Add additional detail')", deleteReason);
-
-        await page.CheckAsync(":nth-match(label:text-is('Yes'), 2)");
-
+        await page.Locator("div.govuk-form-group:has-text('Do you want to add why you are deleting this alert?')").Locator("label:text-is('Yes')").CheckAsync();
+        await page.FillAsync("label:text-is('Add additional detail')", deleteReasonDetails);
+        await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
         await page
             .GetByLabel("Upload a file")
             .SetInputFilesAsync(
@@ -439,7 +431,11 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickButton("Delete this alert");
+        await page.ClickContinueButton();
+
+        await page.AssertOnDeleteAlertCheckAnswersPage(alertId);
+
+        await page.ClickButton("Delete alert");
 
         await page.AssertOnPersonAlertsPage(personId);
 
