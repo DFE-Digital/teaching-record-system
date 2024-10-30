@@ -52,5 +52,5 @@ public class AlertDetailModel(
             Permissions.Alerts.Write)) is { Succeeded: true };
     }
 
-    private record ChangeReasonInfo(string ChangeReason, string ChangeReasonDetail);
+    private record ChangeReasonInfo(string? ChangeReason, string? ChangeReasonDetail);
 }
