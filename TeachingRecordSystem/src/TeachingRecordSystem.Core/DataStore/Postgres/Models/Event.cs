@@ -12,6 +12,8 @@ public class Event
     public string? Key { get; init; }
     public bool Published { get; set; }
     public Guid? PersonId { get; init; }
+    public Guid? QualificationId { get; init; }
+    public Guid? AlertId { get; init; }
 
     public static Event FromEventBase(EventBase @event, DateTime? inserted)
     {
@@ -26,7 +28,9 @@ public class Event
             Inserted = inserted ?? @event.CreatedUtc,
             Payload = payload,
             Key = (@event as IEventWithKey)?.Key,
-            PersonId = (@event as IEventWithPersonId)?.PersonId
+            PersonId = (@event as IEventWithPersonId)?.PersonId,
+            QualificationId = (@event as IEventWithMandatoryQualification)?.MandatoryQualification.QualificationId,
+            AlertId = (@event as IEventWithAlert)?.Alert.AlertId
         };
     }
 

@@ -1,5 +1,6 @@
 using Npgsql;
 using NpgsqlTypes;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
@@ -55,7 +56,9 @@ public static class NpgsqlExtensions
             "inserted",
             "payload",
             "key",
-            "person_id"
+            "person_id",
+            "qualification_id",
+            "alert_id"
         };
 
         var columnList = string.Join(", ", columnNames);
@@ -68,7 +71,9 @@ public static class NpgsqlExtensions
                 inserted TIMESTAMP WITH TIME ZONE NOT NULL,
                 payload JSONB NOT NULL,
                 key VARCHAR(200),
-                person_id UUID
+                person_id UUID,
+                qualification_id UUID,
+                alert_id UUID
             )
             ON COMMIT DROP
             """;
@@ -91,16 +96,18 @@ public static class NpgsqlExtensions
 
         using var writer = await transaction.Connection!.BeginBinaryImportAsync(copyStatement, cancellationToken);
 
-        foreach (var e in events)
+        foreach (var e in events.Select(e => Event.FromEventBase(e, inserted: clock.UtcNow)))
         {
             writer.StartRow();
             writer.WriteValueOrNull(e.EventId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(e.GetEventName(), NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull(e.CreatedUtc, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(clock.UtcNow, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(e.Serialize(), NpgsqlDbType.Jsonb);  // payload
-            writer.WriteValueOrNull((e as IEventWithKey)?.Key, NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull((e as IEventWithPersonId)?.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(e.EventName, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(e.Created, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(e.Inserted, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(e.Payload, NpgsqlDbType.Jsonb);
+            writer.WriteValueOrNull(e.Key, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(e.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(e.QualificationId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(e.AlertId, NpgsqlDbType.Uuid);
         }
 
         await writer.CompleteAsync(cancellationToken);
