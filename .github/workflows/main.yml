@@ -51,26 +51,50 @@ jobs:
 
   deploy_test:
     name: Deploy test environment
+    runs-on: ubuntu-latest
     needs: [package]
-    uses: ./.github/workflows/deploy-test.yml
-    with:
-      docker_image: ${{ needs.package.outputs.docker_image }}
-    secrets: inherit
+    environment: test
+    concurrency: deploy_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/actions/deploy-aks-environment
+        id: deploy
+        with:
+          environment_name: test
+          docker_image: ${{ needs.package.outputs.docker_image }}
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
 
   deploy_preprod:
     name: Deploy pre-production environment
+    runs-on: ubuntu-latest
     needs: [package, deploy_test, check_environments]
     if: needs.check_environments.outputs.deploy_preprod == 'true'
-    uses: ./.github/workflows/deploy-preprod.yml
-    with:
-      docker_image: ${{ needs.package.outputs.docker_image }}
-    secrets: inherit
+    environment: pre-production
+    concurrency: deploy_pre-production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/actions/deploy-aks-environment
+        id: deploy
+        with:
+          environment_name: pre-production
+          docker_image: ${{ needs.package.outputs.docker_image }}
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
 
   deploy_prod:
     name: Deploy production environment
+    runs-on: ubuntu-latest
     needs: [deploy_test, package, deploy_preprod]
     if: always() && (needs.deploy_preprod.result == 'success' || needs.deploy_preprod.result == 'skipped') && (needs.package.result == 'success') && (needs.deploy_test.result == 'success')
-    uses: ./.github/workflows/deploy-prod.yml
-    with:
-      docker_image: ${{ needs.package.outputs.docker_image }}
-    secrets: inherit
+    environment: production
+    concurrency: deploy_production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/actions/deploy-aks-environment
+        id: deploy
+        with:
+          environment_name: production
+          docker_image: ${{ needs.package.outputs.docker_image }}
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
