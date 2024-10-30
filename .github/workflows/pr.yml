@@ -130,8 +130,10 @@ jobs:
         id: cache-packages-restore
         uses: actions/cache/restore@v4
         with:
-          path: ~/.nuget/packages
-          key: nuget-${{ hashFiles('**/packages.lock.json') }}
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/.librarymanager/cache
+          key: ${{ hashFiles('**/packages.lock.json', '**/libman.json') }}
 
       - name: Restore
         run: just restore
@@ -140,7 +142,9 @@ jobs:
         id: cache-packages-save
         uses: actions/cache/save@v4
         with:
-          path: ~/.nuget/packages
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/.librarymanager/cache
           key: ${{ steps.cache-packages-restore.outputs.cache-primary-key }}
         if: steps.cache-packages-restore.outputs.cache-hit != 'true'
 

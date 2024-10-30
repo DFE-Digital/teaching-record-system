@@ -38,8 +38,10 @@ jobs:
       - name: Get cached packages
         uses: actions/cache/restore@v4
         with:
-          path: ~/.nuget/packages
-          key: nuget-${{ hashFiles('**/packages.lock.json') }}
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/.librarymanager/cache
+          key: ${{ hashFiles('**/packages.lock.json', '**/libman.json') }}
 
       - name: Docker build & push
         run: |
