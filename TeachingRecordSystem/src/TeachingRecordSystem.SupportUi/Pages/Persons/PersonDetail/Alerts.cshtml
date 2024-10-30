@@ -50,7 +50,7 @@
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="#" visually-hidden-text="details">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action href="@LinkGenerator.AlertEditDetails(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="details">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>
@@ -65,7 +65,7 @@
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
-                                <govuk-summary-list-row-action href="#" visually-hidden-text="link">Change</govuk-summary-list-row-action>
+                                <govuk-summary-list-row-action href="@LinkGenerator.AlertEditLink(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
                     </govuk-summary-list-row>
@@ -81,7 +81,13 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback></govuk-summary-list-row-value>
+                        @if (canWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action href="@LinkGenerator.AlertClose(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="end date">Add</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }                        
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-summary-card>

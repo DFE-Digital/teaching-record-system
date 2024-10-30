@@ -16,6 +16,15 @@
         <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.Details</govuk-summary-list-row-value>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
+        <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value use-empty-fallback>
+            @if (Model.Alert.ExternalLink is not null)
+            {
+                <a href="@Model.Alert.ExternalLink" rel="noopener noreferrer" class="govuk-link">@Model.Alert.ExternalLink</a>
+            }
+        </govuk-summary-list-row-value>
+    </govuk-summary-list-row>
+    <govuk-summary-list-row>
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
     </govuk-summary-list-row>
@@ -30,4 +39,22 @@
             </govuk-summary-list-row-actions>
         }
     </govuk-summary-list-row>
+    <govuk-summary-list-row>
+        <govuk-summary-list-row-key>Reason for closing alert</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.ChangeReason</govuk-summary-list-row-value>
+    </govuk-summary-list-row>
+    <govuk-summary-list-row>
+        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value>
+            @if (Model.ChangeReasonDetail is not null)
+            {
+                <multi-line-text text="@Model.ChangeReasonDetail" />
+            }
+            else
+            {
+                <span use-empty-fallback></span>
+            }
+        </govuk-summary-list-row-value>
+    </govuk-summary-list-row>
+
 </govuk-summary-list>
