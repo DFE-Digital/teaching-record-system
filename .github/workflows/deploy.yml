@@ -1,18 +1,15 @@
-name: Deploy pre-production environment
+name: Deploy environment
 
 on:
-  workflow_call:
-    inputs:
-      docker_image:
-        type: string
-        required: true
-
   workflow_dispatch:
     inputs:
       docker_image:
         type: string
+      environment:
+        type: environment
+        required: true
 
-concurrency: deploy_pre-production
+concurrency: deploy_${{ inputs.environment }}
 jobs:
   package:
     name: Package application
@@ -27,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: pre-production
+      name: ${{ inputs.environment }}
 
     steps:
     - uses: actions/checkout@v4
@@ -35,6 +32,6 @@ jobs:
     - uses: ./.github/workflows/actions/deploy-aks-environment
       id: deploy
       with:
-        environment_name: pre-production
+        environment_name: ${{ inputs.environment }}
         docker_image: ${{ inputs.docker_image || needs.package.outputs.docker_image }}
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
