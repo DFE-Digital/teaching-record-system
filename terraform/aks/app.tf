@@ -43,8 +43,8 @@ resource "kubernetes_job" "migrations" {
   wait_for_completion = true
 
   timeouts {
-    create = "11m"
-    update = "11m"
+    create = "15m"
+    update = "15m"
   }
 }
 

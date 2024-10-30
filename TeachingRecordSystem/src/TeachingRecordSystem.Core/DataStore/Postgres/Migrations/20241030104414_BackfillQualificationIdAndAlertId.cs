@@ -12,9 +12,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
         {
             migrationBuilder.Sql(
                 """
-                update events set qualification_id = (payload #>> Array['MandatoryQualification', 'QualificationId'])::uuid;
+                update events set qualification_id = (payload #>> Array['MandatoryQualification', 'QualificationId'])::uuid
+                where (payload #>> Array['MandatoryQualification', 'QualificationId'])::uuid is not null;
 
-                update events set alert_id = (payload #>> Array['Alert', 'AlertId'])::uuid;
+                update events set alert_id = (payload #>> Array['Alert', 'AlertId'])::uuid
+                where (payload #>> Array['Alert', 'AlertId'])::uuid is not null;
                 """);
         }
 
