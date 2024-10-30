@@ -2,17 +2,17 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject IFileService FileService
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<AlertCreatedEvent>>
+@model TimelineItem<TimelineEvent<AlertDeletedEvent>>
 @{
-    var createdEvent = Model.ItemModel.Event;
-    var alert = createdEvent.Alert;
+    var deletedEvent = Model.ItemModel.Event;
+    var alert = deletedEvent.Alert;
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
-    var evidenceFileUrl = createdEvent.EvidenceFile is not null ? await FileService.GetFileUrl(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var evidenceFileUrl = deletedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(deletedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-created-event">
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
     <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title">Alert added</h2>
+        <h2 class="moj-timeline__title">Alert deleted</h2>
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
@@ -31,19 +31,15 @@
         </govuk-summary-list>
 
         <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Reason for adding alert</govuk-details-summary>
+            <govuk-details-summary>Reason for deletion</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@createdEvent.AddReason</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Deletion details</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
-                            @if (createdEvent.AddReasonDetail is not null)
+                            @if (deletedEvent.DeletionReasonDetail is not null)
                             {
-                                <multi-line-text text="@createdEvent.AddReasonDetail" />
+                                <multi-line-text text="@deletedEvent.DeletionReasonDetail" />
                             }
                             else
                             {
@@ -51,15 +47,21 @@
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @if (evidenceFileUrl is not null)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="evidence"><a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{createdEvent.EvidenceFile!.Name} (opens in new tab)")</a></govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{deletedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>
-        </govuk-details>        
+        </govuk-details>
     </div>
 </div>
