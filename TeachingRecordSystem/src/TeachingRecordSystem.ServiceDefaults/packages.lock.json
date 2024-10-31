@@ -2358,8 +2358,8 @@
           "EntityFrameworkCore.Projectables": "[3.0.4, )",
           "Google.Cloud.Storage.V1": "[4.10.0, )",
           "GovukNotify": "[6.1.0, )",
-          "Hangfire.Core": "[1.8.14, )",
-          "Hangfire.NetCore": "[1.8.14, )",
+          "Hangfire.Core": "[1.8.15, )",
+          "Hangfire.NetCore": "[1.8.15, )",
           "Hangfire.PostgreSql": "[1.20.9, )",
           "IdentityModel": "[6.2.0, )",
           "Microsoft.ApplicationInsights": "[2.22.0, )",
@@ -2500,23 +2500,11 @@
       },
       "Hangfire.Core": {
         "type": "CentralTransitive",
-        "requested": "[1.8.14, )",
-        "resolved": "1.8.14",
-        "contentHash": "tj/+J8/UdaxydFX6VQr5IEyBtVbAOvkQ8X8tIQKwY9zlpmK83hP4iHEQQQ26zzGUpcE1HlPc6PBUv0NgUDXS3A==",
+        "requested": "[1.8.15, )",
+        "resolved": "1.8.15",
+        "contentHash": "+w8gT6CFH4jicVEsJ8WlMRJMNV2MG52JNtvKoXPFHFs6nkDTND6iDeCjydyHgp+85lZPRXc+s9/vkxD2vbPrLg==",
         "dependencies": {
           "Newtonsoft.Json": "11.0.1"
-        }
-      },
-      "Hangfire.NetCore": {
-        "type": "CentralTransitive",
-        "requested": "[1.8.14, )",
-        "resolved": "1.8.14",
-        "contentHash": "fBLdsxWYFdrQuenvVHEj/z8nOXoOTqpWIl4qYoinBAUCVmp4qlxfFsY3Aq3VVbwket0wBH472aG2LAmYm6hjxw==",
-        "dependencies": {
-          "Hangfire.Core": "[1.8.14]",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.0.0",
-          "Microsoft.Extensions.Hosting.Abstractions": "3.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "3.0.0"
         }
       },
       "Hangfire.PostgreSql": {
