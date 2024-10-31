@@ -73,8 +73,14 @@ public class ChangeHistoryModel(
                 AlertType: at,
                 CanRead: (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Read)) is { Succeeded: true }))
             .Where(t => t.CanRead)
-            .Select(t => t.AlertType.AlertTypeId)
             .ToArrayAsync();
+
+        var alertTypeIdsWithReadPermission = alertTypesWithReadPermission.Select(at => at.AlertType.AlertTypeId).ToArray();
+
+        var dqtSanctionCodesWithReadPermission = alertTypesWithReadPermission
+            .Select(at => at.AlertType.DqtSanctionCode)
+            .Where(sc => sc is not null)
+            .ToArray();
 
         var eventsWithUser = await dbContext.Database
             .SqlQuery<EventWithUser>($"""
@@ -96,7 +102,13 @@ public class ChangeHistoryModel(
                 WHERE
                     e.person_id = {PersonId}
                     AND e.event_name = any ({eventTypes})
-                    AND (NOT (e.event_name = any({alertEventTypes})) OR (e.payload #>> Array['Alert','AlertTypeId'])::uuid = any({alertTypesWithReadPermission}))
+
+                    -- Only return alerts that have an alert type (or DQT sanction code) that the user is authorized to Read
+                    AND (
+                        NOT (e.event_name = any({alertEventTypes}))
+                        OR (e.payload #>> Array['Alert','AlertTypeId'])::uuid = any({alertTypeIdsWithReadPermission})
+                        OR (e.payload #>> Array['Alert','DqtSanctionCode','Value']) = any({dqtSanctionCodesWithReadPermission})
+                    )
                 """)
             .ToListAsync();
 
