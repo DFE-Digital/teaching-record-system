@@ -46,7 +46,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
         OpenAlerts = authorizedAlerts.Where(a => a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
         ClosedAlerts = authorizedAlerts.Where(a => !a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.EndDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
 
-        CanAddAlert = await (await referenceDataCache.GetAlertTypes(activeOnly: true))
+        CanAddAlert = await referenceDataCache.GetAlertTypes(activeOnly: true)
             .ToAsyncEnumerable()
             .AnyAwaitAsync(async at => (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true });
 

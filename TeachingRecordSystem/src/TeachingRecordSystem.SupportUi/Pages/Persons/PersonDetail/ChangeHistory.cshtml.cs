@@ -1,13 +1,20 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.Timeline.Events;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class ChangeHistoryModel(
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsDbContext dbContext,
+    ReferenceDataCache referenceDataCache,
+    IAuthorizationService authorizationService,
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int PageSize = 10;
 
@@ -50,7 +57,31 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbCon
             nameof(MandatoryQualificationCreatedEvent),
             nameof(MandatoryQualificationDqtImportedEvent),
             nameof(MandatoryQualificationMigratedEvent),
+            nameof(AlertCreatedEvent),
+            nameof(AlertUpdatedEvent),
+            nameof(AlertDeletedEvent),
+            nameof(AlertMigratedEvent),
+            nameof(AlertDqtDeactivatedEvent),
+            nameof(AlertDqtImportedEvent),
+            nameof(AlertDqtReactivatedEvent),
         };
+
+        var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
+
+        var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypes(activeOnly: false)
+            .ToAsyncEnumerable()
+            .SelectAwait(async at => (
+                AlertType: at,
+                CanRead: (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Read)) is { Succeeded: true }))
+            .Where(t => t.CanRead)
+            .ToArrayAsync();
+
+        var alertTypeIdsWithReadPermission = alertTypesWithReadPermission.Select(at => at.AlertType.AlertTypeId).ToArray();
+
+        var dqtSanctionCodesWithReadPermission = alertTypesWithReadPermission
+            .Select(at => at.AlertType.DqtSanctionCode)
+            .Where(sc => sc is not null)
+            .ToArray();
 
         var eventsWithUser = await dbContext.Database
             .SqlQuery<EventWithUser>($"""
@@ -72,6 +103,13 @@ public class ChangeHistoryModel(ICrmQueryDispatcher crmQueryDispatcher, TrsDbCon
                 WHERE
                     e.person_id = {PersonId}
                     AND e.event_name = any ({eventTypes})
+
+                    -- Only return alerts that have an alert type (or DQT sanction code) that the user is authorized to Read
+                    AND (
+                        NOT (e.event_name = any({alertEventTypes}))
+                        OR (e.payload #>> Array['Alert','AlertTypeId'])::uuid = any({alertTypeIdsWithReadPermission})
+                        OR (e.payload #>> Array['Alert','DqtSanctionCode','Value']) = any({dqtSanctionCodesWithReadPermission})
+                    )
                 """)
             .ToListAsync();
 
