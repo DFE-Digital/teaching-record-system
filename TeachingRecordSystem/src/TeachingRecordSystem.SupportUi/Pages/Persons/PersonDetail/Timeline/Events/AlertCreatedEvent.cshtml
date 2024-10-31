@@ -65,13 +65,19 @@
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @if (evidenceFileUrl is not null)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="evidence"><a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{createdEvent.EvidenceFile!.Name} (opens in new tab)")</a></govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{createdEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>        

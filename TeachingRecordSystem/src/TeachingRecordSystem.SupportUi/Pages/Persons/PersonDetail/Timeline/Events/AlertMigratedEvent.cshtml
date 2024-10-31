@@ -6,6 +6,7 @@
 @{
     var migratedEvent = Model.ItemModel.Event;
     var alert = migratedEvent.Alert;
+    var oldAlert = migratedEvent.OldAlert;
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
 }
 
@@ -17,4 +18,36 @@
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
         <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
     </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Alert type</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="alert-type" use-empty-fallback>@alertType?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="sanction-code" use-empty-fallback>@oldAlert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="sanction-name" use-empty-fallback>@oldAlert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>DQT spent</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="dqt-spent" use-empty-fallback>@oldAlert.DqtSpent</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
 </div>
