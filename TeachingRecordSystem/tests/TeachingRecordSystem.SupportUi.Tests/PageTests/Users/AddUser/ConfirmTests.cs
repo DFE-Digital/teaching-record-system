@@ -228,37 +228,6 @@ public class ConfirmTests : TestBase
     }
 
     [Fact]
-    public async Task Post_NoRolesSelected_RendersError()
-    {
-        // Arrange
-        var email = Faker.Internet.Email();
-        var name = Faker.Name.FullName();
-        var userId = Guid.NewGuid().ToString();
-        var newName = Faker.Name.FullName();
-
-        ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
-        {
-            Email = email,
-            Name = name,
-            UserId = userId
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Name", newName },
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "Roles", "Select at least one role");
-    }
-
-    [Fact]
     public async Task Post_ValidRequest_CreatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange

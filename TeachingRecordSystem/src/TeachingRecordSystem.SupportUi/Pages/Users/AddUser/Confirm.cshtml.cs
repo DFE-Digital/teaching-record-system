@@ -62,11 +62,6 @@ public class ConfirmModel(
             return BadRequest();
         }
 
-        if (roles.Length == 0)
-        {
-            ModelState.AddModelError(nameof(Roles), "Select at least one role");
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
