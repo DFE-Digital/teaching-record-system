@@ -1028,7 +1028,8 @@ public class TrsDataSyncHelper(
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: true)
+                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: true),
+                OldAlert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false)
             };
         }
 

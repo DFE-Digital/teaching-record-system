@@ -103,6 +103,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(initialVersion, migratedEvent.Alert, expectMigrationMappingsApplied: true);
+                await AssertAlertEventMatchesEntity(initialVersion, migratedEvent.OldAlert, expectMigrationMappingsApplied: false);
             });
     }
 
@@ -138,6 +139,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(initialVersion, migratedEvent.Alert, expectMigrationMappingsApplied: true);
+                await AssertAlertEventMatchesEntity(initialVersion, migratedEvent.OldAlert, expectMigrationMappingsApplied: false);
             });
     }
 
@@ -159,10 +161,10 @@ public partial class TrsDataSyncHelperTests
         var created = Clock.UtcNow;
 
         Clock.Advance();
-        var updatedVersion = await CreateUpdatedAlertEntityVersion(initialVersion, auditDetailCollection, changes: AlertUpdatedEventChanges.StartDate);
+        var intermediateVersion = await CreateUpdatedAlertEntityVersion(initialVersion, auditDetailCollection, changes: AlertUpdatedEventChanges.StartDate);
 
         Clock.Advance();
-        updatedVersion = await CreateUpdatedAlertEntityVersion(updatedVersion, auditDetailCollection, changes: AlertUpdatedEventChanges.Details);
+        var updatedVersion = await CreateUpdatedAlertEntityVersion(intermediateVersion, auditDetailCollection, changes: AlertUpdatedEventChanges.Details);
 
         // Act
         await Helper.SyncAlert(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
@@ -199,6 +201,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(updatedVersion, migratedEvent.Alert, expectMigrationMappingsApplied: true);
+                await AssertAlertEventMatchesEntity(updatedVersion, migratedEvent.OldAlert, expectMigrationMappingsApplied: false);
             });
     }
 
@@ -244,6 +247,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
                 Assert.Equal(person.PersonId, migratedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(updatedVersion, migratedEvent.Alert, expectMigrationMappingsApplied: true);
+                await AssertAlertEventMatchesEntity(initialVersion, migratedEvent.OldAlert, expectMigrationMappingsApplied: true);
             });
     }
 
