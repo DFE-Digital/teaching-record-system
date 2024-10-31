@@ -66,6 +66,8 @@
     <None Remove="Services\DqtReporting\Migrations\0031_TrsAlertsSyncMetadata.sql" />
     <None Remove="Services\DqtReporting\Migrations\0032_AddMissingProgrammeTypes.sql" />
     <None Remove="Services\DqtReporting\Migrations\0033_TrsQtsQualifications.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0034_TrsEvents.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0035_TrsEventsSyncMetadata.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -130,6 +132,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0031_TrsAlertsSyncMetadata.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0032_AddMissingProgrammeTypes.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0033_TrsQtsQualifications.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0034_TrsEvents.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0035_TrsEventsSyncMetadata.sql" />
   </ItemGroup>
 
   <ItemGroup>
