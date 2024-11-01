@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 
@@ -52,6 +53,9 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
                 builder.Services.AddTransient<EWCWalesImportJob>();
+                builder.Services.AddTransient<EWCWalesImportJob>();
+                builder.Services.AddTransient<QTSImporter>();
+                builder.Services.AddTransient<InductionImporter>();
 
                 builder.Services.AddStartupTask(sp =>
                 {

@@ -44,6 +44,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		{
 			public const string AccountId = "accountid";
 			public const string Id = "accountid";
+			public const string AccountNumber = "accountnumber";
 			public const string dfeta_TrainingProvider = "dfeta_trainingprovider";
 			public const string dfeta_UKPRN = "dfeta_ukprn";
 			public const string Name = "name";
@@ -159,6 +160,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			set
 			{
 				this.AccountId = value;
+			}
+		}
+		
+		/// <summary>
+		/// User-provided account number used in correspondence about the account.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("accountnumber")]
+		public string AccountNumber
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("accountnumber");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("AccountNumber");
+				this.SetAttributeValue("accountnumber", value);
+				this.OnPropertyChanged("AccountNumber");
 			}
 		}
 		

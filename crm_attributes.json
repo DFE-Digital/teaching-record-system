@@ -4,7 +4,8 @@
     "dfeta_trainingprovider",
     "dfeta_ukprn",
     "name",
-    "statecode"
+    "statecode",
+    "accountnumber"
   ],
   "annotation": [
     "annotationid",

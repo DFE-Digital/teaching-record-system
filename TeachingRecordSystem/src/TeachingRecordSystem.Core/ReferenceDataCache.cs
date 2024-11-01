@@ -18,6 +18,7 @@ public class ReferenceDataCache(
     private Task<dfeta_specialism[]>? _getSpecialismsTask;
     private Task<dfeta_hequalification[]>? _getHeQualificationsTask;
     private Task<dfeta_hesubject[]>? _getHeSubjectsTask;
+    private Task<dfeta_country[]>? _getCountriesTask;
 
     // TRS
     private Task<AlertCategory[]>? _alertCategoriesTask;
@@ -184,6 +185,12 @@ public class ReferenceDataCache(
         return alertTypes.SingleOrDefault(at => at.DqtSanctionCode == dqtSanctionCode);
     }
 
+    public async Task<dfeta_country?> GetCountry(string countryCode)
+    {
+        var countries = await EnsureCountries();
+        return countries.SingleOrDefault(at => at.dfeta_Value == countryCode);
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -242,6 +249,12 @@ public class ReferenceDataCache(
                 return await dbContext.AlertTypes.ToArrayAsync();
             });
 
+    private Task<dfeta_country[]> EnsureCountries() =>
+        LazyInitializer.EnsureInitialized(
+        ref _getCountriesTask,
+        () => crmQueryDispatcher.ExecuteQuery(new GetAllCountriesQuery()));
+
+
     async Task IStartupTask.Execute()
     {
         // CRM
@@ -253,6 +266,7 @@ public class ReferenceDataCache(
         await EnsureMqEstablishments();
         await EnsureHeQualifications();
         await EnsureHeSubjects();
+        await EnsureCountries();
 
         // TRS
         await EnsureAlertCategories();
