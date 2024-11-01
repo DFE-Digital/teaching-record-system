@@ -43,4 +43,6 @@ public class CreateQTSTests : IAsyncLifetime
         Assert.Null(qts.dfeta_QTSDate);
         Assert.Equal(qts.dfeta_PersonId.Id, contact.PersonId);
     }
+
+    //Test that inserts with a status that allows qtsdate to be set.
 }

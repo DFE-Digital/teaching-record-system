@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.Dqt.Queries;
 
 public record CreateQualificationQuery : ICrmQuery<Guid>
 {
-    public required Guid? Person { get; init; }
+    public required Guid? PersonId { get; init; }
 
     public required Guid? HECountryId { get; init; }
     public required string? HECourseLength { get; init; }

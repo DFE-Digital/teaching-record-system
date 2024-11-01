@@ -11,6 +11,7 @@ public class CreateTaskHandler : ICrmQueryHandler<CreateTaskQuery, Guid>
             RegardingObjectId = query.ContactId.ToEntityReference(Contact.EntityLogicalName),
             Category = query.Category,
             Subject = query.Subject,
+            dfeta_potentialduplicateid = null,
             Description = query.Description,
             ScheduledEnd = query.ScheduledEnd
         });

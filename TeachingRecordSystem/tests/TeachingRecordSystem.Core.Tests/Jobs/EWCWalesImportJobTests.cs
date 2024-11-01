@@ -85,6 +85,9 @@ public class EWCWalesImportJobTests : IAsyncLifetime
         }
 
         // Assert
+        //Asserts success count
+        //Asserts FailureCount
+
     }
 
     [Fact]
