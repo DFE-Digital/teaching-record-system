@@ -67,11 +67,6 @@ public class EditUser(
         // Sanitize roles
         var newRoles = Roles!.Where(r => UserRoles.All.Contains(r)).ToArray();
 
-        if (Roles?.Length == 0)
-        {
-            ModelState.AddModelError(nameof(Roles), "Select at least one role");
-        }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();

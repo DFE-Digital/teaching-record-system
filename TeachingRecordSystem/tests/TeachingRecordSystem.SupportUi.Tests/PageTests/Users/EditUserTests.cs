@@ -184,28 +184,6 @@ public class EditUserTests : TestBase
         await AssertEx.HtmlResponseHasError(response, "Name", "Enter a name");
     }
 
-    [Fact]
-    public async Task Post_NoRolesSelected_RendersError()
-    {
-        // Arrange
-        var user = await TestData.CreateUser();
-        var newName = Faker.Name.FullName();
-
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Name", newName },
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        await AssertEx.HtmlResponseHasError(response, "Roles", "Select at least one role");
-    }
-
     [Theory]
     [InlineData(true, false, true, UserUpdatedEventChanges.Name)]
     [InlineData(false, true, true, UserUpdatedEventChanges.Roles)]
