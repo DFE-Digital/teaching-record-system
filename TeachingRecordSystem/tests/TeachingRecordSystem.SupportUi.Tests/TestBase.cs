@@ -124,15 +124,30 @@ public abstract class TestBase : IDisposable
             return 0;
         });
 
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert(bool populateOptional = true)
+    protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithOpenAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {
-        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(null).WithExternalLink(populateOptional ? TestData.GenerateUrl() : null)));
-        return (person, person.Alerts.Single());
+        return CreatePersonWithAlert(isOpenAlert: true, populateOptional: populateOptional, createdByUser: createdByUser);
     }
 
-    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true)
+    protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true, EventModels.RaisedByUserInfo ? createdByUser = null)
     {
-        var person = await TestData.CreatePerson(p => p.WithAlert(a => a.WithStartDate(Clock.Today.AddDays(-30)).WithEndDate(Clock.Today.AddDays(-1)).WithExternalLink(populateOptional ? TestData.GenerateUrl() : null)));
+        return CreatePersonWithAlert(isOpenAlert: false, populateOptional: populateOptional, createdByUser: createdByUser);
+    }
+
+    protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithAlert(bool isOpenAlert, bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
+    {
+        var person = await TestData.CreatePerson(p => p
+            .WithAlert(a =>
+            {
+                a.WithStartDate(Clock.Today.AddDays(-30));
+                a.WithEndDate(isOpenAlert ? null: Clock.Today.AddDays(-1));
+                a.WithExternalLink(populateOptional ? TestData.GenerateUrl() : null);
+                if (createdByUser is not null)
+                {
+                    a.WithCreatedByUser(createdByUser);
+                }
+            }));
+
         return (person, person.Alerts.Single());
     }
 
