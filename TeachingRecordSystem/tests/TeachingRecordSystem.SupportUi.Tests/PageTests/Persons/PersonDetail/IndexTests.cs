@@ -35,6 +35,7 @@ public class IndexTests : TestBase
         var updatedLastName = TestData.GenerateLastName();
         var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
         var createPersonResult = await TestData.CreatePerson(b => b
+            .WithTrn()
             .WithEmail(email)
             .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber());
@@ -68,7 +69,7 @@ public class IndexTests : TestBase
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn(hasTrn: false));
+        var createPersonResult = await TestData.CreatePerson(b => b.WithoutTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
 
@@ -108,7 +109,7 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasNoAlert_DoesNotShowAlertNotification()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         Debug.Assert(person.Alerts.Count == 0);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");

@@ -18,7 +18,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(person);
             Clock.Advance();
 
@@ -233,7 +233,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -292,7 +292,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -351,7 +351,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -410,7 +410,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -459,7 +459,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -508,7 +508,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -557,7 +557,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -616,7 +616,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -666,7 +666,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -716,7 +716,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -762,7 +762,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -812,7 +812,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(b => b.WithTrn(true));
+            var person = await TestData.CreatePerson(p => p.WithTrn());
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
@@ -918,7 +918,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
             var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person = await TestData.CreatePerson(b => b.WithTrn(false).WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
+            var person = await TestData.CreatePerson(p => p.WithoutTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
             var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();
@@ -977,7 +977,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
             var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person = await TestData.CreatePerson(b => b.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
+            var person = await TestData.CreatePerson(p => p.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
             var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();

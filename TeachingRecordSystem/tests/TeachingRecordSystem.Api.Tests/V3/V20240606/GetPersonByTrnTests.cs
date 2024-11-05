@@ -111,7 +111,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
     public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
             .WithTrn()
             // MQ with no EndDate
             .WithMandatoryQualification(b => b.WithStatus(MandatoryQualificationStatus.InProgress))
@@ -214,7 +214,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
     public async Task Get_DateOfBirthDoesNotMatchTeachingRecord_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithTrn());
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var dateOfBirth = person.DateOfBirth.AddDays(1);
 
         var httpClient = GetHttpClientWithApiKey();
@@ -231,7 +231,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
     public async Task Get_DateOfBirthMatchesTeachingRecord_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithTrn());
+        var person = await TestData.CreatePerson(p => p.WithTrn());
 
         var httpClient = GetHttpClientWithApiKey();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}");
@@ -247,7 +247,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
     public async Task Get_DateOfBirthNotProvided_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithTrn());
+        var person = await TestData.CreatePerson(p => p.WithTrn());
 
         var httpClient = GetHttpClientWithApiKey();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");

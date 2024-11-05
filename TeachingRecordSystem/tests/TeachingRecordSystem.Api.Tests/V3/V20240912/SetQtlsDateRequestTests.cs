@@ -111,7 +111,7 @@ public class SetQtlsDateRequestTests : TestBase
         // Arrange
         var qtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQtlsDate(new DateOnly(2020, 01, 01)));
 
         var requestBody = CreateJsonContent(new { qtsDate = qtlsDate });
@@ -149,7 +149,7 @@ public class SetQtlsDateRequestTests : TestBase
         var expectedInductionStatus = dfeta_InductionStatus.RequiredtoComplete;
         var expectedHttpStatus = HttpStatusCode.OK;
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -181,7 +181,7 @@ public class SetQtlsDateRequestTests : TestBase
         var expectedInductionStatus = dfeta_InductionStatus.Exempt;
         var expectedHttpStatus = HttpStatusCode.OK;
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
@@ -209,7 +209,7 @@ public class SetQtlsDateRequestTests : TestBase
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var expectedInductionStatus = dfeta_InductionStatus.InProgress;
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)); ;
 
@@ -243,7 +243,7 @@ public class SetQtlsDateRequestTests : TestBase
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var expectedInductionStatus = dfeta_InductionStatus.Exempt;
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
@@ -273,7 +273,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate)
@@ -308,7 +308,7 @@ public class SetQtlsDateRequestTests : TestBase
         var incomingqtlsDate = DateOnly.Parse("04/04/2002");
         var existingqtlsDate = DateOnly.Parse("04/04/2002");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingqtlsDate));
@@ -341,7 +341,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("04/04/2001");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithSanction("G1"));
@@ -375,7 +375,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -407,7 +407,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
@@ -438,7 +438,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, Clock.Today.AddMonths(-1), Clock.Today.AddDays(-1), account.AccountId));
 
@@ -469,7 +469,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithQtlsDate(existingQtlsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
@@ -500,7 +500,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("04/04/2011");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
 
@@ -530,7 +530,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
@@ -562,7 +562,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -594,7 +594,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
@@ -626,7 +626,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -658,7 +658,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/01/1992");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
@@ -693,7 +693,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtlsDate = DateOnly.Parse("04/04/1991");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -728,7 +728,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/07/1997");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
@@ -760,7 +760,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -792,7 +792,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtsDate = DateOnly.Parse("04/04/2016");
         var incomingqtlsDate = DateOnly.Parse("01/01/1992");
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
@@ -827,7 +827,7 @@ public class SetQtlsDateRequestTests : TestBase
         var existingQtlsDate = DateOnly.Parse("04/04/1991");
         var incomingqtlsDate = default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(existingQtsDate)
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
@@ -861,7 +861,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtlsDate = new DateOnly(2010, 01, 01);
         var incommingQtlsDate = new DateOnly(2009, 01, 01);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQtlsDate(qtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incommingQtlsDate });
@@ -888,7 +888,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtlsDate = new DateOnly(2010, 01, 01);
         var qtsDate = new DateOnly(2008, 01, 01);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(qtsDate)
             .WithQtlsDate(qtlsDate));
 
@@ -917,7 +917,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtsDate1 = new DateOnly(2010, 01, 01);
         var earliestQTSDate = new DateOnly(2008, 01, 01);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(qtsDate1)
             .WithQts(earliestQTSDate));
 
@@ -944,7 +944,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtsDate1 = new DateOnly(2010, 01, 01);
         var qtsDate2 = new DateOnly(2008, 01, 01);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(qtsDate1)
             .WithQts(qtsDate2));
 
@@ -976,7 +976,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtsDate2 = DateOnly.Parse(qts2);
         var expectedQTSDate = DateOnly.Parse(expectedQTS);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithQts(qtsDate1)
             .WithQts(qtsDate2)
             .WithQtlsDate(qtlsDate));
@@ -1018,7 +1018,7 @@ public class SetQtlsDateRequestTests : TestBase
         // Arrange
         var qtlsDate = !string.IsNullOrEmpty(incomingQtls) ? DateOnly.Parse(incomingQtls) : default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: existingInductionExemptionReason, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = qtlsDate });

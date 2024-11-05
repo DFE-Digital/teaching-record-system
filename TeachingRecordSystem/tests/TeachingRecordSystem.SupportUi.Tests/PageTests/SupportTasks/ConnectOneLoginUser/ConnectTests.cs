@@ -27,7 +27,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 
@@ -48,7 +48,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_TrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 
@@ -65,7 +65,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_ReturnsExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 
@@ -102,7 +102,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 
@@ -123,7 +123,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_TrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 
@@ -140,7 +140,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequest_ClosesTaskConnectsUserToPersonAndRedirectsToSupportTaskList()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 

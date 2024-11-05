@@ -11,7 +11,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     public CreateDateOfBirthChangeTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentApiClient(new[] { ApiRoles.UpdatePerson });
+        SetCurrentApiClient([ApiRoles.UpdatePerson]);
     }
 
     [Theory, RoleNamesData(except: [ApiRoles.UpdatePerson])]
@@ -73,7 +73,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
 
         var newDateOfBirth = newDateOfBirthString is not null ? DateOnly.ParseExact(newDateOfBirthString, "yyyy-MM-dd") : (DateOnly?)null;
 
@@ -145,7 +145,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";
@@ -173,7 +173,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_ValidRequest_CreatesIncident()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";

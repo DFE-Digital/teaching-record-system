@@ -34,7 +34,7 @@ public class GetActiveContactByTrnTests : IAsyncLifetime
     public async Task WhenCalled_WithTrnForExistingContact_ReturnsContactDetail()
     {
         // Arrange        
-        var person = await _dataScope.TestData.CreatePerson(b => b.WithTrn());
+        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn());
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(person.Trn!, new ColumnSet()));

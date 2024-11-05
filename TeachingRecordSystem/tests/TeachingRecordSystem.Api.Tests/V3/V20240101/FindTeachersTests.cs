@@ -9,7 +9,7 @@ public class FindTeachersTests : TestBase
         : base(hostFixture)
     {
         XrmFakedContext.DeleteAllEntities<Contact>();
-        SetCurrentApiClient(new[] { ApiRoles.GetPerson });
+        SetCurrentApiClient([ApiRoles.GetPerson]);
     }
 
     [Theory, RoleNamesData(except: [ApiRoles.GetPerson])]
@@ -22,8 +22,8 @@ public class FindTeachersTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
-        var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -85,8 +85,8 @@ public class FindTeachersTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
-        var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
+        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
+        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -155,9 +155,9 @@ public class FindTeachersTests : TestBase
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
-        var person2 = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
-        var person3 = await TestData.CreatePerson(b => b.WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
+        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
+        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
+        var person3 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
         var updatedLastName = TestData.GenerateChangedLastName(lastName);
         await TestData.UpdatePerson(b => b.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName));
 
@@ -238,7 +238,7 @@ public class FindTeachersTests : TestBase
 
         var sanctionCode = "A17";
         Debug.Assert(!TeachingRecordSystem.Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
-        var person = await TestData.CreatePerson(b => b.WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction(sanctionCode));
+        var person = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction(sanctionCode));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

@@ -25,7 +25,7 @@ public class NotVerifiedTests(HostFixture hostFixture) : TestBase(hostFixture)
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var person = await TestData.CreatePerson(b => b.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber());
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);

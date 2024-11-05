@@ -55,55 +55,30 @@ public partial class TestData
 
         public CreatePersonBuilder WithDateOfBirth(DateOnly dateOfBirth)
         {
-            if (_dateOfBirth is not null && _dateOfBirth != dateOfBirth)
-            {
-                throw new InvalidOperationException("WithDateOfBirth cannot be changed after it's set.");
-            }
-
             _dateOfBirth = dateOfBirth;
             return this;
         }
 
         public CreatePersonBuilder WithFirstName(string firstName)
         {
-            if (_firstName is not null && _firstName != firstName)
-            {
-                throw new InvalidOperationException("WithFirstName cannot be changed after it's set.");
-            }
-
             _firstName = firstName;
             return this;
         }
 
-        public CreatePersonBuilder WithMiddleName(string middleName)
+        public CreatePersonBuilder WithMiddleName(string? middleName)
         {
-            if (_middleName is not null && _middleName != middleName)
-            {
-                throw new InvalidOperationException("WithMiddleName cannot be changed after it's set.");
-            }
-
             _middleName = middleName;
             return this;
         }
 
         public CreatePersonBuilder WithLastName(string lastName)
         {
-            if (_lastName is not null && _lastName != lastName)
-            {
-                throw new InvalidOperationException("WithLastName cannot be changed after it's set.");
-            }
-
             _lastName = lastName;
             return this;
         }
 
-        public CreatePersonBuilder WithEmail(string email)
+        public CreatePersonBuilder WithEmail(string? email)
         {
-            if (_email is not null && _email != email)
-            {
-                throw new InvalidOperationException("WithEmail cannot be changed after it's set.");
-            }
-
             _email = email;
             return this;
         }
@@ -117,6 +92,8 @@ public partial class TestData
             DateOnly? inductionPeriodEndDate = null,
             Guid? appropriateBodyOrgId = null)
         {
+            EnsureTrn();
+
             var inductionId = Guid.NewGuid();
             if (inductionStatus == dfeta_InductionStatus.Exempt && inductionExemptionReason == null)
             {
@@ -136,13 +113,8 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithMobileNumber(string mobileNumber)
+        public CreatePersonBuilder WithMobileNumber(string? mobileNumber)
         {
-            if (_mobileNumber is not null && _mobileNumber != mobileNumber)
-            {
-                throw new InvalidOperationException("WithMobileNumber cannot be changed after it's set.");
-            }
-
             _mobileNumber = mobileNumber;
             return this;
         }
@@ -157,15 +129,21 @@ public partial class TestData
             string? detailsLink = null,
             bool isActive = true)
         {
+            EnsureTrn();
+
             _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, detailsLink, isActive));
+
             return this;
         }
 
         public CreatePersonBuilder WithAlert(Action<CreatePersonAlertBuilder>? configure = null)
         {
+            EnsureTrn();
+
             var alertBuilder = new CreatePersonAlertBuilder();
             configure?.Invoke(alertBuilder);
             _alertBuilders.Add(alertBuilder);
+
             return this;
         }
 
@@ -179,70 +157,76 @@ public partial class TestData
             string? heSubject2Value = null,
             string? heSubject3Value = null)
         {
+            EnsureTrn();
+
             _qualifications.Add(new(qualificationId ?? Guid.NewGuid(), type, completionOrAwardDate, isActive!.Value, heQualificationValue, heSubject1Value, heSubject2Value, heSubject3Value));
+
             return this;
         }
 
         public CreatePersonBuilder WithMandatoryQualification(Action<CreatePersonMandatoryQualificationBuilder>? configure = null)
         {
+            EnsureTrn();
+
             var mqBuilder = new CreatePersonMandatoryQualificationBuilder();
             configure?.Invoke(mqBuilder);
             _mqBuilders.Add(mqBuilder);
+
             return this;
         }
 
-        public CreatePersonBuilder WithTrn(bool hasTrn = true)
+        public CreatePersonBuilder WithoutTrn()
         {
-            if (_hasTrn is not null && _hasTrn != hasTrn)
+            if (_alertBuilders.Any() ||
+                _inductions.Any() ||
+                _mqBuilders.Any() ||
+                _qtlsDate.HasValue ||
+                _qtsRegistrations.Any() ||
+                _qualifications.Any() ||
+                _sanctions.Any())
             {
-                throw new InvalidOperationException("WithTrn cannot be changed after it's set.");
+                throw new InvalidOperationException("Person requires a TRN.");
             }
 
-            _hasTrn = hasTrn;
+            _hasTrn = false;
             return this;
         }
 
-        public CreatePersonBuilder WithGender(Contact_GenderCode gender)
+        public CreatePersonBuilder WithTrn()
         {
-            if (_gender is not null && _gender != gender)
-            {
-                throw new InvalidOperationException("WithGender cannot be changed after it's set.");
-            }
+            _hasTrn = true;
+            return this;
+        }
 
+        public CreatePersonBuilder WithGender(Contact_GenderCode? gender)
+        {
             _gender = gender;
             return this;
         }
 
-        public CreatePersonBuilder WithNationalInsuranceNumber(bool? hasNationalInsuranceNumber = true, string? nationalInsuranceNumber = null)
+        public CreatePersonBuilder WithNationalInsuranceNumber(bool hasNationalInsuranceNumber = true)
         {
-            if ((_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
-                || (_nationalInsuranceNumber is not null && _nationalInsuranceNumber != nationalInsuranceNumber))
+            _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
+
+            if (_hasNationalInsuranceNumber is false)
             {
-                throw new InvalidOperationException("WithNationalInsuranceNumber cannot be changed after it's set.");
+                _nationalInsuranceNumber = null;
             }
 
-            _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
-            _nationalInsuranceNumber = nationalInsuranceNumber;
             return this;
         }
 
         public CreatePersonBuilder WithNationalInsuranceNumber(string nationalInsuranceNumber)
         {
-            var hasNationalInsuranceNumber = true;
-
-            if ((_hasNationalInsuranceNumber is not null && _hasNationalInsuranceNumber != hasNationalInsuranceNumber)
-                || (_nationalInsuranceNumber is not null && _nationalInsuranceNumber != nationalInsuranceNumber))
-            {
-                throw new InvalidOperationException("WithNationalInsuranceNumber cannot be changed after it's set.");
-            }
-
-            _hasNationalInsuranceNumber = hasNationalInsuranceNumber;
+            _hasNationalInsuranceNumber = true;
             _nationalInsuranceNumber = nationalInsuranceNumber;
             return this;
         }
 
         public CreatePersonBuilder WithQts(DateOnly? qtsDate = null)
         {
+            EnsureTrn();
+
             _qtsRegistrations.Add(
                 new QtsRegistration(
                     qtsDate ?? new DateOnly(2022, 9, 1),
@@ -256,63 +240,52 @@ public partial class TestData
 
         public CreatePersonBuilder WithQtlsDate(DateOnly? qtlsDate)
         {
-            if (_qtlsDate is not null && _qtlsDate != qtlsDate)
-            {
-                throw new InvalidOperationException("WithQtlsDate cannot be changed after it's set.");
-            }
+            EnsureTrn();
+
             _qtlsDate = qtlsDate;
+
             return this;
         }
 
         public CreatePersonBuilder WithQtsRegistration(DateOnly? qtsDate, string? teacherStatusValue, DateTime? createdDate, DateOnly? eytsDate, string? eytsTeacherStatus)
         {
+            EnsureTrn();
+
             _qtsRegistrations.Add(new QtsRegistration(qtsDate, teacherStatusValue, createdDate, eytsDate, eytsTeacherStatus));
+
             return this;
         }
 
         public CreatePersonBuilder WithEyts(DateOnly? eytsDate, string? eytsStatusValue, DateTime? createdDate = null)
         {
+            EnsureTrn();
+
             _qtsRegistrations.Add(new QtsRegistration(null, null, createdDate, eytsDate, eytsStatusValue));
+
             return this;
         }
 
         public CreatePersonBuilder WithTrnRequestId(string trnRequestId)
         {
-            if (_trnRequestId is not null && _trnRequestId != trnRequestId)
-            {
-                throw new InvalidOperationException("WithTrnRequestId cannot be changed after it's set.");
-            }
-
             _trnRequestId = trnRequestId;
             return this;
         }
 
         public CreatePersonBuilder WithTrnToken(string trnToken)
         {
-            if (_trnToken is not null && _trnToken != trnToken)
-            {
-                throw new InvalidOperationException("WithTrnToken cannot be changed after it's set.");
-            }
-
             _trnToken = trnToken;
             return this;
         }
 
         public CreatePersonBuilder WithSlugId(string slugId)
         {
-            if (_slugId is not null && _slugId != slugId)
-            {
-                throw new InvalidOperationException("WithSlugId cannot be changed after it's set.");
-            }
-
             _slugId = slugId;
             return this;
         }
 
         internal async Task<CreatePersonResult> Execute(TestData testData)
         {
-            var hasTrn = _hasTrn ?? true;
-            var trn = hasTrn ? await testData.GenerateTrn() : null;
+            var trn = _hasTrn == true ? await testData.GenerateTrn() : null;
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
             var firstAndMiddleNames = $"{statedFirstName} {statedMiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -661,6 +634,16 @@ public partial class TestData
                 Alerts = alerts
             };
         }
+
+        private void EnsureTrn()
+        {
+            _hasTrn ??= true;
+
+            if (_hasTrn != true)
+            {
+                throw new InvalidOperationException("Person requires a TRN.");
+            }
+        }
     }
 
     public class CreatePersonAlertBuilder
@@ -705,7 +688,7 @@ public partial class TestData
         {
             if (endDate.HasValue && !_startDate.HasValue)
             {
-                throw new ArgumentException($"{nameof(endDate)} cannot be specified until {nameof(WithStartDate)} has been called with a non null startDate.");
+                throw new ArgumentException($"{nameof(endDate)} cannot be specified until {nameof(WithStartDate)} has been called with a non-null startDate.");
             }
 
             if (endDate.HasValue && endDate < _startDate.ValueOrDefault())

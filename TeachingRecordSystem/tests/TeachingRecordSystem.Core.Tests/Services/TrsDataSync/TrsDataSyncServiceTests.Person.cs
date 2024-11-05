@@ -11,7 +11,7 @@ public partial class TrsDataSyncServiceTests
     public async Task Contact_NewRecord_WritesNewPersonRecordToDatabase()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b => b.WithSyncOverride(false));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithSyncOverride(false));
         var contactId = createPersonResult.ContactId;
         var contact = createPersonResult.Contact;
         contact.CreatedOn = Clock.UtcNow;
@@ -35,7 +35,7 @@ public partial class TrsDataSyncServiceTests
     public async Task Contact_UpdatedRecord_WritesUpdatedPersonRecordToDatabase()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b => b.WithSyncOverride(false));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithSyncOverride(false));
         var contactId = createPersonResult.ContactId;
         var contact = createPersonResult.Contact;
         contact.CreatedOn = Clock.UtcNow;
@@ -69,7 +69,7 @@ public partial class TrsDataSyncServiceTests
     public async Task Contact_DeletedRecord_DeletesPersonRecordFromDatabase()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b => b.WithSyncOverride(true));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithSyncOverride(true));
         var contactId = createPersonResult.ContactId;
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, createPersonResult.Contact);
 
