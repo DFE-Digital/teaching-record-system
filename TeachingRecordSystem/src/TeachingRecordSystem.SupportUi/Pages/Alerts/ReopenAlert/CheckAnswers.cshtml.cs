@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     IFileService fileService,
     IClock clock) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
 
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
@@ -32,6 +32,8 @@ public class CheckAnswersModel(
     public string? Details { get; set; }
 
     public string? Link { get; set; }
+
+    public Uri? LinkUri { get; set; }
 
     public DateOnly? StartDate { get; set; }
 
@@ -108,6 +110,7 @@ public class CheckAnswersModel(
         AlertTypeName = alertInfo.Alert.AlertType.Name;
         Details = alertInfo.Alert.Details;
         Link = alertInfo.Alert.ExternalLink;
+        LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
         StartDate = alertInfo.Alert.StartDate;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;

@@ -68,8 +68,8 @@ public class ConfirmTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(person.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetElementByTestId("current-value")!.TextContent);
-        Assert.Equal(newDateOfBirth.ToString("dd/MM/yyyy"), doc.GetElementByTestId("new-value")!.TextContent);
+        Assert.Equal(person.DateOfBirth.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetElementByTestId("current-value")!.TextContent);
+        Assert.Equal(newDateOfBirth.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetElementByTestId("new-value")!.TextContent);
     }
 
     [Fact]

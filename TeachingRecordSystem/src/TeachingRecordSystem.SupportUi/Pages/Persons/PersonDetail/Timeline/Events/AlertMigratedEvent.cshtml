@@ -10,7 +10,7 @@
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-migrated-event">
     <div class="moj-timeline__header">
         <h2 class="moj-timeline__title">Alert migrated</h2>
     </div>
@@ -26,7 +26,7 @@
             </govuk-summary-list-row>
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
         </govuk-summary-list>
 

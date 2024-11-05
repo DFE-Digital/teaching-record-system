@@ -8,7 +8,7 @@
     var alert = dqtDeactivatedEvent.Alert;
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-dqt-deactivated-event">
     <div class="moj-timeline__header">
         <h2 class="moj-timeline__title">Alert deactivated</h2>
     </div>
@@ -31,7 +31,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
@@ -39,11 +39,20 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="external-link" use-empty-fallback>@alert.ExternalLink</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>
+                        @if (alert.ExternalLink is not null)
+                        {
+                            <a data-testid="external-link" href="@alert.ExternalLink" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{alert.ExternalLink} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="external-link" use-empty-fallback></span>
+                        }
+                        </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>DQT spent</govuk-summary-list-row-key>

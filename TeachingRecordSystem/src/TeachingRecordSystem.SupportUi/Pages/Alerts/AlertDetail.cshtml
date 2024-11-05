@@ -13,24 +13,37 @@
 <govuk-summary-list>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.Details</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value>
+            @if (Model.Alert.Details is not null)
+            {
+                <multi-line-text text="@Model.Alert.Details" />
+            }
+            else
+            {
+                <span use-empty-fallback></span>
+            }
+        </govuk-summary-list-row-value>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>
+        <govuk-summary-list-row-value>
             @if (Model.Alert.ExternalLink is not null)
             {
-                <a href="@Model.Alert.ExternalLink" rel="noopener noreferrer" class="govuk-link">@Model.Alert.ExternalLink</a>
+                <a href="@Model.ExternalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Alert.ExternalLink} (opens in new tab)")</a>
+            }
+            else
+            {
+                <span data-testid="link" use-empty-fallback></span>
             }
         </govuk-summary-list-row-value>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
         @if (Model.CanEdit)
         {
             <govuk-summary-list-row-actions>
@@ -53,6 +66,19 @@
             else
             {
                 <span use-empty-fallback></span>
+            }
+        </govuk-summary-list-row-value>
+    </govuk-summary-list-row>
+    <govuk-summary-list-row>
+        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+        <govuk-summary-list-row-value>
+            @if (Model.UploadedEvidenceFileUrl is not null)
+            {
+                <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+            }
+            else
+            {
+                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
             }
         </govuk-summary-list-row-value>
     </govuk-summary-list-row>

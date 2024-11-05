@@ -94,11 +94,11 @@ public class CheckAnswersTests : StartDateTestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(journeyInstance.State.StartDate!.Value.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("New start date"));
-        Assert.Equal(alert.StartDate!.Value.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Current start date"));
+        Assert.Equal(journeyInstance.State.StartDate!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("New start date"));
+        Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Current start date"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Theory]

@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     IFileService fileService,
     IClock clock) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
 
     public JourneyInstance<EditAlertLinkState>? JourneyInstance { get; set; }
 
@@ -29,7 +29,11 @@ public class CheckAnswersModel(
 
     public string? NewLink { get; set; }
 
+    public Uri? NewLinkUri { get; set; }
+
     public string? CurrentLink { get; set; }
+
+    public Uri? CurrentLinkUri { get; set; }
 
     public AlertChangeLinkReasonOption ChangeReason { get; set; }
 
@@ -110,7 +114,9 @@ public class CheckAnswersModel(
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
         NewLink = JourneyInstance!.State.Link;
+        NewLinkUri = TrsUriHelper.TryCreateWebsiteUri(NewLink, out var newLinkUri) ? newLinkUri : null;
         CurrentLink = alertInfo.Alert.ExternalLink;
+        CurrentLinkUri = TrsUriHelper.TryCreateWebsiteUri(CurrentLink, out var currentLinkUri) ? currentLinkUri : null;
         ChangeReason = JourneyInstance.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;

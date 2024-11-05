@@ -139,10 +139,10 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(journeyDetails, doc.GetSummaryListValueForKey("New details"));
-        Assert.Equal(populateOptional ? databaseDetails : "-", doc.GetSummaryListValueForKey("Current details"));
+        Assert.Equal(populateOptional ? databaseDetails : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Current details"));
         Assert.Equal(reason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? reasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? reasonDetail : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]

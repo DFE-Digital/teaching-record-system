@@ -11,9 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 [Journey(JourneyNames.CloseAlert), RequireJourneyInstance]
 public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    public const int MaxFileSizeMb = 50;
-    public const int ChangeReasonDetailMaxLength = 4000;
-
     private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
 
     public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
@@ -40,7 +37,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
-    [MaxLength(ChangeReasonDetailMaxLength, ErrorMessage = "Additional detail must be 4000 characters or less")]
+    [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -50,7 +47,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(AlertDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }

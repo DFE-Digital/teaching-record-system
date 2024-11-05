@@ -41,7 +41,11 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
 
         var authorizedAlerts = alerts
             .Where(a => alertTypePermissions[a.AlertTypeId].CanRead)
-            .Select(a => new AlertWithPermissions(a, alertTypePermissions[a.AlertTypeId].CanWrite));
+            .Select(a =>
+                {
+                    TrsUriHelper.TryCreateWebsiteUri(a.ExternalLink, out var externalLinkUri);
+                    return new AlertWithPermissions(a, externalLinkUri, alertTypePermissions[a.AlertTypeId].CanWrite);
+                });
 
         OpenAlerts = authorizedAlerts.Where(a => a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
         ClosedAlerts = authorizedAlerts.Where(a => !a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.EndDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
@@ -53,5 +57,5 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
         ShowOpenAlertFlag = alerts.Any(a => a.IsOpen && alertTypePermissions[a.AlertTypeId] is { CanFlag: true, CanRead: false });
     }
 
-    public record AlertWithPermissions(Alert Alert, bool CanWrite);
+    public record AlertWithPermissions(Alert Alert, Uri? ExternalLinkUri, bool CanWrite);
 }

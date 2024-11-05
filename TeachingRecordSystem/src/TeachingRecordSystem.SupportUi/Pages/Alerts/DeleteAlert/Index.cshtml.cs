@@ -11,10 +11,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 [Journey(JourneyNames.DeleteAlert), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    public const int MaxFileSizeMb = 50;
-    public const int DeleteReasonDetailMaxLength = 4000;
-
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
 
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
 
@@ -39,6 +36,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
+    [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? DeleteReasonDetail { get; set; }
 
     [BindProperty]
@@ -48,7 +46,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(AlertDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }

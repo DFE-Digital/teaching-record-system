@@ -40,7 +40,7 @@
             }
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date">@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
         </govuk-summary-list>
 
@@ -57,11 +57,11 @@
                         <govuk-summary-list-row-value>
                             @if (createdEvent.AddReasonDetail is not null)
                             {
-                                <multi-line-text text="@createdEvent.AddReasonDetail" />
+                                <multi-line-text text="@createdEvent.AddReasonDetail" data-testid="reason-detail" />
                             }
                             else
                             {
-                                <span use-empty-fallback></span>
+                                <span use-empty-fallback data-testid="reason-detail"></span>
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
@@ -74,7 +74,7 @@
                             }
                             else
                             {
-                                <span use-empty-fallback></span>
+                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>

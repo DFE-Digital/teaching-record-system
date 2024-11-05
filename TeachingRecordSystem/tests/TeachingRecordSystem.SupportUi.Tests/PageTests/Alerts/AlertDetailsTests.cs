@@ -63,8 +63,8 @@ public class AlertDetailsTests : TestBase
         Assert.Equal(alert.AlertType.Name, h1.TextContent);
 
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(alert.StartDate?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Start date"));
-        Assert.Equal(alert.EndDate?.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("End date"));
+        Assert.Equal(alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
+        Assert.Equal(alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("End date"));
     }
 
     [Fact]

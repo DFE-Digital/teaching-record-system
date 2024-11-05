@@ -96,11 +96,11 @@ public class CheckAnswersTests : ReopenAlertTestBase
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(alert.AlertType.Name, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Link"));
-        Assert.Equal(alert.StartDate!.Value.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Start date"));
+        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Link"));
+        Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Theory]

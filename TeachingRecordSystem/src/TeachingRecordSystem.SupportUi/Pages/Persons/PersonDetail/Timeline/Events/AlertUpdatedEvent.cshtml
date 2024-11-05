@@ -81,7 +81,7 @@
             }
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
             {
@@ -103,7 +103,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
 
@@ -145,13 +145,19 @@
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    @if (evidenceFileUrl is not null)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="evidence"><a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a></govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>
@@ -166,7 +172,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@oldAlert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@oldAlert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -190,7 +196,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@oldAlert.EndDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@oldAlert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 

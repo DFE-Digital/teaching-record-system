@@ -78,7 +78,7 @@
                         <tr class="govuk-table__row" data-reference="@result.Reference">
                             <td class="govuk-table__cell"><a href="@LinkGenerator.SupportTaskDetail(result.Reference, result.Type)" class="govuk-link">@result.Reference</a></td>
                             <td class="govuk-table__cell">@result.TypeTitle</td>
-                            <td class="govuk-table__cell">@($"{result.RequestedOn.ToString("d MMMM yyyy")} at {result.RequestedOn:h:mmtt}")</td>
+                            <td class="govuk-table__cell">@($"{result.RequestedOn.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)} at {result.RequestedOn:h:mmtt}")</td>
                         </tr>
                     }
                 </tbody>

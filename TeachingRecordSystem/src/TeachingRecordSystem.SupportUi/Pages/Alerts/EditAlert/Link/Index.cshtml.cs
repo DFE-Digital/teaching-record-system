@@ -50,8 +50,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         }
         else if (AddLink == true)
         {
-            if (!Uri.TryCreate(Link, UriKind.Absolute, out var uri) ||
-                (uri.Scheme != "http" && uri.Scheme != "https"))
+            if (!TrsUriHelper.TryCreateWebsiteUri(Link, out _))
             {
                 ModelState.AddModelError(nameof(Link), "Enter a valid URL");
             }

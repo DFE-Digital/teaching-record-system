@@ -13,7 +13,7 @@ public class CheckAnswersModel(
     IFileService fileService,
     IClock clock) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
 
     public JourneyInstance<EditAlertStartDateState>? JourneyInstance { get; set; }
 

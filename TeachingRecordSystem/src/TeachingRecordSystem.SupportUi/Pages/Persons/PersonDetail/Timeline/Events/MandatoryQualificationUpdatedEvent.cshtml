@@ -67,7 +67,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="start-date">@(oldMandatoryQualification.StartDate?.ToString("d MMMM yyyy") ?? "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="start-date">@(oldMandatoryQualification.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
 
@@ -83,7 +83,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="end-date">@(oldMandatoryQualification.EndDate?.ToString("d MMMM yyyy") ?? "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="end-date">@(oldMandatoryQualification.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
                 </govuk-summary-list>

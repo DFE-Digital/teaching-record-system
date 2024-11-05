@@ -120,11 +120,11 @@ public class CheckAnswersTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(journeyEndDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("New end date"));
-        Assert.Equal(databaseEndDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Current end date"));
+        Assert.Equal(journeyEndDate.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("New end date"));
+        Assert.Equal(databaseEndDate.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Current end date"));
         Assert.Equal(changeReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? changeReasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? changeReasonDetail : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]

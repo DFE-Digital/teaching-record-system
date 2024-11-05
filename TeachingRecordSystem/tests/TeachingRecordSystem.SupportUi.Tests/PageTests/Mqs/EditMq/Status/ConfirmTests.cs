@@ -122,8 +122,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isEndDateChange)
         {
-            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString("d MMMM yyyy") : "None", changeSummary.GetElementByTestId("current-end-date")!.TextContent);
-            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString("d MMMM yyyy") : "None", changeSummary.GetElementByTestId("new-end-date")!.TextContent);
+            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("current-end-date")!.TextContent);
+            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("new-end-date")!.TextContent);
         }
         else
         {
