@@ -30,11 +30,11 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Current end date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="current-end-date">@(Model.CurrentEndDate.HasValue ? Model.CurrentEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>New end date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
                 @if (Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)

@@ -20,7 +20,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.NewLink is not null)
                         {
-                            <a href="@Model.NewLink" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.NewLink} (opens in new tab)")</a>
+                            <a href="@Model.NewLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.NewLink} (opens in new tab)")</a>
                         }
                         else
                         {
@@ -36,7 +36,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.CurrentLink is not null)
                         {
-                            <a href="@Model.CurrentLink" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.CurrentLink} (opens in new tab)")</a>
+                            <a href="@Model.CurrentLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.CurrentLink} (opens in new tab)")</a>
                         }
                         else
                         {

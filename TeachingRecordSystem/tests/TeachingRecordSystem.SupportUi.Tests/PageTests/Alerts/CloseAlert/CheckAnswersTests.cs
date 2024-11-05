@@ -151,12 +151,12 @@ public class CheckAnswersTests : TestBase
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(alertType.Name, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Link"));
-        Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("Start date"));
-        Assert.Equal(journeyEndDate.ToString("d MMMM yyyy"), doc.GetSummaryListValueForKey("End date"));
+        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
+        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
+        Assert.Equal(journeyEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("End date"));
         Assert.Equal(changeReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? changeReasonDetail : "-", doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : "-", doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? changeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]

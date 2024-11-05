@@ -17,14 +17,14 @@
             <govuk-summary-list data-testid="change-summary">
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>New start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.NewStartDate.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@Model.NewStartDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDate(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Current start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value use-empty-fallback>@Model.CurrentStartDate.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.CurrentStartDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>                
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>

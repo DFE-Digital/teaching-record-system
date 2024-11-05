@@ -33,20 +33,29 @@
     }
     else
     {
-        @foreach (var (alert, canWrite) in Model.OpenAlerts)
+        @foreach (var (alert, externalLinkUri, canWrite) in Model.OpenAlerts)
         {
             <govuk-summary-card data-testid="open-alert">
                 <govuk-summary-card-title heading-level="3">@alert.AlertType.Name</govuk-summary-card-title>
                 @if (canWrite)
                 {
                     <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)">Delete alert</govuk-summary-card-action>
+                        <govuk-summary-card-action href="@LinkGenerator.AlertDelete(alert.AlertId, journeyInstanceId: null)" visually-hidden-text="alert">Delete</govuk-summary-card-action>
                     </govuk-summary-card-actions>
                 }
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@alert.Details</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>
+                            @if (alert.Details is not null)
+                            {
+                                <multi-line-text text="@alert.Details" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
@@ -56,10 +65,14 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>
+                        <govuk-summary-list-row-value>
                             @if (alert.ExternalLink is not null)
                             {
-                                <a href="@alert.ExternalLink" rel="noopener noreferrer" class="govuk-link">@alert.ExternalLink</a>
+                                <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{alert.ExternalLink} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span use-empty-fallback></span>
                             }
                         </govuk-summary-list-row-value>
                         @if (canWrite)
@@ -71,7 +84,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         @if (canWrite)
                         {
                             <govuk-summary-list-row-actions>
@@ -121,12 +134,12 @@
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
-                @foreach (var (alert, canWrite) in Model.ClosedAlerts!)
+                @foreach (var (alert, externalLinkUri, canWrite) in Model.ClosedAlerts!)
                 {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType.Name</a></td>
-                        <td class="govuk-table__cell">@alert.StartDate?.ToString("d MMMM yyyy")</td>
-                        <td class="govuk-table__cell">@alert.EndDate?.ToString("d MMMM yyyy")</td>
+                        <td class="govuk-table__cell">@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                        <td class="govuk-table__cell">@alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell">
                             @if (canWrite)
                             {

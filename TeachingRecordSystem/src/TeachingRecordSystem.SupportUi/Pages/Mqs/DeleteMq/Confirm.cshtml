@@ -41,7 +41,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("d MMMM yyyy") : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
 

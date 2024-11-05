@@ -1,3 +1,4 @@
+@using TeachingRecordSystem.SupportUi.Pages.Common
 @model PersonDetailViewModel
 
 <govuk-summary-card>
@@ -29,7 +30,7 @@
         }
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value  use-empty-fallback>@Model.DateOfBirth?.ToString("dd/MM/yyyy")</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowChangeLinks))
             {
                 <govuk-summary-list-row-actions>

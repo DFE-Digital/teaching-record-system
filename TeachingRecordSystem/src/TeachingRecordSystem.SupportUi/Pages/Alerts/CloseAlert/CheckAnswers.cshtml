@@ -5,7 +5,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.AlertCloseReason(Model.PersonId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.AlertCloseReason(Model.AlertId, Model.JourneyInstance!.InstanceId)">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -28,7 +28,7 @@
                     <govuk-summary-list-row-value>
                         @if (Model.Link is not null)
                         {
-                            <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Link} (opens in new tab)")</a>
+                            <a href="@Model.LinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="link">@($"{Model.Link} (opens in new tab)")</a>
                         }
                         else
                         {
@@ -38,11 +38,11 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date">@Model.EndDate!.Value.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date">@Model.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertClose(Model.AlertId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

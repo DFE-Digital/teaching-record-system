@@ -11,11 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 [Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    public const int MaxFileSizeMb = 50;
-    public const int ChangeReasonDetailMaxLength = 4000;
-
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
-
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -40,7 +35,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
-    [MaxLength(ChangeReasonDetailMaxLength, ErrorMessage = "Additional detail must be 4000 characters or less")]
+    [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -50,7 +45,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(MaxFileSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(AlertDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -68,7 +63,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
     }
 

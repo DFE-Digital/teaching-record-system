@@ -86,11 +86,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(provider.Name, doc.GetElementByTestId("provider")!.TextContent);
         Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TextContent);
-        Assert.Equal(startDate.ToString("d MMMM yyyy"), doc.GetElementByTestId("start-date")!.TextContent);
+        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("start-date")!.TextContent);
         Assert.Equal(status.GetTitle(), doc.GetElementByTestId("status")!.TextContent);
         if (status == MandatoryQualificationStatus.Passed)
         {
-            Assert.Equal(endDate!.Value.ToString("d MMMM yyyy"), doc.GetElementByTestId("end-date")!.TextContent);
+            Assert.Equal(endDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("end-date")!.TextContent);
         }
         else
         {

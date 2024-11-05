@@ -35,9 +35,7 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        if (AddLink == true &&
-            (!Uri.TryCreate(Link, UriKind.Absolute, out var uri) ||
-                (uri.Scheme != "http" && uri.Scheme != "https")))
+        if (AddLink == true && !TrsUriHelper.TryCreateWebsiteUri(Link, out _))
         {
             ModelState.AddModelError(nameof(Link), "Enter a valid URL");
         }

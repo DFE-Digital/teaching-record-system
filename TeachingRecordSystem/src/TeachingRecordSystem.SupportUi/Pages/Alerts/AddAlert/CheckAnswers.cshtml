@@ -32,14 +32,14 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Link</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
-                    @if (Model.Link is not null)
-                    {
-                        <a href="@Model.Link" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.Link} (opens in new tab)")</a>                        
-                    }
-                    else
-                    {
-                        <span use-empty-fallback></span>
-                    }
+                        @if (Model.Link is not null)
+                        {
+                                <a href="@Model.LinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.Link} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertAddLink(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="link">Change</govuk-summary-list-row-action>
@@ -47,7 +47,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.StartDate.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>@Model.StartDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.AlertAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

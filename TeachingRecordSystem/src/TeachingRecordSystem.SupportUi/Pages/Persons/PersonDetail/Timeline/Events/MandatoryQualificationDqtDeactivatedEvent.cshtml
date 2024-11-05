@@ -28,7 +28,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString("d MMMM yyyy") ?? "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="start-date">@(mandatoryQualification.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat) ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
@@ -36,7 +36,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString("d MMMM yyyy") ?? "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="end-date">@(mandatoryQualification.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat) ?? "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 </govuk-summary-list>
             </govuk-details-text>

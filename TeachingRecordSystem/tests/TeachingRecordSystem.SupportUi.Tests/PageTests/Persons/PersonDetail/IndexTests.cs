@@ -57,7 +57,7 @@ public class IndexTests : TestBase
         var previousNames = doc.GetSummaryListValueElementForKey("Previous name(s)")?.QuerySelectorAll("li");
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TextContent);
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TextContent);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
         Assert.Equal(createPersonResult.Gender, doc.GetSummaryListValueForKey("Gender"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
@@ -81,11 +81,11 @@ public class IndexTests : TestBase
 
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TextContent);
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetSummaryListValueForKey("Name"));
-        Assert.Equal(createPersonResult.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
-        Assert.Equal("-", doc.GetSummaryListValueForKey("TRN"));
-        Assert.Equal("-", doc.GetSummaryListValueForKey("Email"));
-        Assert.Equal("-", doc.GetSummaryListValueForKey("National Insurance number"));
-        Assert.Equal("-", doc.GetSummaryListValueForKey("Mobile number"));
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("TRN"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Email"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Mobile number"));
     }
 
     [Fact]

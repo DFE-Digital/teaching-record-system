@@ -243,7 +243,7 @@ public class LinkTests : TestBase
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "AddLink", bool.TrueString },
-                { "Link", "badurl" }
+                { "Link", "bad..url" }
             }
         };
 

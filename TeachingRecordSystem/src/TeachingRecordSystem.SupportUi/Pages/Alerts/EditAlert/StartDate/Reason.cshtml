@@ -35,7 +35,7 @@
                     <govuk-radios-item value="@true">
                         Yes
                         <govuk-radios-item-conditional>
-                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="@ReasonModel.ChangeReasonDetailMaxLength" />
+                            <govuk-character-count asp-for="ChangeReasonDetail" max-length="AlertDefaults.DetailMaxCharacterCount" rows="AlertDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                     <govuk-radios-item value="@false">
