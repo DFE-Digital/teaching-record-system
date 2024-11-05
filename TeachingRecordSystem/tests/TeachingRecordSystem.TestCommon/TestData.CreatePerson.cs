@@ -39,8 +39,8 @@ public partial class TestData
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private DateOnly? _qtlsDate;
-        private readonly List<Induction> _inductions = [];
-        private readonly List<InductionPeriod> _inductionPeriods = [];
+        private readonly List<DqtInduction> _dqtInductions = [];
+        private readonly List<DqtInductionPeriod> _dqtInductionPeriods = [];
         private string? _trnRequestId;
         private string? _trnToken;
         private string? _slugId;
@@ -83,7 +83,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithInduction(
+        public CreatePersonBuilder WithDqtInduction(
             dfeta_InductionStatus inductionStatus,
             dfeta_InductionExemptionReason? inductionExemptionReason,
             DateOnly? inductionStartDate,
@@ -99,7 +99,7 @@ public partial class TestData
             {
                 throw new InvalidOperationException("WithInduction must provide InductionExemptionReason if InductionStatus is Exempt");
             }
-            _inductions.Add(new Induction(inductionId, inductionStatus, inductionExemptionReason, inductionStartDate, completedDate));
+            _dqtInductions.Add(new DqtInduction(inductionId, inductionStatus, inductionExemptionReason, inductionStartDate, completedDate));
 
             //inductionPeriod is optional
             if (!appropriateBodyOrgId.HasValue && inductionPeriodStartDate.HasValue || !appropriateBodyOrgId.HasValue && inductionPeriodEndDate.HasValue)
@@ -108,7 +108,7 @@ public partial class TestData
             }
             if (appropriateBodyOrgId.HasValue)
             {
-                _inductionPeriods.Add(new InductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
+                _dqtInductionPeriods.Add(new DqtInductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
             }
             return this;
         }
@@ -178,7 +178,7 @@ public partial class TestData
         public CreatePersonBuilder WithoutTrn()
         {
             if (_alertBuilders.Any() ||
-                _inductions.Any() ||
+                _dqtInductions.Any() ||
                 _mqBuilders.Any() ||
                 _qtlsDate.HasValue ||
                 _qtsRegistrations.Any() ||
@@ -482,7 +482,7 @@ public partial class TestData
                 }
             }
 
-            foreach (var induction in _inductions)
+            foreach (var induction in _dqtInductions)
             {
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
@@ -498,9 +498,9 @@ public partial class TestData
                 });
             }
 
-            foreach (var inductionperiod in _inductionPeriods)
+            foreach (var inductionperiod in _dqtInductionPeriods)
             {
-                var induction = _inductions.First();
+                var induction = _dqtInductions.First();
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
                     Target = new dfeta_inductionperiod()
@@ -629,8 +629,8 @@ public partial class TestData
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 Sanctions = [.. _sanctions],
                 MandatoryQualifications = mqs,
-                Inductions = [.. _inductions],
-                InductionPeriods = [.. _inductionPeriods],
+                DqtInductions = [.. _dqtInductions],
+                DqtInductionPeriods = [.. _dqtInductionPeriods],
                 Alerts = alerts
             };
         }
@@ -988,14 +988,14 @@ public partial class TestData
         public required DateOnly? EytsDate { get; init; }
         public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
-        public required IReadOnlyCollection<Induction> Inductions { get; init; }
-        public required IReadOnlyCollection<InductionPeriod> InductionPeriods { get; init; }
+        public required IReadOnlyCollection<DqtInduction> DqtInductions { get; init; }
+        public required IReadOnlyCollection<DqtInductionPeriod> DqtInductionPeriods { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
     }
 
-    public record Induction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
+    public record DqtInduction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
 
-    public record InductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
+    public record DqtInductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
 
     public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
 

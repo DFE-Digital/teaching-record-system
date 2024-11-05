@@ -84,7 +84,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
             .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithSanction("G1")
-            .WithInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
+            .WithDqtInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
             .WithQts(qtsDate: new(2021, 7, 1))
             .WithEyts(eytsDate: new(2021, 8, 1), eytsStatusValue: "222"));
 
@@ -126,7 +126,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
             .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithSanction("A21B")
-            .WithInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
+            .WithDqtInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
             .WithQts(qtsDate: new(2021, 7, 1))
             .WithEyts(eytsDate: new(2021, 8, 1), eytsStatusValue: "222"));
 

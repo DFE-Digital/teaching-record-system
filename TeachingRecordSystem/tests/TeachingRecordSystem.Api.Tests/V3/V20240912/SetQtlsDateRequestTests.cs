@@ -151,7 +151,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
 
@@ -183,7 +183,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -211,7 +211,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)); ;
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)); ;
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -245,7 +245,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -275,7 +275,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate)
             .WithSanction("G1"));
 
@@ -310,7 +310,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingqtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -343,7 +343,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithSanction("G1"));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -377,7 +377,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -409,7 +409,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -440,7 +440,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, Clock.Today.AddMonths(-1), Clock.Today.AddDays(-1), account.AccountId));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, Clock.Today.AddMonths(-1), Clock.Today.AddDays(-1), account.AccountId));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -472,7 +472,7 @@ public class SetQtlsDateRequestTests : TestBase
             .WithTrn()
             .WithQts(existingQtsDate)
             .WithQtlsDate(existingQtlsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -502,7 +502,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, account.AccountId));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -532,7 +532,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -564,7 +564,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -596,7 +596,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -628,7 +628,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -660,7 +660,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -695,7 +695,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -730,7 +730,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -762,7 +762,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: dfeta_InductionExemptionReason.Exempt, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -794,7 +794,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -829,7 +829,7 @@ public class SetQtlsDateRequestTests : TestBase
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
             .WithQts(existingQtsDate)
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
@@ -1019,7 +1019,7 @@ public class SetQtlsDateRequestTests : TestBase
         var qtlsDate = !string.IsNullOrEmpty(incomingQtls) ? DateOnly.Parse(incomingQtls) : default(DateOnly?);
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
-            .WithInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: existingInductionExemptionReason, null, null, null, null, null));
+            .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: existingInductionExemptionReason, null, null, null, null, null));
 
         var requestBody = CreateJsonContent(new { qtsDate = qtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
