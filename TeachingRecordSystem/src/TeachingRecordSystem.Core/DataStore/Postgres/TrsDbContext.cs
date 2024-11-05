@@ -95,6 +95,10 @@ public class TrsDbContext : DbContext
 
     public DbSet<Route> Routes => Set<Route>();
 
+    public DbSet<WebhookEndpoint> WebhookEndpoints => Set<WebhookEndpoint>();
+
+    public DbSet<WebhookMessage> WebhookMessages => Set<WebhookMessage>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);
