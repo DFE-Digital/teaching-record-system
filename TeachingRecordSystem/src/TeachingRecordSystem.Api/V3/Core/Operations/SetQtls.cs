@@ -15,9 +15,9 @@ public sealed class SetQtlsResult
 
     public bool Succeeded { get; private set; }
 
-    public QtlsInfo? QtlsInfo { get; private set; }
+    public QtlsResult? QtlsInfo { get; private set; }
 
-    public static SetQtlsResult Success(QtlsInfo qtlsInfo) => new()
+    public static SetQtlsResult Success(QtlsResult qtlsInfo) => new()
     {
         Succeeded = true,
         QtlsInfo = qtlsInfo
@@ -69,7 +69,7 @@ public class SetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher, IClock clock
         await crmQueryDispatcher.ExecuteQuery(
              new SetQtlsDateQuery(contact.Id, command.QtsDate, contact.dfeta_ActiveSanctions == true, clock.UtcNow))!;
 
-        return SetQtlsResult.Success(new QtlsInfo()
+        return SetQtlsResult.Success(new QtlsResult()
         {
             Trn = command.Trn,
             QtsDate = command.QtsDate
