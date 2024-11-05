@@ -18,35 +18,14 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        var events = eventData.Context!.ChangeTracker.Entries<Event>();
-
-        if (events.Any())
-        {
-            throw new NotSupportedException();
-        }
+        PublishEvents(eventData);
 
         return base.SavingChanges(eventData, result);
     }
 
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
-        var events = eventData.Context!.ChangeTracker.Entries<Event>();
-
-        foreach (var e in events)
-        {
-            if (e.State == EntityState.Added)
-            {
-                e.Property(e => e.Published).CurrentValue = true;
-
-                eventData.Context.SavedChanges += OnEventSaved;
-
-                void OnEventSaved(object? sender, SavedChangesEventArgs args)
-                {
-                    _eventPublisher.PublishEvent(e.Entity.ToEventBase()).GetAwaiter().GetResult();
-                    eventData.Context.SavedChanges -= OnEventSaved;
-                }
-            }
-        }
+        PublishEvents(eventData);
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
@@ -67,5 +46,26 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
         });
 
         return services;
+    }
+
+    private void PublishEvents(DbContextEventData eventData)
+    {
+        var events = eventData.Context!.ChangeTracker.Entries<Event>();
+
+        foreach (var e in events)
+        {
+            if (e.State == EntityState.Added)
+            {
+                e.Property(e => e.Published).CurrentValue = true;
+
+                eventData.Context.SavedChanges += OnEventSaved;
+
+                void OnEventSaved(object? sender, SavedChangesEventArgs args)
+                {
+                    _eventPublisher.PublishEvent(e.Entity.ToEventBase()).GetAwaiter().GetResult();
+                    eventData.Context.SavedChanges -= OnEventSaved;
+                }
+            }
+        }
     }
 }
