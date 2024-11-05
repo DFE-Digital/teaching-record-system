@@ -43,7 +43,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         var optionsAccessor = Mock.Of<IOptions<WorkforceDataExportOptions>>();
         var storageClientProvider = Mock.Of<IStorageClientProvider>();
         var storageClient = Mock.Of<StorageClient>();
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
         var personPostcode = Faker.Address.UkPostCode();

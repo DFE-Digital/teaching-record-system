@@ -20,7 +20,8 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
@@ -79,7 +80,8 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithSanction("G1")
             .WithInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
@@ -120,7 +122,8 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithSanction("A21B")
             .WithInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
@@ -197,7 +200,8 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         var sanctionCode = "A17";
         Debug.Assert(!Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithSanction(sanctionCode));
 

@@ -122,7 +122,7 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
         var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
-        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn(false).WithTrnRequestId(trnRequestId).WithSlugId(slugId));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithoutTrn().WithTrnRequestId(trnRequestId).WithSlugId(slugId));
 
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
@@ -206,7 +206,7 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
         var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
-        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn().WithTrnRequestId(trnRequestId));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn().WithTrnRequestId(trnRequestId));
 
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
@@ -296,7 +296,7 @@ public class GetTrnRequestTests : TestBase
         var trnToken = "ABCDEFG1234567";
         var qtsDate = new DateOnly(2020, 10, 03);
         var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
-        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn().WithTrnRequestId(trnRequestId).WithQts(qtsDate).WithTrnToken(trnToken));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn().WithTrnRequestId(trnRequestId).WithQts(qtsDate).WithTrnToken(trnToken));
 
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))

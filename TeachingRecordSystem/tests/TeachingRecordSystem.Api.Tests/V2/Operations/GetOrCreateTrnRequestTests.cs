@@ -86,7 +86,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
         var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
-        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn().WithTrnRequestId(trnRequestId));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn().WithTrnRequestId(trnRequestId));
 
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
@@ -163,7 +163,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
         var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
-        var createPersonResult = await TestData.CreatePerson(b => b.WithTrn(false).WithTrnRequestId(trnRequestId).WithSlugId(slugId));
+        var createPersonResult = await TestData.CreatePerson(p => p.WithoutTrn().WithTrnRequestId(trnRequestId).WithSlugId(slugId));
 
         DataverseAdapterMock
             .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))

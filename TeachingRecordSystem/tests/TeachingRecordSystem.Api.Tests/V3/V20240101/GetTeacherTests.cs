@@ -195,7 +195,7 @@ public class GetTeacherTests : GetTeacherTestBase
     public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
             .WithTrn()
             // MQ with no EndDate
             .WithMandatoryQualification(b => b.WithStatus(MandatoryQualificationStatus.InProgress))

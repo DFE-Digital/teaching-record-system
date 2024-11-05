@@ -61,7 +61,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNonMatchingEstablishments_WhenCalledWithEstablishmentsNotMatchingEstablishmentsInTrs_SetsResultToInvalidEstablishment()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "124", establishmentNumber: "1235");
         var nonExistentEstablishmentNumber = "4321";
@@ -86,7 +86,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNewEmploymentHistory_WhenCalledWithNewEmploymentHistory_InsertsNewPersonEmploymentRecord()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment = await TestData.CreateEstablishment(localAuthorityCode: "125", establishmentNumber: "1236");
         var startDate = new DateOnly(2023, 02, 03);
@@ -115,7 +115,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNewEmploymentHistory_WhenCalledWithEndDateInTheFuture_SetsLastKnownEmployedDateToExtractDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment = await TestData.CreateEstablishment(localAuthorityCode: "125", establishmentNumber: "1236");
         var startDate = new DateOnly(2023, 02, 03);
@@ -144,7 +144,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNewEmploymentHistory_WhenCalledWithWithdrawalIndicatorSet_SetsEndDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment = await TestData.CreateEstablishment(localAuthorityCode: "125", establishmentNumber: "1236");
         var startDate = new DateOnly(2023, 02, 03);
@@ -173,7 +173,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNewEmploymentHistory_WhenCalledWithLastKnownEmployedDateOlderThanFiveMonths_SetsEndDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment = await TestData.CreateEstablishment(localAuthorityCode: "125", establishmentNumber: "1236");
         var startDate = new DateOnly(2023, 02, 03);
@@ -203,7 +203,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNewEmploymentHistory_ForLaCodeAndEstablishmentNumberWithMultipleEstablishmentEntries_MatchesToTheMostOpenEstablishment()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var laCode = "321";
         var establishmentNumber = "4321";
@@ -237,7 +237,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessNewEmploymentHistory_WithValidData_OnlyMatchesToLaCodeAndPostCodeForHigherEducationIfNoMatchOnLaCodeAndEstablishment()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var laCode1 = "322";
         var establishmentNumber1 = "4322";
@@ -271,7 +271,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithUpdatedEmploymentHistory_UpdatesPersonEmploymentRecord()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -301,7 +301,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithEndDateInTheFuture_SetsLastKnownEmployedDateToExtractDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -329,7 +329,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithWithdrawalIndicatorSet_SetsEndDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -361,7 +361,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithLastKnownEmployedDateOlderThanFiveMonths_SetsEndDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -389,7 +389,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithWithdrawalIndicatorNowRemoved_ResetsEndDate()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -418,7 +418,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessUpdatedEmploymentHistory_WhenCalledWithUpdatedEmploymentHistoryWithNoChanges_SetsResultToValidNoChanges()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -442,7 +442,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task UpdateLatestEstablishmentVersions_WithEstablishmentChangingUrn_UpdatesPersonEmploymentRecord()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 2); // Closed
         var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "127", establishmentNumber: "1238", establishmentStatusCode: 1); // Open
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
@@ -465,7 +465,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task ProcessEndedEmployments_WithLastKnownEmployedDateGreaterThanThreeMonthsBeforeLastExtractDate_SetsEndDateOnPersonEmploymentRecord()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "128", establishmentNumber: "1239");
         var establishment2 = await TestData.CreateEstablishment(localAuthorityCode: "128", establishmentNumber: "1240");
         var extractDate = new DateOnly(2024, 04, 25);
@@ -494,7 +494,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
     public async Task BackfillNinoAndPersonPostcodeInEmploymentHistory_WhenCalledWithPersonEmploymentRecordsWithoutNinoAndPersonPostcode_SetsNinoAndPersonPostcode()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var tpsCsvExtractId = Guid.NewGuid();
         var establishment = await TestData.CreateEstablishment(localAuthorityCode: "129", establishmentNumber: "1241");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();

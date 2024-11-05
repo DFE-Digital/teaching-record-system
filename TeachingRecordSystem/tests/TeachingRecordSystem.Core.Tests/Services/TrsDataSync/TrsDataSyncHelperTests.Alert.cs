@@ -15,7 +15,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_NewRecord_WritesNewRowToDb(bool personAlreadySynced)
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithSyncOverride(personAlreadySynced));
+        var person = await TestData.CreatePerson(p => p.WithTrn().WithSyncOverride(personAlreadySynced));
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
@@ -31,7 +31,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_SanctionCodeIsRedundant_IsNotWrittenToDb()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection, redundantType: true);
@@ -51,7 +51,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_WithDeactivatedEvent_SetsDeletedOnAttribute()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithSyncOverride(false));
+        var person = await TestData.CreatePerson(p => p.WithTrn().WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
@@ -75,7 +75,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_WithDqtCreateAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: true);
@@ -111,7 +111,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_WithNoDqtAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection, addCreateAudit: false);
@@ -154,7 +154,7 @@ public partial class TrsDataSyncHelperTests
         // be reconstructed from multiple Update audits.
 
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection, addCreateAudit: false);
@@ -209,7 +209,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_WithDqtUpdateAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
@@ -255,7 +255,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_WithDqtDeactivatedAudit_CreatesExpectedEvent()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
@@ -279,7 +279,7 @@ public partial class TrsDataSyncHelperTests
     public async Task SyncAlert_WithDqtReactivatedAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);

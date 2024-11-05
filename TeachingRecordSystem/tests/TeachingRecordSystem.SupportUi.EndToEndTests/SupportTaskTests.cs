@@ -5,7 +5,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task ConnectOneLoginUser_WithSuggestion()
     {
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 
@@ -28,7 +28,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task ConnectOneLoginUser_WithoutSuggestions()
     {
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePerson(p => p.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([TestData.GenerateFirstName(), TestData.GenerateLastName()], TestData.GenerateDateOfBirth()));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
 

@@ -23,7 +23,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var alertType = await ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
         var alertCategory = await ReferenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithSanction(sanctionCode, startDate, endDate, details: details));

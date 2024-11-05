@@ -27,7 +27,7 @@ public class GetTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -80,7 +80,7 @@ public class GetTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var masterContact = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -89,7 +89,7 @@ public class GetTrnRequestTests : TestBase
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
 
         var existingContact = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: false)
+            .WithoutTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -143,7 +143,7 @@ public class GetTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: true)
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -189,7 +189,7 @@ public class GetTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePerson(p => p
-            .WithTrn(hasTrn: false)
+            .WithoutTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)

@@ -76,9 +76,9 @@ public class GetContactsByDateOfBirthTests : IAsyncLifetime
             Contact.Fields.FullName);
 
 
-        var person1 = await _dataScope.TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
-        var person2 = await _dataScope.TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
-        var person3 = await _dataScope.TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
+        var person1 = await _dataScope.TestData.CreatePerson(p => p.WithTrn().WithDateOfBirth(dateOfBirth));
+        var person2 = await _dataScope.TestData.CreatePerson(p => p.WithTrn().WithDateOfBirth(dateOfBirth));
+        var person3 = await _dataScope.TestData.CreatePerson(p => p.WithTrn().WithDateOfBirth(dateOfBirth));
 
         // Act
         var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, testScenarioData.SortBy, maxRecordCount, columnSet));

@@ -25,7 +25,8 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         var lastName = Faker.Name.Last();
         var dob = new DateTime(1987, 01, 01);
 
-        var person = await _dataScope.TestData.CreatePerson(b => b
+        var person = await _dataScope.TestData.CreatePerson(p => p
+            .WithTrn()
             .WithFirstName(firstNameSynonym)
             .WithLastName(lastName)
             .WithMiddleName(middleName)
@@ -60,7 +61,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         // Arrange
         var email = $"{Guid.NewGuid()}@test.com";
 
-        var person = await _dataScope.TestData.CreatePerson(b => b.WithEmail(email));
+        var person = await _dataScope.TestData.CreatePerson(p => p.WithEmail(email));
 
         var query = new FindPotentialDuplicateContactsQuery()
         {
