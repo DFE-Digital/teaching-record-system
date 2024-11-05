@@ -140,11 +140,11 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(populateOptional ? $"{journeyLink} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("New link"));
+        Assert.Equal(populateOptional ? $"{journeyLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("New link"));
         Assert.Equal($"{databaseLink} (opens in new tab)", doc.GetSummaryListValueForKey("Current link"));
         Assert.Equal(reason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? reasonDetail : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? reasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]

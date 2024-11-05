@@ -39,11 +39,11 @@
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.Alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         @if (Model.CanEdit)
         {
             <govuk-summary-list-row-actions>

@@ -69,7 +69,7 @@
                         {
                             <tr class="govuk-table__row" data-testid="person-@personInfo.PersonId">
                                 <td class="govuk-table__cell" data-testid="name"><a href="@LinkGenerator.PersonDetail(personInfo.PersonId)" class="govuk-link">@personInfo.Name</a></td>
-                                <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : string.Empty)</td>
+                                <td class="govuk-table__cell" data-testid="date-of-birth" use-empty-fallback>@(personInfo.DateOfBirth.HasValue ? personInfo.DateOfBirth.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</td>
                                 <td class="govuk-table__cell" data-testid="trn" use-empty-fallback>@personInfo.Trn</td>
                                 <td class="govuk-table__cell" data-testid="nino" use-empty-fallback>@personInfo.NationalInsuranceNumber</td>
                             </tr>

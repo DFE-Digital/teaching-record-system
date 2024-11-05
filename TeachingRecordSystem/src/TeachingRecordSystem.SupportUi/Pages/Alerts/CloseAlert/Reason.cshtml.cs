@@ -11,8 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 [Journey(JourneyNames.CloseAlert), RequireJourneyInstance]
 public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
-
     public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -65,7 +63,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
     }
 

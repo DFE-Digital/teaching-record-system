@@ -11,8 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 [Journey(JourneyNames.AddAlert), RequireJourneyInstance]
 public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
-
     public JourneyInstance<AddAlertState>? JourneyInstance { get; set; }
 
     [FromQuery]
@@ -62,7 +60,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         AddReasonDetail = JourneyInstance!.State.AddReasonDetail;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
     }

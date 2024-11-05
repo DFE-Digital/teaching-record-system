@@ -81,7 +81,7 @@
             }
             <govuk-summary-list-row>
                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.Details))
             {
@@ -103,7 +103,7 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
 
@@ -172,7 +172,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@oldAlert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@oldAlert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -196,7 +196,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@oldAlert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@oldAlert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 

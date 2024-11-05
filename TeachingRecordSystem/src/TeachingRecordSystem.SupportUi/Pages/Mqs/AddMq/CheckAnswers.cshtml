@@ -32,7 +32,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate.ToString(UiDefaults.DefaultDateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="start-date">@Model.StartDate.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
@@ -46,7 +46,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="end-date">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqAddStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

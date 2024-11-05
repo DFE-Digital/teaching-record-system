@@ -133,10 +133,10 @@ public class CheckAnswersTests : TestBase
         var doc = await AssertEx.HtmlResponse(response);
         Assert.Equal(alertType.Name, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Link"));
-        Assert.Equal(startDate.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
+        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
+        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
         Assert.Equal(reason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for adding"));
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.DefaultNullDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
     }
 
     [Fact]

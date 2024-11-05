@@ -59,8 +59,8 @@ public class ConfirmModel : PageModel
                     Contact.PrimaryIdAttribute,
                     Contact.Fields.BirthDate)));
 
-        CurrentValue = person!.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat);
-        NewValue = state.DateOfBirth!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat);
+        CurrentValue = person!.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value.ToString(UiDefaults.DateOnlyDisplayFormat);
+        NewValue = state.DateOfBirth!.Value.ToString(UiDefaults.DateOnlyDisplayFormat);
 
         await next();
     }

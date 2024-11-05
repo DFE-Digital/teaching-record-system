@@ -11,8 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 [Journey(JourneyNames.ReopenAlert), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
-
     public JourneyInstance<ReopenAlertState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -65,7 +63,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
     }
 

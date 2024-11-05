@@ -81,7 +81,7 @@ public class IndexTests : TestBase
         var person1 = await TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
         var person2 = await TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
         var person3 = await TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
-        var search = dateOfBirth.ToString(UiDefaults.DefaultDateOnlyDisplayFormat);
+        var search = dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
 

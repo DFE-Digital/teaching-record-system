@@ -62,8 +62,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
 
                 Assert.Equal(alert.Details, card.GetSummaryListValueForKey("Details"));
                 Assert.Equal(alert.ExternalLink, card.GetSummaryListValueElementForKey("Link")?.GetElementsByTagName("a").FirstOrDefault()?.TextContent);
-                Assert.Equal(alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), card.GetSummaryListValueForKey("Start date"));
-                Assert.Equal(UiDefaults.DefaultNullDisplayContent, card.GetSummaryListValueForKey("End date"));
+                Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), card.GetSummaryListValueForKey("Start date"));
+                Assert.Equal(UiDefaults.EmptyDisplayContent, card.GetSummaryListValueForKey("End date"));
             });
     }
 
@@ -109,8 +109,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
             row => Assert.Collection(
                 row.GetElementsByTagName("td"),
                 column => Assert.Equal(alert.AlertType.Name, column.TextContent),
-                column => Assert.Equal(alert.StartDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), column.TextContent),
-                column => Assert.Equal(alert.EndDate?.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), column.TextContent),
+                column => Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TextContent),
+                column => Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TextContent),
                 column => { }));
     }
 

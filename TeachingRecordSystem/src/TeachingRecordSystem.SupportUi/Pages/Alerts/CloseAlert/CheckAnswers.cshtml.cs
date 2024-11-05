@@ -13,8 +13,6 @@ public class CheckAnswersModel(
     IFileService fileService,
     IClock clock) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
-
     public JourneyInstance<CloseAlertState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -119,7 +117,7 @@ public class CheckAnswersModel(
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
             null;
 
         await next();

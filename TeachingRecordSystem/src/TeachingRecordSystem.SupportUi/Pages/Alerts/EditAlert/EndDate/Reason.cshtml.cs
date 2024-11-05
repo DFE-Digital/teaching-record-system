@@ -14,8 +14,6 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
     public const int MaxFileSizeMb = 50;
     public const int ChangeReasonDetailMaxLength = 4000;
 
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
-
     public JourneyInstance<EditAlertEndDateState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -68,7 +66,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
     }
 

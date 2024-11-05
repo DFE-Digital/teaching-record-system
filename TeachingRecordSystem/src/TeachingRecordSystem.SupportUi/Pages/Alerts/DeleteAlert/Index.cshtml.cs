@@ -11,8 +11,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Alerts.DeleteAlert;
 [Journey(JourneyNames.DeleteAlert), ActivatesJourney, RequireJourneyInstance]
 public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(AlertDefaults.FileUrlExpiryMinutes);
-
     public JourneyInstance<DeleteAlertState>? JourneyInstance { get; set; }
 
     [FromRoute]
@@ -63,7 +61,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         DeleteReasonDetail = JourneyInstance!.State.DeleteReasonDetail;
         UploadEvidence = JourneyInstance!.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
     }
 

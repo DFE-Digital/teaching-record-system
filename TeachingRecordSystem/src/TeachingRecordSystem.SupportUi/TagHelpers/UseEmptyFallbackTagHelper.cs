@@ -17,7 +17,7 @@ public class UseEmptyFallbackTagHelper : TagHelper
         if (content.IsEmptyOrWhiteSpace)
         {
             output.AddClass("trs-subtle-emphasis", HtmlEncoder.Default);
-            output.Content.SetContent(UiDefaults.DefaultNullDisplayContent);
+            output.Content.SetContent(UiDefaults.EmptyDisplayContent);
         }
     }
 }

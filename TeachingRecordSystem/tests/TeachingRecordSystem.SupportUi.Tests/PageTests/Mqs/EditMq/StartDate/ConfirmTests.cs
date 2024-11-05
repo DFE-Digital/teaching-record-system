@@ -65,8 +65,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponse(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
-        Assert.Equal(oldStartDate.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TextContent);
-        Assert.Equal(newStartDate.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), changeSummary.GetElementByTestId("new-start-date")!.TextContent);
+        Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TextContent);
+        Assert.Equal(newStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("new-start-date")!.TextContent);
         Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TextContent);
         Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
         var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");

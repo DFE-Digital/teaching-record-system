@@ -15,8 +15,6 @@ public class AlertDetailModel(
     TrsDbContext dbContext,
     IFileService fileService) : PageModel
 {
-    private static readonly TimeSpan _fileUrlExpiresAfter = TimeSpan.FromMinutes(15);
-
     public Alert? Alert { get; set; }
 
     public Uri? ExternalLinkUri { get; set; }
@@ -60,7 +58,7 @@ public class AlertDetailModel(
         ChangeReasonDetail = changeReasonInfo?.ChangeReasonDetail;
         EvidenceFileName = changeReasonInfo?.EvidenceFileName;
         UploadedEvidenceFileUrl = changeReasonInfo?.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(changeReasonInfo.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrl(changeReasonInfo.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
             null;
         ExternalLinkUri = TrsUriHelper.TryCreateWebsiteUri(Alert.ExternalLink, out var linkUri) ? linkUri : null;
 

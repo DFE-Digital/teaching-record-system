@@ -80,8 +80,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(provider?.Name ?? "None", deletionSummary.GetElementByTestId("provider")!.TextContent);
         Assert.Equal(specialism?.GetTitle() ?? "None", deletionSummary.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(status is not null ? status.Value.ToString() : "None", deletionSummary.GetElementByTestId("status")!.TextContent);
-        Assert.Equal(startDate is not null ? startDate.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("start-date")!.TextContent);
-        Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("end-date")!.TextContent);
+        Assert.Equal(startDate is not null ? startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("start-date")!.TextContent);
+        Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", deletionSummary.GetElementByTestId("end-date")!.TextContent);
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
         if (uploadEvidence)
         {

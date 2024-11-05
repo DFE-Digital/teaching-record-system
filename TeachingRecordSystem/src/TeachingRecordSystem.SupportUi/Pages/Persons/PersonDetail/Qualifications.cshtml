@@ -41,7 +41,7 @@ else
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-start-date-@mq.QualificationId">@(mq.StartDate.HasValue ? mq.StartDate!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="mq-start-date-@mq.QualificationId">@(mq.StartDate.HasValue ? mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqEditStartDate(mq.QualificationId, null)" class="govuk-link" visually-hidden-text="change start date" data-testid="start-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
@@ -55,7 +55,7 @@ else
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString(UiDefaults.DefaultDateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="mq-end-date-@mq.QualificationId">@(mq.EndDate.HasValue ? mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.MqEditStatus(mq.QualificationId, null)" visually-hidden-text="change end date" data-testid="end-date-change-link-@mq.QualificationId">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>

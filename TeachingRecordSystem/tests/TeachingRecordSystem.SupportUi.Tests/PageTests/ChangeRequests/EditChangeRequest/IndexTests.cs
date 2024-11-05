@@ -167,8 +167,8 @@ public class IndexTests : TestBase
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TextContent);
-        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString(UiDefaults.DefaultDateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TextContent);
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TextContent);
+        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TextContent);
 
         var imageDocument = doc.GetElementByTestId($"image-{createIncidentResult.Evidence.DocumentId}");
         Assert.NotNull(imageDocument);
