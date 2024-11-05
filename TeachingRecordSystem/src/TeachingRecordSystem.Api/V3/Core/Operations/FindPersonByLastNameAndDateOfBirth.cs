@@ -141,7 +141,7 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
                             LastName = name.LastName
                         })
                         .AsReadOnly(),
-                    InductionStatus = r.dfeta_InductionStatus?.ConvertToInductionStatus() is InductionStatus inductionStatus ?
+                    InductionStatus = r.dfeta_InductionStatus?.ConvertToInductionStatus() is SharedModels.InductionStatus inductionStatus ?
                         new InductionStatusInfo()
                         {
                             Status = inductionStatus,

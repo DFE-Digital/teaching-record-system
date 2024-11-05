@@ -60,7 +60,7 @@ public record GetPersonResultInduction
 {
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
-    public required InductionStatus? Status { get; init; }
+    public required SharedModels.InductionStatus? Status { get; init; }
     public required string? StatusDescription { get; init; }
     public required string? CertificateUrl { get; init; }
     public required IReadOnlyCollection<GetPersonResultInductionPeriod> Periods { get; init; }
