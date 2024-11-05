@@ -2038,7 +2038,7 @@
           "GovukNotify": "[6.1.0, )",
           "Hangfire.Core": "[1.8.14, )",
           "Hangfire.NetCore": "[1.8.14, )",
-          "Hangfire.PostgreSql": "[1.20.9, )",
+          "Hangfire.PostgreSql": "[1.20.10, )",
           "IdentityModel": "[6.2.0, )",
           "Microsoft.ApplicationInsights": "[2.22.0, )",
           "Microsoft.Data.SqlClient": "[5.2.2, )",
@@ -2244,9 +2244,9 @@
       },
       "Hangfire.PostgreSql": {
         "type": "CentralTransitive",
-        "requested": "[1.20.9, )",
-        "resolved": "1.20.9",
-        "contentHash": "lq6zWz4hn9+5i6rOkkvI2HZ9g39ZclVwb6Qgj5ROD29BAGquYqtBD/6pY2WDeCB1ZHRfLT9ps2Vmvy1V94A/DA==",
+        "requested": "[1.20.10, )",
+        "resolved": "1.20.10",
+        "contentHash": "Nn/88KoBvmy/xyopC9s+lXkwxQ6VB+RKyM8tjX3EgfSARDFxl2sEsFu0lw7WrjFdosg+E3naGzM5MzyiiL5i6w==",
         "dependencies": {
           "Dapper": "2.0.123",
           "Hangfire.Core": "1.8.0",
