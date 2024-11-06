@@ -26,6 +26,7 @@ public class CreateTrnRequestTests : TestBase
         var email2 = Faker.Internet.Email();
 
         await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)

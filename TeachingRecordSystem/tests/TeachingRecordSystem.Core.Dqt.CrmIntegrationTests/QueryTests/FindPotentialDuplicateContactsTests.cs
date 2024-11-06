@@ -38,7 +38,9 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
             MiddleName = middleName,
             LastName = lastName,
             DateOfBirth = dob.ToDateOnlyWithDqtBstFix(isLocalTime: false),
-            EmailAddresses = []
+            EmailAddresses = [],
+            NationalInsuranceNumber = null,
+            MatchedOnNationalInsuranceNumberContactIds = []
         };
 
         // Act
@@ -61,7 +63,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         // Arrange
         var email = $"{Guid.NewGuid()}@test.com";
 
-        var person = await _dataScope.TestData.CreatePerson(p => p.WithEmail(email));
+        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn().WithEmail(email));
 
         var query = new FindPotentialDuplicateContactsQuery()
         {
@@ -69,7 +71,9 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
             MiddleName = "",
             LastName = Faker.Name.Last(),
             DateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth()),
-            EmailAddresses = [email]
+            EmailAddresses = [email],
+            NationalInsuranceNumber = null,
+            MatchedOnNationalInsuranceNumberContactIds = []
         };
 
         // Act

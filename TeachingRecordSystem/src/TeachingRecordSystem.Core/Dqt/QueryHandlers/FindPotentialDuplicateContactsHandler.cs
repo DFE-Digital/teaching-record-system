@@ -9,27 +9,42 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 {
     public async Task<FindPotentialDuplicateContactsResult[]> Execute(FindPotentialDuplicateContactsQuery findQuery, IOrganizationServiceAsync organizationService)
     {
-        var emails = findQuery.EmailAddresses.ToArray();
+        // Find an existing active record with a TRN that matches on:
+        // * at least 3 of FirstName, MiddleName, LastName and BirthDate *OR*
+        // * email address *OR*
+        // * NINO.
 
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.StateCode, ConditionOperator.Equal, (int)ContactState.Active);
+        filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.NotNull);
 
         var childFilters = new FilterExpression(LogicalOperator.Or);
 
-        if (TryGetMatchCombinationsFilter(out var matchCombinationsFilter))
+        if (TryGetAtLeastThreeMatchesFilter(out var matchCombinationsFilter))
         {
             childFilters.AddFilter(matchCombinationsFilter);
         }
 
+        var emails = findQuery.EmailAddresses.ToArray();
         if (emails.Length > 0)
         {
             childFilters.AddCondition(Contact.Fields.EMailAddress1, ConditionOperator.In, emails);
         }
 
+        if (!string.IsNullOrEmpty(findQuery.NationalInsuranceNumber))
+        {
+            childFilters.AddCondition(Contact.Fields.dfeta_NINumber, ConditionOperator.Equal, findQuery.NationalInsuranceNumber);
+        }
+
+        if (findQuery.MatchedOnNationalInsuranceNumberContactIds.Length > 0)
+        {
+            childFilters.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.In, findQuery.MatchedOnNationalInsuranceNumberContactIds.Cast<object>().ToArray());
+        }
+
         if (childFilters.Filters.Count == 0)
         {
             // Not enough data in the input to match on
-            return Array.Empty<FindPotentialDuplicateContactsResult>();
+            return [];
         }
 
         filter.AddFilter(childFilters);
@@ -46,11 +61,16 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     Contact.Fields.FirstName,
                     Contact.Fields.MiddleName,
                     Contact.Fields.LastName,
+                    Contact.Fields.dfeta_StatedFirstName,
+                    Contact.Fields.dfeta_StatedMiddleName,
+                    Contact.Fields.dfeta_StatedLastName,
                     Contact.Fields.dfeta_PreviousLastName,
                     Contact.Fields.BirthDate,
                     Contact.Fields.dfeta_HUSID,
                     Contact.Fields.dfeta_SlugId,
                     Contact.Fields.EMailAddress1,
+                    Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.dfeta_TRN
                 }
             },
             Criteria = filter
@@ -58,7 +78,8 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
         var queryResult = await organizationService.RetrieveMultipleAsync(query);
 
-        var results = queryResult.Entities.Select(entity => entity.ToEntity<Contact>())
+        var results = queryResult.Entities
+            .Select(entity => entity.ToEntity<Contact>())
             .Select(match =>
             {
                 var attributeMatches = new[]
@@ -86,6 +107,11 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     (
                         Attribute: Contact.Fields.EMailAddress1,
                         Matches: findQuery.EmailAddresses.Contains(match.EMailAddress1, StringComparer.OrdinalIgnoreCase)
+                    ),
+                    (
+                        Attribute: Contact.Fields.dfeta_NINumber,
+                        Matches: (!string.IsNullOrEmpty(findQuery.NationalInsuranceNumber) && findQuery.NationalInsuranceNumber == match.dfeta_NINumber) ||
+                            findQuery.MatchedOnNationalInsuranceNumberContactIds.Contains(match.Id)
                     )
                 };
 
@@ -94,6 +120,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                 return new FindPotentialDuplicateContactsResult()
                 {
                     ContactId = match.Id,
+                    Trn = match.dfeta_TRN,
                     MatchedAttributes = matchedAttributeNames,
                     HasActiveSanctions = match.dfeta_ActiveSanctions == true,
                     HasQtsDate = match.dfeta_QTSDate.HasValue,
@@ -101,7 +128,11 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     FirstName = match.FirstName,
                     MiddleName = match.MiddleName ?? "",
                     LastName = match.LastName,
+                    StatedFirstName = match.dfeta_StatedFirstName,
+                    StatedMiddleName = match.dfeta_StatedMiddleName,
+                    StatedLastName = match.dfeta_StatedLastName,
                     DateOfBirth = match.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                    NationalInsuranceNumber = !string.IsNullOrEmpty(match.dfeta_NINumber) ? match.dfeta_NINumber : null,
                     EmailAddress = match.EMailAddress1
                 };
             })
@@ -109,10 +140,8 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
 
         return results;
 
-        bool TryGetMatchCombinationsFilter(out FilterExpression? filter)
+        bool TryGetAtLeastThreeMatchesFilter(out FilterExpression? filter)
         {
-            // Find an existing active record that matches on at least 3 of FirstName, MiddleName, LastName & BirthDate
-
             var fields = new[]
             {
                 (FieldName: Contact.Fields.FirstName, Value: findQuery.FirstNames),

@@ -155,6 +155,7 @@ public class CreateContactTests : IAsyncLifetime
                 new FindPotentialDuplicateContactsResult()
                 {
                     ContactId = createdTeacherId1,
+                    Trn = trn1,
                     MatchedAttributes = [Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName],
                     HasActiveSanctions = false,
                     HasEytsDate = false,
@@ -162,8 +163,12 @@ public class CreateContactTests : IAsyncLifetime
                     FirstName = firstName,
                     MiddleName = middleName,
                     LastName = lastName,
+                    StatedFirstName = firstName,
+                    StatedMiddleName = middleName,
+                    StatedLastName = lastName,
                     DateOfBirth = dob,
-                    EmailAddress = email
+                    EmailAddress = email,
+                    NationalInsuranceNumber = ni
                 }
             ]
         };

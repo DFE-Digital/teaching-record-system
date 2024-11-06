@@ -1,7 +1,9 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Api.Validation;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
@@ -20,6 +22,7 @@ public record CreateTrnRequestCommand
 }
 
 public class CreateTrnRequestHandler(
+    TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     TrnRequestHelper trnRequestHelper,
     ICurrentClientProvider currentClientProvider,
@@ -31,37 +34,76 @@ public class CreateTrnRequestHandler(
         var currentClientId = currentClientProvider.GetCurrentClientId();
 
         var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentClientId, command.RequestId);
-        if (trnRequest != null)
+        if (trnRequest is not null)
         {
             throw new ErrorException(ErrorRegistry.CannotResubmitRequest());
         }
 
-        string? trn = null;
-
+        // Normalize names; DQT matching process requires a single-word first name :-|
         var firstAndMiddleNames = $"{command.FirstName} {command.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var firstName = firstAndMiddleNames.First();
         var middleName = string.Join(' ', firstAndMiddleNames.Skip(1));
 
         var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
 
-        var potentialDuplicates = await crmQueryDispatcher.ExecuteQuery(
+        var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
+
+        // Check workforce data for NINO matches
+        var workforceDataMatches = normalizedNino is not null ?
+            await dbContext.TpsEmployments
+                .Where(e => e.NationalInsuranceNumber == normalizedNino)
+                .Join(dbContext.Persons, e => e.PersonId, p => p.PersonId, (e, p) => p.DqtContactId!.Value)
+                .ToArrayAsync() :
+            [];
+
+        var potentialDuplicates = (await crmQueryDispatcher.ExecuteQuery(
             new FindPotentialDuplicateContactsQuery()
             {
                 FirstNames = firstNameSynonyms.Append(firstName),
                 MiddleName = middleName,
                 LastName = command.LastName,
                 DateOfBirth = command.DateOfBirth,
-                EmailAddresses = command.EmailAddresses
-            });
+                EmailAddresses = command.EmailAddresses,
+                NationalInsuranceNumber = normalizedNino,
+                MatchedOnNationalInsuranceNumberContactIds = workforceDataMatches
+            })).ToList();
 
-        if (potentialDuplicates.Length == 0)
+        // If any record has matched on NINO & DOB treat that as a definite match and return the existing record's details
+        var matchedOnNinoAndDob = potentialDuplicates
+            .FirstOrDefault(d => d.MatchedAttributes.Contains(Contact.Fields.dfeta_NINumber) && d.MatchedAttributes.Contains(Contact.Fields.BirthDate));
+        if (matchedOnNinoAndDob is not null)
+        {
+            // FUTURE: consider whether we should be updating any missing attributes here
+
+            var hasStatedNames = !string.IsNullOrEmpty(matchedOnNinoAndDob.StatedFirstName) &&
+                !string.IsNullOrEmpty(matchedOnNinoAndDob.StatedLastName);
+
+            return new TrnRequestInfo()
+            {
+                RequestId = command.RequestId,
+                Person = new TrnRequestInfoPerson()
+                {
+                    FirstName = hasStatedNames ? matchedOnNinoAndDob.StatedFirstName! : matchedOnNinoAndDob.FirstName,
+                    MiddleName = hasStatedNames ? matchedOnNinoAndDob.StatedMiddleName ?? "" : matchedOnNinoAndDob.MiddleName,
+                    LastName = hasStatedNames ? matchedOnNinoAndDob.StatedLastName! : matchedOnNinoAndDob.LastName,
+                    EmailAddress = matchedOnNinoAndDob.EmailAddress,
+                    DateOfBirth = matchedOnNinoAndDob.DateOfBirth!.Value,
+                    NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(matchedOnNinoAndDob.NationalInsuranceNumber)
+                },
+                Trn = matchedOnNinoAndDob.Trn,
+                Status = TrnRequestStatus.Completed
+            };
+        }
+
+        string? trn = null;
+        if (potentialDuplicates.Count == 0)
         {
             trn = await trnGenerationApiClient.GenerateTrn();
         }
 
         var emailAddress = command.EmailAddresses?.FirstOrDefault();
 
-        var contactId = await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
+        await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,
