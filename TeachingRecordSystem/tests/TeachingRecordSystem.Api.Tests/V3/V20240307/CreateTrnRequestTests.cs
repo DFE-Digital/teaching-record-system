@@ -174,6 +174,7 @@ public class CreateTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -232,6 +233,7 @@ public class CreateTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -349,6 +351,7 @@ public class CreateTrnRequestTests : TestBase
         var invalidNino = "IvalidNi";
 
         var existingContact = await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -468,7 +471,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PotentialDuplicateContact_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    public async Task Post_PotentialDuplicateContactOnNamesAndDateOfBirth_CreatesContactWithoutTrnAndReturnsPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -480,6 +483,7 @@ public class CreateTrnRequestTests : TestBase
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
         await TestData.CreatePerson(p => p
+            .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -529,6 +533,290 @@ public class CreateTrnRequestTests : TestBase
                 },
                 trn = (string?)null,
                 status = "Pending"
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Post_PotentialDuplicateContactMatchedOnDqtNinoOnly_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
+            .WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
+        Assert.NotNull(contact);
+        Assert.Null(contact.dfeta_TRN);
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId,
+                person = new
+                {
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
+                    nationalInsuranceNumber,
+                },
+                trn = (string?)null,
+                status = "Pending"
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Post_PotentialDuplicateContactMatchedOnWorkforceDataNinoOnly_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
+            .WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth)));
+
+        var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321");
+        await TestData.CreateTpsEmployment(
+            person,
+            establishment,
+            startDate: new DateOnly(2024, 1, 1),
+            lastKnownEmployedDate: new DateOnly(2024, 10, 1),
+            EmploymentType.FullTime,
+            lastExtractDate: new DateOnly(2024, 10, 1),
+            nationalInsuranceNumber: nationalInsuranceNumber);
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
+        Assert.NotNull(contact);
+        Assert.Null(contact.dfeta_TRN);
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId,
+                person = new
+                {
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
+                    nationalInsuranceNumber,
+                },
+                trn = (string?)null,
+                status = "Pending"
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Post_DuplicateContactMatchedOnDqtNinoAndDateOfBirth_ReturnsExistingTrnAndDoesNotCreateNewContact()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
+            .WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(dateOfBirth)
+            .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId,
+                person = new
+                {
+                    firstName = person.FirstName,
+                    middleName = person.MiddleName,
+                    lastName = person.LastName,
+                    email = person.Email,
+                    dateOfBirth = person.DateOfBirth,
+                    nationalInsuranceNumber = person.NationalInsuranceNumber,
+                },
+                trn = person.Trn,
+                status = "Completed"
+            },
+            expectedStatusCode: 200);
+    }
+
+    [Fact]
+    public async Task Post_DuplicateContactMatchedOnWorkforceDataNinoAndDqtDateOfBirth_ReturnsExistingTrnAndDoesNotCreateNewContact()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
+            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
+            .WithLastName(TestData.GenerateChangedLastName(lastName))
+            .WithDateOfBirth(dateOfBirth));
+
+        var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321");
+        await TestData.CreateTpsEmployment(
+            person,
+            establishment,
+            startDate: new DateOnly(2024, 1, 1),
+            lastKnownEmployedDate: new DateOnly(2024, 10, 1),
+            EmploymentType.FullTime,
+            lastExtractDate: new DateOnly(2024, 10, 1),
+            nationalInsuranceNumber: nationalInsuranceNumber);
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
+
+        await AssertEx.JsonResponseEquals(
+            response,
+            expected: new
+            {
+                requestId,
+                person = new
+                {
+                    firstName = person.FirstName,
+                    middleName = person.MiddleName,
+                    lastName = person.LastName,
+                    email = person.Email,
+                    dateOfBirth = person.DateOfBirth,
+                    nationalInsuranceNumber = person.NationalInsuranceNumber,
+                },
+                trn = person.Trn,
+                status = "Completed"
             },
             expectedStatusCode: 200);
     }

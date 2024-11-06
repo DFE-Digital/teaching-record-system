@@ -14,6 +14,8 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
 
+        Debug.Assert(query.Trn is null || query.PotentialDuplicates.Count == 0);
+
         var contact = new Contact()
         {
             Id = contactId,
@@ -27,28 +29,16 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             dfeta_NINumber = query.NationalInsuranceNumber,
             EMailAddress1 = query.EmailAddress,
             dfeta_AllowPiiUpdatesFromRegister = false,
-            dfeta_TrnRequestID = query.TrnRequestId
+            dfeta_TrnRequestID = query.TrnRequestId,
+            dfeta_TRN = query.Trn
         };
-
-        // only set trn if there is not any potential duplicate matches on the query
-        if (query.PotentialDuplicates.Length == 0)
-        {
-            contact.dfeta_TRN = query.Trn;
-        }
 
         requestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
-        if (query.PotentialDuplicates.Length == 0)
+        foreach (var duplicate in query.PotentialDuplicates)
         {
-            FlagBadData(requestBuilder, query, contactId);
-        }
-        else
-        {
-            foreach (var duplicate in query.PotentialDuplicates)
-            {
-                var task = CreateDuplicateReviewTaskEntity(duplicate, query, contactId);
-                requestBuilder.AddRequest(new CreateRequest() { Target = task });
-            }
+            var task = CreateDuplicateReviewTaskEntity(duplicate, contactId);
+            requestBuilder.AddRequest(new CreateRequest() { Target = task });
         }
 
         await requestBuilder.Execute();
@@ -56,22 +46,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         return contactId;
     }
 
-    private void FlagBadData(RequestBuilder requestBuilder, CreateContactQuery createTeacherRequest, Guid contactId)
-    {
-        var firstNameContainsDigit = createTeacherRequest.FirstName.Any(Char.IsDigit);
-        var middleNameContainsDigit = createTeacherRequest.MiddleName?.Any(Char.IsDigit) ?? false;
-        var lastNameContainsDigit = createTeacherRequest.LastName.Any(Char.IsDigit);
-
-        if (firstNameContainsDigit || middleNameContainsDigit || lastNameContainsDigit)
-        {
-            requestBuilder.AddRequest(new CreateRequest()
-            {
-                Target = CreateNameWithDigitsReviewTaskEntity(firstNameContainsDigit, middleNameContainsDigit, lastNameContainsDigit, contactId)
-            });
-        }
-    }
-
-    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, CreateContactQuery createTeacherRequest, Guid contactId)
+    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, Guid contactId)
     {
         var description = GetDescription();
 
@@ -92,7 +67,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             sb.AppendLine("Potential duplicate");
             sb.AppendLine("Matched on");
 
-            foreach (var matchedAttribute in duplicate.MatchedAttributes ?? Array.Empty<string>())
+            foreach (var matchedAttribute in duplicate.MatchedAttributes)
             {
                 sb.AppendLine(matchedAttribute switch
                 {
@@ -100,12 +75,12 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
                     Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
                     Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
                     Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
+                    Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
                     Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
                     _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
                 });
             }
 
-            Debug.Assert(!duplicate.HasEytsDate || !duplicate.HasQtsDate);
             var additionalFlags = new List<string>();
 
             if (duplicate.HasActiveSanctions)
@@ -117,7 +92,8 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             {
                 additionalFlags.Add("QTS date");
             }
-            else if (duplicate.HasEytsDate)
+
+            if (duplicate.HasEytsDate)
             {
                 additionalFlags.Add("EYTS date");
             }
@@ -128,52 +104,6 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             }
 
             return sb.ToString();
-        }
-    }
-
-    private CrmTask CreateNameWithDigitsReviewTaskEntity(
-        bool firstNameContainsDigit,
-        bool middleNameContainsDigit,
-        bool lastNameContainsDigit,
-        Guid teacherId)
-    {
-        var description = GetDescription();
-
-        return new CrmTask()
-        {
-            RegardingObjectId = teacherId.ToEntityReference(Contact.EntityLogicalName),
-            Category = "DMSImportTrn",
-            Subject = "Notification for QTS Unit Team",
-            Description = description
-        };
-
-        string GetDescription()
-        {
-            var badFields = new List<string>();
-
-            if (firstNameContainsDigit)
-            {
-                badFields.Add("first name");
-            }
-
-            if (middleNameContainsDigit)
-            {
-                badFields.Add("middle name");
-            }
-
-            if (lastNameContainsDigit)
-            {
-                badFields.Add("last name");
-            }
-
-            Debug.Assert(badFields.Count > 0);
-
-            var description = badFields.ToCommaSeparatedString(finalValuesConjunction: "and")
-                + $" contain{(badFields.Count == 1 ? "s" : "")} a digit";
-
-            description = description[0..1].ToUpper() + description[1..];
-
-            return description;
         }
     }
 }
