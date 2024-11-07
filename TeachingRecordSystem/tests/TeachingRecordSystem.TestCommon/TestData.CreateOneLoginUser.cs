@@ -1,19 +1,20 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<OneLoginUser> CreateOneLoginUser(CreatePersonResult createPersonResult, string? subject = null, string? email = null) =>
+    public Task<OneLoginUser> CreateOneLoginUser(CreatePersonResult createPersonResult, Option<string> subject = default, Option<string?> email = default) =>
         CreateOneLoginUser(
             createPersonResult.PersonId,
             subject,
             email,
             verifiedInfo: ([createPersonResult.FirstName, createPersonResult.LastName], createPersonResult.DateOfBirth));
 
-    public Task<OneLoginUser> CreateOneLoginUser(string? subject = null, string? email = null, bool verified = false) =>
+    public Task<OneLoginUser> CreateOneLoginUser(Option<string> subject = default, Option<string?> email = default, bool verified = false) =>
         CreateOneLoginUser(
             personId: null,
             subject,
@@ -22,8 +23,8 @@ public partial class TestData
 
     public Task<OneLoginUser> CreateOneLoginUser(
         Guid? personId,
-        string? subject = null,
-        string? email = null,
+        Option<string> subject = default,
+        Option<string?> email = default,
         (string[] Name, DateOnly DateOfBirth)? verifiedInfo = null)
     {
         if (personId is not null && verifiedInfo is null)
@@ -33,24 +34,39 @@ public partial class TestData
 
         return WithDbContext(async dbContext =>
         {
-            subject ??= CreateOneLoginUserSubject();
-            email ??= Faker.Internet.Email();
+            var hasSignedInBefore = email != Option.Some((string?)null);
 
             var user = new OneLoginUser()
             {
-                Subject = subject,
-                Email = email,
-                FirstOneLoginSignIn = Clock.UtcNow,
-                LastOneLoginSignIn = Clock.UtcNow,
-                PersonId = personId
+                Subject = subject.ValueOr(CreateOneLoginUserSubject())
             };
+
+            if (hasSignedInBefore)
+            {
+                user.Email = email.ValueOr(Faker.Internet.Email());
+                user.FirstOneLoginSignIn = Clock.UtcNow;
+                user.LastOneLoginSignIn = Clock.UtcNow;
+            }
 
             if (verifiedInfo is not null)
             {
-                user.VerifiedOn = Clock.UtcNow;
-                user.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
-                user.VerifiedNames = [verifiedInfo!.Value.Name];
-                user.VerifiedDatesOfBirth = [verifiedInfo!.Value.DateOfBirth];
+                user.SetVerified(
+                    Clock.UtcNow,
+                    OneLoginUserVerificationRoute.OneLogin,
+                    verifiedByApplicationUserId: null,
+                    [verifiedInfo!.Value.Name],
+                    [verifiedInfo!.Value.DateOfBirth]);
+            }
+
+            if (personId is not null)
+            {
+                user.SetMatched(personId.Value, OneLoginUserMatchRoute.Automatic, matchedAttributes: null);
+
+                if (hasSignedInBefore)
+                {
+                    user.FirstSignIn = Clock.UtcNow;
+                    user.LastSignIn = Clock.UtcNow;
+                }
             }
 
             dbContext.OneLoginUsers.Add(user);

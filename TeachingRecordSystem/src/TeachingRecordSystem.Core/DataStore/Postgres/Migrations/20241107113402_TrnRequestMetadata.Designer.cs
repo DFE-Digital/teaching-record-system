@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241107113402_TrnRequestMetadata")]
+    partial class TrnRequestMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1676,11 +1679,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("subject");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("email");
 
-                    b.Property<DateTime?>("FirstOneLoginSignIn")
+                    b.Property<DateTime>("FirstOneLoginSignIn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("first_one_login_sign_in");
 
@@ -1692,7 +1696,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("last_core_identity_vc");
 
-                    b.Property<DateTime?>("LastOneLoginSignIn")
+                    b.Property<DateTime>("LastOneLoginSignIn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_one_login_sign_in");
 
@@ -1700,7 +1704,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_sign_in");
 
-                    b.Property<int?>("MatchRoute")
+                    b.Property<int>("MatchRoute")
                         .HasColumnType("integer")
                         .HasColumnName("match_route");
 
@@ -1715,10 +1719,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<int?>("VerificationRoute")
                         .HasColumnType("integer")
                         .HasColumnName("verification_route");
-
-                    b.Property<Guid?>("VerifiedByApplicationUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("verified_by_application_user_id");
 
                     b.Property<string>("VerifiedDatesOfBirth")
                         .HasColumnType("jsonb")
@@ -3106,11 +3106,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .WithOne()
                         .HasForeignKey("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", "PersonId")
                         .HasConstraintName("fk_one_login_users_persons_person_id");
-
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("VerifiedByApplicationUserId")
-                        .HasConstraintName("fk_one_login_users_application_users_verified_by_application_u");
 
                     b.Navigation("Person");
                 });

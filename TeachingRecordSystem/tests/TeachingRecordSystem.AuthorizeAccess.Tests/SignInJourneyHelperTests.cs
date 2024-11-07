@@ -3,6 +3,7 @@ using System.Security.Claims;
 using GovUk.OneLogin.AspNetCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
@@ -42,6 +43,45 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.NotEqual(Clock.UtcNow, user.FirstSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastSignIn);
+
+            var redirectResult = Assert.IsType<RedirectHttpResult>(result);
+            Assert.Equal($"{state.RedirectUri}?{journeyInstance.GetUniqueIdQueryParameter()}", redirectResult.Url);
+        });
+
+    [Fact]
+    public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsWithSubjectOnlyAndTeachingRecordKnown_AssignsEmailAndSignInFieldsAndCompletesJourney() =>
+        WithDbContext(async dbContext =>
+        {
+            // Arrange
+            var helper = CreateHelper(dbContext);
+
+            var person = await TestData.CreatePerson(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUser(person, email: Option.Some((string?)null));
+            Clock.Advance();
+
+            var state = new SignInJourneyState(
+                redirectUri: "/",
+                serviceName: "Test Service",
+                serviceUrl: "https://service",
+                oneLoginAuthenticationScheme: "dummy",
+                clientApplicationUserId: default);
+            var journeyInstance = await CreateJourneyInstance(state);
+
+            var email = Faker.Internet.Email();
+            var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject, email);
+
+            // Act
+            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+
+            // Assert
+            Assert.NotNull(state.AuthenticationTicket);
+
+            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            Assert.Equal(email, user.Email);
+            Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
+            Assert.Equal(Clock.UtcNow, user.FirstSignIn);
             Assert.Equal(Clock.UtcNow, user.LastSignIn);
 
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -237,7 +277,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Medium);
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Medium);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -296,7 +336,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Low, TrnAssociationSource.SupportUi);
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Low, TrnAssociationSource.SupportUi);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -355,7 +395,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Low, TrnAssociationSource.TrnToken);
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Low, TrnAssociationSource.TrnToken);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -414,7 +454,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Low);
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Low);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -463,7 +503,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Medium);
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Medium);
 
             var firstName = person.FirstName;
             var lastName = TestData.GenerateChangedLastName(person.LastName);
@@ -512,7 +552,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email, TrnVerificationLevel.Medium);
+            await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Medium);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -561,7 +601,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var trnToken = await CreateTrnToken(person.Trn!, user.Email);
+            var trnToken = await CreateTrnToken(person.Trn!, user.Email!);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -670,7 +710,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var trnToken = await CreateTrnToken(person.Trn!, user.Email, expires: TimeSpan.FromSeconds(-1));
+            var trnToken = await CreateTrnToken(person.Trn!, user.Email!, expires: TimeSpan.FromSeconds(-1));
 
             var firstName = person.FirstName;
             var lastName = person.LastName;
@@ -720,7 +760,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var trnToken = await CreateTrnToken(person.Trn!, user.Email, userId: Guid.NewGuid());
+            var trnToken = await CreateTrnToken(person.Trn!, user.Email!, userId: Guid.NewGuid());
 
             var state = new SignInJourneyState(
                 redirectUri: "/",
@@ -766,7 +806,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var trnToken = await CreateTrnToken(person.Trn!, user.Email);
+            var trnToken = await CreateTrnToken(person.Trn!, user.Email!);
 
             var firstName = person.FirstName;
             var lastName = TestData.GenerateChangedLastName(person.LastName);
@@ -816,7 +856,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var user = await TestData.CreateOneLoginUser(personId: null);
             Clock.Advance();
 
-            var trnToken = await CreateTrnToken(person.Trn!, user.Email);
+            var trnToken = await CreateTrnToken(person.Trn!, user.Email!);
 
             var firstName = person.FirstName;
             var lastName = person.LastName;

@@ -116,7 +116,7 @@ public class DebugIdentityModel(
 
         if (_oneLoginUser!.PersonId is not null && DetachPerson)
         {
-            _oneLoginUser.PersonId = null;
+            _oneLoginUser.ClearMatchedPerson();
         }
 
         if (IdentityVerified)
@@ -125,10 +125,7 @@ public class DebugIdentityModel(
         }
         else
         {
-            _oneLoginUser!.VerifiedOn = null;
-            _oneLoginUser.VerificationRoute = null;
-            _oneLoginUser.VerifiedNames = null;
-            _oneLoginUser.VerifiedDatesOfBirth = null;
+            _oneLoginUser.ClearVerifiedInfo();
 
             await JourneyInstance!.UpdateStateAsync(state => state.ClearVerified());
         }

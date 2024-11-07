@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241107123546_NullableOneLoginUserFields")]
+    partial class NullableOneLoginUserFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1716,10 +1719,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("verification_route");
 
-                    b.Property<Guid?>("VerifiedByApplicationUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("verified_by_application_user_id");
-
                     b.Property<string>("VerifiedDatesOfBirth")
                         .HasColumnType("jsonb")
                         .HasColumnName("verified_dates_of_birth");
@@ -3106,11 +3105,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .WithOne()
                         .HasForeignKey("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", "PersonId")
                         .HasConstraintName("fk_one_login_users_persons_person_id");
-
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("VerifiedByApplicationUserId")
-                        .HasConstraintName("fk_one_login_users_application_users_verified_by_application_u");
 
                     b.Navigation("Person");
                 });
