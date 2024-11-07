@@ -33,6 +33,7 @@ public class OneLoginUserMapping : IEntityTypeConfiguration<OneLoginUser>
             new ValueComparer<KeyValuePair<OneLoginUserMatchedAttribute, string>[]>(
                 (a, b) => a == b,  // Reference equality is fine here; we'll always replace the entire collection
                 v => v.GetHashCode()));
+        builder.HasOne<ApplicationUser>().WithMany().HasForeignKey(o => o.VerifiedByApplicationUserId);
     }
 }
 

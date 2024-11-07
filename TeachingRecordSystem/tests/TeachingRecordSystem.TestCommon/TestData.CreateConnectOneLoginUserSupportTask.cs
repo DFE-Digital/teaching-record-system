@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 
@@ -14,12 +15,13 @@ public partial class TestData
         WithDbContext(async dbContext =>
         {
             var user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUserSubject);
+            Debug.Assert(user.Email is not null);
 
             var data = new ConnectOneLoginUserData()
             {
                 Verified = user.VerificationRoute is not null,
                 OneLoginUserSubject = user.Subject,
-                OneLoginUserEmail = user.Email,
+                OneLoginUserEmail = user.Email!,
                 VerifiedNames = user.VerifiedNames,
                 VerifiedDatesOfBirth = user.VerifiedDatesOfBirth,
                 StatedNationalInsuranceNumber = statedNationalInsuranceNumber,

@@ -37,14 +37,17 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
         };
         _supportTask.Status = SupportTaskStatus.Closed;
 
-        var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == data.OneLoginUserSubject);
-        oneLoginUser.PersonId = PersonDetail!.PersonId;
-        oneLoginUser.MatchedAttributes = (await personMatchingService
+        var matchedAttributes = (await personMatchingService
             .GetMatchedAttributes(
                 new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn),
                 PersonDetail.PersonId))
             .ToArray();
-        oneLoginUser.MatchRoute = OneLoginUserMatchRoute.Support;
+
+        var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == data.OneLoginUserSubject);
+        oneLoginUser.SetMatched(
+            PersonDetail!.PersonId,
+            OneLoginUserMatchRoute.Support,
+            matchedAttributes);
 
         await dbContext.SaveChangesAsync();
 

@@ -92,14 +92,16 @@ public class SignInJourneyHelper(
         }
         else
         {
+            oneLoginUser.FirstOneLoginSignIn ??= clock.UtcNow;
             oneLoginUser.LastOneLoginSignIn = clock.UtcNow;
 
-            // Email may have changed since the last sign in - ensure we update it.
+            // Email may have changed since the last sign in or we may have never had it (e.g. if we got the user ID over our API).
             // TODO Should we emit an event if it has changed?
             oneLoginUser.Email = email;
 
             if (oneLoginUser.PersonId is not null)
             {
+                oneLoginUser.FirstSignIn ??= clock.UtcNow;
                 oneLoginUser.LastSignIn = clock.UtcNow;
             }
         }
@@ -149,10 +151,7 @@ public class SignInJourneyHelper(
         var sub = journeyInstance.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
         var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == sub);
-        oneLoginUser.VerifiedOn = clock.UtcNow;
-        oneLoginUser.VerificationRoute = OneLoginUserVerificationRoute.OneLogin;
-        oneLoginUser.VerifiedNames = verifiedNames;
-        oneLoginUser.VerifiedDatesOfBirth = verifiedDatesOfBirth;
+        oneLoginUser.SetVerified(clock.UtcNow, OneLoginUserVerificationRoute.OneLogin, verifiedByApplicationUserId: null, verifiedNames, verifiedDatesOfBirth);
         oneLoginUser.LastCoreIdentityVc = coreIdentityClaimVc;
 
         string? trn = null;
@@ -167,11 +166,9 @@ public class SignInJourneyHelper(
 
             if (result.MatchRoute is not null)
             {
-                oneLoginUser.PersonId = result.PersonId;
                 oneLoginUser.FirstSignIn = clock.UtcNow;
                 oneLoginUser.LastSignIn = clock.UtcNow;
-                oneLoginUser.MatchRoute = result.MatchRoute.Value;
-                oneLoginUser.MatchedAttributes = result.MatchedAttributes!.ToArray();
+                oneLoginUser.SetMatched(result.PersonId, result.MatchRoute.Value, result.MatchedAttributes!.ToArray());
                 trn = result.Trn;
             }
         }
@@ -319,11 +316,9 @@ public class SignInJourneyHelper(
             var subject = state.OneLoginAuthenticationTicket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
 
             var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(o => o.Subject == subject);
-            oneLoginUser.PersonId = matchedPersonId;
             oneLoginUser.FirstSignIn = clock.UtcNow;
             oneLoginUser.LastSignIn = clock.UtcNow;
-            oneLoginUser.MatchRoute = OneLoginUserMatchRoute.Interactive;
-            oneLoginUser.MatchedAttributes = matchedAttributes.ToArray();
+            oneLoginUser.SetMatched(matchedPersonId, OneLoginUserMatchRoute.Interactive, matchedAttributes.ToArray());
             await dbContext.SaveChangesAsync();
 
             await journeyInstance.UpdateStateAsync(state => Complete(state, matchedTrn));

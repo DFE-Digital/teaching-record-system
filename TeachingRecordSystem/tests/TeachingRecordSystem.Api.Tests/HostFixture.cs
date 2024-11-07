@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -30,6 +31,8 @@ public class HostFixture : WebApplicationFactory<Program>
 
         _ = Services;  // Start the host
     }
+
+    public static Guid DefaultApplicationUserId { get; } = new("c0c8c511-e8e4-4b8e-96e3-55085dafc05d");
 
     public HttpClientInterceptorOptions EvidenceFilesHttpClientInterceptorOptions { get; } = new();
 
@@ -95,6 +98,20 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddHttpClient("EvidenceFiles")
                 .AddHttpMessageHandler(_ => EvidenceFilesHttpClientInterceptorOptions.CreateHttpMessageHandler())
                 .ConfigurePrimaryHttpMessageHandler(_ => new NotFoundHandler());
+
+            services.AddStartupTask(async sp =>
+            {
+                await using var dbContext = await sp.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
+
+                dbContext.ApplicationUsers.Add(new Core.DataStore.Postgres.Models.ApplicationUser()
+                {
+                    UserId = DefaultApplicationUserId,
+                    Name = "Tests",
+                    ApiRoles = ApiRoles.All.ToArray()
+                });
+
+                await dbContext.SaveChangesAsync();
+            });
         });
     }
 

@@ -32,6 +32,9 @@ public class GetTrnRequestHandler(
                     Contact.Fields.FirstName,
                     Contact.Fields.MiddleName,
                     Contact.Fields.LastName,
+                    Contact.Fields.dfeta_StatedFirstName,
+                    Contact.Fields.dfeta_StatedMiddleName,
+                    Contact.Fields.dfeta_StatedLastName,
                     Contact.Fields.EMailAddress1,
                     Contact.Fields.dfeta_NINumber,
                     Contact.Fields.BirthDate,
@@ -39,6 +42,13 @@ public class GetTrnRequestHandler(
                     Contact.Fields.MasterId))))!;
 
         var status = !string.IsNullOrEmpty(contact.dfeta_TRN) ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
+
+        // If we have metadata for the One Login user, ensure they're added to the OneLoginUsers table.
+        // FUTURE: when TRN requests are handled exclusively in TRS this should be done at the point the task is resolved instead of here.
+        if (status == TrnRequestStatus.Completed)
+        {
+            await trnRequestHelper.EnsureOneLoginUserIsConnected(trnRequest, contact);
+        }
 
         return new TrnRequestInfo()
         {
