@@ -13,20 +13,22 @@ namespace TeachingRecordSystem.Api.Tests;
 
 public abstract class TestBase
 {
+    private static readonly Guid _defaultApplicationUserId = new Guid("c0c8c511-e8e4-4b8e-96e3-55085dafc05d");
+
     private readonly TestScopedServices _testServices;
 
     protected TestBase(HostFixture hostFixture)
     {
         HostFixture = hostFixture;
         _testServices = TestScopedServices.Reset();
-        SetCurrentApiClient(Array.Empty<string>());
+        SetCurrentApiClient([]);
     }
 
     public HostFixture HostFixture { get; }
 
     public Mock<ICertificateGenerator> CertificateGeneratorMock => _testServices.CertificateGeneratorMock;
 
-    public string ClientId { get; } = "tests";
+    public Guid ApplicationUserId { get; } = _defaultApplicationUserId;
 
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
 
@@ -97,10 +99,10 @@ public abstract class TestBase
         return httpClient;
     }
 
-    protected void SetCurrentApiClient(IEnumerable<string> roles, string clientId = "tests")
+    protected void SetCurrentApiClient(IEnumerable<string> roles, Guid? applicationUserId = null)
     {
         var currentUserProvider = HostFixture.Services.GetRequiredService<CurrentApiClientProvider>();
-        currentUserProvider.CurrentApiClientId = clientId;
+        currentUserProvider.CurrentApiUserId = applicationUserId ?? _defaultApplicationUserId;
         currentUserProvider.Roles = roles.ToArray();
     }
 

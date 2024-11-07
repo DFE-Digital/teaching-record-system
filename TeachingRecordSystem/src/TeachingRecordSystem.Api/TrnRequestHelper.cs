@@ -8,11 +8,11 @@ namespace TeachingRecordSystem.Api;
 
 public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task<GetTrnRequestResult?> GetTrnRequestInfo(string currentClientId, string requestId)
+    public async Task<GetTrnRequestResult?> GetTrnRequestInfo(Guid currentApplicationUserId, string requestId)
     {
-        var getDbTrnRequestTask = dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == currentClientId && r.RequestId == requestId);
+        var getDbTrnRequestTask = dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == currentApplicationUserId.ToString() && r.RequestId == requestId);
 
-        var crmTrnRequestId = GetCrmTrnRequestId(currentClientId, requestId);
+        var crmTrnRequestId = GetCrmTrnRequestId(currentApplicationUserId, requestId);
         var getContactByTrnRequestIdTask = crmQueryDispatcher.ExecuteQuery(
             new GetContactByTrnRequestIdQuery(crmTrnRequestId, new Microsoft.Xrm.Sdk.Query.ColumnSet(Contact.Fields.ContactId, Contact.Fields.dfeta_TrnToken)));
 
@@ -29,8 +29,8 @@ public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQue
         return null;
     }
 
-    public static string GetCrmTrnRequestId(string currentClientId, string requestId) =>
-        $"{currentClientId}::{requestId}";
+    public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
+        $"{currentApplicationUserId}::{requestId}";
 }
 
 public record GetTrnRequestResult(Guid ContactId, string? TrnToken);

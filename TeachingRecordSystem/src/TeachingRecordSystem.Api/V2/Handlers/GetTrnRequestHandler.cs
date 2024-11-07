@@ -15,27 +15,27 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
 {
     private readonly TrnRequestHelper _trnRequestHelper;
     private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly ICurrentClientProvider _currentClientProvider;
+    private readonly ICurrentUserProvider _currentUserProvider;
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public GetTrnRequestHandler(
         TrnRequestHelper trnRequestHelper,
         TrsDbContext TrsDbContext,
         IDataverseAdapter dataverseAdapter,
-        ICurrentClientProvider currentClientProvider,
+        ICurrentUserProvider currentUserProvider,
         IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
         _trnRequestHelper = trnRequestHelper;
         _dataverseAdapter = dataverseAdapter;
-        _currentClientProvider = currentClientProvider;
+        _currentUserProvider = currentUserProvider;
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
     }
 
     public async Task<TrnRequestInfo> Handle(GetTrnRequest request, CancellationToken cancellationToken)
     {
-        var currentClientId = _currentClientProvider.GetCurrentClientId();
+        var currentApplicationUserId = _currentUserProvider.GetCurrentApplicationUserId();
 
-        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentClientId, request.RequestId);
+        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, request.RequestId);
         if (trnRequest == null)
         {
             return null;

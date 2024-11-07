@@ -25,15 +25,15 @@ public class CreateTrnRequestHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     TrnRequestHelper trnRequestHelper,
-    ICurrentClientProvider currentClientProvider,
+    ICurrentUserProvider currentUserProvider,
     ITrnGenerationApiClient trnGenerationApiClient,
     INameSynonymProvider nameSynonymProvider)
 {
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
     {
-        var currentClientId = currentClientProvider.GetCurrentClientId();
+        var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentClientId, command.RequestId);
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
         {
             throw new ErrorException(ErrorRegistry.CannotResubmitRequest());
@@ -116,7 +116,7 @@ public class CreateTrnRequestHandler(
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates,
             Trn = trn,
-            TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentClientId, command.RequestId),
+            TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
         });
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;

@@ -188,7 +188,7 @@ public class Program
         });
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
-        services.AddSingleton<ICurrentClientProvider, ClaimsPrincipalCurrentClientProvider>();
+        services.AddSingleton<ICurrentUserProvider, ClaimsPrincipalCurrentUserProvider>();
         services.AddMemoryCache();
         services.AddSingleton<AddTrnToSentryScopeResourceFilter>();
         services.AddTransient<TrnRequestHelper>();
