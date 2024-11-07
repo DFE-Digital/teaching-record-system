@@ -4,9 +4,9 @@
     "net8.0": {
       "Dfe.Analytics": {
         "type": "Direct",
-        "requested": "[0.2.3, )",
-        "resolved": "0.2.3",
-        "contentHash": "BCAchAqut4iapKaJy3cEuMUpR4PmzprBSS9GKFNJ+U4DNJChS2P4wzcxGhuYa9EToNoBwJ+pQP9EiqhKNClNsg==",
+        "requested": "[0.2.4, )",
+        "resolved": "0.2.4",
+        "contentHash": "b5NGUtfkKyO0F1vEdFafykXDbAu1L4owBh3qUy1vakbm/aE5J4Mc4o+xXkktH78oYemz3SUXrPJwLs78v+g2vA==",
         "dependencies": {
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
           "Microsoft.Extensions.Configuration": "[8.0.0, 9.0.0)",
