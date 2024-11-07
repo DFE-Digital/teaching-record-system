@@ -20,12 +20,12 @@ public class TestApiKeyAuthenticationHandler(
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var currentApiClientId = currentApiClientProvider.CurrentApiClientId;
+        var currentApiClientId = currentApiClientProvider.CurrentApiUserId;
         var currentRoles = currentApiClientProvider.Roles!;
 
-        if (currentApiClientId is not null)
+        if (currentApiClientId is Guid id)
         {
-            var principal = ApiKeyAuthenticationHandler.CreatePrincipal(currentApiClientId, name: currentApiClientId, currentRoles);
+            var principal = ApiKeyAuthenticationHandler.CreatePrincipal(id, name: id.ToString(), currentRoles);
 
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
@@ -42,14 +42,14 @@ public class TestApiKeyAuthenticationOptions : AuthenticationSchemeOptions { }
 
 public class CurrentApiClientProvider
 {
-    private readonly AsyncLocal<string> _currentApiClientId = new();
+    private readonly AsyncLocal<Guid?> _currentApiUserId = new();
     private readonly AsyncLocal<string[]> _roles = new();
 
     [DisallowNull]
-    public string? CurrentApiClientId
+    public Guid? CurrentApiUserId
     {
-        get => _currentApiClientId.Value;
-        set => _currentApiClientId.Value = value;
+        get => _currentApiUserId.Value;
+        set => _currentApiUserId.Value = value;
     }
 
     [DisallowNull]

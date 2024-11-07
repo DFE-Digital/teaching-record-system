@@ -51,7 +51,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         {
             dbContext.Add(new TrnRequest()
             {
-                ClientId = ClientId,
+                ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
                 TeacherId = teacherId
             });
@@ -85,7 +85,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
-        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId);
         var createPersonResult = await TestData.CreatePerson(p => p.WithTrn().WithTrnRequestId(trnRequestId));
 
         DataverseAdapterMock
@@ -128,7 +128,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         {
             dbContext.Add(new TrnRequest()
             {
-                ClientId = ClientId,
+                ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
                 TeacherId = teacherId
             });
@@ -162,7 +162,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
-        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId);
+        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId);
         var createPersonResult = await TestData.CreatePerson(p => p.WithoutTrn().WithTrnRequestId(trnRequestId).WithSlugId(slugId));
 
         DataverseAdapterMock

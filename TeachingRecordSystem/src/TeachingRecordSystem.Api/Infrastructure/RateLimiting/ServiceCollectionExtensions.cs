@@ -10,7 +10,7 @@ namespace TeachingRecordSystem.Api.Infrastructure.RateLimiting;
 
 public static class ServiceCollectionExtensions
 {
-    private const string UnknownClientId = "__UNKNOWN__";
+    private const string UnknownUserPartitionKey = "__UNKNOWN__";
 
     public static IServiceCollection AddRateLimiting(
         this IServiceCollection services,
@@ -52,13 +52,13 @@ public static class ServiceCollectionExtensions
                 {
                     var rateLimiterOptions = httpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>().Value;
                     var connectionMultiplexerFactory = () => httpContext.RequestServices.GetRequiredService<IConnectionMultiplexer>();
-                    var clientId = ClaimsPrincipalCurrentClientProvider.GetCurrentClientIdFromHttpContext(httpContext) ?? UnknownClientId;
-                    var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(clientId, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
+                    var partitionKey = ClaimsPrincipalCurrentUserProvider.TryGetCurrentClientIdFromHttpContext(httpContext, out var userId) ? userId.ToString() : UnknownUserPartitionKey;
+                    var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(partitionKey, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
 
                     // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead
                     httpContext.Items.TryAdd(_windowSecondsHttpContextKey, clientRateLimit.Window.TotalSeconds);
 
-                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(clientId, key => new RedisFixedWindowRateLimiterOptions()
+                    return RedisRateLimitPartition.GetFixedWindowRateLimiter(partitionKey, key => new RedisFixedWindowRateLimiterOptions()
                     {
                         Window = clientRateLimit.Window,
                         PermitLimit = clientRateLimit.PermitLimit,

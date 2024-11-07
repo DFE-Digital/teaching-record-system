@@ -23,7 +23,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 
     private readonly TrnRequestHelper _trnRequestHelper;
     private readonly IDataverseAdapter _dataverseAdapter;
-    private readonly ICurrentClientProvider _currentClientProvider;
+    private readonly ICurrentUserProvider _currentUserProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IGetAnIdentityApiClient _identityApiClient;
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
@@ -31,14 +31,14 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     public GetOrCreateTrnRequestHandler(
         TrnRequestHelper trnRequestHelper,
         IDataverseAdapter dataverseAdapter,
-        ICurrentClientProvider currentClientProvider,
+        ICurrentUserProvider currentUserProvider,
         IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
         _trnRequestHelper = trnRequestHelper;
         _dataverseAdapter = dataverseAdapter;
-        _currentClientProvider = currentClientProvider;
+        _currentUserProvider = currentUserProvider;
         _distributedLockProvider = distributedLockProvider;
         _identityApiClient = identityApiClient;
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
@@ -46,17 +46,17 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 
     public async Task<TrnRequestInfo> Handle(GetOrCreateTrnRequest request, CancellationToken cancellationToken)
     {
-        var currentClientId = _currentClientProvider.GetCurrentClientId();
+        var currentApplicationUserId = _currentUserProvider.GetCurrentApplicationUserId();
 
         await using var requestIdLock = await _distributedLockProvider.AcquireLockAsync(
-            DistributedLockKeys.TrnRequestId(currentClientId, request.RequestId),
+            DistributedLockKeys.TrnRequestId(currentApplicationUserId, request.RequestId),
             _lockTimeout);
 
         await using var husidLock = !string.IsNullOrEmpty(request.HusId) ?
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentClientId, request.RequestId);
+        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, request.RequestId);
 
         bool wasCreated;
         string trn;
@@ -136,7 +136,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 InductionRequired = request.InductionRequired,
                 UnderNewOverseasRegulations = request.UnderNewOverseasRegulations,
                 SlugId = request.SlugId,
-                TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentClientId, request.RequestId),
+                TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, request.RequestId),
                 GetTrnToken = GetTrnToken
             });
 

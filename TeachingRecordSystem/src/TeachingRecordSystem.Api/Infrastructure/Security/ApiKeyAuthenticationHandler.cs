@@ -70,7 +70,7 @@ public class ApiKeyAuthenticationHandler(
 
         var applicationUser = apiKey.ApplicationUser;
 
-        var principal = CreatePrincipal(applicationUser.UserId.ToString(), applicationUser.Name, applicationUser.ApiRoles ?? []);
+        var principal = CreatePrincipal(applicationUser.UserId, applicationUser.Name, applicationUser.ApiRoles ?? []);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
         LogContext.PushProperty("ApplicationUserId", applicationUser.UserId);
@@ -84,11 +84,11 @@ public class ApiKeyAuthenticationHandler(
         return AuthenticateResult.Success(ticket);
     }
 
-    public static ClaimsPrincipal CreatePrincipal(string clientId, string name, IEnumerable<string> roles)
+    public static ClaimsPrincipal CreatePrincipal(Guid applicationUserId, string name, IEnumerable<string> roles)
     {
         var identity = new ClaimsIdentity(
             [
-                new Claim("sub", clientId),
+                new Claim("sub", applicationUserId.ToString()),
                 new Claim(ClaimTypes.Name, name)
             ],
             authenticationType: "Bearer",

@@ -186,7 +186,7 @@ public class CreateTrnRequestTests : TestBase
         {
             dbContext.Add(new TrnRequest()
             {
-                ClientId = ClientId,
+                ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
                 TeacherId = existingContact.ContactId
             });
@@ -240,7 +240,7 @@ public class CreateTrnRequestTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ClientId, requestId)));
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId)));
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
@@ -363,7 +363,7 @@ public class CreateTrnRequestTests : TestBase
         {
             dbContext.Add(new TrnRequest()
             {
-                ClientId = ClientId,
+                ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
                 TeacherId = existingContact.ContactId
             });

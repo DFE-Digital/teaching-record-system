@@ -12,13 +12,13 @@ public record GetTrnRequestCommand(string RequestId);
 public class GetTrnRequestHandler(
     ICrmQueryDispatcher crmQueryDispatcher,
     TrnRequestHelper trnRequestHelper,
-    ICurrentClientProvider currentClientProvider)
+    ICurrentUserProvider currentUserProvider)
 {
     public async Task<TrnRequestInfo?> Handle(GetTrnRequestCommand command)
     {
-        var currentClientId = currentClientProvider.GetCurrentClientId();
+        var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentClientId, command.RequestId);
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, command.RequestId);
         if (trnRequest is null)
         {
             return null;
