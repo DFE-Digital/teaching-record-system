@@ -2,7 +2,8 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
-    <DefaultItemExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);packages.lock.json</DefaultItemExcludesInProjectFolder>  <!-- https://github.com/dotnet/sdk/issues/25294 -->
+    <DefaultItemExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);packages.lock.json</DefaultItemExcludesInProjectFolder>
+    <!-- https://github.com/dotnet/sdk/issues/25294 -->
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AngleSharp" Version="1.1.2" />
@@ -14,7 +15,7 @@
     <PackageVersion Include="Castle.Core" Version="5.1.1" />
     <PackageVersion Include="CsvHelper" Version="30.1.0" />
     <PackageVersion Include="dbup-sqlserver" Version="5.0.37" />
-    <PackageVersion Include="Dfe.Analytics" Version="0.2.3" />
+    <PackageVersion Include="Dfe.Analytics" Version="0.2.4" />
     <PackageVersion Include="DistributedLock.Azure" Version="1.0.0" />
     <PackageVersion Include="DistributedLock.FileSystem" Version="1.0.2" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
