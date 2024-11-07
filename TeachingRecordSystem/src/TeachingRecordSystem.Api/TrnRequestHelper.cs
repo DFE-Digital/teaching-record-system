@@ -55,12 +55,18 @@ public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQue
 
         var oneLoginUser = new OneLoginUser() { Subject = oneLoginUserSubject };
 
-        var verifiedName = new string[]
+        var verifiedName = new List<string>()
         {
             contact.HasStatedNames() ? contact.dfeta_StatedFirstName : contact.FirstName,
             contact.HasStatedNames() ? contact.dfeta_StatedMiddleName : contact.MiddleName,
             contact.HasStatedNames() ? contact.dfeta_StatedLastName : contact.LastName
         };
+
+        // Remove an empty middlename
+        if (string.IsNullOrEmpty(verifiedName[1]))
+        {
+            verifiedName.RemoveAt(1);
+        }
 
         var verifiedDateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false);
 
