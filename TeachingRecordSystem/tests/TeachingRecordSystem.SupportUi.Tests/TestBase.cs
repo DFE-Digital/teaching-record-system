@@ -129,7 +129,7 @@ public abstract class TestBase : IDisposable
         return CreatePersonWithAlert(isOpenAlert: true, populateOptional: populateOptional, createdByUser: createdByUser);
     }
 
-    protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true, EventModels.RaisedByUserInfo ? createdByUser = null)
+    protected Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithClosedAlert(bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {
         return CreatePersonWithAlert(isOpenAlert: false, populateOptional: populateOptional, createdByUser: createdByUser);
     }
@@ -140,7 +140,7 @@ public abstract class TestBase : IDisposable
             .WithAlert(a =>
             {
                 a.WithStartDate(Clock.Today.AddDays(-30));
-                a.WithEndDate(isOpenAlert ? null: Clock.Today.AddDays(-1));
+                a.WithEndDate(isOpenAlert ? null : Clock.Today.AddDays(-1));
                 a.WithExternalLink(populateOptional ? TestData.GenerateUrl() : null);
                 if (createdByUser is not null)
                 {

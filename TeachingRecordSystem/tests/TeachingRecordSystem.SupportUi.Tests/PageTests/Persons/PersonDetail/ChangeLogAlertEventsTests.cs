@@ -549,7 +549,7 @@ public class ChangeLogAlertEventsTests : TestBase
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Value, item.GetElementByTestId("sanction-code")?.TextContent.Trim());
                     Assert.Equal(alertUpdatedEvent!.Alert.DqtSanctionCode!.Name, item.GetElementByTestId("sanction-name")?.TextContent.Trim());
-                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TextContent.Trim());                    
+                    Assert.Equal(populateOptional ? alertUpdatedEvent.Alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : UiDefaults.EmptyDisplayContent, item.GetElementByTestId("start-date")?.TextContent.Trim());
                     Assert.Equal(populateOptional ? UiDefaults.EmptyDisplayContent : alertUpdatedEvent.OldAlert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TextContent.Trim());
                 });
     }
@@ -736,7 +736,7 @@ public class ChangeLogAlertEventsTests : TestBase
                     if (alertUpdatedEvent.Alert.EndDate is null)
                     {
                         expectedHeading = "Alert re-opened";
-                    } 
+                    }
                     else if (alertUpdatedEvent.OldAlert.EndDate is null)
                     {
                         expectedHeading = "Alert closed";
@@ -1027,7 +1027,7 @@ public class ChangeLogAlertEventsTests : TestBase
         {
             EventId = Guid.NewGuid(),
             PersonId = personId,
-            Alert = alert,            
+            Alert = alert,
             DeletionReasonDetail = reasonDetail,
             EvidenceFile = evidenceFile,
             RaisedBy = createdByUser,
@@ -1045,7 +1045,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
     private async Task<AlertDqtDeactivatedEvent> CreateAlertDqtDeactivatedEvent(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromDqt(personId, populateOptional, isOpenAlert, isDbsAlertType);        
+        var alert = await CreateEventAlertFromDqt(personId, populateOptional, isOpenAlert, isDbsAlertType);
 
         var alertDqtDeactivatedEvent = new AlertDqtDeactivatedEvent()
         {
@@ -1181,7 +1181,7 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeById(AlertType.DbsAlertTypeId);
         var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).Where(t => t.IsDbsAlertType == isDbsAlertType).RandomOne();
-        
+
         var alertDetails = "My alert details";
         var externalLink = populateOptional ? TestData.GenerateUrl() : null;
         var startDate = Clock.Today.AddDays(-30);
