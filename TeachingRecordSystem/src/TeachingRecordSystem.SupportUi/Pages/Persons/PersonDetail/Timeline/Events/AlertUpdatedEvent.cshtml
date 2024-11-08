@@ -6,7 +6,9 @@
 @{
     var updatedEvent = Model.ItemModel.Event;
     var alert = updatedEvent.Alert;
+    TrsUriHelper.TryCreateWebsiteUri(alert.ExternalLink, out var externalLinkUri);
     var oldAlert = updatedEvent.OldAlert;
+    TrsUriHelper.TryCreateWebsiteUri(oldAlert.ExternalLink, out var oldExternalLinkUri);
     var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
     var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
     var heading = "changed";
@@ -51,9 +53,9 @@
     }
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-deleted-event">
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-updated-event">
     <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title">Alert @heading</h2>
+        <h2 class="moj-timeline__title" data-testid="heading">Alert @heading</h2>
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
@@ -87,7 +89,16 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="details" use-empty-fallback>@alert.Details</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>
+                        @if (alert.Details is not null)
+                        {
+                            <multi-line-text text="@alert.Details" data-testid="details" />
+                        }
+                        else
+                        {
+                            <span use-empty-fallback data-testid="details"></span>
+                        }
+                    </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
 
@@ -95,7 +106,16 @@
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="external-link" use-empty-fallback>@alert.ExternalLink</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>
+                        @if (alert.ExternalLink is not null)
+                        {
+                            <a href="@externalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="external-link">@($"{alert.ExternalLink} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span data-testid="external-link" use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
 
@@ -137,11 +157,11 @@
                         <govuk-summary-list-row-value>
                             @if (updatedEvent.ChangeReasonDetail is not null)
                             {
-                                <multi-line-text text="@updatedEvent.ChangeReasonDetail" />
+                                <multi-line-text text="@updatedEvent.ChangeReasonDetail" data-testid="reason-detail" />
                             }
                             else
                             {
-                                <span use-empty-fallback></span>
+                                <span use-empty-fallback data-testid="reason-detail"></span>
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
@@ -172,7 +192,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@oldAlert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldAlert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -180,15 +200,33 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Details</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="details" use-empty-fallback>@oldAlert.Details</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value>
+                                    @if (oldAlert.Details is not null)
+                                    {
+                                        <multi-line-text text="@oldAlert.Details" data-testid="old-details" />
+                                    }
+                                    else
+                                    {
+                                        <span use-empty-fallback data-testid="old-details"></span>
+                                    }
+                                </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
                         @if (updatedEvent.Changes.HasFlag(AlertUpdatedEventChanges.ExternalLink))
                         {
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="external-link" use-empty-fallback>@oldAlert.ExternalLink</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-key>External link</govuk-summary-list-row-key>                                
+                                <govuk-summary-list-row-value>
+                                    @if (oldAlert.ExternalLink is not null)
+                                    {
+                                        <a href="@oldExternalLinkUri" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="old-external-link">@($"{oldAlert.ExternalLink} (opens in new tab)")</a>
+                                    }
+                                    else
+                                    {
+                                        <span data-testid="old-external-link" use-empty-fallback></span>
+                                    }
+                                </govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -196,7 +234,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@oldAlert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-end-date" use-empty-fallback>@oldAlert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -204,7 +242,7 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>DQT spent</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="dqt-spent" use-empty-fallback>@oldAlert.DqtSpent</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-dqt-spent" use-empty-fallback>@oldAlert.DqtSpent</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
 
@@ -212,11 +250,11 @@
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>DQT sanction code</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="sanction-code" use-empty-fallback>@oldAlert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-sanction-code" use-empty-fallback>@oldAlert.DqtSanctionCode?.Value</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>DQT sanction name</govuk-summary-list-row-key>
-                                <govuk-summary-list-row-value data-testid="sanction-name" use-empty-fallback>@oldAlert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
+                                <govuk-summary-list-row-value data-testid="old-sanction-name" use-empty-fallback>@oldAlert.DqtSanctionCode?.Name</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                     </govuk-summary-list>
