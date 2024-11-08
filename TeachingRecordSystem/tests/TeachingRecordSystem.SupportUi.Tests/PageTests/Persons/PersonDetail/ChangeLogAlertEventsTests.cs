@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
@@ -130,7 +129,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertCreatedEventGeneratedInDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -147,10 +146,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -204,7 +199,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDeletedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -221,10 +216,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -280,7 +271,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDqtDeactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -297,10 +288,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -350,7 +337,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDqtImportedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -367,10 +354,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -420,7 +403,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDqtReactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -437,10 +420,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -490,7 +469,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertMigratedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -507,10 +486,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -707,10 +682,10 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(EndDateChangeType.Change)]
-    [InlineData(EndDateChangeType.Close)]
-    [InlineData(EndDateChangeType.Reopen)]
-    public async Task Person_WithAlertUpdatedEventEndDateChangedFromDqt_RendersExpectedContent(EndDateChangeType changeType)
+    [InlineData(EndDateChangeType.Change, "Alert end date changed")]
+    [InlineData(EndDateChangeType.Close, "Alert closed")]
+    [InlineData(EndDateChangeType.Reopen, "Alert re-opened")]
+    public async Task Person_WithAlertUpdatedEventEndDateChangedFromDqt_RendersExpectedContent(EndDateChangeType changeType, string expectedHeading)
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
@@ -732,16 +707,6 @@ public class ChangeLogAlertEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
                 item =>
                 {
-                    var expectedHeading = "Alert end date changed";
-                    if (alertUpdatedEvent.Alert.EndDate is null)
-                    {
-                        expectedHeading = "Alert re-opened";
-                    }
-                    else if (alertUpdatedEvent.OldAlert.EndDate is null)
-                    {
-                        expectedHeading = "Alert closed";
-                    }
-
                     Assert.Equal(expectedHeading, item.GetElementByTestId("heading")?.TextContent.Trim());
                     Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
@@ -754,10 +719,10 @@ public class ChangeLogAlertEventsTests : TestBase
     }
 
     [Theory]
-    [InlineData(EndDateChangeType.Change)]
-    [InlineData(EndDateChangeType.Close)]
-    [InlineData(EndDateChangeType.Reopen)]
-    public async Task Person_WithAlertUpdatedEventEndDateChangedFromTrs_RendersExpectedContent(EndDateChangeType changeType)
+    [InlineData(EndDateChangeType.Change, "Alert end date changed")]
+    [InlineData(EndDateChangeType.Close, "Alert closed")]
+    [InlineData(EndDateChangeType.Reopen, "Alert re-opened")]
+    public async Task Person_WithAlertUpdatedEventEndDateChangedFromTrs_RendersExpectedContent(EndDateChangeType changeType, string expectedHeading)
     {
         // Arrange
         var createdByUser = await TestData.CreateUser();
@@ -780,16 +745,6 @@ public class ChangeLogAlertEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
                 item =>
                 {
-                    var expectedHeading = "Alert end date changed";
-                    if (alertUpdatedEvent.Alert.EndDate is null)
-                    {
-                        expectedHeading = "Alert re-opened";
-                    }
-                    else if (alertUpdatedEvent.OldAlert.EndDate is null)
-                    {
-                        expectedHeading = "Alert closed";
-                    }
-
                     Assert.Equal(expectedHeading, item.GetElementByTestId("heading")?.TextContent.Trim());
                     Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
                     Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
@@ -883,7 +838,7 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventFromDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
         var person = await TestData.CreatePerson();
@@ -903,10 +858,6 @@ public class ChangeLogAlertEventsTests : TestBase
 
         if (shouldDisplay)
         {
-            if (items.Count == 0)
-            {
-                Debug.Assert(false);
-            }
             Assert.NotEmpty(items);
         }
         else
@@ -1205,7 +1156,12 @@ public class ChangeLogAlertEventsTests : TestBase
     private async Task<EventModels.Alert> CreateEventAlertFromDqt(Guid personId, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
         var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeById(AlertType.DbsAlertTypeId);
-        var dqtSanctionCode = (await TestData.ReferenceDataCache.GetSanctionCodes(activeOnly: false)).Where(s => isDbsAlertType ? s.dfeta_Value == dbsAlertType.DqtSanctionCode : s.dfeta_Value != dbsAlertType.DqtSanctionCode).RandomOne();
+        var migratedSanctionCodes = (await TestData.ReferenceDataCache.GetAlertTypes())
+            .Where(t => t.DqtSanctionCode is not null)
+            .Select(c => c.DqtSanctionCode);
+        var dqtSanctionCode = (await TestData.ReferenceDataCache.GetSanctionCodes(activeOnly: false))
+            .Where(s => migratedSanctionCodes.Contains(s.dfeta_Value) && (isDbsAlertType ? s.dfeta_Value == dbsAlertType.DqtSanctionCode : s.dfeta_Value != dbsAlertType.DqtSanctionCode))
+            .RandomOne();
         var alertDqtSanctionCode = new AlertDqtSanctionCode
         {
             SanctionCodeId = dqtSanctionCode!.Id,
