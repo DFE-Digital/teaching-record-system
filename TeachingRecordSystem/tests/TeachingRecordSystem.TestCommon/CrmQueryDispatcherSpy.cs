@@ -52,4 +52,9 @@ public class CrmQueryDispatcherDecorator(ICrmQueryDispatcher innerDispatcher, Cr
     {
         return innerDispatcher.ExecuteQuery(query, cancellationToken);
     }
+
+    public CrmTransactionScope CreateTransactionRequestBuilder()
+    {
+        return innerDispatcher.CreateTransactionRequestBuilder();
+    }
 }

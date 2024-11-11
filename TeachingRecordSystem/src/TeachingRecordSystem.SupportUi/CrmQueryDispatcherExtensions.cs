@@ -16,6 +16,9 @@ public static class CrmQueryDispatcherExtensions
         public IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default) =>
             innerDispatcher.ExecuteQuery(GetOrganizationService, query, cancellationToken);
 
+        public CrmTransactionScope CreateTransactionRequestBuilder() =>
+            throw new NotSupportedException();
+
         private IOrganizationServiceAsync GetOrganizationService(IServiceProvider serviceProvider)
         {
             var organizationService = innerDispatcher.GetOrganizationService(serviceProvider);

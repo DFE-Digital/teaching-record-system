@@ -50,6 +50,13 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
         }
     }
 
+    public CrmTransactionScope CreateTransactionRequestBuilder()
+    {
+        var scope = serviceProvider.CreateScope();
+        var organizationService = GetOrganizationService(scope.ServiceProvider);
+        return new CrmTransactionScope(RequestBuilder.CreateTransaction(organizationService), scope);
+    }
+
     public IOrganizationServiceAsync GetOrganizationService(IServiceProvider serviceProvider) =>
         serviceProvider.GetRequiredKeyedService<IOrganizationServiceAsync>(serviceClientName);
 
