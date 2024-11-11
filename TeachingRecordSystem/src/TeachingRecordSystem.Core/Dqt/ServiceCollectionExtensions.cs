@@ -16,6 +16,9 @@ public static partial class ServiceCollectionExtensions
                 .WithTransientLifetime()
             .AddClasses(classes => classes.AssignableTo(typeof(IEnumerableCrmQueryHandler<,>)))
                 .AsImplementedInterfaces()
+                .WithTransientLifetime()
+            .AddClasses(classes => classes.AssignableTo(typeof(ICrmTransactionalQueryHandler<,>)))
+                .AsImplementedInterfaces()
                 .WithTransientLifetime());
 
         return services;
