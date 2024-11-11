@@ -10,7 +10,7 @@ public record GetQtlsCommand(string Trn);
 
 public class GetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task<QtlsInfo?> Handle(GetQtlsCommand command)
+    public async Task<QtlsResult?> Handle(GetQtlsCommand command)
     {
         var contact = (await crmQueryDispatcher.ExecuteQuery(
             new GetActiveContactByTrnQuery(
@@ -25,7 +25,7 @@ public class GetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher)
             return null;
         }
 
-        return new QtlsInfo()
+        return new QtlsResult()
         {
             Trn = command.Trn,
             QtsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
