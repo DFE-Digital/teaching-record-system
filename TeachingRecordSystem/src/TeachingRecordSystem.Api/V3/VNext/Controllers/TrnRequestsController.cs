@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240307.ApiModels;
-using TeachingRecordSystem.Api.V3.V20240307.Requests;
+using TeachingRecordSystem.Api.V3.V20240606.ApiModels;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
 
-namespace TeachingRecordSystem.Api.V3.V20240307.Controllers;
+namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
@@ -36,37 +36,11 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             MiddleName = request.Person.MiddleName,
             LastName = request.Person.LastName,
             DateOfBirth = request.Person.DateOfBirth,
-            EmailAddresses = request.Person.Email is string emailAddress ? [emailAddress] : [],
+            EmailAddresses = request.Person.EmailAddresses ?? [],
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
-            VerifiedOneLoginUserSubject = null
+            VerifiedOneLoginUserSubject = request.VerifiedOneLoginUserSubject
         };
         var result = await handler.Handle(command);
-
-        var response = mapper.Map<TrnRequestInfo>(result);
-        return Ok(response);
-    }
-
-    [HttpGet("")]
-    [SwaggerOperation(
-        OperationId = "GetTrnRequest",
-        Summary = "Get the TRN request's details",
-        Description = """
-        Gets the TRN request for the requestId specified in the query string.
-        If the request's status is 'Completed' a TRN will also be returned.
-        """)]
-    [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTrnRequest(
-        [FromQuery] string requestId,
-        [FromServices] GetTrnRequestHandler handler)
-    {
-        var command = new GetTrnRequestCommand(requestId);
-        var result = await handler.Handle(command);
-
-        if (result is null)
-        {
-            return NotFound();
-        }
 
         var response = mapper.Map<TrnRequestInfo>(result);
         return Ok(response);

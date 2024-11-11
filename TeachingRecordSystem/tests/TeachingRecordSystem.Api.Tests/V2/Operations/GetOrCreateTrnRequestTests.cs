@@ -36,16 +36,11 @@ public class GetOrCreateTrnRequestTests : TestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var teacherId = Guid.NewGuid();
-        var trn = "1234567";
 
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), true))
-            .ReturnsAsync(new Contact()
-            {
-                Id = teacherId,
-                dfeta_TRN = trn
-            });
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn());
+
+        ConfigureDataverseAdapterGetTeacher(person.Contact);
 
         await WithDbContext(async dbContext =>
         {
@@ -53,7 +48,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             {
                 ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
-                TeacherId = teacherId
+                TeacherId = person.ContactId
             });
 
             await dbContext.SaveChangesAsync();
@@ -70,7 +65,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             expected: new
             {
                 requestId = requestId,
-                trn = trn,
+                trn = person.Trn,
                 status = "Completed",
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = false,
@@ -85,15 +80,20 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
-        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId);
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn().WithTrnRequestId(trnRequestId));
+
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithSlugId(slugId));
+
+        ConfigureDataverseAdapterGetTeacher(person.Contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .Setup(mock => mock.GetTeacher(person.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {
-                Id = createPersonResult.ContactId,
-                dfeta_TRN = createPersonResult.Trn,
+                Id = person.ContactId,
+                dfeta_TRN = person.Trn,
                 dfeta_SlugId = slugId
             });
 
@@ -108,7 +108,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             expected: new
             {
                 requestId = requestId,
-                trn = createPersonResult.Trn,
+                trn = person.Trn,
                 status = "Completed",
                 qtsDate = (DateOnly?)null,
                 potentialDuplicate = false,
@@ -122,7 +122,9 @@ public class GetOrCreateTrnRequestTests : TestBase
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var teacherId = Guid.NewGuid();
+
+        var person = await TestData.CreatePerson(p => p
+            .WithoutTrn());
 
         await WithDbContext(async dbContext =>
         {
@@ -130,7 +132,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             {
                 ClientId = ApplicationUserId.ToString(),
                 RequestId = requestId,
-                TeacherId = teacherId
+                TeacherId = person.ContactId
             });
 
             await dbContext.SaveChangesAsync();
@@ -162,17 +164,13 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
-        var trnRequestId = TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId);
-        var createPersonResult = await TestData.CreatePerson(p => p.WithoutTrn().WithTrnRequestId(trnRequestId).WithSlugId(slugId));
 
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(createPersonResult.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
-            .ReturnsAsync(new Contact()
-            {
-                Id = createPersonResult.ContactId,
-                dfeta_TRN = null,
-                dfeta_SlugId = slugId
-            });
+        var person = await TestData.CreatePerson(p => p
+            .WithoutTrn()
+            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithSlugId(slugId));
+
+        ConfigureDataverseAdapterGetTeacher(person.Contact);
 
         var request = CreateRequest(req => req.RequestId = requestId);
 
@@ -925,5 +923,12 @@ public class GetOrCreateTrnRequestTests : TestBase
         configureRequest?.Invoke(request);
 
         return CreateJsonContent(request);
+    }
+
+    private void ConfigureDataverseAdapterGetTeacher(Contact contact)
+    {
+        DataverseAdapterMock
+            .Setup(mock => mock.GetTeacher(contact.Id, It.IsAny<string[]>(), /* resolveMerges: */ true))
+            .ReturnsAsync(contact);
     }
 }
