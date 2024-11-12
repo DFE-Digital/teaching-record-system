@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
-using TeachingRecordSystem.Core.Events.Processing;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.TestCommon.Infrastructure;
@@ -52,7 +51,7 @@ public class HostFixture : WebApplicationFactory<Program>
             // Publish events synchronously
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
-            services.AddSingleton<IEventPublisher>(_ => new ForwardToTestScopedEventPublisher());
+            services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
@@ -110,11 +109,11 @@ public class HostFixture : WebApplicationFactory<Program>
         }
     }
 
-    // IEventPublisher needs to be a singleton but we want it to resolve to a test-scoped CaptureEventPublisher.
-    // This provides a wrapper that can be registered as a singleon that delegates to the test-scoped IEventPublisher instance.
-    private class ForwardToTestScopedEventPublisher : IEventPublisher
+    // IEventObserver needs to be a singleton but we want it to resolve to a test-scoped CaptureEventObserver.
+    // This provides a wrapper that can be registered as a singleton that delegates to the test-scoped IEventObserver instance.
+    private class ForwardToTestScopedEventObserver : IEventObserver
     {
-        public Task PublishEvent(EventBase @event) => TestScopedServices.GetCurrent().EventPublisher.PublishEvent(@event);
+        public void OnEventCreated(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventCreated(@event);
     }
 
     private class ForwardToTestScopedClock : IClock

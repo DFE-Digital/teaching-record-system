@@ -3,19 +3,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Events.Processing;
 
 namespace TeachingRecordSystem.TestCommon.Infrastructure;
 
-public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
+public class PublishEventsDbCommandInterceptor(IEventObserver eventObserver) : SaveChangesInterceptor
 {
-    private readonly IEventPublisher _eventPublisher;
-
-    public PublishEventsDbCommandInterceptor(IEventPublisher eventPublisher)
-    {
-        _eventPublisher = eventPublisher;
-    }
-
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
         PublishEvents(eventData);
@@ -39,10 +31,10 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
             var coreOptionsExtension = inner.GetExtension<CoreOptionsExtension>();
 
             return (DbContextOptions<TrsDbContext>)inner.WithExtension(
-                coreOptionsExtension.WithInterceptors(new IInterceptor[]
-                {
-                        sp.GetRequiredService<PublishEventsDbCommandInterceptor>(),
-                }));
+                coreOptionsExtension.WithInterceptors(
+                [
+                    sp.GetRequiredService<PublishEventsDbCommandInterceptor>(),
+                ]));
         });
 
         return services;
@@ -62,7 +54,7 @@ public class PublishEventsDbCommandInterceptor : SaveChangesInterceptor
 
                 void OnEventSaved(object? sender, SavedChangesEventArgs args)
                 {
-                    _eventPublisher.PublishEvent(e.Entity.ToEventBase()).GetAwaiter().GetResult();
+                    eventObserver.OnEventCreated(e.Entity.ToEventBase());
                     eventData.Context.SavedChanges -= OnEventSaved;
                 }
             }

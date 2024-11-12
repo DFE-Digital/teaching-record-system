@@ -36,14 +36,14 @@ public abstract class TestBase : IDisposable
                 var events = synced.OfType<EventBase>();
                 foreach (var e in events)
                 {
-                    TestScopedServices.GetCurrent().EventPublisher.PublishEvent(e);
+                    TestScopedServices.GetCurrent().EventObserver.OnEventCreated(e);
                 }
             });
     }
 
     public HostFixture HostFixture { get; }
 
-    public CaptureEventPublisher EventPublisher => _testServices.EventPublisher;
+    public CaptureEventObserver EventPublisher => _testServices.EventObserver;
 
     public TestableClock Clock => _testServices.Clock;
 
