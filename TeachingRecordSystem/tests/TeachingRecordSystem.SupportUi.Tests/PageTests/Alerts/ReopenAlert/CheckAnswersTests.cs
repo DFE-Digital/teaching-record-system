@@ -157,6 +157,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     [Fact]
     public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
     {
+        // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 

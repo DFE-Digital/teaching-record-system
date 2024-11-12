@@ -1,26 +1,26 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
-public class IndexTests : TestBase
+public class IndexTests : LinkTestBase
 {
+    private const string PreviousStep = JourneySteps.New;
+    private const string ThisStep = JourneySteps.Index;
+
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
-    [Fact]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -34,7 +34,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -49,13 +49,10 @@ public class IndexTests : TestBase
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -68,61 +65,51 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(link, doc.GetElementById("Link")?.GetAttribute("value"));
+        Assert.Equal(alert.ExternalLink, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
     [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var databaseLink = TestData.GenerateUrl();
-        var journeyLink = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithExternalLink(databaseLink)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentLink: journeyLink);
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
+        Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Fact]
-    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
         var newLink = TestData.GenerateUrl();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.TrueString },
-                { "Link", newLink }
-            }
+            Content = CreatePostContent(true, newLink)
         };
 
         // Act
@@ -137,7 +124,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -152,13 +139,13 @@ public class IndexTests : TestBase
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(true, TestData.GenerateUrl())
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -173,13 +160,13 @@ public class IndexTests : TestBase
     public async Task Post_NoAddLinkOptionSelected_ReturnsError(bool hasCurrentLink)
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = hasCurrentLink ? TestData.GenerateUrl() : null;
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert(populateOptional: hasCurrentLink);
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(null, null)
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -195,24 +182,18 @@ public class IndexTests : TestBase
         }
     }
 
-    [Fact]
-    public async Task Post_WithInvalidLinkUrl_ReturnsError()
+    [Theory]
+    [InlineData("invalid url")]
+    [InlineData(null)]
+    public async Task Post_WithInvalidLinkUrl_ReturnsError(string? invalidLink)
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
-        var invalidUrl = "invalid url";
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.TrueString },
-                { "Link", invalidUrl }
-            }
+            Content = CreatePostContent(true, invalidLink)
         };
 
         // Act
@@ -226,19 +207,12 @@ public class IndexTests : TestBase
     public async Task Post_WithUnchangedLink_ReturnsError()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.TrueString },
-                { "Link", link }
-            }
+            Content = CreatePostContent(true, alert.ExternalLink)
         };
 
         // Act
@@ -252,18 +226,12 @@ public class IndexTests : TestBase
     public async Task Post_WithNoCurrentLinkAndAddLinkOptionNoSelected_RedirectsToPersonAlertsPage()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert(populateOptional: false);
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.FalseString }
-            }
+            Content = CreatePostContent(false, null)
         };
 
         // Act
@@ -281,20 +249,13 @@ public class IndexTests : TestBase
     public async Task Post_WithLink_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert(populateOptional: false);
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
         var newLink = TestData.GenerateUrl();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.TrueString },
-                { "Link", newLink }
-            }
+            Content = CreatePostContent(true, newLink)
         };
 
         // Act
@@ -302,7 +263,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/link/change-reason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.State.AddLink);
@@ -313,19 +274,12 @@ public class IndexTests : TestBase
     public async Task Post_WithNoLink_UpdatesStateAndRedirectsToChangeReasonPage()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
-        var newLink = TestData.GenerateUrl();
+        var (person, alert) = await CreatePersonWithOpenAlert(populateOptional: true);
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.FalseString }
-            }
+            Content = CreatePostContent(false, null)
         };
 
         // Act
@@ -333,7 +287,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/link/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/link/change-reason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.False(journeyInstance.State.AddLink);
@@ -344,13 +298,10 @@ public class IndexTests : TestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var link = TestData.GenerateUrl();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithExternalLink(link)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert(populateOptional: true);
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/link/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/link/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -363,19 +314,20 @@ public class IndexTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    private Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, string? currentLink) =>
-        CreateJourneyInstance(
-            alertId,
-            new EditAlertLinkState()
-            {
-                Initialized = true,
-                CurrentLink = currentLink,
-                Link = currentLink
-            });
+    private static FormUrlEncodedContentBuilder CreatePostContent(bool? addLink, string? newLink)
+    {
+        var builder = new FormUrlEncodedContentBuilder();
 
-    private async Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, EditAlertLinkState state) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditAlertLink,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+        if (addLink is not null)
+        {
+            builder.Add("AddLink", addLink.Value.ToString());
+        }
+
+        if (newLink is not null)
+        {
+            builder.Add("Link", newLink);
+        }
+
+        return builder;
+    }
 }

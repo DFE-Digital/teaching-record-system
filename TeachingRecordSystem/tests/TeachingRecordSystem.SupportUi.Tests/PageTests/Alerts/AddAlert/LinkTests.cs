@@ -1,28 +1,24 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class LinkTests : TestBase
+public class LinkTests : AddAlertTestBase
 {
+    private const string PreviousStep = JourneySteps.Details;
+    private const string ThisStep = JourneySteps.Link;
+
     public LinkTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
-    [Fact]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -38,13 +34,7 @@ public class LinkTests : TestBase
     {
         // Arrange        
         var personId = Guid.NewGuid();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -60,13 +50,7 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name
-        });
+        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -83,14 +67,7 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -106,16 +83,7 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-        var link = TestData.GenerateUrl();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            Link = link
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -124,24 +92,18 @@ public class LinkTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(link, doc.GetElementById("Link")?.GetAttribute("value"));
+        Assert.Equal(journeyInstance.State.Link, doc.GetElementById("Link")?.GetAttribute("value"));
     }
 
-    [Fact]
-    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -157,14 +119,7 @@ public class LinkTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -180,13 +135,7 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name
-        });
+        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -203,18 +152,11 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
+            Content = CreatePostContent(journeyInstance.State.AddLink, journeyInstance.State.Link)
         };
 
         // Act
@@ -229,22 +171,11 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.TrueString },
-                { "Link", "bad..url" }
-            }
+            Content = CreatePostContent(true, "invalid url")
         };
 
         // Act
@@ -259,24 +190,12 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
-
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
         var link = "http://example.com";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.TrueString },
-                { "Link", link }
-            }
+            Content = CreatePostContent(true, link)
         };
 
         // Act
@@ -296,21 +215,11 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "AddLink", bool.FalseString }
-            }
+            Content = CreatePostContent(false, null)
         };
 
         // Act
@@ -330,14 +239,7 @@ public class LinkTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -351,9 +253,20 @@ public class LinkTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<AddAlertState>> CreateJourneyInstance(Guid personId, AddAlertState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.AddAlert,
-            state ?? new AddAlertState(),
-            new KeyValuePair<string, object>("personId", personId));
+    private static FormUrlEncodedContentBuilder CreatePostContent(bool? addLink, string? newLink)
+    {
+        var builder = new FormUrlEncodedContentBuilder();
+
+        if (addLink is not null)
+        {
+            builder.Add("AddLink", addLink.Value.ToString());
+        }
+
+        if (newLink is not null)
+        {
+            builder.Add("Link", newLink);
+        }
+
+        return builder;
+    }
 }

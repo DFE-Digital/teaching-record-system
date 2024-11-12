@@ -1,30 +1,24 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
-public class StartDateTests : TestBase
+public class StartDateTests : AddAlertTestBase
 {
+    private const string PreviousStep = JourneySteps.Link;
+    private const string ThisStep = JourneySteps.StartDate;
+
     public StartDateTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
-    [Fact]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -40,15 +34,7 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -64,14 +50,7 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-        });
+        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -88,15 +67,7 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -112,17 +83,7 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-        var startDate = new DateOnly(2021, 1, 1);
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false,
-            StartDate = startDate
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -131,27 +92,20 @@ public class StartDateTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal($"{startDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
-        Assert.Equal($"{startDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
-        Assert.Equal($"{startDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
+        Assert.Equal($"{journeyInstance.State.StartDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
+        Assert.Equal($"{journeyInstance.State.StartDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
+        Assert.Equal($"{journeyInstance.State.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
     }
 
-    [Fact]
-    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -167,26 +121,9 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-        var startDate = Clock.Today;
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, personId);
 
-        var journeyInstance = await CreateJourneyInstance(personId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", startDate.Day },
-                { "StartDate.Month", startDate.Month },
-                { "StartDate.Year", startDate.Year }
-            }
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -200,25 +137,9 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-        var startDate = Clock.Today;
+        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details"
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", startDate.Day },
-                { "StartDate.Month", startDate.Month },
-                { "StartDate.Year", startDate.Year }
-            }
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -233,15 +154,7 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -257,25 +170,12 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
         var startDate = Clock.Today.AddDays(2);
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", startDate.Day },
-                { "StartDate.Month", startDate.Month },
-                { "StartDate.Year", startDate.Year }
-            }
+            Content = CreatePostContent(startDate)
         };
 
         // Act
@@ -290,25 +190,12 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
         var startDate = Clock.Today;
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "StartDate.Day", startDate.Day },
-                { "StartDate.Month", startDate.Month },
-                { "StartDate.Year", startDate.Year }
-            }
+            Content = CreatePostContent(startDate)
         };
 
         // Act
@@ -327,15 +214,7 @@ public class StartDateTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePerson();
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).RandomOne();
-
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, new AddAlertState()
-        {
-            AlertTypeId = alertType.AlertTypeId,
-            AlertTypeName = alertType.Name,
-            Details = "Details",
-            AddLink = false
-        });
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -349,9 +228,17 @@ public class StartDateTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<AddAlertState>> CreateJourneyInstance(Guid personId, AddAlertState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.AddAlert,
-            state ?? new AddAlertState(),
-            new KeyValuePair<string, object>("personId", personId));
+    private static FormUrlEncodedContentBuilder CreatePostContent(DateOnly? startDate)
+    {
+        var builder = new FormUrlEncodedContentBuilder();
+
+        if (startDate is DateOnly date)
+        {
+            builder.Add("StartDate.Day", date.Day);
+            builder.Add("StartDate.Month", date.Month);
+            builder.Add("StartDate.Year", date.Year);
+        }
+
+        return builder;
+    }
 }
