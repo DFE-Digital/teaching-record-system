@@ -155,6 +155,11 @@ variable "app_name" { default = null }
 
 variable "app_name_suffix" { default = null }
 
+variable "postgres_max_slot_wal_keep_size" {
+  type    = string
+  default = null
+}
+
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
 }
