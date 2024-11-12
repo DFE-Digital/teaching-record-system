@@ -2,49 +2,27 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
-public class CheckAnswersTests : TestBase
+public class CheckAnswersTests : CloseAlertTestBase
 {
+    private const string PreviousStep = JourneySteps.Reason;
+    private const string ThisStep = JourneySteps.CheckAnswers;
+
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
     }
 
-    [Fact]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var details = "Some details";
-        var link = TestData.GenerateUrl();
-        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReason = CloseAlertReasonOption.EndDateSet;
-        var changeReasonDetail = "Some details";
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "test.pdf";
-        var person = await TestData.CreatePerson(
-            b => b.WithAlert(
-                a => a.WithAlertTypeId(alertType.AlertTypeId)
-                    .WithDetails(details)
-                    .WithExternalLink(link)
-                    .WithStartDate(startDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(
-            alertId,
-            new CloseAlertState()
-            {
-                EndDate = journeyEndDate,
-                ChangeReason = changeReason,
-                HasAdditionalReasonDetail = true,
-                ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = true,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName
-            });
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -57,9 +35,8 @@ public class CheckAnswersTests : TestBase
     public async Task Get_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -74,13 +51,10 @@ public class CheckAnswersTests : TestBase
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -93,18 +67,17 @@ public class CheckAnswersTests : TestBase
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithAlert());
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId);
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.Index, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/close", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/close", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
@@ -113,59 +86,51 @@ public class CheckAnswersTests : TestBase
     public async Task Get_WithValidJourneyState_ReturnsOk(bool populateOptional)
     {
         // Arrange
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var details = "Some details";
-        var link = populateOptional ? TestData.GenerateUrl() : null;
-        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReason = CloseAlertReasonOption.EndDateSet;
-        var changeReasonDetail = populateOptional ? "Some details" : null;
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "test.pdf";
-        var person = await TestData.CreatePerson(
-            b => b.WithAlert(
-                a => a.WithAlertTypeId(alertType.AlertTypeId)
-                    .WithDetails(details)
-                    .WithExternalLink(link)
-                    .WithStartDate(startDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(
-            alertId,
-            new CloseAlertState()
-            {
-                EndDate = journeyEndDate,
-                ChangeReason = changeReason,
-                HasAdditionalReasonDetail = populateOptional,
-                ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = populateOptional ? true : false,
-                EvidenceFileId = populateOptional ? evidenceFileId : null,
-                EvidenceFileName = populateOptional ? evidenceFileName : null
-            });
+        var (person, alert) = await CreatePersonWithOpenAlert(populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(alertType.Name, doc.GetSummaryListValueForKey("Alert type"));
-        Assert.Equal(details, doc.GetSummaryListValueForKey("Details"));
-        Assert.Equal(populateOptional ? $"{link} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
-        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
-        Assert.Equal(journeyEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("End date"));
-        Assert.Equal(changeReason.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
-        Assert.Equal(populateOptional ? changeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
-        Assert.Equal(populateOptional ? $"{evidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+        Assert.Equal(alert.AlertType.Name, doc.GetSummaryListValueForKey("Alert type"));
+        Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
+        Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
+        Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));
+        Assert.Equal(journeyInstance.State.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("End date"));
+        Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
+        Assert.Equal(populateOptional ? journeyInstance.State.ChangeReasonDetail : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Reason details"));
+        Assert.Equal(populateOptional ? $"{journeyInstance.State.EvidenceFileName} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Evidence"));
+    }
+
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(role));
+
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
     }
 
     [Fact]
     public async Task Post_WithAlertIdForNonExistentAlert_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -180,13 +145,10 @@ public class CheckAnswersTests : TestBase
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -199,53 +161,32 @@ public class CheckAnswersTests : TestBase
     public async Task Post_MissingDataInJourneyState_RedirectsToIndexPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithAlert());
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId);
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/close", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/close", response.Headers.Location?.OriginalString);
     }
 
     [Theory]
-    [InlineData(CloseAlertReasonOption.EndDateSet)]
-    [InlineData(CloseAlertReasonOption.AlertPeriodHasEnded)]
-    [InlineData(CloseAlertReasonOption.AlertTypeIsNoLongerValid)]
-    [InlineData(CloseAlertReasonOption.AnotherReason)]
-    public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(CloseAlertReasonOption changeReason)
+    [InlineData(true)]
+    [InlineData(false)]
+
+    public async Task Post_Confirm_UpdatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
     {
         // Arrange
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReasonDetail = "Some reason or other";
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "test.pdf";
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate)));
-        var originalAlert = person.Alerts.Single();
-        var alertId = originalAlert.AlertId;
+        var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
 
         EventPublisher.Clear();
 
-        var journeyInstance = await CreateJourneyInstance(
-            alertId,
-            new CloseAlertState()
-            {
-                EndDate = journeyEndDate,
-                ChangeReason = changeReason,
-                HasAdditionalReasonDetail = true,
-                ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = true,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -259,48 +200,50 @@ public class CheckAnswersTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            var updatedAlert = await dbContext.Alerts.FirstOrDefaultAsync(a => a.AlertId == alertId);
-            Assert.Equal(journeyEndDate, updatedAlert!.EndDate);
+            var updatedAlert = await dbContext.Alerts.FirstOrDefaultAsync(a => a.AlertId == alert.AlertId);
+            Assert.Equal(journeyInstance.State.EndDate, updatedAlert!.EndDate);
         });
 
         EventPublisher.AssertEventsSaved(e =>
         {
+            var actualAlertUpdatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
+
             var expectedAlertUpdatedEvent = new AlertUpdatedEvent()
             {
-                EventId = Guid.Empty,
+                EventId = actualAlertUpdatedEvent.EventId,
                 CreatedUtc = Clock.UtcNow,
                 RaisedBy = GetCurrentUserId(),
                 PersonId = person.PersonId,
                 Alert = new()
                 {
-                    AlertId = alertId,
-                    AlertTypeId = originalAlert.AlertTypeId,
-                    Details = originalAlert.Details,
-                    ExternalLink = originalAlert.ExternalLink,
-                    StartDate = originalAlert.StartDate,
-                    EndDate = journeyEndDate
+                    AlertId = alert.AlertId,
+                    AlertTypeId = alert.AlertTypeId,
+                    Details = alert.Details,
+                    ExternalLink = alert.ExternalLink,
+                    StartDate = alert.StartDate,
+                    EndDate = journeyInstance.State.EndDate
                 },
                 OldAlert = new()
                 {
-                    AlertId = alertId,
-                    AlertTypeId = originalAlert.AlertTypeId,
-                    Details = originalAlert.Details,
-                    ExternalLink = originalAlert.ExternalLink,
-                    StartDate = originalAlert.StartDate,
+                    AlertId = alert.AlertId,
+                    AlertTypeId = alert.AlertTypeId,
+                    Details = alert.Details,
+                    ExternalLink = alert.ExternalLink,
+                    StartDate = alert.StartDate,
                     EndDate = null
                 },
-                ChangeReason = changeReason.GetDisplayName(),
-                ChangeReasonDetail = changeReasonDetail,
-                EvidenceFile = new()
+                ChangeReason = journeyInstance.State.ChangeReason!.GetDisplayName(),
+                ChangeReasonDetail = populateOptional ? journeyInstance.State.ChangeReasonDetail : null,
+                EvidenceFile = populateOptional ? new()
                 {
-                    FileId = evidenceFileId,
-                    Name = evidenceFileName
-                },
+                    FileId = journeyInstance.State.EvidenceFileId!.Value,
+                    Name = journeyInstance.State.EvidenceFileName!
+                }
+                : null,
                 Changes = AlertUpdatedEventChanges.EndDate
             };
 
-            var actualAlertUpdatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
-            Assert.Equivalent(expectedAlertUpdatedEvent with { EventId = actualAlertUpdatedEvent.EventId }, actualAlertUpdatedEvent);
+            Assert.Equivalent(expectedAlertUpdatedEvent, actualAlertUpdatedEvent);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -308,75 +251,13 @@ public class CheckAnswersTests : TestBase
     }
 
     [Fact]
-    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
-    {
-        // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
-
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var details = "Some details";
-        var link = TestData.GenerateUrl();
-        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReason = CloseAlertReasonOption.EndDateSet;
-        var changeReasonDetail = "Some details";
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "test.pdf";
-        var person = await TestData.CreatePerson(
-            b => b.WithAlert(
-                a => a.WithAlertTypeId(alertType.AlertTypeId)
-                    .WithDetails(details)
-                    .WithExternalLink(link)
-                    .WithStartDate(startDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(
-            alertId,
-            new CloseAlertState()
-            {
-                EndDate = journeyEndDate,
-                ChangeReason = changeReason,
-                HasAdditionalReasonDetail = true,
-                ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = true,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName
-            });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
-    }
-
-    [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var startDate = TestData.Clock.Today.AddDays(-50);
-        var journeyEndDate = TestData.Clock.Today.AddDays(-5);
-        var changeReason = CloseAlertReasonOption.AnotherReason;
-        var changeReasonDetail = "Some reason or other";
-        var evidenceFileId = Guid.NewGuid();
-        var evidenceFileName = "test.pdf";
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(startDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(
-            alertId,
-            new CloseAlertState()
-            {
-                EndDate = journeyEndDate,
-                ChangeReason = changeReason,
-                HasAdditionalReasonDetail = true,
-                ChangeReasonDetail = changeReasonDetail,
-                UploadEvidence = true,
-                EvidenceFileId = evidenceFileId,
-                EvidenceFileName = evidenceFileName
-            });
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

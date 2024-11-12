@@ -1,21 +1,26 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Details;
 
-public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class IndexTests : DetailsTestBase
 {
-    [Fact]
-    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
+    private const string PreviousStep = JourneySteps.New;
+    private const string ThisStep = JourneySteps.Index;
+
+    public IndexTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
+    }
+
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(null)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -29,7 +34,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -44,13 +49,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -63,59 +65,50 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithUninitializedJourneyState_PopulatesModelFromDatabase()
     {
         // Arrange
-        var details = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(details)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(details, doc.GetElementById("Details")?.TextContent);
+        Assert.Equal(alert.Details, doc.GetElementById("Details")?.TextContent);
     }
 
     [Fact]
     public async Task Get_ValidRequestWithInitializedJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var databaseDetails = TestData.GenerateLoremIpsum();
-        var journeyDetails = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(databaseDetails)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, currentDetails: journeyDetails);
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         var doc = await AssertEx.HtmlResponse(response);
-        Assert.Equal(journeyDetails, doc.GetElementById("Details")?.TextContent);
+        Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TextContent);
     }
 
-    [Fact]
-    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
+    [Theory]
+    [RolesWithoutAlertWritePermissionData]
+    public async Task Post_UserDoesNotHavePermission_ReturnsForbidden(string? role)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
-        var databaseDetails = TestData.GenerateLoremIpsum();
-        var newDetails = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(databaseDetails)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var newDetails = "New details";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Details", newDetails }
-            }
+            Content = CreatePostContent(newDetails)
         };
 
         // Act
@@ -130,7 +123,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -145,13 +138,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WithClosedAlert_ReturnsBadRequest()
     {
         // Arrange
-        var databaseStartDate = new DateOnly(2021, 10, 5);
-        var databaseEndDate = new DateOnly(2022, 11, 6);
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithStartDate(databaseStartDate).WithEndDate(databaseEndDate)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithClosedAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -163,17 +153,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_WithUnchangedDetails_ReturnsError()
     {
-        var details = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(details)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        // Arrange
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var newDetails = alert.Details;
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Details", details }
-            }
+            Content = CreatePostContent(newDetails)
         };
 
         // Act
@@ -186,17 +173,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_WithEmptyDetails_ReturnsError()
     {
-        var details = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(details)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        // Arrange
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var newDetails = string.Empty;
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Details", string.Empty }
-            }
+            Content = CreatePostContent(newDetails)
         };
 
         // Act
@@ -209,18 +193,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_WhenChangedDetailsEntered_UpdatesStateAndRedirectsToChangeReasonPage()
     {
-        var databaseDetails = TestData.GenerateLoremIpsum();
-        var newDetails = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(databaseDetails)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        // Arrange
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var newDetails = "New details";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "Details", newDetails }
-            }
+            Content = CreatePostContent(newDetails)
         };
 
         // Act
@@ -228,7 +208,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/{alertId}/details/change-reason", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/{alert.AlertId}/details/change-reason", response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(newDetails, journeyInstance.State.Details);
@@ -238,12 +218,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var details = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(q => q.WithDetails(details)));
-        var alertId = person.Alerts.Single().AlertId;
-        var journeyInstance = await CreateJourneyInstance(alertId, state: new());
+        var (person, alert) = await CreatePersonWithOpenAlert();
+        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -256,19 +234,14 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, string currentDetails) =>
-        CreateJourneyInstance(
-            alertId,
-            new EditAlertDetailsState()
-            {
-                Initialized = true,
-                CurrentDetails = currentDetails,
-                Details = currentDetails
-            });
+    private static FormUrlEncodedContentBuilder CreatePostContent(string? newDetails)
+    {
+        var builder = new FormUrlEncodedContentBuilder();
+        if (newDetails is not null)
+        {
+            builder.Add("Details", newDetails);
+        }
 
-    private async Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, EditAlertDetailsState state) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditAlertDetails,
-            state,
-            new KeyValuePair<string, object>("alertId", alertId));
+        return builder;
+    }
 }
