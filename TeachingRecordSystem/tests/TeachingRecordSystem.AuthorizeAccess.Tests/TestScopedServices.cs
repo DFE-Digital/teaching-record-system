@@ -7,7 +7,7 @@ public class TestScopedServices
     public TestScopedServices()
     {
         Clock = new();
-        EventPublisher = new();
+        EventObserver = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -25,5 +25,5 @@ public class TestScopedServices
 
     public TestableClock Clock { get; }
 
-    public CaptureEventPublisher EventPublisher { get; }
+    public CaptureEventObserver EventObserver { get; }
 }
