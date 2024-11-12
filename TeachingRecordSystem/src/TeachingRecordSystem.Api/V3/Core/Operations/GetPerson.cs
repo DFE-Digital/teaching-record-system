@@ -224,6 +224,21 @@ public class GetPersonHandler(
             }
         }
 
+        using var trsDbLock = new SemaphoreSlim(1, 1);
+
+        async Task<T> WithTrsDbLock<T>(Func<Task<T>> action)
+        {
+            await trsDbLock.WaitAsync();
+            try
+            {
+                return await action();
+            }
+            finally
+            {
+                trsDbLock.Release();
+            }
+        }
+
         var contact = contactDetail.Contact;
         var personId = contact.Id;
 
@@ -288,7 +303,7 @@ public class GetPersonHandler(
             null;
 
         var getMqsTask = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
-            dbContext.MandatoryQualifications.Where(q => q.PersonId == personId).ToArrayAsync() :
+            WithTrsDbLock(() => dbContext.MandatoryQualifications.Where(q => q.PersonId == personId).ToArrayAsync()) :
             null;
 
         var getQualificationsTask = (command.Include & (GetPersonCommandIncludes.NpqQualifications | GetPersonCommandIncludes.HigherEducationQualifications)) != 0 ?
@@ -324,7 +339,7 @@ public class GetPersonHandler(
             null;
 
         var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync() :
+            WithTrsDbLock(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
             null;
 
         IEnumerable<NameInfo>? previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
