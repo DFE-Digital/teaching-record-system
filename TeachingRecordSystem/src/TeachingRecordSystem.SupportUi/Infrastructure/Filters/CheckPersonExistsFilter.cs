@@ -33,7 +33,7 @@ public class CheckPersonExistsFilter(
             return;
         }
 
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == personId);
+        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == personId && p.DqtState == 0);
 
         if (person is not null)
         {
