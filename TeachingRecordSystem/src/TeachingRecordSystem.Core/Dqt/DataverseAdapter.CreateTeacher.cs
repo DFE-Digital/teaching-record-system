@@ -377,7 +377,6 @@ public partial class DataverseAdapter
                 {
                     Columns =
                     {
-                        Contact.Fields.dfeta_ActiveSanctions,
                         Contact.Fields.dfeta_QTSDate,
                         Contact.Fields.dfeta_EYTSDate,
                         Contact.Fields.FirstName,
@@ -396,6 +395,13 @@ public partial class DataverseAdapter
             // Old implementation returns the first record that matches on at least three attributes; replicating that here
             var matches = result.Entities.Select(entity => entity.ToEntity<Contact>()).ToList();
 
+            var matchedContactIds = matches.Select(c => c.Id).ToHashSet();
+            var contactsWithActiveAlerts = await _dataverseAdapter._dbContext.Alerts
+                .Where(a => matchedContactIds.Contains(a.PersonId) && a.IsOpen)
+                .Select(a => a.PersonId)
+                .Distinct()
+                .ToArrayAsync();
+
             // if a teacher exists that contains an itt record with a slugid that matches request slugid, use it
             // in potential duplicate check
             var teachersWithIttWithSlugs = string.IsNullOrEmpty(_command.SlugId) ? Array.Empty<Contact>() : await _dataverseAdapter.GetTeachersByInitialTeacherTrainingSlugId(_command.SlugId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_SlugId }, null);
@@ -403,7 +409,6 @@ public partial class DataverseAdapter
             {
                 matches.AddRange(teachersWithIttWithSlugs);
             }
-
 
             foreach (var match in matches)
             {
@@ -414,23 +419,23 @@ public partial class DataverseAdapter
 
                 var attributeMatches = new[]
                 {
-                (
-                    Attribute: Contact.Fields.FirstName,
-                    Matches: NamesAreEqual(_command.FirstName, match.FirstName)
-                ),
-                (
-                    Attribute: Contact.Fields.MiddleName,
-                    Matches: NamesAreEqual(_command.MiddleName, match.MiddleName)
-                ),
-                (
-                    Attribute: Contact.Fields.LastName,
-                    Matches: NamesAreEqual(_command.LastName, match.LastName)
-                ),
-                (
-                    Attribute: Contact.Fields.BirthDate,
-                    Matches: _command.BirthDate.Equals(match.BirthDate)
-                )
-            };
+                    (
+                        Attribute: Contact.Fields.FirstName,
+                        Matches: NamesAreEqual(_command.FirstName, match.FirstName)
+                    ),
+                    (
+                        Attribute: Contact.Fields.MiddleName,
+                        Matches: NamesAreEqual(_command.MiddleName, match.MiddleName)
+                    ),
+                    (
+                        Attribute: Contact.Fields.LastName,
+                        Matches: NamesAreEqual(_command.LastName, match.LastName)
+                    ),
+                    (
+                        Attribute: Contact.Fields.BirthDate,
+                        Matches: _command.BirthDate.Equals(match.BirthDate)
+                    )
+                };
 
                 if (!string.IsNullOrEmpty(_command.HusId))
                 {
@@ -453,7 +458,7 @@ public partial class DataverseAdapter
                 {
                     TeacherId = match.Id,
                     MatchedAttributes = matchedAttributeNames,
-                    HasActiveSanctions = match.dfeta_ActiveSanctions == true,
+                    HasActiveSanctions = contactsWithActiveAlerts.Contains(match.Id),
                     HasQtsDate = match.dfeta_QTSDate.HasValue,
                     HasEytsDate = match.dfeta_EYTSDate.HasValue,
                     HusId = match.dfeta_HUSID,

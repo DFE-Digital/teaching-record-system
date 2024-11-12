@@ -277,7 +277,7 @@ public class SetQtlsDateRequestTests : TestBase
             .WithQts(existingQtsDate)
             .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
             .WithQtlsDate(existingQtlsDate)
-            .WithSanction("G1"));
+            .WithAlert(a => a.WithEndDate(null)));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
@@ -344,7 +344,7 @@ public class SetQtlsDateRequestTests : TestBase
             .WithTrn()
             .WithQts(existingQtsDate)
             .WithDqtInduction(inductionStatus: existingInductionStatus, inductionExemptionReason: null, null, null, null, null, null)
-            .WithSanction("G1"));
+            .WithAlert(a => a.WithEndDate(null)));
 
         var requestBody = CreateJsonContent(new { qtsDate = incomingqtlsDate });
         var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")

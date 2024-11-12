@@ -323,22 +323,8 @@ public class GetPersonHandler(
             GetPendingDetailChanges() :
             null;
 
-        async Task<SanctionResult[]> GetSanctions()
-        {
-            var result = await crmQueryDispatcher.ExecuteQuery(new GetSanctionsByContactIdsQuery(
-                [contact.Id],
-                ActiveOnly: true,
-                ColumnSet: new(
-                    dfeta_sanction.Fields.dfeta_StartDate,
-                    dfeta_sanction.Fields.dfeta_EndDate,
-                    dfeta_sanction.Fields.dfeta_SanctionDetails,
-                    dfeta_sanction.Fields.dfeta_Spent)));
-
-            return result[contact.Id];
-        }
-
-        var getSanctionsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            GetSanctions() :
+        var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
+            dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync() :
             null;
 
         IEnumerable<NameInfo>? previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
@@ -419,61 +405,49 @@ public class GetPersonHandler(
                 Option.Some(MapHigherEducationQualifications((await getQualificationsTask!))) :
                 default,
             Sanctions = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) ?
-                Option.Some((await getSanctionsTask!)
-                    .Where(s => Constants.LegacyExposableSanctionCodes.Contains(s.SanctionCode))
-                    .Where(s => s.Sanction.dfeta_EndDate is null && s.Sanction.dfeta_Spent != true)
+                Option.Some((await getAlertsTask!)
+                    .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType.DqtSanctionCode) && a.IsOpen)
                     .Select(s => new SanctionInfo()
                     {
-                        Code = s.SanctionCode,
-                        StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                        Code = s.AlertType.DqtSanctionCode!,
+                        StartDate = s.StartDate
                     })
                     .AsReadOnly()) :
                 default,
             Alerts = command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-                Option.Some(await (await getSanctionsTask!)
-                    .ToAsyncEnumerable()
-                    .WhereAwait(async s =>
+                Option.Some((await getAlertsTask!)
+                    .Where(a =>
                     {
-                        var alertType = await referenceDataCache.GetAlertTypeByDqtSanctionCodeIfExists(s.SanctionCode);
-
-                        if (alertType is null)
-                        {
-                            return false;
-                        }
-
                         // The Legacy behavior is to only return prohibition-type alerts
                         if (command.ApplyLegacyAlertsBehavior)
                         {
-                            return Constants.LegacyProhibitionSanctionCodes.Contains(s.SanctionCode);
+                            return Constants.LegacyProhibitionSanctionCodes.Contains(a.AlertType.DqtSanctionCode);
                         }
 
-                        return !alertType.InternalOnly;
+                        return !a.AlertType.InternalOnly;
                     })
-                    .SelectAwait(async s =>
+                    .Select(a =>
                     {
-                        var alertType = await referenceDataCache.GetAlertTypeByDqtSanctionCode(s.SanctionCode);
-                        var alertCategory = await referenceDataCache.GetAlertCategoryById(alertType.AlertCategoryId);
-
                         return new Alert()
                         {
-                            AlertId = s.Sanction.Id,
+                            AlertId = a.AlertId,
                             AlertType = new()
                             {
-                                AlertTypeId = alertType.AlertTypeId,
+                                AlertTypeId = a.AlertType.AlertTypeId,
                                 AlertCategory = new()
                                 {
-                                    AlertCategoryId = alertCategory.AlertCategoryId,
-                                    Name = alertCategory.Name
+                                    AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
+                                    Name = a.AlertType.AlertCategory.Name
                                 },
-                                Name = alertType.Name,
-                                DqtSanctionCode = alertType.DqtSanctionCode!
+                                Name = a.AlertType.Name,
+                                DqtSanctionCode = a.AlertType.DqtSanctionCode!
                             },
-                            Details = s.Sanction.dfeta_SanctionDetails,
-                            StartDate = s.Sanction.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                            EndDate = s.Sanction.dfeta_EndDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                            Details = a.Details,
+                            StartDate = a.StartDate,
+                            EndDate = a.EndDate
                         };
                     })
-                    .AsReadOnlyAsync()) :
+                    .AsReadOnly()) :
                 default,
             PreviousNames = command.Include.HasFlag(GetPersonCommandIncludes.PreviousNames) ?
                 Option.Some(previousNames.Select(n => n).AsReadOnly()) :

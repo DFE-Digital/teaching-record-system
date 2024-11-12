@@ -55,7 +55,6 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
             {
                 Columns =
                 {
-                    Contact.Fields.dfeta_ActiveSanctions,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.FirstName,
@@ -122,7 +121,6 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     ContactId = match.Id,
                     Trn = match.dfeta_TRN,
                     MatchedAttributes = matchedAttributeNames,
-                    HasActiveSanctions = match.dfeta_ActiveSanctions == true,
                     HasQtsDate = match.dfeta_QTSDate.HasValue,
                     HasEytsDate = match.dfeta_EYTSDate.HasValue,
                     FirstName = match.FirstName,

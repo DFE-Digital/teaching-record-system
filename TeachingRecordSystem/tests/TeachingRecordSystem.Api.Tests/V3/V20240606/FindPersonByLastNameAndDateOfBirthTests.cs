@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace TeachingRecordSystem.Api.Tests.V3.V20240606;
 
 [Collection(nameof(DisableParallelization))]
@@ -22,8 +20,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
-        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("G1"));
+        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -85,8 +83,20 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
-        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
+
+        var person1 = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
+
+        var person2 = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -120,8 +130,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person1.Sanctions.First().SanctionCode,
-                                startDate = person1.Sanctions.First().StartDate
+                                code = person1.Alerts.First().AlertType.DqtSanctionCode,
+                                startDate = person1.Alerts.First().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -137,8 +147,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person2.Sanctions.First().SanctionCode,
-                                startDate = person2.Sanctions.First().StartDate
+                                code = person2.Alerts.First().AlertType.DqtSanctionCode,
+                                startDate = person2.Alerts.First().StartDate
                             }
                         },
                         previousNames = Array.Empty<object>()
@@ -155,8 +165,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
-        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction("A21B"));
+        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
         var person3 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(TestData.GenerateChangedLastName(lastName)).WithDateOfBirth(dateOfBirth));
         var updatedLastName = TestData.GenerateChangedLastName(lastName);
         await TestData.UpdatePerson(p => p.WithPersonId(person2.PersonId).WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName));
@@ -189,14 +199,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         firstName = person1.FirstName,
                         middleName = person1.MiddleName ?? "",
                         lastName = person1.LastName,
-                        sanctions = new[]
-                        {
-                            new
-                            {
-                                code = person1.Sanctions.First().SanctionCode,
-                                startDate = person1.Sanctions.First().StartDate
-                            }
-                        },
+                        sanctions = Array.Empty<object>(),
                         previousNames = Array.Empty<object>()
                     },
                     new
@@ -206,14 +209,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         firstName = person2.FirstName,
                         middleName = person2.MiddleName,
                         lastName = updatedLastName,
-                        sanctions = new[]
-                        {
-                            new
-                            {
-                                code = person2.Sanctions.First().SanctionCode,
-                                startDate = person2.Sanctions.First().StartDate
-                            }
-                        },
+                        sanctions = Array.Empty<object>(),
                         previousNames = new object[]
                         {
                             new
@@ -236,9 +232,13 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var sanctionCode = "A17";
-        Debug.Assert(!Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
-        var person = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithSanction(sanctionCode));
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertType = alertTypes.Where(at => !Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
+
+        var person = await TestData.CreatePerson(b => b
+            .WithLastName(lastName)
+            .WithDateOfBirth(dateOfBirth)
+            .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

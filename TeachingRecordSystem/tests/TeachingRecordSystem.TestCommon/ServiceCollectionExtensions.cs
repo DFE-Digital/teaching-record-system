@@ -47,7 +47,6 @@ public static class ServiceCollectionExtensions
 
         AssignTicketNumberToIncidentPlugin.Register(fakedXrmContext);
         PersonNameChangedPlugin.Register(fakedXrmContext);
-        CalculateActiveSanctionsPlugin.Register(fakedXrmContext);
         QtsRegistrationUpdatedPlugin.Register(fakedXrmContext);
         UpdateInductionStatusPlugin.Register(fakedXrmContext);
         UpdateQtlsDateSetPlugin.Register(fakedXrmContext);

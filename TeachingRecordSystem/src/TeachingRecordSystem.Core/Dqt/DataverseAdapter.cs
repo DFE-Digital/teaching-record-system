@@ -6,6 +6,7 @@ using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
 namespace TeachingRecordSystem.Core.Dqt;
@@ -16,17 +17,20 @@ public partial class DataverseAdapter : IDataverseAdapter
     private readonly IClock _clock;
     private readonly IMemoryCache _cache;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
+    private readonly TrsDbContext _dbContext;
 
     public DataverseAdapter(
         IOrganizationServiceAsync organizationServiceAsync,
         IClock clock,
         IMemoryCache cache,
-        ITrnGenerationApiClient trnGenerationApiClient)
+        ITrnGenerationApiClient trnGenerationApiClient,
+        TrsDbContext dbContext)
     {
         _service = organizationServiceAsync;
         _clock = clock;
         _cache = cache;
         _trnGenerationApiClient = trnGenerationApiClient;
+        _dbContext = dbContext;
     }
 
     public Task<string> GenerateTrn() => _trnGenerationApiClient.GenerateTrn();
@@ -416,7 +420,6 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_NINumber,
                 Contact.Fields.BirthDate,
-                Contact.Fields.dfeta_ActiveSanctions,
                 Contact.Fields.dfeta_InductionStatus
             ),
             Criteria = filter
@@ -1166,8 +1169,7 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Contact.Fields.MiddleName,
                 Contact.Fields.LastName,
                 Contact.Fields.BirthDate,
-                Contact.Fields.dfeta_NINumber,
-                Contact.Fields.dfeta_ActiveSanctions
+                Contact.Fields.dfeta_NINumber
             ),
             Criteria = new FilterExpression(LogicalOperator.And)
             {
@@ -1254,8 +1256,7 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Contact.Fields.MiddleName,
                 Contact.Fields.LastName,
                 Contact.Fields.BirthDate,
-                Contact.Fields.dfeta_NINumber,
-                Contact.Fields.dfeta_ActiveSanctions
+                Contact.Fields.dfeta_NINumber
             ),
             Criteria = new FilterExpression(LogicalOperator.And)
             {

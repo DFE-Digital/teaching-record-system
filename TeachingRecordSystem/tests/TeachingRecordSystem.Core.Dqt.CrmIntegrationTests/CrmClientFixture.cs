@@ -52,7 +52,7 @@ public sealed class CrmClientFixture : IDisposable
     /// </summary>
     public TestDataScope CreateTestDataScope(bool withSync = false) => new(
         _baseServiceClient,
-        orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient),
+        orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient, DbFixture.GetDbContext()),
         orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache), serviceClientName: null),
         orgService => TestData.CreateWithCustomTrnGeneration(
             DbFixture.GetDbContextFactory(),

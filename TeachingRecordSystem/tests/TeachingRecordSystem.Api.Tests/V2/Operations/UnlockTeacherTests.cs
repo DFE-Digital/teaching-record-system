@@ -1,5 +1,6 @@
 #nullable disable
 using System.Net;
+using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Api.Tests.V2.Operations;
 
@@ -14,24 +15,22 @@ public class UnlockTeacherTests : TestBase
     public async Task UnlockTeacher_ClientDoesNotHaveSecurityRoles_ReturnsForbidden(string[] roles)
     {
         // Arrange
-        var teacherId = Guid.NewGuid();
         SetCurrentApiClient(roles);
 
-        DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
-            .ReturnsAsync(new Contact()
-            {
-                Id = teacherId,
-                dfeta_ActiveSanctions = false,
-                dfeta_loginfailedcounter = 3
-            });
+        var createPersonResult = await TestData.CreatePerson();
+        var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
+            .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(teacherId))
+            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .ReturnsAsync(contact);
+
+        DataverseAdapterMock
+            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{createPersonResult.ContactId}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -63,23 +62,25 @@ public class UnlockTeacherTests : TestBase
     public async Task Given_a_teacher_that_does_exist_and_is_locked_returns_ok()
     {
         // Arrange
-        var teacherId = Guid.NewGuid();
+        var createPersonResult = await TestData.CreatePerson(p => p.WithLoginFailedCounter(3));
+        var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
+            .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
-            .ReturnsAsync(new Contact()
-            {
-                Id = teacherId,
-                dfeta_ActiveSanctions = false,
-                dfeta_loginfailedcounter = 3
-            });
+            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(teacherId))
+            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
+        DataverseAdapterMock
+            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .ReturnsAsync(true)
+            .Verifiable();
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{contact.Id}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -101,23 +102,25 @@ public class UnlockTeacherTests : TestBase
     public async Task Given_a_teacher_that_does_exist_but_is_not_locked_returns_ok(int? loginFailedCounter)
     {
         // Arrange
-        var teacherId = Guid.NewGuid();
+        var createPersonResult = await TestData.CreatePerson(p => p.WithLoginFailedCounter(loginFailedCounter));
+        var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
+            .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
-            .ReturnsAsync(new Contact()
-            {
-                Id = teacherId,
-                dfeta_ActiveSanctions = false,
-                dfeta_loginfailedcounter = loginFailedCounter
-            });
+            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(teacherId))
+            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
+        DataverseAdapterMock
+            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .ReturnsAsync(true)
+            .Verifiable();
+
+        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{contact.Id}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
@@ -135,14 +138,15 @@ public class UnlockTeacherTests : TestBase
     public async Task Given_a_teacher_that_has_activesanctions_returns_error()
     {
         // Arrange
-        var teacherId = Guid.NewGuid();
-        var teacher = new Contact() { dfeta_ActiveSanctions = true };
+        var createPersonResult = await TestData.CreatePerson(b => b.WithAlert(a => a.WithEndDate(null)));
+        var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
+            .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, It.IsAny<string[]>(), It.IsAny<bool>()))
-            .ReturnsAsync(teacher);
+            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .ReturnsAsync(contact);
 
-        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{contact.Id}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);

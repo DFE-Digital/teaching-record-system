@@ -201,7 +201,7 @@ public partial class DataverseAdapter
             }
         }
 
-        if (lookupData.Teacher.dfeta_ActiveSanctions == true)
+        if (lookupData.HasActiveAlert)
         {
             txnRequest.Requests.Add(new CreateRequest()
             {
@@ -279,9 +279,12 @@ public partial class DataverseAdapter
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.StateCode,
-                    Contact.Fields.dfeta_ActiveSanctions,
                     Contact.Fields.dfeta_TRN
                 });
+
+            var getActiveAlertsTask = _dataverseAdapter._dbContext.Alerts
+                .Where(a => a.PersonId == _teacherId && a.IsOpen)
+                .AnyAsync();
 
             var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationsByUkprn(_ittProviderUkprn, columnNames: Array.Empty<string>(), activeOnly: true)
                 .ContinueWith(t => t.Result.SingleOrDefault());
@@ -310,6 +313,7 @@ public partial class DataverseAdapter
             await requestBuilder.Execute();
             await Task.WhenAll(
                 getTeacherTask,
+                getActiveAlertsTask,
                 getIttProviderTask,
                 getIttRecordsTask,
                 getQtsRegistrationsTask,
@@ -328,6 +332,7 @@ public partial class DataverseAdapter
             return new SetIttResultForTeacherLookupResult()
             {
                 Teacher = getTeacherTask.Result,
+                HasActiveAlert = getActiveAlertsTask.Result,
                 IttProvider = getIttProviderTask.Result,
                 Itt = getIttRecordsTask.Result,
                 QtsRegistrations = getQtsRegistrationsTask.Result,
@@ -491,6 +496,7 @@ public partial class DataverseAdapter
     internal class SetIttResultForTeacherLookupResult
     {
         public Contact Teacher { get; set; }
+        public bool HasActiveAlert { get; set; }
         public Account IttProvider { get; set; }
         public IEnumerable<dfeta_initialteachertraining> Itt { get; set; }
         public IEnumerable<dfeta_qtsregistration> QtsRegistrations { get; set; }

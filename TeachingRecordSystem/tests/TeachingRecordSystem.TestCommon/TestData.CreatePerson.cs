@@ -44,6 +44,7 @@ public partial class TestData
         private string? _trnRequestId;
         private string? _trnToken;
         private string? _slugId;
+        private int? _loginFailedCounter;
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -283,6 +284,17 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithLoginFailedCounter(int? loginFailedCounter)
+        {
+            if (_loginFailedCounter is not null && _loginFailedCounter != loginFailedCounter)
+            {
+                throw new InvalidOperationException("WithLoginFailedCounter cannot be changed after it's set.");
+            }
+
+            _loginFailedCounter = loginFailedCounter;
+            return this;
+        }
+
         internal async Task<CreatePersonResult> Execute(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrn() : null;
@@ -310,7 +322,8 @@ public partial class TestData
                 dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
                 dfeta_TrnRequestID = _trnRequestId,
                 dfeta_TrnToken = _trnToken,
-                dfeta_SlugId = _slugId
+                dfeta_SlugId = _slugId,
+                dfeta_loginfailedcounter = _loginFailedCounter
             };
 
             if (_email is not null)
