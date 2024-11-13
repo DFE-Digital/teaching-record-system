@@ -13,18 +13,12 @@ public static class HostApplicationBuilderExtensions
         return builder;
     }
 
-    public static IHostApplicationBuilder AddDqtOutboxMessageHandler(this IHostApplicationBuilder builder)
-    {
-        builder.Services.AddSingleton<OutboxMessageHandler>();
-
-        return builder;
-    }
-
     public static IHostApplicationBuilder AddDqtOutboxMessageProcessorService(this IHostApplicationBuilder builder)
     {
         AddDqtOutboxMessageSerializer(builder);
 
         builder.Services.AddSingleton<IHostedService, DqtOutboxMessageProcessorService>();
+        builder.Services.AddSingleton<OutboxMessageHandler>();
 
         return builder;
     }
