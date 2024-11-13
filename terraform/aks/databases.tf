@@ -56,3 +56,10 @@ resource "azurerm_postgresql_flexible_server_configuration" "hot_standby_feedbac
   server_id = module.postgres.azure_server_id
   value     = "on"
 }
+
+resource "azurerm_postgresql_flexible_server_configuration" "max_slot_wal_keep_size" {
+  count     = var.postgres_max_slot_wal_keep_size == null ? 0 : 1
+  name      = "max_slot_wal_keep_size"
+  server_id = module.postgres.azure_server_id
+  value     = var.postgres_max_slot_wal_keep_size
+}
