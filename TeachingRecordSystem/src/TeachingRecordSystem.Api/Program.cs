@@ -24,6 +24,7 @@ using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Certificates;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
@@ -210,7 +211,8 @@ public class Program
             .AddBlobStorage()
             .AddDistributedLocks()
             .AddIdentityApi()
-            .AddNameSynonyms();
+            .AddNameSynonyms()
+            .AddDqtOutboxMessageSerializer();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();

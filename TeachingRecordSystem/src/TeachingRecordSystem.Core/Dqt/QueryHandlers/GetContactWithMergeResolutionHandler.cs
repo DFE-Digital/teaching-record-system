@@ -9,6 +9,10 @@ public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactW
 {
     public async Task<Contact> Execute(GetContactWithMergeResolutionQuery query, IOrganizationServiceAsync organizationService)
     {
+        // Ensure we have MasterId in the columns requested
+        var columns = query.ColumnSet.AllColumns ? query.ColumnSet :
+            new ColumnSet([Contact.Fields.MasterId, .. query.ColumnSet.Columns]);
+
         return await FetchContact(query.ContactId);
 
         async Task<Contact> FetchContact(Guid id)
@@ -18,16 +22,7 @@ public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactW
 
             var queryExpression = new QueryExpression(Contact.EntityLogicalName)
             {
-                ColumnSet = new ColumnSet(
-                    Contact.Fields.dfeta_TRN,
-                    Contact.Fields.FirstName,
-                    Contact.Fields.MiddleName,
-                    Contact.Fields.LastName,
-                    Contact.Fields.EMailAddress1,
-                    Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.BirthDate,
-                    Contact.Fields.Merged,
-                    Contact.Fields.MasterId),
+                ColumnSet = columns,
                 Criteria = filter
             };
 

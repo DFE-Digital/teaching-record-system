@@ -41,6 +41,11 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             requestBuilder.AddRequest(new CreateRequest() { Target = task });
         }
 
+        foreach (var outboxMessage in query.OutboxMessages)
+        {
+            requestBuilder.AddRequest(new CreateRequest() { Target = outboxMessage });
+        }
+
         await requestBuilder.Execute();
 
         return contactId;

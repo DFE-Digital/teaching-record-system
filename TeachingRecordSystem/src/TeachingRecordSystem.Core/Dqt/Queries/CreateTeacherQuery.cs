@@ -14,4 +14,5 @@ public class CreateContactQuery : ICrmQuery<Guid>
     public required IReadOnlyCollection<(FindPotentialDuplicateContactsResult Duplicate, bool HasActiveAlert)> PotentialDuplicates { get; init; }
     public required string? Trn { get; init; }
     public required string? TrnRequestId { get; init; }
+    public required IEnumerable<dfeta_TrsOutboxMessage> OutboxMessages { get; init; }
 }

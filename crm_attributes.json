@@ -346,5 +346,11 @@
     "statecode",
     "subject",
     "dfeta_EmailAddress"
+  ],
+  "dfeta_trsoutboxmessage": [
+    "dfeta_trsoutboxmessageid",
+    "dfeta_messagename",
+    "dfeta_payload",
+    "statecode"
   ]
 }

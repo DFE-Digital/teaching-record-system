@@ -42,7 +42,8 @@ public class CreateContactTests : IAsyncLifetime
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn,
-            PotentialDuplicates = []
+            PotentialDuplicates = [],
+            OutboxMessages = []
         };
 
         // Act
@@ -90,7 +91,8 @@ public class CreateContactTests : IAsyncLifetime
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn,
-            PotentialDuplicates = []
+            PotentialDuplicates = [],
+            OutboxMessages = []
         };
 
         // Act
@@ -132,7 +134,8 @@ public class CreateContactTests : IAsyncLifetime
             NationalInsuranceNumber = ni,
             DateOfBirth = dob,
             Trn = trn1,
-            PotentialDuplicates = []
+            PotentialDuplicates = [],
+            OutboxMessages = []
         };
 
         // Act
@@ -170,7 +173,8 @@ public class CreateContactTests : IAsyncLifetime
                     NationalInsuranceNumber = ni
                 },
                 HasActiveAlert: false)
-            ]
+            ],
+            OutboxMessages = []
         };
         var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query2);
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

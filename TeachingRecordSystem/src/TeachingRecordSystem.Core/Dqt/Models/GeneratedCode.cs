@@ -1668,6 +1668,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string business_unit_dfeta_qualification = "business_unit_dfeta_qualification";
 			public const string business_unit_dfeta_sanction = "business_unit_dfeta_sanction";
 			public const string business_unit_dfeta_trsevent = "business_unit_dfeta_trsevent";
+			public const string business_unit_dfeta_trsoutboxmessage = "business_unit_dfeta_trsoutboxmessage";
 			public const string business_unit_incident_resolution_activities = "business_unit_incident_resolution_activities";
 			public const string business_unit_incidents = "business_unit_incidents";
 			public const string Referencedbusiness_unit_parent_business_unit = "Referencedbusiness_unit_parent_business_unit";
@@ -2024,6 +2025,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("business_unit_dfeta_trsevent");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TRSEvent>("business_unit_dfeta_trsevent", null, value);
 				this.OnPropertyChanged("business_unit_dfeta_trsevent");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N business_unit_dfeta_trsoutboxmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("business_unit_dfeta_trsoutboxmessage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> business_unit_dfeta_trsoutboxmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("business_unit_dfeta_trsoutboxmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("business_unit_dfeta_trsoutboxmessage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("business_unit_dfeta_trsoutboxmessage", null, value);
+				this.OnPropertyChanged("business_unit_dfeta_trsoutboxmessage");
 			}
 		}
 		
@@ -12772,6 +12793,331 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum dfeta_TrsOutboxMessageState
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Active = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		Inactive = 1,
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	[System.Runtime.Serialization.DataContractAttribute()]
+	[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("dfeta_trsoutboxmessage")]
+	public partial class dfeta_TrsOutboxMessage : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+	{
+		
+		/// <summary>
+		/// Available fields, a the time of codegen, for the dfeta_trsoutboxmessage entity
+		/// </summary>
+		public static class Fields
+		{
+			public const string dfeta_MessageName = "dfeta_messagename";
+			public const string dfeta_Payload = "dfeta_payload";
+			public const string dfeta_TrsOutboxMessageId = "dfeta_trsoutboxmessageid";
+			public const string Id = "dfeta_trsoutboxmessageid";
+			public const string StateCode = "statecode";
+			public const string business_unit_dfeta_trsoutboxmessage = "business_unit_dfeta_trsoutboxmessage";
+			public const string lk_dfeta_trsoutboxmessage_createdby = "lk_dfeta_trsoutboxmessage_createdby";
+			public const string lk_dfeta_trsoutboxmessage_createdonbehalfby = "lk_dfeta_trsoutboxmessage_createdonbehalfby";
+			public const string lk_dfeta_trsoutboxmessage_modifiedby = "lk_dfeta_trsoutboxmessage_modifiedby";
+			public const string lk_dfeta_trsoutboxmessage_modifiedonbehalfby = "lk_dfeta_trsoutboxmessage_modifiedonbehalfby";
+			public const string user_dfeta_trsoutboxmessage = "user_dfeta_trsoutboxmessage";
+		}
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public dfeta_TrsOutboxMessage() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntitySchemaName = "dfeta_TrsOutboxMessage";
+		
+		public const string PrimaryIdAttribute = "dfeta_trsoutboxmessageid";
+		
+		public const string PrimaryNameAttribute = "dfeta_messagename";
+		
+		public const string EntityLogicalName = "dfeta_trsoutboxmessage";
+		
+		public const string EntityLogicalCollectionName = "dfeta_trsoutboxmessages";
+		
+		public const string EntitySetName = "dfeta_trsoutboxmessages";
+		
+		public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+		
+		public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_messagename")]
+		public string dfeta_MessageName
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_messagename");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_MessageName");
+				this.SetAttributeValue("dfeta_messagename", value);
+				this.OnPropertyChanged("dfeta_MessageName");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_payload")]
+		public string dfeta_Payload
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_payload");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_Payload");
+				this.SetAttributeValue("dfeta_payload", value);
+				this.OnPropertyChanged("dfeta_Payload");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trsoutboxmessageid")]
+		public System.Nullable<System.Guid> dfeta_TrsOutboxMessageId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_trsoutboxmessageid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_TrsOutboxMessageId");
+				this.SetAttributeValue("dfeta_trsoutboxmessageid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_TrsOutboxMessageId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_trsoutboxmessageid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_TrsOutboxMessageId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Status of the TRS outbox message
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statecode")]
+		public System.Nullable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessageState> StateCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				Microsoft.Xrm.Sdk.OptionSetValue optionSet = this.GetAttributeValue<Microsoft.Xrm.Sdk.OptionSetValue>("statecode");
+				if ((optionSet != null))
+				{
+					return ((TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessageState)(System.Enum.ToObject(typeof(TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessageState), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StateCode");
+				if ((value == null))
+				{
+					this.SetAttributeValue("statecode", null);
+				}
+				else
+				{
+					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
+				}
+				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 business_unit_dfeta_trsoutboxmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owningbusinessunit")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("business_unit_dfeta_trsoutboxmessage")]
+		public TeachingRecordSystem.Core.Dqt.Models.BusinessUnit business_unit_dfeta_trsoutboxmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.BusinessUnit>("business_unit_dfeta_trsoutboxmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("business_unit_dfeta_trsoutboxmessage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.BusinessUnit>("business_unit_dfeta_trsoutboxmessage", null, value);
+				this.OnPropertyChanged("business_unit_dfeta_trsoutboxmessage");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_trsoutboxmessage_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_createdby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_trsoutboxmessage_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_createdby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_trsoutboxmessage_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_createdonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_trsoutboxmessage_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_createdonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_trsoutboxmessage_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_modifiedby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_trsoutboxmessage_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_modifiedby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 lk_dfeta_trsoutboxmessage_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedonbehalfby")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_modifiedonbehalfby")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser lk_dfeta_trsoutboxmessage_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_modifiedonbehalfby");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("lk_dfeta_trsoutboxmessage_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 user_dfeta_trsoutboxmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("owninguser")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_trsoutboxmessage")]
+		public TeachingRecordSystem.Core.Dqt.Models.SystemUser user_dfeta_trsoutboxmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_trsoutboxmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_trsoutboxmessage");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.SystemUser>("user_dfeta_trsoutboxmessage", null, value);
+				this.OnPropertyChanged("user_dfeta_trsoutboxmessage");
+			}
+		}
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum IncidentState
 	{
 		
@@ -19890,6 +20236,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string lk_dfeta_trsevent_createdonbehalfby = "lk_dfeta_trsevent_createdonbehalfby";
 			public const string lk_dfeta_trsevent_modifiedby = "lk_dfeta_trsevent_modifiedby";
 			public const string lk_dfeta_trsevent_modifiedonbehalfby = "lk_dfeta_trsevent_modifiedonbehalfby";
+			public const string lk_dfeta_trsoutboxmessage_createdby = "lk_dfeta_trsoutboxmessage_createdby";
+			public const string lk_dfeta_trsoutboxmessage_createdonbehalfby = "lk_dfeta_trsoutboxmessage_createdonbehalfby";
+			public const string lk_dfeta_trsoutboxmessage_modifiedby = "lk_dfeta_trsoutboxmessage_modifiedby";
+			public const string lk_dfeta_trsoutboxmessage_modifiedonbehalfby = "lk_dfeta_trsoutboxmessage_modifiedonbehalfby";
 			public const string lk_incidentbase_createdby = "lk_incidentbase_createdby";
 			public const string lk_incidentbase_createdonbehalfby = "lk_incidentbase_createdonbehalfby";
 			public const string lk_incidentbase_modifiedby = "lk_incidentbase_modifiedby";
@@ -19946,6 +20296,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string user_dfeta_qualification = "user_dfeta_qualification";
 			public const string user_dfeta_sanction = "user_dfeta_sanction";
 			public const string user_dfeta_trsevent = "user_dfeta_trsevent";
+			public const string user_dfeta_trsoutboxmessage = "user_dfeta_trsoutboxmessage";
 			public const string user_incidentresolution = "user_incidentresolution";
 			public const string Referenceduser_parent_user = "Referenceduser_parent_user";
 			public const string user_task = "user_task";
@@ -22307,6 +22658,86 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N lk_dfeta_trsoutboxmessage_createdby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_createdby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> lk_dfeta_trsoutboxmessage_createdby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_createdby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_createdby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_createdby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_trsoutboxmessage_createdonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_createdonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> lk_dfeta_trsoutboxmessage_createdonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_createdonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_createdonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_createdonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_createdonbehalfby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_trsoutboxmessage_modifiedby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_modifiedby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> lk_dfeta_trsoutboxmessage_modifiedby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_modifiedby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_modifiedby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_modifiedby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedby");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N lk_dfeta_trsoutboxmessage_modifiedonbehalfby
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_dfeta_trsoutboxmessage_modifiedonbehalfby")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> lk_dfeta_trsoutboxmessage_modifiedonbehalfby
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_modifiedonbehalfby", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("lk_dfeta_trsoutboxmessage_modifiedonbehalfby");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("lk_dfeta_trsoutboxmessage_modifiedonbehalfby", null, value);
+				this.OnPropertyChanged("lk_dfeta_trsoutboxmessage_modifiedonbehalfby");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N lk_incidentbase_createdby
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("lk_incidentbase_createdby")]
@@ -23423,6 +23854,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("user_dfeta_trsevent");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TRSEvent>("user_dfeta_trsevent", null, value);
 				this.OnPropertyChanged("user_dfeta_trsevent");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N user_dfeta_trsoutboxmessage
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("user_dfeta_trsoutboxmessage")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> user_dfeta_trsoutboxmessage
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("user_dfeta_trsoutboxmessage", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("user_dfeta_trsoutboxmessage");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>("user_dfeta_trsoutboxmessage", null, value);
+				this.OnPropertyChanged("user_dfeta_trsoutboxmessage");
 			}
 		}
 		
@@ -24737,6 +25188,18 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			get
 			{
 				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_TRSEvent>();
+			}
+		}
+		
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage"/> entities.
+		/// </summary>
+		public System.Linq.IQueryable<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage> dfeta_TrsOutboxMessageSet
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<TeachingRecordSystem.Core.Dqt.Models.dfeta_TrsOutboxMessage>();
 			}
 		}
 		

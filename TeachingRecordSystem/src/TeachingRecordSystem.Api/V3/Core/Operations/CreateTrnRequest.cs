@@ -5,6 +5,8 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 
@@ -19,6 +21,7 @@ public record CreateTrnRequestCommand
     public required DateOnly DateOfBirth { get; init; }
     public required IReadOnlyCollection<string> EmailAddresses { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
+    public required string? VerifiedOneLoginUserSubject { get; init; }
 }
 
 public class CreateTrnRequestHandler(
@@ -27,7 +30,8 @@ public class CreateTrnRequestHandler(
     TrnRequestHelper trnRequestHelper,
     ICurrentUserProvider currentUserProvider,
     ITrnGenerationApiClient trnGenerationApiClient,
-    INameSynonymProvider nameSynonymProvider)
+    INameSynonymProvider nameSynonymProvider,
+    MessageSerializer messageSerializer)
 {
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
     {
@@ -110,6 +114,17 @@ public class CreateTrnRequestHandler(
 
         var emailAddress = command.EmailAddresses?.FirstOrDefault();
 
+        var outboxMessages = new List<dfeta_TrsOutboxMessage>();
+        if (command.VerifiedOneLoginUserSubject is string oneLoginUserId)
+        {
+            outboxMessages.Add(messageSerializer.CreateCrmOutboxMessage(new TrnRequestMetadataMessage()
+            {
+                ApplicationUserId = currentApplicationUserId,
+                RequestId = command.RequestId,
+                VerifiedOneLoginUserSubject = oneLoginUserId
+            }));
+        }
+
         await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
         {
             FirstName = firstName,
@@ -124,6 +139,7 @@ public class CreateTrnRequestHandler(
             PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
+            OutboxMessages = outboxMessages
         });
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;

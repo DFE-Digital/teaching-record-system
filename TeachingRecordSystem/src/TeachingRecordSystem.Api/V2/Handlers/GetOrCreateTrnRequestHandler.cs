@@ -65,7 +65,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 
         if (trnRequest is not null)
         {
-            var teacher = await _dataverseAdapter.GetTeacher(trnRequest.ContactId, columnNames: [Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_QTSDate]);
+            var teacher = trnRequest.Contact;
 
             wasCreated = false;
             trn = teacher?.dfeta_TRN;
