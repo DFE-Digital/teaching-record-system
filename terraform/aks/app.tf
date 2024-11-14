@@ -113,13 +113,13 @@ module "authz_application_configuration" {
   config_short           = var.environment_short_name
   secret_key_vault_short = "authz"
 
-  config_variables = {
+  config_variables = merge({
     DataProtectionKeysContainerName = azurerm_storage_container.keys.name
     SENTRY_ENVIRONMENT              = local.app_name_suffix
     DUMMY                           = "Dummy variable to force new Kubernetes config map to be created"
-  }
+  }, local.federated_auth_configmap)
 
-  secret_variables = {
+  secret_variables = merge({
     ApplicationInsights__ConnectionString = azurerm_application_insights.app.connection_string
     ConnectionStrings__DefaultConnection  = module.postgres.dotnet_connection_string
     ConnectionStrings__Redis              = "${module.redis.connection_string},defaultDatabase=1"
@@ -127,7 +127,7 @@ module "authz_application_configuration" {
     Sentry__Dsn                           = module.infrastructure_secrets.map.SENTRY-DSN
     SharedConfig                          = module.infrastructure_secrets.map.SharedConfig
     StorageConnectionString               = "DefaultEndpointsProtocol=https;AccountName=${azurerm_storage_account.app_storage.name};AccountKey=${azurerm_storage_account.app_storage.primary_access_key}"
-  }
+  }, local.federated_auth_secrets)
 }
 
 module "authz_application" {

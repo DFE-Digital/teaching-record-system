@@ -155,6 +155,20 @@ variable "app_name" { default = null }
 
 variable "app_name_suffix" { default = null }
 
+variable "enable_dfe_analytics_federated_auth" {
+  description = "Create the resources in Google cloud for federated authentication and enable in application"
+  default     = false
+}
 locals {
   app_name_suffix = var.app_name == null ? var.environment_name : var.app_name
+
+  federated_auth_configmap = var.enable_dfe_analytics_federated_auth ? {
+    DfeAnalytics__Environment = var.environment_name
+    DfeAnalytics__TableId     = module.dfe_analytics[0].bigquery_table_name
+    DfeAnalytics__DatasetId   = module.dfe_analytics[0].bigquery_dataset
+  } : {}
+
+  federated_auth_secrets = var.enable_dfe_analytics_federated_auth ? {
+    DfeAnalytics__CredentialsJson = module.dfe_analytics[0].google_cloud_credentials
+  } : {}
 }

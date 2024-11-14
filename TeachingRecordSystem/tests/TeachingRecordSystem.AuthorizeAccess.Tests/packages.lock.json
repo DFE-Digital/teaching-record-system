@@ -2479,7 +2479,7 @@
       "teachingrecordsystem.authorizeaccess": {
         "type": "Project",
         "dependencies": {
-          "Dfe.Analytics": "[0.2.4, )",
+          "Dfe.Analytics": "[0.2.5, )",
           "GovUk.Frontend.AspNetCore": "[2.0.1, )",
           "GovUk.OneLogin.AspNetCore": "[0.3.1, )",
           "Humanizer.Core": "[2.14.1, )",
@@ -2650,9 +2650,9 @@
       },
       "Dfe.Analytics": {
         "type": "CentralTransitive",
-        "requested": "[0.2.4, )",
-        "resolved": "0.2.4",
-        "contentHash": "b5NGUtfkKyO0F1vEdFafykXDbAu1L4owBh3qUy1vakbm/aE5J4Mc4o+xXkktH78oYemz3SUXrPJwLs78v+g2vA==",
+        "requested": "[0.2.5, )",
+        "resolved": "0.2.5",
+        "contentHash": "tMvmXnWEfv06wr0qpNGPuslyLusqiMOlV7LrnqB89KIAPiSJAotJu4MsV3Djmau+HpEx05TTVg1wOnmAK/Zn3g==",
         "dependencies": {
           "Google.Cloud.BigQuery.V2": "[3.0.0, 4.0.0)",
           "Microsoft.Extensions.Configuration": "[8.0.0, 9.0.0)",
