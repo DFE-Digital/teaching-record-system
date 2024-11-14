@@ -61,12 +61,13 @@ ci:	## Run in automation environment
 	$(eval SKIP_CONFIRM=true)
 
 bin/terrafile: ## Install terrafile to manage terraform modules
-	curl -sL https://github.com/coretech/terrafile/releases/download/v${TERRAFILE_VERSION}/terrafile_${TERRAFILE_VERSION}_$$(uname)_x86_64.tar.gz \
+	curl -sL https://github.com/coretech/terrafile/releases/download/v${TERRAFILE_VERSION}/terrafile_${TERRAFILE_VERSION}_$$(uname)_$$(uname -m).tar.gz \
 		| tar xz -C ./bin terrafile
 
 terraform-init: bin/terrafile
 	$(eval export TF_VAR_service_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_service_short_name=$(SERVICE_SHORT))
+	$(eval export TF_VAR_config=${CONFIG})
 	$(eval export TF_VAR_environment_short_name=$(CONFIG_SHORT))
 	$(eval export TF_VAR_azure_resource_prefix=$(AZURE_RESOURCE_PREFIX))
 

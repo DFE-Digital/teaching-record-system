@@ -24,6 +24,11 @@ runs:
       with:
         azure-credentials: ${{ inputs.azure_credentials }}
 
+    - uses: google-github-actions/auth@v2
+      with:
+        project_id: teaching-record-system
+        workload_identity_provider: projects/63681705511/locations/global/workloadIdentityPools/teaching-record-system/providers/teaching-record-system
+
     - name: Terraform
       id: terraform
       run: |
