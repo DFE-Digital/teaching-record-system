@@ -30,9 +30,7 @@ public class CreateTrnRequestHandler(
     TrnRequestHelper trnRequestHelper,
     ICurrentUserProvider currentUserProvider,
     ITrnGenerationApiClient trnGenerationApiClient,
-#pragma warning disable CS9113 // Parameter is unread.
     INameSynonymProvider nameSynonymProvider,
-#pragma warning restore CS9113 // Parameter is unread.
     MessageSerializer messageSerializer)
 {
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
@@ -50,8 +48,7 @@ public class CreateTrnRequestHandler(
         var firstName = firstAndMiddleNames.First();
         var middleName = string.Join(' ', firstAndMiddleNames.Skip(1));
 
-        //var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
-        var firstNameSynonyms = Array.Empty<string>();  // Disabled temporarily
+        var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
 
         var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
 
