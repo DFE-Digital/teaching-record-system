@@ -43,6 +43,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         Assert.True(result.Succeeded);
 
         transactionRequest.AssertSingleCreateRequest<Contact>();
+        transactionRequest.AssertSingleCreateRequest<dfeta_TrsOutboxMessage>();
         transactionRequest.AssertSingleCreateRequest<dfeta_initialteachertraining>();
         transactionRequest.AssertSingleCreateRequest<dfeta_qualification>();
         transactionRequest.AssertSingleCreateRequest<dfeta_qtsregistration>();
@@ -966,7 +967,9 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
             TeacherType = type,
             InductionRequired = type == CreateTeacherType.OverseasQualifiedTeacher ? false : null,
             QtsDate = type == CreateTeacherType.OverseasQualifiedTeacher ? new DateOnly(2020, 10, 10) : null,
-            RecognitionRoute = type == CreateTeacherType.OverseasQualifiedTeacher ? CreateTeacherRecognitionRoute.Scotland : null
+            RecognitionRoute = type == CreateTeacherType.OverseasQualifiedTeacher ? CreateTeacherRecognitionRoute.Scotland : null,
+            TrnRequestId = Guid.NewGuid().ToString(),
+            ApplicationUserId = Guid.NewGuid()
         };
 
         configureCommand?.Invoke(command);

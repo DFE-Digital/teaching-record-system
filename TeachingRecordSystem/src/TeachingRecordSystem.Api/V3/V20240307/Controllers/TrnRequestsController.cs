@@ -38,7 +38,8 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             DateOfBirth = request.Person.DateOfBirth,
             EmailAddresses = request.Person.Email is string emailAddress ? [emailAddress] : [],
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
-            VerifiedOneLoginUserSubject = null
+            IdentityVerified = null,
+            OneLoginUserSubject = null
         };
         var result = await handler.Handle(command);
 

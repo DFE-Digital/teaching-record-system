@@ -7,5 +7,5 @@ public enum OneLoginUserMatchRoute
     TrnToken = 3,
     Support = 4,
     GetAnIdentityUser = 5,
-    TrnAllocation = 6,
+    TrnRequest = 6,
 }

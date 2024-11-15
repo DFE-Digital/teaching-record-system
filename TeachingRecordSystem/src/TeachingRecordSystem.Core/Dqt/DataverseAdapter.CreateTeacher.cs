@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Text;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -33,6 +35,7 @@ public partial class DataverseAdapter
         }
 
         var newContact = helper.CreateContactEntity();
+        var metadataOutboxMessage = helper.CreateTrnRequestMetadataOutboxMessage();
 
         // Send a single Transaction request with all the data changes in.
         // This is important for atomicity; we really do not want torn writes here.
@@ -42,6 +45,7 @@ public partial class DataverseAdapter
             Requests = new()
             {
                 new CreateRequest() { Target = newContact },
+                new CreateRequest() { Target = metadataOutboxMessage },
                 new CreateRequest() { Target = helper.CreateInitialTeacherTrainingEntity(referenceData) },
                 new CreateRequest() { Target = helper.CreateQualificationEntity(referenceData) }
             }
@@ -251,7 +255,7 @@ public partial class DataverseAdapter
                 dfeta_HUSID = _command.HusId,
                 dfeta_SlugId = _command.SlugId,
                 dfeta_AllowPiiUpdatesFromRegister = true,
-                dfeta_TrnRequestID = _command.TrnRequestId
+                dfeta_TrnRequestID = TrnRequestHelper.GetCrmTrnRequestId(_command.ApplicationUserId, _command.TrnRequestId)
             };
 
             // We get a NullReferenceException back from CRM if City is null or empty
@@ -825,6 +829,41 @@ public partial class DataverseAdapter
             }
 
             return failedReasons;
+        }
+
+        public dfeta_TrsOutboxMessage CreateTrnRequestMetadataOutboxMessage()
+        {
+            var name = new List<string>()
+            {
+                _command.StatedFirstName,
+                _command.StatedMiddleName,
+                _command.StatedLastName
+            };
+
+            if (string.IsNullOrEmpty(name[1]))
+            {
+                name.RemoveAt(1);
+            }
+
+            var message = new TrnRequestMetadataMessage()
+            {
+                ApplicationUserId = _command.ApplicationUserId,
+                RequestId = _command.TrnRequestId,
+                CreatedOn = _dataverseAdapter._clock.UtcNow,
+                IdentityVerified = _command.IdentityVerified,
+                OneLoginUserSubject = _command.OneLoginUserSubject,
+                EmailAddress = _command.EmailAddress,
+                Name = name.ToArray(),
+                DateOfBirth = _command.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)
+            };
+
+            var payload = new MessageSerializer().SerializeMessage(message, out var messageName);
+
+            return new dfeta_TrsOutboxMessage()
+            {
+                dfeta_MessageName = messageName,
+                dfeta_Payload = payload
+            };
         }
     }
 

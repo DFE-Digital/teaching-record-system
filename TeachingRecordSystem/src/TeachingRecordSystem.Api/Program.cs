@@ -192,7 +192,6 @@ public class Program
         services.AddSingleton<ICurrentUserProvider, ClaimsPrincipalCurrentUserProvider>();
         services.AddMemoryCache();
         services.AddSingleton<AddTrnToSentryScopeResourceFilter>();
-        services.AddTransient<TrnRequestHelper>();
 
         builder.Services.AddOptions<EvidenceFilesOptions>()
             .Bind(builder.Configuration.GetSection("EvidenceFiles"))

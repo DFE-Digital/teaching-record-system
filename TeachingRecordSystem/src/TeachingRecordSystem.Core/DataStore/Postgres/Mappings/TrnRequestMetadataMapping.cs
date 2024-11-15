@@ -9,6 +9,8 @@ public class TrnRequestMetadataMapping : IEntityTypeConfiguration<TrnRequestMeta
     {
         builder.HasKey(r => new { r.ApplicationUserId, r.RequestId });
         builder.Property(r => r.RequestId).IsRequired().HasMaxLength(TrnRequest.RequestIdMaxLength);
-        builder.Property(o => o.VerifiedOneLoginUserSubject).HasMaxLength(255);
+        builder.Property(r => r.OneLoginUserSubject).HasMaxLength(255);
+        builder.HasIndex(r => r.OneLoginUserSubject);
+        builder.HasIndex(r => r.EmailAddress);
     }
 }

@@ -30,62 +30,28 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
     public TestData TestData => Fixture.TestData;
 
     [Fact]
-    public async Task HandleOutboxMessage_ForTrnRequestMetadataMessageWithCompletedTrnRequest_AddsOneLoginUserToDb()
+    public async Task HandleOutboxMessage_ForTrnRequestMetadataMessage_AddsTrnRequestMetadataToDb()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var applicationUser = await TestData.CreateApplicationUser();
         var oneLoginUserSubject = TestData.CreateOneLoginUserSubject();
-
-        var person = await TestData.CreatePerson(p => p
-            .WithTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(applicationUser.UserId, requestId)));
-
-        var message = new TrnRequestMetadataMessage()
-        {
-            ApplicationUserId = applicationUser.UserId,
-            RequestId = requestId,
-            VerifiedOneLoginUserSubject = oneLoginUserSubject
-        };
-
-        var outboxMessage = new dfeta_TrsOutboxMessage()
-        {
-            dfeta_Payload = MessageSerializer.SerializeMessage(message, out var messageName),
-            dfeta_MessageName = messageName
-        };
-
-        // Act
-        await Handler.HandleOutboxMessage(outboxMessage);
-
-        // Assert
-        await DbFixture.WithDbContext(async dbContext =>
-        {
-            var oneLoginUser = await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject);
-            Assert.NotNull(oneLoginUser);
-            Assert.Equal(person.PersonId, oneLoginUser.PersonId);
-            Assert.Equal(Clock.UtcNow, oneLoginUser.VerifiedOn);
-            Assert.Equal(OneLoginUserVerificationRoute.External, oneLoginUser.VerificationRoute);
-            Assert.Equal(applicationUser.UserId, oneLoginUser.VerifiedByApplicationUserId);
-        });
-    }
-
-    [Fact]
-    public async Task HandleOutboxMessage_ForTrnRequestMetadataMessageWithPendingTrnRequest_DoesNotAddOneLoginButDoesAddTrnRequestMetadataToDb()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var applicationUser = await TestData.CreateApplicationUser();
-        var oneLoginUserSubject = TestData.CreateOneLoginUserSubject();
+        var email = TestData.GenerateUniqueEmail();
 
         var person = await TestData.CreatePerson(p => p
             .WithoutTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(applicationUser.UserId, requestId)));
+            .WithTrnRequest(applicationUser.UserId, requestId, writeMetadata: false));
 
         var message = new TrnRequestMetadataMessage()
         {
             ApplicationUserId = applicationUser.UserId,
             RequestId = requestId,
-            VerifiedOneLoginUserSubject = oneLoginUserSubject
+            CreatedOn = Clock.UtcNow,
+            IdentityVerified = true,
+            OneLoginUserSubject = oneLoginUserSubject,
+            EmailAddress = email,
+            Name = [person.FirstName, person.LastName],
+            DateOfBirth = person.DateOfBirth,
         };
 
         var outboxMessage = new dfeta_TrsOutboxMessage()
@@ -105,7 +71,11 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
 
             var trnRequestMetadata = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUser.UserId && m.RequestId == requestId);
             Assert.NotNull(trnRequestMetadata);
-            Assert.Equal(oneLoginUserSubject, trnRequestMetadata.VerifiedOneLoginUserSubject);
+            Assert.Equal(message.IdentityVerified, trnRequestMetadata.IdentityVerified);
+            Assert.Equal(message.OneLoginUserSubject, trnRequestMetadata.OneLoginUserSubject);
+            Assert.Equal(message.EmailAddress, trnRequestMetadata.EmailAddress);
+            Assert.Equal(message.Name, trnRequestMetadata.Name);
+            Assert.Equal(message.DateOfBirth, trnRequestMetadata.DateOfBirth);
         });
     }
 }
