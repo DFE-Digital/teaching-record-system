@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -7,7 +6,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core;
 
-public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock)
+public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
 {
     public async Task<GetTrnRequestResult?> GetTrnRequestInfo(Guid applicationUserId, string requestId)
     {
@@ -60,47 +59,6 @@ public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQue
 
     public Task<TrnRequestMetadata?> GetRequestMetadata(Guid applicationUserId, string requestId) =>
         dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId);
-
-    public async Task EnsureOneLoginUserIsConnected(GetTrnRequestResult trnRequest, string oneLoginUserSubject)
-    {
-        if (await dbContext.OneLoginUsers.AnyAsync(u => u.Subject == oneLoginUserSubject))
-        {
-            return;
-        }
-
-        var contact = trnRequest.Contact;
-
-        Debug.Assert(contact.dfeta_TRN is not null);
-
-        var oneLoginUser = new OneLoginUser() { Subject = oneLoginUserSubject };
-
-        var verifiedName = new List<string>()
-        {
-            contact.HasStatedNames() ? contact.dfeta_StatedFirstName : contact.FirstName,
-            contact.HasStatedNames() ? contact.dfeta_StatedMiddleName : contact.MiddleName,
-            contact.HasStatedNames() ? contact.dfeta_StatedLastName : contact.LastName
-        };
-
-        if (string.IsNullOrEmpty(verifiedName[1]))
-        {
-            verifiedName.RemoveAt(1);
-        }
-
-        var verifiedDateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false);
-
-        oneLoginUser.SetVerified(
-            verifiedOn: clock.UtcNow,
-            OneLoginUserVerificationRoute.External,
-            verifiedByApplicationUserId: trnRequest.ApplicationUserId,
-            verifiedNames: [[.. verifiedName]],
-            verifiedDatesOfBirth: [verifiedDateOfBirth]);
-
-        oneLoginUser.SetMatched(contact.Id, OneLoginUserMatchRoute.TrnAllocation, matchedAttributes: null);
-
-        dbContext.OneLoginUsers.Add(oneLoginUser);
-
-        await dbContext.SaveChangesAsync();
-    }
 }
 
-public record GetTrnRequestResult(string? TrnToken, Guid ApplicationUserId, Contact Contact, bool Completed);
+public record GetTrnRequestResult(string? TrnToken, Guid ApplicationUserId, Contact Contact, bool IsCompleted);

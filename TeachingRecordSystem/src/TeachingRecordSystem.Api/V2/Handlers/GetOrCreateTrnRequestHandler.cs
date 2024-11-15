@@ -136,8 +136,11 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 InductionRequired = request.InductionRequired,
                 UnderNewOverseasRegulations = request.UnderNewOverseasRegulations,
                 SlugId = request.SlugId,
-                TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, request.RequestId),
-                GetTrnToken = GetTrnToken
+                TrnRequestId = request.RequestId,
+                GetTrnToken = GetTrnToken,
+                ApplicationUserId = currentApplicationUserId,
+                IdentityVerified = request.IdentityVerified,
+                OneLoginUserSubject = request.OneLoginUserSubject
             });
 
             if (!createTeacherResult.Succeeded)

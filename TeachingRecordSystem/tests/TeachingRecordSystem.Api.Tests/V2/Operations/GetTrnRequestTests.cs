@@ -117,7 +117,7 @@ public class GetTrnRequestTests : TestBase
 
         var person = await TestData.CreatePerson(p => p
             .WithoutTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
 
         // Act
@@ -188,7 +188,7 @@ public class GetTrnRequestTests : TestBase
 
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
 
         // Act
@@ -264,7 +264,7 @@ public class GetTrnRequestTests : TestBase
 
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId)
             .WithTrnToken(trnToken));
 

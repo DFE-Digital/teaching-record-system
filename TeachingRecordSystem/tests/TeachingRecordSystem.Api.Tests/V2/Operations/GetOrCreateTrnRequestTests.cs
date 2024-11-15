@@ -83,7 +83,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         var person = await TestData.CreatePerson(p => p
             .WithTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
 
         ConfigureDataverseAdapterGetTeacher(person.Contact);
@@ -167,7 +167,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         var person = await TestData.CreatePerson(p => p
             .WithoutTrn()
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId))
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
 
         ConfigureDataverseAdapterGetTeacher(person.Contact);

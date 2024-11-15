@@ -20,18 +20,6 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
 
         var contact = trnRequest.Contact;
 
-        // If we have metadata for the One Login user, ensure they're added to the OneLoginUsers table.
-        // FUTURE: when TRN requests are handled exclusively in TRS this should be done at the point the task is resolved instead of here.
-        if (trnRequest.Completed)
-        {
-            var metadata = await trnRequestHelper.GetRequestMetadata(trnRequest.ApplicationUserId, command.RequestId);
-
-            if (metadata?.VerifiedOneLoginUserSubject is string oneLoginUserId)
-            {
-                await trnRequestHelper.EnsureOneLoginUserIsConnected(trnRequest, oneLoginUserId);
-            }
-        }
-
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId.ToString(),
@@ -45,7 +33,7 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
                 DateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false)
             },
             Trn = contact.dfeta_TRN,
-            Status = trnRequest.Completed ? TrnRequestStatus.Completed : TrnRequestStatus.Pending,
+            Status = trnRequest.IsCompleted ? TrnRequestStatus.Completed : TrnRequestStatus.Pending,
         };
     }
 }

@@ -1,3 +1,4 @@
+using Optional;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
 
 namespace TeachingRecordSystem.AuthorizeAccess.EndToEndTests;
@@ -344,8 +345,56 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePerson(x => x.WithTrn());
         var oneLoginUser = await TestData.CreateOneLoginUser(person);
 
-        var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
-        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!, coreIdentityVc));
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPage();
+
+        await page.AssertSignedIn(person.Trn!);
+    }
+
+    [Fact]
+    public async Task SignIn_UnknownUser_OneLoginUserIsAttachedToTrnRequest()
+    {
+        var applicationUser = await TestData.CreateApplicationUser();
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        var subject = TestData.CreateOneLoginUserSubject();
+
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
+
+        var oneLoginUser = await TestData.CreateOneLoginUser(subject: Option.Some(subject));
+
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToTestStartPage();
+
+        await page.AssertSignedIn(person.Trn!);
+    }
+
+    [Fact]
+    public async Task SignIn_UnknownUser_EmailIsAttachedToTrnRequest()
+    {
+        var applicationUser = await TestData.CreateApplicationUser();
+        var trnRequestId = Guid.NewGuid().ToString();
+
+        var email = TestData.GenerateUniqueEmail();
+
+        var person = await TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithEmail(email)
+            .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true));
+
+        var oneLoginUser = await TestData.CreateOneLoginUser(email: Option.Some((string?)email));
+
+        SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

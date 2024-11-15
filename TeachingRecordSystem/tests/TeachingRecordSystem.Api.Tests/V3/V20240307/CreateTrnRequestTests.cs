@@ -240,7 +240,7 @@ public class CreateTrnRequestTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId)));
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {

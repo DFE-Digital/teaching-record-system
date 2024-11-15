@@ -96,7 +96,7 @@ public class GetTrnRequestTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId)));
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         XrmFakedContext.UpdateEntity(new Contact()
         {
@@ -150,7 +150,7 @@ public class GetTrnRequestTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId)));
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         // Act
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
@@ -196,7 +196,7 @@ public class GetTrnRequestTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequestId(TrnRequestHelper.GetCrmTrnRequestId(ApplicationUserId, requestId)));
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         // Act
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
