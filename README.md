@@ -5,6 +5,7 @@ Provides an API over the Database of Qualified Teachers (DQT). Provides the core
 
 # High level architecture (showing one of the citizen facing services that make use of the TRS API)
 * [Teaching Record System High Level Architecture (just showing core components)](docs/c4-diagrams-as-code/trs-core-containers.jpg)
+* [Logical Data Model](docs/logical-data-model.md)
 
 # Data Integrations **
 TRS provides the the core teaching record data to a number of internal and external facing digital services:
