@@ -10,7 +10,7 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
 {
     public async Task<TrnRequestInfo?> Handle(GetTrnRequestCommand command)
     {
-        var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
+        var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
         var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, command.RequestId);
         if (trnRequest is null)

@@ -25,8 +25,8 @@ public class CreateContactTests : IAsyncLifetime
         var middleName = _dataScope.TestData.GenerateMiddleName();
         var lastName = _dataScope.TestData.GenerateLastName();
         var email = _dataScope.TestData.GenerateUniqueEmail();
-        var ni = _dataScope.TestData.GenerateNationalInsuranceNumber();
-        var dob = _dataScope.TestData.GenerateDateOfBirth();
+        var nino = _dataScope.TestData.GenerateNationalInsuranceNumber();
+        var dateOfBirth = _dataScope.TestData.GenerateDateOfBirth();
         var trn = await _dataScope.TestData.GenerateTrn();
 
         var query = new CreateContactQuery()
@@ -39,10 +39,11 @@ public class CreateContactTests : IAsyncLifetime
             StatedMiddleName = middleName,
             StatedLastName = lastName,
             EmailAddress = email,
-            NationalInsuranceNumber = ni,
-            DateOfBirth = dob,
+            NationalInsuranceNumber = nino,
+            DateOfBirth = dateOfBirth,
             Trn = trn,
             PotentialDuplicates = [],
+            ApplicationUserName = "Tests",
             OutboxMessages = []
         };
 
@@ -59,53 +60,8 @@ public class CreateContactTests : IAsyncLifetime
         Assert.Equal(lastName, contact.LastName);
         Assert.Equal(email, contact.EMailAddress1);
         Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
-        Assert.Equal(ni, contact.dfeta_NINumber);
-        Assert.Equal(dob, contact.BirthDate.ToDateOnlyWithDqtBstFix(true));
-    }
-
-    [Theory]
-    [InlineData("1", "", "", "First name contains a digit")]
-    [InlineData("", "1", "", "Middle name contains a digit")]
-    [InlineData("", "", "1", "Last name contains a digit")]
-    public async Task QueryWithDigits_ExecutesSuccessfully_CreatesTask(string firstNameStr, string middleNameStr, string lastNameStr, string description)
-    {
-        // Arrange
-        var firstName = $"{_dataScope.TestData.GenerateFirstName()}{firstNameStr}";
-        var middleName = $"{_dataScope.TestData.GenerateMiddleName()}{middleNameStr}";
-        var lastName = $"{_dataScope.TestData.GenerateLastName()}{lastNameStr}";
-        var email = _dataScope.TestData.GenerateUniqueEmail();
-        var ni = _dataScope.TestData.GenerateNationalInsuranceNumber();
-        var dob = _dataScope.TestData.GenerateDateOfBirth();
-        var trn = await _dataScope.TestData.GenerateTrn();
-
-        var query = new CreateContactQuery()
-        {
-            TrnRequestId = null,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            StatedFirstName = firstName,
-            StatedMiddleName = middleName,
-            StatedLastName = lastName,
-            EmailAddress = email,
-            NationalInsuranceNumber = ni,
-            DateOfBirth = dob,
-            Trn = trn,
-            PotentialDuplicates = [],
-            OutboxMessages = []
-        };
-
-        // Act
-        var createdTeacherId = await _crmQueryDispatcher.ExecuteQuery(query);
-
-        // Assert
-        using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
-        var contact = ctx.ContactSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Contact.PrimaryIdAttribute) == createdTeacherId);
-        var task = ctx.TaskSet.FirstOrDefault(x => x.RegardingObjectId == createdTeacherId.ToEntityReference(Contact.EntityLogicalName));
-        Assert.NotNull(contact);
-        Assert.NotNull(task);
-        Assert.Equal(description, task.Description);
-        Assert.Equal("DMSImportTrn", task.Category);
+        Assert.Equal(nino, contact.dfeta_NINumber);
+        Assert.Equal(dateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(true));
     }
 
     [Fact]
@@ -116,31 +72,23 @@ public class CreateContactTests : IAsyncLifetime
         var middleName = $"{_dataScope.TestData.GenerateMiddleName()}";
         var lastName = $"{_dataScope.TestData.GenerateLastName()}";
         var email = _dataScope.TestData.GenerateUniqueEmail();
-        var ni = _dataScope.TestData.GenerateNationalInsuranceNumber();
-        var dob = _dataScope.TestData.GenerateDateOfBirth();
-        var trn1 = await _dataScope.TestData.GenerateTrn();
-        var trn2 = await _dataScope.TestData.GenerateTrn();
+        var nino = _dataScope.TestData.GenerateNationalInsuranceNumber();
+        var dateOfBirth = _dataScope.TestData.GenerateDateOfBirth();
 
-        var query1 = new CreateContactQuery()
+        var existingContactId = Guid.NewGuid();
+        var existingContactTrn = await _dataScope.TestData.GenerateTrn();
+        await _dataScope.OrganizationService.CreateAsync(new Contact()
         {
-            TrnRequestId = null,
+            Id = existingContactId,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
-            StatedFirstName = firstName,
-            StatedMiddleName = middleName,
-            StatedLastName = lastName,
-            EmailAddress = email,
-            NationalInsuranceNumber = ni,
-            DateOfBirth = dob,
-            Trn = trn1,
-            PotentialDuplicates = [],
-            OutboxMessages = []
-        };
+            BirthDate = dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
+            dfeta_TRN = existingContactTrn
+        });
 
         // Act
-        var createdTeacherId1 = await _crmQueryDispatcher.ExecuteQuery(query1);
-        var query2 = new CreateContactQuery()
+        var query = new CreateContactQuery()
         {
             TrnRequestId = null,
             FirstName = firstName,
@@ -150,15 +98,15 @@ public class CreateContactTests : IAsyncLifetime
             StatedMiddleName = middleName,
             StatedLastName = lastName,
             EmailAddress = email,
-            NationalInsuranceNumber = ni,
-            DateOfBirth = dob,
-            Trn = trn2,
+            NationalInsuranceNumber = nino,
+            DateOfBirth = dateOfBirth,
+            Trn = null,
             PotentialDuplicates =
             [
                 (Duplicate: new FindPotentialDuplicateContactsResult()
                 {
-                    ContactId = createdTeacherId1,
-                    Trn = trn1,
+                    ContactId = existingContactId,
+                    Trn = existingContactTrn,
                     MatchedAttributes = [Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName],
                     HasEytsDate = false,
                     HasQtsDate = false,
@@ -168,26 +116,25 @@ public class CreateContactTests : IAsyncLifetime
                     StatedFirstName = firstName,
                     StatedMiddleName = middleName,
                     StatedLastName = lastName,
-                    DateOfBirth = dob,
+                    DateOfBirth = dateOfBirth,
                     EmailAddress = email,
-                    NationalInsuranceNumber = ni
+                    NationalInsuranceNumber = nino
                 },
                 HasActiveAlert: false)
             ],
+            ApplicationUserName = "Tests",
             OutboxMessages = []
         };
-        var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query2);
+        var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query);
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
-        var contact1 = ctx.ContactSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Contact.PrimaryIdAttribute) == createdTeacherId1);
-        var contact2 = ctx.ContactSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Contact.PrimaryIdAttribute) == createdTeacherId2);
+        var contact = ctx.ContactSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Contact.PrimaryIdAttribute) == createdTeacherId2);
         var potentialDuplicateTask = ctx.TaskSet.FirstOrDefault(x => x.RegardingObjectId == createdTeacherId2.ToEntityReference(Contact.EntityLogicalName));
 
         // Assert
-        Assert.NotNull(contact1);
-        Assert.NotNull(contact2);
-        Assert.Null(contact2.dfeta_TRN);
+        Assert.NotNull(contact);
+        Assert.Null(contact.dfeta_TRN);
         Assert.NotNull(potentialDuplicateTask);
         Assert.Contains("Potential duplicate", potentialDuplicateTask.Description);
-        Assert.Equal("DMSImportTrn", potentialDuplicateTask.Category);
+        Assert.Equal("TRN request from Tests", potentialDuplicateTask.Category);
     }
 }

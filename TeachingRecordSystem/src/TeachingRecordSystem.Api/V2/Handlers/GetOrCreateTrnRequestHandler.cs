@@ -46,7 +46,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 
     public async Task<TrnRequestInfo> Handle(GetOrCreateTrnRequest request, CancellationToken cancellationToken)
     {
-        var currentApplicationUserId = _currentUserProvider.GetCurrentApplicationUserId();
+        var (currentApplicationUserId, _) = _currentUserProvider.GetCurrentApplicationUser();
 
         await using var requestIdLock = await _distributedLockProvider.AcquireLockAsync(
             DistributedLockKeys.TrnRequestId(currentApplicationUserId, request.RequestId),
