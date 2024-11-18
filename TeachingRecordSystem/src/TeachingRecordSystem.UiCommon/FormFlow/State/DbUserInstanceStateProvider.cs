@@ -22,7 +22,7 @@ public class DbWithHttpContextTransactionUserInstanceStateProvider(
         await CompleteInstanceAsync(instanceId, stateType, userId, dbContext);
     }
 
-    public async Task CommitChanges()
+    public async Task CommitChangesAsync()
     {
         var httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext.");
 
@@ -43,33 +43,33 @@ public class DbWithHttpContextTransactionUserInstanceStateProvider(
         object state,
         IReadOnlyDictionary<object, object>? properties)
     {
-        var dbContext = await EnsureDbContext();
+        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
         return await CreateInstanceAsync(instanceId, stateType, state, properties, userId, dbContext);
     }
 
     public override async Task DeleteInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
-        var dbContext = await EnsureDbContext();
+        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
         await DeleteInstanceAsync(instanceId, stateType, userId, dbContext);
     }
 
     public override async Task<JourneyInstance?> GetInstanceAsync(JourneyInstanceId instanceId, Type stateType)
     {
-        var dbContext = await EnsureDbContext();
+        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
         return await GetInstanceAsync(instanceId, stateType, userId, dbContext);
     }
 
     public override async Task UpdateInstanceStateAsync(JourneyInstanceId instanceId, Type stateType, object state)
     {
-        var dbContext = await EnsureDbContext();
+        var dbContext = await EnsureDbContextAsync();
         var userId = currentUserIdProvider.GetCurrentUserId();
         await UpdateInstanceStateAsync(instanceId, stateType, state, userId, dbContext);
     }
 
-    private async Task<TrsDbContext> EnsureDbContext()
+    private async Task<TrsDbContext> EnsureDbContextAsync()
     {
         var httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HttpContext.");
 

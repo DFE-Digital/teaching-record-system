@@ -48,7 +48,7 @@ public class UpdateTeacherIdentityInfoTests : IAsyncLifetime
 
         // Act
         var updateTime = DateTime.UtcNow;
-        await _dataverseAdapter.UpdateTeacherIdentityInfo(new UpdateTeacherIdentityInfoCommand()
+        await _dataverseAdapter.UpdateTeacherIdentityInfoAsync(new UpdateTeacherIdentityInfoCommand()
         {
             TeacherId = teacherId,
             IdentityUserId = identityUserId,
@@ -58,7 +58,7 @@ public class UpdateTeacherIdentityInfoTests : IAsyncLifetime
         });
 
         // Assert
-        var updatedTeacher = await _dataverseAdapter.GetTeacher(
+        var updatedTeacher = await _dataverseAdapter.GetTeacherAsync(
             teacherId,
             columnNames: new[]
             {

@@ -24,8 +24,8 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
     public async Task<FindTeachersResponse> Handle(FindTeachersRequest request, CancellationToken cancellationToken)
     {
         var result = request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default ?
-            await HandleDefaultRequest(request) :
-            await HandleStrictRequest(request);
+            await HandleDefaultRequestAsync(request) :
+            await HandleStrictRequestAsync(request);
 
         var matchedPersonIds = result.Select(c => c.Id).ToHashSet();
         var resultsWithActiveAlerts = await _dbContext.Alerts
@@ -51,7 +51,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
         };
     }
 
-    private async Task<Contact[]> HandleDefaultRequest(FindTeachersRequest request)
+    private async Task<Contact[]> HandleDefaultRequestAsync(FindTeachersRequest request)
     {
         Debug.Assert(request.MatchPolicy.GetValueOrDefault() == FindTeachersMatchPolicy.Default);
 
@@ -59,7 +59,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
 
         if (!string.IsNullOrEmpty(request.IttProviderUkprn))
         {
-            ittProviders = await _dataverseAdapter.GetIttProviderOrganizationsByUkprn(
+            ittProviders = await _dataverseAdapter.GetIttProviderOrganizationsByUkprnAsync(
                 request.IttProviderUkprn,
                 columnNames: Array.Empty<string>(),
                 activeOnly: false);
@@ -71,7 +71,7 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
         }
         else if (!string.IsNullOrEmpty(request.IttProviderName))
         {
-            ittProviders = await _dataverseAdapter.GetIttProviderOrganizationsByName(
+            ittProviders = await _dataverseAdapter.GetIttProviderOrganizationsByNameAsync(
                 request.IttProviderName,
                 columnNames: Array.Empty<string>(),
                 activeOnly: false);
@@ -95,10 +95,10 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
             Trn = request.Trn
         };
 
-        return await _dataverseAdapter.FindTeachers(query);
+        return await _dataverseAdapter.FindTeachersAsync(query);
     }
 
-    private async Task<Contact[]> HandleStrictRequest(FindTeachersRequest request)
+    private async Task<Contact[]> HandleStrictRequestAsync(FindTeachersRequest request)
     {
         Debug.Assert(request.MatchPolicy == FindTeachersMatchPolicy.Strict);
 
@@ -114,6 +114,6 @@ public class FindTeachersHandler : IRequestHandler<FindTeachersRequest, FindTeac
             Trn = request.Trn
         };
 
-        return await _dataverseAdapter.FindTeachersStrict(query);
+        return await _dataverseAdapter.FindTeachersStrictAsync(query);
     }
 }

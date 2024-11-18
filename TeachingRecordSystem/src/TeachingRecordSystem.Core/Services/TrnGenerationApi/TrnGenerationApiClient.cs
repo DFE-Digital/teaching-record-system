@@ -21,7 +21,7 @@ public class TrnGenerationApiClient : ITrnGenerationApiClient
             .Build();
     }
 
-    public async Task<string> GenerateTrn()
+    public async Task<string> GenerateTrnAsync()
     {
         var response = await _resiliencePipeline.ExecuteAsync(async _ => await _httpClient.PostAsync("/api/v1/trn-requests", null));
 

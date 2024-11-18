@@ -17,7 +17,7 @@ public class FormFlowSessionMiddleware(RequestDelegate next, IDataProtectionProv
         Secure = true,
     };
 
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         if (!TryExtractSessionIdFromRequest(context, out var sessionId))
         {

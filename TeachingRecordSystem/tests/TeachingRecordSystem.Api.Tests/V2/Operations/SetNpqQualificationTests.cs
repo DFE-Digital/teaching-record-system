@@ -25,11 +25,11 @@ public class SetNpqQualificationTests : TestBase
         };
 
         DataverseAdapterMock
-           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync(contact);
 
         DataverseAdapterMock
-           .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))
+           .Setup(mock => mock.SetNpqQualificationAsync(It.IsAny<SetNpqQualificationCommand>()))
            .ReturnsAsync(result);
 
         // Act
@@ -63,7 +63,7 @@ public class SetNpqQualificationTests : TestBase
         Clock.UtcNow = new DateTime(2021, 10, 31);
         var trn = "1234567";
         DataverseAdapterMock
-           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync((Contact)null);
 
         // Act
@@ -72,7 +72,7 @@ public class SetNpqQualificationTests : TestBase
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(SetNpqQualificationRequest.CompletionDate)}",
             expectedError: Properties.StringResources.Errors_10022_Title);
@@ -85,7 +85,7 @@ public class SetNpqQualificationTests : TestBase
         Clock.UtcNow = new DateTime(2022, 01, 01);
         var trn = "1234567";
         DataverseAdapterMock
-           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync((Contact)null);
 
         // Act
@@ -94,7 +94,7 @@ public class SetNpqQualificationTests : TestBase
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -119,15 +119,15 @@ public class SetNpqQualificationTests : TestBase
         };
 
         DataverseAdapterMock
-           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync(contact);
 
         DataverseAdapterMock
-           .Setup(mock => mock.GetQualificationsForTeacher(id, It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>()))
+           .Setup(mock => mock.GetQualificationsForTeacherAsync(id, It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>()))
            .ReturnsAsync(qualifications);
 
         DataverseAdapterMock
-           .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))
+           .Setup(mock => mock.SetNpqQualificationAsync(It.IsAny<SetNpqQualificationCommand>()))
            .ReturnsAsync(SetNpqQualificationResult.Failed(SetNpqQualificationFailedReasons.NpqQualificationNotCreatedByApi));
 
         // Act
@@ -136,7 +136,7 @@ public class SetNpqQualificationTests : TestBase
             CreateRequest(req => req.CompletionDate = new DateOnly(Clock.UtcNow.Year, Clock.UtcNow.Month, Clock.UtcNow.Day)));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(SetNpqQualificationRequest.QualificationType)}",
             expectedError: Properties.StringResources.Errors_10021_Title);
@@ -170,11 +170,11 @@ public class SetNpqQualificationTests : TestBase
         };
 
         DataverseAdapterMock
-           .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+           .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
            .ReturnsAsync(contact);
 
         DataverseAdapterMock
-           .Setup(mock => mock.SetNpqQualification(It.IsAny<SetNpqQualificationCommand>()))
+           .Setup(mock => mock.SetNpqQualificationAsync(It.IsAny<SetNpqQualificationCommand>()))
            .ReturnsAsync(result);
 
         // Act

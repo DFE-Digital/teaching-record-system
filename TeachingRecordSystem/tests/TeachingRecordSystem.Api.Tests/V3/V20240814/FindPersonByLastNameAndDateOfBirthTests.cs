@@ -20,8 +20,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -51,7 +51,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "findBy", expectedErrorMessage);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "findBy", expectedErrorMessage);
     }
 
     [Theory]
@@ -72,7 +72,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, expectedErrorPropertyName, expectedErrorMessage);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, expectedErrorPropertyName, expectedErrorMessage);
     }
 
     [Fact]
@@ -83,10 +83,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        var person1 = await TestData.CreatePerson(p => p
+        var person1 = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
@@ -95,7 +95,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
             .WithQts(qtsDate: new(2021, 7, 1))
             .WithEyts(eytsDate: new(2021, 8, 1), eytsStatusValue: "222"));
 
-        var person2 = await TestData.CreatePerson(p => p
+        var person2 = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
@@ -109,7 +109,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -186,18 +186,18 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = TestData.GenerateLastName();
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person1 = await TestData.CreatePerson(p => p
+        var person1 = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 
-        var person2 = await TestData.CreatePerson(p => p
+        var person2 = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 
         var updatedLastName = TestData.GenerateChangedLastName(lastName);
-        await TestData.UpdatePerson(p => p
+        await TestData.UpdatePersonAsync(p => p
             .WithPersonId(person2.PersonId)
             .WithUpdatedName(person2.FirstName, person2.MiddleName, updatedLastName));
 
@@ -209,7 +209,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var results = jsonResponse.RootElement.GetProperty("results").EnumerateArray();
         Assert.Collection(
             results,
@@ -241,10 +241,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => !Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
@@ -258,7 +258,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseSanctions = jsonResponse.RootElement.GetProperty("results").EnumerateArray().First().GetProperty("sanctions").EnumerateArray();
         Assert.Empty(responseSanctions);
     }

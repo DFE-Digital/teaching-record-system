@@ -35,7 +35,7 @@ public class ChangeHistoryModel(
 
     public bool GotNextPage { get; set; }
 
-    public async Task<IActionResult> OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
         PageNumber ??= 1;
 
@@ -46,7 +46,7 @@ public class ChangeHistoryModel(
 
         var personInfo = HttpContext.GetCurrentPersonFeature();
 
-        var notesResult = await crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(PersonId));
+        var notesResult = await crmQueryDispatcher.ExecuteQueryAsync(new GetNotesByContactIdQuery(PersonId));
 
         var eventTypes = new[]
         {
@@ -68,8 +68,8 @@ public class ChangeHistoryModel(
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();
 
-        var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypes(activeOnly: false)
-            .ToAsyncEnumerable()
+        var alertTypesWithReadPermission = await referenceDataCache.GetAlertTypesAsync(activeOnly: false)
+            .ToAsyncEnumerableAsync()
             .SelectAwait(async at => (
                 AlertType: at,
                 CanRead: (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Read)) is { Succeeded: true }))

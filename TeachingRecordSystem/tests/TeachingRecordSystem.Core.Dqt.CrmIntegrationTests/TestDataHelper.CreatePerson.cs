@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests;
 
 public partial class TestDataHelper
 {
-    public async Task<CreatePersonResult> CreatePerson(
+    public async Task<CreatePersonResult> CreatePersonAsync(
         bool earlyYears = false,
         bool assessmentOnly = false,
         bool iqts = false,
@@ -39,7 +39,7 @@ public partial class TestDataHelper
 
         var getIttProviderTask = _globalCache.GetOrCreateAsync(
             CacheKeys.GetIttProviderOrganizationByUkprnKey(ittProviderUkprn),
-            _ => _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>(), lookupRequestBuilder)
+            _ => _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>(), lookupRequestBuilder)
                 .ContinueWith(t => t.Result.SingleOrDefault()));
 
         var earlyYearsStatus = "220"; // 220 == 'Early Years Trainee'
@@ -47,7 +47,7 @@ public partial class TestDataHelper
         var getEarlyYearsStatusTask = earlyYears ?
             _globalCache.GetOrCreateAsync(
                 CacheKeys.GetEarlyYearsStatusKey(earlyYearsStatus),
-                _ => _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatus, lookupRequestBuilder)) :
+                _ => _dataverseAdapter.GetEarlyYearsStatusAsync(earlyYearsStatus, lookupRequestBuilder)) :
             Task.FromResult<dfeta_earlyyearsstatus>(null);
 
         var teacherStatus = programmeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute ?
@@ -57,35 +57,35 @@ public partial class TestDataHelper
         var getTeacherStatusTask = !earlyYears ?
             _globalCache.GetOrCreateAsync(
                 CacheKeys.GetTeacherStatusKey(teacherStatus),
-                _ => _dataverseAdapter.GetTeacherStatus(teacherStatus, lookupRequestBuilder)) :
+                _ => _dataverseAdapter.GetTeacherStatusAsync(teacherStatus, lookupRequestBuilder)) :
             Task.FromResult<dfeta_teacherstatus>(null);
 
         var country = "XK";
         var getCountryCodeTask = _globalCache.GetOrCreateAsync(
             CacheKeys.GetCountryKey(country),
-            _ => _dataverseAdapter.GetCountry(country, lookupRequestBuilder));
+            _ => _dataverseAdapter.GetCountryAsync(country, lookupRequestBuilder));
 
         var heSubjectCode = "100366";  // computer science
         var getHeSubjectTask = _globalCache.GetOrCreateAsync(
             CacheKeys.GetHeSubjectKey(heSubjectCode),
-            _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
+            _ => _dataverseAdapter.GetHeSubjectByCodeAsync(heSubjectCode, lookupRequestBuilder));
 
         var heSubject2Code = "B780";  // Paramedical Nursing
         var getHeSubject2Task = _globalCache.GetOrCreateAsync(
             CacheKeys.GetHeSubjectKey(heSubject2Code),
-            _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
+            _ => _dataverseAdapter.GetHeSubjectByCodeAsync(heSubjectCode, lookupRequestBuilder));
 
         var heSubject3Code = "101076";  // Laser Physics
         var getHeSubject3Task = _globalCache.GetOrCreateAsync(
             CacheKeys.GetHeSubjectKey(heSubject3Code),
-            _ => _dataverseAdapter.GetHeSubjectByCode(heSubjectCode, lookupRequestBuilder));
+            _ => _dataverseAdapter.GetHeSubjectByCodeAsync(heSubjectCode, lookupRequestBuilder));
 
         var qualificationCode = "400";  // First Degree
         var getQualificationTask = _globalCache.GetOrCreateAsync(
             CacheKeys.GetHeQualificationKey(qualificationCode),
-            _ => _dataverseAdapter.GetHeQualificationByCode(qualificationCode, lookupRequestBuilder));
+            _ => _dataverseAdapter.GetHeQualificationByCodeAsync(qualificationCode, lookupRequestBuilder));
 
-        await lookupRequestBuilder.Execute();
+        await lookupRequestBuilder.ExecuteAsync();
 
         var ittProvider = getIttProviderTask.Result;
         var earlyYearsStatusId = getEarlyYearsStatusTask?.Result?.Id;
@@ -186,7 +186,7 @@ public partial class TestDataHelper
             });
         }
 
-        await txnRequestBuilder.Execute();
+        await txnRequestBuilder.ExecuteAsync();
 
         var trn = getTrnTask.GetResponse().Entity.ToEntity<Contact>().dfeta_TRN;
         var ittId = createIttTask.GetResponse().id;

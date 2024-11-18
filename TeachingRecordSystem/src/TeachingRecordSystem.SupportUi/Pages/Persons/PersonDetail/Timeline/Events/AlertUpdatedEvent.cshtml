@@ -9,8 +9,8 @@
     TrsUriHelper.TryCreateWebsiteUri(alert.ExternalLink, out var externalLinkUri);
     var oldAlert = updatedEvent.OldAlert;
     TrsUriHelper.TryCreateWebsiteUri(oldAlert.ExternalLink, out var oldExternalLinkUri);
-    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
-    var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
+    var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
     var heading = "changed";
     var hasMultipleChanges = (updatedEvent.Changes & (updatedEvent.Changes - 1)) != 0;
     if (!hasMultipleChanges)

@@ -29,7 +29,7 @@ public class AlertDetailModel(
 
     public bool CanEdit { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         Alert = HttpContext.GetCurrentAlertFeature().Alert;
         var personId = HttpContext.GetCurrentPersonFeature().PersonId;
@@ -58,7 +58,7 @@ public class AlertDetailModel(
         ChangeReasonDetail = changeReasonInfo?.ChangeReasonDetail;
         EvidenceFileName = changeReasonInfo?.EvidenceFileName;
         UploadedEvidenceFileUrl = changeReasonInfo?.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(changeReasonInfo.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(changeReasonInfo.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
             null;
         ExternalLinkUri = TrsUriHelper.TryCreateWebsiteUri(Alert.ExternalLink, out var linkUri) ? linkUri : null;
 

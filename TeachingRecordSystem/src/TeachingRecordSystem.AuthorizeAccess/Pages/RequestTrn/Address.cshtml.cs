@@ -52,7 +52,7 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
         Country = JourneyInstance!.State.Country;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {

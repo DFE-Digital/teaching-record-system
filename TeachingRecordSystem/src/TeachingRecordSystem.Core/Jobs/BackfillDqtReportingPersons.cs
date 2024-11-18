@@ -58,7 +58,7 @@ public class BackfillDqtReportingPersons(IConfiguration configuration, TrsDbCont
             sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
         }
 
-        await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().Chunk(200).WithCancellation(cancellationToken))
+        await foreach (var chunk in dbContext.Persons.AsNoTracking().AsAsyncEnumerable().ChunkAsync(200).WithCancellation(cancellationToken))
         {
             foreach (var e in chunk)
             {

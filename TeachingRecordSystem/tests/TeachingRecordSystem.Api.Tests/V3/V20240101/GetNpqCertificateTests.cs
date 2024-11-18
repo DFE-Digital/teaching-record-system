@@ -34,7 +34,7 @@ public class GetNpqCertificateTests : TestBase
         var qualificationId = Guid.NewGuid();
 
         DataverseAdapterMock
-            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .Setup(d => d.GetQualificationByIdAsync(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
                 dfeta_Type = dfeta_qualification_dfeta_Type.HigherEducation,
@@ -59,7 +59,7 @@ public class GetNpqCertificateTests : TestBase
         var qualificationId = Guid.NewGuid();
 
         DataverseAdapterMock
-            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .Setup(d => d.GetQualificationByIdAsync(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
                 dfeta_Type = dfeta_qualification_dfeta_Type.NPQLT
@@ -83,7 +83,7 @@ public class GetNpqCertificateTests : TestBase
         var qualificationId = Guid.NewGuid();
 
         DataverseAdapterMock
-            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .Setup(d => d.GetQualificationByIdAsync(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
                 dfeta_Type = dfeta_qualification_dfeta_Type.NPQLT,
@@ -109,7 +109,7 @@ public class GetNpqCertificateTests : TestBase
         var qualificationId = Guid.NewGuid();
 
         DataverseAdapterMock
-            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .Setup(d => d.GetQualificationByIdAsync(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(new dfeta_qualification()
             {
                 dfeta_Type = dfeta_qualification_dfeta_Type.NPQLT,
@@ -161,7 +161,7 @@ public class GetNpqCertificateTests : TestBase
         qualification.Attributes.Add($"contact.{Contact.Fields.dfeta_TRN}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.dfeta_TRN, teacher.dfeta_TRN));
 
         DataverseAdapterMock
-            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .Setup(d => d.GetQualificationByIdAsync(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(qualification);
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);
@@ -207,14 +207,14 @@ public class GetNpqCertificateTests : TestBase
         qualification.Attributes.Add($"contact.{Contact.Fields.dfeta_TRN}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.dfeta_TRN, teacher.dfeta_TRN));
 
         DataverseAdapterMock
-            .Setup(d => d.GetQualificationById(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
+            .Setup(d => d.GetQualificationByIdAsync(qualificationId, It.IsAny<string[]>(), It.IsAny<string[]>()))
             .ReturnsAsync(qualification);
 
         using var pdfStream = typeof(GetNpqCertificateTests).Assembly.GetManifestResourceStream("TeachingRecordSystem.Api.Tests.Resources.TestCertificate.pdf") ??
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         CertificateGeneratorMock
-            .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+            .Setup(g => g.GenerateCertificateAsync(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);

@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.UiCommon.FormFlow.State;
 
 public class CommitStateChangesMiddleware(IUserInstanceStateProvider userInstanceStateProvider, RequestDelegate next)
 {
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {
@@ -14,7 +14,7 @@ public class CommitStateChangesMiddleware(IUserInstanceStateProvider userInstanc
         {
             if (userInstanceStateProvider is DbWithHttpContextTransactionUserInstanceStateProvider typedProvider)
             {
-                await typedProvider.CommitChanges();
+                await typedProvider.CommitChangesAsync();
             }
         }
     }

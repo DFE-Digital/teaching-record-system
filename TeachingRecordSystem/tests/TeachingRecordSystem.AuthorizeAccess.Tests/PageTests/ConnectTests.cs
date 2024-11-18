@@ -7,7 +7,7 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -23,10 +23,10 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -42,13 +42,13 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -65,12 +65,12 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -78,14 +78,14 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponse(response);
+        await AssertEx.HtmlResponseAsync(response);
     }
     [Fact]
     public async Task Post_NotAuthenticatedWithOneLogin_ReturnsBadRequest()
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -101,10 +101,10 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -120,13 +120,13 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -143,12 +143,12 @@ public class ConnectTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/connect?{journeyInstance.GetUniqueIdQueryParameter()}");
 

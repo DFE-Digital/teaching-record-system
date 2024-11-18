@@ -13,8 +13,8 @@ public class AcceptTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/accept");
 
@@ -31,8 +31,8 @@ public class AcceptTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/accept");
 
@@ -62,8 +62,8 @@ public class AcceptTests : TestBase
     public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}/accept");
 
@@ -80,8 +80,8 @@ public class AcceptTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/accept")
         {
@@ -99,8 +99,8 @@ public class AcceptTests : TestBase
     public async Task Post_ValidRequest_RedirectsWithFlashMessage()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/change-requests/{createIncidentResult.TicketNumber}/accept")
         {
@@ -112,8 +112,8 @@ public class AcceptTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "The request has been accepted");
     }
 }

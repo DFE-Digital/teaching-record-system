@@ -37,7 +37,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -56,7 +56,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(CreateTeacherType.TraineeTeacher);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -71,7 +71,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(CreateTeacherType.OverseasQualifiedTeacher);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -100,7 +100,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         };
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -114,11 +114,11 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: cmd => cmd.Qualification.HeQualificationValue = qualificationValue);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             result.TeacherId,
             columnNames: Array.Empty<string>(),
             heQualificationColumnNames: new[]
@@ -136,11 +136,11 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: cmd => cmd.Qualification.HeQualificationValue = null);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             result.TeacherId,
             columnNames: Array.Empty<string>(),
             heQualificationColumnNames: new[]
@@ -161,7 +161,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand();
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command, findExistingTeacher);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -224,7 +224,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command, findExistingTeacher);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command, findExistingTeacher);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -255,7 +255,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: command => command.InitialTeacherTraining.ProviderUkprn = "badukprn");
 
         // Act
-        var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, _) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.False(result.Succeeded);
@@ -269,7 +269,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: command => command.Qualification.Subject2 = "SOME BAD SUBJECT");
 
         // Act
-        var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, _) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.False(result.Succeeded);
@@ -283,7 +283,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: command => command.Qualification.Subject3 = "SOME BAD SUBJECT");
 
         // Act
-        var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, _) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.False(result.Succeeded);
@@ -428,7 +428,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         };
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -475,10 +475,10 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
             },
             SlugId = slugId
         };
-        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand1);
 
         // Act
-        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImpl(teachercommand2);
+        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand2);
 
         // Assert
         Assert.True(result1.Succeeded);
@@ -510,7 +510,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         };
 
         // Act
-        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand1);
 
         // Assert
         Assert.True(result1.Succeeded);
@@ -556,10 +556,10 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
             },
             SlugId = slugId
         };
-        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand1);
 
         // Act
-        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImpl(teachercommand2);
+        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand2);
 
         // Assert
         Assert.True(result1.Succeeded);
@@ -607,10 +607,10 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
             },
             HusId = husid
         };
-        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImpl(teachercommand1);
+        var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand1);
 
         // Act
-        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImpl(teachercommand2);
+        var (result2, transactionRequest2) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand2);
 
         // Assert
         Assert.True(result1.Succeeded);
@@ -709,7 +709,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
 
         // Act
-        var result = await helper.FindExistingTeacher();
+        var result = await helper.FindExistingTeacherAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -740,7 +740,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, transactionRequest) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         transactionRequest.AssertContainsCreateRequest<CrmTask>(t =>
@@ -771,8 +771,8 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         };
 
         // Act
-        var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
-        var getIttRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var (result, _) = await _dataverseAdapter.CreateTeacherImplAsync(command);
+        var getIttRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             result.TeacherId,
             columnNames: new[]
             {
@@ -795,7 +795,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: cmd => cmd.InitialTeacherTraining.IttQualificationValue = "xxx");
 
         // Act
-        var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, _) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.False(result.Succeeded);
@@ -809,7 +809,7 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var command = CreateCommand(configureCommand: cmd => cmd.Qualification.HeQualificationValue = "xxx");
 
         // Act
-        var (result, _) = await _dataverseAdapter.CreateTeacherImpl(command);
+        var (result, _) = await _dataverseAdapter.CreateTeacherImplAsync(command);
 
         // Assert
         Assert.False(result.Succeeded);

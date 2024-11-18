@@ -18,9 +18,9 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<string> Handle(CreateDateOfBirthChangeRequestCommand command)
+    public async Task<string> HandleAsync(CreateDateOfBirthChangeRequestCommand command)
     {
-        var contact = await crmQueryDispatcher.ExecuteQuery(
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
 
         if (contact is null)
@@ -44,7 +44,7 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        var (_, ticketNumber) = await crmQueryDispatcher.ExecuteQuery(new CreateDateOfBirthChangeIncidentQuery()
+        var (_, ticketNumber) = await crmQueryDispatcher.ExecuteQueryAsync(new CreateDateOfBirthChangeIncidentQuery()
         {
             ContactId = contact.Id,
             DateOfBirth = command.DateOfBirth,

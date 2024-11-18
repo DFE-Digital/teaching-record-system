@@ -2,9 +2,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Detail
 
 public class CheckAnswersTests : DetailsTestBase
 {
-    private const string PreviousStep = JourneySteps.Reason;
-    private const string ThisStep = JourneySteps.CheckAnswers;
-
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
@@ -18,7 +15,7 @@ public class CheckAnswersTests : DetailsTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -34,7 +31,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -50,7 +47,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -66,7 +63,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.Index, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -85,7 +82,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -93,7 +90,7 @@ public class CheckAnswersTests : DetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueForKey("New details"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Current details"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
@@ -109,7 +106,7 @@ public class CheckAnswersTests : DetailsTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -125,7 +122,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -141,7 +138,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -157,7 +154,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.Index, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -176,7 +173,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         EventPublisher.Clear();
 
@@ -188,8 +185,8 @@ public class CheckAnswersTests : DetailsTestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
 
         EventPublisher.AssertEventsSaved(e =>
@@ -244,7 +241,7 @@ public class CheckAnswersTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 

@@ -28,7 +28,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         StartDate = JourneyInstance!.State.StartDate;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (StartDate is null)
         {
@@ -49,7 +49,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         return Redirect(linkGenerator.MqEditStartDateReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));

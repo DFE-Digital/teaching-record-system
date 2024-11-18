@@ -32,7 +32,7 @@ public class GetInductionCertificateTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
                 Id = Guid.NewGuid(),
@@ -59,7 +59,7 @@ public class GetInductionCertificateTests : TestBase
         var inductionStatus = dfeta_InductionStatus.NotYetCompleted;
 
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
                 Id = teacherId,
@@ -67,7 +67,7 @@ public class GetInductionCertificateTests : TestBase
             });
 
         DataverseAdapterMock
-            .Setup(d => d.GetInductionByTeacher(
+            .Setup(d => d.GetInductionByTeacherAsync(
                 teacherId,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -103,7 +103,7 @@ public class GetInductionCertificateTests : TestBase
         var inductionStatus = dfeta_InductionStatus.Pass;
 
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact()
             {
                 Id = teacherId,
@@ -111,7 +111,7 @@ public class GetInductionCertificateTests : TestBase
             });
 
         DataverseAdapterMock
-            .Setup(d => d.GetInductionByTeacher(
+            .Setup(d => d.GetInductionByTeacherAsync(
                 teacherId,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -157,7 +157,7 @@ public class GetInductionCertificateTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(trn, It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(teacher);
 
         var induction = new dfeta_induction()
@@ -175,7 +175,7 @@ public class GetInductionCertificateTests : TestBase
         induction.Attributes.Add($"contact.{Contact.Fields.LastName}", new AliasedValue(Contact.EntityLogicalName, Contact.Fields.FirstName, teacher.LastName));
 
         DataverseAdapterMock
-            .Setup(d => d.GetInductionByTeacher(
+            .Setup(d => d.GetInductionByTeacherAsync(
                 teacherId,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -187,7 +187,7 @@ public class GetInductionCertificateTests : TestBase
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         CertificateGeneratorMock
-            .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+            .Setup(g => g.GenerateCertificateAsync(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);

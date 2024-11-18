@@ -25,14 +25,14 @@ public class EditNameState : IRegisterJourney
     [MemberNotNullWhen(true, nameof(FirstName), nameof(LastName))]
     public bool IsComplete => !string.IsNullOrWhiteSpace(FirstName) && !string.IsNullOrWhiteSpace(LastName);
 
-    public async Task EnsureInitialized(ICrmQueryDispatcher crmQueryDispatcher, Guid personId)
+    public async Task EnsureInitializedAsync(ICrmQueryDispatcher crmQueryDispatcher, Guid personId)
     {
         if (Initialized)
         {
             return;
         }
 
-        var person = await crmQueryDispatcher.ExecuteQuery(
+        var person = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactDetailByIdQuery(
                 personId,
                 new ColumnSet(

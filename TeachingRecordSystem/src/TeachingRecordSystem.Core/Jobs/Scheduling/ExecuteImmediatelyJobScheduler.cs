@@ -12,7 +12,7 @@ public class ExecuteImmediatelyJobScheduler : IBackgroundJobScheduler
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<string> Enqueue<T>(Expression<Func<T, Task>> expression) where T : notnull
+    public async Task<string> EnqueueAsync<T>(Expression<Func<T, Task>> expression) where T : notnull
     {
         using var scope = _serviceProvider.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<T>();
@@ -21,8 +21,8 @@ public class ExecuteImmediatelyJobScheduler : IBackgroundJobScheduler
         return Guid.NewGuid().ToString();
     }
 
-    public Task<string> ContinueJobWith<T>(string parentId, Expression<Func<T, Task>> expression) where T : notnull
+    public Task<string> ContinueJobWithAsync<T>(string parentId, Expression<Func<T, Task>> expression) where T : notnull
     {
-        return Enqueue(expression);
+        return EnqueueAsync(expression);
     }
 }

@@ -59,7 +59,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.NationalInsuranceNumber, doc.GetElementById("NationalInsuranceNumber")?.GetAttribute("value"));
     }
 
@@ -124,7 +124,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HasNationalInsuranceNumber", "Select yes if you have a National Insurance number");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasNationalInsuranceNumber", "Select yes if you have a National Insurance number");
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "NationalInsuranceNumber", "Enter your National Insurance number");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter your National Insurance number");
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "NationalInsuranceNumber", "Enter a National Insurance number in the correct format");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number in the correct format");
     }
 
     [Theory]

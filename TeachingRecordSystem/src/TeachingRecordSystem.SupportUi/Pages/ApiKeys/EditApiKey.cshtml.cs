@@ -28,7 +28,7 @@ public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenera
     {
     }
 
-    public async Task<IActionResult> OnPostExpire()
+    public async Task<IActionResult> OnPostExpireAsync()
     {
         if (Expires.HasValue)
         {

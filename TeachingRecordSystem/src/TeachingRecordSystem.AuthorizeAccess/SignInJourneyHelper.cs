@@ -45,7 +45,7 @@ public class SignInJourneyHelper(
     public IResult VerifyIdentityWithOneLogin(JourneyInstance<SignInJourneyState> journeyInstance) =>
         OneLoginChallenge(journeyInstance, AuthenticationAndIdentityVerificationVtr);
 
-    public async Task<IResult> OnOneLoginCallback(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public async Task<IResult> OnOneLoginCallbackAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
         if (!ticket.Properties.TryGetVectorOfTrust(out var vtr))
         {
@@ -54,13 +54,13 @@ public class SignInJourneyHelper(
 
         if (vtr == AuthenticationOnlyVtr)
         {
-            await OnUserAuthenticated(journeyInstance, ticket);
+            await OnUserAuthenticatedAsync(journeyInstance, ticket);
         }
         else
         {
             Debug.Assert(vtr == AuthenticationAndIdentityVerificationVtr);
             Debug.Assert(journeyInstance.State.OneLoginAuthenticationTicket is not null);
-            await OnUserVerified(journeyInstance, ticket);
+            await OnUserVerifiedAsync(journeyInstance, ticket);
         }
 
         if (ShowDebugPages)
@@ -71,7 +71,7 @@ public class SignInJourneyHelper(
         return GetNextPage(journeyInstance);
     }
 
-    public async Task OnUserAuthenticated(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public async Task OnUserAuthenticatedAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
         var sub = ticket.Principal.FindFirstValue("sub") ?? throw new InvalidOperationException("No sub claim.");
         var email = ticket.Principal.FindFirstValue("email") ?? throw new InvalidOperationException("No email claim.");
@@ -110,7 +110,7 @@ public class SignInJourneyHelper(
         string? trn = oneLoginUser.Person?.Trn;
 
         if (oneLoginUser.PersonId is null &&
-            await TryMatchToTrnRequest(oneLoginUser) is { } matchResult)
+            await TryMatchToTrnRequestAsync(oneLoginUser) is { } matchResult)
         {
             trn = matchResult.Trn;
             oneLoginUser.FirstSignIn ??= clock.UtcNow;
@@ -138,13 +138,13 @@ public class SignInJourneyHelper(
         });
     }
 
-    public Task OnUserVerified(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
+    public Task OnUserVerifiedAsync(JourneyInstance<SignInJourneyState> journeyInstance, AuthenticationTicket ticket)
     {
         var verifiedNames = ticket.Principal.GetCoreIdentityNames().Select(n => n.NameParts.Select(part => part.Value).ToArray()).ToArray();
         var verifiedDatesOfBirth = ticket.Principal.GetCoreIdentityBirthDates().Select(d => d.Value).ToArray();
         var coreIdentityClaimVc = ticket.Principal.FindFirstValue("vc") ?? throw new InvalidOperationException("No vc claim present.");
 
-        return OnUserVerifiedCore(
+        return OnUserVerifiedCoreAsync(
             journeyInstance,
             verifiedNames,
             verifiedDatesOfBirth,
@@ -152,7 +152,7 @@ public class SignInJourneyHelper(
             state => state.OneLoginAuthenticationTicket = ticket);
     }
 
-    public async Task OnUserVerifiedCore(
+    public async Task OnUserVerifiedCoreAsync(
         JourneyInstance<SignInJourneyState> journeyInstance,
         string[][] verifiedNames,
         DateOnly[] verifiedDatesOfBirth,
@@ -168,7 +168,7 @@ public class SignInJourneyHelper(
         string? trn = null;
         string? trnTokenTrn = null;
 
-        if (await TryMatchToIdentityUser() is TryMatchToIdentityUserResult result)
+        if (await TryMatchToIdentityUserAsync() is TryMatchToIdentityUserResult result)
         {
             if (result.MatchRoute == OneLoginUserMatchRoute.TrnToken)
             {
@@ -201,7 +201,7 @@ public class SignInJourneyHelper(
             }
         });
 
-        async Task<TryMatchToIdentityUserResult?> TryMatchToIdentityUser()
+        async Task<TryMatchToIdentityUserResult?> TryMatchToIdentityUserAsync()
         {
             Person? getAnIdentityPerson = null;
             OneLoginUserMatchRoute? matchRoute = null;
@@ -267,7 +267,7 @@ public class SignInJourneyHelper(
         }
     }
 
-    public async Task<IResult> OnVerificationFailed(JourneyInstance<SignInJourneyState> journeyInstance)
+    public async Task<IResult> OnVerificationFailedAsync(JourneyInstance<SignInJourneyState> journeyInstance)
     {
         await journeyInstance.UpdateStateAsync(state =>
         {
@@ -299,7 +299,7 @@ public class SignInJourneyHelper(
     public string GetSafeRedirectUri(JourneyInstance<SignInJourneyState> journeyInstance) =>
         EnsureUrlHasJourneyId(journeyInstance.State.RedirectUri, journeyInstance.InstanceId);
 
-    public async Task<bool> TryMatchToTeachingRecord(JourneyInstance<SignInJourneyState> journeyInstance)
+    public async Task<bool> TryMatchToTeachingRecordAsync(JourneyInstance<SignInJourneyState> journeyInstance)
     {
         var state = journeyInstance.State;
 
@@ -313,7 +313,7 @@ public class SignInJourneyHelper(
         var nationalInsuranceNumber = state.NationalInsuranceNumber;
         var trn = state.Trn;
 
-        var matchResult = await personMatchingService.Match(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
+        var matchResult = await personMatchingService.MatchAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
@@ -340,7 +340,7 @@ public class SignInJourneyHelper(
         return false;
     }
 
-    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequest(OneLoginUser oneLoginUser)
+    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequestAsync(OneLoginUser oneLoginUser)
     {
         Debug.Assert(oneLoginUser.Email is not null);
 
@@ -358,7 +358,7 @@ public class SignInJourneyHelper(
             return null;
         }
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
         if (trnRequest is null)
         {
             Debug.Fail("TRN request does not exist.");

@@ -17,7 +17,7 @@ public class QTSRegistrationDeleteTests : IAsyncLifetime
 
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
-    public Task InitializeAsync() => DbFixture.DbHelper.EnsureSchema();
+    public Task InitializeAsync() => DbFixture.DbHelper.EnsureSchemaAsync();
 
     [Fact]
     public async Task WhenCreatingTeacherWithQtlsDate_QtsDateIsSet()
@@ -26,11 +26,11 @@ public class QTSRegistrationDeleteTests : IAsyncLifetime
         var qtlsDate = new DateOnly(2021, 01, 1);
 
         // Act
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQtlsDate(new DateOnly(2021, 01, 1));
         });
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QTSDate)));
 
         // Assert
@@ -44,11 +44,11 @@ public class QTSRegistrationDeleteTests : IAsyncLifetime
         var qtsDate = new DateOnly(2019, 01, 1);
 
         // Act
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(qtsDate);
         });
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QTSDate)));
 
         // Assert
@@ -63,12 +63,12 @@ public class QTSRegistrationDeleteTests : IAsyncLifetime
         var qtlsDate = new DateOnly(2022, 01, 1);
 
         // Act
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(qtsDate);
             x.WithQtlsDate(qtlsDate);
         });
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QTSDate)));
 
         // Assert
@@ -83,12 +83,12 @@ public class QTSRegistrationDeleteTests : IAsyncLifetime
         var qtlsDate = new DateOnly(2012, 01, 1);
 
         // Act
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(qtsDate);
             x.WithQtlsDate(qtlsDate);
         });
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QTSDate)));
 
         // Assert

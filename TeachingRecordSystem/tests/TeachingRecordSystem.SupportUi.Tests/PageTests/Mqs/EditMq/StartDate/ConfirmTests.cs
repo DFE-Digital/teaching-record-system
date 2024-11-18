@@ -9,9 +9,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState()
             {
@@ -38,10 +38,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var changeReason = MqChangeStartDateReasonOption.IncorrectStartDate;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState()
             {
@@ -62,7 +62,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
         Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), changeSummary.GetElementByTestId("current-start-date")!.TextContent);
@@ -84,9 +84,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState()
             {
@@ -113,7 +113,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
@@ -122,7 +122,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         EventPublisher.Clear();
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState()
             {
@@ -144,8 +144,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification changed");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -212,9 +212,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldStartDate = new DateOnly(2021, 10, 5);
         var newStartDate = new DateOnly(2021, 10, 6);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStartDateState()
             {
@@ -247,7 +247,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    private async Task<JourneyInstance<EditMqStartDateState>> CreateJourneyInstance(Guid qualificationId, EditMqStartDateState? state = null) =>
+    private async Task<JourneyInstance<EditMqStartDateState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStartDateState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqStartDate,
             state ?? new EditMqStartDateState(),

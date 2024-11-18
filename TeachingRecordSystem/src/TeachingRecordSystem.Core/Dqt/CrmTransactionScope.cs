@@ -6,7 +6,7 @@ public sealed class CrmTransactionScope(RequestBuilder requestBuilder, IServiceS
 {
     public void Dispose() => scope.Dispose();
 
-    public Task Execute() => requestBuilder.Execute();
+    public Task ExecuteAsync() => requestBuilder.ExecuteAsync();
 
     public Func<TResult> AppendQuery<TResult>(ICrmTransactionalQuery<TResult> query)
     {

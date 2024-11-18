@@ -19,7 +19,7 @@ public class CreateDateOfBirthChangeTests(HostFixture hostFixture) : TestBase(ho
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var newDateOfBirth = newDateOfBirthString is not null ? DateOnly.ParseExact(newDateOfBirthString, "yyyy-MM-dd") : (DateOnly?)null;
 
@@ -44,7 +44,7 @@ public class CreateDateOfBirthChangeTests(HostFixture hostFixture) : TestBase(ho
     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
         var newDateOfBirth = TestData.GenerateDateOfBirth();
 
         var evidenceFileName = "evidence.txt";
@@ -83,14 +83,14 @@ public class CreateDateOfBirthChangeTests(HostFixture hostFixture) : TestBase(ho
         var response = await GetHttpClientWithIdentityAccessToken(trn).SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10001, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";
@@ -110,14 +110,14 @@ public class CreateDateOfBirthChangeTests(HostFixture hostFixture) : TestBase(ho
         var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_ValidRequest_CreatesIncidentAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";
@@ -160,7 +160,7 @@ public class CreateDateOfBirthChangeTests(HostFixture hostFixture) : TestBase(ho
         var crmResults = TestData.OrganizationService.RetrieveMultiple(crmQuery);
         var incident = Assert.Single(crmResults.Entities).ToEntity<Incident>();
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

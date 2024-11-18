@@ -24,7 +24,7 @@ public class GetActiveContactByTrnTests : IAsyncLifetime
         var trn = "DodgyTrn";
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(trn, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactByTrnQuery(trn, new ColumnSet()));
 
         // Assert
         Assert.Null(result);
@@ -34,10 +34,10 @@ public class GetActiveContactByTrnTests : IAsyncLifetime
     public async Task WhenCalled_WithTrnForExistingContact_ReturnsContactDetail()
     {
         // Arrange        
-        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn());
+        var person = await _dataScope.TestData.CreatePersonAsync(p => p.WithTrn());
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(person.Trn!, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactByTrnQuery(person.Trn!, new ColumnSet()));
 
         // Assert
         Assert.NotNull(result);

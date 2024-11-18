@@ -33,7 +33,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         EndDate = JourneyInstance!.State.EndDate;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (Status == MandatoryQualificationStatus.Passed)
         {
@@ -62,7 +62,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         return Redirect(linkGenerator.MqEditStatusReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));

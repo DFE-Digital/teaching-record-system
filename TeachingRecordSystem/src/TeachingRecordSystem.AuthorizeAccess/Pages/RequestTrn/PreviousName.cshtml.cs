@@ -32,7 +32,7 @@ public class PreviousNameModel(AuthorizeAccessLinkGenerator linkGenerator) : Pag
         PreviousName = JourneyInstance!.State.PreviousName;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {

@@ -7,7 +7,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -23,10 +23,10 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -42,13 +42,13 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -67,12 +67,12 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var existingNationalInsuranceNumber = haveExistingValueInState ? Faker.Identification.UkNationalInsuranceNumber() : null;
         if (existingNationalInsuranceNumber is not null)
@@ -86,7 +86,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(existingNationalInsuranceNumber ?? "", doc.GetElementById("NationalInsuranceNumber")?.GetAttribute("value"));
     }
 
@@ -95,7 +95,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
@@ -119,10 +119,10 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
@@ -146,13 +146,13 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = person.NationalInsuranceNumber!;
 
@@ -177,12 +177,12 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -195,7 +195,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HaveNationalInsuranceNumber", "Select yes if you have a National Insurance number");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HaveNationalInsuranceNumber", "Select yes if you have a National Insurance number");
     }
 
     [Fact]
@@ -203,12 +203,12 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = "";
 
@@ -225,7 +225,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "NationalInsuranceNumber", "Enter a National Insurance number");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number");
     }
 
     [Fact]
@@ -233,12 +233,12 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = "xxx";
 
@@ -255,7 +255,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "NationalInsuranceNumber", "Enter a National Insurance number in the correct format");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "NationalInsuranceNumber", "Enter a National Insurance number in the correct format");
     }
 
     [Fact]
@@ -263,12 +263,12 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/national-insurance-number?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -285,7 +285,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        journeyInstance = await ReloadJourneyInstanceAsync(journeyInstance);
         state = journeyInstance.State;
         Assert.False(state.HaveNationalInsuranceNumber);
         Assert.Null(state.AuthenticationTicket);
@@ -296,12 +296,12 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
@@ -321,7 +321,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/trn?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        journeyInstance = await ReloadJourneyInstanceAsync(journeyInstance);
         state = journeyInstance.State;
         Assert.True(state.HaveNationalInsuranceNumber);
         Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
@@ -333,15 +333,15 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber());
-        var oneLoginUser = await TestData.CreateOneLoginUser(
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(
             personId: null,
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallback(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = person.NationalInsuranceNumber!;
 
@@ -361,13 +361,13 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/found?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
 
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        journeyInstance = await ReloadJourneyInstanceAsync(journeyInstance);
         state = journeyInstance.State;
         Assert.True(state.HaveNationalInsuranceNumber);
         Assert.Equal(nationalInsuranceNumber, state.NationalInsuranceNumber);
         Assert.NotNull(state.AuthenticationTicket);
 
-        oneLoginUser = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
+        oneLoginUser = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUser.Subject));
         Assert.Equal(Clock.UtcNow, oneLoginUser.FirstSignIn);
         Assert.Equal(Clock.UtcNow, oneLoginUser.LastSignIn);
         Assert.Equal(person.PersonId, oneLoginUser.PersonId);

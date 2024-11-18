@@ -28,7 +28,7 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDis
         Email = JourneyInstance!.State.Email;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -37,7 +37,7 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDis
 
         await JourneyInstance!.UpdateStateAsync(state => state.Email = Email);
 
-        var openTasks = await crmQueryDispatcher.ExecuteQuery(
+        var openTasks = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetOpenTasksForEmailAddressQuery(EmailAddress: JourneyInstance!.State.Email!));
 
         if (openTasks.Any())

@@ -25,7 +25,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         var lastName = Faker.Name.Last();
         var dob = new DateTime(1987, 01, 01);
 
-        var person = await _dataScope.TestData.CreatePerson(p => p
+        var person = await _dataScope.TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstNameSynonym)
             .WithLastName(lastName)
@@ -44,7 +44,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         };
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(query);
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         var queryResult = Assert.Single(result, r => r.ContactId == person.PersonId);
@@ -63,7 +63,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         // Arrange
         var email = $"{Guid.NewGuid()}@test.com";
 
-        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn().WithEmail(email));
+        var person = await _dataScope.TestData.CreatePersonAsync(p => p.WithTrn().WithEmail(email));
 
         var query = new FindPotentialDuplicateContactsQuery()
         {
@@ -77,7 +77,7 @@ public class FindPotentialDuplicateContactsTests : IAsyncLifetime
         };
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(query);
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         var queryResult = Assert.Single(result, r => r.ContactId == person.PersonId);

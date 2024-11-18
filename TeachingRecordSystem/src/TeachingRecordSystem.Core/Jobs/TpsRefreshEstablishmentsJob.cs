@@ -10,14 +10,14 @@ public class TpsRefreshEstablishmentsJob(
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var tpsEstablishmentFileName = await tpsExtractStorageService.GetPendingEstablishmentImportFileName(cancellationToken);
+        var tpsEstablishmentFileName = await tpsExtractStorageService.GetPendingEstablishmentImportFileNameAsync(cancellationToken);
         if (tpsEstablishmentFileName == null)
         {
             return;
         }
 
-        var importJobId = await backgroundJobScheduler.Enqueue<TpsEstablishmentRefresher>(j => j.ImportFile(tpsEstablishmentFileName, cancellationToken));
-        var archiveJobId = await backgroundJobScheduler.ContinueJobWith<ITpsExtractStorageService>(importJobId, j => j.ArchiveFile(tpsEstablishmentFileName, cancellationToken));
-        var refreshJobId = await backgroundJobScheduler.ContinueJobWith<TpsEstablishmentRefresher>(archiveJobId, j => j.RefreshEstablishments(cancellationToken));
+        var importJobId = await backgroundJobScheduler.EnqueueAsync<TpsEstablishmentRefresher>(j => j.ImportFileAsync(tpsEstablishmentFileName, cancellationToken));
+        var archiveJobId = await backgroundJobScheduler.ContinueJobWithAsync<ITpsExtractStorageService>(importJobId, j => j.ArchiveFileAsync(tpsEstablishmentFileName, cancellationToken));
+        var refreshJobId = await backgroundJobScheduler.ContinueJobWithAsync<TpsEstablishmentRefresher>(archiveJobId, j => j.RefreshEstablishmentsAsync(cancellationToken));
     }
 }

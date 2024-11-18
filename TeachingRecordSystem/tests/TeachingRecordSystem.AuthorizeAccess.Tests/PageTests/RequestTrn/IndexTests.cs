@@ -15,6 +15,6 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponse(response);
+        await AssertEx.HtmlResponseAsync(response);
     }
 }

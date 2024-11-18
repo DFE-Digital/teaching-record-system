@@ -42,11 +42,11 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
 
     public TrsDataSyncHelper Helper { get; }
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContext(dbContext => dbContext.Events.ExecuteDeleteAsync());
+    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
-    private async Task<T> CreateDeactivatedEntityVersion<T>(
+    private async Task<T> CreateDeactivatedEntityVersionAsync<T>(
         T existingEntity,
         string entityLogicalName,
         AuditDetailCollection auditDetailCollection)
@@ -57,7 +57,7 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
             throw new ArgumentException("Entity must be active.", nameof(existingEntity));
         }
 
-        var currentDqtUser = await TestData.GetCurrentCrmUser();
+        var currentDqtUser = await TestData.GetCurrentCrmUserAsync();
 
         var updatedEntity = existingEntity.Clone();
         updatedEntity.Attributes["statecode"] = new OptionSetValue(1);
@@ -90,7 +90,7 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
         return updatedEntity.ToEntity<T>();
     }
 
-    private async Task<T> CreateReactivatedEntityVersion<T>(
+    private async Task<T> CreateReactivatedEntityVersionAsync<T>(
         T existingEntity,
         string entityLogicalName,
         AuditDetailCollection auditDetailCollection)
@@ -101,7 +101,7 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
             throw new ArgumentException("Entity must be inactive.", nameof(existingEntity));
         }
 
-        var currentDqtUser = await TestData.GetCurrentCrmUser();
+        var currentDqtUser = await TestData.GetCurrentCrmUserAsync();
 
         var updatedEntity = existingEntity.Clone();
         updatedEntity.Attributes["statecode"] = new OptionSetValue(0);

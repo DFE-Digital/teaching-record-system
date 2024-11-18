@@ -21,7 +21,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
         Description = "Gets the details for the authenticated teacher.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
         [FromServices] GetPersonHandler handler)
     {
@@ -38,7 +38,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
             DateOfBirth: null,
             ApplyLegacyAlertsBehavior: true);
 
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {

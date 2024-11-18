@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveContactDetailByIdHandler : ICrmQueryHandler<GetActiveContactDetailByIdQuery, ContactDetail?>
 {
-    public async Task<ContactDetail?> Execute(GetActiveContactDetailByIdQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<ContactDetail?> ExecuteAsync(GetActiveContactDetailByIdQuery query, IOrganizationServiceAsync organizationService)
     {
         var contactFilter = new FilterExpression();
         contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, query.ContactId);
@@ -47,7 +47,7 @@ public class GetActiveContactDetailByIdHandler : ICrmQueryHandler<GetActiveConta
         var contactResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(contactRequest);
         var previousNameResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(previousNameRequest);
 
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         var contact = (await contactResponse.GetResponseAsync()).EntityCollection.Entities.FirstOrDefault()?.ToEntity<Contact>();
         var previousNames = (await previousNameResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<dfeta_previousname>()).ToArray();

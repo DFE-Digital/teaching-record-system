@@ -22,7 +22,7 @@ public class QualificationsModel(TrsDbContext dbContext) : PageModel
 
     public MandatoryQualification[]? MandatoryQualifications { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         MandatoryQualifications = await dbContext.MandatoryQualifications
             .Include(q => q.Provider)

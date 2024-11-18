@@ -11,7 +11,7 @@ public class AadUserService : IAadUserService
         _graphServiceClient = graphServiceClient;
     }
 
-    public async Task<User?> GetUserById(string userId)
+    public async Task<User?> GetUserByIdAsync(string userId)
     {
         var user = await _graphServiceClient.Users[userId].GetAsync();
 
@@ -28,7 +28,7 @@ public class AadUserService : IAadUserService
         };
     }
 
-    public async Task<User?> GetUserByEmail(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
         var result = await _graphServiceClient.Users.GetAsync(req =>
         {

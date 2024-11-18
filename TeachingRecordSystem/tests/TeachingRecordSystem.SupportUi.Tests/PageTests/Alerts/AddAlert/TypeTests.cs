@@ -19,8 +19,8 @@ public class TypeTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -36,7 +36,7 @@ public class TypeTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(personId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -51,8 +51,8 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -69,8 +69,8 @@ public class TypeTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -78,7 +78,7 @@ public class TypeTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
         Assert.Contains(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
@@ -89,8 +89,8 @@ public class TypeTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -98,7 +98,7 @@ public class TypeTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
         Assert.DoesNotContain(AlertType.DbsAlertTypeId, alertTypeOptions);
     }
@@ -109,8 +109,8 @@ public class TypeTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -118,9 +118,9 @@ public class TypeTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
-        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).Where(t => !t.IsDbsAlertType);
+        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).Where(t => !t.IsDbsAlertType);
         Assert.True(alertTypeOptions.SequenceEqualIgnoringOrder(nonDbsAlertTypes.Select(t => t.AlertTypeId)));
     }
 
@@ -130,8 +130,8 @@ public class TypeTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -139,9 +139,9 @@ public class TypeTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
-        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).Where(t => !t.IsDbsAlertType);
+        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).Where(t => !t.IsDbsAlertType);
         Assert.True(nonDbsAlertTypes.All(t => !alertTypeOptions.Contains(t.AlertTypeId)));
     }
 
@@ -149,8 +149,8 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -158,7 +158,7 @@ public class TypeTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var radioButtons = doc.GetElementsByName("AlertTypeId");
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal(journeyInstance.State.AlertTypeId.ToString(), selectedRadioButton.GetAttribute("value"));
@@ -171,8 +171,8 @@ public class TypeTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -188,7 +188,7 @@ public class TypeTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(personId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -203,8 +203,8 @@ public class TypeTests : AddAlertTestBase
     public async Task Post_WhenAlertTypeHasNotBeenSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -212,16 +212,16 @@ public class TypeTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "AlertTypeId", "Select an alert type");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AlertTypeId", "Select an alert type");
     }
 
     [Fact]
     public async Task Post_ValidInput_UpdatesStateAndRedirectsToDetailsPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
-        var alertType = await GetKnownAlertType();
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var alertType = await GetKnownAlertTypeAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -243,8 +243,8 @@ public class TypeTests : AddAlertTestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/type/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

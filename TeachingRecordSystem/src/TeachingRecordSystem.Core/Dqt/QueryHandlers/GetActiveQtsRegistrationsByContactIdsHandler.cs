@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveQtsRegistrationsByContactIdsHandler : ICrmQueryHandler<GetActiveQtsRegistrationsByContactIdsQuery, IDictionary<Guid, dfeta_qtsregistration[]>>
 {
-    public async Task<IDictionary<Guid, dfeta_qtsregistration[]>> Execute(GetActiveQtsRegistrationsByContactIdsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<IDictionary<Guid, dfeta_qtsregistration[]>> ExecuteAsync(GetActiveQtsRegistrationsByContactIdsQuery query, IOrganizationServiceAsync organizationService)
     {
         var contactIdsArray = query.ContactIds.ToArray();
 

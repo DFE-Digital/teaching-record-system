@@ -23,7 +23,7 @@ public class GetIttProvidersTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var result = await _dataverseAdapter.GetIttProviders(false);
+        var result = await _dataverseAdapter.GetIttProvidersAsync(false);
 
         // Assert
         Assert.NotEmpty(result);

@@ -10,11 +10,11 @@ public class BackfillDqtReportingWorkforceData(IOptions<DqtReportingOptions> dqt
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await SyncEmployments();
-        await SyncTpsEstablishments();
-        await SyncTpsEmployments();
+        await SyncEmploymentsAsync();
+        await SyncTpsEstablishmentsAsync();
+        await SyncTpsEmploymentsAsync();
 
-        async Task SyncEmployments()
+        async Task SyncEmploymentsAsync()
         {
             dbContext.Database.SetCommandTimeout(0);
 
@@ -54,7 +54,7 @@ public class BackfillDqtReportingWorkforceData(IOptions<DqtReportingOptions> dqt
                 sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
             }
 
-            await foreach (var chunk in dbContext.Establishments.AsNoTracking().AsAsyncEnumerable().Chunk(200))
+            await foreach (var chunk in dbContext.Establishments.AsNoTracking().AsAsyncEnumerable().ChunkAsync(200))
             {
                 foreach (var e in chunk)
                 {
@@ -90,7 +90,7 @@ public class BackfillDqtReportingWorkforceData(IOptions<DqtReportingOptions> dqt
             await txn.CommitAsync();
         }
 
-        async Task SyncTpsEstablishments()
+        async Task SyncTpsEstablishmentsAsync()
         {
             dbContext.Database.SetCommandTimeout(0);
 
@@ -117,7 +117,7 @@ public class BackfillDqtReportingWorkforceData(IOptions<DqtReportingOptions> dqt
                 sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
             }
 
-            await foreach (var chunk in dbContext.TpsEstablishments.AsNoTracking().AsAsyncEnumerable().Chunk(200))
+            await foreach (var chunk in dbContext.TpsEstablishments.AsNoTracking().AsAsyncEnumerable().ChunkAsync(200))
             {
                 foreach (var e in chunk)
                 {
@@ -140,7 +140,7 @@ public class BackfillDqtReportingWorkforceData(IOptions<DqtReportingOptions> dqt
             await txn.CommitAsync();
         }
 
-        async Task SyncTpsEmployments()
+        async Task SyncTpsEmploymentsAsync()
         {
             dbContext.Database.SetCommandTimeout(0);
 
@@ -175,7 +175,7 @@ public class BackfillDqtReportingWorkforceData(IOptions<DqtReportingOptions> dqt
                 sqlBulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(column.ColumnName, column.ColumnName));
             }
 
-            await foreach (var chunk in dbContext.TpsEmployments.AsNoTracking().AsAsyncEnumerable().Chunk(200))
+            await foreach (var chunk in dbContext.TpsEmployments.AsNoTracking().AsAsyncEnumerable().ChunkAsync(200))
             {
                 foreach (var e in chunk)
                 {

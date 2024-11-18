@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Detail
 
 public abstract class DetailsTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<EditAlertDetailsState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<EditAlertDetailsState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new EditAlertDetailsState()
+    protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState()
         {
             Initialized = true,
             CurrentDetails = alert.Details,
@@ -23,24 +23,24 @@ public abstract class DetailsTestBase(HostFixture hostFixture) : TestBase(hostFi
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert) =>
+    protected Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
-                CreateEmptyJourneyInstance(alert.AlertId),
+                CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index =>
-                CreateJourneyInstance(alert.AlertId, new EditAlertDetailsState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertDetailsState()
                 {
                     Initialized = true,
                     CurrentDetails = alert.Details,
                     Details = "New details"
                 }),
             JourneySteps.Reason or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstance(Guid alertId, EditAlertDetailsState state) =>
+    private Task<JourneyInstance<EditAlertDetailsState>> CreateJourneyInstanceAsync(Guid alertId, EditAlertDetailsState state) =>
         CreateJourneyInstance(
             JourneyNames.EditAlertDetails,
             state,

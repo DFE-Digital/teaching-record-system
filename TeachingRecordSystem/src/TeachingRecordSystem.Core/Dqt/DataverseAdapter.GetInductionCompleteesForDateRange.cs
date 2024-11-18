@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public partial class DataverseAdapter
 {
-    public async IAsyncEnumerable<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate)
+    public async IAsyncEnumerable<InductionCompletee[]> GetInductionCompleteesForDateRangeAsync(DateTime startDate, DateTime endDate)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.GreaterEqual, startDate);

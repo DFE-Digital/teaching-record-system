@@ -27,7 +27,7 @@ public class TeachersController : ControllerBase
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
+    public async Task<IActionResult> GetTeacherAsync([FromRoute] GetTeacherRequest request)
     {
         var response = await _mediator.Send(request);
         return response != null ? Ok(response) : NotFound();

@@ -2,11 +2,11 @@ namespace TeachingRecordSystem.Core.Services.Files;
 
 public interface IFileService
 {
-    Task<Guid> UploadFile(Stream stream, string? contentType);
+    Task<Guid> UploadFileAsync(Stream stream, string? contentType);
 
-    Task<string> GetFileUrl(Guid fileId, TimeSpan expiresAfter);
+    Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter);
 
-    Task<Stream> OpenReadStream(Guid fileId);
+    Task<Stream> OpenReadStreamAsync(Guid fileId);
 
-    Task DeleteFile(Guid fileId);
+    Task DeleteFileAsync(Guid fileId);
 }

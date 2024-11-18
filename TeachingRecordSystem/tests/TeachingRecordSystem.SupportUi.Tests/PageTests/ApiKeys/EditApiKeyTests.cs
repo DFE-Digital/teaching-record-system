@@ -8,8 +8,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/{apiKey.Key}");
 
@@ -39,8 +39,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/{apiKey.ApiKeyId}");
 
@@ -48,7 +48,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(apiKey.Key, doc.GetElementById("Key")?.GetAttribute("value"));
     }
 
@@ -56,8 +56,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_KeyIsExpired_HasDisabledExpireButton()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId, expired: true);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: true);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/{apiKey.ApiKeyId}");
 
@@ -65,7 +65,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
@@ -73,8 +73,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_KeyIsNotExpired_HasNonDisabledExpireButton()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId, expired: false);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/{apiKey.ApiKeyId}");
 
@@ -82,7 +82,7 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("ExpireButton")?.GetAttribute("disabled"));
     }
 
@@ -92,8 +92,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId, expired: false);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: false);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/{apiKey.ApiKeyId}/Expire");
 
@@ -124,8 +124,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task PostExpire_KeyIsAlreadyExpired_ReturnsBadRequest()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId, expired: true);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: true);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/{apiKey.ApiKeyId}/Expire");
 
@@ -140,8 +140,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task PostExpire_ValidRequest_SetsExpiresOnApiKeyCreatesEventAndRedirectsToApplicationUserWithFlashMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId, expired: false);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: false);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/{apiKey.ApiKeyId}/Expire");
 
@@ -171,8 +171,8 @@ public class EditApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(Clock.UtcNow, apiKeyUpdatedEvent.ApiKey.Expires);
             });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "API key expired");
     }
 }

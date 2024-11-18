@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
 public partial class TrsDataSyncHelperTests
 {
     [Fact]
-    public async Task SyncEvent_NewRecord_WritesNewRowToDb()
+    public async Task SyncEventsAsync_NewRecord_WritesNewRowToDb()
     {
         // Arrange
         var @event = new DqtAnnotationDeletedEvent()
@@ -27,10 +27,10 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncEvents([trsEventEntity], dryRun: false);
+        await Helper.SyncEventsAsync([trsEventEntity], dryRun: false);
 
         // Assert
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var dbEvent = await dbContext.Events.SingleOrDefaultAsync(p => p.EventId == @event.EventId);
             Assert.NotNull(dbEvent);

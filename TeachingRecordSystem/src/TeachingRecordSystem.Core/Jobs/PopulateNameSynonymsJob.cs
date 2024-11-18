@@ -6,9 +6,9 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class PopulateNameSynonymsJob(TrsDbContext dbContext, INameSynonymProvider nameSynonymProvider)
 {
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var namesLookup = await nameSynonymProvider.GetAllNameSynonyms();
+        var namesLookup = await nameSynonymProvider.GetAllNameSynonymsAsync();
 
         foreach (var (name, synonyms) in namesLookup)
         {

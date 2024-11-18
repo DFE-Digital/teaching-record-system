@@ -23,7 +23,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     public async Task Get_WithPersonIdForPersonWithNoMandatoryQualifications_DisplaysNoMandatoryQualifications()
     {
         // Arrange        
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
 
@@ -31,7 +31,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.NotNull(noMandatoryQualifications);
     }
@@ -52,7 +52,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
 
-        var person = await TestData.CreatePerson(x => x
+        var person = await TestData.CreatePersonAsync(x => x
             .WithMandatoryQualification(q => q
                 .WithProvider(provider?.MandatoryQualificationProviderId)
                 .WithSpecialism(specialism)
@@ -66,7 +66,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.Null(noMandatoryQualifications);
 

@@ -18,7 +18,7 @@ public class IndexTests : CloseAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -34,7 +34,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -50,7 +50,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -66,7 +66,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -82,7 +82,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -90,7 +90,7 @@ public class IndexTests : CloseAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{journeyInstance.State.EndDate:%d}", doc.GetElementById("EndDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.EndDate:%M}", doc.GetElementById("EndDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.EndDate:yyyy}", doc.GetElementById("EndDate.Year")?.GetAttribute("value"));
@@ -104,7 +104,7 @@ public class IndexTests : CloseAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.New, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.New, alert);
         var endDate = alert.StartDate!.Value.AddDays(5);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -124,7 +124,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -140,7 +140,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -156,7 +156,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -164,7 +164,7 @@ public class IndexTests : CloseAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EndDate", "Enter an end date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var futureDate = Clock.Today.AddDays(2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -184,7 +184,7 @@ public class IndexTests : CloseAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EndDate", "End date cannot be in the future");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date cannot be in the future");
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newEndDate = alert.StartDate!.Value.AddDays(-2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -204,7 +204,7 @@ public class IndexTests : CloseAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EndDate", "End date must be after the start date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after the start date");
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newEndDate = alert.StartDate!.Value.AddDays(2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -236,7 +236,7 @@ public class IndexTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

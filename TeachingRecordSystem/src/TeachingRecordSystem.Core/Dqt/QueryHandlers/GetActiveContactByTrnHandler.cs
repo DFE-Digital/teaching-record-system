@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveContactByTrnHandler : ICrmQueryHandler<GetActiveContactByTrnQuery, Contact?>
 {
-    public async Task<Contact?> Execute(GetActiveContactByTrnQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact?> ExecuteAsync(GetActiveContactByTrnQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryByAttribute = new QueryByAttribute()
         {

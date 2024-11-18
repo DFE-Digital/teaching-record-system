@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class SetDeceasedHandler : ICrmQueryHandler<SetDeceasedQuery, bool>
 {
-    public async Task<bool> Execute(SetDeceasedQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<bool> ExecuteAsync(SetDeceasedQuery query, IOrganizationServiceAsync organizationService)
     {
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
         requestBuilder.AddRequest(new UpdateRequest()
@@ -17,7 +17,7 @@ public class SetDeceasedHandler : ICrmQueryHandler<SetDeceasedQuery, bool>
                 dfeta_DateofDeath = query.DateOfDeath.ToDateTimeWithDqtBstFix(isLocalTime: false)
             }
         });
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         return true;
     }

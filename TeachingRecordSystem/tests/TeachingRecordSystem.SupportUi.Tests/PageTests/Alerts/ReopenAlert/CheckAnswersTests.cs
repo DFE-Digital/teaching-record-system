@@ -3,7 +3,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.ReopenAlert;
 public class CheckAnswersTests : ReopenAlertTestBase
 {
     private const string PreviousStep = JourneySteps.Index;
-    private const string ThisStep = JourneySteps.CheckAnswers;
 
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -18,7 +17,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -34,7 +33,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -50,7 +49,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -66,7 +65,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -85,7 +84,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert(populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -93,7 +92,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(alert.AlertType.Name, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
         Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
@@ -111,7 +110,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -127,7 +126,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -143,7 +142,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -159,7 +158,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -176,7 +175,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         EventPublisher.Clear();
 
@@ -188,8 +187,8 @@ public class CheckAnswersTests : ReopenAlertTestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert re-opened");
 
         await WithDbContext(async dbContext =>
@@ -248,7 +247,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 

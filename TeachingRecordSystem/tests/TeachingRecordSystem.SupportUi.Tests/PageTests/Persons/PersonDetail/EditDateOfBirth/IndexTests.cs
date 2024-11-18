@@ -28,7 +28,7 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestForNewJourney_PopulatesModelFromDqt()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-date-of-birth");
 
         // Act
@@ -36,8 +36,8 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var doc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var doc = await redirectResponse.GetDocumentAsync();
         Assert.Equal($"{person.DateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")!.GetAttribute("value"));
         Assert.Equal($"{person.DateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")!.GetAttribute("value"));
         Assert.Equal($"{person.DateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")!.GetAttribute("value"));
@@ -47,9 +47,9 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDateOfBirthState()
             {
@@ -63,7 +63,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{newDateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")!.GetAttribute("value"));
         Assert.Equal($"{newDateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")!.GetAttribute("value"));
         Assert.Equal($"{newDateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")!.GetAttribute("value"));
@@ -79,8 +79,8 @@ public class IndexTests : TestBase
         string expectedErrorMessage)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -96,16 +96,16 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, expectedErrorElementId, expectedErrorMessage);
+        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorElementId, expectedErrorMessage);
     }
 
     [Fact]
     public async Task Post_WithValidData_RedirectsToConfirmPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
-        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-date-of-birth?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -192,7 +192,7 @@ public class IndexTests : TestBase
         },
     };
 
-    private async Task<JourneyInstance<EditDateOfBirthState>> CreateJourneyInstance(Guid personId, EditDateOfBirthState? state = null) =>
+    private async Task<JourneyInstance<EditDateOfBirthState>> CreateJourneyInstanceAsync(Guid personId, EditDateOfBirthState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditDateOfBirth,
             state ?? new EditDateOfBirthState(),

@@ -21,7 +21,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_NoChanges_DisplaysNoChangesMessage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -29,7 +29,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var noChanges = doc.GetElementByTestId("no-changes");
         Assert.NotNull(noChanges);
     }
@@ -38,8 +38,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithNote_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateNote(b => b.WithPersonId(person.ContactId).WithSubject("Note 1 Subject").WithDescription("Note 1 Description"));
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateNoteAsync(b => b.WithPersonId(person.ContactId).WithSubject("Note 1 Subject").WithDescription("Note 1 Description"));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -47,7 +47,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
@@ -66,8 +66,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithTask_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithSubject("Task 1 Subject").WithDescription("Task 1 Description").WithOpenStatus());
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(b => b.WithPersonId(person.ContactId).WithSubject("Task 1 Subject").WithDescription("Task 1 Description").WithOpenStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -75,7 +75,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
@@ -93,8 +93,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithTaskWithPastDueDate_RendersOverdueStatus()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithDueDate(Clock.UtcNow.AddDays(-2)));
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(b => b.WithPersonId(person.ContactId).WithDueDate(Clock.UtcNow.AddDays(-2)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -102,7 +102,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
@@ -113,8 +113,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithTaskWithCompletedStatus_RendersClosedStatus()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -122,7 +122,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
@@ -141,8 +141,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         string expectedSummaryText)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateNameChangeIncident(b => b.WithCustomerId(person.ContactId).WithStatus(status));
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(person.ContactId).WithStatus(status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -150,7 +150,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
@@ -172,8 +172,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         string expectedSummaryText)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(person.ContactId).WithStatus(status));
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(person.ContactId).WithStatus(status));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -181,7 +181,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
@@ -199,8 +199,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_OutOfBoundsPageNumber_RedirectsToPage1()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
 
@@ -216,8 +216,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SinglePage_DoesNotShowPagination()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(b => b.WithPersonId(person.ContactId).WithCompletedStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -225,7 +225,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetElementsByClassName("govuk-pagination"));
     }
 
@@ -233,8 +233,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsNotLastPage_ShowsNextPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await CreateTasks(person.PersonId, 11);
+        var person = await TestData.CreatePersonAsync();
+        await CreateTasksAsync(person.PersonId, 11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=1");
 
@@ -242,7 +242,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotEmpty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "next"));
     }
 
@@ -250,8 +250,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsLastPage_DoesNotShowNextPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await CreateTasks(person.PersonId, 11);
+        var person = await TestData.CreatePersonAsync();
+        await CreateTasksAsync(person.PersonId, 11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
 
@@ -259,7 +259,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "next"));
     }
 
@@ -267,8 +267,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsNotFirstPage_ShowsPreviousPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await CreateTasks(person.PersonId, 11);
+        var person = await TestData.CreatePersonAsync();
+        await CreateTasksAsync(person.PersonId, 11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=2");
 
@@ -276,7 +276,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotEmpty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "prev"));
     }
 
@@ -284,8 +284,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PageIsFirstPage_DoesNotShowPreviousPageLink()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        await CreateTasks(person.PersonId, 11);
+        var person = await TestData.CreatePersonAsync();
+        await CreateTasksAsync(person.PersonId, 11);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history?pageNumber=1");
 
@@ -293,15 +293,15 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetElementsByClassName("govuk-pagination__link").Where(e => e.GetAttribute("rel") == "prev"));
     }
 
-    private async Task CreateTasks(Guid personId, int count)
+    private async Task CreateTasksAsync(Guid personId, int count)
     {
         for (int i = 0; i < count; i++)
         {
-            await TestData.CreateCrmTask(b => b.WithPersonId(personId).WithCompletedStatus());
+            await TestData.CreateCrmTaskAsync(b => b.WithPersonId(personId).WithCompletedStatus());
         }
     }
 }

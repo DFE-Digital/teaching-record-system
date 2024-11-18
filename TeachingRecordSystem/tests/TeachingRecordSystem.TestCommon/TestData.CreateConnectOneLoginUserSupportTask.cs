@@ -6,13 +6,13 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<SupportTask> CreateConnectOneLoginUserSupportTask(
+    public Task<SupportTask> CreateConnectOneLoginUserSupportTaskAsync(
         string oneLoginUserSubject,
         Guid clientApplicationUserId = default,
         string? statedNationalInsuranceNumber = null,
         string? statedTrn = null,
         string? trnTokenTrn = null) =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             var user = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == oneLoginUserSubject);
             Debug.Assert(user.Email is not null);

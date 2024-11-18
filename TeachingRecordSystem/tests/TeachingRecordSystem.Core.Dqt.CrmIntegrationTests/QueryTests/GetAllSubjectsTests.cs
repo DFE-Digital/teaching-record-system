@@ -16,7 +16,7 @@ public class GetAllSubjectsTests
         var query = new GetAllSubjectsQuery();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(query);
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         Assert.NotEmpty(result);

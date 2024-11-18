@@ -30,7 +30,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         ProviderId = JourneyInstance!.State.ProviderId;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -42,7 +42,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         return Redirect(linkGenerator.MqEditProviderReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));

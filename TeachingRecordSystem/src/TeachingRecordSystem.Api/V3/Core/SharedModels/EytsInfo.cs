@@ -9,7 +9,7 @@ public record EytsInfo
     public required string CertificateUrl { get; init; }
     public required string StatusDescription { get; init; }
 
-    public static async Task<EytsInfo?> Create(dfeta_qtsregistration? qtsRegistration, ReferenceDataCache referenceDataCache)
+    public static async Task<EytsInfo?> CreateAsync(dfeta_qtsregistration? qtsRegistration, ReferenceDataCache referenceDataCache)
     {
         if (qtsRegistration is null)
         {
@@ -22,7 +22,7 @@ public record EytsInfo
             return null;
         }
 
-        var earlyYearsStatus = await referenceDataCache.GetEarlyYearsStatusById(qtsRegistration.dfeta_EarlyYearsStatusId.Id);
+        var earlyYearsStatus = await referenceDataCache.GetEarlyYearsStatusByIdAsync(qtsRegistration.dfeta_EarlyYearsStatusId.Id);
         var statusDescription = GetStatusDescription(earlyYearsStatus);
 
         return new()

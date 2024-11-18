@@ -19,8 +19,8 @@ public class DeleteAnnotationTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var createIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(c => c.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var createIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncidentAsync(c => c.WithCustomerId(createPersonResult.ContactId));
 
         var annotationId = createIncidentResult.AnnotationId;
         var @event = new DqtAnnotationDeletedEvent()
@@ -32,7 +32,7 @@ public class DeleteAnnotationTests : IAsyncLifetime
         };
 
         // Act
-        await _crmQueryDispatcher.ExecuteQuery(new DeleteAnnotationQuery(annotationId, EventInfo.Create(@event)));
+        await _crmQueryDispatcher.ExecuteQueryAsync(new DeleteAnnotationQuery(annotationId, EventInfo.Create(@event)));
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

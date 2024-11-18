@@ -25,7 +25,7 @@ public class CreateTrnRequestTests : TestBase
         var email1 = Faker.Internet.Email();
         var email2 = Faker.Internet.Email();
 
-        await TestData.CreatePerson(p => p
+        await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -61,7 +61,7 @@ public class CreateTrnRequestTests : TestBase
         Assert.Null(contact.dfeta_TRN);
         Assert.Equal(email1, contact.EMailAddress1);
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

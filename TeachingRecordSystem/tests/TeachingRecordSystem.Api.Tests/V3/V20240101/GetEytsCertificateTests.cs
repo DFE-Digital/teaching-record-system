@@ -34,7 +34,7 @@ public class GetEytsCertificateTests : TestBase
         var lastName = Faker.Name.Last();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
                 Id = Guid.NewGuid(),
@@ -66,7 +66,7 @@ public class GetEytsCertificateTests : TestBase
         var eytsDate = new DateOnly(1997, 4, 23);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
                 Id = Guid.NewGuid(),
@@ -81,7 +81,7 @@ public class GetEytsCertificateTests : TestBase
             throw new Exception("Failed to find TestCertificate.pdf.");
 
         CertificateGeneratorMock
-            .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+            .Setup(g => g.GenerateCertificateAsync(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .ReturnsAsync(pdfStream);
 
         var httpClient = GetHttpClientWithIdentityAccessToken(trn);

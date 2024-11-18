@@ -17,16 +17,16 @@ public class UnlockTeacherTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
 
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePersonAsync();
         var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
             .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .Setup(mock => mock.GetTeacherAsync(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .Setup(mock => mock.UnlockTeacherRecordAsync(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
@@ -46,7 +46,7 @@ public class UnlockTeacherTests : TestBase
         var teacherId = Guid.NewGuid();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync((Contact)null);
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{teacherId}");
@@ -62,21 +62,21 @@ public class UnlockTeacherTests : TestBase
     public async Task Given_a_teacher_that_does_exist_and_is_locked_returns_ok()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithLoginFailedCounter(3));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithLoginFailedCounter(3));
         var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
             .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .Setup(mock => mock.GetTeacherAsync(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .Setup(mock => mock.UnlockTeacherRecordAsync(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .Setup(mock => mock.UnlockTeacherRecordAsync(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
@@ -86,7 +86,7 @@ public class UnlockTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -102,21 +102,21 @@ public class UnlockTeacherTests : TestBase
     public async Task Given_a_teacher_that_does_exist_but_is_not_locked_returns_ok(int? loginFailedCounter)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithLoginFailedCounter(loginFailedCounter));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithLoginFailedCounter(loginFailedCounter));
         var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
             .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .Setup(mock => mock.GetTeacherAsync(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .Setup(mock => mock.UnlockTeacherRecordAsync(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
         DataverseAdapterMock
-            .Setup(mock => mock.UnlockTeacherRecord(contact.Id))
+            .Setup(mock => mock.UnlockTeacherRecordAsync(contact.Id))
             .ReturnsAsync(true)
             .Verifiable();
 
@@ -126,7 +126,7 @@ public class UnlockTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -138,12 +138,12 @@ public class UnlockTeacherTests : TestBase
     public async Task Given_a_teacher_that_has_activesanctions_returns_error()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b => b.WithAlert(a => a.WithEndDate(null)));
+        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithEndDate(null)));
         var contact = (await TestData.OrganizationService.RetrieveAsync(Contact.EntityLogicalName, createPersonResult.ContactId, new ColumnSet(allColumns: true)))
             .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
+            .Setup(mock => mock.GetTeacherAsync(contact.Id, /* resolveMerges: */ It.IsAny<string[]>(), /* columnNames: */ It.IsAny<bool>()))
             .ReturnsAsync(contact);
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"v2/unlock-teacher/{contact.Id}");
@@ -152,6 +152,6 @@ public class UnlockTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10014, expectedStatusCode: StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10014, expectedStatusCode: StatusCodes.Status400BadRequest);
     }
 }

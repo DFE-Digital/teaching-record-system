@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<Account> CreateAccount(Action<CreateAccountBuilder>? configure)
+    public Task<Account> CreateAccountAsync(Action<CreateAccountBuilder>? configure)
     {
         var builder = new CreateAccountBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class CreateAccountBuilder
@@ -27,7 +27,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task<Account> Execute(TestData testData)
+        public async Task<Account> ExecuteAsync(TestData testData)
         {
             var name = _name ?? Faker.Company.Name();
             var accountId = Guid.NewGuid();

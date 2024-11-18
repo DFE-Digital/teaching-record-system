@@ -28,7 +28,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_AlertIsOpen_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithEndDate(null)));
 
         var alert = person.Alerts.Single();
@@ -46,7 +46,7 @@ public class AlertDetailsTests : TestBase
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10))));
 
         var alert = person.Alerts.Single();
@@ -57,7 +57,7 @@ public class AlertDetailsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var h1 = doc.GetElementsByTagName("h1").Single();
         Assert.Equal(alert.AlertType.Name, h1.TextContent);
@@ -73,7 +73,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -93,7 +93,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -113,7 +113,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -133,7 +133,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -144,7 +144,7 @@ public class AlertDetailsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
     }
 
@@ -154,7 +154,7 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(AlertType.DbsAlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -165,7 +165,7 @@ public class AlertDetailsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
     }
 
@@ -175,8 +175,8 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
-        var person = await TestData.CreatePerson(b => b
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -187,7 +187,7 @@ public class AlertDetailsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetSummaryListActionsForKey("End date"));
     }
 
@@ -197,8 +197,8 @@ public class AlertDetailsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
-        var person = await TestData.CreatePerson(b => b
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10)).WithAlertTypeId(alertType.AlertTypeId)));
 
         var alert = person.Alerts.Single();
@@ -209,7 +209,7 @@ public class AlertDetailsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotEmpty(doc.GetSummaryListActionsForKey("End date"));
     }
 }

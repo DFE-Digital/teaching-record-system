@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetOpenTasksForEmailAddressHandler : ICrmQueryHandler<GetOpenTasksForEmailAddressQuery, CrmTask[]>
 {
-    public async Task<CrmTask[]> Execute(GetOpenTasksForEmailAddressQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<CrmTask[]> ExecuteAsync(GetOpenTasksForEmailAddressQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

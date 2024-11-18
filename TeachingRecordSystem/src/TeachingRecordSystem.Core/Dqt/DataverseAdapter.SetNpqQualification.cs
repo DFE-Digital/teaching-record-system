@@ -5,17 +5,17 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public partial class DataverseAdapter
 {
-    public async Task<SetNpqQualificationResult> SetNpqQualification(SetNpqQualificationCommand command)
+    public async Task<SetNpqQualificationResult> SetNpqQualificationAsync(SetNpqQualificationCommand command)
     {
-        var (r, _) = await SetNpqQualificationImpl(command);
+        var (r, _) = await SetNpqQualificationImplAsync(command);
         return r;
     }
 
-    internal async Task<(SetNpqQualificationResult, ExecuteTransactionRequest TransactionRequest)> SetNpqQualificationImpl(SetNpqQualificationCommand command)
+    internal async Task<(SetNpqQualificationResult, ExecuteTransactionRequest TransactionRequest)> SetNpqQualificationImplAsync(SetNpqQualificationCommand command)
     {
         var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == command.TeacherId && a.IsOpen).AnyAsync();
 
-        var qualifications = await GetQualificationsForTeacher(
+        var qualifications = await GetQualificationsForTeacherAsync(
             command.TeacherId,
             new[]
             {

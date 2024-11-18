@@ -6,8 +6,8 @@
 @{
     var createdEvent = Model.ItemModel.Event;
     var alert = createdEvent.Alert;
-    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
-    var evidenceFileUrl = createdEvent.EvidenceFile is not null ? await FileService.GetFileUrl(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
+    var evidenceFileUrl = createdEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-created-event">

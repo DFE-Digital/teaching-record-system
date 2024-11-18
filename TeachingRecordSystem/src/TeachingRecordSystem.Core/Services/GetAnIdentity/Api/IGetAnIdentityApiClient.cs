@@ -4,9 +4,9 @@ namespace TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 public interface IGetAnIdentityApiClient
 {
-    Task<User?> GetUserById(Guid userId);
+    Task<User?> GetUserByIdAsync(Guid userId);
 
-    Task<CreateTrnTokenResponse> CreateTrnToken(CreateTrnTokenRequest request);
+    Task<CreateTrnTokenResponse> CreateTrnTokenAsync(CreateTrnTokenRequest request);
 
-    Task SetTeacherTrn(Guid userId, string trn);
+    Task SetTeacherTrnAsync(Guid userId, string trn);
 }

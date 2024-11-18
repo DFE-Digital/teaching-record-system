@@ -16,7 +16,7 @@ public class GetAllTeacherStatusesTests
         var query = new GetAllTeacherStatusesQuery();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(query);
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         Assert.NotEmpty(result);

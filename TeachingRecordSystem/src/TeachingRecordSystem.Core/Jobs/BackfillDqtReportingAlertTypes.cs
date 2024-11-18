@@ -13,10 +13,10 @@ public class BackfillDqtReportingAlertTypes(IOptions<DqtReportingOptions> dqtRep
         using var conn = new SqlConnection(dqtReportingOptionsAccessor.Value.ReportingDbConnectionString);
         conn.Open();
 
-        await BackFillAlertCategories();
-        await BackFillAlertTypes();
+        await BackFillAlertCategoriesAsync();
+        await BackFillAlertTypesAsync();
 
-        async Task BackFillAlertCategories()
+        async Task BackFillAlertCategoriesAsync()
         {
             var dataTable = new DataTable();
             dataTable.Columns.Add("alert_category_id", typeof(Guid));
@@ -51,7 +51,7 @@ public class BackfillDqtReportingAlertTypes(IOptions<DqtReportingOptions> dqtRep
             }
         }
 
-        async Task BackFillAlertTypes()
+        async Task BackFillAlertTypesAsync()
         {
             var dataTable = new DataTable();
             dataTable.Columns.Add("alert_type_id", typeof(Guid));

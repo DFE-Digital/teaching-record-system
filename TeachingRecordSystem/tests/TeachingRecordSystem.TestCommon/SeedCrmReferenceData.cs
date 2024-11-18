@@ -12,7 +12,7 @@ public class SeedCrmReferenceData : IStartupTask
         _xrmFakedContext = xrmFakedContext;
     }
 
-    public Task Execute()
+    public Task ExecuteAsync()
     {
         AddSubjects();
         AddSanctionCodes();

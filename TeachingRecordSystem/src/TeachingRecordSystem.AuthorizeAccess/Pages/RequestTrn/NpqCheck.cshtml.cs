@@ -21,7 +21,7 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
         IsPlanningToTakeAnNpq = JourneyInstance!.State.IsPlanningToTakeAnNpq;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {

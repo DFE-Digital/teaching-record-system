@@ -21,10 +21,10 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
     public async Task WhenCalled_ForContactWithoutQualifications_ReturnsEmptyArray()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
 
         // Act
-        var qualifications = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(person.ContactId, new ColumnSet()));
+        var qualifications = await _crmQueryDispatcher.ExecuteQueryAsync(new GetQualificationsByContactIdQuery(person.ContactId, new ColumnSet()));
 
         // Assert
         Assert.Empty(qualifications);
@@ -42,7 +42,7 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
         var inActiveHeQualificationId = Guid.NewGuid();
         var activeHeQualificationWithNoSubjectsId = Guid.NewGuid();
 
-        var person = await _dataScope.TestData.CreatePerson(
+        var person = await _dataScope.TestData.CreatePersonAsync(
             x => x.WithQualification(activeNpqQualificationId, activeNpqQualificationType, isActive: true)
                 .WithQualification(inActiveNpqQualificationId, inActiveNpqQualificationType, isActive: false)
                 .WithQualification(activeHeQualificationId, dfeta_qualification_dfeta_Type.HigherEducation, isActive: true, heSubject1Value: "100035")
@@ -50,7 +50,7 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
                 .WithQualification(activeHeQualificationWithNoSubjectsId, dfeta_qualification_dfeta_Type.HigherEducation, isActive: true));
 
         // Act
-        var qualifications = await _crmQueryDispatcher.ExecuteQuery(new GetQualificationsByContactIdQuery(person.ContactId, new ColumnSet()));
+        var qualifications = await _crmQueryDispatcher.ExecuteQueryAsync(new GetQualificationsByContactIdQuery(person.ContactId, new ColumnSet()));
 
         // Assert
         Assert.Equal(2, qualifications.Length);
@@ -67,7 +67,7 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
         var activeHeQualificationId = Guid.NewGuid();
         var activeHeQualificationWithNoSubjectsId = Guid.NewGuid();
 
-        var person = await _dataScope.TestData.CreatePerson(
+        var person = await _dataScope.TestData.CreatePersonAsync(
             x => x.WithQualification(
                 activeHeQualificationId,
                 dfeta_qualification_dfeta_Type.HigherEducation,
@@ -78,7 +78,7 @@ public class GetQualificationsByContactIdTests : IAsyncLifetime
                 heSubject3Value: "100037"));
 
         // Act
-        var qualifications = await _crmQueryDispatcher.ExecuteQuery(
+        var qualifications = await _crmQueryDispatcher.ExecuteQueryAsync(
             new GetQualificationsByContactIdQuery(person.ContactId, new ColumnSet(), IncludeHigherEducationDetails: includeHeEducationDetails));
 
         // Assert

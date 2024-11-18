@@ -9,9 +9,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -38,10 +38,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -62,7 +62,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
         Assert.Equal(oldProvider.Name, changeSummary.GetElementByTestId("current-provider")!.TextContent);
@@ -84,9 +84,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -112,13 +112,13 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
 
         EventPublisher.Clear();
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -140,8 +140,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification changed");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -208,9 +208,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -243,7 +243,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstance(Guid qualificationId, EditMqProviderState? state = null) =>
+    private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqProviderState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqProvider,
             state ?? new EditMqProviderState(),

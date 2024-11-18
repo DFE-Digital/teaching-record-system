@@ -43,7 +43,7 @@ public class CheckPersonExistsFilter(
         {
             // If person isn't in the TRS DB it may be because we haven't synced it yet..
 
-            var dqtContact = await crmQueryDispatcher.ExecuteQuery(
+            var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(
                 new GetActiveContactDetailByIdQuery(
                     personId,
                     new ColumnSet(
@@ -60,7 +60,7 @@ public class CheckPersonExistsFilter(
             {
                 context.HttpContext.SetCurrentPersonFeature(dqtContact);
 
-                await backgroundJobScheduler.Enqueue<TrsDataSyncHelper>(helper => helper.SyncPerson(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None));
+                await backgroundJobScheduler.EnqueueAsync<TrsDataSyncHelper>(helper => helper.SyncPersonAsync(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None));
             }
             else
             {

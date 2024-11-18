@@ -11,7 +11,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -27,9 +27,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange        
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(databaseProvider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
@@ -49,9 +49,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange        
         var databaseProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var journeyProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(databaseProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -65,7 +65,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var selectedProvider = doc.GetElementById("ProviderId") as IHtmlSelectElement;
         Assert.NotNull(selectedProvider);
         Assert.Equal(journeyProvider.MandatoryQualificationProviderId.ToString(), selectedProvider.Value);
@@ -77,7 +77,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var qualificationId = Guid.NewGuid();
         var mqEstablishmentValue = "959"; // University of Leeds
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -98,9 +98,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoProviderIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/provider?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -111,7 +111,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "ProviderId", "Select a training provider");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ProviderId", "Select a training provider");
     }
 
     [Fact]
@@ -120,9 +120,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
         var newProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithProvider(oldProvider.MandatoryQualificationProviderId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -151,9 +151,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqProviderState()
             {
@@ -175,7 +175,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstance(Guid qualificationId, EditMqProviderState? state = null) =>
+    private async Task<JourneyInstance<EditMqProviderState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqProviderState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqProvider,
             state ?? new EditMqProviderState(),

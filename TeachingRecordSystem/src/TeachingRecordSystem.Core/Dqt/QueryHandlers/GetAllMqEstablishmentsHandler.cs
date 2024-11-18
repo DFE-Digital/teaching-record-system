@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllMqEstablishmentsHandler : ICrmQueryHandler<GetAllMqEstablishmentsQuery, dfeta_mqestablishment[]>
 {
-    public async Task<dfeta_mqestablishment[]> Execute(GetAllMqEstablishmentsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_mqestablishment[]> ExecuteAsync(GetAllMqEstablishmentsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
 

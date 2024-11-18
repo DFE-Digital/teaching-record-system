@@ -30,7 +30,7 @@ public class SendInductionCompletedEmailJob
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
     }
 
-    public async Task Execute(Guid inductionCompletedEmailsJobId, Guid personId)
+    public async Task ExecuteAsync(Guid inductionCompletedEmailsJobId, Guid personId)
     {
         var item = await _dbContext.InductionCompletedEmailsJobItems.SingleAsync(i => i.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && i.PersonId == personId);
 
@@ -42,11 +42,11 @@ public class SendInductionCompletedEmailJob
                 Email = item.EmailAddress
             };
 
-            var tokenResponse = await _identityApiClient.CreateTrnToken(request);
+            var tokenResponse = await _identityApiClient.CreateTrnTokenAsync(request);
             item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
-        await _notificationSender.SendEmail(InductionCompletedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
+        await _notificationSender.SendEmailAsync(InductionCompletedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
         _dbContext.AddEvent(new InductionCompletedEmailSentEvent

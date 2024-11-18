@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetResolvedIncidentAnnotationsHandler : IEnumerableCrmQueryHandler<GetResolvedIncidentAnnotationsQuery, Annotation[]>
 {
-    public async IAsyncEnumerable<Annotation[]> Execute(
+    public async IAsyncEnumerable<Annotation[]> ExecuteAsync(
         GetResolvedIncidentAnnotationsQuery query,
         IOrganizationServiceAsync organizationService,
         [EnumeratorCancellation] CancellationToken cancellationToken)

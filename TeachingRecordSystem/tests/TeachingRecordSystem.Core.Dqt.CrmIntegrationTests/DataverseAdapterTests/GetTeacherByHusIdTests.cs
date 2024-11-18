@@ -31,7 +31,7 @@ public class GetTeacherByHusIdTests : IAsyncLifetime
         var (_, _) = await CreateTeacher(husId);
 
         // Act
-        var result = await _dataverseAdapter.GetTeachersByHusId(husId, columnNames: new[] { Contact.Fields.dfeta_HUSID });
+        var result = await _dataverseAdapter.GetTeachersByHusIdAsync(husId, columnNames: new[] { Contact.Fields.dfeta_HUSID });
 
         // Assert
         Assert.NotEmpty(result);
@@ -46,7 +46,7 @@ public class GetTeacherByHusIdTests : IAsyncLifetime
         var (_, _) = await CreateTeacher(husId);
 
         // Act
-        var result = await _dataverseAdapter.GetTeachersByHusId("SOME_NONE_EXISTENT_HUSID", columnNames: new[] { Contact.Fields.dfeta_HUSID });
+        var result = await _dataverseAdapter.GetTeachersByHusIdAsync("SOME_NONE_EXISTENT_HUSID", columnNames: new[] { Contact.Fields.dfeta_HUSID });
 
         // Assert
         Assert.Empty(result);

@@ -63,7 +63,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Email", "Enter an email address");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "Enter an email address");
     }
 
 
@@ -87,7 +87,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Email", "User does not exist");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "User does not exist");
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        AzureActiveDirectoryUserServiceMock.Verify(mock => mock.GetUserByEmail(email + "@education.gov.uk"));
+        AzureActiveDirectoryUserServiceMock.Verify(mock => mock.GetUserByEmailAsync(email + "@education.gov.uk"));
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public class IndexTests : TestBase
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid();
-        var user = await TestData.CreateUser(name: name, email: email, azureAdUserId: userId);
+        var user = await TestData.CreateUserAsync(name: name, email: email, azureAdUserId: userId);
 
         ConfigureUserServiceMock(email, new Services.AzureActiveDirectory.User()
         {
@@ -177,6 +177,6 @@ public class IndexTests : TestBase
 
     private void ConfigureUserServiceMock(string email, Services.AzureActiveDirectory.User? user) =>
         AzureActiveDirectoryUserServiceMock
-            .Setup(mock => mock.GetUserByEmail(email))
+            .Setup(mock => mock.GetUserByEmailAsync(email))
             .ReturnsAsync(user);
 }

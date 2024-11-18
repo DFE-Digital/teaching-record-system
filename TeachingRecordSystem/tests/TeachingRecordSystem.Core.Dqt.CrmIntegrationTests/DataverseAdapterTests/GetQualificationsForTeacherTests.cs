@@ -77,7 +77,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
         });
 
         // Need QTS to be able to get MQ quals into CRM due to plugin validation
-        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, null);
+        var teacherStatus = await _dataverseAdapter.GetTeacherStatusAsync(teacherStatusValue, null);
         await _organizationService.CreateAsync(new dfeta_qtsregistration()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
@@ -158,7 +158,7 @@ public class GetQualificationsForTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {

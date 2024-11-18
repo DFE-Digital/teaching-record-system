@@ -30,7 +30,7 @@ public class NationalInsuranceNumberModel(AuthorizeAccessLinkGenerator linkGener
         NationalInsuranceNumber = JourneyInstance?.State.NationalInsuranceNumber;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (HasNationalInsuranceNumber == true)
         {

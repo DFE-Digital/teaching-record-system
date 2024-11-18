@@ -22,15 +22,15 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
 
         services.AddSingleton<DbHelper>();
 
-        services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().EnsureSchema());
+        services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().EnsureSchemaAsync());
     }
 
-    public async Task ClearData()
+    public async Task ClearDataAsync()
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await dbContext.Database.OpenConnectionAsync();
         var connection = dbContext.Database.GetDbConnection();
-        await EnsureRespawner(connection);
+        await EnsureRespawnerAsync(connection);
         await _respawner!.ResetAsync(connection);
 
         // Ensure we have the System User around
@@ -38,7 +38,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task EnsureSchema()
+    public async Task EnsureSchemaAsync()
     {
         await _schemaLock.WaitAsync();
 
@@ -46,7 +46,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
         {
             if (!_haveResetSchema)
             {
-                await ResetSchema();
+                await ResetSchemaAsync();
                 _haveResetSchema = true;
             }
         }
@@ -56,7 +56,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
         }
     }
 
-    public async Task ResetSchema()
+    public async Task ResetSchemaAsync()
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
@@ -72,7 +72,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
 
         if (currentDbVersion == GetPreviousMigrationsVersion())
         {
-            await ClearData();
+            await ClearDataAsync();
             return;
         }
 
@@ -82,7 +82,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
         WriteMigrationsVersion();
 
         await connection.OpenAsync();
-        await EnsureRespawner(connection);
+        await EnsureRespawnerAsync(connection);
 
         string? GetPreviousMigrationsVersion() =>
             File.Exists(cachedMigrationsVersionPath) ? File.ReadAllText(cachedMigrationsVersionPath) : null;
@@ -95,7 +95,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
         }
     }
 
-    private async Task EnsureRespawner(DbConnection connection) =>
+    private async Task EnsureRespawnerAsync(DbConnection connection) =>
         _respawner = await Respawner.CreateAsync(
             connection,
             new RespawnerOptions()

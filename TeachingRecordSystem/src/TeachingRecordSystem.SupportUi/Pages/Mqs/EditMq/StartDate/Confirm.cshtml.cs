@@ -38,7 +38,7 @@ public class ConfirmModel(
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var now = clock.UtcNow;
 
@@ -87,7 +87,7 @@ public class ConfirmModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
@@ -111,7 +111,7 @@ public class ConfirmModel(
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         UploadedEvidenceFileUrl ??= JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
 
         await next();

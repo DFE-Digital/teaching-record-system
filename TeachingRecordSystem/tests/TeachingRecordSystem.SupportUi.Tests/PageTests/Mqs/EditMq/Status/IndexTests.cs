@@ -10,7 +10,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -27,9 +27,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseStatus = MandatoryQualificationStatus.Passed;
         var databaseEndDate = new DateOnly(2021, 11, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus, databaseEndDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus, databaseEndDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -37,7 +37,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var resultOptions = doc.GetElementByTestId("result-options");
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -55,9 +55,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var databaseStatus = MandatoryQualificationStatus.Failed;
         var journeyStatus = MandatoryQualificationStatus.Passed;
         var journeyEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(databaseStatus)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState()
             {
@@ -72,7 +72,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var resultOptions = doc.GetElementByTestId("result-options");
         var radioButtons = resultOptions!.GetElementsByTagName("input");
         var selectedResult = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -88,7 +88,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -106,9 +106,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenResultIsNotSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -119,16 +119,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Status", "Select a status");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Status", "Select a status");
     }
 
     [Fact]
     public async Task Post_WhenResultIsSelectedAndEndDateHasNotBeenEntered_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
         var status = MandatoryQualificationStatus.Passed;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -143,7 +143,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EndDate", "Enter an end date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "Enter an end date");
     }
 
     [Theory]
@@ -155,9 +155,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2021, 12, 5);
         var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = startDate.AddDays(-daysBefore);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(startDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(startDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -174,7 +174,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EndDate", "End date must be after start date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EndDate", "End date must be after start date");
     }
 
     [Fact]
@@ -184,9 +184,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldStatus = MandatoryQualificationStatus.Failed;
         var newStatus = dfeta_qualification_dfeta_MQ_Status.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -211,9 +211,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/status/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -230,7 +230,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstance(Guid qualificationId, EditMqStatusState? state = null) =>
+    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStatusState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqStatus,
             state ?? new EditMqStatusState(),

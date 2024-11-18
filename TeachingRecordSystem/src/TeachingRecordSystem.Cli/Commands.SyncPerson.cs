@@ -42,7 +42,7 @@ public partial class Commands
                 var syncHelper = services.GetRequiredService<TrsDataSyncHelper>();
 
                 var entityInfo = TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person);
-                var contact = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(trn, new Microsoft.Xrm.Sdk.Query.ColumnSet(entityInfo.AttributeNames)));
+                var contact = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactByTrnQuery(trn, new Microsoft.Xrm.Sdk.Query.ColumnSet(entityInfo.AttributeNames)));
 
                 if (contact is null)
                 {
@@ -51,7 +51,7 @@ public partial class Commands
                     return;
                 }
 
-                await syncHelper.SyncPerson(contact, ignoreInvalid: false, dryRun: false);
+                await syncHelper.SyncPersonAsync(contact, ignoreInvalid: false, dryRun: false);
                 //return 0;
             },
             connectionStringOption,

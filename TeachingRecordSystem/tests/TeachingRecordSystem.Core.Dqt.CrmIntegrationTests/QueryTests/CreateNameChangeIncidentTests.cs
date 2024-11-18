@@ -19,7 +19,7 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
 
         var newFirstName = _dataScope.TestData.GenerateFirstName();
         var newMiddleName = _dataScope.TestData.GenerateMiddleName();
@@ -47,7 +47,7 @@ public class CreateNameChangeIncidentTests : IAsyncLifetime
         };
 
         // Act
-        var (incidentId, ticketNumber) = await _crmQueryDispatcher.ExecuteQuery(query);
+        var (incidentId, ticketNumber) = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

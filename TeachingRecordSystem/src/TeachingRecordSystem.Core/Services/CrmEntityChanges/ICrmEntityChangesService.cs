@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Services.CrmEntityChanges;
 
 public interface ICrmEntityChangesService
 {
-    IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
+    IAsyncEnumerable<IChangedItem[]> GetEntityChangesAsync(
         string changesKey,
         string entityLogicalName,
         ColumnSet columns,

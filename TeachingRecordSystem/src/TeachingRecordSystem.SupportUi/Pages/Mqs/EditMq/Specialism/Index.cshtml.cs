@@ -29,7 +29,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
         Specialism = JourneyInstance!.State.Specialism;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
         {
@@ -46,7 +46,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
         return Redirect(linkGenerator.MqEditSpecialismReason(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
@@ -63,7 +63,7 @@ public class IndexModel(ReferenceDataCache referenceDataCache, TrsLinkGenerator 
         PersonName = personInfo.Name;
 
         var migratedFromDqtWithLegacySpecialism = qualificationInfo.MandatoryQualification.DqtSpecialismId is Guid dqtSpecialismId &&
-            MandatoryQualificationSpecialismRegistry.GetByDqtValue((await referenceDataCache.GetMqSpecialismById(dqtSpecialismId)).dfeta_Value).IsLegacy();
+            MandatoryQualificationSpecialismRegistry.GetByDqtValue((await referenceDataCache.GetMqSpecialismByIdAsync(dqtSpecialismId)).dfeta_Value).IsLegacy();
 
         Specialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: migratedFromDqtWithLegacySpecialism);
 

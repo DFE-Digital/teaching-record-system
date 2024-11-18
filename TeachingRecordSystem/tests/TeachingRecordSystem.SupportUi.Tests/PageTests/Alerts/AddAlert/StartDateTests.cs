@@ -17,8 +17,8 @@ public class StartDateTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -34,7 +34,7 @@ public class StartDateTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -49,8 +49,8 @@ public class StartDateTests : AddAlertTestBase
     public async Task Get_MissingDataInJourneyState_RedirectsToLinkPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -66,8 +66,8 @@ public class StartDateTests : AddAlertTestBase
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -82,8 +82,8 @@ public class StartDateTests : AddAlertTestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -91,7 +91,7 @@ public class StartDateTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{journeyInstance.State.StartDate:%d}", doc.GetElementById("StartDate.Day")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.StartDate:%M}", doc.GetElementById("StartDate.Month")?.GetAttribute("value"));
         Assert.Equal($"{journeyInstance.State.StartDate:yyyy}", doc.GetElementById("StartDate.Year")?.GetAttribute("value"));
@@ -104,8 +104,8 @@ public class StartDateTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -121,7 +121,7 @@ public class StartDateTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -136,8 +136,8 @@ public class StartDateTests : AddAlertTestBase
     public async Task Post_WithMissingDataInJourneyState_RedirectsToLinkPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -153,8 +153,8 @@ public class StartDateTests : AddAlertTestBase
     public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -162,15 +162,15 @@ public class StartDateTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "StartDate", "Enter a start date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Enter a start date");
     }
 
     [Fact]
     public async Task Post_WhenStartDateIsInTheFuture_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
         var startDate = Clock.Today.AddDays(2);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -182,15 +182,15 @@ public class StartDateTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "StartDate", "Start date cannot be in the future");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "Start date cannot be in the future");
     }
 
     [Fact]
     public async Task Post_WithValidInput_UpdatesStateAndRedirectsToReasonPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
         var startDate = Clock.Today;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -213,8 +213,8 @@ public class StartDateTests : AddAlertTestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/start-date/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

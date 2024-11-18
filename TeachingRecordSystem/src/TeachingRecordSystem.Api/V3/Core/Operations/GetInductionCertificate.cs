@@ -25,9 +25,9 @@ public class GetInductionCertificateHandler
         _certificateGenerator = certificateGenerator;
     }
 
-    public async Task<FileDownloadInfo?> Handle(GetInductionCertificateCommand command)
+    public async Task<FileDownloadInfo?> HandleAsync(GetInductionCertificateCommand command)
     {
-        var teacher = await _dataverseAdapter.GetTeacherByTrn(
+        var teacher = await _dataverseAdapter.GetTeacherByTrnAsync(
             command.Trn,
             columnNames: new[]
             {
@@ -39,7 +39,7 @@ public class GetInductionCertificateHandler
             return null;
         }
 
-        var (induction, _) = await _dataverseAdapter.GetInductionByTeacher(
+        var (induction, _) = await _dataverseAdapter.GetInductionByTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {
@@ -86,7 +86,7 @@ public class GetInductionCertificateHandler
             }
         };
 
-        var pdfStream = await _certificateGenerator.GenerateCertificate("Induction certificate.pdf", fieldValues);
+        var pdfStream = await _certificateGenerator.GenerateCertificateAsync("Induction certificate.pdf", fieldValues);
 
         return new FileDownloadInfo(pdfStream, $"InductionCertificate.pdf", "application/pdf");
     }

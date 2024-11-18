@@ -10,11 +10,11 @@ public static class CrmQueryDispatcherExtensions
 
     private class CrmQueryDispatcherWithDqtUserImpersonation(CrmQueryDispatcher innerDispatcher) : ICrmQueryDispatcher
     {
-        public Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query) =>
-            innerDispatcher.ExecuteQuery(GetOrganizationService, query);
+        public Task<TResult> ExecuteQueryAsync<TResult>(ICrmQuery<TResult> query) =>
+            innerDispatcher.ExecuteQueryAsync(GetOrganizationService, query);
 
-        public IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default) =>
-            innerDispatcher.ExecuteQuery(GetOrganizationService, query, cancellationToken);
+        public IAsyncEnumerable<TResult> ExecuteQueryAsync<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default) =>
+            innerDispatcher.ExecuteQueryAsync(GetOrganizationService, query, cancellationToken);
 
         public CrmTransactionScope CreateTransactionRequestBuilder() =>
             throw new NotSupportedException();

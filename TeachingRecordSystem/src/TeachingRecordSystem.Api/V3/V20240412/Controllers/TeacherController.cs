@@ -20,7 +20,7 @@ public class TeacherController : ControllerBase
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    public async Task<IActionResult> CreateNameChange(
+    public async Task<IActionResult> CreateNameChangeAsync(
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
@@ -35,7 +35,7 @@ public class TeacherController : ControllerBase
             EmailAddress = request.Email
         };
 
-        var caseNumber = await handler.Handle(command);
+        var caseNumber = await handler.HandleAsync(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
     }
@@ -48,7 +48,7 @@ public class TeacherController : ControllerBase
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    public async Task<IActionResult> CreateDateOfBirthChange(
+    public async Task<IActionResult> CreateDateOfBirthChangeAsync(
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
@@ -61,7 +61,7 @@ public class TeacherController : ControllerBase
             EmailAddress = request.Email
         };
 
-        var caseNumber = await handler.Handle(command);
+        var caseNumber = await handler.HandleAsync(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
     }

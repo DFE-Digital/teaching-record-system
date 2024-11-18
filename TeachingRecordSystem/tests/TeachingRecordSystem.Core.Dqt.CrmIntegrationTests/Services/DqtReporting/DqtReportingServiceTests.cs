@@ -168,7 +168,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         var mqEndDate = new DateOnly(2023, 4, 1);
 
         // Act
-        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p
+        var createPersonResult = await testDataScope.TestData.CreatePersonAsync(p => p
             .WithMandatoryQualification(m => m
                 .WithProvider(mqProviderId)
                 .WithSpecialism(mqSpecialism)
@@ -208,7 +208,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         var mqStartDate = new DateOnly(2022, 5, 1);
         var mqEndDate = new DateOnly(2023, 4, 1);
 
-        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p.WithMandatoryQualification());
+        var createPersonResult = await testDataScope.TestData.CreatePersonAsync(p => p.WithMandatoryQualification());
         var mq = createPersonResult.MandatoryQualifications.Single();
 
         await InsertRow("trs_qualifications", new Dictionary<string, object?>()
@@ -227,7 +227,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         await ProcessTrsChangesSingle(async singleMessageConsumed =>
         {
             // Act
-            await fixture.DbFixture.WithDbContext(async dbContext =>
+            await fixture.DbFixture.WithDbContextAsync(async dbContext =>
             {
                 var qualification = await dbContext.MandatoryQualifications.SingleAsync(q => q.QualificationId == mq.QualificationId);
                 qualification.ProviderId = mqProviderId;
@@ -264,7 +264,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
 
         var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
 
-        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p.WithMandatoryQualification());
+        var createPersonResult = await testDataScope.TestData.CreatePersonAsync(p => p.WithMandatoryQualification());
         var mq = createPersonResult.MandatoryQualifications.Single();
 
         await InsertRow("trs_qualifications", new Dictionary<string, object?>()
@@ -283,7 +283,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         await ProcessTrsChangesSingle(async singleMessageConsumed =>
         {
             // Act
-            await fixture.DbFixture.WithDbContext(async dbContext =>
+            await fixture.DbFixture.WithDbContextAsync(async dbContext =>
             {
                 await dbContext.MandatoryQualifications.Where(q => q.QualificationId == mq.QualificationId).ExecuteDeleteAsync();
             });
@@ -304,7 +304,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
 
         var insertedTime = fixture.Clock.UtcNow.AddDays(-10);
 
-        var createPersonResult = await testDataScope.TestData.CreatePerson(p => p.WithMandatoryQualification());
+        var createPersonResult = await testDataScope.TestData.CreatePersonAsync(p => p.WithMandatoryQualification());
         var mq = createPersonResult.MandatoryQualifications.Single();
 
         await InsertRow("trs_qualifications", new Dictionary<string, object?>()
@@ -323,7 +323,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         await ProcessTrsChangesSingle(async singleMessageConsumed =>
         {
             // Act
-            await fixture.DbFixture.WithDbContext(async dbContext =>
+            await fixture.DbFixture.WithDbContextAsync(async dbContext =>
             {
                 await dbContext.Database.ExecuteSqlAsync($"truncate table qualifications");
             });
@@ -346,7 +346,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
 
             using var cts = new CancellationTokenSource();
 
-            var processChangesTask = Task.Run(() => service.ProcessTrsChanges(observer: replicationStatusSubject, cancellationToken: cts.Token));
+            var processChangesTask = Task.Run(() => service.ProcessTrsChangesAsync(observer: replicationStatusSubject, cancellationToken: cts.Token));
 
             // Wait until the replication slot has been established
             await replicationStatusSubject.FirstAsync(s => s == DqtReportingService.TrsReplicationStatus.ReplicationSlotEstablished).ToTask(cts.Token);
@@ -381,7 +381,7 @@ public class DqtReportingServiceTests(DqtReportingFixture fixture) : IClassFixtu
         }
         finally
         {
-            await fixture.DbFixture.DropReplicationSlot(fixture.TrsDbReplicationSlotName);
+            await fixture.DbFixture.DropReplicationSlotAsync(fixture.TrsDbReplicationSlotName);
         }
     });
 

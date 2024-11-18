@@ -97,7 +97,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
         DateTime startActual = DateTime.MinValue;
         DateTime endActual = DateTime.MaxValue;
         dataverseAdapter
-            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetQtsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(new QtsAwardee[] { })
             .Callback<DateTime, DateTime>(
                 (start, end) =>
@@ -114,7 +114,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
             clock);
 
         // Act
-        await job.Execute(CancellationToken.None);
+        await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
         Assert.Equal(startExpected, startActual);
@@ -153,7 +153,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
         var qtsAwardees = new[] { qtsAwardee1 };
 
         dataverseAdapter
-            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetQtsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(qtsAwardees);
 
         var job = new BatchSendQtsAwardedEmailsJob(
@@ -164,7 +164,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
             clock);
 
         // Act
-        await job.Execute(CancellationToken.None);
+        await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
         var jobItem = await dbContext.QtsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.PersonId == qtsAwardee1.TeacherId);
@@ -175,7 +175,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
         Assert.Equal(qtsAwardee1.LastName, jobItem.Personalization["last name"]);
 
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()), Times.Once);
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()), Times.Once);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
         clock.UtcNow = today;
 
         dataverseAdapter
-            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetQtsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(new QtsAwardee[] { });
 
         var job = new BatchSendQtsAwardedEmailsJob(
@@ -210,14 +210,14 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
             clock);
 
         // Act
-        await job.Execute(CancellationToken.None);
+        await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
         var jobInfo = await dbContext.QtsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
         Assert.NotNull(jobInfo);
 
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()), Times.Never);
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()), Times.Never);
     }
 
     [Fact]
@@ -252,11 +252,11 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
         var qtsAwardees = new[] { qtsAwardee1 };
 
         dataverseAdapter
-            .Setup(d => d.GetQtsAwardeesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetQtsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(qtsAwardees);
 
         backgroundJobScheduler
-            .Setup(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()))
+            .Setup(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<QtsAwardedEmailJobDispatcher, Task>>>()))
             .Throws<Exception>();
 
         var job = new BatchSendQtsAwardedEmailsJob(
@@ -267,7 +267,7 @@ public class BatchSendQtsAwardedEmailsJobTests : QtsAwardedEmailJobTestBase
             clock);
 
         // Act
-        await Assert.ThrowsAsync<Exception>(() => job.Execute(CancellationToken.None));
+        await Assert.ThrowsAsync<Exception>(() => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         var jobInfo = await dbContext.QtsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);

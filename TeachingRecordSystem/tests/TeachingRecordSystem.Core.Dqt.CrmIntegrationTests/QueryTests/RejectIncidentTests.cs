@@ -19,11 +19,11 @@ public class RejectIncidentTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var createNameChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var createNameChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         // Act
-        _ = await _crmQueryDispatcher.ExecuteQuery(new RejectIncidentQuery(createNameChangeIncidentResult.IncidentId, "Computer says no"));
+        _ = await _crmQueryDispatcher.ExecuteQueryAsync(new RejectIncidentQuery(createNameChangeIncidentResult.IncidentId, "Computer says no"));
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

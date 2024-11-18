@@ -19,8 +19,8 @@ public class ReasonTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -36,7 +36,7 @@ public class ReasonTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -51,8 +51,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Get_MissingDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -68,8 +68,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -84,8 +84,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -93,7 +93,7 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("AddReason", journeyInstance.State.AddReason!.ToString()!);
         AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
@@ -118,8 +118,8 @@ public class ReasonTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -135,7 +135,7 @@ public class ReasonTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -150,8 +150,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Post_WithMissingDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -167,8 +167,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Post_WhenNoReasonIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -179,15 +179,15 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "AddReason", "Select a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReason", "Select a reason");
     }
 
     [Fact]
     public async Task Post_WhenNoHasAdditionalReasonDetailIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -200,7 +200,7 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this alert");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re adding this alert");
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public class ReasonTests : AddAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -223,15 +223,15 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "AddReasonDetail", "Enter additional detail");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Enter additional detail");
     }
 
     [Fact]
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -245,15 +245,15 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -268,15 +268,15 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
     [Fact]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -291,15 +291,15 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
     public async Task Post_AdditionalReasonIsTooLong_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -314,15 +314,15 @@ public class ReasonTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "AddReasonDetail", "Additional detail must be 4000 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "AddReasonDetail", "Additional detail must be 4000 characters or less");
     }
 
     [Fact]
     public async Task Post_ValidInputWithoutEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var reason = AddAlertReasonOption.AnotherReason;
         var hasAdditionalReasonDetail = true;
@@ -357,8 +357,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Post_ValidInputWithEvidenceFile_UpdatesStateAndRedirectsToCheckAnswersPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var reason = AddAlertReasonOption.AnotherReason;
         var hasAdditionalReasonDetail = false;
@@ -393,8 +393,8 @@ public class ReasonTests : AddAlertTestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/reason/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

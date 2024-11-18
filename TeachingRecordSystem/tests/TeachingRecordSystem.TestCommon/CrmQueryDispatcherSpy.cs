@@ -41,16 +41,16 @@ public class CrmQueryDispatcherSpy
 
 public class CrmQueryDispatcherDecorator(ICrmQueryDispatcher innerDispatcher, CrmQueryDispatcherSpy spy) : ICrmQueryDispatcher
 {
-    public async Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query)
+    public async Task<TResult> ExecuteQueryAsync<TResult>(ICrmQuery<TResult> query)
     {
-        var result = await innerDispatcher.ExecuteQuery(query);
+        var result = await innerDispatcher.ExecuteQueryAsync(query);
         spy.RegisterQuery(query, result);
         return result;
     }
 
-    public IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<TResult> ExecuteQueryAsync<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default)
     {
-        return innerDispatcher.ExecuteQuery(query, cancellationToken);
+        return innerDispatcher.ExecuteQueryAsync(query, cancellationToken);
     }
 
     public CrmTransactionScope CreateTransactionRequestBuilder()

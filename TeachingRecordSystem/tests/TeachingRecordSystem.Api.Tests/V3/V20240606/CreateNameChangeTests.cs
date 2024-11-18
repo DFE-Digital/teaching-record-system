@@ -21,7 +21,7 @@ public class CreateNameChangeTests(HostFixture hostFixture) : TestBase(hostFixtu
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/person/name-changes")
         {
@@ -46,7 +46,7 @@ public class CreateNameChangeTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -70,14 +70,14 @@ public class CreateNameChangeTests(HostFixture hostFixture) : TestBase(hostFixtu
         var response = await GetHttpClientWithIdentityAccessToken(createPersonResult.Trn!).SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_ValidRequest_CreatesIncidentAndReturnsTicketNumber()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -124,7 +124,7 @@ public class CreateNameChangeTests(HostFixture hostFixture) : TestBase(hostFixtu
         var crmResults = TestData.OrganizationService.RetrieveMultiple(crmQuery);
         var incident = Assert.Single(crmResults.Entities).ToEntity<Incident>();
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

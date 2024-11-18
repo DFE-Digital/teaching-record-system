@@ -89,7 +89,7 @@ public class TrsDataSyncHelper(
         };
     }
 
-    public async Task DeleteRecords(string modelType, IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
+    public async Task DeleteRecordsAsync(string modelType, IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
     {
         if (ids.Count == 0)
         {
@@ -113,7 +113,7 @@ public class TrsDataSyncHelper(
         }
     }
 
-    public async Task<DateTime?> GetLastModifiedOnForModelType(string modelType)
+    public async Task<DateTime?> GetLastModifiedOnForModelTypeAsync(string modelType)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
 
@@ -134,30 +134,30 @@ public class TrsDataSyncHelper(
         }
     }
 
-    public Task SyncRecords(string modelType, IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
+    public Task SyncRecordsAsync(string modelType, IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
         return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<bool> SyncPerson(Guid contactId, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
+    public async Task<bool> SyncPersonAsync(Guid contactId, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Person);
 
-        var contacts = await GetEntities<Contact>(
+        var contacts = await GetEntitiesAsync<Contact>(
             Contact.EntityLogicalName,
             Contact.PrimaryIdAttribute,
             [contactId],
             modelTypeSyncInfo.AttributeNames,
             cancellationToken);
 
-        return await SyncPersons(contacts, ignoreInvalid, dryRun, cancellationToken) == 1;
+        return await SyncPersonsAsync(contacts, ignoreInvalid, dryRun, cancellationToken) == 1;
     }
 
-    public async Task<bool> SyncPerson(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
-        await SyncPersons(new[] { entity }, ignoreInvalid, dryRun, cancellationToken) == 1;
+    public async Task<bool> SyncPersonAsync(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
+        await SyncPersonsAsync(new[] { entity }, ignoreInvalid, dryRun, cancellationToken) == 1;
 
-    public async Task<int> SyncPersons(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
+    public async Task<int> SyncPersonsAsync(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
         // We're syncing all contacts for now.
         // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
@@ -235,7 +235,7 @@ public class TrsDataSyncHelper(
             await txn.DisposeAsync();
             await connection.DisposeAsync();
 
-            return await SyncPersons(entitiesExceptFailedOne, ignoreInvalid, dryRun, cancellationToken);
+            return await SyncPersonsAsync(entitiesExceptFailedOne, ignoreInvalid, dryRun, cancellationToken);
         }
 
         if (!dryRun)
@@ -247,7 +247,7 @@ public class TrsDataSyncHelper(
         return people.Count;
     }
 
-    public async Task<bool> SyncAlert(
+    public async Task<bool> SyncAlertAsync(
         dfeta_sanction entity,
         AuditDetailCollection auditDetails,
         bool ignoreInvalid,
@@ -260,22 +260,22 @@ public class TrsDataSyncHelper(
             { entity.Id, auditDetails }
         };
 
-        return await SyncAlerts(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken) == 1;
+        return await SyncAlertsAsync(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken) == 1;
     }
 
-    public async Task<int> SyncAlerts(
+    public async Task<int> SyncAlertsAsync(
         IReadOnlyCollection<dfeta_sanction> entities,
         bool ignoreInvalid,
         bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var auditDetails = await GetAuditRecords(dfeta_sanction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+        var auditDetails = await GetAuditRecordsAsync(dfeta_sanction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
 
-        return await SyncAlerts(entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+        return await SyncAlertsAsync(entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
     }
 
-    public async Task<int> SyncAlerts(
+    public async Task<int> SyncAlertsAsync(
         IReadOnlyCollection<dfeta_sanction> entities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
@@ -283,12 +283,12 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken = default)
     {
-        var (alerts, events) = await MapAlertsAndAudits(entities, auditDetails, ignoreInvalid, createMigratedEvent);
+        var (alerts, events) = await MapAlertsAndAuditsAsync(entities, auditDetails, ignoreInvalid, createMigratedEvent);
 
-        return await SyncAlerts(alerts, events, ignoreInvalid, dryRun, cancellationToken);
+        return await SyncAlertsAsync(alerts, events, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    private async Task<int> SyncAlerts(
+    private async Task<int> SyncAlertsAsync(
         IReadOnlyCollection<Alert> alerts,
         IReadOnlyCollection<EventBase> events,
         bool ignoreInvalid,
@@ -339,7 +339,7 @@ public class TrsDataSyncHelper(
                     await mergeCommand.ExecuteNonQueryAsync();
                 }
 
-                await txn.SaveEvents(events, "events_import", clock, cancellationToken);
+                await txn.SaveEventsAsync(events, "events_import", clock, cancellationToken);
 
                 if (!dryRun)
                 {
@@ -356,7 +356,7 @@ public class TrsDataSyncHelper(
                 // ex.Detail will be something like "Key (person_id)=(6ac8dc26-c8ae-e311-b8ed-005056822391) is not present in table "persons"."
                 var personId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, Guid.Empty.ToString().Length));
 
-                var personSynced = await SyncPerson(personId, ignoreInvalid, dryRun: false, cancellationToken);
+                var personSynced = await SyncPersonAsync(personId, ignoreInvalid, dryRun: false, cancellationToken);
                 if (!personSynced)
                 {
                     // The person sync may fail if the record doesn't meet the criteria (e.g. it doesn't have a TRN).
@@ -389,7 +389,7 @@ public class TrsDataSyncHelper(
         return toSync.Count;
     }
 
-    public async Task<int> SyncEvents(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
+    public async Task<int> SyncEventsAsync(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<EventInfo>(ModelTypes.Event);
 
@@ -398,7 +398,7 @@ public class TrsDataSyncHelper(
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
-        await txn.SaveEvents(mapped, tempTableSuffix: "events_import", clock, cancellationToken);
+        await txn.SaveEventsAsync(mapped, tempTableSuffix: "events_import", clock, cancellationToken);
 
         if (!dryRun)
         {
@@ -546,7 +546,7 @@ public class TrsDataSyncHelper(
             modelTypeSyncInfo :
             throw new ArgumentException($"Unknown data type: '{modelType}.", nameof(modelType));
 
-    private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecords(
+    private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecordsAsync(
         string entityLogicalName,
         IEnumerable<Guid> ids,
         CancellationToken cancellationToken)
@@ -609,7 +609,7 @@ public class TrsDataSyncHelper(
             .ToDictionary(t => t.Id, t => t.AuditDetailCollection);
     }
 
-    private async Task<TEntity[]> GetEntities<TEntity>(
+    private async Task<TEntity[]> GetEntitiesAsync<TEntity>(
         string entityLogicalName,
         string idAttributeName,
         IEnumerable<Guid> ids,
@@ -721,7 +721,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = Contact.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncPersons(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, dryRun, ct),
+                helper.SyncPersonsAsync(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, dryRun, ct),
             WriteRecord = writeRecord
         };
     }
@@ -745,7 +745,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = dfeta_TRSEvent.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncEvents(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), dryRun, ct),
+                helper.SyncEventsAsync(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), dryRun, ct),
             WriteRecord = null
         };
     }
@@ -839,7 +839,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = dfeta_sanction.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncAlerts(entities.Select(e => e.ToEntity<dfeta_sanction>()).ToArray(), ignoreInvalid, createMigratedEvent: false, dryRun, ct),
+                helper.SyncAlertsAsync(entities.Select(e => e.ToEntity<dfeta_sanction>()).ToArray(), ignoreInvalid, createMigratedEvent: false, dryRun, ct),
             WriteRecord = writeRecord
         };
     }
@@ -867,14 +867,14 @@ public class TrsDataSyncHelper(
         })
         .ToList();
 
-    private async Task<(List<Alert> Alerts, List<EventBase> Events)> MapAlertsAndAudits(
+    private async Task<(List<Alert> Alerts, List<EventBase> Events)> MapAlertsAndAuditsAsync(
         IEnumerable<dfeta_sanction> sanctions,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
         bool createMigratedEvent)
     {
-        var sanctionCodes = await referenceDataCache.GetSanctionCodes(activeOnly: false);
-        var alertTypes = await referenceDataCache.GetAlertTypes();
+        var sanctionCodes = await referenceDataCache.GetSanctionCodesAsync(activeOnly: false);
+        var alertTypes = await referenceDataCache.GetAlertTypesAsync();
 
         var alerts = new List<Alert>();
         var events = new List<EventBase>();

@@ -20,7 +20,7 @@ public class CertificatesController : ControllerBase
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetQts([FromServices] GetQtsCertificateHandler handler)
+    public async Task<IActionResult> GetQtsAsync([FromServices] GetQtsCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -29,7 +29,7 @@ public class CertificatesController : ControllerBase
         }
 
         var command = new GetQtsCertificateCommand(trn);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {
@@ -48,7 +48,7 @@ public class CertificatesController : ControllerBase
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEyts([FromServices] GetEytsCertificateHandler handler)
+    public async Task<IActionResult> GetEytsAsync([FromServices] GetEytsCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -57,7 +57,7 @@ public class CertificatesController : ControllerBase
         }
 
         var command = new GetEytsCertificateCommand(trn);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {
@@ -76,7 +76,7 @@ public class CertificatesController : ControllerBase
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetInduction([FromServices] GetInductionCertificateHandler handler)
+    public async Task<IActionResult> GetInductionAsync([FromServices] GetInductionCertificateHandler handler)
     {
         var trn = User.FindFirstValue("trn");
         if (trn is null)
@@ -85,7 +85,7 @@ public class CertificatesController : ControllerBase
         }
 
         var command = new GetInductionCertificateCommand(trn);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {
@@ -104,7 +104,7 @@ public class CertificatesController : ControllerBase
     [Produces("application/pdf")]
     [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetNpq(
+    public async Task<IActionResult> GetNpqAsync(
         [FromRoute, SwaggerParameter("The ID of the qualification record associated with the certificate.")] Guid qualificationId,
         [FromServices] GetNpqCertificateHandler handler)
     {
@@ -115,7 +115,7 @@ public class CertificatesController : ControllerBase
         }
 
         var command = new GetNpqCertificateCommand(trn, qualificationId);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {

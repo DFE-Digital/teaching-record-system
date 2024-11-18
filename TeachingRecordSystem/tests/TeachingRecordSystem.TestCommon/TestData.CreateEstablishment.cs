@@ -6,7 +6,7 @@ public partial class TestData
 
     public int GenerateEstablishmentUrn() => Interlocked.Increment(ref _lastEstablishmentUrn);
 
-    public async Task<Core.DataStore.Postgres.Models.Establishment> CreateEstablishment(
+    public async Task<Core.DataStore.Postgres.Models.Establishment> CreateEstablishmentAsync(
         string localAuthorityCode,
         string? localAuthorityName = null,
         string? establishmentNumber = null,
@@ -44,7 +44,7 @@ public partial class TestData
                 break;
         }
 
-        var establishment = await WithDbContext(async dbContext =>
+        var establishment = await WithDbContextAsync(async dbContext =>
         {
             var establishment = new Core.DataStore.Postgres.Models.Establishment
             {

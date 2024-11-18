@@ -28,7 +28,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
         StartDate = JourneyInstance!.State.StartDate;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (StartDate > clock.Today)
         {
@@ -50,7 +50,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
             : linkGenerator.AlertAddReason(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

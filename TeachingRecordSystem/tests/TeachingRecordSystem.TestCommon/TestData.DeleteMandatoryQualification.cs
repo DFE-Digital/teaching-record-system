@@ -4,14 +4,14 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task DeleteMandatoryQualification(
+    public Task DeleteMandatoryQualificationAsync(
         Guid qualificationId,
         RaisedByUserInfo deletedBy,
         string? deletionReason = null,
         string? deletionReasonDetail = null,
         (Guid FileId, string Name)? evidenceFile = null)
     {
-        return WithDbContext(async dbContext =>
+        return WithDbContextAsync(async dbContext =>
         {
             var now = Clock.UtcNow;
 
@@ -22,7 +22,7 @@ public partial class TestData
             qualification.DeletedOn = now;
 
             var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-                await ReferenceDataCache.GetMqEstablishmentById(mqEstablishmentId) :
+                await ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
                 null;
 
             var deletedEvent = new MandatoryQualificationDeletedEvent()

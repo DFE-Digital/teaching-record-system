@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotentialDuplicateContactsQuery, FindPotentialDuplicateContactsResult[]>
 {
-    public async Task<FindPotentialDuplicateContactsResult[]> Execute(FindPotentialDuplicateContactsQuery findQuery, IOrganizationServiceAsync organizationService)
+    public async Task<FindPotentialDuplicateContactsResult[]> ExecuteAsync(FindPotentialDuplicateContactsQuery findQuery, IOrganizationServiceAsync organizationService)
     {
         // Find an existing active record with a TRN that matches on:
         // * at least 3 of FirstName, MiddleName, LastName and BirthDate *OR*

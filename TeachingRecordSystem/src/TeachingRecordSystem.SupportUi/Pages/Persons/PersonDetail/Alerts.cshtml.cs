@@ -20,7 +20,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
 
     public bool ShowOpenAlertFlag { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         var alerts = await dbContext.Alerts
             .Include(a => a.AlertType)
@@ -50,8 +50,8 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
         OpenAlerts = authorizedAlerts.Where(a => a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
         ClosedAlerts = authorizedAlerts.Where(a => !a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.EndDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
 
-        CanAddAlert = await referenceDataCache.GetAlertTypes(activeOnly: true)
-            .ToAsyncEnumerable()
+        CanAddAlert = await referenceDataCache.GetAlertTypesAsync(activeOnly: true)
+            .ToAsyncEnumerableAsync()
             .AnyAwaitAsync(async at => (await authorizationService.AuthorizeForAlertTypeAsync(User, at.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true });
 
         ShowOpenAlertFlag = alerts.Any(a => a.IsOpen && alertTypePermissions[a.AlertTypeId] is { CanFlag: true, CanRead: false });

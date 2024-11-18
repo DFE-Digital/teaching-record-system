@@ -11,7 +11,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -26,14 +26,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForValidPersonReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
             new AddMqState()
             {
@@ -60,13 +60,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState(MandatoryQualificationStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
             new AddMqState()
             {
@@ -83,7 +83,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(provider.Name, doc.GetElementByTestId("provider")!.TextContent);
         Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TextContent);
         Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("start-date")!.TextContent);
@@ -104,7 +104,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -125,13 +125,13 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Confirm_CreatesMqCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(MandatoryQualificationStatus status)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         DateOnly? endDate = status == MandatoryQualificationStatus.Passed ? new DateOnly(2021, 11, 5) : null;
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
             new AddMqState()
             {
@@ -152,8 +152,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification added");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -206,14 +206,14 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyRedirectsAndDoesNotCreateMq()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var provider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Leeds");
         var specialism = MandatoryQualificationSpecialism.Hearing;
         var startDate = new DateOnly(2021, 3, 1);
         var status = MandatoryQualificationStatus.Passed;
         DateOnly? endDate = new DateOnly(2021, 11, 5);
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.ContactId,
             new AddMqState()
             {
@@ -245,7 +245,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    private async Task<JourneyInstance<AddMqState>> CreateJourneyInstance(Guid personId, AddMqState? state = null) =>
+    private async Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, AddMqState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.AddMq,
             state ?? new AddMqState(),

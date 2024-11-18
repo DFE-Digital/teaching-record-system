@@ -10,7 +10,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -26,9 +26,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -36,7 +36,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var specialismList = doc.GetElementByTestId("specialism-list");
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -50,9 +50,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var databaseSpecialism = MandatoryQualificationSpecialism.Hearing;
         var journeySpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(databaseSpecialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState()
             {
@@ -66,7 +66,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var specialismList = doc.GetElementByTestId("specialism-list");
         var radioButtons = specialismList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -80,11 +80,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var specialism = MandatoryQualificationSpecialism.DeafEducation;
         Debug.Assert(MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
-        var dqtSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue(specialism.GetDqtValue());
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism, dqtSpecialism.dfeta_specialismId)));
+        var dqtSpecialism = await TestData.ReferenceDataCache.GetMqSpecialismByValueAsync(specialism.GetDqtValue());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism, dqtSpecialism.dfeta_specialismId)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState()
             {
@@ -98,7 +98,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var legacySpecialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).Where(s => s.Legacy).ToArray();
         var specialismRadios = doc.GetElementsByName("Specialism");
@@ -114,10 +114,10 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var specialism = MandatoryQualificationSpecialism.Hearing;
         Debug.Assert(!MandatoryQualificationSpecialismRegistry.IsLegacy(specialism));
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState()
             {
@@ -131,7 +131,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var legacySpecialisms = MandatoryQualificationSpecialismRegistry.GetAll(includeLegacy: true).Where(s => s.Legacy).ToArray();
         var specialismRadios = doc.GetElementsByName("Specialism");
@@ -147,7 +147,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var qualificationId = Guid.NewGuid();
         var specialismValue = "Hearing";
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -168,9 +168,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoSpecialismIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/specialism?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -181,7 +181,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Specialism", "Select a specialism");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
     }
 
     [Fact]
@@ -190,9 +190,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var oldSpecialism = MandatoryQualificationSpecialism.Hearing;
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldSpecialism)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(oldSpecialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState()
             {
@@ -221,9 +221,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var specialism = MandatoryQualificationSpecialism.Hearing;
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithSpecialism(specialism)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqSpecialismState()
             {
@@ -247,7 +247,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
 
-    private async Task<JourneyInstance<EditMqSpecialismState>> CreateJourneyInstance(Guid qualificationId, EditMqSpecialismState? state = null) =>
+    private async Task<JourneyInstance<EditMqSpecialismState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqSpecialismState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqSpecialism,
             state ?? new EditMqSpecialismState(),

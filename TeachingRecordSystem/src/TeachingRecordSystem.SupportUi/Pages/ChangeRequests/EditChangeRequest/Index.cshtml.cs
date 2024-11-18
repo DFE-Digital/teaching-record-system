@@ -30,9 +30,9 @@ public partial class IndexModel : PageModel
     [FromRoute]
     public string TicketNumber { get; set; } = null!;
 
-    public async Task<IActionResult> OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
-        var incidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(TicketNumber));
         if (incidentDetail is null)
         {
             return NotFound();
@@ -47,9 +47,9 @@ public partial class IndexModel : PageModel
 
         return Page();
     }
-    public async Task<IActionResult> OnGetDocuments(Guid id)
+    public async Task<IActionResult> OnGetDocumentsAsync(Guid id)
     {
-        var document = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new GetDocumentByIdQuery(id));
+        var document = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetDocumentByIdQuery(id));
         var annotation = document?.Extract<Annotation>("annotation", Annotation.PrimaryIdAttribute);
 
         if (document is null || annotation is null)

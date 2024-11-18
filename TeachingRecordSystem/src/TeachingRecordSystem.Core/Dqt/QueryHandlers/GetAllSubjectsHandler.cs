@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllSubjectsHandler : ICrmQueryHandler<GetAllSubjectsQuery, Subject[]>
 {
-    public async Task<Subject[]> Execute(GetAllSubjectsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Subject[]> ExecuteAsync(GetAllSubjectsQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

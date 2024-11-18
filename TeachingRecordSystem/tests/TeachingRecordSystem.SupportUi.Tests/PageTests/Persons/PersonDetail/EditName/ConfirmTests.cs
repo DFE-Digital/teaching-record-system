@@ -16,7 +16,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/edit-name/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -35,7 +35,7 @@ public class ConfirmTests : TestBase
     public async Task Get_StateHasMissingRequiredData_RedirectsToIndex(string? firstName, string? middleName, string? lastName)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var editNameState = new EditNameState();
         if (firstName is not null)
         {
@@ -52,7 +52,7 @@ public class ConfirmTests : TestBase
             editNameState.LastName = lastName;
         }
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             editNameState);
 
@@ -70,11 +70,11 @@ public class ConfirmTests : TestBase
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
         var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
         var newLastName = TestData.GenerateChangedLastName(person.LastName);
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditNameState()
             {
@@ -90,7 +90,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{person.FirstName} {person.MiddleName} {person.LastName}", doc.GetElementByTestId("current-value")!.TextContent);
         Assert.Equal($"{newFirstName} {newMiddleName} {newLastName}", doc.GetElementByTestId("new-value")!.TextContent);
     }
@@ -101,7 +101,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{personId}/edit-name/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -116,11 +116,11 @@ public class ConfirmTests : TestBase
     public async Task Post_ValidRequest_UpdatesNameAndCompletesJourney()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
         var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
         var newLastName = TestData.GenerateChangedLastName(person.LastName);
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditNameState()
             {
@@ -144,8 +144,8 @@ public class ConfirmTests : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Record has been updated");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -153,7 +153,7 @@ public class ConfirmTests : TestBase
     }
 
 
-    private async Task<JourneyInstance<EditNameState>> CreateJourneyInstance(Guid personId, EditNameState? state = null) =>
+    private async Task<JourneyInstance<EditNameState>> CreateJourneyInstanceAsync(Guid personId, EditNameState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditName,
             state ?? new EditNameState(),

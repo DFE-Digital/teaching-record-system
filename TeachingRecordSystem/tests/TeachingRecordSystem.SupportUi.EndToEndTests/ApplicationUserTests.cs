@@ -12,17 +12,17 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToApplicationUsersPage();
+        await page.GoToApplicationUsersPageAsync();
 
-        await page.AssertOnApplicationUsersPage();
+        await page.AssertOnApplicationUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId("add-application-user");
+        await page.ClickLinkForElementWithTestIdAsync("add-application-user");
 
-        await page.AssertOnAddApplicationUserPage();
+        await page.AssertOnAddApplicationUserPageAsync();
 
         await page.FillAsync("text=Name", applicationUserName);
 
-        await page.ClickButton("Save");
+        await page.ClickButtonAsync("Save");
 
         var applicationUserId = await WithDbContext(async dbContext =>
         {
@@ -30,15 +30,15 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
             return applicationUser!.UserId;
         });
 
-        await page.AssertOnEditApplicationUserPage(applicationUserId);
+        await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
-        await page.AssertFlashMessage("Application user added");
+        await page.AssertFlashMessageAsync("Application user added");
     }
 
     [Fact]
     public async Task EditApplicationUser()
     {
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var applicationUserId = applicationUser.UserId;
         var newApplicationUserName = TestData.GenerateChangedApplicationUserName(applicationUser.Name);
         var newClientId = Guid.NewGuid().ToString();
@@ -54,13 +54,13 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToApplicationUsersPage();
+        await page.GoToApplicationUsersPageAsync();
 
-        await page.AssertOnApplicationUsersPage();
+        await page.AssertOnApplicationUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId($"edit-application-user-{applicationUserId}");
+        await page.ClickLinkForElementWithTestIdAsync($"edit-application-user-{applicationUserId}");
 
-        await page.AssertOnEditApplicationUserPage(applicationUserId);
+        await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
         await page.FillAsync("text=Name", newApplicationUserName);
         await page.SetCheckedAsync($"label:text-is('{ApiRoles.GetPerson}')", true);
@@ -76,70 +76,70 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.FillAsync("text=One Login redirect URI path", newOneLoginRedirectUri);
         await page.FillAsync("text=One Login post logout redirect URI path", newOneLoginPostLogoutRedirectUri);
 
-        await page.ClickButton("Save changes");
+        await page.ClickButtonAsync("Save changes");
 
-        await page.AssertOnApplicationUsersPage();
+        await page.AssertOnApplicationUsersPageAsync();
 
-        await page.AssertFlashMessage("Application user updated");
+        await page.AssertFlashMessageAsync("Application user updated");
     }
 
     [Fact]
     public async Task AddApiKey()
     {
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var applicationUserId = applicationUser.UserId;
         var apiKey = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToApplicationUsersPage();
+        await page.GoToApplicationUsersPageAsync();
 
-        await page.AssertOnApplicationUsersPage();
+        await page.AssertOnApplicationUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId($"edit-application-user-{applicationUserId}");
+        await page.ClickLinkForElementWithTestIdAsync($"edit-application-user-{applicationUserId}");
 
-        await page.AssertOnEditApplicationUserPage(applicationUserId);
+        await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
-        await page.ClickLinkForElementWithTestId("AddApiKey");
+        await page.ClickLinkForElementWithTestIdAsync("AddApiKey");
 
-        await page.AssertOnAddApiKeyPage();
+        await page.AssertOnAddApiKeyPageAsync();
 
         await page.FillAsync("label:text-is('Key')", apiKey);
 
-        await page.ClickButton("Save");
+        await page.ClickButtonAsync("Save");
 
-        await page.AssertOnEditApplicationUserPage(applicationUserId);
+        await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
-        await page.AssertFlashMessage("API key added");
+        await page.AssertFlashMessageAsync("API key added");
     }
 
     [Fact]
     public async Task EditApiKey()
     {
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var applicationUserId = applicationUser.UserId;
-        var apiKey = await TestData.CreateApiKey(applicationUser.UserId);
+        var apiKey = await TestData.CreateApiKeyAsync(applicationUser.UserId);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToApplicationUsersPage();
+        await page.GoToApplicationUsersPageAsync();
 
-        await page.AssertOnApplicationUsersPage();
+        await page.AssertOnApplicationUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId($"edit-application-user-{applicationUserId}");
+        await page.ClickLinkForElementWithTestIdAsync($"edit-application-user-{applicationUserId}");
 
-        await page.AssertOnEditApplicationUserPage(applicationUserId);
+        await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
-        await page.ClickLinkForElementWithTestId($"EditApiKey-{apiKey.ApiKeyId}");
+        await page.ClickLinkForElementWithTestIdAsync($"EditApiKey-{apiKey.ApiKeyId}");
 
-        await page.AssertOnEditApiKeyPage(apiKey.ApiKeyId);
+        await page.AssertOnEditApiKeyPageAsync(apiKey.ApiKeyId);
 
-        await page.ClickButton("Expire");
+        await page.ClickButtonAsync("Expire");
 
-        await page.AssertOnEditApplicationUserPage(applicationUserId);
+        await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
-        await page.AssertFlashMessage("API key expired");
+        await page.AssertFlashMessageAsync("API key expired");
     }
 }

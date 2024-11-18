@@ -29,7 +29,7 @@ public class BatchSendEytsAwardedEmailsJob
         _clock = clock;
     }
 
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var lastAwardedToUtc = await _dbContext.EytsAwardedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
             _batchSendEytsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
@@ -53,7 +53,7 @@ public class BatchSendEytsAwardedEmailsJob
         _dbContext.EytsAwardedEmailsJobs.Add(job);
 
         var totalEytsAwardees = 0;
-        await foreach (var eytsAwardees in _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate))
+        await foreach (var eytsAwardees in _dataverseAdapter.GetEytsAwardeesForDateRangeAsync(startDate, endDate))
         {
             foreach (var eytsAwardee in eytsAwardees)
             {
@@ -87,7 +87,7 @@ public class BatchSendEytsAwardedEmailsJob
 
         if (totalEytsAwardees > 0)
         {
-            await _backgroundJobScheduler.Enqueue<EytsAwardedEmailJobDispatcher>(j => j.Execute(eytsAwardedEmailsJobId));
+            await _backgroundJobScheduler.EnqueueAsync<EytsAwardedEmailJobDispatcher>(j => j.ExecuteAsync(eytsAwardedEmailsJobId));
         }
 
         transaction.Complete();

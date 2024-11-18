@@ -95,10 +95,10 @@ public class InductionCompletedEmailJobDispatcherTests : InductionCompletedEmail
             backgroundJobScheduler.Object);
 
         // Act
-        await dispatcher.Execute(inductionCompletedEmailsJobId);
+        await dispatcher.ExecuteAsync(inductionCompletedEmailsJobId);
 
         // Assert
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<SendInductionCompletedEmailJob, Task>>>()), Times.Exactly(2));
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<SendInductionCompletedEmailJob, Task>>>()), Times.Exactly(2));
     }
 }

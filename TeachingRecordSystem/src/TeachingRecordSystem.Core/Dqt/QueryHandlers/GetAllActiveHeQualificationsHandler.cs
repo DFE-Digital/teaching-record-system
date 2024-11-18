@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllActiveHeQualificationsHandler : ICrmQueryHandler<GetAllActiveHeQualificationsQuery, dfeta_hequalification[]>
 {
-    public async Task<dfeta_hequalification[]> Execute(GetAllActiveHeQualificationsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_hequalification[]> ExecuteAsync(GetAllActiveHeQualificationsQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

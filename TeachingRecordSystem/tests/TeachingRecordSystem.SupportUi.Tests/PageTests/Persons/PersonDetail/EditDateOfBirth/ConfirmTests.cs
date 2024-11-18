@@ -30,10 +30,10 @@ public class ConfirmTests : TestBase
     public async Task Get_StateHasNoDateOfBirth_RedirectsToIndex()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var editDateOfBirthState = new EditDateOfBirthState();
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
            person.PersonId,
            editDateOfBirthState);
 
@@ -51,9 +51,9 @@ public class ConfirmTests : TestBase
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDateOfBirthState()
             {
@@ -67,7 +67,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(person.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("current-value")!.TextContent);
         Assert.Equal(newDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("new-value")!.TextContent);
     }
@@ -78,7 +78,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{personId}/edit-date-of-birth/confirm?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -93,9 +93,9 @@ public class ConfirmTests : TestBase
     public async Task Post_ValidRequest_UpdatesDateOfBirthAndCompletesJourney()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDateOfBirthState()
             {
@@ -114,15 +114,15 @@ public class ConfirmTests : TestBase
 
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Record has been updated");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
     }
 
-    private async Task<JourneyInstance<EditDateOfBirthState>> CreateJourneyInstance(Guid personId, EditDateOfBirthState? state = null) =>
+    private async Task<JourneyInstance<EditDateOfBirthState>> CreateJourneyInstanceAsync(Guid personId, EditDateOfBirthState? state = null) =>
     await CreateJourneyInstance(
         JourneyNames.EditDateOfBirth,
         state ?? new EditDateOfBirthState(),

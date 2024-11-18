@@ -24,7 +24,7 @@ public class GetSystemUserByAzureActiveDirectoryObjectIdTests : IAsyncLifetime
         var query = new GetSystemUserByAzureActiveDirectoryObjectIdQuery(nonExistentId);
 
         // Act
-        var systemUserInfo = await _crmQueryDispatcher.ExecuteQuery(query);
+        var systemUserInfo = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         Assert.Null(systemUserInfo);
@@ -37,7 +37,7 @@ public class GetSystemUserByAzureActiveDirectoryObjectIdTests : IAsyncLifetime
         var query = new GetSystemUserByAzureActiveDirectoryObjectIdQuery(KnownCrmAzureActiveDirectoryObjectId);
 
         // Act
-        var systemUserInfo = await _crmQueryDispatcher.ExecuteQuery(query);
+        var systemUserInfo = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         Assert.NotNull(systemUserInfo);

@@ -48,7 +48,7 @@ public class GetTrnRequestTests : TestBase
         var anotherClientId = Guid.NewGuid();
         Assert.NotEqual(ApplicationUserId, anotherClientId);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -74,11 +74,11 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
             .WithSlugId(slugId));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -94,7 +94,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -115,7 +115,7 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
             .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
@@ -124,7 +124,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -145,11 +145,11 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithSlugId(slugId));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -165,7 +165,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -186,7 +186,7 @@ public class GetTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
@@ -195,7 +195,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -217,12 +217,12 @@ public class GetTrnRequestTests : TestBase
         var slugId = Guid.NewGuid().ToString();
         var trnToken = "ABCDEFG1234567";
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithSlugId(slugId)
             .WithTrnToken(trnToken));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -239,7 +239,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -262,7 +262,7 @@ public class GetTrnRequestTests : TestBase
         var slugId = Guid.NewGuid().ToString();
         var trnToken = "ABCDEFG1234567";
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId)
@@ -272,7 +272,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v2/trn-requests/{requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

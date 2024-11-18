@@ -14,8 +14,8 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task AddAlert()
     {
-        var person = await TestData.CreatePerson();
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
+        var person = await TestData.CreatePersonAsync();
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(Guid.Parse("ed0cd700-3fb2-4db0-9403-ba57126090ed")); // Prohibition by the Secretary of State - misconduct
         var details = TestData.GenerateLoremIpsum();
         var link = TestData.GenerateUrl();
         var startDate = new DateOnly(2021, 1, 1);
@@ -28,37 +28,37 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonAlertsPage(personId);
+        await page.GoToPersonAlertsPageAsync(personId);
 
-        await page.ClickButton("Add an alert");
+        await page.ClickButtonAsync("Add an alert");
 
-        await page.AssertOnAddAlertTypePage();
+        await page.AssertOnAddAlertTypePageAsync();
 
         await page.CheckAsync($"label:text-is('{alertType.Name}')");
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddAlertDetailsPage();
+        await page.AssertOnAddAlertDetailsPageAsync();
 
         await page.FillAsync($"label:text-is('Enter details about the alert type: {alertType.Name}')", details);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddAlertLinkPage();
+        await page.AssertOnAddAlertLinkPageAsync();
 
         await page.CheckAsync("label:text-is('Yes')");
 
         await page.FillAsync("label:text-is('Enter link to panel outcome')", link);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddAlertStartDatePage();
+        await page.AssertOnAddAlertStartDatePageAsync();
 
-        await page.FillDateInput(startDate);
+        await page.FillDateInputAsync(startDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddAlertReasonPage();
+        await page.AssertOnAddAlertReasonPageAsync();
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re adding this alert?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -74,15 +74,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddAlertCheckAnswersPage();
+        await page.AssertOnAddAlertCheckAnswersPageAsync();
 
-        await page.ClickButton("Add alert");
+        await page.ClickButtonAsync("Add alert");
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert added");
+        await page.AssertFlashMessageAsync("Alert added");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var startDate = new DateOnly(2023, 1, 1);
         var details = TestData.GenerateLoremIpsum();
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithDetails(details)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithDetails(details)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var newDetails = TestData.GenerateLoremIpsum();
@@ -102,15 +102,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToEditAlertDetailsPage(alertId);
+        await page.GoToEditAlertDetailsPageAsync(alertId);
 
-        await page.AssertOnEditAlertDetailsPage(alertId);
+        await page.AssertOnEditAlertDetailsPageAsync(alertId);
 
         await page.FillAsync("label:text-is('Change details')", newDetails);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertDetailsChangeReasonPage(alertId);
+        await page.AssertOnEditAlertDetailsChangeReasonPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the alert details?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -126,22 +126,22 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertDetailsCheckAnswersPage(alertId);
+        await page.AssertOnEditAlertDetailsCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert changed");
+        await page.AssertFlashMessageAsync("Alert changed");
     }
 
     [Fact]
     public async Task EditAlertStartDate()
     {
         var startDate = new DateOnly(2023, 1, 1);
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var newStartDate = new DateOnly(2023, 2, 3);
@@ -153,15 +153,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToEditAlertStartDatePage(alertId);
+        await page.GoToEditAlertStartDatePageAsync(alertId);
 
-        await page.AssertOnEditAlertStartDatePage(alertId);
+        await page.AssertOnEditAlertStartDatePageAsync(alertId);
 
-        await page.FillDateInput(newStartDate);
+        await page.FillDateInputAsync(newStartDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertStartDateChangeReasonPage(alertId);
+        await page.AssertOnEditAlertStartDateChangeReasonPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the start date?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -177,15 +177,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertStartDateCheckAnswersPage(alertId);
+        await page.AssertOnEditAlertStartDateCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert changed");
+        await page.AssertFlashMessageAsync("Alert changed");
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
         var endDate = TestData.Clock.Today.AddDays(-10);
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var newEndDate = TestData.Clock.Today.AddDays(-5);
@@ -205,15 +205,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToEditAlertEndDatePage(alertId);
+        await page.GoToEditAlertEndDatePageAsync(alertId);
 
-        await page.AssertOnEditAlertEndDatePage(alertId);
+        await page.AssertOnEditAlertEndDatePageAsync(alertId);
 
-        await page.FillDateInput(newEndDate);
+        await page.FillDateInputAsync(newEndDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertEndDateChangeReasonPage(alertId);
+        await page.AssertOnEditAlertEndDateChangeReasonPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the end date?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -229,15 +229,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertEndDateCheckAnswersPage(alertId);
+        await page.AssertOnEditAlertEndDateCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert changed");
+        await page.AssertFlashMessageAsync("Alert changed");
     }
 
     [Theory]
@@ -247,7 +247,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
         var link = hasCurrentLink ? TestData.GenerateUrl() : null;
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithExternalLink(link)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithExternalLink(link)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var newLink = TestData.GenerateUrl();
@@ -259,9 +259,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToEditAlertLinkPage(alertId);
+        await page.GoToEditAlertLinkPageAsync(alertId);
 
-        await page.AssertOnEditAlertLinkPage(alertId);
+        await page.AssertOnEditAlertLinkPageAsync(alertId);
 
         if (hasCurrentLink)
         {
@@ -274,9 +274,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.FillAsync("label:text-is('Enter link to panel outcome')", newLink);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertLinkChangeReasonPage(alertId);
+        await page.AssertOnEditAlertLinkChangeReasonPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the panel outcome link?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -292,22 +292,22 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditAlertLinkCheckAnswersPage(alertId);
+        await page.AssertOnEditAlertLinkCheckAnswersPageAsync(alertId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert changed");
+        await page.AssertFlashMessageAsync("Alert changed");
     }
 
     [Fact]
     public async Task CloseAlert()
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var newEndDate = TestData.Clock.Today.AddDays(-5);
@@ -319,15 +319,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToCloseAlertPage(alertId);
+        await page.GoToCloseAlertPageAsync(alertId);
 
-        await page.AssertOnCloseAlertPage(alertId);
+        await page.AssertOnCloseAlertPageAsync(alertId);
 
-        await page.FillDateInput(newEndDate);
+        await page.FillDateInputAsync(newEndDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnCloseAlertChangeReasonPage(alertId);
+        await page.AssertOnCloseAlertChangeReasonPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re adding an end date?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -343,15 +343,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnCloseAlertCheckAnswersPage(alertId);
+        await page.AssertOnCloseAlertCheckAnswersPageAsync(alertId);
 
-        await page.ClickButton("Confirm and close alert");
+        await page.ClickButtonAsync("Confirm and close alert");
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert closed");
+        await page.AssertFlashMessageAsync("Alert closed");
     }
 
     [Fact]
@@ -359,7 +359,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
         var endDate = TestData.Clock.Today.AddDays(-10);
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var changeReason = ReopenAlertReasonOption.ClosedInError;
@@ -370,9 +370,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToReopenAlertPage(alertId);
+        await page.GoToReopenAlertPageAsync(alertId);
 
-        await page.AssertOnReopenAlertPage(alertId);
+        await page.AssertOnReopenAlertPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re removing the end date?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -388,15 +388,15 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnReopenAlertCheckAnswersPage(alertId);
+        await page.AssertOnReopenAlertCheckAnswersPageAsync(alertId);
 
-        await page.ClickButton("Confirm and re-open alert");
+        await page.ClickButtonAsync("Confirm and re-open alert");
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert re-opened");
+        await page.AssertFlashMessageAsync("Alert re-opened");
     }
 
     [Fact]
@@ -404,7 +404,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var startDate = TestData.Clock.Today.AddDays(-50);
         var endDate = TestData.Clock.Today.AddDays(-10);
-        var person = await TestData.CreatePerson(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithAlert(a => a.WithStartDate(startDate).WithEndDate(endDate)));
         var personId = person.PersonId;
         var alertId = person.Alerts.First().AlertId;
         var deleteReasonDetails = TestData.GenerateLoremIpsum();
@@ -414,9 +414,9 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToDeleteAlertPage(alertId);
+        await page.GoToDeleteAlertPageAsync(alertId);
 
-        await page.AssertOnDeleteAlertPage(alertId);
+        await page.AssertOnDeleteAlertPageAsync(alertId);
 
         await page.Locator("div.govuk-form-group:has-text('Do you want to add why you are deleting this alert?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", deleteReasonDetails);
@@ -431,14 +431,14 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
                     Buffer = TestData.JpegImage
                 });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnDeleteAlertCheckAnswersPage(alertId);
+        await page.AssertOnDeleteAlertCheckAnswersPageAsync(alertId);
 
-        await page.ClickButton("Delete alert");
+        await page.ClickButtonAsync("Delete alert");
 
-        await page.AssertOnPersonAlertsPage(personId);
+        await page.AssertOnPersonAlertsPageAsync(personId);
 
-        await page.AssertFlashMessage("Alert deleted");
+        await page.AssertFlashMessageAsync("Alert deleted");
     }
 }

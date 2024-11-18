@@ -37,12 +37,12 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn());
 
         ConfigureDataverseAdapterGetTeacher(person.Contact);
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -60,7 +60,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -81,7 +81,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
@@ -89,7 +89,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         ConfigureDataverseAdapterGetTeacher(person.Contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(person.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
+            .Setup(mock => mock.GetTeacherAsync(person.ContactId, /* resolveMerges: */ It.IsAny<string[]>(), true))
             .ReturnsAsync(new Contact()
             {
                 Id = person.ContactId,
@@ -103,7 +103,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -123,10 +123,10 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Arrange
         var requestId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithoutTrn());
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -144,7 +144,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -165,7 +165,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
         var slugId = Guid.NewGuid().ToString();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
             .WithTrnRequest(ApplicationUserId, requestId)
             .WithSlugId(slugId));
@@ -178,7 +178,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -202,7 +202,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.RequestId),
             expectedError: Properties.StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
@@ -218,7 +218,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", CreateRequest());
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.RequestId),
             expectedError: Properties.StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
@@ -237,11 +237,11 @@ public class GetOrCreateTrnRequestTests : TestBase
         var teacherId = Guid.NewGuid();
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         var slugId = Guid.NewGuid().ToString();
@@ -253,7 +253,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         // Assert
         DataverseAdapterMock.Verify();
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -276,11 +276,11 @@ public class GetOrCreateTrnRequestTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req => req.Qualification = null);
@@ -301,11 +301,11 @@ public class GetOrCreateTrnRequestTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req => req.Qualification.Subject2 = null);
@@ -326,11 +326,11 @@ public class GetOrCreateTrnRequestTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req => req.Qualification.Subject3 = null);
@@ -349,7 +349,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject2NotFound));
 
         // Act
@@ -358,7 +358,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject2)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -371,7 +371,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubject3NotFound));
 
         // Act
@@ -380,7 +380,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.Qualification.Subject3 = "some invalid subject"));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject3)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -394,7 +394,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var ukprn = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttProviderNotFound));
 
         // Act
@@ -404,7 +404,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.ProviderUkprn)}",
             expectedError: Properties.StringResources.Errors_10008_Title);
@@ -418,7 +418,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var subject = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject1NotFound));
 
         // Act
@@ -427,7 +427,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject1)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -441,7 +441,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var subject = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.Subject2NotFound));
 
         // Act
@@ -450,7 +450,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}.{nameof(GetOrCreateTrnRequest.InitialTeacherTraining.Subject2)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -464,7 +464,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var ittQualificationType = (IttQualificationType)(-1);
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.IttQualificationNotFound));
 
         // Act
@@ -484,7 +484,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var country = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationCountryNotFound));
 
         // Act
@@ -493,7 +493,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.Qualification.CountryCode = country));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.CountryCode)}",
             expectedError: Properties.StringResources.Errors_10010_Title);
@@ -507,7 +507,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var subject = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationSubjectNotFound));
 
         // Act
@@ -516,7 +516,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.Subject)}",
             expectedError: Properties.StringResources.Errors_10009_Title);
@@ -530,7 +530,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var ukprn = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationProviderNotFound));
 
         // Act
@@ -539,7 +539,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.Qualification.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.ProviderUkprn)}",
             expectedError: Properties.StringResources.Errors_10008_Title);
@@ -569,7 +569,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var heQualificationType = HeQualificationType.BachelorOfCommerce;
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Failed(CreateTeacherFailedReasons.QualificationNotFound));
 
         // Act
@@ -578,7 +578,7 @@ public class GetOrCreateTrnRequestTests : TestBase
             CreateRequest(req => req.Qualification.HeQualificationType = heQualificationType));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(GetOrCreateTrnRequest.Qualification)}.{nameof(GetOrCreateTrnRequest.Qualification.HeQualificationType)}",
             expectedError: Properties.StringResources.Errors_10013_Title);
@@ -602,7 +602,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Birthdate",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -626,7 +626,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Birthdate",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -653,7 +653,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             expectedErrorPropertyName,
             expectedErrorMessage);
@@ -674,10 +674,10 @@ public class GetOrCreateTrnRequestTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null));
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(cmd =>
@@ -691,7 +691,7 @@ public class GetOrCreateTrnRequestTests : TestBase
 
         // Assert
         DataverseAdapterMock
-            .Verify(mock => mock.CreateTeacher(It.Is<CreateTeacherCommand>(cmd => cmd.FirstName == expectedFirstName && cmd.MiddleName == expectedMiddleName)));
+            .Verify(mock => mock.CreateTeacherAsync(It.Is<CreateTeacherCommand>(cmd => cmd.FirstName == expectedFirstName && cmd.MiddleName == expectedMiddleName)));
     }
 
     [Fact]
@@ -730,15 +730,15 @@ public class GetOrCreateTrnRequestTests : TestBase
         var qtsDate = new DateOnly(2020, 10, 10);
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, trnToken))
             .Verifiable();
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         GetAnIdentityApiClientMock
-            .Setup(mock => mock.CreateTrnToken(It.IsAny<CreateTrnTokenRequest>()))
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
             .ReturnsAsync(new CreateTrnTokenResponse()
             {
                 Email = Faker.Internet.Email(),
@@ -765,7 +765,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         Assert.True(response.IsSuccessStatusCode);
         DataverseAdapterMock.Verify();
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -789,11 +789,11 @@ public class GetOrCreateTrnRequestTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(mock => mock.CreateTeacher(It.IsAny<CreateTeacherCommand>()))
+            .Setup(mock => mock.CreateTeacherAsync(It.IsAny<CreateTeacherCommand>()))
             .ReturnsAsync(CreateTeacherResult.Success(teacherId, trn, /* trnToken: */ null))
             .Verifiable();
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(teacherId, Array.Empty<string>(), false))
+            .Setup(mock => mock.GetTeacherAsync(teacherId, Array.Empty<string>(), false))
             .ReturnsAsync(new Contact() { Id = teacherId });
 
         var request = CreateRequest(req =>
@@ -827,7 +827,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.SlugId),
             expectedError: Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
@@ -849,7 +849,7 @@ public class GetOrCreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"v2/trn-requests/{requestId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(GetOrCreateTrnRequest.SlugId),
             expectedError: Properties.StringResources.ErrorMessages_SlugIdCanOnlyBeProvidedForTraineeTeachers);
@@ -928,7 +928,7 @@ public class GetOrCreateTrnRequestTests : TestBase
     private void ConfigureDataverseAdapterGetTeacher(Contact contact)
     {
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacher(contact.Id, It.IsAny<string[]>(), /* resolveMerges: */ true))
+            .Setup(mock => mock.GetTeacherAsync(contact.Id, It.IsAny<string[]>(), /* resolveMerges: */ true))
             .ReturnsAsync(contact);
     }
 }

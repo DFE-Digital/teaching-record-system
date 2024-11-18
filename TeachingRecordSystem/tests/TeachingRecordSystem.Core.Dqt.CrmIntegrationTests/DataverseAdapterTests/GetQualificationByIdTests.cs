@@ -57,7 +57,7 @@ public class GetQualificationByIdTests : IAsyncLifetime
         });
 
         // Act
-        var qualification = await _dataverseAdapter.GetQualificationById(
+        var qualification = await _dataverseAdapter.GetQualificationByIdAsync(
             qualificationId,
             columnNames: new[]
             {

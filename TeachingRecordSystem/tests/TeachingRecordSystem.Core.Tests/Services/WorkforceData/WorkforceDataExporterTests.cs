@@ -43,11 +43,11 @@ public class WorkforceDataExporterTests : IAsyncLifetime
         var optionsAccessor = Mock.Of<IOptions<WorkforceDataExportOptions>>();
         var storageClientProvider = Mock.Of<IStorageClientProvider>();
         var storageClient = Mock.Of<StorageClient>();
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var establishment1 = await TestData.CreateEstablishment(localAuthorityCode: "126", establishmentNumber: "1237");
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var establishment1 = await TestData.CreateEstablishmentAsync(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
         var personPostcode = Faker.Address.UkPostCode();
-        var personEmployment = await TestData.CreateTpsEmployment(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
+        var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
 
         Mock.Get(optionsAccessor)
             .Setup(o => o.Value)
@@ -77,7 +77,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
             optionsAccessor,
             storageClientProvider);
 
-        await workforceDataExporter.Export(CancellationToken.None);
+        await workforceDataExporter.ExportAsync(CancellationToken.None);
 
         // Assert
         Assert.NotNull(deserializedExport);
@@ -104,7 +104,7 @@ public class WorkforceDataExporterTests : IAsyncLifetime
 
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearData();
+    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
 
     private DbFixture DbFixture { get; }
 

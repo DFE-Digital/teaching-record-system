@@ -12,7 +12,7 @@ public class WorkforceDataExporter(
     IOptions<WorkforceDataExportOptions> optionsAccessor,
     IStorageClientProvider storageClientProvider)
 {
-    public async Task Export(CancellationToken cancellationToken)
+    public async Task ExportAsync(CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -85,11 +85,11 @@ public class WorkforceDataExporter(
         using var stream = new MemoryStream();
         var merger = new FileMerger(new DirectoryInfo(tempDirectory));
         await merger.MergeFilesAsync(stream);
-        await UploadFile(stream, $"workforce_data_{clock.UtcNow:yyyyMMddHHmm}.parquet", cancellationToken);
+        await UploadFileAsync(stream, $"workforce_data_{clock.UtcNow:yyyyMMddHHmm}.parquet", cancellationToken);
         Directory.Delete(tempDirectory, true);
     }
 
-    private async Task UploadFile(Stream stream, string fileName, CancellationToken cancellationToken)
+    private async Task UploadFileAsync(Stream stream, string fileName, CancellationToken cancellationToken)
     {
         var storageClient = await storageClientProvider.GetStorageClientAsync();
         var options = optionsAccessor.Value;

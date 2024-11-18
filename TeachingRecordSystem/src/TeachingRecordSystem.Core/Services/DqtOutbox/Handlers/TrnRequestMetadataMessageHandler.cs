@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Services.DqtOutbox.Handlers;
 
 public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessageHandler<TrnRequestMetadataMessage>
 {
-    public async Task HandleMessage(TrnRequestMetadataMessage message)
+    public async Task HandleMessageAsync(TrnRequestMetadataMessage message)
     {
         try
         {

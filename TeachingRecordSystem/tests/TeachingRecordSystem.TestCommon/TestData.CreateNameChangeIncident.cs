@@ -10,11 +10,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<CreateNameChangeIncidentResult> CreateNameChangeIncident(Action<CreateNameChangeIncidentBuilder> configure)
+    public Task<CreateNameChangeIncidentResult> CreateNameChangeIncidentAsync(Action<CreateNameChangeIncidentBuilder> configure)
     {
         var builder = new CreateNameChangeIncidentBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class CreateNameChangeIncidentBuilder
@@ -103,7 +103,7 @@ public partial class TestData
 
         public CreateNameChangeIncidentBuilder WithApprovedStatus() => WithStatus(IncidentStatusType.Approved);
 
-        public async Task<CreateNameChangeIncidentResult> Execute(TestData testData)
+        public async Task<CreateNameChangeIncidentResult> ExecuteAsync(TestData testData)
         {
             if (_customerId is null)
             {
@@ -117,7 +117,7 @@ public partial class TestData
             var incidentId = Guid.NewGuid();
             var title = "Request to change name";
             var subjectTitle = "Change of Name";
-            var nameChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitle(subjectTitle);
+            var nameChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitleAsync(subjectTitle);
 
             var incident = new Incident()
             {
@@ -137,13 +137,13 @@ public partial class TestData
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = incident });
-            var (document, annotation, evidence) = await CreateDocument(_customerId.Value, _defaultEvidenceFileName, _defaultEvidenceFileContent, _defaultEvidenceFileMimeType);
+            var (document, annotation, evidence) = await CreateDocumentAsync(_customerId.Value, _defaultEvidenceFileName, _defaultEvidenceFileContent, _defaultEvidenceFileMimeType);
             evidences.Add(evidence);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
             if (_hasMultipleEvidenceFiles)
             {
-                (document, annotation, evidence) = await CreateDocument(_customerId.Value, _additionalEvidenceFileName, _additionalEvidenceFileContent, _additionalEvidenceFileMimeType);
+                (document, annotation, evidence) = await CreateDocumentAsync(_customerId.Value, _additionalEvidenceFileName, _additionalEvidenceFileContent, _additionalEvidenceFileMimeType);
                 evidences.Add(evidence);
                 txnRequestBuilder.AddRequest(new CreateRequest() { Target = document });
                 txnRequestBuilder.AddRequest(new CreateRequest() { Target = annotation });
@@ -201,7 +201,7 @@ public partial class TestData
                     ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Incident.Fields.TicketNumber, Incident.Fields.CreatedOn)
                 });
 
-            await txnRequestBuilder.Execute();
+            await txnRequestBuilder.ExecuteAsync();
 
             var createdIncident = retrieveIncidentResponse.GetResponse().Entity.ToEntity<Incident>();
             var ticketNumber = createdIncident.TicketNumber;
@@ -225,7 +225,7 @@ public partial class TestData
                 Evidence = evidences.ToArray()
             };
 
-            async Task<(dfeta_document, Annotation, CreateNameChangeIncidentEvidence)> CreateDocument(Guid customerId, string filename, Stream content, string mimeType)
+            async Task<(dfeta_document, Annotation, CreateNameChangeIncidentEvidence)> CreateDocumentAsync(Guid customerId, string filename, Stream content, string mimeType)
             {
                 var document = new dfeta_document()
                 {
@@ -237,7 +237,7 @@ public partial class TestData
                     StatusCode = dfeta_document_StatusCode.Active
                 };
 
-                var annotationBody = await GetBase64EncodedFileContent(content);
+                var annotationBody = await GetBase64EncodedFileContentAsync(content);
 
                 var annotation = new Annotation()
                 {

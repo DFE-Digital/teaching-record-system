@@ -17,8 +17,8 @@ public class DetailsTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -34,7 +34,7 @@ public class DetailsTests : AddAlertTestBase
     {
         // Arrange        
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -49,8 +49,8 @@ public class DetailsTests : AddAlertTestBase
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -66,8 +66,8 @@ public class DetailsTests : AddAlertTestBase
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -82,8 +82,8 @@ public class DetailsTests : AddAlertTestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -91,7 +91,7 @@ public class DetailsTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TextContent);
     }
 
@@ -102,8 +102,8 @@ public class DetailsTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -119,7 +119,7 @@ public class DetailsTests : AddAlertTestBase
     {
         // Arrange        
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -134,8 +134,8 @@ public class DetailsTests : AddAlertTestBase
     public async Task Post_WithMissingDataInJourneyState_Redirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -151,8 +151,8 @@ public class DetailsTests : AddAlertTestBase
     public async Task Post_WhenDetailsIsBlank_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -160,15 +160,15 @@ public class DetailsTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Details", "Enter details");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
     }
 
     [Fact]
     public async Task Post_DetailsAreTooLong_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
         var details = new string('x', 4001);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -180,15 +180,15 @@ public class DetailsTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Details", "Details must be 4000 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Details must be 4000 characters or less");
     }
 
     [Fact]
     public async Task Post_ValidInput_UpdatesStateAndRedirectsToLinkPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
         var details = "My details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -211,8 +211,8 @@ public class DetailsTests : AddAlertTestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/details/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 

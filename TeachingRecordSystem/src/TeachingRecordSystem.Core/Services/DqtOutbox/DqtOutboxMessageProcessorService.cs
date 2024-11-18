@@ -34,7 +34,7 @@ public class DqtOutboxMessageProcessorService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) =>
         await _resiliencePipeline.ExecuteAsync(async ct =>
         {
-            await foreach (var changedItems in crmEntityChangesService.GetEntityChanges(
+            await foreach (var changedItems in crmEntityChangesService.GetEntityChangesAsync(
                 ChangesKey,
                 EntityName,
                 _columns,
@@ -50,7 +50,7 @@ public class DqtOutboxMessageProcessorService(
                     }
 
                     var message = newOrUpdatedItem.NewOrUpdatedEntity.ToEntity<dfeta_TrsOutboxMessage>();
-                    await outboxMessageHandler.HandleOutboxMessage(message);
+                    await outboxMessageHandler.HandleOutboxMessageAsync(message);
                 }
             }
         },

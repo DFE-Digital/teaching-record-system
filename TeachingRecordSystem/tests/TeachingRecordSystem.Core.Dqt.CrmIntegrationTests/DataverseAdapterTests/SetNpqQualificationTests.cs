@@ -38,7 +38,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         var (_, qualificationId, _) = await CreateQualification(teacherId, type, true);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImpl(new SetNpqQualificationCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImplAsync(new SetNpqQualificationCommand()
         {
             TeacherId = teacherId,
             CompletionDate = null,
@@ -68,7 +68,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         await CreateQualification(teacherId, type, false);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImpl(new SetNpqQualificationCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImplAsync(new SetNpqQualificationCommand()
         {
             TeacherId = teacherId,
             CompletionDate = DateTime.Now.AddDays(-100),
@@ -98,7 +98,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         var (_, apiqualificationid, _) = await CreateQualification(teacherId, type, true);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImpl(new SetNpqQualificationCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImplAsync(new SetNpqQualificationCommand()
         {
             TeacherId = teacherId,
             CompletionDate = DateTime.Now.AddDays(-100),
@@ -121,7 +121,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         await CreateQualification(teacherId, type, false);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImpl(new SetNpqQualificationCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImplAsync(new SetNpqQualificationCommand()
         {
             TeacherId = teacherId,
             CompletionDate = null,
@@ -151,7 +151,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         await CreateQualification(teacherId, type, true);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImpl(new SetNpqQualificationCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImplAsync(new SetNpqQualificationCommand()
         {
             TeacherId = teacherId,
             CompletionDate = DateTime.Now.AddDays(-100),
@@ -180,7 +180,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         var (teacherId, _) = await CreatePerson(false, false, true);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImpl(new SetNpqQualificationCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.SetNpqQualificationImplAsync(new SetNpqQualificationCommand()
         {
             TeacherId = teacherId,
             CompletionDate = DateTime.Now.AddDays(-100),
@@ -199,7 +199,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
     bool assessmentOnly = false,
     bool hasActiveSanctions = false)
     {
-        var createPersonResult = await _testDataHelper.CreatePerson(
+        var createPersonResult = await _testDataHelper.CreatePersonAsync(
             earlyYears,
             assessmentOnly,
             withQualification: true,
@@ -213,7 +213,7 @@ public class SetNpqQualificationTests : IAsyncLifetime
         dfeta_qualification_dfeta_Type qualificationType,
         bool createdByApi = true)
     {
-        var createQualification = await _testDataHelper.CreateQualification(TeacherId,
+        var createQualification = await _testDataHelper.CreateQualificationAsync(TeacherId,
             qualificationType, createdByApi);
 
         return (createQualification.TeacherId, createQualification.QualificationId, qualificationType);

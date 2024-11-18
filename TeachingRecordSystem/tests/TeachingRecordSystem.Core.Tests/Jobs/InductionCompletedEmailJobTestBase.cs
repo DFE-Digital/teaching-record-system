@@ -13,5 +13,5 @@ public abstract class InductionCompletedEmailJobTestBase : IAsyncLifetime
     public Task DisposeAsync() => Task.CompletedTask;
 
     public Task InitializeAsync() =>
-        DbFixture.WithDbContext(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from induction_completed_emails_jobs"));
+        DbFixture.WithDbContextAsync(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from induction_completed_emails_jobs"));
 }

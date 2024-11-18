@@ -34,7 +34,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var result = await _dataverseAdapter.FindTeachers(query);
+        var result = await _dataverseAdapter.FindTeachersAsync(query);
 
         var teacher = result.FirstOrDefault(match => match.dfeta_TRN == query.Trn) ??
                       result.FirstOrDefault(match => match.dfeta_NINumber == query.NationalInsuranceNumber);
@@ -44,7 +44,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {

@@ -12,41 +12,41 @@ public class ChangeRequestTests : TestBase
     [InlineData(false)]
     public async Task SelectChangeRequestAndApprove(bool isNameChange)
     {
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePersonAsync();
         string caseReference;
         if (isNameChange)
         {
-            var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
             caseReference = createIncidentResult.TicketNumber;
         }
         else
         {
-            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
             caseReference = createIncidentResult.TicketNumber;
         }
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToHomePage();
+        await page.GoToHomePageAsync();
 
-        await page.ClickSupportTasksLinkInNavigationBar();
+        await page.ClickSupportTasksLinkInNavigationBarAsync();
 
-        await page.AssertOnSupportTasksPage();
+        await page.AssertOnSupportTasksPageAsync();
 
-        await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
+        await page.ClickCaseReferenceLinkChangeRequestsPageAsync(caseReference);
 
-        await page.AssertOnChangeRequestDetailPage(caseReference);
+        await page.AssertOnChangeRequestDetailPageAsync(caseReference);
 
-        await page.ClickAcceptChangeButton();
+        await page.ClickAcceptChangeButtonAsync();
 
-        await page.AssertOnAcceptChangeRequestPage(caseReference);
+        await page.AssertOnAcceptChangeRequestPageAsync(caseReference);
 
-        await page.ClickConfirmButton();
+        await page.ClickConfirmButtonAsync();
 
-        await page.AssertOnSupportTasksPage();
+        await page.AssertOnSupportTasksPageAsync();
 
-        await page.AssertFlashMessage("The request has been accepted");
+        await page.AssertFlashMessageAsync("The request has been accepted");
     }
 
     [Theory]
@@ -54,43 +54,43 @@ public class ChangeRequestTests : TestBase
     [InlineData(false)]
     public async Task SelectChangeRequestAndReject(bool isNameChange)
     {
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePersonAsync();
         string caseReference;
         if (isNameChange)
         {
-            var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
             caseReference = createIncidentResult.TicketNumber;
         }
         else
         {
-            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
             caseReference = createIncidentResult.TicketNumber;
         }
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToHomePage();
+        await page.GoToHomePageAsync();
 
-        await page.ClickSupportTasksLinkInNavigationBar();
+        await page.ClickSupportTasksLinkInNavigationBarAsync();
 
-        await page.AssertOnSupportTasksPage();
+        await page.AssertOnSupportTasksPageAsync();
 
-        await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
+        await page.ClickCaseReferenceLinkChangeRequestsPageAsync(caseReference);
 
-        await page.AssertOnChangeRequestDetailPage(caseReference);
+        await page.AssertOnChangeRequestDetailPageAsync(caseReference);
 
-        await page.ClickRejectChangeButton();
+        await page.ClickRejectChangeButtonAsync();
 
-        await page.AssertOnRejectChangeRequestPage(caseReference);
+        await page.AssertOnRejectChangeRequestPageAsync(caseReference);
 
         await page.CheckAsync("label:text-is('Request and proof don’t match')");
 
-        await page.ClickRejectButton();
+        await page.ClickRejectButtonAsync();
 
-        await page.AssertOnSupportTasksPage();
+        await page.AssertOnSupportTasksPageAsync();
 
-        await page.AssertFlashMessage("The request has been rejected");
+        await page.AssertFlashMessageAsync("The request has been rejected");
     }
 
     [Theory]
@@ -98,42 +98,42 @@ public class ChangeRequestTests : TestBase
     [InlineData(false)]
     public async Task SelectChangeRequestAndCancel(bool isNameChange)
     {
-        var createPersonResult = await TestData.CreatePerson();
+        var createPersonResult = await TestData.CreatePersonAsync();
         string caseReference;
         if (isNameChange)
         {
-            var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
             caseReference = createIncidentResult.TicketNumber;
         }
         else
         {
-            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+            var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
             caseReference = createIncidentResult.TicketNumber;
         }
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToHomePage();
+        await page.GoToHomePageAsync();
 
-        await page.ClickSupportTasksLinkInNavigationBar();
+        await page.ClickSupportTasksLinkInNavigationBarAsync();
 
-        await page.AssertOnSupportTasksPage();
+        await page.AssertOnSupportTasksPageAsync();
 
-        await page.ClickCaseReferenceLinkChangeRequestsPage(caseReference);
+        await page.ClickCaseReferenceLinkChangeRequestsPageAsync(caseReference);
 
-        await page.AssertOnChangeRequestDetailPage(caseReference);
+        await page.AssertOnChangeRequestDetailPageAsync(caseReference);
 
-        await page.ClickRejectChangeButton();
+        await page.ClickRejectChangeButtonAsync();
 
-        await page.AssertOnRejectChangeRequestPage(caseReference);
+        await page.AssertOnRejectChangeRequestPageAsync(caseReference);
 
         await page.CheckAsync("label:text-is('Change no longer required')");
 
-        await page.ClickRejectButton();
+        await page.ClickRejectButtonAsync();
 
-        await page.AssertOnSupportTasksPage();
+        await page.AssertOnSupportTasksPageAsync();
 
-        await page.AssertFlashMessage("The request has been cancelled");
+        await page.AssertFlashMessageAsync("The request has been cancelled");
     }
 }

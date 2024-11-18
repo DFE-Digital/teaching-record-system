@@ -21,7 +21,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.GetPerson},{ApiRoles.AppropriateBody}")]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
         [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
@@ -48,7 +48,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             dateOfBirth,
             ApplyLegacyAlertsBehavior: false);
 
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {
@@ -67,12 +67,12 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersons(
+    public async Task<IActionResult> FindPersonsAsync(
         [FromBody] FindPersonsRequest request,
         [FromServices] FindPersonsByTrnAndDateOfBirthHandler handler)
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
         var response = mapper.Map<FindPersonsResponse>(result);
         return Ok(response);
     }
@@ -85,12 +85,12 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindPersons(
+    public async Task<IActionResult> FindPersonsAsync(
         FindPersonRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         var response = new FindPersonResponse()
         {
@@ -109,13 +109,13 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Marks a person as deceased.")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
-    public async Task<IActionResult> Deceased(
+    public async Task<IActionResult> DeceasedAsync(
         [FromRoute] string trn,
         [FromBody] SetDeceasedRequest request,
         [FromServices] SetDeceasedHandler handler)
     {
         var command = new SetDeceasedCommand(trn, request.DateOfDeath);
-        await handler.Handle(command);
+        await handler.HandleAsync(command);
         return NoContent();
     }
 }

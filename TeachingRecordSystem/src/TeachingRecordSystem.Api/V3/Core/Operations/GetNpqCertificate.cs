@@ -13,9 +13,9 @@ public class GetNpqCertificateHandler(IDataverseAdapter dataverseAdapter, ICerti
     private const string FullNameFormField = "Full Name";
     private const string PassDateFormField = "Pass Date";
 
-    public async Task<FileDownloadInfo?> Handle(GetNpqCertificateCommand command)
+    public async Task<FileDownloadInfo?> HandleAsync(GetNpqCertificateCommand command)
     {
-        var qualification = await dataverseAdapter.GetQualificationById(
+        var qualification = await dataverseAdapter.GetQualificationByIdAsync(
             command.QualificationId,
             columnNames: new[]
             {
@@ -62,7 +62,7 @@ public class GetNpqCertificateHandler(IDataverseAdapter dataverseAdapter, ICerti
             { PassDateFormField, qualification.dfeta_CompletionorAwardDate.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("d MMMM yyyy") }
         };
 
-        var pdfStream = await certificateGenerator.GenerateCertificate($"{qualification.dfeta_Type} Certificate.pdf", fieldValues);
+        var pdfStream = await certificateGenerator.GenerateCertificateAsync($"{qualification.dfeta_Type} Certificate.pdf", fieldValues);
 
         return new FileDownloadInfo(pdfStream, $"{qualification.dfeta_Type}Certificate.pdf", "application/pdf");
     }

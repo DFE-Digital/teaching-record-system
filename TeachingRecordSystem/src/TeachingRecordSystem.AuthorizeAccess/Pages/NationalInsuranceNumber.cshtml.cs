@@ -30,7 +30,7 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageMode
         NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (HaveNationalInsuranceNumber == true)
         {
@@ -51,7 +51,7 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageMode
 
         await JourneyInstance!.UpdateStateAsync(state => state.SetNationalInsuranceNumber(HaveNationalInsuranceNumber!.Value, NationalInsuranceNumber));
 
-        return await helper.TryMatchToTeachingRecord(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance!.InstanceId)) :
+        return await helper.TryMatchToTeachingRecordAsync(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance!.InstanceId)) :
             FromCheckAnswers == true ? Redirect(helper.LinkGenerator.CheckAnswers(JourneyInstance!.InstanceId)) :
             Redirect(helper.LinkGenerator.Trn(JourneyInstance!.InstanceId));
     }

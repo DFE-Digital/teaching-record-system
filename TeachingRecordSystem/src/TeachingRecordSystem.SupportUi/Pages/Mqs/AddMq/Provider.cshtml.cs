@@ -31,7 +31,7 @@ public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
         ProviderId = JourneyInstance!.State.ProviderId;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -45,7 +45,7 @@ public class ProviderModel(TrsLinkGenerator linkGenerator) : PageModel
             linkGenerator.MqAddSpecialism(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));

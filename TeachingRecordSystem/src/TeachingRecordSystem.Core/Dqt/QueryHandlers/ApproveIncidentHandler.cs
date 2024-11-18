@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class ApproveIncidentHandler : ICrmQueryHandler<ApproveIncidentQuery, bool>
 {
-    public async Task<bool> Execute(ApproveIncidentQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<bool> ExecuteAsync(ApproveIncidentQuery query, IOrganizationServiceAsync organizationService)
     {
         await organizationService.ExecuteAsync(new CloseIncidentRequest()
         {

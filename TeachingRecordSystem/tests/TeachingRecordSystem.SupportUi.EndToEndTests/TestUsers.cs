@@ -24,7 +24,7 @@ public static class TestUsers
 
     public class CreateUsersStartupTask(TrsDbContext trsDbContext) : IStartupTask
     {
-        public Task Execute()
+        public Task ExecuteAsync()
         {
             trsDbContext.Users.Add(Administrator);
 

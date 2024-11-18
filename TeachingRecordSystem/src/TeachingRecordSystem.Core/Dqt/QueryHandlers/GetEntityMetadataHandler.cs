@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetEntityMetadataHandler : ICrmQueryHandler<GetEntityMetadataQuery, EntityMetadata>
 {
-    public async Task<EntityMetadata> Execute(GetEntityMetadataQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<EntityMetadata> ExecuteAsync(GetEntityMetadataQuery query, IOrganizationServiceAsync organizationService)
     {
         var entityResponse = (RetrieveEntityResponse)await organizationService.ExecuteAsync(new RetrieveEntityRequest()
         {

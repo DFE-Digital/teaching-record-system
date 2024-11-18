@@ -4,11 +4,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task CreateTpsCsvExtract(Action<TpsCsvExtractBuilder>? configure = null)
+    public Task CreateTpsCsvExtractAsync(Action<TpsCsvExtractBuilder>? configure = null)
     {
         var builder = new TpsCsvExtractBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class TpsCsvExtractBuilder
@@ -63,7 +63,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task Execute(TestData testData)
+        internal async Task ExecuteAsync(TestData testData)
         {
             if (_tpsCsvExtractId is null)
             {
@@ -81,7 +81,7 @@ public partial class TestData
                 CreatedOn = createdOn
             };
 
-            await testData.WithDbContext(async dbContext =>
+            await testData.WithDbContextAsync(async dbContext =>
             {
                 dbContext.TpsCsvExtracts.Add(tpsCsvExtract);
                 int memberId = 10000;

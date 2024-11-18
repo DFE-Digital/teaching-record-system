@@ -24,7 +24,7 @@ public class GetCountryTests : IAsyncLifetime
         var countryCode = "XK";
 
         // Act
-        var result = await _dataverseAdapter.GetCountry(countryCode);
+        var result = await _dataverseAdapter.GetCountryAsync(countryCode);
 
         // Assert
         Assert.NotNull(result);
@@ -38,7 +38,7 @@ public class GetCountryTests : IAsyncLifetime
         var countryCode = "XXXX";
 
         // Act
-        var result = await _dataverseAdapter.GetCountry(countryCode);
+        var result = await _dataverseAdapter.GetCountryAsync(countryCode);
 
         // Assert
         Assert.Null(result);

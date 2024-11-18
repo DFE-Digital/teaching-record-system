@@ -22,7 +22,7 @@ public class OAuth2Controller(
     [HttpGet("~/oauth2/authorize")]
     [HttpPost("~/oauth2/authorize")]
     [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> Authorize()
+    public async Task<IActionResult> AuthorizeAsync()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
@@ -110,7 +110,7 @@ public class OAuth2Controller(
     [HttpPost("~/oauth2/token")]
     [IgnoreAntiforgeryToken]
     [Produces("application/json")]
-    public async Task<IActionResult> Token()
+    public async Task<IActionResult> TokenAsync()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
@@ -137,7 +137,7 @@ public class OAuth2Controller(
     [HttpGet("~/oauth2/userinfo")]
     [HttpPost("~/oauth2/userinfo")]
     [Produces("application/json")]
-    public async Task<IActionResult> UserInfo()
+    public async Task<IActionResult> UserInfoAsync()
     {
         var subject = User.GetClaim(ClaimTypes.Subject)!;
 

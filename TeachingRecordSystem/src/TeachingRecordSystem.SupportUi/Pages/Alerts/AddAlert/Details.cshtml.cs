@@ -31,7 +31,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
         Details = JourneyInstance!.State.Details;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -48,7 +48,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
             : linkGenerator.AlertAddLink(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

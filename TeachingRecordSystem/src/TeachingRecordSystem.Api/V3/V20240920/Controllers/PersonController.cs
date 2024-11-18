@@ -21,7 +21,7 @@ public class PersonController(IMapper mapper) : ControllerBase
         Description = "Gets the details for the authenticated person.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
         [FromServices] GetPersonHandler handler)
     {
@@ -31,7 +31,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             DateOfBirth: null,
             ApplyLegacyAlertsBehavior: false);
 
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
         var response = mapper.Map<GetPersonResponse?>(result);
         return response is null ? Forbid() : Ok(response);
     }

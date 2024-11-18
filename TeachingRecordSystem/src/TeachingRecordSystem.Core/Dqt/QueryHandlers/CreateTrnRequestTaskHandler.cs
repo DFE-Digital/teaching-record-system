@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class CreateTrnRequestTaskHandler : ICrmQueryHandler<CreateTrnRequestTaskQuery, Guid>
 {
-    public async Task<Guid> Execute(CreateTrnRequestTaskQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Guid> ExecuteAsync(CreateTrnRequestTaskQuery query, IOrganizationServiceAsync organizationService)
     {
         var crmTask = new CrmTask()
         {
@@ -16,7 +16,7 @@ public class CreateTrnRequestTaskHandler : ICrmQueryHandler<CreateTrnRequestTask
             dfeta_EmailAddress = query.EmailAddress
         };
 
-        var annotationBody = await StreamHelper.GetBase64EncodedFileContent(query.EvidenceFileContent);
+        var annotationBody = await StreamHelper.GetBase64EncodedFileContentAsync(query.EvidenceFileContent);
 
         var annotation = new Annotation()
         {
@@ -32,7 +32,7 @@ public class CreateTrnRequestTaskHandler : ICrmQueryHandler<CreateTrnRequestTask
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
         requestBuilder.AddRequest<CreateResponse>(new CreateRequest() { Target = crmTask });
         requestBuilder.AddRequest(new CreateRequest() { Target = annotation });
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         return crmTask.Id;
     }

@@ -26,7 +26,7 @@ public class GetTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -35,7 +35,7 @@ public class GetTrnRequestTests : TestBase
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -79,7 +79,7 @@ public class GetTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var masterContact = await TestData.CreatePerson(p => p
+        var masterContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -88,7 +88,7 @@ public class GetTrnRequestTests : TestBase
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -110,7 +110,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -142,7 +142,7 @@ public class GetTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -156,7 +156,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -188,7 +188,7 @@ public class GetTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -202,7 +202,7 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

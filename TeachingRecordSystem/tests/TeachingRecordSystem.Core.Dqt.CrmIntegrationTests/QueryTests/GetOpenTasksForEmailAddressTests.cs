@@ -22,7 +22,7 @@ public class GetOpenTasksForEmailAddressTests : IAsyncLifetime
         var emailWithNoOpenTasks = Faker.Internet.Email();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetOpenTasksForEmailAddressQuery(emailWithNoOpenTasks));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetOpenTasksForEmailAddressQuery(emailWithNoOpenTasks));
 
         // Assert
         Assert.Empty(result);
@@ -32,16 +32,16 @@ public class GetOpenTasksForEmailAddressTests : IAsyncLifetime
     public async Task WhenCalled_WithEmailWithOpenTasks_ReturnsTasks()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
         var emailWithOpenTasks = Faker.Internet.Email();
-        await _dataScope.TestData.CreateCrmTask(x =>
+        await _dataScope.TestData.CreateCrmTaskAsync(x =>
         {
             x.WithPersonId(person.ContactId);
             x.WithEmailAddress(emailWithOpenTasks);
         });
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetOpenTasksForEmailAddressQuery(emailWithOpenTasks));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetOpenTasksForEmailAddressQuery(emailWithOpenTasks));
 
         // Assert
         Assert.NotEmpty(result);
@@ -55,9 +55,9 @@ public class GetOpenTasksForEmailAddressTests : IAsyncLifetime
     public async Task WhenCalled_WithEmailWithCompletedTasks_ReturnsEmpty()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
         var emailWithOpenTasks = Faker.Internet.Email();
-        await _dataScope.TestData.CreateCrmTask(x =>
+        await _dataScope.TestData.CreateCrmTaskAsync(x =>
         {
             x.WithPersonId(person.ContactId);
             x.WithEmailAddress(emailWithOpenTasks);
@@ -65,7 +65,7 @@ public class GetOpenTasksForEmailAddressTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetOpenTasksForEmailAddressQuery(emailWithOpenTasks));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetOpenTasksForEmailAddressQuery(emailWithOpenTasks));
 
         // Assert
         Assert.Empty(result);
@@ -75,9 +75,9 @@ public class GetOpenTasksForEmailAddressTests : IAsyncLifetime
     public async Task WhenCalled_WithEmailWithCancelledTasks_ReturnsEmpty()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
         var emailWithOpenTasks = Faker.Internet.Email();
-        await _dataScope.TestData.CreateCrmTask(x =>
+        await _dataScope.TestData.CreateCrmTaskAsync(x =>
         {
             x.WithPersonId(person.ContactId);
             x.WithEmailAddress(emailWithOpenTasks);
@@ -85,7 +85,7 @@ public class GetOpenTasksForEmailAddressTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetOpenTasksForEmailAddressQuery(emailWithOpenTasks));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetOpenTasksForEmailAddressQuery(emailWithOpenTasks));
 
         // Assert
         Assert.Empty(result);

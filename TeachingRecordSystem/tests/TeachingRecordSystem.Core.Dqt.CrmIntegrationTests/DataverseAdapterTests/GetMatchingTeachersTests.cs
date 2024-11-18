@@ -20,7 +20,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, true);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Single(matchingTeachers);
 
@@ -32,7 +32,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.None, true);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Empty(matchingTeachers);
     }
@@ -42,7 +42,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, false);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Empty(matchingTeachers);
     }
@@ -52,7 +52,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.None, false);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Empty(matchingTeachers);
     }
@@ -62,7 +62,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, true, MatchFixture.One);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Single(matchingTeachers);
 
@@ -74,7 +74,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, true, MatchFixture.Two);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Collection(matchingTeachers,
             firstTeacher => _fixture.AssertMatchesFixture(firstTeacher, 0),
@@ -87,7 +87,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.None, true, MatchFixture.One);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Single(matchingTeachers);
 
@@ -99,7 +99,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, true, MatchFixture.None);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Single(matchingTeachers);
 
@@ -111,7 +111,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.None, false, MatchFixture.One);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Empty(matchingTeachers);
     }
@@ -121,7 +121,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, false, MatchFixture.None);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Empty(matchingTeachers);
     }
@@ -131,7 +131,7 @@ public class GetMatchingTeachersTests : IClassFixture<GetMatchingTeachersFixture
     {
         var request = _fixture.GetQuery(MatchFixture.One, false, MatchFixture.One);
 
-        var matchingTeachers = await _dataverseAdapter.FindTeachers(request);
+        var matchingTeachers = await _dataverseAdapter.FindTeachersAsync(request);
 
         Assert.Empty(matchingTeachers);
     }

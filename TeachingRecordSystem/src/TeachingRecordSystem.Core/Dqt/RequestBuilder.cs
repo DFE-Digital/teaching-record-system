@@ -58,7 +58,7 @@ public class RequestBuilder
 
         if (_requestType == RequestType.Single)
         {
-            _ = Execute();
+            _ = ExecuteAsync();
         }
 
         return new InnerRequestHandle<TResponse>(this, request);
@@ -72,22 +72,22 @@ public class RequestBuilder
         }
     }
 
-    public async Task Execute()
+    public async Task ExecuteAsync()
     {
         ThrowIfCompleted();
 
         var executeTask = _requestType switch
         {
-            RequestType.Single => ExecuteSingleRequest(),
-            RequestType.Multiple => ExecuteMultipleRequest(),
-            RequestType.Transaction => ExecuteTransactionRequest(),
+            RequestType.Single => ExecuteSingleRequestAsync(),
+            RequestType.Multiple => ExecuteMultipleRequestAsync(),
+            RequestType.Transaction => ExecuteTransactionRequestAsync(),
             _ => throw new NotSupportedException($"Unknown {nameof(RequestType)}: '{_requestType}'.")
         };
 
         await executeTask;
         await _completedTcs.Task;
 
-        async Task ExecuteSingleRequest()
+        async Task ExecuteSingleRequestAsync()
         {
             if (_requests.Count == 0)
             {
@@ -108,7 +108,7 @@ public class RequestBuilder
             }
         }
 
-        async Task ExecuteMultipleRequest()
+        async Task ExecuteMultipleRequestAsync()
         {
             if (_requests.Count == 0)
             {
@@ -142,7 +142,7 @@ public class RequestBuilder
             }
         }
 
-        async Task ExecuteTransactionRequest()
+        async Task ExecuteTransactionRequestAsync()
         {
             if (_requests.Count == 0)
             {

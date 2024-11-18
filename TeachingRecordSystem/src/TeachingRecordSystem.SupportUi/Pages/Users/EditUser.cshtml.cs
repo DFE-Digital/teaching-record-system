@@ -41,7 +41,7 @@ public class EditUser(
 
     public bool CrmAccountIsDisabled { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         Name = _user!.Name;
         IsActiveUser = _user.Active;
@@ -49,7 +49,7 @@ public class EditUser(
 
         if (_user.AzureAdUserId is not null)
         {
-            var crmUserInfo = await crmQueryDispatcher.ExecuteQuery(
+            var crmUserInfo = await crmQueryDispatcher.ExecuteQueryAsync(
                 new GetSystemUserByAzureActiveDirectoryObjectIdQuery(_user.AzureAdUserId));
 
             HasCrmAccount = crmUserInfo is not null;
@@ -62,7 +62,7 @@ public class EditUser(
         }
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         // Sanitize roles
         var newRoles = Roles!.Where(r => UserRoles.All.Contains(r)).ToArray();
@@ -99,7 +99,7 @@ public class EditUser(
         return Redirect(linkGenerator.Users());
     }
 
-    public async Task<IActionResult> OnPostDeactivate()
+    public async Task<IActionResult> OnPostDeactivateAsync()
     {
         var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
 
@@ -124,7 +124,7 @@ public class EditUser(
         return Redirect(linkGenerator.Users());
     }
 
-    public async Task<IActionResult> OnPostActivate()
+    public async Task<IActionResult> OnPostActivateAsync()
     {
         var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
 

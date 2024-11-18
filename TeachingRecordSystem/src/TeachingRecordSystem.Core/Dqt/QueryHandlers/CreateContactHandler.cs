@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 {
-    public async Task<Guid> Execute(CreateContactQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Guid> ExecuteAsync(CreateContactQuery query, IOrganizationServiceAsync organizationService)
     {
         var contactId = Guid.NewGuid();
 
@@ -52,7 +52,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             requestBuilder.AddRequest(new CreateRequest() { Target = outboxMessage });
         }
 
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         return contactId;
 

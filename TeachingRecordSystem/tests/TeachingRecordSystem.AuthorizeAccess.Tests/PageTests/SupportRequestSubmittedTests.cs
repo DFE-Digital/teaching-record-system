@@ -9,7 +9,7 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-submitted?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -25,10 +25,10 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnUserAuthenticatedAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-submitted?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -44,12 +44,12 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnUserAuthenticatedAsync(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
 
@@ -68,12 +68,12 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnUserAuthenticatedAsync(journeyInstance, ticket);
 
         Debug.Assert(state.NationalInsuranceNumber is null);
         await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber()));
@@ -93,13 +93,13 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnUserAuthenticatedAsync(journeyInstance, ticket);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-submitted?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -116,15 +116,15 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnUserAuthenticatedAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
 
         await journeyInstance.UpdateStateAsync(state =>
         {
@@ -147,15 +147,15 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        var journeyInstance = await CreateJourneyInstance(state);
+        var journeyInstance = await CreateJourneyInstanceAsync(state);
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(verified: true);
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnUserAuthenticated(journeyInstance, ticket);
+        await GetSignInJourneyHelper().OnUserAuthenticatedAsync(journeyInstance, ticket);
 
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
 
         await journeyInstance.UpdateStateAsync(state =>
         {
@@ -170,6 +170,6 @@ public class SupportRequestSubmittedTests(HostFixture hostFixture) : TestBase(ho
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponse(response);
+        await AssertEx.HtmlResponseAsync(response);
     }
 }

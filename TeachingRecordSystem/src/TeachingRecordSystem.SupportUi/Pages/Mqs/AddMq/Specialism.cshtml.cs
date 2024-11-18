@@ -30,7 +30,7 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
         Specialism = JourneyInstance!.State.Specialism;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (Specialism is MandatoryQualificationSpecialism specialism && !Specialisms!.Any(s => s.Value == specialism))
         {
@@ -49,7 +49,7 @@ public class SpecialismModel(TrsLinkGenerator linkGenerator) : PageModel
             linkGenerator.MqAddStartDate(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));

@@ -14,9 +14,9 @@ public class GetQtsCertificateHandler(IDataverseAdapter dataverseAdapter, ICerti
     private const string QtsFormTrnField = "TRN";
     private const string QtsFormDateField = "QTSDate";
 
-    public async Task<FileDownloadInfo?> Handle(GetQtsCertificateCommand command)
+    public async Task<FileDownloadInfo?> HandleAsync(GetQtsCertificateCommand command)
     {
-        var teacher = await dataverseAdapter.GetTeacherByTrn(
+        var teacher = await dataverseAdapter.GetTeacherByTrnAsync(
             command.Trn,
             columnNames: new[]
             {
@@ -55,7 +55,7 @@ public class GetQtsCertificateHandler(IDataverseAdapter dataverseAdapter, ICerti
             certificateName = "Exempt QTS certificate.pdf";
         }
 
-        var pdfStream = await certificateGenerator.GenerateCertificate(certificateName, fieldValues);
+        var pdfStream = await certificateGenerator.GenerateCertificateAsync(certificateName, fieldValues);
 
         return new FileDownloadInfo(pdfStream, "QTSCertificate.pdf", "application/pdf");
     }

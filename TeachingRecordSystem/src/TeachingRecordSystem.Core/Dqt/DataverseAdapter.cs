@@ -33,11 +33,11 @@ public partial class DataverseAdapter : IDataverseAdapter
         _dbContext = dbContext;
     }
 
-    public Task<string> GenerateTrn() => _trnGenerationApiClient.GenerateTrn();
+    public Task<string> GenerateTrnAsync() => _trnGenerationApiClient.GenerateTrnAsync();
 
-    public Task<dfeta_country> GetCountry(string value) => GetCountry(value, requestBuilder: null);
+    public Task<dfeta_country> GetCountryAsync(string value) => GetCountryAsync(value, requestBuilder: null);
 
-    public async Task<dfeta_country> GetCountry(string value, RequestBuilder requestBuilder)
+    public async Task<dfeta_country> GetCountryAsync(string value, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -59,9 +59,9 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_country>()).FirstOrDefault();
     }
 
-    public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId) => GetEarlyYearsStatus(earlyYearsStatusId, requestBuilder: null);
+    public Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusAsync(Guid earlyYearsStatusId) => GetEarlyYearsStatusAsync(earlyYearsStatusId, requestBuilder: null);
 
-    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId, RequestBuilder requestBuilder)
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusAsync(Guid earlyYearsStatusId, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -83,13 +83,13 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_earlyyearsstatus>()).FirstOrDefault();
     }
 
-    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value, RequestBuilder requestBuilder)
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusAsync(string value, RequestBuilder requestBuilder)
     {
-        var all = await GetAllEarlyYearsStatuses(requestBuilder);
+        var all = await GetAllEarlyYearsStatusesAsync(requestBuilder);
         return all.SingleOrDefault(x => x.dfeta_Value == value);
     }
 
-    public async Task<List<dfeta_earlyyearsstatus>> GetAllEarlyYearsStatuses(RequestBuilder requestBuilder)
+    public async Task<List<dfeta_earlyyearsstatus>> GetAllEarlyYearsStatusesAsync(RequestBuilder requestBuilder)
     {
         return await _cache.GetOrCreate(CacheKeys.GetAllEytsStatuses(), async _ =>
         {
@@ -112,9 +112,9 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public Task<dfeta_hequalification> GetHeQualificationByCode(string value) => GetHeQualificationByCode(value, requestBuilder: null);
+    public Task<dfeta_hequalification> GetHeQualificationByCodeAsync(string value) => GetHeQualificationByCodeAsync(value, requestBuilder: null);
 
-    public async Task<dfeta_hequalification> GetHeQualificationByCode(string value, RequestBuilder requestBuilder)
+    public async Task<dfeta_hequalification> GetHeQualificationByCodeAsync(string value, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -136,9 +136,9 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_hequalification>()).FirstOrDefault();
     }
 
-    public Task<dfeta_hesubject> GetHeSubjectByCode(string value) => GetHeSubjectByCode(value, requestBuilder: null);
+    public Task<dfeta_hesubject> GetHeSubjectByCodeAsync(string value) => GetHeSubjectByCodeAsync(value, requestBuilder: null);
 
-    public async Task<dfeta_hesubject> GetHeSubjectByCode(string value, RequestBuilder requestBuilder)
+    public async Task<dfeta_hesubject> GetHeSubjectByCodeAsync(string value, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -160,16 +160,16 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_hesubject>()).FirstOrDefault();
     }
 
-    public Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
+    public Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] establishmentColumnNames = null,
         string[] subjectColumnNames = null,
         string[] qualificationColumnNames = null,
         bool activeOnly = true) =>
-        GetInitialTeacherTrainingByTeacher(teacherId, columnNames, establishmentColumnNames, subjectColumnNames, qualificationColumnNames, requestBuilder: null, activeOnly);
+        GetInitialTeacherTrainingByTeacherAsync(teacherId, columnNames, establishmentColumnNames, subjectColumnNames, qualificationColumnNames, requestBuilder: null, activeOnly);
 
-    public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
+    public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugIdAsync(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -195,7 +195,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).ToArray();
     }
 
-    public async Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
+    public async Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugIdAsync(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
         var query = new QueryExpression(Contact.EntityLogicalName)
@@ -234,7 +234,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
+    public async Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] establishmentColumnNames,
@@ -316,7 +316,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<Account[]> GetIttProviders(bool activeOnly)
+    public async Task<Account[]> GetIttProvidersAsync(bool activeOnly)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         if (activeOnly)
@@ -344,9 +344,9 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
     }
 
-    public Task<dfeta_ittqualification> GetIttQualificationByCode(string code) => GetIttQualificationByCode(code, requestBuilder: null);
+    public Task<dfeta_ittqualification> GetIttQualificationByCodeAsync(string code) => GetIttQualificationByCodeAsync(code, requestBuilder: null);
 
-    public async Task<dfeta_ittqualification> GetIttQualificationByCode(string code, RequestBuilder requestBuilder)
+    public async Task<dfeta_ittqualification> GetIttQualificationByCodeAsync(string code, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -368,9 +368,9 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_ittqualification>()).FirstOrDefault();
     }
 
-    public Task<dfeta_ittsubject> GetIttSubjectByCode(string code) => GetIttSubjectByCode(code, requestBuilder: null);
+    public Task<dfeta_ittsubject> GetIttSubjectByCodeAsync(string code) => GetIttSubjectByCodeAsync(code, requestBuilder: null);
 
-    public async Task<dfeta_ittsubject> GetIttSubjectByCode(string code, RequestBuilder requestBuilder)
+    public async Task<dfeta_ittsubject> GetIttSubjectByCodeAsync(string code, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -392,7 +392,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_ittsubject>()).FirstOrDefault();
     }
 
-    public async Task<Contact[]> FindTeachers(FindTeachersByTrnBirthDateAndNinoQuery request)
+    public async Task<Contact[]> FindTeachersAsync(FindTeachersByTrnBirthDateAndNinoQuery request)
     {
         var filter = new FilterExpression(LogicalOperator.And);
 
@@ -533,10 +533,10 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public Task<Account[]> GetIttProviderOrganizationsByName(string name, string[] columnNames, bool activeOnly) =>
-        GetIttProviderOrganizationsByName(name, activeOnly, columnNames, requestBuilder: null);
+    public Task<Account[]> GetIttProviderOrganizationsByNameAsync(string name, string[] columnNames, bool activeOnly) =>
+        GetIttProviderOrganizationsByNameAsync(name, activeOnly, columnNames, requestBuilder: null);
 
-    public async Task<Account[]> GetIttProviderOrganizationsByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
+    public async Task<Account[]> GetIttProviderOrganizationsByNameAsync(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -563,10 +563,10 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
     }
 
-    public Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, string[] columnNames, bool activeOnly) =>
-        GetIttProviderOrganizationsByUkprn(ukprn, activeOnly, columnNames, requestBuilder: null);
+    public Task<Account[]> GetIttProviderOrganizationsByUkprnAsync(string ukprn, string[] columnNames, bool activeOnly) =>
+        GetIttProviderOrganizationsByUkprnAsync(ukprn, activeOnly, columnNames, requestBuilder: null);
 
-    public async Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
+    public async Task<Account[]> GetIttProviderOrganizationsByUkprnAsync(string ukprn, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -593,10 +593,10 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
     }
 
-    public Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames) =>
-        GetOrganizationsByUkprn(ukprn, columnNames, requestBuilder: null);
+    public Task<Account[]> GetOrganizationsByUkprnAsync(string ukprn, string[] columnNames) =>
+        GetOrganizationsByUkprnAsync(ukprn, columnNames, requestBuilder: null);
 
-    public async Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
+    public async Task<Account[]> GetOrganizationsByUkprnAsync(string ukprn, string[] columnNames, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -618,12 +618,12 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
     }
 
-    public Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
+    public Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacherAsync(
         Guid teacherId,
         string[] columnNames) =>
-        GetQtsRegistrationsByTeacher(teacherId, columnNames, requestBuilder: null);
+        GetQtsRegistrationsByTeacherAsync(teacherId, columnNames, requestBuilder: null);
 
-    public async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(
+    public async Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         RequestBuilder requestBuilder)
@@ -648,7 +648,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<dfeta_qtsregistration>()).ToArray();
     }
 
-    public async Task<dfeta_qualification[]> GetQualificationsForTeacher(
+    public async Task<dfeta_qualification[]> GetQualificationsForTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] heQualificationColumnNames = null,
@@ -716,7 +716,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<dfeta_qualification> GetQualificationById(
+    public async Task<dfeta_qualification> GetQualificationByIdAsync(
         Guid qualificationId,
         string[] columnNames,
         string[] contactColumnNames = null)
@@ -753,7 +753,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacher(
+    public async Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] inductionPeriodColumnNames = null,
@@ -820,7 +820,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return returnValue;
     }
 
-    public async Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true)
+    public async Task<Contact> GetTeacherAsync(Guid teacherId, string[] columnNames, bool resolveMerges = true)
     {
         var columnSet = new ColumnSet(
             columnNames
@@ -843,13 +843,13 @@ public partial class DataverseAdapter : IDataverseAdapter
         while (resolveMerges && teacher.Merged == true)
         {
             var masterReference = teacher.MasterId;
-            return await GetTeacher(masterReference.Id, columnNames, resolveMerges);
+            return await GetTeacherAsync(masterReference.Id, columnNames, resolveMerges);
         }
 
         return teacher;
     }
 
-    public async Task<Contact> GetTeacherByTrn(string trn, string[] columnNames, bool activeOnly = true)
+    public async Task<Contact> GetTeacherByTrnAsync(string trn, string[] columnNames, bool activeOnly = true)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
@@ -869,7 +869,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
     }
 
-    public async Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true)
+    public async Task<Contact[]> GetTeachersByTrnAndDoBAsync(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, trn);
@@ -890,7 +890,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 
-    public async Task<Contact[]> GetTeachersBySlugIdAndTrn(string slugId, string trn, string[] columnNames, bool activeOnly = true)
+    public async Task<Contact[]> GetTeachersBySlugIdAndTrnAsync(string slugId, string trn, string[] columnNames, bool activeOnly = true)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_SlugId, ConditionOperator.Equal, slugId);
@@ -911,10 +911,10 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 
-    public Task<Models.Task[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames) =>
-        GetCrmTasksForTeacher(teacherId, columnNames, requestBuilder: null);
+    public Task<Models.Task[]> GetCrmTasksForTeacherAsync(Guid teacherId, string[] columnNames) =>
+        GetCrmTasksForTeacherAsync(teacherId, columnNames, requestBuilder: null);
 
-    public async Task<Models.Task[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames, RequestBuilder requestBuilder)
+    public async Task<Models.Task[]> GetCrmTasksForTeacherAsync(Guid teacherId, string[] columnNames, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -934,7 +934,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Models.Task>()).ToArray();
     }
 
-    public async Task<Contact[]> GetTeachersByHusId(string husId, string[] columnNames)
+    public async Task<Contact[]> GetTeachersByHusIdAsync(string husId, string[] columnNames)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_HUSID, ConditionOperator.Equal, husId);
@@ -951,7 +951,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 
-    public async Task<Contact[]> GetTeachersBySlugId(string slugId, string[] columnNames)
+    public async Task<Contact[]> GetTeachersBySlugIdAsync(string slugId, string[] columnNames)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_SlugId, ConditionOperator.Equal, slugId);
@@ -968,16 +968,16 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).ToArray();
     }
 
-    public async Task<dfeta_teacherstatus> GetTeacherStatus(string value, RequestBuilder requestBuilder)
+    public async Task<dfeta_teacherstatus> GetTeacherStatusAsync(string value, RequestBuilder requestBuilder)
     {
-        var result = await GetAllTeacherStatuses(requestBuilder);
+        var result = await GetAllTeacherStatusesAsync(requestBuilder);
 
         return result.SingleOrDefault(x => x.dfeta_Value == value);
     }
 
-    public Task<List<dfeta_teacherstatus>> GetAllTeacherStatuses() => GetAllTeacherStatuses(requestBuilder: null);
+    public Task<List<dfeta_teacherstatus>> GetAllTeacherStatusesAsync() => GetAllTeacherStatusesAsync(requestBuilder: null);
 
-    public async Task<List<dfeta_teacherstatus>> GetAllTeacherStatuses(
+    public async Task<List<dfeta_teacherstatus>> GetAllTeacherStatusesAsync(
         RequestBuilder requestBuilder)
     {
         return await _cache.GetOrCreate(CacheKeys.GetAllTeacherStatuses(), async _ =>
@@ -1002,7 +1002,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public async Task<bool> UnlockTeacherRecord(Guid teacherId)
+    public async Task<bool> UnlockTeacherRecordAsync(Guid teacherId)
     {
         var update = new Entity(Contact.EntityLogicalName, teacherId);
         update[Contact.Fields.dfeta_loginfailedcounter] = 0;
@@ -1019,10 +1019,10 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public Task<Account[]> GetOrganizationsByName(string name, string[] columnNames, bool activeOnly) =>
-        GetOrganizationsByName(name, activeOnly, columnNames, requestBuilder: null);
+    public Task<Account[]> GetOrganizationsByNameAsync(string name, string[] columnNames, bool activeOnly) =>
+        GetOrganizationsByNameAsync(name, activeOnly, columnNames, requestBuilder: null);
 
-    public async Task<Account[]> GetOrganizationsByName(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
+    public async Task<Account[]> GetOrganizationsByNameAsync(string name, bool activeOnly, string[] columnNames, RequestBuilder requestBuilder)
     {
         requestBuilder ??= RequestBuilder.CreateSingle(_service);
 
@@ -1048,7 +1048,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.EntityCollection.Entities.Select(entity => entity.ToEntity<Account>()).ToArray();
     }
 
-    public async Task<Contact[]> FindTeachers(FindTeachersQuery findTeachersQuery)
+    public async Task<Contact[]> FindTeachersAsync(FindTeachersQuery findTeachersQuery)
     {
         var conditions = new List<object>();  //  Either ConditionExpresssion or FilterExpression
 
@@ -1203,7 +1203,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return contacts.GroupBy(c => c.Id).Select(c => c.First()).ToArray();
     }
 
-    public async Task<Contact[]> FindTeachersStrict(FindTeachersQuery findTeachersQuery)
+    public async Task<Contact[]> FindTeachersStrictAsync(FindTeachersQuery findTeachersQuery)
     {
         // Match on DOB, NINO & TRN *OR*
         // DOB, TRN & Name & contact.NINO is null
@@ -1323,7 +1323,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         }
     }
 
-    public async Task<Contact> GetTeacherByTsPersonId(string tsPersonId, string[] columnNames)
+    public async Task<Contact> GetTeacherByTsPersonIdAsync(string tsPersonId, string[] columnNames)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Contact.Fields.dfeta_TSPersonID, ConditionOperator.Equal, tsPersonId);
@@ -1340,7 +1340,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Contact>()).SingleOrDefault();
     }
 
-    public Task SetTsPersonId(Guid teacherId, string tsPersonId)
+    public Task SetTsPersonIdAsync(Guid teacherId, string tsPersonId)
     {
         return _service.UpdateAsync(new Contact()
         {
@@ -1349,7 +1349,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public Task UpdateTeacherIdentityInfo(UpdateTeacherIdentityInfoCommand command)
+    public Task UpdateTeacherIdentityInfoAsync(UpdateTeacherIdentityInfoCommand command)
     {
         return _service.UpdateAsync(new Contact()
         {
@@ -1361,9 +1361,9 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public Task<Subject> GetSubjectByTitle(string title) => GetSubjectByTitle(title, requestBuilder: null);
+    public Task<Subject> GetSubjectByTitleAsync(string title) => GetSubjectByTitleAsync(title, requestBuilder: null);
 
-    public async Task<Subject> GetSubjectByTitle(string title, RequestBuilder requestBuilder)
+    public async Task<Subject> GetSubjectByTitleAsync(string title, RequestBuilder requestBuilder)
     {
         return await _cache.GetOrCreateAsync(CacheKeys.GetSubjectTitleKey(title), async _ =>
         {
@@ -1388,7 +1388,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         });
     }
 
-    public async Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames)
+    public async Task<Incident[]> GetIncidentsByContactIdAsync(Guid contactId, IncidentState? state, string[] columnNames)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.CustomerId, ConditionOperator.Equal, contactId);
@@ -1409,7 +1409,7 @@ public partial class DataverseAdapter : IDataverseAdapter
         return result.Entities.Select(e => e.ToEntity<Incident>()).ToArray();
     }
 
-    public async Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc)
+    public async Task ClearTeacherIdentityInfoAsync(Guid identityUserId, DateTime updateTimeUtc)
     {
         var query = new QueryByAttribute(Contact.EntityLogicalName)
         {
@@ -1442,12 +1442,12 @@ public partial class DataverseAdapter : IDataverseAdapter
 
     public RequestBuilder CreateTransactionRequestBuilder() => RequestBuilder.CreateTransaction(_service);
 
-    public async Task<bool> DoesTeacherHavePendingPIIChanges(Guid teacherId)
+    public async Task<bool> DoesTeacherHavePendingPIIChangesAsync(Guid teacherId)
     {
         bool pendingNameChange = default, pendingDateOfBirthChange = default;
-        var nameChangeSubject = await GetSubjectByTitle("Change of Name");
-        var dateOfBirthChangeSubject = await GetSubjectByTitle("Change of Date of Birth");
-        var incidents = await GetIncidentsByContactId(
+        var nameChangeSubject = await GetSubjectByTitleAsync("Change of Name");
+        var dateOfBirthChangeSubject = await GetSubjectByTitleAsync("Change of Date of Birth");
+        var incidents = await GetIncidentsByContactIdAsync(
             teacherId,
             IncidentState.Active,
             columnNames: new[] { Incident.Fields.SubjectId, Incident.Fields.StateCode });

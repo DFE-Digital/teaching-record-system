@@ -20,7 +20,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithDateOfBirth(dateOfBirth));
 
@@ -60,7 +60,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
                     .ToAsyncEnumerable()
                     .SelectAwait(async i => new
                     {
-                        trn = await TestData.GenerateTrn(),
+                        trn = await TestData.GenerateTrnAsync(),
                         dateOfBirth = new DateOnly(1990, 1, 1).AddDays(i)
                     })
                     .ToArrayAsync()
@@ -71,7 +71,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "persons", "Only 500 persons or less can be specified.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "persons", "Only 500 persons or less can be specified.");
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithDqtInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
@@ -106,7 +106,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -121,10 +121,10 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null))
@@ -151,7 +151,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -202,8 +202,8 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         var sanctionCode = "A17";
         Debug.Assert(!Api.V3.Constants.LegacyExposableSanctionCodes.Contains(sanctionCode));
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCode(sanctionCode);
-        var person = await TestData.CreatePerson(p => p.WithTrn().WithDateOfBirth(dateOfBirth).WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync(sanctionCode);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithDateOfBirth(dateOfBirth).WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId)));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
         {
@@ -224,7 +224,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseSanctions = jsonResponse.RootElement.GetProperty("results").EnumerateArray().First().GetProperty("sanctions").EnumerateArray();
         Assert.Empty(responseSanctions);
     }

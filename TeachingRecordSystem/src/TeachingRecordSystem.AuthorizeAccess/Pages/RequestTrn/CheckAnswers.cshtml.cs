@@ -46,7 +46,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
 
     public string? Country { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         Email = JourneyInstance!.State.Email;
         Name = JourneyInstance!.State.Name;
@@ -55,7 +55,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, _fileUrlExpiresAfter) :
             null;
         HasNationalInsuranceNumber = JourneyInstance!.State.HasNationalInsuranceNumber;
         NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber;
@@ -66,7 +66,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
         Country = JourneyInstance!.State.Country;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var state = JourneyInstance!.State;
 
@@ -95,9 +95,9 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
             evidenceFileMimeType = "application/octet-stream";
         }
 
-        using var stream = await fileService.OpenReadStream(JourneyInstance!.State.EvidenceFileId!.Value);
+        using var stream = await fileService.OpenReadStreamAsync(JourneyInstance!.State.EvidenceFileId!.Value);
 
-        await crmQueryDispatcher.ExecuteQuery(
+        await crmQueryDispatcher.ExecuteQueryAsync(
             new CreateTrnRequestTaskQuery()
             {
                 Description = description,

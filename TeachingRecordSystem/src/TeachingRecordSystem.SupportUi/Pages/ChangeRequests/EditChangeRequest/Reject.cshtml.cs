@@ -37,7 +37,7 @@ public class RejectModel : PageModel
     [Required(ErrorMessage = "Select the reason for rejecting this change")]
     public CaseRejectionReasonOption? RejectionReasonChoice { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -51,11 +51,11 @@ public class RejectModel : PageModel
             requestStatus = "cancelled";
             flashMessage = "The user’s record has not been changed and they have not been notified.";
 
-            _ = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new CancelIncidentQuery(IncidentDetail!.Incident.Id));
+            _ = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new CancelIncidentQuery(IncidentDetail!.Incident.Id));
         }
         else
         {
-            _ = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new RejectIncidentQuery(IncidentDetail!.Incident.Id, RejectionReasonChoice.Value.GetDisplayName()!));
+            _ = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new RejectIncidentQuery(IncidentDetail!.Incident.Id, RejectionReasonChoice.Value.GetDisplayName()!));
         }
 
         TempData.SetFlashSuccess(
@@ -67,7 +67,7 @@ public class RejectModel : PageModel
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        IncidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        IncidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(TicketNumber));
         if (IncidentDetail is null)
         {
             context.Result = NotFound();

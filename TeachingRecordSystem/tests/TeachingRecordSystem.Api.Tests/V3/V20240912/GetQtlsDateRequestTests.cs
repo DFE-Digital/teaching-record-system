@@ -15,7 +15,7 @@ public class GetQtlsDateRequestTests : TestBase
     {
         // Arrange
         SetCurrentApiClient(roles);
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{existingContact.Trn}/qtls");
@@ -46,14 +46,14 @@ public class GetQtlsDateRequestTests : TestBase
     public async Task Get_NoQtls_ReturnsExpectedResult()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{person.Trn}/qtls");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -69,7 +69,7 @@ public class GetQtlsDateRequestTests : TestBase
     {
         // Arrange
         var qtlsDate = new DateOnly(2020, 01, 01);
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQtlsDate(qtlsDate));
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{person.Trn}/qtls");
@@ -78,7 +78,7 @@ public class GetQtlsDateRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

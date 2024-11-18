@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class SetQtlsDateHandler : ICrmQueryHandler<SetQtlsDateQuery, bool>
 {
-    public async Task<bool> Execute(SetQtlsDateQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<bool> ExecuteAsync(SetQtlsDateQuery query, IOrganizationServiceAsync organizationService)
     {
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
         if (query.HasActiveSanctions == true)
@@ -32,7 +32,7 @@ public class SetQtlsDateHandler : ICrmQueryHandler<SetQtlsDateQuery, bool>
                 dfeta_qtlsdate = query.QtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false)
             }
         });
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         return true;
     }

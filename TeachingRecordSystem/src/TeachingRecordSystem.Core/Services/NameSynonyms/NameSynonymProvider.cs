@@ -4,10 +4,10 @@ public class NameSynonymProvider(HttpClient httpClient) : INameSynonymProvider
 {
     private Task<IReadOnlyDictionary<string, IReadOnlyCollection<string>>>? _synonymsTask;
 
-    public Task<IReadOnlyDictionary<string, IReadOnlyCollection<string>>> GetAllNameSynonyms() =>
-        LazyInitializer.EnsureInitialized(ref _synonymsTask, () => DownloadAllNameSynonyms());
+    public Task<IReadOnlyDictionary<string, IReadOnlyCollection<string>>> GetAllNameSynonymsAsync() =>
+        LazyInitializer.EnsureInitialized(ref _synonymsTask, () => DownloadAllNameSynonymsAsync());
 
-    private async Task<IReadOnlyDictionary<string, IReadOnlyCollection<string>>> DownloadAllNameSynonyms()
+    private async Task<IReadOnlyDictionary<string, IReadOnlyCollection<string>>> DownloadAllNameSynonymsAsync()
     {
         using var stream = await httpClient.GetStreamAsync("https://raw.githubusercontent.com/carltonnorthern/nicknames/master/names.csv");
         using var reader = new StreamReader(stream);

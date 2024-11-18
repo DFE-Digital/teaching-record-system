@@ -16,7 +16,7 @@ public class EytsAwardedEmailJobDispatcher
         _backgroundJobScheduler = backgroundJobScheduler;
     }
 
-    public async Task Execute(Guid eytsAwardedEmailsJobId)
+    public async Task ExecuteAsync(Guid eytsAwardedEmailsJobId)
     {
         var jobItems = await _dbContext.EytsAwardedEmailsJobItems
             .Where(i => i.EytsAwardedEmailsJobId == eytsAwardedEmailsJobId && i.EmailSent == false)
@@ -24,7 +24,7 @@ public class EytsAwardedEmailJobDispatcher
 
         foreach (var jobItem in jobItems)
         {
-            await _backgroundJobScheduler.Enqueue<SendEytsAwardedEmailJob>(j => j.Execute(eytsAwardedEmailsJobId, jobItem.PersonId));
+            await _backgroundJobScheduler.EnqueueAsync<SendEytsAwardedEmailJob>(j => j.ExecuteAsync(eytsAwardedEmailsJobId, jobItem.PersonId));
         }
     }
 }

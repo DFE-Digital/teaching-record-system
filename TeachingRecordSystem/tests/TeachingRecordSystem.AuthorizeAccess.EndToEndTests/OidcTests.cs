@@ -7,8 +7,8 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignInAndOut()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var coreIdentityVc = TestData.CreateOneLoginCoreIdentityVc(person.FirstName, person.LastName, person.DateOfBirth);
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!, coreIdentityVc));
@@ -17,7 +17,7 @@ public class OidcTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/oidc-test");
-        await page.ClickButton("Start");
+        await page.ClickButtonAsync("Start");
         await page.WaitForUrlPathAsync("/oidc-test/signed-in");
 
         string[][] expectedVerifiedNames = [[person.FirstName, person.LastName]];

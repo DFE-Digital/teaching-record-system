@@ -14,6 +14,6 @@
     </p>
     <div class="moj-timeline__description">
         <p class="govuk-body" data-testid="timeline-item-summary">@Model.ItemModel.Subject</p>
-        <multi-line-text data-testid="timeline-item-description" text="@(await Model.ItemModel.GetNoteTextWithoutHtml())" />
+        <multi-line-text data-testid="timeline-item-description" text="@(await Model.ItemModel.GetNoteTextWithoutHtmlAsync())" />
     </div>
 </div>

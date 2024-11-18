@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllTeacherStatusesHandler : ICrmQueryHandler<GetAllTeacherStatusesQuery, dfeta_teacherstatus[]>
 {
-    public async Task<dfeta_teacherstatus[]> Execute(GetAllTeacherStatusesQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_teacherstatus[]> ExecuteAsync(GetAllTeacherStatusesQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

@@ -22,11 +22,11 @@ public class SetDeceasedQueryTests : IAsyncLifetime
     {
         // Arrange
         var dateOfDeath = new DateOnly(2021, 01, 01);
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
 
         // Act
-        await _crmQueryDispatcher.ExecuteQuery(new SetDeceasedQuery(ContactId: createPersonResult.ContactId, DateOfDeath: dateOfDeath));
-        var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
+        await _crmQueryDispatcher.ExecuteQueryAsync(new SetDeceasedQuery(ContactId: createPersonResult.ContactId, DateOfDeath: dateOfDeath));
+        var contact = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
             Contact.Fields.dfeta_DateofDeath, Contact.Fields.StateCode)));
 
         // Assert

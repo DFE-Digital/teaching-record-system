@@ -33,7 +33,7 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponse(response);
+        await AssertEx.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(email, doc.GetElementById("Email")?.GetAttribute("value"));
     }
 
@@ -90,7 +90,7 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Email", "Enter your email address");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "Enter your email address");
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Email", "Enter an email address in the correct format, like name@example.com");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "Enter an email address in the correct format, like name@example.com");
     }
 
     [Fact]
@@ -147,8 +147,8 @@ public class EmailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var email = Faker.Internet.Email();
         var state = CreateNewState();
         var journeyInstance = await CreateJourneyInstance(state);
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(x =>
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(x =>
         {
             x.WithPersonId(person.ContactId);
             x.WithEmailAddress(email);

@@ -21,7 +21,7 @@ public class PersonController(IMapper mapper) : ControllerBase
         Description = "Gets the details for the authenticated person.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
         [FromServices] GetPersonHandler handler)
     {
@@ -31,7 +31,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             DateOfBirth: null,
             ApplyLegacyAlertsBehavior: true);
 
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
         var response = mapper.Map<GetPersonResponse?>(result);
         return response is null ? Forbid() : Ok(response);
     }
@@ -44,7 +44,7 @@ public class PersonController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(CreateNameChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    public async Task<IActionResult> CreateNameChange(
+    public async Task<IActionResult> CreateNameChangeAsync(
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
@@ -59,7 +59,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             EmailAddress = request.EmailAddress
         };
 
-        var caseNumber = await handler.Handle(command);
+        var caseNumber = await handler.HandleAsync(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
     }
@@ -72,7 +72,7 @@ public class PersonController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(CreateDateOfBirthChangeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(AuthorizationPolicies.IdentityUserWithTrn)]
-    public async Task<IActionResult> CreateDateOfBirthChange(
+    public async Task<IActionResult> CreateDateOfBirthChangeAsync(
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
@@ -85,7 +85,7 @@ public class PersonController(IMapper mapper) : ControllerBase
             EmailAddress = request.EmailAddress
         };
 
-        var caseNumber = await handler.Handle(command);
+        var caseNumber = await handler.HandleAsync(command);
         var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
         return Ok(response);
     }

@@ -35,8 +35,8 @@ public class GetInitialTeacherTrainingByTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.FirstName });
-        var ittRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(teacherId, columnNames: new[]
+        var result = await _dataverseAdapter.GetTeacherAsync(teacherId, new[] { Contact.Fields.FirstName });
+        var ittRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(teacherId, columnNames: new[]
             {
                 dfeta_initialteachertraining.Fields.dfeta_PersonId,
                 dfeta_initialteachertraining.Fields.StateCode
@@ -64,8 +64,8 @@ public class GetInitialTeacherTrainingByTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.FirstName });
-        var ittRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(teacherId, columnNames: new[]
+        var result = await _dataverseAdapter.GetTeacherAsync(teacherId, new[] { Contact.Fields.FirstName });
+        var ittRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(teacherId, columnNames: new[]
             {
                 dfeta_initialteachertraining.Fields.dfeta_PersonId,
                 dfeta_initialteachertraining.Fields.StateCode
@@ -166,7 +166,7 @@ public class GetInitialTeacherTrainingByTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var ittRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var ittRecords = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {

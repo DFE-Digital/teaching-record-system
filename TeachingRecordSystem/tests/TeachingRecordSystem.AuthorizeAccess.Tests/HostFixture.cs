@@ -68,13 +68,13 @@ public class HostFixture : WebApplicationFactory<Program>
             {
                 var fileService = new Mock<IFileService>();
                 fileService
-                    .Setup(s => s.UploadFile(It.IsAny<Stream>(), It.IsAny<string?>()))
+                    .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>()))
                     .ReturnsAsync(Guid.NewGuid());
                 fileService
-                    .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                    .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
                     .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                 fileService
-                    .Setup(s => s.OpenReadStream(It.IsAny<Guid>()))
+                    .Setup(s => s.OpenReadStreamAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => new MemoryStream(TestData.JpegImage));
                 return fileService.Object;
             }

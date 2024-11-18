@@ -28,7 +28,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
         StartDate = JourneyInstance!.State.StartDate;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (StartDate.HasValue && JourneyInstance!.State.EndDate is DateOnly endDate && StartDate >= endDate)
         {
@@ -47,7 +47,7 @@ public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
             linkGenerator.MqAddStatus(PersonId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));

@@ -21,7 +21,7 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
 
     public async Task Handle(SetNpqQualificationRequest request, CancellationToken cancellationToken)
     {
-        var contact = await _dataverseAdapter.GetTeacherByTrn(
+        var contact = await _dataverseAdapter.GetTeacherByTrnAsync(
             request.Trn,
             columnNames: new[]
             {
@@ -40,7 +40,7 @@ public class SetNpqQualificationHandler : IRequestHandler<SetNpqQualificationReq
             throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
         }
 
-        var setNpqQualificationResult = await _dataverseAdapter.SetNpqQualification(new SetNpqQualificationCommand()
+        var setNpqQualificationResult = await _dataverseAdapter.SetNpqQualificationAsync(new SetNpqQualificationCommand()
         {
             TeacherId = contact.Id,
             CompletionDate = request.CompletionDate.ToDateTime(),

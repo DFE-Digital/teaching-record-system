@@ -70,7 +70,7 @@ public class SendInternationalQtsAwardedEmailJobTests : InternationalQtsAwardedE
         };
 
         getAnIdentityApiClient
-            .Setup(i => i.CreateTrnToken(It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
+            .Setup(i => i.CreateTrnTokenAsync(It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
             .ReturnsAsync(tokenResponse);
 
         var job = new SendInternationalQtsAwardedEmailJob(
@@ -81,11 +81,11 @@ public class SendInternationalQtsAwardedEmailJobTests : InternationalQtsAwardedE
             clock);
 
         // Act
-        await job.Execute(internationalQtsAwardedEmailsJobId, personId);
+        await job.ExecuteAsync(internationalQtsAwardedEmailsJobId, personId);
 
         // Assert
         notificationSender
-            .Verify(n => n.SendEmail(It.IsAny<string>(), It.Is<string>(s => s == emailAddress), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
+            .Verify(n => n.SendEmailAsync(It.IsAny<string>(), It.Is<string>(s => s == emailAddress), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
 
         var updatedJobItem = await dbContext.InternationalQtsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.InternationalQtsAwardedEmailsJobId == internationalQtsAwardedEmailsJobId && i.PersonId == personId);
         Assert.NotNull(updatedJobItem);

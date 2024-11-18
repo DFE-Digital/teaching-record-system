@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetNotesByContactIdHandler : ICrmQueryHandler<GetNotesByContactIdQuery, TeacherNotesResult>
 {
-    public async Task<TeacherNotesResult> Execute(GetNotesByContactIdQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<TeacherNotesResult> ExecuteAsync(GetNotesByContactIdQuery query, IOrganizationServiceAsync organizationService)
     {
         var annotationFilter = new FilterExpression();
         annotationFilter.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.Equal, query.ContactId);
@@ -126,7 +126,7 @@ public class GetNotesByContactIdHandler : ICrmQueryHandler<GetNotesByContactIdQu
         var incidentResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(incidentRequest);
         var taskResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(taskRequest);
 
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         var annotations = (await annotationResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<Annotation>()).ToArray();
         var incidents = (await incidentResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<Incident>()).ToArray();

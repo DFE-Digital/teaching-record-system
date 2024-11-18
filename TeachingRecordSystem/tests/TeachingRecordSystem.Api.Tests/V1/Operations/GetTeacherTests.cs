@@ -24,7 +24,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
     [Theory]
@@ -39,7 +39,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "birthdate", expectedError: $"The value '{birthDate}' is not valid for BirthDate.");
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class GetTeacherTests : TestBase
         var birthDate = "1990-04-01";
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
@@ -81,7 +81,7 @@ public class GetTeacherTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
             .ReturnsAsync(new[] { contact });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{trn}?birthdate={birthDate}");
@@ -126,7 +126,7 @@ public class GetTeacherTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersByTrnBirthDateAndNinoQuery>()))
             .ReturnsAsync(new[] { contactWithMatchingTrn, contactWithMatchingNino });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v1/teachers/{matchingTrn}?birthdate={birthDate}&nino={nino}");
@@ -135,7 +135,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var responseJson = await AssertEx.JsonResponse(response, expectedStatusCode: StatusCodes.Status200OK);
+        var responseJson = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
         Assert.Equal(matchingTrn, responseJson.RootElement.GetProperty("trn").GetString());
     }
 }

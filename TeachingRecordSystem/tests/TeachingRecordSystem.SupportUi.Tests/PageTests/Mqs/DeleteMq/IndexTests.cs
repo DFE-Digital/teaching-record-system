@@ -14,7 +14,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -29,9 +29,9 @@ public class IndexTests : TestBase
     public async Task Get_WithQualificationIdForValidQualification_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -46,10 +46,10 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
         var deletionReason = MqDeletionReasonOption.ProviderRequest;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
             new DeleteMqState()
             {
@@ -67,7 +67,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var deletionReasonOptions = doc.GetElementByTestId("deletion-reason-options");
         var deletionReasonRadioButtons = deletionReasonOptions!.GetElementsByTagName("input");
         var selectedDeletionReason = deletionReasonRadioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -86,7 +86,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var qualificationId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstance(qualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -101,9 +101,9 @@ public class IndexTests : TestBase
     public async Task Post_WhenNoDeletionReasonIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -117,16 +117,16 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "DeletionReason", "Select a reason for deleting");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "DeletionReason", "Select a reason for deleting");
     }
 
     [Fact]
     public async Task Post_WhenNoUploadEvidenceOptionIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -140,16 +140,16 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
     public async Task Post_WhenUploadEvidenceOptionIsYesAndNoFileIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -164,16 +164,16 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
     [Fact]
     public async Task Post_WhenEvidenceFileIsInvalidType_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var multipartContent = CreateFormFileUpload(".cs");
         multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
@@ -189,15 +189,15 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
     public async Task Post_ValidInput_RedirectsToConfirmPage()
     {
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var multipartContent = CreateFormFileUpload(".png");
         multipartContent.Add(new StringContent(MqDeletionReasonOption.ProviderRequest.ToString()), "DeletionReason");
@@ -220,9 +220,9 @@ public class IndexTests : TestBase
     [Fact]
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(qualification.QualificationId);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification.QualificationId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/{qualification.QualificationId}/delete/cancel?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -239,7 +239,7 @@ public class IndexTests : TestBase
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstance(Guid qualificationId, DeleteMqState? state = null) =>
+    private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteMqState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.DeleteMq,
             state ?? new DeleteMqState(),

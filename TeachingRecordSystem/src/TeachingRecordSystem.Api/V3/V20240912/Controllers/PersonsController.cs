@@ -20,13 +20,13 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
-    public async Task<IActionResult> PutQtls(
+    public async Task<IActionResult> PutQtlsAsync(
         [FromRoute] string trn,
         [FromBody] SetQtlsRequest request,
         [FromServices] SetQtlsHandler handler)
     {
         var command = new SetQtlsCommand(trn, request.QtsDate);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
         return result is { Succeeded: true } ? Ok(result.QtlsInfo!) : Accepted();
     }
 
@@ -37,12 +37,12 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Gets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
-    public async Task<IActionResult> GetQtls(
+    public async Task<IActionResult> GetQtlsAsync(
     [FromRoute] string trn,
         [FromServices] GetQtlsHandler handler)
     {
         var command = new GetQtlsCommand(trn);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
         var response = mapper.Map<QtlsResponse?>(result);
         return response is not null ? Ok(response) : NotFound();
     }

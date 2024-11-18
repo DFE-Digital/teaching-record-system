@@ -82,7 +82,7 @@ public static class GetAnIdentityEndpoints
                 }
                 else if (notification.Message is UserMergedMessage userMergeMessage)
                 {
-                    await dataverseAdapter.ClearTeacherIdentityInfo(userMergeMessage.MergedUserId, notification.TimeUtc);
+                    await dataverseAdapter.ClearTeacherIdentityInfoAsync(userMergeMessage.MergedUserId, notification.TimeUtc);
                     return CreateResult();
                 }
                 else
@@ -95,7 +95,7 @@ public static class GetAnIdentityEndpoints
                     if (notification.Message is UserUpdatedMessage { Changes: { Trn: { HasValue: true } } })
                     {
                         // TRN has been removed
-                        await dataverseAdapter.ClearTeacherIdentityInfo(user.UserId, notification.TimeUtc);
+                        await dataverseAdapter.ClearTeacherIdentityInfoAsync(user.UserId, notification.TimeUtc);
                     }
 
                     return CreateResult();
@@ -103,7 +103,7 @@ public static class GetAnIdentityEndpoints
 
                 await using var trnLock = await distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(user.Trn), _lockTimeout);
 
-                var teacher = await dataverseAdapter.GetTeacherByTrn(
+                var teacher = await dataverseAdapter.GetTeacherByTrnAsync(
                     user.Trn,
                     columnNames: new[]
                     {
@@ -117,7 +117,7 @@ public static class GetAnIdentityEndpoints
 
                 if (notification.TimeUtc > (teacher.dfeta_LastIdentityUpdate ?? DateTime.MinValue))
                 {
-                    await dataverseAdapter.UpdateTeacherIdentityInfo(new UpdateTeacherIdentityInfoCommand()
+                    await dataverseAdapter.UpdateTeacherIdentityInfoAsync(new UpdateTeacherIdentityInfoCommand()
                     {
                         TeacherId = teacher.Id,
                         IdentityUserId = user.UserId,

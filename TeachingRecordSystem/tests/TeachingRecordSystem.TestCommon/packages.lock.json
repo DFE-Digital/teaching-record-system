@@ -26,6 +26,12 @@
           "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "1.1.22"
         }
       },
+      "Microsoft.VisualStudio.Threading.Analyzers": {
+        "type": "Direct",
+        "requested": "[17.12.19, )",
+        "resolved": "17.12.19",
+        "contentHash": "v3IYeedjoktvZ+GqYmLudxZJngmf/YWIxNT2Uy6QMMN19cvw+nkWoip1Gr1RtnFkUo1MPUVMis4C8Kj8d8DpSQ=="
+      },
       "Moq": {
         "type": "Direct",
         "requested": "[4.20.70, )",

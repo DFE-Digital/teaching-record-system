@@ -11,7 +11,7 @@ public static class PageExtensions
             return asUri.LocalPath == path;
         });
 
-    public static async Task GoToTestStartPage(this IPage page, string? trnToken = null)
+    public static async Task GoToTestStartPageAsync(this IPage page, string? trnToken = null)
     {
         await page.GotoAsync(
             $"/test" +
@@ -19,19 +19,19 @@ public static class PageExtensions
             $"&trn_token={Uri.EscapeDataString(trnToken ?? "")}");
     }
 
-    public static async Task AssertSignedIn(this IPage page, string trn)
+    public static async Task AssertSignedInAsync(this IPage page, string trn)
     {
         await page.WaitForUrlPathAsync("/test");
         Assert.Equal(trn, await page.GetByTestId("trn").InnerTextAsync());
     }
 
-    public static async Task FillDateInput(this IPage page, DateOnly date)
+    public static async Task FillDateInputAsync(this IPage page, DateOnly date)
     {
         await page.FillAsync("label:text-is('Day')", date.Day.ToString());
         await page.FillAsync("label:text-is('Month')", date.Month.ToString());
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
 
-    public static Task ClickButton(this IPage page, string text) =>
+    public static Task ClickButtonAsync(this IPage page, string text) =>
         page.ClickAsync($".govuk-button:text-is('{text}')");
 }

@@ -25,7 +25,7 @@ public class EndToEndTests : MvcTestBase
             properties: new PropertiesBuilder().Add("bar", 42).Build());
 
         // Act & Assert
-        var responseJson = await ReadStateAndAssert(instance.InstanceId, expectedValue: "initial");
+        var responseJson = await ReadStateAndAssertAsync(instance.InstanceId, expectedValue: "initial");
         Assert.Equal("42", responseJson["properties"]?["bar"]?.ToString());
     }
 
@@ -40,7 +40,7 @@ public class EndToEndTests : MvcTestBase
             properties: new PropertiesBuilder().Add("bar", 42).Add("baz", "ah").Build());
 
         // Act & Assert
-        await UpdateState(instance.InstanceId, newValue: "updated");
+        await UpdateStateAsync(instance.InstanceId, newValue: "updated");
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class EndToEndTests : MvcTestBase
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        await Assert.ThrowsAnyAsync<Exception>(() => UpdateState(instance.InstanceId, newValue: "anything"));
+        await Assert.ThrowsAnyAsync<Exception>(() => UpdateStateAsync(instance.InstanceId, newValue: "anything"));
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class EndToEndTests : MvcTestBase
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        await ReadStateAndAssert(instance.InstanceId, expectedValue: "initial");
+        await ReadStateAndAssertAsync(instance.InstanceId, expectedValue: "initial");
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class EndToEndTests : MvcTestBase
             });
     }
 
-    private async Task<JsonNode> ReadStateAndAssert(
+    private async Task<JsonNode> ReadStateAndAssertAsync(
         JourneyInstanceId instanceId,
         string expectedValue)
     {
@@ -148,7 +148,7 @@ public class EndToEndTests : MvcTestBase
         return responseObj;
     }
 
-    private async Task UpdateState(JourneyInstanceId instanceId, string newValue)
+    private async Task UpdateStateAsync(JourneyInstanceId instanceId, string newValue)
     {
         var id = instanceId.Keys["id"];
         var subid = instanceId.Keys["subid"];

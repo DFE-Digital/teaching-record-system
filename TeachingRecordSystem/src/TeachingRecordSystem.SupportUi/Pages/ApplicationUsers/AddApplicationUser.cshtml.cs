@@ -21,7 +21,7 @@ public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator li
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {

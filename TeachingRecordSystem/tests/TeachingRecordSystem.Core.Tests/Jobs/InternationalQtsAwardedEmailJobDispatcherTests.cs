@@ -95,10 +95,10 @@ public class InternationalQtsAwardedEmailJobDispatcherTests : InternationalQtsAw
             backgroundJobScheduler.Object);
 
         // Act
-        await dispatcher.Execute(internationalQtsAwardedEmailsJobId);
+        await dispatcher.ExecuteAsync(internationalQtsAwardedEmailsJobId);
 
         // Assert
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<SendInternationalQtsAwardedEmailJob, Task>>>()), Times.Exactly(2));
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<SendInternationalQtsAwardedEmailJob, Task>>>()), Times.Exactly(2));
     }
 }

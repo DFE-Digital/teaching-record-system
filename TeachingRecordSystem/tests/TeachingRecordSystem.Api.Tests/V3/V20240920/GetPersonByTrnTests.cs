@@ -18,7 +18,7 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}");
 
@@ -41,7 +41,7 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: [ApiRoles.AppropriateBody]);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}&include={Uri.EscapeDataString(include.ToString())}");
 
@@ -61,7 +61,7 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: [ApiRoles.AppropriateBody]);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}&include={Uri.EscapeDataString(include.ToString())}");
 
@@ -78,7 +78,7 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: [ApiRoles.AppropriateBody]);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
 
@@ -93,10 +93,10 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
 
-        var person = await TestData.CreatePerson(x => x
+        var person = await TestData.CreatePersonAsync(x => x
             .WithTrn()
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
@@ -108,7 +108,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
 
         AssertEx.JsonObjectEquals(
@@ -141,14 +141,14 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: [ApiRoles.AppropriateBody]);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var ittProviderUkprn = "12345";
         var ittProviderName = Faker.Company.Name();
         var itt = CreateIttEntity(person.ContactId, ittProviderUkprn, ittProviderName);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(
                 person.ContactId,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -163,7 +163,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseItt = jsonResponse.RootElement.GetProperty("initialTeacherTraining");
 
         AssertEx.JsonObjectEquals(
@@ -187,14 +187,14 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient(roles: [ApiRoles.GetPerson]);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var ittProviderUkprn = "12345";
         var ittProviderName = Faker.Company.Name();
         var itt = CreateIttEntity(person.ContactId, ittProviderUkprn, ittProviderName);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(
                 person.ContactId,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -209,7 +209,7 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseItt = jsonResponse.RootElement.GetProperty("initialTeacherTraining");
 
         AssertEx.JsonObjectEquals(

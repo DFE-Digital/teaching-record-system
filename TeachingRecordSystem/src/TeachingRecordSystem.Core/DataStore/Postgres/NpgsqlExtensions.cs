@@ -32,7 +32,7 @@ public static class NpgsqlExtensions
         }
     }
 
-    public static async Task<int> SaveEvents(
+    public static async Task<int> SaveEventsAsync(
         this NpgsqlTransaction transaction,
         IReadOnlyCollection<EventBase> events,
         string tempTableSuffix,

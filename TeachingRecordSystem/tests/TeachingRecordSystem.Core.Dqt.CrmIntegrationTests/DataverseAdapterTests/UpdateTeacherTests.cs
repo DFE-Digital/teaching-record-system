@@ -33,7 +33,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -70,15 +70,15 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
-        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
-        var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
-        var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
-        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("X300");  // Academic Studies in Education
+        var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("N400");  // Accounting
+        var updatedHeCountryId = await _dataverseAdapter.GetCountryAsync("XK");
+        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100403");  // mathematics
+        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100366");  // computer science
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -105,7 +105,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -141,13 +141,13 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
-        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var updatedHeCountryId = await _dataverseAdapter.GetCountryAsync("XK");
+        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100403");  // mathematics
+        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100366");  // computer science
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -172,7 +172,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -204,7 +204,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -228,7 +228,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -263,20 +263,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_passed_eyts_itt_record_cannot_change_result_to(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
         var assessmentDate = new DateOnly(2023, 03, 24);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (passResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (passResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Pass,
             assessmentDate);
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -319,14 +319,14 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_intraining_eyts_itt_record_cannot_passing_result_returns_error(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
 
         // Act
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -367,14 +367,14 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_intraining_eyts_itt_record_cannot_change_result_to(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -415,14 +415,14 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_itt_record_passing_result_returns_error(bool eyts, bool asessmentonlyroute, dfeta_ITTProgrammeType programmetype, dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: eyts, hasActiveSanctions: false, assessmentOnly: asessmentonlyroute);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
 
         // Act
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -464,19 +464,19 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_failed_itt_record_passing_result_returns_error(bool eyts, bool asessmentonlyroute, dfeta_ITTProgrammeType programmetype, dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: eyts, hasActiveSanctions: false, assessmentOnly: asessmentonlyroute);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (failResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (failResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Fail,
             null);
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -519,19 +519,19 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_failed_eyts_itt_record_cannot_change_result_to(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (failResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (failResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Fail,
             null);
 
         // Act
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -573,20 +573,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_eyts_itt_record_cannot_unwithdraw_record_to_result(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -625,20 +625,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_eyts_itt_record_passing_withdrawn_returns_success_without_updating()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -678,20 +678,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_eyts_itt_record_cannot_unwithdraw_to_deferred()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -733,20 +733,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_eyts_itt_record_can_unwithdraw_record(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -789,20 +789,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_qts_itt_record_cannot_unwithdraw_record_to_result(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -841,20 +841,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_qts_itt_record_cannot_unwithdraw_to_deferred()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -917,7 +917,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -962,7 +962,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1006,7 +1006,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1025,7 +1025,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             Qualification = null,
             SlugId = Option.None<string>()
         }); ;
-        var contactRecord = await _dataverseAdapter.GetTeacher(teacherId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_SlugId });
+        var contactRecord = await _dataverseAdapter.GetTeacherAsync(teacherId, columnNames: new[] { Contact.Fields.dfeta_TRN, Contact.Fields.dfeta_SlugId });
 
         // Assert
         Assert.True(result.Succeeded);
@@ -1038,20 +1038,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_qts_itt_record_passing_withdrawn_returns_success_without_updating()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1092,20 +1092,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_qts_itt_record_can_unwithdraw_record(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllTeacherStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllTeacherStatusesAsync(null);
         var qtsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "211");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1147,20 +1147,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_assessmentonlyroute_itt_record_cannot_unwithdraw_to_deferred()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: true);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1203,20 +1203,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_assessmentonlyroute_itt_record_cannot_unwithdraw_record_to_result(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: true);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1255,19 +1255,19 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_assessmentonlyroute_with_none_empty_teacherstatus_fail()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllTeacherStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllTeacherStatusesAsync(null);
         var teacherStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "211");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: true);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
-        var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+        var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
                     dfeta_qtsregistration.Fields.StateCode });
 
@@ -1282,7 +1282,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1322,19 +1322,19 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_eyts_with_none_empty_earlyyearsteacherstatus_fail()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsteacherStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false, assessmentOnly: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
-        var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+        var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
                     dfeta_qtsregistration.Fields.StateCode });
 
@@ -1349,7 +1349,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1390,19 +1390,19 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_qts_with_none_empty_teacherstatus_fail()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllTeacherStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllTeacherStatusesAsync(null);
         var teacherStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "211");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: false);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
-        var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacher(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+        var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
                     dfeta_qtsregistration.Fields.StateCode });
 
@@ -1417,7 +1417,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1457,20 +1457,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_assessmentonlyroute_itt_record_passing_withdrawn_returns_success_without_updating()
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllEarlyYearsStatusesAsync(null);
         var eytsStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "220");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: true);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1511,20 +1511,20 @@ public class UpdateTeacherTests : IAsyncLifetime
     public async Task Given_withdrawn_assessmentonlyroute_itt_record_can_unwithdraw_record(dfeta_ITTResult ittResult)
     {
         // Arrange
-        var allStatuses = await _dataverseAdapter.GetAllTeacherStatuses(null);
+        var allStatuses = await _dataverseAdapter.GetAllTeacherStatusesAsync(null);
         var aorStatus = allStatuses.SingleOrDefault(x => x.dfeta_Value == "212");
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: true);
         var assessmentDate = default(DateOnly?);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImpl(
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var (withdrawResult, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
             assessmentDate);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1567,13 +1567,13 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
-        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var updatedHeCountryId = await _dataverseAdapter.GetCountryAsync("XK");
+        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100403");  // mathematics
+        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100366");  // computer science
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1597,9 +1597,9 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
+        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -1615,7 +1615,7 @@ public class UpdateTeacherTests : IAsyncLifetime
                 dfeta_qualification.Fields.dfeta_HE_HESubject3Id,
             });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -1657,18 +1657,18 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-        var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
-        var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
-        var updateHeSubject = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var updatedHeCountry = await _dataverseAdapter.GetCountry("XK");
-        var updateIttSubject1 = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-        var updateIttSubject2 = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
-        var updateIttSubject3 = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
+        var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("X300");  // Academic Studies in Education
+        var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("N400");  // Accounting
+        var updateHeSubject = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var updatedHeCountry = await _dataverseAdapter.GetCountryAsync("XK");
+        var updateIttSubject1 = await _dataverseAdapter.GetIttSubjectByCodeAsync("100403");  // mathematics
+        var updateIttSubject2 = await _dataverseAdapter.GetIttSubjectByCodeAsync("100366");  // computer science
+        var updateIttSubject3 = await _dataverseAdapter.GetIttSubjectByCodeAsync("100302");  // history
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1697,9 +1697,9 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
+        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -1716,7 +1716,7 @@ public class UpdateTeacherTests : IAsyncLifetime
                 dfeta_qualification.Fields.dfeta_HE_HEQualificationId
             });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -1774,12 +1774,12 @@ public class UpdateTeacherTests : IAsyncLifetime
     {
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, assessmentOnly: false, hasActiveSanctions: false);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var aorCandidate = await _dataverseAdapter.GetTeacherStatus("212", null);
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var aorCandidate = await _dataverseAdapter.GetTeacherStatusAsync("212", null);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1819,12 +1819,12 @@ public class UpdateTeacherTests : IAsyncLifetime
     {
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, assessmentOnly: true, hasActiveSanctions: false);
-        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCode("001");  // BEd
-        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCode("401");  // Higher Degree
-        var traineeTeacherStatusId = await _dataverseAdapter.GetTeacherStatus("211", null);
+        var updateIttQualification = await _dataverseAdapter.GetIttQualificationByCodeAsync("001");  // BEd
+        var updateHeQualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("401");  // Higher Degree
+        var traineeTeacherStatusId = await _dataverseAdapter.GetTeacherStatusAsync("211", null);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1866,7 +1866,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1910,7 +1910,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -1967,7 +1967,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2006,7 +2006,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2052,7 +2052,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2098,7 +2098,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2126,7 +2126,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
         teacherId,
         columnNames: new[]
         {
@@ -2166,7 +2166,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2194,7 +2194,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
         teacherId,
         columnNames: new[]
         {
@@ -2233,7 +2233,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2271,12 +2271,12 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-        var countryId = await _dataverseAdapter.GetCountry("XK");
-        var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single();
-        var qualification = await _dataverseAdapter.GetHeQualificationByCode("400");  // First Degree
-        var HeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
-        var HeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
+        var countryId = await _dataverseAdapter.GetCountryAsync("XK");
+        var qualificationSubject1Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>())).Single();
+        var qualification = await _dataverseAdapter.GetHeQualificationByCodeAsync("400");  // First Degree
+        var HeSubject2Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("X300");  // Academic Studies in Education
+        var HeSubject3Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("N400");  // Accounting
 
         var txnResponse = (ExecuteTransactionResponse)await _organizationService.ExecuteAsync(new ExecuteTransactionRequest()
         {
@@ -2302,7 +2302,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             ReturnResponses = true
         });
 
-        await _dataverseAdapter.GetQualificationsForTeacher(
+        await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -2319,7 +2319,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             });
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2344,7 +2344,7 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -2389,7 +2389,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     {
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, assessmentOnly: true);
-        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn("10045988", columnNames: Array.Empty<string>())).Single();
+        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprnAsync("10045988", columnNames: Array.Empty<string>())).Single();
 
         // Create second Itt record
         await _organizationService.ExecuteAsync(new CreateRequest()
@@ -2407,7 +2407,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2449,7 +2449,7 @@ public class UpdateTeacherTests : IAsyncLifetime
     {
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
-        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn("10045988", columnNames: Array.Empty<string>())).Single();
+        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprnAsync("10045988", columnNames: Array.Empty<string>())).Single();
 
         // Create second Itt record
         await _organizationService.ExecuteAsync(new CreateRequest()
@@ -2467,7 +2467,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2506,7 +2506,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
-        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single();
+        var providerId = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>())).Single();
 
         // Create second Itt record
         await _organizationService.ExecuteAsync(new CreateRequest()
@@ -2524,7 +2524,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2634,13 +2634,13 @@ public class UpdateTeacherTests : IAsyncLifetime
         // Arrange
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: true);
 
-        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var updatedHeCountryId = await _dataverseAdapter.GetCountry("XK");
-        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
+        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var updatedHeCountryId = await _dataverseAdapter.GetCountryAsync("XK");
+        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100403");  // mathematics
+        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100366");  // computer science
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2668,9 +2668,9 @@ public class UpdateTeacherTests : IAsyncLifetime
             }
         });
 
-        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
+        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -2684,7 +2684,7 @@ public class UpdateTeacherTests : IAsyncLifetime
                 dfeta_qualification.Fields.dfeta_HE_CountryId,
             });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -2751,7 +2751,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2787,7 +2787,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (_, _, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2819,7 +2819,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, _, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2878,7 +2878,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var newIttProviderUkprn = "10045988";
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2920,17 +2920,17 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: true, hasActiveSanctions: false);
 
         var newIttProviderUkprn = "10045988";
-        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCode("100366");  // computer science
-        var updatedHeCountryId = await _dataverseAdapter.GetCountry("XQ");
-        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCode("100403");  // mathematics
-        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCode("100366");  // computer science
-        var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCode("100302");  // history
+        var updateHeSubjectId = await _dataverseAdapter.GetHeSubjectByCodeAsync("100366");  // computer science
+        var updatedHeCountryId = await _dataverseAdapter.GetCountryAsync("XQ");
+        var updateIttSubject1Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100403");  // mathematics
+        var updateIttSubject2Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100366");  // computer science
+        var updateIttSubject3Id = await _dataverseAdapter.GetIttSubjectByCodeAsync("100302");  // history
         var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
-        var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCode("X300");  // Academic Studies in Education
-        var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCode("N400");  // Accounting
+        var updateHeSubject2Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("X300");  // Academic Studies in Education
+        var updateHeSubject3Id = await _dataverseAdapter.GetHeSubjectByCodeAsync("N400");  // Accounting
 
         // Act
-        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -2959,10 +2959,10 @@ public class UpdateTeacherTests : IAsyncLifetime
             HusId = husId
         });
 
-        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
-        var newProviderProvider = (await _dataverseAdapter.GetOrganizationsByUkprn(newIttProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
+        var oldProvider = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(ittProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
+        var newProviderProvider = (await _dataverseAdapter.GetOrganizationsByUkprnAsync(newIttProviderUkprn, columnNames: Array.Empty<string>())).Single().Id;
 
-        var qualifications = await _dataverseAdapter.GetQualificationsForTeacher(
+        var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -2978,7 +2978,7 @@ public class UpdateTeacherTests : IAsyncLifetime
                 dfeta_qualification.Fields.dfeta_HE_CountryId,
             });
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacherId,
             columnNames: new[]
             {
@@ -3017,7 +3017,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var (teacherId, ittProviderUkprn, _) = await CreatePerson(earlyYears: false, hasActiveSanctions: false);
 
         // Act
-        var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -3050,7 +3050,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
 
         // Act
-        var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -3092,7 +3092,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -3134,7 +3134,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var (result, _) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -3168,7 +3168,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
 
         // Act
-        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (result, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -3201,10 +3201,10 @@ public class UpdateTeacherTests : IAsyncLifetime
         var ukprn = "10000571";
         var (teacherId, ittProviderUkprn, ittId) = await CreatePerson(earlyYears: false, hasActiveSanctions: false, slugId: slugId.ValueOrDefault());
         var husId = Option.Some(new Random().NextInt64(2000000000000, 2999999999999).ToString());
-        var ukproviderukprnid = await _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, Array.Empty<string>(), true);
+        var ukproviderukprnid = await _dataverseAdapter.GetIttProviderOrganizationsByUkprnAsync(ukprn, Array.Empty<string>(), true);
 
         // Act
-        var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImpl(new UpdateTeacherCommand()
+        var (_, txnRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
         {
             TeacherId = teacherId,
             InitialTeacherTraining = new UpdateTeacherCommandInitialTeacherTraining()
@@ -3238,7 +3238,7 @@ public class UpdateTeacherTests : IAsyncLifetime
         bool hasActiveSanctions = false,
         string slugId = null)
     {
-        var createPersonResult = await _testDataHelper.CreatePerson(
+        var createPersonResult = await _testDataHelper.CreatePersonAsync(
             earlyYears,
             assessmentOnly,
             withQualification: true,

@@ -6,7 +6,7 @@
     var updatedEvent = Model.ItemModel.Event;
     var mandatoryQualification = updatedEvent.MandatoryQualification;
     var oldMandatoryQualification = updatedEvent.OldMandatoryQualification;
-    var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-mq-updated-event">

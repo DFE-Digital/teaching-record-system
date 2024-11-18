@@ -54,18 +54,18 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         AddReason = JourneyInstance!.State.AddReason;
         HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         AddReasonDetail = JourneyInstance!.State.AddReasonDetail;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
             null;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (HasAdditionalReasonDetail == true && AddReasonDetail is null)
         {
@@ -88,11 +88,11 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
             {
                 if (EvidenceFileId is not null)
                 {
-                    await fileService.DeleteFile(EvidenceFileId.Value);
+                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
                 }
 
                 using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await fileService.UploadFile(stream, EvidenceFile.ContentType);
+                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
                 await JourneyInstance!.UpdateStateAsync(state =>
                 {
                     state.EvidenceFileId = evidenceFileId;
@@ -103,7 +103,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         }
         else if (EvidenceFileId is not null)
         {
-            await fileService.DeleteFile(EvidenceFileId.Value);
+            await fileService.DeleteFileAsync(EvidenceFileId.Value);
             await JourneyInstance!.UpdateStateAsync(state =>
             {
                 state.EvidenceFileId = null;
@@ -123,7 +123,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         return Redirect(linkGenerator.AlertAddCheckAnswers(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

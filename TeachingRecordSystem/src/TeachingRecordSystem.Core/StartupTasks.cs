@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core;
 
 public interface IStartupTask
 {
-    Task Execute();
+    Task ExecuteAsync();
 }
 
 public static partial class ServiceCollectionExtensions
@@ -42,7 +42,7 @@ public static partial class ServiceCollectionExtensions
             _action = action;
         }
 
-        public Task Execute() => _action(_serviceProvider);
+        public Task ExecuteAsync() => _action(_serviceProvider);
     }
 
     private class RunStartupTasksHostedService : IHostedService
@@ -58,7 +58,7 @@ public static partial class ServiceCollectionExtensions
         {
             foreach (var startupTask in _startupTasks)
             {
-                await startupTask.Execute();
+                await startupTask.ExecuteAsync();
             }
         }
 

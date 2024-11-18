@@ -29,7 +29,7 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var subject = JourneyInstance!.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("sub")!;
         var email = JourneyInstance!.State.OneLoginAuthenticationTicket!.Principal.FindFirstValue("email")!;

@@ -24,7 +24,7 @@ public class GetActiveContactDetailByTrnTests : IAsyncLifetime
         var trn = "DodgyTrn";
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByTrnQuery(trn, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByTrnQuery(trn, new ColumnSet()));
 
         // Assert
         Assert.Null(result);
@@ -34,10 +34,10 @@ public class GetActiveContactDetailByTrnTests : IAsyncLifetime
     public async Task WhenCalled_WithTrnForExistingContact_ReturnsContactDetail()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn());
+        var person = await _dataScope.TestData.CreatePersonAsync(p => p.WithTrn());
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByTrnQuery(person.Trn!, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByTrnQuery(person.Trn!, new ColumnSet()));
 
         // Assert
         Assert.NotNull(result);
@@ -52,11 +52,11 @@ public class GetActiveContactDetailByTrnTests : IAsyncLifetime
         var updatedFirstName = _dataScope.TestData.GenerateFirstName();
         var updatedMiddleName = _dataScope.TestData.GenerateMiddleName();
         var updatedLastName = _dataScope.TestData.GenerateLastName();
-        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn());
-        await _dataScope.TestData.UpdatePerson(b => b.WithPersonId(person.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
+        var person = await _dataScope.TestData.CreatePersonAsync(p => p.WithTrn());
+        await _dataScope.TestData.UpdatePersonAsync(b => b.WithPersonId(person.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByTrnQuery(person.Trn!, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByTrnQuery(person.Trn!, new ColumnSet()));
 
         // Assert
         Assert.NotNull(result);

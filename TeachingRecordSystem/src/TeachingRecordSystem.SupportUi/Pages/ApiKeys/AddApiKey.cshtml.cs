@@ -28,7 +28,7 @@ public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerat
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {

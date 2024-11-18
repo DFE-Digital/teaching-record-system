@@ -53,17 +53,17 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         DeletionReason = JourneyInstance!.State.DeletionReason;
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
@@ -81,11 +81,11 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
             {
                 if (EvidenceFileId is not null)
                 {
-                    await fileService.DeleteFile(EvidenceFileId.Value);
+                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
                 }
 
                 using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await fileService.UploadFile(stream, EvidenceFile.ContentType);
+                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
                 await JourneyInstance!.UpdateStateAsync(state =>
                 {
                     state.EvidenceFileId = evidenceFileId;
@@ -96,7 +96,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         }
         else if (EvidenceFileId is not null)
         {
-            await fileService.DeleteFile(EvidenceFileId.Value);
+            await fileService.DeleteFileAsync(EvidenceFileId.Value);
             await JourneyInstance!.UpdateStateAsync(state =>
             {
                 state.EvidenceFileId = null;
@@ -115,11 +115,11 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
         return Redirect(linkGenerator.MqDeleteConfirm(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         if (JourneyInstance!.State.EvidenceFileId is not null)
         {
-            await fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
+            await fileService.DeleteFileAsync(JourneyInstance!.State.EvidenceFileId.Value);
         }
 
         await JourneyInstance!.DeleteAsync();

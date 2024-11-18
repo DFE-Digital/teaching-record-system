@@ -81,7 +81,7 @@ public partial class TestData
         return new TestData(dbContextFactory, organizationService, referenceDataCache, clock, generateTrn, syncConfiguration);
     }
 
-    public static async Task<string> GetBase64EncodedFileContent(Stream file)
+    public static async Task<string> GetBase64EncodedFileContentAsync(Stream file)
     {
         using var ms = new MemoryStream();
         await file.CopyToAsync(ms);
@@ -224,7 +224,7 @@ public partial class TestData
         return mobileNumber;
     }
 
-    public Task<string> GenerateTrn() => _generateTrn();
+    public Task<string> GenerateTrnAsync() => _generateTrn();
 
     public Contact_GenderCode GenerateGender() => Faker.Enum.Random<Contact_GenderCode>();
 
@@ -263,13 +263,13 @@ public partial class TestData
 
     public string GenerateUrl() => Faker.Internet.Url();
 
-    protected async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
+    protected async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    protected async Task WithDbContext(Func<TrsDbContext, Task> action)
+    protected async Task WithDbContextAsync(Func<TrsDbContext, Task> action)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
         await action(dbContext);
@@ -293,7 +293,7 @@ public sealed class TestDataSyncConfiguration
 
     public static TestDataSyncConfiguration Sync(TrsDataSyncHelper helper) => new(true, helper);
 
-    public async Task SyncIfEnabled(Func<TrsDataSyncHelper, Task> action, bool? overrideSync = null)
+    public async Task SyncIfEnabledAsync(Func<TrsDataSyncHelper, Task> action, bool? overrideSync = null)
     {
         if (overrideSync == true && !SyncEnabled)
         {

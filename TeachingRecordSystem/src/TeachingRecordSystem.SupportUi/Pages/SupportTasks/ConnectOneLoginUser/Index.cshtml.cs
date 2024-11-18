@@ -33,7 +33,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (SuggestedMatches!.Length > 0 && Trn is null)
         {
@@ -62,7 +62,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var data = (ConnectOneLoginUserData)supportTask.Data;
 
-        var suggestedMatches = await personMatchingService.GetSuggestedMatches(new(
+        var suggestedMatches = await personMatchingService.GetSuggestedMatchesAsync(new(
             data.VerifiedNames!,
             data.VerifiedDatesOfBirth!,
             data.StatedNationalInsuranceNumber,

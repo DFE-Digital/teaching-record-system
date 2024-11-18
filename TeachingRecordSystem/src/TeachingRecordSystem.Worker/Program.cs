@@ -79,5 +79,5 @@ void AddLegacyDataverseAdapterServices()
 
 sealed class DummyTrnGenerationApiClient : ITrnGenerationApiClient
 {
-    public Task<string> GenerateTrn() => throw new NotImplementedException();
+    public Task<string> GenerateTrnAsync() => throw new NotImplementedException();
 }

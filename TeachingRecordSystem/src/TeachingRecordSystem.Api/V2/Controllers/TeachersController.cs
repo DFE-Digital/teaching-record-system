@@ -25,7 +25,7 @@ public class TeachersController : ControllerBase
         Description = "Returns teachers matching the specified criteria")]
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindTeachers(FindTeachersRequest request)
+    public async Task<IActionResult> FindTeachersAsync(FindTeachersRequest request)
     {
         var response = await _mediator.Send(request);
         return Ok(response);
@@ -38,7 +38,7 @@ public class TeachersController : ControllerBase
         Description = "Gets an individual teacher by their TRN")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> GetTeacher([FromRoute] GetTeacherRequest request)
+    public async Task<IActionResult> GetTeacherAsync([FromRoute] GetTeacherRequest request)
     {
         var response = await _mediator.Send(request);
         return response != null ? Ok(response) : NotFound();
@@ -53,7 +53,7 @@ public class TeachersController : ControllerBase
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
-    public async Task<IActionResult> Update([FromBody] UpdateTeacherRequest request)
+    public async Task<IActionResult> UpdateAsync([FromBody] UpdateTeacherRequest request)
     {
         await _mediator.Send(request);
         return NoContent();

@@ -27,7 +27,7 @@ public class NpqQualificationsController : ControllerBase
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SetNpqQualification([FromBody] SetNpqQualificationRequest request)
+    public async Task<IActionResult> SetNpqQualificationAsync([FromBody] SetNpqQualificationRequest request)
     {
         await _mediator.Send(request);
         return NoContent();

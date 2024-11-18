@@ -6,10 +6,10 @@ public class EstablishmentRefresher(
     TrsDbContext dbContext,
     IEstablishmentMasterDataService establishmentMasterDataService)
 {
-    public async Task RefreshEstablishments(CancellationToken cancellationToken)
+    public async Task RefreshEstablishmentsAsync(CancellationToken cancellationToken)
     {
         int i = 0;
-        await foreach (var establishment in establishmentMasterDataService.GetEstablishments())
+        await foreach (var establishment in establishmentMasterDataService.GetEstablishmentsAsync())
         {
             var existingEstablishment = await dbContext.Establishments.SingleOrDefaultAsync(e => e.Urn == establishment.Urn);
             if (existingEstablishment == null)

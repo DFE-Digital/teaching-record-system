@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core;
 
 public static class TaskEnumerableExtensions
 {
-    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Task<T[]> task)
+    public static async IAsyncEnumerable<T> ToAsyncEnumerableAsync<T>(this Task<T[]> task)
     {
         var result = await task;
 

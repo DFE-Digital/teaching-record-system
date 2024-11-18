@@ -14,7 +14,7 @@ public class TpsCsvExtractFileImporter(
     IDbContextFactory<TrsDbContext> dbContextFactory,
     IClock clock)
 {
-    public async Task ImportFile(Guid tpsCsvExtractId, string fileName, CancellationToken cancellationToken)
+    public async Task ImportFileAsync(Guid tpsCsvExtractId, string fileName, CancellationToken cancellationToken)
     {
         var fileNameParts = fileName.Split("/");
         var fileNameWithoutFolder = fileNameParts.Last();
@@ -71,7 +71,7 @@ public class TpsCsvExtractFileImporter(
 
         writer.Timeout = TimeSpan.FromMinutes(5);
 
-        using var stream = await tpsExtractStorageService.GetFile(fileName, cancellationToken);
+        using var stream = await tpsExtractStorageService.GetFileAsync(fileName, cancellationToken);
         using var streamReader = new StreamReader(stream);
         using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
 
@@ -170,7 +170,7 @@ public class TpsCsvExtractFileImporter(
         await transaction.CommitAsync(cancellationToken);
     }
 
-    public async Task CopyValidFormatDataToStaging(Guid tpsCsvExtractId, CancellationToken cancellationToken)
+    public async Task CopyValidFormatDataToStagingAsync(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         using var readDbContext = dbContextFactory.CreateDbContext();
         using var writeDbContext = dbContextFactory.CreateDbContext();

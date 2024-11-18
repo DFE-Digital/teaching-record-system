@@ -10,7 +10,7 @@ public class PersonTests : TestBase
     [Fact]
     public async Task EditName()
     {
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var personId = person.ContactId;
         var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
         var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
@@ -19,55 +19,55 @@ public class PersonTests : TestBase
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonDetailPage(personId);
+        await page.GoToPersonDetailPageAsync(personId);
 
-        await page.AssertOnPersonDetailPage(personId);
+        await page.AssertOnPersonDetailPageAsync(personId);
 
-        await page.ClickChangeLinkForSummaryListRowWithKey("Name");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Name");
 
-        await page.AssertOnPersonEditNamePage(personId);
+        await page.AssertOnPersonEditNamePageAsync(personId);
 
-        await page.FillNameInputs(newFirstName, newMiddleName, newLastName);
+        await page.FillNameInputsAsync(newFirstName, newMiddleName, newLastName);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnPersonEditNameConfirmPage(personId);
+        await page.AssertOnPersonEditNameConfirmPageAsync(personId);
 
-        await page.ClickConfirmButton();
+        await page.ClickConfirmButtonAsync();
 
-        await page.AssertOnPersonDetailPage(personId);
+        await page.AssertOnPersonDetailPageAsync(personId);
 
-        await page.AssertFlashMessage("Record has been updated");
+        await page.AssertFlashMessageAsync("Record has been updated");
     }
 
     [Fact]
     public async Task EditDateOfBirth()
     {
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var personId = person.ContactId;
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonDetailPage(personId);
+        await page.GoToPersonDetailPageAsync(personId);
 
-        await page.AssertOnPersonDetailPage(personId);
+        await page.AssertOnPersonDetailPageAsync(personId);
 
-        await page.ClickChangeLinkForSummaryListRowWithKey("Date of birth");
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Date of birth");
 
-        await page.AssertOnPersonEditDateOfBirthPage(personId);
+        await page.AssertOnPersonEditDateOfBirthPageAsync(personId);
 
-        await page.FillDateInput(newDateOfBirth);
+        await page.FillDateInputAsync(newDateOfBirth);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnPersonEditDateOfBirthConfirmPage(personId);
+        await page.AssertOnPersonEditDateOfBirthConfirmPageAsync(personId);
 
-        await page.ClickConfirmButton();
+        await page.ClickConfirmButtonAsync();
 
-        await page.AssertOnPersonDetailPage(personId);
+        await page.AssertOnPersonDetailPageAsync(personId);
 
-        await page.AssertFlashMessage("Record has been updated");
+        await page.AssertFlashMessageAsync("Record has been updated");
     }
 }

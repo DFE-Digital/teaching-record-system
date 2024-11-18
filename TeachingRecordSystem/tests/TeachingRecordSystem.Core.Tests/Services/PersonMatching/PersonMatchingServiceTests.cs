@@ -38,7 +38,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
 
     private TestableClock Clock { get; }
 
-    public Task InitializeAsync() => DbFixture.DbHelper.ClearData();
+    public Task InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
 
     public Task DisposeAsync() => Task.CompletedTask;
 
@@ -51,7 +51,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             TrnArgumentOption trnOption,
             bool expectMatch,
             IEnumerable<OneLoginUserMatchedAttribute>? expectedMatchedAttributes) =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();
@@ -67,10 +67,10 @@ public class PersonMatchingServiceTests : IAsyncLifetime
                 await dbContext.SaveChangesAsync();
             }
 
-            var person = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
-            var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
+            var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var employmentNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
-            var personEmployment = await TestData.CreateTpsEmployment(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
+            var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), employmentNino);
 
             string[][] names = nameOption switch
             {
@@ -102,14 +102,14 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var trn = trnOption switch
             {
                 TrnArgumentOption.SpecifiedAndMatches => person.Trn!,
-                TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrn(),
+                TrnArgumentOption.SpecifiedButDifferent => await TestData.GenerateTrnAsync(),
                 _ => null
             };
 
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.Match(new(names, datesOfBirth, nationalInsuranceNumber, trn));
+            var result = await service.MatchAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn));
 
             // Assert
             if (expectMatch)
@@ -127,15 +127,15 @@ public class PersonMatchingServiceTests : IAsyncLifetime
 
     [Fact]
     public Task Match_WithMultipleMatchingResults_ReturnsNull() =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();
             var lastName = TestData.GenerateLastName();
             var dateOfBirth = TestData.GenerateDateOfBirth();
 
-            var person1 = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
-            var person2 = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];
@@ -145,7 +145,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.Match(new(names, datesOfBirth, nationalInsuranceNumber, trn));
+            var result = await service.MatchAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn));
 
             // Assert
             Assert.Null(result);
@@ -153,7 +153,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
 
     [Fact]
     public Task Match_WithMultipleMatchingNames_ReturnsResult() =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = Guid.NewGuid().ToString();  // Deliberately weird first name to avoid unique constraint violations in NameSynonyms below
@@ -166,7 +166,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             });
             await dbContext.SaveChangesAsync();
 
-            var person = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber().WithFirstName(firstName));
 
             string[][] names = [[person.FirstName, person.LastName], [alias, person.LastName]];
             DateOnly[] datesOfBirth = [person.DateOfBirth];
@@ -176,7 +176,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.Match(new(names, datesOfBirth, nationalInsuranceNumber, trn));
+            var result = await service.MatchAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn));
 
             // Assert
             Assert.NotNull(result);
@@ -186,7 +186,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
     [InlineData(true)]
     [InlineData(false)]
     public Task GetSuggestedMatches_ReturnsExpectedResults(bool usePersonNino) =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();
@@ -196,19 +196,19 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
 
             // Person who matches on last name & DOB
-            var person1 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
             // Person who matches on NINO            
-            var person2 = await TestData.CreatePerson(p => p.WithTrn().WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
-            var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var personEmployment = await TestData.CreateTpsEmployment(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
+            var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
+            var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+            var personEmployment = await TestData.CreateTpsEmploymentAsync(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
 
             // Person who matches on TRN
-            var person3 = await TestData.CreatePerson(p => p.WithTrn());
+            var person3 = await TestData.CreatePersonAsync(p => p.WithTrn());
             var trn = person3.Trn!;
 
             // Person who matches on last name, DOB & TRN
-            var person4 = await TestData.CreatePerson(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
+            var person4 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
             var trnTokenHintTrn = person4.Trn!;
 
             string[][] names = [[firstName, lastName]];
@@ -217,7 +217,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.GetSuggestedMatches(new(names, datesOfBirth, nationalInsuranceNumber, trn, trnTokenHintTrn));
+            var result = await service.GetSuggestedMatchesAsync(new(names, datesOfBirth, nationalInsuranceNumber, trn, trnTokenHintTrn));
 
             // Assert
             Assert.Collection(
@@ -232,7 +232,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
     [InlineData(true)]
     [InlineData(false)]
     public Task GetMatchedAttributes_ReturnsExpectedResults(bool usePersonNino) =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var firstName = TestData.GenerateFirstName();
@@ -241,9 +241,9 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
             var alternativeNationalInsuranceNumber = TestData.GenerateChangedNationalInsuranceNumber(nationalInsuranceNumber);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
-            var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
-            var personEmployment = await TestData.CreateTpsEmployment(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
+            var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
+            var personEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
 
             string[][] names = [[firstName, lastName]];
             DateOnly[] datesOfBirth = [dateOfBirth];
@@ -251,7 +251,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             var service = new PersonMatchingService(dbContext);
 
             // Act
-            var result = await service.GetMatchedAttributes(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn!, TrnTokenTrnHint: null), person.PersonId);
+            var result = await service.GetMatchedAttributesAsync(new(names, datesOfBirth, nationalInsuranceNumber, person.Trn!, TrnTokenTrnHint: null), person.PersonId);
 
             // Assert
             Assert.Collection(

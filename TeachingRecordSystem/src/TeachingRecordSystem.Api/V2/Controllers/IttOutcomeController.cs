@@ -29,7 +29,7 @@ public class IttOutcomeController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
     [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> SetIttOutcome([FromBody] SetIttOutcomeRequest request)
+    public async Task<IActionResult> SetIttOutcomeAsync([FromBody] SetIttOutcomeRequest request)
     {
         var response = await _mediator.Send(request);
         return Ok(response);

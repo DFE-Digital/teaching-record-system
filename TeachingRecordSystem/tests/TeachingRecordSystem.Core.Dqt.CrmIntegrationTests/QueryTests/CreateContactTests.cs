@@ -27,7 +27,7 @@ public class CreateContactTests : IAsyncLifetime
         var email = _dataScope.TestData.GenerateUniqueEmail();
         var nino = _dataScope.TestData.GenerateNationalInsuranceNumber();
         var dateOfBirth = _dataScope.TestData.GenerateDateOfBirth();
-        var trn = await _dataScope.TestData.GenerateTrn();
+        var trn = await _dataScope.TestData.GenerateTrnAsync();
 
         var query = new CreateContactQuery()
         {
@@ -48,7 +48,7 @@ public class CreateContactTests : IAsyncLifetime
         };
 
         // Act
-        var createdTeacherId = await _crmQueryDispatcher.ExecuteQuery(query);
+        var createdTeacherId = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
@@ -76,7 +76,7 @@ public class CreateContactTests : IAsyncLifetime
         var dateOfBirth = _dataScope.TestData.GenerateDateOfBirth();
 
         var existingContactId = Guid.NewGuid();
-        var existingContactTrn = await _dataScope.TestData.GenerateTrn();
+        var existingContactTrn = await _dataScope.TestData.GenerateTrnAsync();
         await _dataScope.OrganizationService.CreateAsync(new Contact()
         {
             Id = existingContactId,
@@ -125,7 +125,7 @@ public class CreateContactTests : IAsyncLifetime
             ApplicationUserName = "Tests",
             OutboxMessages = []
         };
-        var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQuery(query);
+        var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQueryAsync(query);
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
         var contact = ctx.ContactSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Contact.PrimaryIdAttribute) == createdTeacherId2);
         var potentialDuplicateTask = ctx.TaskSet.FirstOrDefault(x => x.RegardingObjectId == createdTeacherId2.ToEntityReference(Contact.EntityLogicalName));

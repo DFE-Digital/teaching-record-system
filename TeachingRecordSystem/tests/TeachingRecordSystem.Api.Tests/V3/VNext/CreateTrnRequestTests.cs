@@ -48,7 +48,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response, expectedStatusCode: StatusCodes.Status200OK);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
 
         var (crmQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
         Assert.Collection(

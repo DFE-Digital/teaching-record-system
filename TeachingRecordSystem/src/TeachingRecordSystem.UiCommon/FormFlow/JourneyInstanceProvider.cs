@@ -331,7 +331,9 @@ public class JourneyInstanceProvider(
 
             // All the in-box implementations of IValueProviderFactory complete synchronously
             // and making this method async forces the entire API to be sync.
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
             valueProviderFactory.CreateValueProviderAsync(ctx).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
             valueProviders.AddRange(ctx.ValueProviders);
         }

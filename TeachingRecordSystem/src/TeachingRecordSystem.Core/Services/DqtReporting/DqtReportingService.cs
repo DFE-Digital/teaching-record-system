@@ -78,11 +78,11 @@ public partial class DqtReportingService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return Task.WhenAll(ProcessCrmChangesWrapper(), ProcessTrsChangesWrapper());
+        return Task.WhenAll(ProcessCrmChangesWrapperAsync(), ProcessTrsChangesWrapperAsync());
 
-        async Task ProcessCrmChangesWrapper()
+        async Task ProcessCrmChangesWrapperAsync()
         {
-            await LoadEntityMetadata();
+            await LoadEntityMetadataAsync();
 
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollIntervalSeconds));
 
@@ -90,7 +90,7 @@ public partial class DqtReportingService : BackgroundService
             {
                 try
                 {
-                    await _resiliencePipeline.ExecuteAsync(async ct => await ProcessCrmChanges(ct), stoppingToken);
+                    await _resiliencePipeline.ExecuteAsync(async ct => await ProcessCrmChangesAsync(ct), stoppingToken);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {
@@ -109,11 +109,11 @@ public partial class DqtReportingService : BackgroundService
             while (await timer.WaitForNextTickAsync(stoppingToken));
         }
 
-        async Task ProcessTrsChangesWrapper()
+        async Task ProcessTrsChangesWrapperAsync()
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChanges(observer: null, ct), stoppingToken);
+                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -126,7 +126,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    internal async Task LoadEntityMetadata()
+    internal async Task LoadEntityMetadataAsync()
     {
         foreach (var entity in _options.Entities)
         {
@@ -139,7 +139,7 @@ public partial class DqtReportingService : BackgroundService
 
                 try
                 {
-                    var entityMetadata = await _crmQueryDispatcher.ExecuteQuery(
+                    var entityMetadata = await _crmQueryDispatcher.ExecuteQueryAsync(
                         new GetEntityMetadataQuery(entity, EntityFilters.Default | EntityFilters.Attributes));
 
                     if (entityMetadata.ChangeTrackingEnabled != true)
@@ -168,7 +168,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    internal async Task ProcessCrmChanges(CancellationToken cancellationToken)
+    internal async Task ProcessCrmChangesAsync(CancellationToken cancellationToken)
     {
         using var operation = _telemetryClient.StartOperation<DependencyTelemetry>(ProcessChangesOperationName);
 
@@ -183,7 +183,7 @@ public partial class DqtReportingService : BackgroundService
             {
                 try
                 {
-                    await ProcessCrmChangesForEntityType(entityType, ct);
+                    await ProcessCrmChangesForEntityTypeAsync(entityType, ct);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
@@ -196,7 +196,7 @@ public partial class DqtReportingService : BackgroundService
             });
     }
 
-    internal async Task ProcessCrmChangesForEntityType(string entityLogicalName, CancellationToken cancellationToken)
+    internal async Task ProcessCrmChangesForEntityTypeAsync(string entityLogicalName, CancellationToken cancellationToken)
     {
         var totalProcessed = 0;
 
@@ -217,7 +217,7 @@ public partial class DqtReportingService : BackgroundService
         try
         {
             // We don't populate modifiedSince here since it's so slow to query in the reporting DB
-            var changesEnumerable = _crmEntityChangesService.GetEntityChanges(ChangesKey, entityLogicalName, columns, modifiedSince: null, PageSize)
+            var changesEnumerable = _crmEntityChangesService.GetEntityChangesAsync(ChangesKey, entityLogicalName, columns, modifiedSince: null, PageSize)
                 .WithCancellation(cancellationToken);
 
             await foreach (var changes in changesEnumerable)
@@ -241,11 +241,11 @@ public partial class DqtReportingService : BackgroundService
                     }
                 }
 
-                await HandleNewOrUpdatedItems(newOrUpdatedItems, cancellationToken);
+                await HandleNewOrUpdatedItemsAsync(newOrUpdatedItems, cancellationToken);
                 totalProcessed += newOrUpdatedItems.Count;
 
                 // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
-                await HandleRemovedOrDeletedItems(removedOrDeletedItems, cancellationToken);
+                await HandleRemovedOrDeletedItemsAsync(removedOrDeletedItems, cancellationToken);
                 totalProcessed += removedOrDeletedItems.Count;
             }
         }
@@ -259,7 +259,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task HandleNewOrUpdatedItems(
+    private async Task HandleNewOrUpdatedItemsAsync(
         IReadOnlyCollection<NewOrUpdatedItem> newOrUpdatedItems,
         CancellationToken cancellationToken)
     {
@@ -280,13 +280,13 @@ public partial class DqtReportingService : BackgroundService
         using var conn = new SqlConnection(_options.ReportingDbConnectionString);
         await conn.OpenAsync();
 
-        await CreateTempTable();
+        await CreateTempTableAsync();
 
         foreach (var chunk in entities.Chunk(MaxUpsertBatchSize))
         {
             try
             {
-                await UpsertRows(chunk);
+                await UpsertRowsAsync(chunk);
             }
             catch (SqlException ex) when (ex.Number == 207)  // Likely means a column is missing
             {
@@ -300,13 +300,13 @@ public partial class DqtReportingService : BackgroundService
                     throw;
                 }
 
-                await AddMissingColumns(missingColumns);
+                await AddMissingColumnsAsync(missingColumns);
 
-                await UpsertRows(chunk);
+                await UpsertRowsAsync(chunk);
             }
         }
 
-        await DropTempTable();
+        await DropTempTableAsync();
 
         DataTable CreateDataTable()
         {
@@ -323,7 +323,7 @@ public partial class DqtReportingService : BackgroundService
             return dataTable;
         }
 
-        async Task CreateTempTable()
+        async Task CreateTempTableAsync()
         {
             var sqlBuilder = new StringBuilder();
             sqlBuilder.AppendFormat("create table [{0}] (\n", tempTableName);
@@ -358,7 +358,7 @@ public partial class DqtReportingService : BackgroundService
             }
         }
 
-        async Task UpsertRows(Entity[] entities)
+        async Task UpsertRowsAsync(Entity[] entities)
         {
             dataTable.Rows.Clear();
 
@@ -404,7 +404,7 @@ public partial class DqtReportingService : BackgroundService
             await txn.CommitAsync(cancellationToken);
         }
 
-        async Task DropTempTable()
+        async Task DropTempTableAsync()
         {
             var sql = $"drop table [{tempTableName}]";
 
@@ -414,7 +414,7 @@ public partial class DqtReportingService : BackgroundService
             await command.ExecuteNonQueryAsync();
         }
 
-        async Task AddMissingColumns(string[] columnNames)
+        async Task AddMissingColumnsAsync(string[] columnNames)
         {
             var attributes = entityTableMapping.Attributes.Where(a => a.ColumnDefinitions.Any(c => columnNames.Contains(c.ColumnName)));
 
@@ -433,7 +433,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task HandleRemovedOrDeletedItems(
+    private async Task HandleRemovedOrDeletedItemsAsync(
         IReadOnlyCollection<RemovedOrDeletedItem> removedOrDeletedItems,
         CancellationToken cancellationToken)
     {
@@ -458,7 +458,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    internal async Task ProcessTrsChanges(
+    internal async Task ProcessTrsChangesAsync(
         IObserver<TrsReplicationStatus>? observer,
         CancellationToken cancellationToken)
     {
@@ -471,7 +471,7 @@ public partial class DqtReportingService : BackgroundService
         await using var replicationConn = new LogicalReplicationConnection(_configuration.GetPostgresConnectionString());
         await replicationConn.Open();
 
-        var slot = await GetReplicationSlot(replicationConn, cancellationToken);
+        var slot = await GetReplicationSlotAsync(replicationConn, cancellationToken);
         observer?.OnNext(TrsReplicationStatus.ReplicationSlotEstablished);
 
         var replicationOptions = new PgOutputReplicationOptions(TrsDbPublicationName, protocolVersion: 1, binary: true);
@@ -490,7 +490,7 @@ public partial class DqtReportingService : BackgroundService
                 {
                     var targetTableName = GetTargetTableName(relation);
 
-                    await TruncateTableFromTrs(targetTableName);
+                    await TruncateTableFromTrsAsync(targetTableName);
                     PublishMessageConsumed();
                 }
 
@@ -509,7 +509,7 @@ public partial class DqtReportingService : BackgroundService
                 };
 
                 var targetTableName = GetTargetTableName(relation);
-                var values = await GetTupleValues(tuple);
+                var values = await GetTupleValuesAsync(tuple);
                 var columns = relation.Columns.ToArray();
                 var idColumn = columns.Single(c => c.Flags == RelationMessage.Column.ColumnFlags.PartOfKey);
                 var columnValues = columns.Zip(values, (c, v) => (Column: c, Value: v)).ToDictionary(t => t.Column.ColumnName, t => t.Value);
@@ -517,12 +517,12 @@ public partial class DqtReportingService : BackgroundService
 
                 if (message is InsertMessage or UpdateMessage)
                 {
-                    await UpsertRowFromTrs(targetTableName, idColumn.ColumnName, id, columnValues);
+                    await UpsertRowFromTrsAsync(targetTableName, idColumn.ColumnName, id, columnValues);
                 }
                 else
                 {
                     Debug.Assert(message is DeleteMessage);
-                    await DeleteRowFromTrs(targetTableName, idColumn.ColumnName, id);
+                    await DeleteRowFromTrsAsync(targetTableName, idColumn.ColumnName, id);
                 }
 
                 replicationConn.SetReplicationStatus(message.WalEnd);
@@ -534,11 +534,11 @@ public partial class DqtReportingService : BackgroundService
 
         static string GetTargetTableName(RelationMessage relation) => $"trs_{relation.RelationName}";
 
-        static ValueTask<object?[]> GetTupleValues(ReplicationTuple tuple)
+        static ValueTask<object?[]> GetTupleValuesAsync(ReplicationTuple tuple)
         {
-            return Core().ToArrayAsync();
+            return CoreAsync().ToArrayAsync();
 
-            async IAsyncEnumerable<object?> Core()
+            async IAsyncEnumerable<object?> CoreAsync()
             {
                 await foreach (var value in tuple)
                 {
@@ -548,7 +548,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task<PgOutputReplicationSlot> GetReplicationSlot(
+    private async Task<PgOutputReplicationSlot> GetReplicationSlotAsync(
         LogicalReplicationConnection replicationConn,
         CancellationToken cancellationToken)
     {
@@ -580,7 +580,7 @@ public partial class DqtReportingService : BackgroundService
         }
     }
 
-    private async Task UpsertRowFromTrs(string targetTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
+    private async Task UpsertRowFromTrsAsync(string targetTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
     {
         var parameters = new List<SqlParameter>();
         var columnNames = new List<string>();
@@ -622,7 +622,7 @@ public partial class DqtReportingService : BackgroundService
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private async Task DeleteRowFromTrs(string targetTableName, string idColumnName, object id)
+    private async Task DeleteRowFromTrsAsync(string targetTableName, string idColumnName, object id)
     {
         var parameters = new List<SqlParameter>();
 
@@ -643,7 +643,7 @@ public partial class DqtReportingService : BackgroundService
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private async Task TruncateTableFromTrs(string targetTableName)
+    private async Task TruncateTableFromTrsAsync(string targetTableName)
     {
         var sql = $"""
             truncate table {targetTableName}

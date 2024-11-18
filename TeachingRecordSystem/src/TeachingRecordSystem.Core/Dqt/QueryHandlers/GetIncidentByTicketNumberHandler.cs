@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetIncidentByTicketNumberHandler : ICrmQueryHandler<GetIncidentByTicketNumberQuery, IncidentDetail?>
 {
-    public async Task<IncidentDetail?> Execute(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<IncidentDetail?> ExecuteAsync(GetIncidentByTicketNumberQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.TicketNumber, ConditionOperator.Equal, query.TicketNumber);

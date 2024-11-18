@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetInductionByContactIdHandler : ICrmQueryHandler<GetActiveInductionByContactIdQuery, InductionRecord>
 {
-    public async Task<InductionRecord> Execute(GetActiveInductionByContactIdQuery getInductionQuery, IOrganizationServiceAsync organizationService)
+    public async Task<InductionRecord> ExecuteAsync(GetActiveInductionByContactIdQuery getInductionQuery, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_induction.Fields.dfeta_PersonId, ConditionOperator.Equal, getInductionQuery.ContactId);

@@ -11,7 +11,7 @@ public partial class TrsDataSyncServiceTests
     public async Task Contact_NewRecord_WritesNewPersonRecordToDatabase()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithSyncOverride(false));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithSyncOverride(false));
         var contactId = createPersonResult.ContactId;
         var contact = createPersonResult.Contact;
         contact.CreatedOn = Clock.UtcNow;
@@ -19,10 +19,10 @@ public partial class TrsDataSyncServiceTests
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, contact);
 
         // Act
-        await fixture.PublishChangedItemAndConsume(TrsDataSyncHelper.ModelTypes.Person, newItem);
+        await fixture.PublishChangedItemAndConsumeAsync(TrsDataSyncHelper.ModelTypes.Person, newItem);
 
         // Assert
-        await fixture.DbFixture.WithDbContext(async dbContext =>
+        await fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.NotNull(person);
@@ -35,13 +35,13 @@ public partial class TrsDataSyncServiceTests
     public async Task Contact_UpdatedRecord_WritesUpdatedPersonRecordToDatabase()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithSyncOverride(false));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithSyncOverride(false));
         var contactId = createPersonResult.ContactId;
         var contact = createPersonResult.Contact;
         contact.CreatedOn = Clock.UtcNow;
         contact.ModifiedOn = Clock.UtcNow;
 
-        await fixture.Helper.SyncPerson(contact, ignoreInvalid: false);
+        await fixture.Helper.SyncPersonAsync(contact, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
 
         var modifiedOn = Clock.Advance();
@@ -53,10 +53,10 @@ public partial class TrsDataSyncServiceTests
         var updatedItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, updatedContact);
 
         // Act
-        await fixture.PublishChangedItemAndConsume(TrsDataSyncHelper.ModelTypes.Person, updatedItem);
+        await fixture.PublishChangedItemAndConsumeAsync(TrsDataSyncHelper.ModelTypes.Person, updatedItem);
 
         // Assert
-        await fixture.DbFixture.WithDbContext(async dbContext =>
+        await fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.NotNull(person);
@@ -69,17 +69,17 @@ public partial class TrsDataSyncServiceTests
     public async Task Contact_DeletedRecord_DeletesPersonRecordFromDatabase()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithSyncOverride(true));
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithSyncOverride(true));
         var contactId = createPersonResult.ContactId;
         var newItem = new NewOrUpdatedItem(ChangeType.NewOrUpdated, createPersonResult.Contact);
 
         var removedItem = new RemovedOrDeletedItem(ChangeType.RemoveOrDeleted, new EntityReference(Contact.EntityLogicalName, contactId));
 
         // Act
-        await fixture.PublishChangedItemAndConsume(TrsDataSyncHelper.ModelTypes.Person, removedItem);
+        await fixture.PublishChangedItemAndConsumeAsync(TrsDataSyncHelper.ModelTypes.Person, removedItem);
 
         // Assert
-        await fixture.DbFixture.WithDbContext(async dbContext =>
+        await fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.Null(person);

@@ -57,7 +57,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
         Assert.NotNull(uploadedEvidenceLink);
         Assert.Equal($"{state.EvidenceFileName} ({state.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
@@ -119,7 +119,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a PDF, JPG, JPEG or PNG");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a PDF, JPG, JPEG or PNG");
     }
 
 

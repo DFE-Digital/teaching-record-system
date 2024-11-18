@@ -21,12 +21,12 @@ public class SetQtlsDateTests : IAsyncLifetime
     {
         // Arrange
         var qtlsDate = new DateOnly(2021, 01, 01);
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
 
         // Act
-        await _crmQueryDispatcher.ExecuteQuery(new SetQtlsDateQuery(ContactId: createPersonResult.ContactId, QtlsDate: qtlsDate, HasActiveSanctions: false, TaskScheduleEnd: null));
-        await _crmQueryDispatcher.ExecuteQuery(new SetQtlsDateQuery(ContactId: createPersonResult.ContactId, QtlsDate: qtlsDate, HasActiveSanctions: false, TaskScheduleEnd: null));
-        var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
+        await _crmQueryDispatcher.ExecuteQueryAsync(new SetQtlsDateQuery(ContactId: createPersonResult.ContactId, QtlsDate: qtlsDate, HasActiveSanctions: false, TaskScheduleEnd: null));
+        await _crmQueryDispatcher.ExecuteQueryAsync(new SetQtlsDateQuery(ContactId: createPersonResult.ContactId, QtlsDate: qtlsDate, HasActiveSanctions: false, TaskScheduleEnd: null));
+        var contact = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
             Contact.Fields.dfeta_qtlsdate, Contact.Fields.dfeta_QtlsDateHasBeenSet)));
 
         // Assert
@@ -39,14 +39,14 @@ public class SetQtlsDateTests : IAsyncLifetime
     {
         // Arrange
         var qtlsDate = new DateOnly(2021, 01, 01);
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQtlsDate(qtlsDate);
         });
 
         // Act
-        await _crmQueryDispatcher.ExecuteQuery(new SetQtlsDateQuery(ContactId: createPersonResult.ContactId, QtlsDate: null, HasActiveSanctions: false, TaskScheduleEnd: null));
-        var contact = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
+        await _crmQueryDispatcher.ExecuteQueryAsync(new SetQtlsDateQuery(ContactId: createPersonResult.ContactId, QtlsDate: null, HasActiveSanctions: false, TaskScheduleEnd: null));
+        var contact = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(ContactId: createPersonResult.ContactId, ColumnSet: new ColumnSet(
             Contact.Fields.dfeta_qtlsdate, Contact.Fields.dfeta_QtlsDateHasBeenSet)));
 
         // Assert

@@ -153,9 +153,9 @@ public class GetPersonHandler(
     IDataverseAdapter dataverseAdapter,
     PreviousNameHelper previousNameHelper)
 {
-    public async Task<GetPersonResult?> Handle(GetPersonCommand command)
+    public async Task<GetPersonResult?> HandleAsync(GetPersonCommand command)
     {
-        var contactDetail = await crmQueryDispatcher.ExecuteQuery(
+        var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactDetailByTrnQuery(
                 command.Trn,
                 new ColumnSet(
@@ -211,7 +211,7 @@ public class GetPersonHandler(
         // This lock should be used around all calls to DataverseAdatper.
         using var dataverseLock = new SemaphoreSlim(1, 1);
 
-        async Task<T> WithDataverseAdapterLock<T>(Func<Task<T>> action)
+        async Task<T> WithDataverseAdapterLockAsync<T>(Func<Task<T>> action)
         {
             await dataverseLock.WaitAsync();
             try
@@ -226,7 +226,7 @@ public class GetPersonHandler(
 
         using var trsDbLock = new SemaphoreSlim(1, 1);
 
-        async Task<T> WithTrsDbLock<T>(Func<Task<T>> action)
+        async Task<T> WithTrsDbLockAsync<T>(Func<Task<T>> action)
         {
             await trsDbLock.WaitAsync();
             try
@@ -243,7 +243,7 @@ public class GetPersonHandler(
         var personId = contact.Id;
 
         var getInductionTask = command.Include.HasFlag(GetPersonCommandIncludes.Induction) ?
-            WithDataverseAdapterLock(() => dataverseAdapter.GetInductionByTeacher(
+            WithDataverseAdapterLockAsync(() => dataverseAdapter.GetInductionByTeacherAsync(
                 contact.Id,
                 columnNames:
                 [
@@ -268,7 +268,7 @@ public class GetPersonHandler(
             null;
 
         var getIttTask = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
-            WithDataverseAdapterLock(() => dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            WithDataverseAdapterLockAsync(() => dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
                 contact.Id,
                 columnNames:
                 [
@@ -303,11 +303,11 @@ public class GetPersonHandler(
             null;
 
         var getMqsTask = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
-            WithTrsDbLock(() => dbContext.MandatoryQualifications.Where(q => q.PersonId == personId).ToArrayAsync()) :
+            WithTrsDbLockAsync(() => dbContext.MandatoryQualifications.Where(q => q.PersonId == personId).ToArrayAsync()) :
             null;
 
         var getQualificationsTask = (command.Include & (GetPersonCommandIncludes.NpqQualifications | GetPersonCommandIncludes.HigherEducationQualifications)) != 0 ?
-            crmQueryDispatcher.ExecuteQuery(
+            crmQueryDispatcher.ExecuteQueryAsync(
                 new GetQualificationsByContactIdQuery(
                     contact.Id,
                     new ColumnSet(
@@ -318,12 +318,12 @@ public class GetPersonHandler(
                     IncludeHigherEducationDetails: command.Include.HasFlag(GetPersonCommandIncludes.HigherEducationQualifications))) :
             null;
 
-        async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChanges()
+        async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
-            var nameChangeSubject = await referenceDataCache.GetSubjectByTitle("Change of Name");
-            var dateOfBirthChangeSubject = await referenceDataCache.GetSubjectByTitle("Change of Date of Birth");
+            var nameChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Name");
+            var dateOfBirthChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Date of Birth");
 
-            var incidents = await WithDataverseAdapterLock(() => dataverseAdapter.GetIncidentsByContactId(
+            var incidents = await WithDataverseAdapterLockAsync(() => dataverseAdapter.GetIncidentsByContactIdAsync(
                 contact.Id,
                 IncidentState.Active,
                 columnNames: [Incident.Fields.SubjectId, Incident.Fields.StateCode]));
@@ -335,11 +335,11 @@ public class GetPersonHandler(
         }
 
         var getPendingDetailChangesTask = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ?
-            GetPendingDetailChanges() :
+            GetPendingDetailChangesAsync() :
             null;
 
         var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            WithTrsDbLock(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
+            WithTrsDbLockAsync(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
             null;
 
         IEnumerable<NameInfo>? previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
@@ -355,7 +355,7 @@ public class GetPersonHandler(
         var middleName = contact.ResolveMiddleName();
         var lastName = contact.ResolveLastName();
 
-        var qtsRegistrations = await WithDataverseAdapterLock(() => dataverseAdapter.GetQtsRegistrationsByTeacher(
+        var qtsRegistrations = await WithDataverseAdapterLockAsync(() => dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
             contact.Id,
             columnNames:
             [
@@ -368,8 +368,8 @@ public class GetPersonHandler(
 
         var qts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_QTSDate is not null);
         var eyts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
-        var allTeacherStatuses = await referenceDataCache.GetTeacherStatuses();
-        var allEarlyYearsStatuses = await referenceDataCache.GetEytsStatuses();
+        var allTeacherStatuses = await referenceDataCache.GetTeacherStatusesAsync();
+        var allEarlyYearsStatuses = await referenceDataCache.GetEytsStatusesAsync();
         var eytsStatus = eyts is not null ? allEarlyYearsStatuses.Single(x => x.Id == eyts.dfeta_EarlyYearsStatusId.Id) : null;
         var qtsStatus = qts is not null ? allTeacherStatuses.Single(x => x.Id == qts.dfeta_TeacherStatusId.Id) : null;
 
@@ -387,8 +387,8 @@ public class GetPersonHandler(
             NationalInsuranceNumber = contact.dfeta_NINumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
-            Qts = await QtsInfo.Create(qts, referenceDataCache),
-            Eyts = await EytsInfo.Create(eyts, referenceDataCache),
+            Qts = await QtsInfo.CreateAsync(qts, referenceDataCache),
+            Eyts = await EytsInfo.CreateAsync(eyts, referenceDataCache),
             EmailAddress = contact.EMailAddress1,
             Induction = command.Include.HasFlag(GetPersonCommandIncludes.Induction) ?
                 Option.Some(MapInduction(await getInductionTask!, contact)) :
