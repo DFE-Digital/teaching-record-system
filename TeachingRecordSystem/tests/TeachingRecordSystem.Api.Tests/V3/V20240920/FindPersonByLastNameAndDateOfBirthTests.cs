@@ -16,10 +16,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
 
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
@@ -46,7 +46,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseAlerts = jsonResponse.RootElement.GetProperty("results").EnumerateArray().Single().GetProperty("alerts");
 
         AssertEx.JsonObjectEquals(

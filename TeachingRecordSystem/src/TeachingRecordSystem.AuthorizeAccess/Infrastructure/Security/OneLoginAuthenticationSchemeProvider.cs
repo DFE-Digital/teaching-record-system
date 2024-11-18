@@ -40,7 +40,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     public async Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
     {
-        await EnsureLoaded();
+        await EnsureLoadedAsync();
 
         return (await innerProvider.GetAllSchemesAsync()).Concat(_schemeCache.Values.Select(v => v.Scheme));
     }
@@ -62,14 +62,14 @@ public sealed class OneLoginAuthenticationSchemeProvider(
 
     public async Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync()
     {
-        await EnsureLoaded();
+        await EnsureLoadedAsync();
 
         return (await innerProvider.GetRequestHandlerSchemesAsync()).Concat(_schemeCache.Values.Select(v => v.Scheme));
     }
 
     public async Task<AuthenticationScheme?> GetSchemeAsync(string name)
     {
-        await EnsureLoaded();
+        await EnsureLoadedAsync();
 
         return (await innerProvider.GetSchemeAsync(name)) ??
             (_schemeCache.TryGetValue(name, out var userAndScheme) ? userAndScheme.Scheme : default);
@@ -92,16 +92,16 @@ public sealed class OneLoginAuthenticationSchemeProvider(
         return new ECDsaSecurityKey(coreIdentityIssuer);
     }
 
-    private async Task EnsureLoaded()
+    private async Task EnsureLoadedAsync()
     {
         if (!_loaded)
         {
-            await ReloadSchemes();
+            await ReloadSchemesAsync();
             _loaded = true;
         }
     }
 
-    private async Task ReloadSchemes()
+    private async Task ReloadSchemesAsync()
     {
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         var applicationUsers = await dbContext.ApplicationUsers.AsNoTracking().Where(u => u.IsOidcClient).ToListAsync();
@@ -187,7 +187,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
                 var signInJourneyHelper = context.HttpContext.RequestServices.GetRequiredService<SignInJourneyHelper>();
                 var journeyInstance = (await signInJourneyHelper.UserInstanceStateProvider.GetSignInJourneyInstanceAsync(context.HttpContext, journeyInstanceId))!;
 
-                var result = await signInJourneyHelper.OnVerificationFailed(journeyInstance);
+                var result = await signInJourneyHelper.OnVerificationFailedAsync(journeyInstance);
                 await result.ExecuteAsync(context.HttpContext);
             }
         };
@@ -244,10 +244,10 @@ public sealed class OneLoginAuthenticationSchemeProvider(
     Task IHostedService.StartAsync(CancellationToken cancellationToken)
     {
         _stoppingCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        _reloadSchemesTask = UpdateSchemesFromDb(cancellationToken);
+        _reloadSchemesTask = UpdateSchemesFromDbAsync(cancellationToken);
         return Task.CompletedTask;
 
-        async Task UpdateSchemesFromDb(CancellationToken cancellationToken)
+        async Task UpdateSchemesFromDbAsync(CancellationToken cancellationToken)
         {
             var timer = new PeriodicTimer(_pollDbInterval);
 
@@ -255,7 +255,7 @@ public sealed class OneLoginAuthenticationSchemeProvider(
             {
                 try
                 {
-                    await ReloadSchemes();
+                    await ReloadSchemesAsync();
                 }
                 catch (Exception ex)
                 {

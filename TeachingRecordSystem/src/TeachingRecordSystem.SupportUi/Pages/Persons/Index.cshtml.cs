@@ -40,7 +40,7 @@ public partial class IndexModel(TrsLinkGenerator linkGenerator, ICrmQueryDispatc
 
     public PersonInfo[]? SearchResults { get; set; }
 
-    public async Task<IActionResult> OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
         PageNumber ??= 1;
 
@@ -51,13 +51,13 @@ public partial class IndexModel(TrsLinkGenerator linkGenerator, ICrmQueryDispatc
                 return BadRequest();
             }
 
-            return await PerformSearch();
+            return await PerformSearchAsync();
         }
 
         return Page();
     }
 
-    private async Task<IActionResult> PerformSearch()
+    private async Task<IActionResult> PerformSearchAsync()
     {
         Contact[]? contacts = null;
 
@@ -76,16 +76,16 @@ public partial class IndexModel(TrsLinkGenerator linkGenerator, ICrmQueryDispatc
         // Check if the search string is a date of birth, TRN or one or more names
         if (DateOnly.TryParse(Search, EnGbCulture, out var dateOfBirth))
         {
-            contacts = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
+            contacts = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactsByDateOfBirthQuery(dateOfBirth, SortBy, MaxSearchResultCount, columnSet));
         }
         else if (TrnRegex().IsMatch(Search!))
         {
-            var contact = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactByTrnQuery(Search!, columnSet));
+            var contact = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactByTrnQuery(Search!, columnSet));
             contacts = contact is not null ? [contact] : [];
         }
         else
         {
-            contacts = await crmQueryDispatcher.ExecuteQuery(new GetActiveContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
+            contacts = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactsByNameQuery(Search!, SortBy, MaxSearchResultCount, columnSet));
         }
         Debug.Assert(contacts is not null);
 

@@ -16,7 +16,7 @@ public class FindTeachersTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find");
@@ -34,7 +34,7 @@ public class FindTeachersTests : TestBase
     {
         // Arrange
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find");
@@ -43,7 +43,7 @@ public class FindTeachersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -68,7 +68,7 @@ public class FindTeachersTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
@@ -77,7 +77,7 @@ public class FindTeachersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -105,7 +105,7 @@ public class FindTeachersTests : TestBase
     {
         // Arrange
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?dateOfBirth&emailAddress&firstName&ittProviderName&lastName&nationalInsuranceNumber");
@@ -114,7 +114,7 @@ public class FindTeachersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -143,15 +143,15 @@ public class FindTeachersTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetIttProviderOrganizationsByName(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
+            .Setup(mock => mock.GetIttProviderOrganizationsByNameAsync(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
             .ReturnsAsync(new[] { account });
 
         DataverseAdapterMock
-             .Setup(mock => mock.GetIttProviderOrganizationsByUkprn(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
+             .Setup(mock => mock.GetIttProviderOrganizationsByUkprnAsync(It.IsAny<string>(), It.IsAny<string[]>(), /*activeOnly: */false))
              .ReturnsAsync(new[] { account });
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
         var request = new HttpRequestMessage(
@@ -162,7 +162,7 @@ public class FindTeachersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -201,7 +201,7 @@ public class FindTeachersTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
         var request = new HttpRequestMessage(
@@ -221,7 +221,7 @@ public class FindTeachersTests : TestBase
         // Arrange
         var contact1 = new Contact() { FirstName = "test", MiddleName = "tester", LastName = "testing", Id = Guid.NewGuid(), dfeta_NINumber = "1111", BirthDate = new DateTime(1988, 2, 1), dfeta_TRN = "someReference" };
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
@@ -230,7 +230,7 @@ public class FindTeachersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -259,7 +259,7 @@ public class FindTeachersTests : TestBase
     public async Task Given_search_returns_a_result_with_activesanctions_set_returns_expected_response(bool? activeSanctions)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b =>
+        var createPersonResult = await TestData.CreatePersonAsync(b =>
         {
             if (activeSanctions == true)
             {
@@ -271,7 +271,7 @@ public class FindTeachersTests : TestBase
             .ToEntity<Contact>();
 
         DataverseAdapterMock
-            .Setup(mock => mock.FindTeachers(It.IsAny<FindTeachersQuery>()))
+            .Setup(mock => mock.FindTeachersAsync(It.IsAny<FindTeachersQuery>()))
             .ReturnsAsync(new[] { contact1 });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"v2/teachers/find?FirstName={contact1.FirstName}&LastName={contact1.LastName}");
@@ -280,7 +280,7 @@ public class FindTeachersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

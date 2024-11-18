@@ -7,15 +7,15 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactWithMergeResolutionQuery, Contact>
 {
-    public async Task<Contact> Execute(GetContactWithMergeResolutionQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact> ExecuteAsync(GetContactWithMergeResolutionQuery query, IOrganizationServiceAsync organizationService)
     {
         // Ensure we have MasterId in the columns requested
         var columns = query.ColumnSet.AllColumns ? query.ColumnSet :
             new ColumnSet([Contact.Fields.MasterId, .. query.ColumnSet.Columns]);
 
-        return await FetchContact(query.ContactId);
+        return await FetchContactAsync(query.ContactId);
 
-        async Task<Contact> FetchContact(Guid id)
+        async Task<Contact> FetchContactAsync(Guid id)
         {
             var filter = new FilterExpression();
             filter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, id);
@@ -36,7 +36,7 @@ public class GetContactWithMergeResolutionHandler : ICrmQueryHandler<GetContactW
 
             if (teacher.Merged == true)
             {
-                return await FetchContact(teacher.MasterId.Id);
+                return await FetchContactAsync(teacher.MasterId.Id);
             }
 
             return teacher;

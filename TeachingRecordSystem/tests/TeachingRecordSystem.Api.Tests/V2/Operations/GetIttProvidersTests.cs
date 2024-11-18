@@ -25,7 +25,7 @@ public class GetIttProvidersTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetIttProviders(false))
+            .Setup(mock => mock.GetIttProvidersAsync(false))
             .ReturnsAsync(new[] { provider1, provider2 });
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/v2/itt-providers");
@@ -34,7 +34,7 @@ public class GetIttProvidersTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

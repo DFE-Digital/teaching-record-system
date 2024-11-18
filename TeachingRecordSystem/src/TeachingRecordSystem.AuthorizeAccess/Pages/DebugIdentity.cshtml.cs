@@ -62,7 +62,7 @@ public class DebugIdentityModel(
         }
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         string[][]? verifiedNames;
         DateOnly[]? verifiedDatesOfBirth;
@@ -121,7 +121,7 @@ public class DebugIdentityModel(
 
         if (IdentityVerified)
         {
-            await helper.OnUserVerifiedCore(JourneyInstance!, verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
+            await helper.OnUserVerifiedCoreAsync(JourneyInstance!, verifiedNames!, verifiedDatesOfBirth!, coreIdentityClaimVc: null);
         }
         else
         {

@@ -22,7 +22,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
     public async Task<GetTeacherResponse> Handle(GetTeacherRequest request, CancellationToken cancellationToken)
     {
-        var teacher = await _dataverseAdapter.GetTeacherByTrn(
+        var teacher = await _dataverseAdapter.GetTeacherByTrnAsync(
             request.Trn,
             columnNames: new[]
             {
@@ -44,7 +44,7 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
-        var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacher(
+        var qtsRegistrations = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {
@@ -57,10 +57,10 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
         var earlyYearsQtsRegistration = qtsRegistrations.SingleOrDefault(qts => qts.dfeta_EarlyYearsStatusId is not null);
         if (earlyYearsQtsRegistration is not null)
         {
-            earlyYearsStatus = await _dataverseAdapter.GetEarlyYearsStatus(earlyYearsQtsRegistration.dfeta_EarlyYearsStatusId.Id);
+            earlyYearsStatus = await _dataverseAdapter.GetEarlyYearsStatusAsync(earlyYearsQtsRegistration.dfeta_EarlyYearsStatusId.Id);
         }
 
-        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+        var itt = await _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
             teacher.Id,
             columnNames: new[]
             {

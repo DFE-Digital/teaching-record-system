@@ -61,7 +61,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             expectedJson["eyts"] = null;
         }
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expectedJson,
             StatusCodes.Status200OK);
@@ -116,7 +116,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             expectedJson["eyts"] = null;
         }
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expectedJson,
             StatusCodes.Status200OK);
@@ -161,7 +161,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             }
         })!;
 
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseInduction = jsonResponse.RootElement.GetProperty("induction");
 
         AssertEx.JsonObjectEquals(expectedJson, responseInduction);
@@ -183,7 +183,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseItt = jsonResponse.RootElement.GetProperty("initialTeacherTraining");
 
         AssertEx.JsonObjectEquals(
@@ -263,7 +263,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             }
         })!;
 
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseNpqQualifications = jsonResponse.RootElement.GetProperty("npqQualifications");
 
         AssertEx.JsonObjectEquals(expectedJson, responseNpqQualifications);
@@ -284,18 +284,18 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseHigherEducationQualifications = jsonResponse.RootElement.GetProperty("higherEducationQualifications");
 
-        var heQualification1 = await TestData.ReferenceDataCache.GetHeQualificationByValue(qualifications[0].HeQualificationValue!);
-        var heQualification1Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[0].HeSubject1Value!);
-        var heQualification1Subject2 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[0].HeSubject2Value!);
-        var heQualification1Subject3 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[0].HeSubject3Value!);
-        var heQualification2 = await TestData.ReferenceDataCache.GetHeQualificationByValue(qualifications[1].HeQualificationValue!);
-        var heQualification2Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[1].HeSubject1Value!);
-        var heQualification3 = await TestData.ReferenceDataCache.GetHeQualificationByValue(qualifications[2].HeQualificationValue!);
-        var heQualification3Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[2].HeSubject1Value!);
-        var heQualification5Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValue(qualifications[4].HeSubject1Value!);
+        var heQualification1 = await TestData.ReferenceDataCache.GetHeQualificationByValueAsync(qualifications[0].HeQualificationValue!);
+        var heQualification1Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValueAsync(qualifications[0].HeSubject1Value!);
+        var heQualification1Subject2 = await TestData.ReferenceDataCache.GetHeSubjectByValueAsync(qualifications[0].HeSubject2Value!);
+        var heQualification1Subject3 = await TestData.ReferenceDataCache.GetHeSubjectByValueAsync(qualifications[0].HeSubject3Value!);
+        var heQualification2 = await TestData.ReferenceDataCache.GetHeQualificationByValueAsync(qualifications[1].HeQualificationValue!);
+        var heQualification2Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValueAsync(qualifications[1].HeSubject1Value!);
+        var heQualification3 = await TestData.ReferenceDataCache.GetHeQualificationByValueAsync(qualifications[2].HeQualificationValue!);
+        var heQualification3Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValueAsync(qualifications[2].HeSubject1Value!);
+        var heQualification5Subject1 = await TestData.ReferenceDataCache.GetHeSubjectByValueAsync(qualifications[4].HeSubject1Value!);
 
         AssertEx.JsonObjectEquals(
             new[]
@@ -348,7 +348,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         Contact contact)
     {
         // Arrange
-        var changeOfNameSubject = await TestData.ReferenceDataCache.GetSubjectByTitle("Change of Name");
+        var changeOfNameSubject = await TestData.ReferenceDataCache.GetSubjectByTitleAsync("Change of Name");
 
         var incidents = new[]
         {
@@ -368,7 +368,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         Assert.True(jsonResponse.RootElement.GetProperty("pendingNameChange").GetBoolean());
     }
 
@@ -378,7 +378,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         Contact contact)
     {
         // Arrange
-        var changeOfDateOfBirthSubject = await TestData.ReferenceDataCache.GetSubjectByTitle("Change of Date of Birth");
+        var changeOfDateOfBirthSubject = await TestData.ReferenceDataCache.GetSubjectByTitleAsync("Change of Date of Birth");
 
         var incidents = new[]
         {
@@ -398,7 +398,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         Assert.True(jsonResponse.RootElement.GetProperty("pendingDateOfBirthChange").GetBoolean());
     }
 
@@ -425,7 +425,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responsePreviousNames = jsonResponse.RootElement.GetProperty("previousNames");
 
         AssertEx.JsonObjectEquals(
@@ -454,7 +454,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
     {
         var firstName = hasMultiWordFirstName ? $"{Faker.Name.First()} {Faker.Name.First()}" : Faker.Name.First();
 
-        var person = await TestData.CreatePerson(
+        var person = await TestData.CreatePersonAsync(
             b =>
             {
                 b.WithFirstName(firstName).WithTrn();
@@ -484,11 +484,11 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         QtsRegistration[]? qtsRegistrations = null)
     {
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(contact.dfeta_TRN, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(contact.dfeta_TRN, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(
                 contact.Id,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -498,7 +498,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             .ReturnsAsync(itt != null ? new[] { itt } : Array.Empty<dfeta_initialteachertraining>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInductionByTeacher(
+            .Setup(mock => mock.GetInductionByTeacherAsync(
                 contact.Id,
                 It.IsAny<string[]>(),
                 It.IsAny<string[]>(),
@@ -507,7 +507,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             .ReturnsAsync((induction, inductionPeriods));
 
         DataverseAdapterMock
-             .Setup(mock => mock.GetQualificationsForTeacher(
+             .Setup(mock => mock.GetQualificationsForTeacherAsync(
                  contact.Id,
                  It.IsAny<string[]>(),
                  It.IsAny<string[]>(),
@@ -515,14 +515,14 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
              .ReturnsAsync(qualifications ?? Array.Empty<dfeta_qualification>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetIncidentsByContactId(contact.Id, IncidentState.Active, It.IsAny<string[]>()))
+            .Setup(mock => mock.GetIncidentsByContactIdAsync(contact.Id, IncidentState.Active, It.IsAny<string[]>()))
             .ReturnsAsync(incidents ?? Array.Empty<Incident>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherStatus(
+            .Setup(mock => mock.GetTeacherStatusAsync(
                 It.Is<string>(s => s == QtsAwardedInWalesTeacherStatusValue),
                 It.IsAny<RequestBuilder>()))
-            .Returns(async (string s, RequestBuilder b) => await TestData.ReferenceDataCache.GetTeacherStatusByValue(s));
+            .Returns(async (string s, RequestBuilder b) => await TestData.ReferenceDataCache.GetTeacherStatusByValueAsync(s));
 
         using var ctx = new DqtCrmServiceContext(TestData.OrganizationService);
         var qtsRegs = ctx.dfeta_qtsregistrationSet
@@ -530,25 +530,25 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             .ToArray();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetQtsRegistrationsByTeacher(
+            .Setup(mock => mock.GetQtsRegistrationsByTeacherAsync(
                 contact.Id,
                 It.IsAny<string[]>()))
             .ReturnsAsync(qtsRegs ?? Array.Empty<dfeta_qtsregistration>());
 
-        var allEytsStatuses = await TestData.ReferenceDataCache.GetEytsStatuses();
+        var allEytsStatuses = await TestData.ReferenceDataCache.GetEytsStatusesAsync();
         var distinctEyts = qtsRegistrations?.Where(x => !string.IsNullOrEmpty(x.EytsStatusValue)).Select(x => x.EytsStatusValue).Distinct().ToArray();
         Array.ForEach(distinctEyts ?? Array.Empty<string>(), item =>
         {
             var eytsStatus = allEytsStatuses.Single(x => x.dfeta_Value == item);
             DataverseAdapterMock
-                .Setup(mock => mock.GetEarlyYearsStatus(eytsStatus.Id))
+                .Setup(mock => mock.GetEarlyYearsStatusAsync(eytsStatus.Id))
                 .ReturnsAsync(eytsStatus);
         });
 
         foreach (var qtsRegistration in qtsRegistrations ?? Array.Empty<QtsRegistration>())
         {
-            var teacherStatus = !string.IsNullOrEmpty(qtsRegistration.TeacherStatusValue) ? await TestData.ReferenceDataCache.GetTeacherStatusByValue(qtsRegistration.TeacherStatusValue) : null;
-            var eytsStatus = !string.IsNullOrEmpty(qtsRegistration.EytsStatusValue) ? await TestData.ReferenceDataCache.GetEarlyYearsStatusByValue(qtsRegistration.EytsStatusValue) : null;
+            var teacherStatus = !string.IsNullOrEmpty(qtsRegistration.TeacherStatusValue) ? await TestData.ReferenceDataCache.GetTeacherStatusByValueAsync(qtsRegistration.TeacherStatusValue) : null;
+            var eytsStatus = !string.IsNullOrEmpty(qtsRegistration.EytsStatusValue) ? await TestData.ReferenceDataCache.GetEarlyYearsStatusByValueAsync(qtsRegistration.EytsStatusValue) : null;
 
             await TestData.OrganizationService.CreateAsync(new dfeta_qtsregistration()
             {
@@ -564,7 +564,7 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
 
         foreach (var updatedName in updatedNames ?? Array.Empty<(string, string?, string)>())
         {
-            await TestData.UpdatePerson(b => b.WithPersonId(contact.Id).WithUpdatedName(updatedName.FirstName, updatedName.MiddleName, updatedName.LastName));
+            await TestData.UpdatePersonAsync(b => b.WithPersonId(contact.Id).WithUpdatedName(updatedName.FirstName, updatedName.MiddleName, updatedName.LastName));
             await Task.Delay(2000);
         }
     }

@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.ReopenAlert;
 
 public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<ReopenAlertState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<ReopenAlertState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new ReopenAlertState()
+    protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new ReopenAlertState()
         {
             ChangeReason = ReopenAlertReasonOption.ClosedInError,
             HasAdditionalReasonDetail = populateOptional ? true : false,
@@ -20,17 +20,17 @@ public abstract class ReopenAlertTestBase(HostFixture hostFixture) : TestBase(ho
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert) =>
+    protected Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
-                CreateEmptyJourneyInstance(alert.AlertId),
+                CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstance(Guid alertId, ReopenAlertState state) =>
+    private Task<JourneyInstance<ReopenAlertState>> CreateJourneyInstanceAsync(Guid alertId, ReopenAlertState state) =>
         CreateJourneyInstance(
             JourneyNames.ReopenAlert,
             state,

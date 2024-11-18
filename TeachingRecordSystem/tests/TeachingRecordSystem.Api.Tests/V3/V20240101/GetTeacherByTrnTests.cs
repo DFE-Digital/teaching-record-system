@@ -112,7 +112,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public async Task Get_ValidRequestWithMandatoryQualifications_ReturnsExpectedMandatoryQualificationsContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             // MQ with no EndDate
             .WithMandatoryQualification(b => b.WithStatus(MandatoryQualificationStatus.InProgress))
@@ -132,7 +132,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseMandatoryQualifications = jsonResponse.RootElement.GetProperty("mandatoryQualifications");
 
         AssertEx.JsonObjectEquals(
@@ -188,10 +188,10 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public async Task Get_ValidRequestWithSanctions_ReturnsExpectedSanctionsContent()
     {
         // Arrange
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyExposableSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithTrn()
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
@@ -204,7 +204,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseSanctions = jsonResponse.RootElement.GetProperty("sanctions");
 
         AssertEx.JsonObjectEquals(
@@ -223,10 +223,10 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => Api.V3.Constants.LegacyProhibitionSanctionCodes.Contains(at.DqtSanctionCode)).RandomOne();
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithTrn()
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
@@ -239,7 +239,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
 
         AssertEx.JsonObjectEquals(

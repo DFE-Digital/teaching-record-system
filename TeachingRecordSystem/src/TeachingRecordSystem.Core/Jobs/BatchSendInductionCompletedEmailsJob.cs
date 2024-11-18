@@ -29,7 +29,7 @@ public class BatchSendInductionCompletedEmailsJob
         _clock = clock;
     }
 
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var lastAwardedToUtc = await _dbContext.InductionCompletedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
             _batchSendInductionCompletedEmailsJobOptions.InitialLastAwardedToUtc;
@@ -53,7 +53,7 @@ public class BatchSendInductionCompletedEmailsJob
         _dbContext.InductionCompletedEmailsJobs.Add(job);
 
         var totalInductionCompletees = 0;
-        await foreach (var inductionCompletees in _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate))
+        await foreach (var inductionCompletees in _dataverseAdapter.GetInductionCompleteesForDateRangeAsync(startDate, endDate))
         {
             foreach (var inductionCompletee in inductionCompletees)
             {
@@ -87,7 +87,7 @@ public class BatchSendInductionCompletedEmailsJob
 
         if (totalInductionCompletees > 0)
         {
-            await _backgroundJobScheduler.Enqueue<InductionCompletedEmailJobDispatcher>(j => j.Execute(inductionCompletedEmailsJobId));
+            await _backgroundJobScheduler.EnqueueAsync<InductionCompletedEmailJobDispatcher>(j => j.ExecuteAsync(inductionCompletedEmailsJobId));
         }
 
         transaction.Complete();

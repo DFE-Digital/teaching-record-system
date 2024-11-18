@@ -1,12 +1,7 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.EndDate;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDate;
 
 public class CheckAnswersTests : EndDateTestBase
 {
-    private const string PreviousStep = JourneySteps.Reason;
-    private const string ThisStep = JourneySteps.CheckAnswers;
-
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
@@ -20,7 +15,7 @@ public class CheckAnswersTests : EndDateTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -36,7 +31,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -52,7 +47,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -68,7 +63,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange        
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.Index, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -87,7 +82,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -95,7 +90,7 @@ public class CheckAnswersTests : EndDateTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("New end date"));
         Assert.Equal(alert.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Current end date"));
         Assert.Equal(journeyInstance.State.ChangeReason!.Value.GetDisplayName(), doc.GetSummaryListValueForKey("Reason for change"));
@@ -111,7 +106,7 @@ public class CheckAnswersTests : EndDateTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -127,7 +122,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -143,7 +138,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -159,7 +154,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.Index, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
 
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -179,7 +174,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         EventPublisher.Clear();
 
@@ -191,8 +186,8 @@ public class CheckAnswersTests : EndDateTestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert changed");
 
         await WithDbContext(async dbContext =>
@@ -253,7 +248,7 @@ public class CheckAnswersTests : EndDateTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, true);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, true);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/end-date/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -267,10 +262,4 @@ public class CheckAnswersTests : EndDateTestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
     }
-
-    private async Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstance(Guid alertId, EditAlertEndDateState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.EditAlertEndDate,
-            state ?? new EditAlertEndDateState(),
-            new KeyValuePair<string, object>("alertId", alertId));
 }

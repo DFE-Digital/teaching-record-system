@@ -17,7 +17,7 @@ public class UpdateQtlsDateSetTests : IAsyncLifetime
 
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
-    public Task InitializeAsync() => DbFixture.DbHelper.EnsureSchema();
+    public Task InitializeAsync() => DbFixture.DbHelper.EnsureSchemaAsync();
 
 
     [Fact]
@@ -26,11 +26,11 @@ public class UpdateQtlsDateSetTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQtlsDate(new DateOnly(2021, 01, 1));
         });
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QtlsDateHasBeenSet)));
 
         // Assert
@@ -43,8 +43,8 @@ public class UpdateQtlsDateSetTests : IAsyncLifetime
         // Arrange
 
         // Act
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QtlsDateHasBeenSet)));
 
         // Assert

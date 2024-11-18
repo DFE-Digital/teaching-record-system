@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 public class GetActiveContactsByTrnsHandler :
     ICrmQueryHandler<GetActiveContactsByTrnsQuery, IDictionary<string, Contact?>>
 {
-    public async Task<IDictionary<string, Contact?>> Execute(
+    public async Task<IDictionary<string, Contact?>> ExecuteAsync(
         GetActiveContactsByTrnsQuery query,
         IOrganizationServiceAsync organizationService)
     {

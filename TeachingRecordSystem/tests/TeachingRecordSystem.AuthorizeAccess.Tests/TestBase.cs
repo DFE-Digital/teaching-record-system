@@ -53,7 +53,7 @@ public abstract class TestBase : IDisposable
 
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
-    public async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstance(SignInJourneyState state)
+    public async Task<JourneyInstance<SignInJourneyState>> CreateJourneyInstanceAsync(SignInJourneyState state)
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
@@ -74,7 +74,7 @@ public abstract class TestBase : IDisposable
         return (JourneyInstance<SignInJourneyState>)instance;
     }
 
-    public async Task<JourneyInstance<SignInJourneyState>> ReloadJourneyInstance(JourneyInstance<SignInJourneyState> journeyInstance)
+    public async Task<JourneyInstance<SignInJourneyState>> ReloadJourneyInstanceAsync(JourneyInstance<SignInJourneyState> journeyInstance)
     {
         await using var scope = HostFixture.Services.CreateAsyncScope();
         var stateProvider = scope.ServiceProvider.GetRequiredService<IUserInstanceStateProvider>();
@@ -87,15 +87,15 @@ public abstract class TestBase : IDisposable
         _trsSyncSubscription.Dispose();
     }
 
-    public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
+    public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContext(Func<TrsDbContext, Task> action) =>
-        WithDbContext(async dbContext =>
+    public virtual Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        WithDbContextAsync(async dbContext =>
         {
             await action(dbContext);
             return 0;
@@ -175,7 +175,7 @@ public abstract class TestBase : IDisposable
 
     private static int _lastTrnToken = 0;
 
-    public async Task<IdTrnToken> CreateTrnToken(string trn, string? email = null)
+    public async Task<IdTrnToken> CreateTrnTokenAsync(string trn, string? email = null)
     {
         var trnTokenStr = Interlocked.Increment(ref _lastTrnToken).ToString("D12");
 

@@ -52,7 +52,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.Name, doc.GetElementById("Name")?.GetAttribute("value"));
     }
 
@@ -88,7 +88,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Enter your full name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter your full name");
     }
 
     [Fact]

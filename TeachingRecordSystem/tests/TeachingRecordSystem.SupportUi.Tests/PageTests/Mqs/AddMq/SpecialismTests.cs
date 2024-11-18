@@ -11,7 +11,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var personId = Guid.NewGuid();
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -26,9 +26,9 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ProviderMissingFromState_RedirectsToProvider()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstance(person.ContactId, state => state.ProviderId = null);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.ContactId, state => state.ProviderId = null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -44,10 +44,10 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstance(person.ContactId, state => state.Specialism = specialism);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.ContactId, state => state.Specialism = specialism);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -55,7 +55,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var providerList = doc.GetElementByTestId("specialism-list");
         var radioButtons = providerList!.GetElementsByTagName("input");
         var selectedSpecialism = radioButtons.SingleOrDefault(r => r.HasAttribute("checked"));
@@ -70,7 +70,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         var personId = Guid.NewGuid();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstance(personId);
+        var journeyInstance = await CreateJourneyInstanceAsync(personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -91,10 +91,10 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ProviderMissingFromState_RedirectsToProvider()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId, state => state.ProviderId = null);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state => state.ProviderId = null);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -116,9 +116,9 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoSpecialismIsSelected_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -129,17 +129,17 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Specialism", "Select a specialism");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Specialism", "Select a specialism");
     }
 
     [Fact]
     public async Task Post_WhenSpecialismIsSelected_RedirectsToStartDatePage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var specialism = MandatoryQualificationSpecialism.Hearing;
 
-        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/mqs/add/specialism?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -157,7 +157,7 @@ public class SpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/mqs/add/start-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    private Task<JourneyInstance<AddMqState>> CreateJourneyInstance(Guid personId, Action<AddMqState>? configureState = null)
+    private Task<JourneyInstance<AddMqState>> CreateJourneyInstanceAsync(Guid personId, Action<AddMqState>? configureState = null)
     {
         var state = new AddMqState()
         {

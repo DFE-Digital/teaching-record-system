@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetSystemUserByAzureActiveDirectoryObjectIdHandler : ICrmQueryHandler<GetSystemUserByAzureActiveDirectoryObjectIdQuery, SystemUserInfo?>
 {
-    public async Task<SystemUserInfo?> Execute(GetSystemUserByAzureActiveDirectoryObjectIdQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<SystemUserInfo?> ExecuteAsync(GetSystemUserByAzureActiveDirectoryObjectIdQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression();
         filter.AddCondition(SystemUser.Fields.AzureActiveDirectoryObjectId, ConditionOperator.Equal, query.AzureActiveDirectoryObjectId);

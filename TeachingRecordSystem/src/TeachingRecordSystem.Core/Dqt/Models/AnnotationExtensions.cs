@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public static class AnnotationExtensions
 {
-    public static async Task<string> GetNoteTextWithoutHtml(this Annotation annotation)
+    public static async Task<string> GetNoteTextWithoutHtmlAsync(this Annotation annotation)
     {
         var text = annotation.NoteText;
 

@@ -5,12 +5,12 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public async Task<ApplicationUser> CreateApplicationUser(
+    public async Task<ApplicationUser> CreateApplicationUserAsync(
         string? name = null,
         string[]? apiRoles = null,
         bool? isOidcClient = false)
     {
-        var user = await WithDbContext(async dbContext =>
+        var user = await WithDbContextAsync(async dbContext =>
         {
             name ??= GenerateApplicationUserName();
             apiRoles ??= [];

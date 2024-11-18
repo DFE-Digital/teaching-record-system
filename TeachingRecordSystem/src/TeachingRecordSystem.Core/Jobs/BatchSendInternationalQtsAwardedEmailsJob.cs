@@ -29,7 +29,7 @@ public class BatchSendInternationalQtsAwardedEmailsJob
         _clock = clock;
     }
 
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var lastAwardedToUtc = await _dbContext.InternationalQtsAwardedEmailsJobs.MaxAsync(j => (DateTime?)j.AwardedToUtc) ??
             _batchSendInternationalQtsAwardedEmailsJobOptions.InitialLastAwardedToUtc;
@@ -53,7 +53,7 @@ public class BatchSendInternationalQtsAwardedEmailsJob
         _dbContext.InternationalQtsAwardedEmailsJobs.Add(job);
 
         var totalInternationalQtsAwardees = 0;
-        await foreach (var internationalQtsAwardees in _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate))
+        await foreach (var internationalQtsAwardees in _dataverseAdapter.GetInternationalQtsAwardeesForDateRangeAsync(startDate, endDate))
         {
             foreach (var internationalQtsAwardee in internationalQtsAwardees)
             {
@@ -87,7 +87,7 @@ public class BatchSendInternationalQtsAwardedEmailsJob
 
         if (totalInternationalQtsAwardees > 0)
         {
-            await _backgroundJobScheduler.Enqueue<InternationalQtsAwardedEmailJobDispatcher>(j => j.Execute(internationalQtsAwardedEmailsJobId));
+            await _backgroundJobScheduler.EnqueueAsync<InternationalQtsAwardedEmailJobDispatcher>(j => j.ExecuteAsync(internationalQtsAwardedEmailsJobId));
         }
 
         transaction.Complete();

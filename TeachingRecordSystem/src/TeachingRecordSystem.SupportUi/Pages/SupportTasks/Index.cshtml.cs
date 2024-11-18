@@ -28,7 +28,7 @@ public class IndexModel(
 
     public SupportTaskInfo[]? Results { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         SortBy ??= SortByOption.DateRequested;
         Categories ??= [];
@@ -38,7 +38,7 @@ public class IndexModel(
             Categories = SupportTaskCategoryRegistry.GetAll().Select(i => i.Value).ToArray();
         }
 
-        var allSupportTasks = (await Task.WhenAll(GetCrmSupportTasks(), GetTrsSupportTasks()))
+        var allSupportTasks = (await Task.WhenAll(GetCrmSupportTasksAsync(), GetTrsSupportTasksAsync()))
             .SelectMany(t => t)
             .ToArray();
 
@@ -60,28 +60,28 @@ public class IndexModel(
             .OrderBy(r => SortBy == SortByOption.Type ? (object)r.TypeTitle : r.RequestedOn)
             .ToArray();
 
-        Task<SupportTaskInfo[]> GetTrsSupportTasks() =>
+        Task<SupportTaskInfo[]> GetTrsSupportTasksAsync() =>
             dbContext.SupportTasks
                 .Where(t => t.Status == SupportTaskStatus.Open)
                 .Select(t => new SupportTaskInfo(t.SupportTaskReference, t.SupportTaskType, t.SupportTaskType.GetTitle(), t.CreatedOn.ToLocal()))
                 .ToArrayAsync();
 
-        async Task<SupportTaskInfo[]> GetCrmSupportTasks()
+        async Task<SupportTaskInfo[]> GetCrmSupportTasksAsync()
         {
             // We can't support paging here yet since we're blending data from both TRS and DQT.
             // In practice the list of pending incidents in production is fairly small so we'll return a single page of up to 50 results.
             // If we get more than that we'll log a warning.
 
             var pageSize = 50;
-            var incidentsResult = await crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery(PageNumber: 1, pageSize));
+            var incidentsResult = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveIncidentsQuery(PageNumber: 1, pageSize));
 
             if (incidentsResult.TotalRecordCount > pageSize)
             {
                 logger.LogWarning("Got more than {PageSize} active incidents from CRM.", pageSize);
             }
 
-            var changeDateOfBirthRequestSubject = await referenceDataCache.GetSubjectByTitle("Change of Date of Birth");
-            var changeNameRequestSubject = await referenceDataCache.GetSubjectByTitle("Change of Name");
+            var changeDateOfBirthRequestSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Date of Birth");
+            var changeNameRequestSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Name");
 
             return incidentsResult.Incidents
                 .Select(i =>

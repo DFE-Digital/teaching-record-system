@@ -28,7 +28,7 @@ public class UnlockTeacherRecordTests : IAsyncLifetime
         var teacherId = Guid.NewGuid();
 
         // Act
-        var result = await _dataverseAdapter.UnlockTeacherRecord(teacherId);
+        var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
 
         // Assert
         Assert.False(result);
@@ -46,7 +46,7 @@ public class UnlockTeacherRecordTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _dataverseAdapter.UnlockTeacherRecord(teacherId);
+        var result = await _dataverseAdapter.UnlockTeacherRecordAsync(teacherId);
 
         // Assert
         Assert.True(result);

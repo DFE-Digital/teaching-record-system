@@ -28,7 +28,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
 
     public DateOnly? EndDate { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var qualification = new MandatoryQualification()
         {
@@ -62,7 +62,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonDetail(PersonId));

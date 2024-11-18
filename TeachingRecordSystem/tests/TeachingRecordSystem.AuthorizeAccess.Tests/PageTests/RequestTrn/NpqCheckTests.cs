@@ -33,7 +33,7 @@ public class NpqCheckTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponse(response);
+        await AssertEx.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class NpqCheckTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var radioButtons = doc.GetElementsByName("IsPlanningToTakeAnNpq");
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
@@ -93,7 +93,7 @@ public class NpqCheckTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "IsPlanningToTakeAnNpq", "Tell us whether you plan on taking a national professional qualification (NPQ)");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "IsPlanningToTakeAnNpq", "Tell us whether you plan on taking a national professional qualification (NPQ)");
     }
 
     [Theory]

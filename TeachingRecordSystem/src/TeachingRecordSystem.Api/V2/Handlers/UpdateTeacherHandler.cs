@@ -34,7 +34,7 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId.ValueOrDefault()), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var teachers = await GetTeacherByTrnDobOrSlugId(request.Trn, request.BirthDate, request.SlugId);
+        var teachers = await GetTeacherByTrnDobOrSlugIdAsync(request.Trn, request.BirthDate, request.SlugId);
 
         if (teachers.Length == 0)
         {
@@ -55,7 +55,7 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             middleName = Option.Some(string.Join(" ", firstAndMiddleNames.Skip(1)));
         }
 
-        var updateTeacherResult = await _dataverseAdapter.UpdateTeacher(new UpdateTeacherCommand()
+        var updateTeacherResult = await _dataverseAdapter.UpdateTeacherAsync(new UpdateTeacherCommand()
         {
             TeacherId = teachers[0].Id,
             Trn = request.Trn,
@@ -106,23 +106,23 @@ public class UpdateTeacherHandler : IRequestHandler<UpdateTeacherRequest>
             throw CreateValidationExceptionFromFailedReasons(updateTeacherResult.FailedReasons);
         }
 
-        async Task<Contact[]> GetTeacherByTrnDobOrSlugId(string trn, DateOnly? dob, string slugId)
+        async Task<Contact[]> GetTeacherByTrnDobOrSlugIdAsync(string trn, DateOnly? dob, string slugId)
         {
             if (!string.IsNullOrEmpty(slugId))
             {
-                var contacts = await _dataverseAdapter.GetTeachersBySlugIdAndTrn(request.SlugId, trn, columnNames: Array.Empty<string>(), true);
+                var contacts = await _dataverseAdapter.GetTeachersBySlugIdAndTrnAsync(request.SlugId, trn, columnNames: Array.Empty<string>(), true);
 
                 //fallback to fetching teacher by trn/dob if slugid match doesn't return anything
                 if (contacts.Length == 0)
                 {
-                    contacts = (await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+                    contacts = (await _dataverseAdapter.GetTeachersByTrnAndDoBAsync(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
                 }
 
                 return contacts;
             }
             else
             {
-                return (await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
+                return (await _dataverseAdapter.GetTeachersByTrnAndDoBAsync(trn, dob.Value, columnNames: Array.Empty<string>(), activeOnly: true)).ToArray();
             }
         }
     }

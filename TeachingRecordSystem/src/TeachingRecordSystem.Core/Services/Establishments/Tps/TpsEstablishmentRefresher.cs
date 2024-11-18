@@ -13,7 +13,7 @@ public class TpsEstablishmentRefresher(
     ITpsExtractStorageService tpsExtractStorageService,
     IDbContextFactory<TrsDbContext> dbContextFactory)
 {
-    public async Task ImportFile(string fileName, CancellationToken cancellationToken)
+    public async Task ImportFileAsync(string fileName, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
@@ -39,7 +39,7 @@ public class TpsEstablishmentRefresher(
                 STDIN (FORMAT BINARY)
             """);
 
-        var stream = await tpsExtractStorageService.GetFile(fileName, cancellationToken);
+        var stream = await tpsExtractStorageService.GetFileAsync(fileName, cancellationToken);
         using var streamReader = new StreamReader(stream);
         using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.CurrentCulture) { HasHeaderRecord = true });
 
@@ -68,7 +68,7 @@ public class TpsEstablishmentRefresher(
         await transaction.CommitAsync(cancellationToken);
     }
 
-    public async Task RefreshEstablishments(CancellationToken cancellationToken)
+    public async Task RefreshEstablishmentsAsync(CancellationToken cancellationToken)
     {
         using var readDbContext = dbContextFactory.CreateDbContext();
         readDbContext.Database.SetCommandTimeout(300);

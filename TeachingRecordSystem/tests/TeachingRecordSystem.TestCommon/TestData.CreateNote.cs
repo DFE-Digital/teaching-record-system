@@ -6,11 +6,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task CreateNote(Action<CreateNoteBuilder>? configure)
+    public Task CreateNoteAsync(Action<CreateNoteBuilder>? configure)
     {
         var builder = new CreateNoteBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class CreateNoteBuilder
@@ -52,7 +52,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task Execute(TestData testData)
+        public async Task ExecuteAsync(TestData testData)
         {
             if (_personId is null)
             {

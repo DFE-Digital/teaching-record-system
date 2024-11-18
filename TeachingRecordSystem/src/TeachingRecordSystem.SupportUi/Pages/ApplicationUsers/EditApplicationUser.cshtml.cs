@@ -100,7 +100,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         // Sanitize roles
         var newApiRoles = ApiRoles!.Where(r => Core.ApiRoles.All.Contains(r)).ToArray();

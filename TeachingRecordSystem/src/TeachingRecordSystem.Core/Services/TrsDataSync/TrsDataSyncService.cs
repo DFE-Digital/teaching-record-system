@@ -37,7 +37,7 @@ public class TrsDataSyncService(
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessChanges(ct), stoppingToken);
+                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessChangesAsync(ct), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -56,22 +56,22 @@ public class TrsDataSyncService(
         while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
-    internal async Task ProcessChanges(CancellationToken cancellationToken)
+    internal async Task ProcessChangesAsync(CancellationToken cancellationToken)
     {
         var modelTypesToSync = optionsAccessor.Value.ModelTypes;
 
         // Order is important here; the dependees should come before dependents
-        await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.Person);
-        await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.Event);
-        await SyncIfEnabled(TrsDataSyncHelper.ModelTypes.Alert);
+        await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Person);
+        await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Event);
+        await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Alert);
 
-        async Task SyncIfEnabled(string modelType)
+        async Task SyncIfEnabledAsync(string modelType)
         {
             if (modelTypesToSync.Contains(modelType))
             {
                 try
                 {
-                    await ProcessChangesForModelType(modelType, cancellationToken);
+                    await ProcessChangesForModelTypeAsync(modelType, cancellationToken);
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
@@ -85,7 +85,7 @@ public class TrsDataSyncService(
         }
     }
 
-    internal async Task ProcessChangesForModelType(string modelType, CancellationToken cancellationToken)
+    internal async Task ProcessChangesForModelTypeAsync(string modelType, CancellationToken cancellationToken)
     {
         // There are few CRM entity types that map to multiple model types (e.g. Qualification) -
         // we want to sync them separately.
@@ -100,9 +100,9 @@ public class TrsDataSyncService(
         var (entityLogicalName, attributeNames) = TrsDataSyncHelper.GetEntityInfoForModelType(modelType);
         var columns = new ColumnSet(attributeNames);
 
-        var modifiedSince = await trsDataSyncHelper.GetLastModifiedOnForModelType(modelType);
+        var modifiedSince = await trsDataSyncHelper.GetLastModifiedOnForModelTypeAsync(modelType);
 
-        var changesEnumerable = crmEntityChangesService.GetEntityChanges(changesKey, entityLogicalName, columns, modifiedSince, PageSize)
+        var changesEnumerable = crmEntityChangesService.GetEntityChangesAsync(changesKey, entityLogicalName, columns, modifiedSince, PageSize)
             .WithCancellation(cancellationToken);
 
         await foreach (var changes in changesEnumerable)
@@ -126,14 +126,14 @@ public class TrsDataSyncService(
                 }
             }
 
-            await trsDataSyncHelper.SyncRecords(
+            await trsDataSyncHelper.SyncRecordsAsync(
                 modelType,
                 newOrUpdatedItems.Select(i => i.NewOrUpdatedEntity).ToArray(),
                 optionsAccessor.Value.IgnoreInvalidData,
                 dryRun: false,
                 cancellationToken);
 
-            await trsDataSyncHelper.DeleteRecords(
+            await trsDataSyncHelper.DeleteRecordsAsync(
                 modelType,
                 removedOrDeletedItems.Select(i => i.RemovedItem.Id).ToArray(),
                 cancellationToken);

@@ -95,10 +95,10 @@ public class QtsAwardedEmailJobDispatcherTests : QtsAwardedEmailJobTestBase
             backgroundJobScheduler.Object);
 
         // Act
-        await dispatcher.Execute(qtsAwardedEmailsJobId);
+        await dispatcher.ExecuteAsync(qtsAwardedEmailsJobId);
 
         // Assert
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<SendQtsAwardedEmailJob, Task>>>()), Times.Exactly(2));
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<SendQtsAwardedEmailJob, Task>>>()), Times.Exactly(2));
     }
 }

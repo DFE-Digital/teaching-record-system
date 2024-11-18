@@ -11,109 +11,109 @@ public class UserTests : TestBase
     public async Task AddUser()
     {
         var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
-        await TestData.CreateCrmUser(azureAdUserId: Guid.Parse(testAzAdUser.UserId), dqtRoles: ["CRM Helpdesk"]);
+        await TestData.CreateCrmUserAsync(azureAdUserId: Guid.Parse(testAzAdUser.UserId), dqtRoles: ["CRM Helpdesk"]);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPage();
+        await page.GoToUsersPageAsync();
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId("add-user");
+        await page.ClickLinkForElementWithTestIdAsync("add-user");
 
-        await page.AssertOnAddUserPage();
+        await page.AssertOnAddUserPageAsync();
 
-        await page.FillEmailInput(testAzAdUser.Email);
+        await page.FillEmailInputAsync(testAzAdUser.Email);
 
-        await page.ClickButton("Find user");
+        await page.ClickButtonAsync("Find user");
 
-        await page.AssertOnAddUserConfirmPage();
+        await page.AssertOnAddUserConfirmPageAsync();
 
         await page.SetCheckedAsync("label:text-is('Helpdesk')", true);
 
-        await page.ClickButton("Save");
+        await page.ClickButtonAsync("Save");
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessage("User added");
+        await page.AssertFlashMessageAsync("User added");
     }
 
     [Fact]
     public async Task EditUser()
     {
         var azAdUserId = Guid.NewGuid();
-        await TestData.CreateCrmUser(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
-        var user = await TestData.CreateUser(azureAdUserId: azAdUserId, roles: ["Administrator"]);
+        await TestData.CreateCrmUserAsync(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
+        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, roles: ["Administrator"]);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPage();
+        await page.GoToUsersPageAsync();
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId($"edit-user-{user.UserId}");
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
 
-        await page.AssertOnEditUserPage(user.UserId);
+        await page.AssertOnEditUserPageAsync(user.UserId);
 
         await page.SetCheckedAsync("label:text-is('Administrator')", false);
         await page.SetCheckedAsync("label:text-is('Helpdesk')", true);
 
-        await page.ClickButton("Save changes");
+        await page.ClickButtonAsync("Save changes");
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessage("User updated");
+        await page.AssertFlashMessageAsync("User updated");
     }
 
     [Fact]
     public async Task DeactivateUser()
     {
         var azAdUserId = Guid.NewGuid();
-        await TestData.CreateCrmUser(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
-        var user = await TestData.CreateUser(azureAdUserId: azAdUserId, roles: ["Administrator"]);
+        await TestData.CreateCrmUserAsync(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
+        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, roles: ["Administrator"]);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPage();
+        await page.GoToUsersPageAsync();
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId($"edit-user-{user.UserId}");
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
 
-        await page.AssertOnEditUserPage(user.UserId);
+        await page.AssertOnEditUserPageAsync(user.UserId);
 
-        await page.ClickButton("Deactivate");
+        await page.ClickButtonAsync("Deactivate");
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessage("User deactivated");
+        await page.AssertFlashMessageAsync("User deactivated");
     }
 
     [Fact]
     public async Task ReactivateUser()
     {
         var azAdUserId = Guid.NewGuid();
-        await TestData.CreateCrmUser(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
-        var user = await TestData.CreateUser(active: false, azureAdUserId: azAdUserId, roles: ["Administrator"]);
+        await TestData.CreateCrmUserAsync(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
+        var user = await TestData.CreateUserAsync(active: false, azureAdUserId: azAdUserId, roles: ["Administrator"]);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToUsersPage();
+        await page.GoToUsersPageAsync();
 
-        await page.AssertOnUsersPage();
+        await page.AssertOnUsersPageAsync();
 
-        await page.ClickLinkForElementWithTestId($"edit-user-{user.UserId}");
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
 
-        await page.AssertOnEditUserPage(user.UserId);
+        await page.AssertOnEditUserPageAsync(user.UserId);
 
-        await page.ClickButton("Reactivate");
+        await page.ClickButtonAsync("Reactivate");
 
-        await page.AssertOnEditUserPage(user.UserId);
+        await page.AssertOnEditUserPageAsync(user.UserId);
 
-        await page.AssertFlashMessage("User reactivated");
+        await page.AssertFlashMessageAsync("User reactivated");
     }
 }

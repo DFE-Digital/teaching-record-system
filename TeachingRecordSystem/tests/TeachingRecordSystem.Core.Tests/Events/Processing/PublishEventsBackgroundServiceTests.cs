@@ -11,7 +11,7 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
     private readonly DbFixture _dbFixture = dbFixture;
 
     public Task InitializeAsync() =>
-        _dbFixture.WithDbContext(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from events"));
+        _dbFixture.WithDbContextAsync(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from events"));
 
     public Task DisposeAsync() => Task.CompletedTask;
 
@@ -32,7 +32,7 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
         var service = new PublishEventsBackgroundService(eventPublisher, _dbFixture.GetDbContextFactory(), logger);
 
         // Act
-        await service.PublishEvents(CancellationToken.None);
+        await service.PublishEventsAsync(CancellationToken.None);
 
         // Assert
         Assert.Collection(eventPublisher.Events, e => e.Equals(@event));
@@ -58,7 +58,7 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
         var service = new PublishEventsBackgroundService(eventPublisher, _dbFixture.GetDbContextFactory(), logger);
 
         // Act
-        await service.PublishEvents(CancellationToken.None);
+        await service.PublishEventsAsync(CancellationToken.None);
 
         // Assert
         Assert.Empty(eventPublisher.Events);
@@ -76,14 +76,14 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
 
         var eventPublisher = new Mock<IEventPublisher>();
         var publishException = new Exception("Bang!");
-        eventPublisher.Setup(mock => mock.PublishEvent(It.IsAny<EventBase>())).ThrowsAsync(publishException);
+        eventPublisher.Setup(mock => mock.PublishEventAsync(It.IsAny<EventBase>())).ThrowsAsync(publishException);
 
         var logger = new Mock<ILogger<PublishEventsBackgroundService>>();
 
         var service = new PublishEventsBackgroundService(eventPublisher.Object, _dbFixture.GetDbContextFactory(), logger.Object);
 
         // Act
-        await service.PublishEvents(CancellationToken.None);
+        await service.PublishEventsAsync(CancellationToken.None);
 
         // Assert
         // Can't easily assert that logging has happened here due to extension methods
@@ -102,7 +102,7 @@ public class PublishEventsBackgroundServiceTests(DbFixture dbFixture) : IAsyncLi
 
         public IReadOnlyCollection<EventBase> Events => _events.AsReadOnly();
 
-        public Task PublishEvent(EventBase @event)
+        public Task PublishEventAsync(EventBase @event)
         {
             _events.Add(@event);
             return Task.CompletedTask;

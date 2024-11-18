@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllSanctionCodesHandler : ICrmQueryHandler<GetAllSanctionCodesQuery, dfeta_sanctioncode[]>
 {
-    public async Task<dfeta_sanctioncode[]> Execute(GetAllSanctionCodesQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_sanctioncode[]> ExecuteAsync(GetAllSanctionCodesQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

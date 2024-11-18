@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveContactsByLastNameAndDateOfBirthHandler : ICrmQueryHandler<GetActiveContactsByLastNameAndDateOfBirthQuery, Contact[]>
 {
-    public async Task<Contact[]> Execute(GetActiveContactsByLastNameAndDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact[]> ExecuteAsync(GetActiveContactsByLastNameAndDateOfBirthQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression(Contact.EntityLogicalName)
         {

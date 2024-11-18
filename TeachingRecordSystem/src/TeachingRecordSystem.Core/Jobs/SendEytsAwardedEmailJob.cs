@@ -30,7 +30,7 @@ public class SendEytsAwardedEmailJob
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
     }
 
-    public async Task Execute(Guid eytsAwardedEmailsJobId, Guid personId)
+    public async Task ExecuteAsync(Guid eytsAwardedEmailsJobId, Guid personId)
     {
         var item = await _dbContext.EytsAwardedEmailsJobItems.SingleAsync(i => i.EytsAwardedEmailsJobId == eytsAwardedEmailsJobId && i.PersonId == personId);
 
@@ -42,11 +42,11 @@ public class SendEytsAwardedEmailJob
                 Email = item.EmailAddress
             };
 
-            var tokenResponse = await _identityApiClient.CreateTrnToken(request);
+            var tokenResponse = await _identityApiClient.CreateTrnTokenAsync(request);
             item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
-        await _notificationSender.SendEmail(EytsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
+        await _notificationSender.SendEmailAsync(EytsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
         _dbContext.AddEvent(new EytsAwardedEmailSentEvent

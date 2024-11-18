@@ -23,7 +23,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithNoOpenAlerts_ShowsNoOpenAlertsMessage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10))));  // Closed alert
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -32,7 +32,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("no-open-alerts"));
     }
 
@@ -40,7 +40,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithOpenAlert_ShowsCardWithExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithEndDate(null)));
 
         var alert = person.Alerts.Single();
@@ -51,7 +51,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("open-alert"),
@@ -71,7 +71,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithNoClosedAlerts_ShowsNoClosedAlertsMessage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithEndDate(null)));  // Open alert
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -80,7 +80,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("no-closed-alerts"));
     }
 
@@ -88,7 +88,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_PersonWithClosedAlert_ShowsTableRowWithExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithAlert(a => a.WithStartDate(new(2024, 1, 1)).WithEndDate(new(2024, 10, 10))));
 
         var alert = person.Alerts.Single();
@@ -99,7 +99,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var closedAlertsTable = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlertsTable);
@@ -120,7 +120,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
 
@@ -128,7 +128,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
@@ -138,7 +138,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
 
@@ -146,7 +146,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
@@ -156,7 +156,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
 
@@ -164,7 +164,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("AddAnAlertBtn"));
     }
 
@@ -174,7 +174,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -183,7 +183,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("open-alert"));
     }
 
@@ -193,7 +193,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -202,7 +202,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("open-alert"));
     }
 
@@ -212,7 +212,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -221,7 +221,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -236,7 +236,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -245,7 +245,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -260,8 +260,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
-        var person = await TestData.CreatePerson(p => p
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -270,7 +270,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -285,8 +285,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
-        var person = await TestData.CreatePerson(p => p
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -295,7 +295,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var card = doc.GetElementByTestId("open-alert");
         Assert.NotNull(card);
         var cardActions = card.QuerySelectorAll(".govuk-summary-card__actions>*");
@@ -310,7 +310,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -319,7 +319,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("closed-alerts"));
     }
 
@@ -329,7 +329,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -338,7 +338,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("closed-alerts"));
     }
 
@@ -348,7 +348,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -357,7 +357,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -371,7 +371,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -380,7 +380,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -394,8 +394,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
-        var person = await TestData.CreatePerson(p => p
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -404,7 +404,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -418,8 +418,8 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
 
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
-        var person = await TestData.CreatePerson(p => p
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).RandomOneExcept(at => at.AlertTypeId == AlertType.DbsAlertTypeId);
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -428,7 +428,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var closedAlerts = doc.GetElementByTestId("closed-alerts");
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
@@ -442,7 +442,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -451,7 +451,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
@@ -461,7 +461,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -470,7 +470,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
 
@@ -480,7 +480,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadOnly));
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithAlertTypeId(AlertType.DbsAlertTypeId).WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/alerts");
@@ -489,7 +489,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertFlag"));
     }
 }

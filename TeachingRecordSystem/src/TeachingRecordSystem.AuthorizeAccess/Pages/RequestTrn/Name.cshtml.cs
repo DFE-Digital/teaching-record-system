@@ -25,7 +25,7 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
         Name = JourneyInstance!.State.Name;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {

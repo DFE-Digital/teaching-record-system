@@ -9,9 +9,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new DeleteMqState()
             {
@@ -47,13 +47,13 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         DateOnly? startDate = !string.IsNullOrEmpty(startDateString) ? DateOnly.Parse(startDateString) : null;
         DateOnly? endDate = !string.IsNullOrEmpty(endDateString) ? DateOnly.Parse(endDateString) : null;
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
             .WithProvider(provider?.MandatoryQualificationProviderId)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
             .WithStatus(status, endDate)));
         var qualification = person.MandatoryQualifications.Single();
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualification.QualificationId,
             new DeleteMqState
             {
@@ -72,7 +72,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var deletionSummary = doc.GetElementByTestId("deletion-summary");
         Assert.NotNull(deletionSummary);
         Assert.Equal(deletionReason.GetDisplayName(), deletionSummary.GetElementByTestId("deletion-reason")!.TextContent);
@@ -97,9 +97,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange        
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new DeleteMqState()
             {
@@ -133,7 +133,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileId = Guid.NewGuid();
         var evidenceFileName = "test.pdf";
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q
             .WithProvider(provider.MandatoryQualificationProviderId)
             .WithSpecialism(specialism)
             .WithStartDate(startDate)
@@ -143,7 +143,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var qualificationId = person.MandatoryQualifications!.Single().QualificationId;
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new DeleteMqState()
             {
@@ -166,8 +166,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification deleted");
 
         EventPublisher.AssertEventsSaved(e =>
@@ -214,9 +214,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new DeleteMqState()
             {
@@ -241,7 +241,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance);
     }
 
-    private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstance(Guid qualificationId, DeleteMqState? state = null) =>
+    private async Task<JourneyInstance<DeleteMqState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteMqState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.DeleteMq,
             state ?? new DeleteMqState(),

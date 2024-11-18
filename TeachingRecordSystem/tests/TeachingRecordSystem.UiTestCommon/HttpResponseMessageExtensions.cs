@@ -11,7 +11,7 @@ public static class HttpResponseMessageExtensions
 {
     private static readonly string[] _testDataStrings = GetTestDataStrings();
 
-    public static async Task<IHtmlDocument> GetDocument(this HttpResponseMessage response)
+    public static async Task<IHtmlDocument> GetDocumentAsync(this HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();
 
@@ -75,7 +75,7 @@ public static class HttpResponseMessageExtensions
         }
     }
 
-    public static async Task<HttpResponseMessage> FollowRedirect(this HttpResponseMessage response, HttpClient httpClient)
+    public static async Task<HttpResponseMessage> FollowRedirectAsync(this HttpResponseMessage response, HttpClient httpClient)
     {
         var statusCode = (int)response.StatusCode;
 

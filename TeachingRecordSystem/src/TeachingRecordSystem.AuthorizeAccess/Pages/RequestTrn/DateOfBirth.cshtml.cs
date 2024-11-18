@@ -24,7 +24,7 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
         DateOfBirth = JourneyInstance!.State.DateOfBirth;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (DateOfBirth >= clock.Today)
         {

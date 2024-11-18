@@ -24,7 +24,7 @@ public class GetIttSubjectByCodeTests : IAsyncLifetime
         var subjectCode = "100366";  // computer science
 
         // Act
-        var result = await _dataverseAdapter.GetIttSubjectByCode(subjectCode);
+        var result = await _dataverseAdapter.GetIttSubjectByCodeAsync(subjectCode);
 
         // Assert
         Assert.NotNull(result);
@@ -38,7 +38,7 @@ public class GetIttSubjectByCodeTests : IAsyncLifetime
         var subjectCode = "XXXX";
 
         // Act
-        var result = await _dataverseAdapter.GetIttSubjectByCode(subjectCode);
+        var result = await _dataverseAdapter.GetIttSubjectByCodeAsync(subjectCode);
 
         // Assert
         Assert.Null(result);

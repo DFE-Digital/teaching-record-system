@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetPreviousNamesByContactIdsHandler : ICrmQueryHandler<GetPreviousNamesByContactIdsQuery, IDictionary<Guid, dfeta_previousname[]>>
 {
-    public async Task<IDictionary<Guid, dfeta_previousname[]>> Execute(GetPreviousNamesByContactIdsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<IDictionary<Guid, dfeta_previousname[]>> ExecuteAsync(GetPreviousNamesByContactIdsQuery query, IOrganizationServiceAsync organizationService)
     {
         var contactIdsArray = query.ContactIds.ToArray();
 

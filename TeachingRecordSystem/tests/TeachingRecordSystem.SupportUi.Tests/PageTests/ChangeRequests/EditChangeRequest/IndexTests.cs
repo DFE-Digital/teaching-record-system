@@ -13,8 +13,8 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
@@ -31,8 +31,8 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
@@ -62,8 +62,8 @@ public class IndexTests : TestBase
     public async Task Get_WithTicketNumberForInactiveIncident_ReturnsBadRequest()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
@@ -85,8 +85,8 @@ public class IndexTests : TestBase
     public async Task Get_WithTicketNumberForActiveNameChangeIncident_RendersExpectedContent(bool hasNewFirstName, bool hasNewMiddleName, bool hasNewLastName)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateNameChangeIncident(
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(
             b => b.WithCustomerId(createPersonResult.ContactId)
                 .WithNewFirstName(hasNewFirstName ? TestData.GenerateChangedFirstName(createPersonResult.FirstName) : createPersonResult.FirstName)
                 .WithNewMiddleName(hasNewMiddleName ? TestData.GenerateChangedMiddleName(createPersonResult.MiddleName) : createPersonResult.MiddleName)
@@ -102,7 +102,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
 
@@ -152,8 +152,8 @@ public class IndexTests : TestBase
     public async Task Get_WithTicketNumberForActiveDateOfBirthChangeIncident_RendersExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson();
-        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var createIncidentResult = await TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/change-requests/{createIncidentResult.TicketNumber}");
 
@@ -161,7 +161,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
 

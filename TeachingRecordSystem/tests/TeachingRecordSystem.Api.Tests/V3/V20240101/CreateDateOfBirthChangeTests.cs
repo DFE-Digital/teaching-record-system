@@ -19,7 +19,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     {
         // Arrange
         SetCurrentApiClient(roles);
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
         var newDateOfBirth = TestData.GenerateDateOfBirth();
         var evidenceFileName = "evidence.txt";
         var evidenceFileUrl = Faker.Internet.SecureUrl();
@@ -73,7 +73,7 @@ public class CreateDateOfBirthChangeTests : TestBase
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var newDateOfBirth = newDateOfBirthString is not null ? DateOnly.ParseExact(newDateOfBirthString, "yyyy-MM-dd") : (DateOnly?)null;
 
@@ -99,7 +99,7 @@ public class CreateDateOfBirthChangeTests : TestBase
     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
         var newDateOfBirth = TestData.GenerateDateOfBirth();
 
         var evidenceFileName = "evidence.txt";
@@ -138,14 +138,14 @@ public class CreateDateOfBirthChangeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10001, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";
@@ -166,14 +166,14 @@ public class CreateDateOfBirthChangeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_ValidRequest_CreatesIncident()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newDateOfBirth = TestData.GenerateChangedDateOfBirth(currentDateOfBirth: createPersonResult.DateOfBirth);
 
         var evidenceFileName = "evidence.txt";

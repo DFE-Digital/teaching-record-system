@@ -14,13 +14,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 {
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsAndTeachingRecordKnown_CompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(person);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(person);
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -29,17 +29,17 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.NotEqual(Clock.UtcNow, user.FirstSignIn);
@@ -51,13 +51,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsWithSubjectOnlyAndTeachingRecordKnown_AssignsEmailAndSignInFieldsAndCompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(person, email: Option.Some((string?)null));
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(person, email: Option.Some((string?)null));
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -66,18 +66,18 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var email = Faker.Internet.Email();
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject, email);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.Equal(email, user.Email);
             Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
@@ -90,7 +90,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithResolvedTrnRequestMatchedOnOneLoginUserSubject_SetsUserVerifiedAssignsTrnAndCompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -101,25 +101,25 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
 
             var trnRequestId = Guid.NewGuid().ToString();
-            var trnRequestFromApplicationUser = await TestData.CreateApplicationUser();
-            var person = await TestData.CreatePerson(p => p
+            var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
+            var person = await TestData.CreatePersonAsync(p => p
                 .WithTrn()
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            var user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
+            var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
             Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
@@ -131,7 +131,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithPendingTrnRequestMatchedOnOneLoginUserSubject_RequestsIdentityVerification() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -142,20 +142,20 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
 
             var trnRequestId = Guid.NewGuid().ToString();
-            var trnRequestFromApplicationUser = await TestData.CreateApplicationUser();
-            var person = await TestData.CreatePerson(p => p
+            var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
+            var person = await TestData.CreatePersonAsync(p => p
                 .WithoutTrn()
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
@@ -167,7 +167,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithResolvedTrnRequestMatchedOnEmail_SetsUserVerifiedAssignsTrnAndCompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -178,14 +178,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
             var email = TestData.GenerateUniqueEmail();
 
             var trnRequestId = Guid.NewGuid().ToString();
-            var trnRequestFromApplicationUser = await TestData.CreateApplicationUser();
-            var person = await TestData.CreatePerson(p => p
+            var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
+            var person = await TestData.CreatePersonAsync(p => p
                 .WithTrn()
                 .WithEmail(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
@@ -193,12 +193,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject, email: email);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            var user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
+            var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == subject));
             Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
@@ -210,7 +210,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithPendingTrnRequestMatchedOnEmail_RequestsIdentityVerification() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -221,14 +221,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
             var email = TestData.GenerateUniqueEmail();
 
             var trnRequestId = Guid.NewGuid().ToString();
-            var trnRequestFromApplicationUser = await TestData.CreateApplicationUser();
-            var person = await TestData.CreatePerson(p => p
+            var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
+            var person = await TestData.CreatePersonAsync(p => p
                 .WithoutTrn()
                 .WithEmail(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: true));
@@ -236,7 +236,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
@@ -248,7 +248,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithTrnRequestMatchedOnOneLoginUserSubjectWithoutIdentityVerified_RequestsIdentityVerification() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -259,20 +259,20 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
 
             var trnRequestId = Guid.NewGuid().ToString();
-            var trnRequestFromApplicationUser = await TestData.CreateApplicationUser();
-            var person = await TestData.CreatePerson(p => p
+            var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
+            var person = await TestData.CreatePersonAsync(p => p
                 .WithoutTrn()
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false, oneLoginUserSubject: subject));
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
@@ -284,7 +284,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_NewUserWithTrnRequestMatchedOnEmailWithoutIdentityVerified_RequestsIdentityVerification() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -295,14 +295,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
             var email = TestData.GenerateUniqueEmail();
 
             var trnRequestId = Guid.NewGuid().ToString();
-            var trnRequestFromApplicationUser = await TestData.CreateApplicationUser();
-            var person = await TestData.CreatePerson(p => p
+            var trnRequestFromApplicationUser = await TestData.CreateApplicationUserAsync();
+            var person = await TestData.CreatePersonAsync(p => p
                 .WithTrn()
                 .WithEmail(email)
                 .WithTrnRequest(trnRequestFromApplicationUser.UserId, trnRequestId, identityVerified: false));
@@ -310,7 +310,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
@@ -322,12 +322,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserAlreadyExistsButTeachingNotRecordKnown_RequestsIdentityVerification() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -336,18 +336,18 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: user.Subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
             Assert.Null(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.NotEqual(Clock.UtcNow, user.FirstSignIn);
@@ -359,7 +359,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationOnly_UserDoesNotExist_RequestsIdentityVerification() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
@@ -370,19 +370,19 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var subject = TestData.CreateOneLoginUserSubject();
             var authenticationTicket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, sub: subject);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
             Assert.Null(state.AuthenticationTicket);
 
-            var user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == subject));
+            var user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == subject));
             Assert.NotNull(user);
             Assert.Equal(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Null(user.FirstSignIn);
@@ -395,12 +395,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationFailed_RedirectsToErrorPage() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -409,24 +409,24 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             // Act
-            var result = await helper.OnVerificationFailed(journeyInstance);
+            var result = await helper.OnVerificationFailedAsync(journeyInstance);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
             Assert.Null(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Null(user.FirstSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
@@ -438,12 +438,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceeded_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var firstName = Faker.Name.First();
@@ -456,14 +456,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -475,13 +475,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             Assert.NotNull(state.OneLoginAuthenticationTicket);
             Assert.Null(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Null(user.FirstSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
@@ -499,14 +499,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserTrnMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Medium);
@@ -521,14 +521,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -540,12 +540,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
@@ -558,14 +558,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedBySupportMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Low, TrnAssociationSource.SupportUi);
@@ -580,14 +580,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -599,12 +599,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
@@ -617,14 +617,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndIdentityUserWithTrnAssociatedByTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Low, TrnAssociationSource.TrnToken);
@@ -639,14 +639,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -658,12 +658,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
@@ -676,14 +676,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButIdentityUserHasTrnVerificationLevelLow_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
             var email = Faker.Internet.Email();
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Low);
@@ -698,14 +698,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -717,7 +717,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -726,13 +726,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromIdentityUserTrnDoesNotMatchLastName_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Medium);
@@ -747,14 +747,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -766,7 +766,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -775,13 +775,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromIdentityUserTrnDoesNotMatchDateOfBirth_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             await CreateIdentityUser(person.FirstName, person.LastName, person.Trn!, user.Email!, TrnVerificationLevel.Medium);
@@ -796,14 +796,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -815,7 +815,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -824,13 +824,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededAndTrnTokenMatchesVerifiedLastNameAndDateOfBirth_CompletesJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var trnToken = await CreateTrnToken(person.Trn!, user.Email!);
@@ -846,14 +846,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
                 trnToken);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -865,12 +865,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             Assert.NotNull(state.AuthenticationTicket);
 
-            user = await WithDbContext(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
+            user = await WithDbContextAsync(dbContext => dbContext.OneLoginUsers.SingleAsync(u => u.Subject == user.Subject));
             Assert.NotEqual(Clock.UtcNow, user.FirstOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.LastOneLoginSignIn);
             Assert.Equal(Clock.UtcNow, user.FirstSignIn);
@@ -883,13 +883,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButTrnTokenDoesNotExist_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var trnToken = Guid.NewGuid().ToString();
@@ -905,14 +905,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
                 trnToken);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -924,7 +924,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -933,13 +933,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButTrnTokenHasExpired_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var trnToken = await CreateTrnToken(person.Trn!, user.Email!, expires: TimeSpan.FromSeconds(-1));
@@ -955,14 +955,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
                 trnToken);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -974,7 +974,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -983,13 +983,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButTrnTokenHasAlreadyBeenUsed_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var trnToken = await CreateTrnToken(person.Trn!, user.Email!, userId: Guid.NewGuid());
@@ -1001,14 +1001,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
                 trnToken);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -1020,7 +1020,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -1029,13 +1029,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromTrnTokenDoesNotMatchLastName_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var trnToken = await CreateTrnToken(person.Trn!, user.Email!);
@@ -1051,14 +1051,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
                 trnToken);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -1070,7 +1070,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -1079,13 +1079,13 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task OnOneLoginCallback_AuthenticationAndVerification_VerificationSucceededButRecordFromTrnTokenDoesNotMatchDateOfBirth_RedirectsToStartOfMatchingJourney() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var helper = CreateHelper(dbContext);
 
-            var person = await TestData.CreatePerson(p => p.WithTrn());
-            var user = await TestData.CreateOneLoginUser(personId: null);
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+            var user = await TestData.CreateOneLoginUserAsync(personId: null);
             Clock.Advance();
 
             var trnToken = await CreateTrnToken(person.Trn!, user.Email!);
@@ -1101,14 +1101,14 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default,
                 trnToken);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 email: user.Email,
                 createCoreIdentityVc: false);
-            var callbackResult = await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            var callbackResult = await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
             Debug.Assert(callbackResult is ChallengeHttpResult);
 
             var verifiedTicket = CreateOneLoginAuthenticationTicket(
@@ -1120,7 +1120,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 createCoreIdentityVc: true);
 
             // Act
-            var result = await helper.OnOneLoginCallback(journeyInstance, verifiedTicket);
+            var result = await helper.OnOneLoginCallbackAsync(journeyInstance, verifiedTicket);
 
             // Assert
             var redirectResult = Assert.IsType<RedirectHttpResult>(result);
@@ -1129,7 +1129,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task TryMatchToTeachingRecord_MatchesZeroResults_ReturnsFalseAndDoesNotSetAuthenticationTicket() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var personMatchingServiceMock = new Mock<IPersonMatchingService>();
@@ -1138,7 +1138,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var verifiedFirstName = Faker.Name.Last();
             var verifiedLastName = Faker.Name.Last();
             var verifiedDateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([verifiedFirstName, verifiedLastName], verifiedDateOfBirth));
+            var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([verifiedFirstName, verifiedLastName], verifiedDateOfBirth));
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -1147,20 +1147,20 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 createCoreIdentityVc: false);
-            await helper.OnOneLoginCallback(journeyInstance,
+            await helper.OnOneLoginCallbackAsync(journeyInstance,
                 authenticationTicket);
 
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true,
                 Faker.Identification.UkNationalInsuranceNumber()));
 
             personMatchingServiceMock
-                .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
+                .Setup(mock => mock.MatchAsync(It.Is<MatchRequest>(r =>
                     r.Names.SequenceEqual(state.VerifiedNames!) &&
                     r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
                     r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
@@ -1168,7 +1168,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 .ReturnsAsync(value: null);
 
             // Act
-            var result = await helper.TryMatchToTeachingRecord(journeyInstance);
+            var result = await helper.TryMatchToTeachingRecordAsync(journeyInstance);
 
             // Assert
             Assert.False(result);
@@ -1181,7 +1181,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task TryMatchToTeachingRecord_MatchesWithoutTrn_ReturnsFalseAndDoesNotSetAuthenticationTicket() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var personMatchingServiceMock = new Mock<IPersonMatchingService>();
@@ -1190,9 +1190,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
             var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person = await TestData.CreatePerson(p => p.WithoutTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
+            var person = await TestData.CreatePersonAsync(p => p.WithoutTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
-            var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
+            var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -1201,18 +1201,18 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 createCoreIdentityVc: false);
-            await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personMatchingServiceMock
-                .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
+                .Setup(mock => mock.MatchAsync(It.Is<MatchRequest>(r =>
                     r.Names.SequenceEqual(state.VerifiedNames!) &&
                     r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
                     r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
@@ -1227,7 +1227,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                     }));
 
             // Act
-            var result = await helper.TryMatchToTeachingRecord(journeyInstance);
+            var result = await helper.TryMatchToTeachingRecordAsync(journeyInstance);
 
             // Assert
             Assert.False(result);
@@ -1240,7 +1240,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Fact]
     public Task TryMatchToTeachingRecord_Matches_ReturnsTrueAndUpdatesOneLoginUserAssignsAuthenticationTicket() =>
-        WithDbContext(async dbContext =>
+        WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var personMatchingServiceMock = new Mock<IPersonMatchingService>();
@@ -1249,9 +1249,9 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             var firstName = Faker.Name.Last();
             var lastName = Faker.Name.Last();
             var dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
-            var person = await TestData.CreatePerson(p => p.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithFirstName(firstName).WithLastName(lastName).WithDateOfBirth(dateOfBirth).WithNationalInsuranceNumber());
 
-            var user = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
+            var user = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([firstName, lastName], dateOfBirth));
             Clock.Advance();
 
             var state = new SignInJourneyState(
@@ -1260,18 +1260,18 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 serviceUrl: "https://service",
                 oneLoginAuthenticationScheme: "dummy",
                 clientApplicationUserId: default);
-            var journeyInstance = await CreateJourneyInstance(state);
+            var journeyInstance = await CreateJourneyInstanceAsync(state);
 
             var authenticationTicket = CreateOneLoginAuthenticationTicket(
                 vtr: SignInJourneyHelper.AuthenticationOnlyVtr,
                 sub: user.Subject,
                 createCoreIdentityVc: false);
-            await helper.OnOneLoginCallback(journeyInstance, authenticationTicket);
+            await helper.OnOneLoginCallbackAsync(journeyInstance, authenticationTicket);
 
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personMatchingServiceMock
-                .Setup(mock => mock.Match(It.Is<MatchRequest>(r =>
+                .Setup(mock => mock.MatchAsync(It.Is<MatchRequest>(r =>
                     r.Names.SequenceEqual(state.VerifiedNames!) &&
                     r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
                     r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
@@ -1286,7 +1286,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                     }));
 
             // Act
-            var result = await helper.TryMatchToTeachingRecord(journeyInstance);
+            var result = await helper.TryMatchToTeachingRecordAsync(journeyInstance);
 
             // Assert
             Assert.True(result);

@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Link;
 
 public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<EditAlertLinkState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<EditAlertLinkState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new EditAlertLinkState()
+    protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState()
         {
             Initialized = true,
             CurrentLink = populateOptional ? null : alert.ExternalLink,
@@ -24,13 +24,13 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert, bool populateOptional = true) =>
+    protected Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert, bool populateOptional = true) =>
         step switch
         {
             JourneySteps.New =>
-                CreateEmptyJourneyInstance(alert.AlertId),
+                CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index =>
-                CreateJourneyInstance(alert.AlertId, new EditAlertLinkState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertLinkState()
                 {
                     Initialized = true,
                     CurrentLink = populateOptional ? null : alert.ExternalLink,
@@ -38,11 +38,11 @@ public abstract class LinkTestBase(HostFixture hostFixture) : TestBase(hostFixtu
                     Link = populateOptional ? "https://www.example.com" : null
                 }),
             JourneySteps.Reason or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: populateOptional),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: populateOptional),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstance(Guid alertId, EditAlertLinkState state) =>
+    private Task<JourneyInstance<EditAlertLinkState>> CreateJourneyInstanceAsync(Guid alertId, EditAlertLinkState state) =>
         CreateJourneyInstance(
             JourneyNames.EditAlertLink,
             state,

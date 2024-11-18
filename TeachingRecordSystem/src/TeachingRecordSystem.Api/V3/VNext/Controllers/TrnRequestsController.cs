@@ -25,7 +25,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [MapError(10029, statusCode: StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> CreateTrnRequest(
+    public async Task<IActionResult> CreateTrnRequestAsync(
         [FromBody] CreateTrnRequestRequest request,
         [FromServices] CreateTrnRequestHandler handler)
     {
@@ -41,7 +41,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             IdentityVerified = request.IdentityVerified,
             OneLoginUserSubject = request.OneLoginUserSubject
         };
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         var response = mapper.Map<TrnRequestInfo>(result);
         return Ok(response);

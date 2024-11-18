@@ -11,11 +11,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<CreatePersonResult> CreatePerson(Action<CreatePersonBuilder>? configure = null)
+    public Task<CreatePersonResult> CreatePersonAsync(Action<CreatePersonBuilder>? configure = null)
     {
         var builder = new CreatePersonBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class CreatePersonBuilder
@@ -300,9 +300,9 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<CreatePersonResult> Execute(TestData testData)
+        internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
-            var trn = _hasTrn == true ? await testData.GenerateTrn() : null;
+            var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
             var statedFirstName = _firstName ?? testData.GenerateFirstName();
             var statedMiddleName = _middleName ?? testData.GenerateMiddleName();
             var firstAndMiddleNames = $"{statedFirstName} {statedMiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -358,7 +358,7 @@ public partial class TestData
             var qts = _qtsRegistrations.Where(x => x.TeacherStatusValue != null && x.QtsDate != null);
             foreach (var item in qts)
             {
-                var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValue(item.TeacherStatusValue!);
+                var teacherStatus = await testData.ReferenceDataCache.GetTeacherStatusByValueAsync(item.TeacherStatusValue!);
                 var qtsRegistrationId = Guid.NewGuid();
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
@@ -409,7 +409,7 @@ public partial class TestData
             foreach (var item in eyts)
             {
                 var eytsRegistrationId = Guid.NewGuid();
-                var earlyYearsStatus = await testData.ReferenceDataCache.GetEarlyYearsStatusByValue(item.EytsStatusValue!);
+                var earlyYearsStatus = await testData.ReferenceDataCache.GetEarlyYearsStatusByValueAsync(item.EytsStatusValue!);
                 txnRequestBuilder.AddRequest(new CreateRequest()
                 {
                     Target = new dfeta_qtsregistration()
@@ -459,25 +459,25 @@ public partial class TestData
                 {
                     if (qualification.HeQualificationValue is not null)
                     {
-                        var heQualification = await testData.ReferenceDataCache.GetHeQualificationByValue(qualification.HeQualificationValue!);
+                        var heQualification = await testData.ReferenceDataCache.GetHeQualificationByValueAsync(qualification.HeQualificationValue!);
                         crmQualification.dfeta_HE_HEQualificationId = heQualification.Id.ToEntityReference(dfeta_hequalification.EntityLogicalName);
                     }
 
                     if (qualification.HeSubject1Value is not null)
                     {
-                        var heSubject1 = await testData.ReferenceDataCache.GetHeSubjectByValue(qualification.HeSubject1Value!);
+                        var heSubject1 = await testData.ReferenceDataCache.GetHeSubjectByValueAsync(qualification.HeSubject1Value!);
                         crmQualification.dfeta_HE_HESubject1Id = heSubject1.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
                     }
 
                     if (qualification.HeSubject2Value is not null)
                     {
-                        var heSubject2 = await testData.ReferenceDataCache.GetHeSubjectByValue(qualification.HeSubject2Value!);
+                        var heSubject2 = await testData.ReferenceDataCache.GetHeSubjectByValueAsync(qualification.HeSubject2Value!);
                         crmQualification.dfeta_HE_HESubject2Id = heSubject2.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
                     }
 
                     if (qualification.HeSubject3Value is not null)
                     {
-                        var heSubject3 = await testData.ReferenceDataCache.GetHeSubjectByValue(qualification.HeSubject3Value!);
+                        var heSubject3 = await testData.ReferenceDataCache.GetHeSubjectByValueAsync(qualification.HeSubject3Value!);
                         crmQualification.dfeta_HE_HESubject3Id = heSubject3.Id.ToEntityReference(dfeta_hesubject.EntityLogicalName);
                     }
                 }
@@ -534,7 +534,7 @@ public partial class TestData
 
             foreach (var sanction in _sanctions)
             {
-                var sanctionCode = await testData.ReferenceDataCache.GetSanctionCodeByValue(sanction.SanctionCode);
+                var sanctionCode = await testData.ReferenceDataCache.GetSanctionCodeByValueAsync(sanction.SanctionCode);
                 var crmSanction = new dfeta_sanction()
                 {
                     Id = sanction.SanctionId,
@@ -576,29 +576,29 @@ public partial class TestData
                 Target = PersonId.ToEntityReference(Contact.EntityLogicalName)
             });
 
-            await txnRequestBuilder.Execute();
+            await txnRequestBuilder.ExecuteAsync();
 
             // Read the contact record back (plugins may have added/amended data so our original record will be stale)
             contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
 
-            await testData.SyncConfiguration.SyncIfEnabled(
-                helper => helper.SyncPerson(contact, ignoreInvalid: false),
+            await testData.SyncConfiguration.SyncIfEnabledAsync(
+                helper => helper.SyncPersonAsync(contact, ignoreInvalid: false),
                 _syncEnabledOverride);
 
-            var (mqs, alerts) = await testData.WithDbContext(async dbContext =>
+            var (mqs, alerts) = await testData.WithDbContextAsync(async dbContext =>
             {
-                await AddTrnRequestMetadata();
+                await AddTrnRequestMetadataAsync();
 
                 return (
-                    await AddMqs(),
-                    await AddAlerts());
+                    await AddMqsAsync(),
+                    await AddAlertsAsync());
 
-                async Task<MandatoryQualification[]> AddMqs()
+                async Task<MandatoryQualification[]> AddMqsAsync()
                 {
                     var mqIds = new List<Guid>();
                     foreach (var builder in _mqBuilders)
                     {
-                        mqIds.Add(await builder.Execute(this, testData, dbContext));
+                        mqIds.Add(await builder.ExecuteAsync(this, testData, dbContext));
                     }
                     await dbContext.SaveChangesAsync();
 
@@ -610,12 +610,12 @@ public partial class TestData
                     return mqIds.Select(id => mqs[id]).ToArray();
                 }
 
-                async Task<Alert[]> AddAlerts()
+                async Task<Alert[]> AddAlertsAsync()
                 {
                     var alertIds = new List<Guid>();
                     foreach (var builder in _alertBuilders)
                     {
-                        alertIds.Add(await builder.Execute(this, testData, dbContext));
+                        alertIds.Add(await builder.ExecuteAsync(this, testData, dbContext));
                     }
                     await dbContext.SaveChangesAsync();
 
@@ -628,7 +628,7 @@ public partial class TestData
                     return alertIds.Select(id => alerts[id]).ToArray();
                 }
 
-                async Task AddTrnRequestMetadata()
+                async Task AddTrnRequestMetadataAsync()
                 {
                     if (_trnRequest is not { WriteMetadata: true } trnRequest)
                     {
@@ -761,16 +761,16 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> Execute(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
+        internal async Task<Guid> ExecuteAsync(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
         {
             var personId = createPersonBuilder.PersonId;
 
-            if (_alertTypeId.HasValue && !(await testData.ReferenceDataCache.GetAlertTypes()).Any(a => a.AlertTypeId == _alertTypeId.ValueOrDefault()))
+            if (_alertTypeId.HasValue && !(await testData.ReferenceDataCache.GetAlertTypesAsync()).Any(a => a.AlertTypeId == _alertTypeId.ValueOrDefault()))
             {
                 throw new ArgumentException("AlertTypeId is invalid.");
             }
 
-            var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypes()).RandomOne().AlertTypeId);
+            var alertTypeId = _alertTypeId.ValueOr((await testData.ReferenceDataCache.GetAlertTypesAsync()).RandomOne().AlertTypeId);
             var details = _details.ValueOr(testData.GenerateLoremIpsum());
             var externalLink = _externalLink.ValueOr((string?)null);
             var startDate = _startDate.ValueOr(testData.GenerateDate(min: new DateOnly(2000, 1, 1)));
@@ -917,7 +917,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> Execute(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
+        internal async Task<Guid> ExecuteAsync(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
         {
             var personId = createPersonBuilder.PersonId;
 

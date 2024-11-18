@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveIncidentsHandler : ICrmQueryHandler<GetActiveIncidentsQuery, GetIncidentsResult>
 {
-    public async Task<GetIncidentsResult> Execute(GetActiveIncidentsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<GetIncidentsResult> ExecuteAsync(GetActiveIncidentsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(Incident.Fields.StateCode, ConditionOperator.Equal, (int)IncidentState.Active);

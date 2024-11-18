@@ -26,18 +26,18 @@ public class MyRolesModel(TrsDbContext dbContext) : PageModel
         MyRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray();
     }
 
-    public Task<IActionResult> OnPost()
+    public Task<IActionResult> OnPostAsync()
     {
         var newRoles = (MyRoles ?? []).Intersect(AvailableRoles!);
-        return SetRoles(newRoles);
+        return SetRolesAsync(newRoles);
     }
 
-    public Task<IActionResult> OnPostReset()
+    public Task<IActionResult> OnPostResetAsync()
     {
-        return SetRoles(_dbRoles!);
+        return SetRolesAsync(_dbRoles!);
     }
 
-    private async Task<IActionResult> SetRoles(IEnumerable<string> roles)
+    private async Task<IActionResult> SetRolesAsync(IEnumerable<string> roles)
     {
         var identity = (ClaimsIdentity)User.Identity!;
 

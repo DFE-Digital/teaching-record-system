@@ -27,7 +27,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         dbContext.SupportTasks.Attach(_supportTask!);
         var data = (ConnectOneLoginUserData)_supportTask!.Data;
@@ -38,7 +38,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
         _supportTask.Status = SupportTaskStatus.Closed;
 
         var matchedAttributes = (await personMatchingService
-            .GetMatchedAttributes(
+            .GetMatchedAttributesAsync(
                 new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn),
                 PersonDetail.PersonId))
             .ToArray();

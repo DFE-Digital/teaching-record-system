@@ -26,6 +26,9 @@ indent_size = 4
 [*.cs]
 indent_size = 4
 dotnet_diagnostic.IDE0005.severity = error
+dotnet_diagnostic.VSTHRD003.severity = none
+dotnet_diagnostic.VSTHRD103.severity = none
+dotnet_diagnostic.VSTHRD105.severity = none
 dotnet_sort_system_directives_first = true
 csharp_style_namespace_declarations = file_scoped:warning
 csharp_prefer_braces = true:warning

@@ -68,7 +68,7 @@ public class ConfirmTests : TestBase
 
         if (hasCrmAccount)
         {
-            await TestData.CreateCrmUser(azureAdUserId: azureAdUserId, hasDisabledCrmAccount: hasDisabledCrmAccount, dqtRoles: dqtRoles);
+            await TestData.CreateCrmUserAsync(azureAdUserId: azureAdUserId, hasDisabledCrmAccount: hasDisabledCrmAccount, dqtRoles: dqtRoles);
         }
 
         ConfigureUserServiceMock(azureAdUserId.ToString(), new Services.AzureActiveDirectory.User()
@@ -84,7 +84,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var noCrmAccountWarning = doc.GetElementByTestId("no-crm-account-warning");
         if (hasCrmAccount)
@@ -224,7 +224,7 @@ public class ConfirmTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Enter a name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
@@ -279,13 +279,13 @@ public class ConfirmTests : TestBase
             Assert.Collection(userCreatedEvent.User.Roles, r => Assert.Equal(role, r));
         });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User added");
     }
 
     private void ConfigureUserServiceMock(string userId, Services.AzureActiveDirectory.User? user) =>
         AzureActiveDirectoryUserServiceMock
-            .Setup(mock => mock.GetUserById(userId))
+            .Setup(mock => mock.GetUserByIdAsync(userId))
             .ReturnsAsync(user);
 }

@@ -27,9 +27,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
         await WithDbContext(dbContext => dbContext.SupportTasks
             .Where(t => t.SupportTaskReference == supportTask.SupportTaskReference)
@@ -48,11 +48,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var statedNationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
         var statedTrn = person.Trn;
-        var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject, statedNationalInsuranceNumber: statedNationalInsuranceNumber, statedTrn: statedTrn);
+        var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject, statedNationalInsuranceNumber: statedNationalInsuranceNumber, statedTrn: statedTrn);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}");
 
@@ -60,7 +60,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(oneLoginUser.Email, doc.GetSummaryListValueForKey("Email address"));
         Assert.Equal($"{person.FirstName} {person.LastName}", doc.GetSummaryListValueForKey("Name"));
         Assert.Equal(person.DateOfBirth.ToString("dd/MM/yyyy"), doc.GetSummaryListValueForKey("Date of birth"));
@@ -94,9 +94,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SupportTaskIsNotOpen_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
         await WithDbContext(dbContext => dbContext.SupportTasks
             .Where(t => t.SupportTaskReference == supportTask.SupportTaskReference)
@@ -121,9 +121,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NoSuggestionChosen_RendersError()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}")
         {
@@ -134,16 +134,16 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Trn", "Select the record you wish to connect");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Trn", "Select the record you wish to connect");
     }
 
     [Fact]
     public async Task Post_ValidRequestFromSuggestion_RedirectsToConnectPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}")
         {
@@ -165,9 +165,9 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequestWithOverridenTrn_RedirectsToConnectPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
-        var supportTask = await TestData.CreateConnectOneLoginUserSupportTask(oneLoginUser.Subject);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
+        var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}")
         {

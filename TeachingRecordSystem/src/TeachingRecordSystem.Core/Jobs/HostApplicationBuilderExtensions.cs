@@ -54,22 +54,22 @@ public static class HostApplicationBuilderExtensions
 
                     recurringJobManager.AddOrUpdate<BatchSendQtsAwardedEmailsJob>(
                         nameof(BatchSendQtsAwardedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
+                        job => job.ExecuteAsync(CancellationToken.None),
                         options.BatchSendQtsAwardedEmails.JobSchedule);
 
                     recurringJobManager.AddOrUpdate<BatchSendInternationalQtsAwardedEmailsJob>(
                         nameof(BatchSendInternationalQtsAwardedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
+                        job => job.ExecuteAsync(CancellationToken.None),
                         options.BatchSendInternationalQtsAwardedEmails.JobSchedule);
 
                     recurringJobManager.AddOrUpdate<BatchSendEytsAwardedEmailsJob>(
                         nameof(BatchSendEytsAwardedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
+                        job => job.ExecuteAsync(CancellationToken.None),
                         options.BatchSendEytsAwardedEmails.JobSchedule);
 
                     recurringJobManager.AddOrUpdate<BatchSendInductionCompletedEmailsJob>(
                         nameof(BatchSendInductionCompletedEmailsJob),
-                        job => job.Execute(CancellationToken.None),
+                        job => job.ExecuteAsync(CancellationToken.None),
                         options.BatchSendInductionCompletedEmails.JobSchedule);
 
                     return Task.CompletedTask;
@@ -85,17 +85,17 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
                     nameof(SyncAllPersonsFromCrmJob),
-                    job => job.Execute(CancellationToken.None),
+                    job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<PopulateNameSynonymsJob>(
                     nameof(PopulateNameSynonymsJob),
-                    job => job.Execute(CancellationToken.None),
+                    job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<PopulateAllPersonsSearchAttributesJob>(
                     nameof(PopulateAllPersonsSearchAttributesJob),
-                    job => job.Execute(CancellationToken.None),
+                    job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
                 var giasOptions = sp.GetRequiredService<IOptions<GiasOptions>>();
@@ -126,7 +126,7 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<DeleteOldAttachmentsJob>(
                     nameof(DeleteOldAttachmentsJob),
-                    job => job.Execute(CancellationToken.None),
+                    job => job.ExecuteAsync(CancellationToken.None),
                     DeleteOldAttachmentsJob.JobSchedule);
 
                 recurringJobManager.AddOrUpdate<BackfillDqtReportingQualifications>(
@@ -151,22 +151,22 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
                     nameof(SyncAllAlertsFromCrmJob),
-                    job => job.Execute(/*createMigratedEvent: */false, /*dryRun: */false, CancellationToken.None),
+                    job => job.ExecuteAsync(/*createMigratedEvent: */false, /*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
                     $"{nameof(SyncAllAlertsFromCrmJob)} (dry-run)",
-                    job => job.Execute(/*createMigratedEvent: */true, /*dryRun: */true, CancellationToken.None),
+                    job => job.ExecuteAsync(/*createMigratedEvent: */true, /*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
                     $"{nameof(SyncAllAlertsFromCrmJob)} & migrate",
-                    job => job.Execute(/*createMigratedEvent: */true, /*dryRun: */false, CancellationToken.None),
+                    job => job.ExecuteAsync(/*createMigratedEvent: */true, /*dryRun: */false, CancellationToken.None),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<ClearAlertsJob>(
                     nameof(ClearAlertsJob),
-                    job => job.Execute(),
+                    job => job.ExecuteAsync(),
                     Cron.Never);
 
                 recurringJobManager.AddOrUpdate<BackfillDqtReportingAlertTypes>(

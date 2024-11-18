@@ -8,19 +8,19 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public partial class DataverseAdapter
 {
-    public async Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command)
+    public async Task<UpdateTeacherResult> UpdateTeacherAsync(UpdateTeacherCommand command)
     {
-        var (result, _) = await UpdateTeacherImpl(command);
+        var (result, _) = await UpdateTeacherImplAsync(command);
         return result;
     }
 
     // Helper method that outputs the write requests that were sent for testing
-    internal async Task<(UpdateTeacherResult Result, ExecuteTransactionRequest TransactionRequest)> UpdateTeacherImpl(
+    internal async Task<(UpdateTeacherResult Result, ExecuteTransactionRequest TransactionRequest)> UpdateTeacherImplAsync(
         UpdateTeacherCommand command)
     {
         var helper = new UpdateTeacherHelper(this, command);
 
-        var referenceData = await helper.LookupReferenceData();
+        var referenceData = await helper.LookupReferenceDataAsync();
 
         var failedReasons = helper.ValidateReferenceData(referenceData);
         if (failedReasons != UpdateTeacherFailedReasons.None)
@@ -723,12 +723,12 @@ public partial class DataverseAdapter
             return failedReasons;
         }
 
-        public async Task<UpdateTeacherReferenceLookupResult> LookupReferenceData()
+        public async Task<UpdateTeacherReferenceLookupResult> LookupReferenceDataAsync()
         {
             Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.ProviderUkprn));
             Debug.Assert(!string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1));
 
-            var getTeacherTask = _dataverseAdapter.GetTeacher(
+            var getTeacherTask = _dataverseAdapter.GetTeacherAsync(
                 TeacherId,
                 columnNames: new[]
                 {
@@ -744,7 +744,7 @@ public partial class DataverseAdapter
                 .Where(a => a.PersonId == TeacherId && a.IsOpen)
                 .AnyAsync();
 
-            var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
                 TeacherId,
                 columnNames: new[]
                 {
@@ -756,7 +756,7 @@ public partial class DataverseAdapter
                 });
 
             var getIttRecordsBySlugIdTask = !string.IsNullOrEmpty(_command.SlugId.ValueOrDefault()) ?
-                _dataverseAdapter.GetInitialTeacherTrainingBySlugId(_command.SlugId.ValueOrDefault(), columnNames: new[]
+                _dataverseAdapter.GetInitialTeacherTrainingBySlugIdAsync(_command.SlugId.ValueOrDefault(), columnNames: new[]
                 {
                     dfeta_initialteachertraining.Fields.dfeta_ProgrammeType,
                     dfeta_initialteachertraining.Fields.dfeta_Result,
@@ -767,7 +767,7 @@ public partial class DataverseAdapter
                 :
                 Task.FromResult(Array.Empty<dfeta_initialteachertraining>());
 
-            var getQtsRegistrationsTask = _dataverseAdapter.GetQtsRegistrationsByTeacher(
+            var getQtsRegistrationsTask = _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
                 TeacherId,
                 columnNames: new[]
                 {
@@ -776,7 +776,7 @@ public partial class DataverseAdapter
                     dfeta_qtsregistration.Fields.StateCode
                 });
 
-            var getQualifications = _dataverseAdapter.GetQualificationsForTeacher(TeacherId,
+            var getQualifications = _dataverseAdapter.GetQualificationsForTeacherAsync(TeacherId,
                 columnNames: new[]
                 {
                     dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
@@ -796,14 +796,14 @@ public partial class DataverseAdapter
                     dfeta_hesubject.Fields.dfeta_Value
                 });
 
-            var getHavePendingPiiChanges = _dataverseAdapter.DoesTeacherHavePendingPIIChanges(TeacherId);
+            var getHavePendingPiiChanges = _dataverseAdapter.DoesTeacherHavePendingPIIChangesAsync(TeacherId);
 
             var isEarlyYears = _command.InitialTeacherTraining.ProgrammeType.IsEarlyYears();
 
             var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
 
-            var getAllEytsTeacherStatusesTask = _dataverseAdapter.GetAllEarlyYearsStatuses(requestBuilder);
-            var getAllTeacherStatuses = _dataverseAdapter.GetAllTeacherStatuses(requestBuilder);
+            var getAllEytsTeacherStatusesTask = _dataverseAdapter.GetAllEarlyYearsStatusesAsync(requestBuilder);
+            var getAllTeacherStatuses = _dataverseAdapter.GetAllTeacherStatusesAsync(requestBuilder);
 
             static TResult Let<T, TResult>(T value, Func<T, TResult> getResult) => getResult(value);
 
@@ -811,7 +811,7 @@ public partial class DataverseAdapter
                 _command.InitialTeacherTraining.ProviderUkprn,
                 ukprn => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                     CacheKeys.GetIttProviderOrganizationByUkprnKey(ukprn),
-                    () => _dataverseAdapter.GetIttProviderOrganizationsByUkprn(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
+                    () => _dataverseAdapter.GetIttProviderOrganizationsByUkprnAsync(ukprn, true, columnNames: Array.Empty<string>(), requestBuilder)
                         .ContinueWith(t => t.Result.SingleOrDefault())));
 
             var getIttCountryTask = !string.IsNullOrEmpty(_command.InitialTeacherTraining.TrainingCountryCode) ?
@@ -819,7 +819,7 @@ public partial class DataverseAdapter
                     _command.InitialTeacherTraining.TrainingCountryCode,
                     country => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetCountryKey(country),
-                        () => _dataverseAdapter.GetCountry(country, requestBuilder))) :
+                        () => _dataverseAdapter.GetCountryAsync(country, requestBuilder))) :
                 null;
 
             var getSubject1Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject1) ?
@@ -827,7 +827,7 @@ public partial class DataverseAdapter
                     _command.InitialTeacherTraining.Subject1,
                     subject => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetIttSubjectKey(subject),
-                        () => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
+                        () => _dataverseAdapter.GetIttSubjectByCodeAsync(subject, requestBuilder))) :
                 null;
 
             var getSubject2Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject2) ?
@@ -835,7 +835,7 @@ public partial class DataverseAdapter
                     _command.InitialTeacherTraining.Subject2,
                     subject => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetIttSubjectKey(subject),
-                        () => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
+                        () => _dataverseAdapter.GetIttSubjectByCodeAsync(subject, requestBuilder))) :
                 null;
 
             var getSubject3Task = !string.IsNullOrEmpty(_command.InitialTeacherTraining.Subject3) ?
@@ -843,7 +843,7 @@ public partial class DataverseAdapter
                     _command.InitialTeacherTraining.Subject3,
                     subject => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetIttSubjectKey(subject),
-                        () => _dataverseAdapter.GetIttSubjectByCode(subject, requestBuilder))) :
+                        () => _dataverseAdapter.GetIttSubjectByCodeAsync(subject, requestBuilder))) :
                 null;
 
             var getIttQualificationTask = !string.IsNullOrEmpty(_command.InitialTeacherTraining.IttQualificationValue) ?
@@ -851,21 +851,21 @@ public partial class DataverseAdapter
                     _command.InitialTeacherTraining.IttQualificationValue,
                     ittQualificationCode => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetIttQualificationKey(ittQualificationCode),
-                        () => _dataverseAdapter.GetIttQualificationByCode(ittQualificationCode, requestBuilder))) :
+                        () => _dataverseAdapter.GetIttQualificationByCodeAsync(ittQualificationCode, requestBuilder))) :
                 null;
 
             var getQualificationTask = Let(
                 !string.IsNullOrEmpty(_command.Qualification?.HeQualificationValue) ? _command.Qualification.HeQualificationValue : "400",   // 400 = First Degree
                 qualificationCode => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                     CacheKeys.GetHeQualificationKey(qualificationCode),
-                    () => _dataverseAdapter.GetHeQualificationByCode(qualificationCode, requestBuilder)));
+                    () => _dataverseAdapter.GetHeQualificationByCodeAsync(qualificationCode, requestBuilder)));
 
             var getQualificationProviderTask = !string.IsNullOrEmpty(_command.Qualification?.ProviderUkprn) ?
                 Let(
                     _command.Qualification.ProviderUkprn,
                     ukprn => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetOrganizationByUkprnKey(ukprn),
-                        () => _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: Array.Empty<string>(), requestBuilder)
+                        () => _dataverseAdapter.GetOrganizationsByUkprnAsync(ukprn, columnNames: Array.Empty<string>(), requestBuilder)
                             .ContinueWith(t => t.Result.SingleOrDefault()))) :
                 null;
 
@@ -874,7 +874,7 @@ public partial class DataverseAdapter
                     _command.Qualification.CountryCode,
                     country => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetCountryKey(country),
-                        () => _dataverseAdapter.GetCountry(country, requestBuilder))) :
+                        () => _dataverseAdapter.GetCountryAsync(country, requestBuilder))) :
                 null;
 
             var getQualificationSubjectTask = !string.IsNullOrEmpty(_command.Qualification?.Subject) ?
@@ -882,7 +882,7 @@ public partial class DataverseAdapter
                     _command.Qualification.Subject,
                     subjectName => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetHeSubjectKey(subjectName),
-                        () => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                        () => _dataverseAdapter.GetHeSubjectByCodeAsync(subjectName, requestBuilder))) :
                 null;
 
             var getQualificationSubject2Task = !string.IsNullOrEmpty(_command.Qualification?.Subject2) ?
@@ -890,7 +890,7 @@ public partial class DataverseAdapter
                     _command.Qualification.Subject2,
                     subjectName => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetHeSubjectKey(subjectName),
-                        () => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                        () => _dataverseAdapter.GetHeSubjectByCodeAsync(subjectName, requestBuilder))) :
                 null;
 
             var getQualificationSubject3Task = !string.IsNullOrEmpty(_command.Qualification?.Subject3) ?
@@ -898,10 +898,10 @@ public partial class DataverseAdapter
                     _command.Qualification.Subject3,
                     subjectName => _dataverseAdapter._cache.GetOrCreateUnlessNullAsync(
                         CacheKeys.GetHeSubjectKey(subjectName),
-                        () => _dataverseAdapter.GetHeSubjectByCode(subjectName, requestBuilder))) :
+                        () => _dataverseAdapter.GetHeSubjectByCodeAsync(subjectName, requestBuilder))) :
                 null;
 
-            var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId.ValueOrDefault()) ? _dataverseAdapter.GetTeachersByHusId(_command.HusId.ValueOrDefault(), columnNames: new[]
+            var existingTeachersWithHusIdTask = !string.IsNullOrEmpty(_command.HusId.ValueOrDefault()) ? _dataverseAdapter.GetTeachersByHusIdAsync(_command.HusId.ValueOrDefault(), columnNames: new[]
             {
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_HUSID,
@@ -934,7 +934,7 @@ public partial class DataverseAdapter
                 }
                 .Where(t => t != null);
 
-            await requestBuilder.Execute();
+            await requestBuilder.ExecuteAsync();
             await Task.WhenAll(lookupTasks);
 
             var getEarlyYearsTraineeStatusId = getAllEytsTeacherStatusesTask.Result.Single(x => x.dfeta_Value == "220");

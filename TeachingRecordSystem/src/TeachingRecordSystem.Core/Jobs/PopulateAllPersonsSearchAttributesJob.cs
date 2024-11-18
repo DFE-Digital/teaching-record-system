@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContext> dbContextFactory)
 {
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         using var readDbContext = await dbContextFactory.CreateDbContextAsync();
         readDbContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(15));
@@ -19,7 +19,7 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
                 """)
             .AsAsyncEnumerable();
 
-        await foreach (var chunk in personIds.Chunk(250).WithCancellation(cancellationToken))
+        await foreach (var chunk in personIds.ChunkAsync(250).WithCancellation(cancellationToken))
         {
             using var writeDbContext = await dbContextFactory.CreateDbContextAsync();
             writeDbContext.Database.SetCommandTimeout(TimeSpan.FromSeconds(60));
@@ -36,7 +36,7 @@ public class PopulateAllPersonsSearchAttributesJob(IDbContextFactory<TrsDbContex
 
 file static class Extensions
 {
-    public static async IAsyncEnumerable<T[]> Chunk<T>(this IAsyncEnumerable<T> source, int size)
+    public static async IAsyncEnumerable<T[]> ChunkAsync<T>(this IAsyncEnumerable<T> source, int size)
     {
         var buffer = new List<T>(size);
 

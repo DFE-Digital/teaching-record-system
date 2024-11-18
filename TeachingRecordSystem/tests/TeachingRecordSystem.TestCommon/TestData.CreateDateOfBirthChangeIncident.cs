@@ -10,11 +10,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<CreateDateOfBirthChangeIncidentResult> CreateDateOfBirthChangeIncident(Action<CreateDateOfBirthChangeIncidentBuilder>? configure = null)
+    public Task<CreateDateOfBirthChangeIncidentResult> CreateDateOfBirthChangeIncidentAsync(Action<CreateDateOfBirthChangeIncidentBuilder>? configure = null)
     {
         var builder = new CreateDateOfBirthChangeIncidentBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class CreateDateOfBirthChangeIncidentBuilder
@@ -56,7 +56,7 @@ public partial class TestData
 
         public CreateDateOfBirthChangeIncidentBuilder WithApprovedStatus() => WithStatus(IncidentStatusType.Approved);
 
-        public async Task<CreateDateOfBirthChangeIncidentResult> Execute(TestData testData)
+        public async Task<CreateDateOfBirthChangeIncidentResult> ExecuteAsync(TestData testData)
         {
             if (_customerId is null)
             {
@@ -69,7 +69,7 @@ public partial class TestData
             var annotationId = Guid.NewGuid();
             var title = "Request to change date of birth";
             var subjectTitle = "Change of Date of Birth";
-            var dateOfBirthChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitle(subjectTitle);
+            var dateOfBirthChangeSubject = await testData.ReferenceDataCache.GetSubjectByTitleAsync(subjectTitle);
 
             var incident = new Incident()
             {
@@ -90,7 +90,7 @@ public partial class TestData
                 StatusCode = dfeta_document_StatusCode.Active
             };
 
-            var annotationBody = await GetBase64EncodedFileContent(_defaultEvidenceFileContent);
+            var annotationBody = await GetBase64EncodedFileContentAsync(_defaultEvidenceFileContent);
 
             var annotation = new Annotation()
             {
@@ -162,7 +162,7 @@ public partial class TestData
                     ColumnSet = new Microsoft.Xrm.Sdk.Query.ColumnSet(Incident.Fields.TicketNumber, Incident.Fields.CreatedOn)
                 });
 
-            await txnRequestBuilder.Execute();
+            await txnRequestBuilder.ExecuteAsync();
 
             var createdIncident = retrieveIncidentResponse.GetResponse().Entity.ToEntity<Incident>();
             var ticketNumber = createdIncident.TicketNumber;

@@ -36,7 +36,7 @@ public class GetQtsCertificateTests : TestBase
         var lastName = Faker.Name.Last();
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(new Contact()
             {
                 Id = Guid.NewGuid(),
@@ -85,7 +85,7 @@ public class GetQtsCertificateTests : TestBase
         }
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(teacher);
 
         var qtsRegistrations = new[]
@@ -98,7 +98,7 @@ public class GetQtsCertificateTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetQtsRegistrationsByTeacher(
+            .Setup(mock => mock.GetQtsRegistrationsByTeacherAsync(
                 teacher.Id,
                 It.IsAny<string[]>()))
             .ReturnsAsync(qtsRegistrations);
@@ -108,7 +108,7 @@ public class GetQtsCertificateTests : TestBase
 
         string? templateNameActual = null;
         CertificateGeneratorMock
-            .Setup(g => g.GenerateCertificate(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
+            .Setup(g => g.GenerateCertificateAsync(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, string>>()))
             .Callback<string, IReadOnlyDictionary<string, string>>(
                 (t, f) =>
                 {

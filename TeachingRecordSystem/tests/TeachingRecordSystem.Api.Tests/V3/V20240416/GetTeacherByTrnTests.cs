@@ -11,7 +11,7 @@ public class GetTeacherByTrnTests : TestBase
     public async Task Get_DateOfBirthDoesNotMatchTeachingRecord_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var dateOfBirth = person.DateOfBirth.AddDays(1);
 
         var httpClient = GetHttpClientWithApiKey();
@@ -28,7 +28,7 @@ public class GetTeacherByTrnTests : TestBase
     public async Task Get_DateOfBirthMatchesTeachingRecord_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var httpClient = GetHttpClientWithApiKey();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{person.Trn}?dateOfBirth={person.DateOfBirth:yyyy-MM-dd}");
@@ -44,7 +44,7 @@ public class GetTeacherByTrnTests : TestBase
     public async Task Get_DateOfBirthNotProvided_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var httpClient = GetHttpClientWithApiKey();
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{person.Trn}");

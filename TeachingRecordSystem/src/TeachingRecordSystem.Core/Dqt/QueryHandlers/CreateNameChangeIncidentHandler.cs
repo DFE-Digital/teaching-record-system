@@ -13,9 +13,9 @@ public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChange
         _referenceDataCache = referenceDataCache;
     }
 
-    public async Task<(Guid IncidentId, string TicketNumber)> Execute(CreateNameChangeIncidentQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<(Guid IncidentId, string TicketNumber)> ExecuteAsync(CreateNameChangeIncidentQuery query, IOrganizationServiceAsync organizationService)
     {
-        var subject = await _referenceDataCache.GetSubjectByTitle("Change of Name");
+        var subject = await _referenceDataCache.GetSubjectByTitleAsync("Change of Name");
 
         var incident = new Incident()
         {
@@ -43,7 +43,7 @@ public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChange
             StatusCode = dfeta_document_StatusCode.Active
         };
 
-        var annotationBody = await StreamHelper.GetBase64EncodedFileContent(query.EvidenceFileContent);
+        var annotationBody = await StreamHelper.GetBase64EncodedFileContentAsync(query.EvidenceFileContent);
 
         var annotation = new Annotation()
         {
@@ -67,7 +67,7 @@ public class CreateNameChangeIncidentHandler : ICrmQueryHandler<CreateNameChange
                 ColumnSet = new(Incident.Fields.TicketNumber)
             });
         requestBuilder.AddRequest(new UpdateRequest() { Target = new Contact() { Id = query.ContactId, dfeta_AllowPiiUpdatesFromRegister = false } });
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         var ticketNumber = getIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;
         return (incident.Id, ticketNumber);

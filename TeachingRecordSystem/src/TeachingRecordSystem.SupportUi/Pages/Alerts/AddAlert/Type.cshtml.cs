@@ -37,7 +37,7 @@ public class TypeModel(
         AlertTypeId = JourneyInstance!.State.AlertTypeId;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -58,7 +58,7 @@ public class TypeModel(
             : linkGenerator.AlertAddDetails(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));
@@ -70,14 +70,14 @@ public class TypeModel(
 
         PersonName = personInfo.Name;
 
-        var alertTypes = await referenceDataCache.GetAlertTypes(activeOnly: true);
+        var alertTypes = await referenceDataCache.GetAlertTypesAsync(activeOnly: true);
         AlertTypes = await alertTypes
             .ToAsyncEnumerable()
             .WhereAwait(async t => (await authorizationService.AuthorizeForAlertTypeAsync(User, t.AlertTypeId, Permissions.Alerts.Write)) is { Succeeded: true })
             .Select(t => new AlertTypeInfo(t.AlertTypeId, t.AlertCategoryId, t.Name, t.DisplayOrder ?? int.MaxValue))
             .ToArrayAsync();
 
-        var categories = await referenceDataCache.GetAlertCategories();
+        var categories = await referenceDataCache.GetAlertCategoriesAsync();
         Categories = categories.Select(
             c => new AlertCategoryInfo(
                 c.Name,

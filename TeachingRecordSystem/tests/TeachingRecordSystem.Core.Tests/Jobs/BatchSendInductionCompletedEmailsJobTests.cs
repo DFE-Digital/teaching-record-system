@@ -97,7 +97,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         DateTime startActual = DateTime.MinValue;
         DateTime endActual = DateTime.MaxValue;
         dataverseAdapter
-            .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetInductionCompleteesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(new InductionCompletee[] { })
             .Callback<DateTime, DateTime>(
                 (start, end) =>
@@ -114,7 +114,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
             clock);
 
         // Act
-        await job.Execute(CancellationToken.None);
+        await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
         Assert.Equal(startExpected, startActual);
@@ -153,7 +153,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         var inductionCompletees = new[] { inductionCompletee1 };
 
         dataverseAdapter
-            .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetInductionCompleteesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(inductionCompletees);
 
         var job = new BatchSendInductionCompletedEmailsJob(
@@ -164,7 +164,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
             clock);
 
         // Act
-        await job.Execute(CancellationToken.None);
+        await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
         var jobItem = await dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(i => i.PersonId == inductionCompletee1.TeacherId);
@@ -175,7 +175,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         Assert.Equal(inductionCompletee1.LastName, jobItem.Personalization["last name"]);
 
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()), Times.Once);
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()), Times.Once);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         clock.UtcNow = today;
 
         dataverseAdapter
-            .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetInductionCompleteesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(new InductionCompletee[] { });
 
         var job = new BatchSendInductionCompletedEmailsJob(
@@ -210,14 +210,14 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
             clock);
 
         // Act
-        await job.Execute(CancellationToken.None);
+        await job.ExecuteAsync(CancellationToken.None);
 
         // Assert
         var jobInfo = await dbContext.InductionCompletedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
         Assert.NotNull(jobInfo);
 
         backgroundJobScheduler
-            .Verify(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()), Times.Never);
+            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()), Times.Never);
     }
 
     [Fact]
@@ -252,11 +252,11 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
         var inductionCompletees = new[] { inductionCompletee1 };
 
         dataverseAdapter
-            .Setup(d => d.GetInductionCompleteesForDateRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            .Setup(d => d.GetInductionCompleteesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
             .ReturnsAsyncEnumerable(inductionCompletees);
 
         backgroundJobScheduler
-            .Setup(s => s.Enqueue(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()))
+            .Setup(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<InductionCompletedEmailJobDispatcher, Task>>>()))
             .Throws<Exception>();
 
         var job = new BatchSendInductionCompletedEmailsJob(
@@ -267,7 +267,7 @@ public class BatchSendInductionCompletedEmailsJobTests : InductionCompletedEmail
             clock);
 
         // Act
-        await Assert.ThrowsAsync<Exception>(() => job.Execute(CancellationToken.None));
+        await Assert.ThrowsAsync<Exception>(() => job.ExecuteAsync(CancellationToken.None));
 
         // Assert
         var jobInfo = await dbContext.InductionCompletedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);

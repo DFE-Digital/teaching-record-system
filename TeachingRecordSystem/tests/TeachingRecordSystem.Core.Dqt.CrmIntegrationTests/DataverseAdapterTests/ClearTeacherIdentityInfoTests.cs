@@ -25,7 +25,7 @@ public class ClearTeacherIdentityInfoTests : IAsyncLifetime
     {
         // Arrange
         var identityUserId = Guid.NewGuid();
-        var trn = await _dataverseAdapter.GenerateTrn();
+        var trn = await _dataverseAdapter.GenerateTrnAsync();
         var updateTimeUtc = DateTime.UtcNow;
 
         var contactId = await _organizationService.CreateAsync(new Contact()
@@ -37,7 +37,7 @@ public class ClearTeacherIdentityInfoTests : IAsyncLifetime
         });
 
         // Act
-        await _dataverseAdapter.ClearTeacherIdentityInfo(identityUserId, updateTimeUtc);
+        await _dataverseAdapter.ClearTeacherIdentityInfoAsync(identityUserId, updateTimeUtc);
 
         // Assert
         var contact = (await _organizationService.RetrieveAsync(
@@ -57,7 +57,7 @@ public class ClearTeacherIdentityInfoTests : IAsyncLifetime
         var updateTimeUtc = DateTime.UtcNow;
 
         // Act
-        await _dataverseAdapter.ClearTeacherIdentityInfo(identityUserId, updateTimeUtc);
+        await _dataverseAdapter.ClearTeacherIdentityInfoAsync(identityUserId, updateTimeUtc);
 
         // Assert
     }

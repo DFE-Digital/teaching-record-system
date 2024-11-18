@@ -8,11 +8,11 @@ public record GetTrnRequestCommand(string RequestId);
 
 public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUserProvider currentUserProvider)
 {
-    public async Task<TrnRequestInfo?> Handle(GetTrnRequestCommand command)
+    public async Task<TrnRequestInfo?> HandleAsync(GetTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
         if (trnRequest is null)
         {
             return null;

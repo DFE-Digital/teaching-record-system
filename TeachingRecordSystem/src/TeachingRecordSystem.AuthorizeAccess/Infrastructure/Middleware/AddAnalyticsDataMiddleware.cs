@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
 
 public class AddAnalyticsDataMiddleware(IUserInstanceStateProvider userInstanceStateProvider, RequestDelegate next)
 {
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         var journeyInstance = await userInstanceStateProvider.GetSignInJourneyInstanceAsync(context);
         if (journeyInstance is not null && context.GetWebRequestEvent() is Event webRequestEvent)

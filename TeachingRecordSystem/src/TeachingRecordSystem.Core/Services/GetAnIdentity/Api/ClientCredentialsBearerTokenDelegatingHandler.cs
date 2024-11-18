@@ -24,13 +24,13 @@ public class ClientCredentialsBearerTokenDelegatingHandler : DelegatingHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        await EnsureToken();
+        await EnsureTokenAsync();
 
         request.SetBearerToken(_accessToken!);
         return await base.SendAsync(request, cancellationToken);
     }
 
-    private async Task EnsureToken()
+    private async Task EnsureTokenAsync()
     {
         if (_accessToken != null && _expiryTime > DateTime.UtcNow)
         {

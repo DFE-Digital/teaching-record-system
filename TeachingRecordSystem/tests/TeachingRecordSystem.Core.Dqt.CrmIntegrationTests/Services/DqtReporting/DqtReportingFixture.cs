@@ -35,10 +35,10 @@ public class DqtReportingFixture
     public Task PublishChangedItemsAndConsume(params IChangedItem[] changedItems) =>
         WithService(async (service, changesObserver) =>
         {
-            await service.LoadEntityMetadata();
+            await service.LoadEntityMetadataAsync();
 
             changesObserver.OnNext(changedItems);
-            var processTask = service.ProcessCrmChangesForEntityType(Contact.EntityLogicalName, CancellationToken.None);
+            var processTask = service.ProcessCrmChangesForEntityTypeAsync(Contact.EntityLogicalName, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
         });

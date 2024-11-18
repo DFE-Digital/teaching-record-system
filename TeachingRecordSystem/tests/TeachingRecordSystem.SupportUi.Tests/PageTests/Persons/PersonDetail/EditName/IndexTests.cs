@@ -28,7 +28,7 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestForNewJourney_PopulatesModelFromDqt()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-name");
 
@@ -37,8 +37,8 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var doc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var doc = await redirectResponse.GetDocumentAsync();
         Assert.Equal(person.FirstName, doc.GetElementById("FirstName")!.GetAttribute("value"));
         Assert.Equal(person.MiddleName, doc.GetElementById("MiddleName")!.GetAttribute("value"));
         Assert.Equal(person.LastName, doc.GetElementById("LastName")!.GetAttribute("value"));
@@ -48,11 +48,11 @@ public class IndexTests : TestBase
     public async Task Get_ValidRequestWithPopulatedDataInJourneyState_PopulatesModelFromJourneyState()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
         var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
         var newLastName = TestData.GenerateChangedLastName(person.LastName);
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditNameState()
             {
@@ -68,7 +68,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(newFirstName, doc.GetElementById("FirstName")!.GetAttribute("value"));
         Assert.Equal(newMiddleName, doc.GetElementById("MiddleName")!.GetAttribute("value"));
         Assert.Equal(newLastName, doc.GetElementById("LastName")!.GetAttribute("value"));
@@ -84,8 +84,8 @@ public class IndexTests : TestBase
         string expectedErrorMessage)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -101,18 +101,18 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, expectedErrorElementId, expectedErrorMessage);
+        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorElementId, expectedErrorMessage);
     }
 
     [Fact]
     public async Task Post_WithValidData_RedirectsToConfirmPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
+        var person = await TestData.CreatePersonAsync();
         var newFirstName = TestData.GenerateChangedFirstName(person.FirstName);
         var newMiddleName = TestData.GenerateChangedMiddleName(person.MiddleName);
         var newLastName = TestData.GenerateChangedLastName(person.LastName);
-        var journeyInstance = await CreateJourneyInstance(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-name?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -171,7 +171,7 @@ public class IndexTests : TestBase
         }
     };
 
-    private async Task<JourneyInstance<EditNameState>> CreateJourneyInstance(Guid personId, EditNameState? state = null) =>
+    private async Task<JourneyInstance<EditNameState>> CreateJourneyInstanceAsync(Guid personId, EditNameState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditName,
             state ?? new EditNameState(),

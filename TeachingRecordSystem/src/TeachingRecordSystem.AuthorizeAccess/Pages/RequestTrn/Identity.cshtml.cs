@@ -33,14 +33,14 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (EvidenceFileId is null && EvidenceFile is null)
         {
@@ -56,11 +56,11 @@ public class IdentityModel(AuthorizeAccessLinkGenerator linkGenerator, IFileServ
         {
             if (EvidenceFileId is not null)
             {
-                await fileService.DeleteFile(EvidenceFileId.Value);
+                await fileService.DeleteFileAsync(EvidenceFileId.Value);
             }
 
             using var stream = EvidenceFile.OpenReadStream();
-            var evidenceFileId = await fileService.UploadFile(stream, EvidenceFile.ContentType);
+            var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
             await JourneyInstance!.UpdateStateAsync(state =>
             {
                 state.EvidenceFileId = evidenceFileId;

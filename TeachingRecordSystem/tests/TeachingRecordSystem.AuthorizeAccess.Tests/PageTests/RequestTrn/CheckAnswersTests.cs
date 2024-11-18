@@ -251,7 +251,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.Email, doc.GetSummaryListValueForKey("Email"));
         Assert.Equal(state.Name, doc.GetSummaryListValueForKey("Name"));
         Assert.Equal(state.PreviousName, doc.GetSummaryListValueForKey("Previous name"));

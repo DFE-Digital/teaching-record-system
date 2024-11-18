@@ -60,6 +60,12 @@
           "Microsoft.EntityFrameworkCore.Relational": "8.0.8"
         }
       },
+      "Microsoft.VisualStudio.Threading.Analyzers": {
+        "type": "Direct",
+        "requested": "[17.12.19, )",
+        "resolved": "17.12.19",
+        "contentHash": "v3IYeedjoktvZ+GqYmLudxZJngmf/YWIxNT2Uy6QMMN19cvw+nkWoip1Gr1RtnFkUo1MPUVMis4C8Kj8d8DpSQ=="
+      },
       "prometheus-net.AspNetCore": {
         "type": "Direct",
         "requested": "[8.2.1, )",

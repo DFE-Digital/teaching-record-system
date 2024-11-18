@@ -21,14 +21,14 @@ public class EditDateOfBirthState : IRegisterJourney
     [MemberNotNullWhen(true, nameof(DateOfBirth))]
     public bool IsComplete => DateOfBirth.HasValue;
 
-    public async Task EnsureInitialized(ICrmQueryDispatcher crmQueryDispatcher, Guid personId)
+    public async Task EnsureInitializedAsync(ICrmQueryDispatcher crmQueryDispatcher, Guid personId)
     {
         if (Initialized)
         {
             return;
         }
 
-        var person = await crmQueryDispatcher.ExecuteQuery(
+        var person = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactDetailByIdQuery(
                 personId,
                 new ColumnSet(

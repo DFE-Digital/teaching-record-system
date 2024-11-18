@@ -34,15 +34,15 @@ public class IndexTests : TestBase
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
-        var createPersonResult = await TestData.CreatePerson(b => b
+        var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithTrn()
             .WithEmail(email)
             .WithMobileNumber(mobileNumber)
             .WithNationalInsuranceNumber());
 
-        await TestData.UpdatePerson(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
+        await TestData.UpdatePersonAsync(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
         await Task.Delay(2000);
-        await TestData.UpdatePerson(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
+        await TestData.UpdatePersonAsync(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
 
@@ -50,7 +50,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TextContent);
         Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetSummaryListValueForKey("Name"));
@@ -69,7 +69,7 @@ public class IndexTests : TestBase
     public async Task Get_WithPersonIdForExistingPersonWithMissingProperties_ReturnsExpectedContent()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(b => b.WithoutTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(b => b.WithoutTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
 
@@ -77,7 +77,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetElementByTestId("page-title")!.TextContent);
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", doc.GetSummaryListValueForKey("Name"));
@@ -92,7 +92,7 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasOpenAlert_ShowsAlertNotification()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithEndDate(null)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -101,7 +101,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.NotNull(doc.GetElementByTestId("OpenAlertNotification"));
     }
 
@@ -109,7 +109,7 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasNoAlert_DoesNotShowAlertNotification()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         Debug.Assert(person.Alerts.Count == 0);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -118,7 +118,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
     }
 
@@ -126,7 +126,7 @@ public class IndexTests : TestBase
     public async Task Get_PersonHasClosedAlertButNoOpenAlert_DoesNotShowAlertNotification()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a => a.WithStartDate(new DateOnly(2024, 1, 1)).WithEndDate(new DateOnly(2024, 10, 1))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
@@ -135,7 +135,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
     }
 }

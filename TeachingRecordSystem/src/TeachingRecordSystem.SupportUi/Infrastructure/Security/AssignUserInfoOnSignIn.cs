@@ -50,7 +50,7 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                 return;
             }
 
-            await SyncUserInfo();
+            await SyncUserInfoAsync();
 
             var claims = user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
                 .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
@@ -70,7 +70,7 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
 
             ctx.Principal = new ClaimsPrincipal(identityWithRoles);
 
-            async Task<Guid?> GetDqtUserId()
+            async Task<Guid?> GetDqtUserIdAsync()
             {
                 var organizationService = ctx.HttpContext.RequestServices.GetRequiredService<IOrganizationServiceAsync>();
 
@@ -88,7 +88,7 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                 return response.Entities.Single().Id;
             }
 
-            async Task SyncUserInfo()
+            async Task SyncUserInfoAsync()
             {
                 // The GraphServiceClient used within AadUserService needs HttpContext.User assigned so it can retrieve the access token;
                 // temporarily assign HttpContext.User for this service call then reset it when we're done.
@@ -99,10 +99,10 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                 try
                 {
                     var aadUserService = ctx.HttpContext.RequestServices.GetRequiredService<IAadUserService>();
-                    var azureAdUser = (await aadUserService.GetUserById(aadUserId))!;
+                    var azureAdUser = (await aadUserService.GetUserByIdAsync(aadUserId))!;
                     user.Email = azureAdUser.Email;
                     user.Name = azureAdUser.Name;
-                    user.DqtUserId ??= await GetDqtUserId();
+                    user.DqtUserId ??= await GetDqtUserIdAsync();
                     await dbContext.SaveChangesAsync();
                 }
                 finally

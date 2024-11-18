@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetNonOpenTaskAnnotationsHandler : IEnumerableCrmQueryHandler<GetNonOpenTaskAnnotationsQuery, Annotation[]>
 {
-    public async IAsyncEnumerable<Annotation[]> Execute(
+    public async IAsyncEnumerable<Annotation[]> ExecuteAsync(
         GetNonOpenTaskAnnotationsQuery query,
         IOrganizationServiceAsync organizationService,
         [EnumeratorCancellation] CancellationToken cancellationToken)

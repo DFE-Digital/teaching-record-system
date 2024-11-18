@@ -56,7 +56,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, request.RequestId);
+        var trnRequest = await _trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, request.RequestId);
 
         bool wasCreated;
         string trn;
@@ -79,7 +79,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             var firstName = firstAndMiddleNames[0];
             var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
-            var createTeacherResult = await _dataverseAdapter.CreateTeacher(new CreateTeacherCommand()
+            var createTeacherResult = await _dataverseAdapter.CreateTeacherAsync(new CreateTeacherCommand()
             {
                 FirstName = firstName,
                 MiddleName = middleName,
@@ -137,7 +137,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                 UnderNewOverseasRegulations = request.UnderNewOverseasRegulations,
                 SlugId = request.SlugId,
                 TrnRequestId = request.RequestId,
-                GetTrnToken = GetTrnToken,
+                GetTrnToken = GetTrnTokenAsync,
                 ApplicationUserId = currentApplicationUserId,
                 IdentityVerified = request.IdentityVerified,
                 OneLoginUserSubject = request.OneLoginUserSubject
@@ -153,7 +153,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             trnToken = createTeacherResult.TrnToken;
             qtsDate = request.QtsDate;
 
-            async Task<string> GetTrnToken(string trn)
+            async Task<string> GetTrnTokenAsync(string trn)
             {
                 if (request.QtsDate is not null && trn is not null)
                 {
@@ -163,7 +163,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
                         Email = request.EmailAddress
                     };
 
-                    var trnTokenResponse = await _identityApiClient.CreateTrnToken(trnTokenRequest);
+                    var trnTokenResponse = await _identityApiClient.CreateTrnTokenAsync(trnTokenRequest);
                     return trnTokenResponse.TrnToken;
                 }
 

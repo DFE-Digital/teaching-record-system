@@ -256,14 +256,14 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContent.ToString()));
         Mock.Get(tpsExtractStorageService)
-            .Setup(x => x.GetFile(filename, CancellationToken.None))
+            .Setup(x => x.GetFileAsync(filename, CancellationToken.None))
             .ReturnsAsync(stream);
 
         // Act
         var refresher = new TpsEstablishmentRefresher(
             tpsExtractStorageService,
             dbContextFactory);
-        await refresher.ImportFile(filename, CancellationToken.None);
+        await refresher.ImportFileAsync(filename, CancellationToken.None);
 
         // Assert
         using var dbContext = dbContextFactory.CreateDbContext();
@@ -293,8 +293,8 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         // Arrange
         var tpsExtractStorageService = Mock.Of<ITpsExtractStorageService>();
         var dbContextFactory = DbFixture.GetDbContextFactory();
-        var giasEstablishmentHackney = await TestData.CreateEstablishment(localAuthorityCode: KnownGiasLaCodeHackney, localAuthorityName: KnownGiasLaNameHackney, establishmentNumber: KnownGiasEstablishmentNumberHackney, establishmentName: KnownGiasEstablishmentNameHackney);
-        var giasEstablishmentCityOfLondon = await TestData.CreateEstablishment(localAuthorityCode: KnownGiasLaCodeCityOfLondon, localAuthorityName: KnownGiasLaNameCityOfLondon, establishmentNumber: KnownGiasEstablishmentNumberCityOfLondon, establishmentName: KnownGiasEstablishmentNameCityOfLondon);
+        var giasEstablishmentHackney = await TestData.CreateEstablishmentAsync(localAuthorityCode: KnownGiasLaCodeHackney, localAuthorityName: KnownGiasLaNameHackney, establishmentNumber: KnownGiasEstablishmentNumberHackney, establishmentName: KnownGiasEstablishmentNameHackney);
+        var giasEstablishmentCityOfLondon = await TestData.CreateEstablishmentAsync(localAuthorityCode: KnownGiasLaCodeCityOfLondon, localAuthorityName: KnownGiasLaNameCityOfLondon, establishmentNumber: KnownGiasEstablishmentNumberCityOfLondon, establishmentName: KnownGiasEstablishmentNameCityOfLondon);
 
         using var dbContext = dbContextFactory.CreateDbContext();
         foreach (var tpsEstablishment in scenarioData.TpsEstablishments)
@@ -307,7 +307,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
         var refresher = new TpsEstablishmentRefresher(
             tpsExtractStorageService,
             dbContextFactory);
-        await refresher.RefreshEstablishments(CancellationToken.None);
+        await refresher.RefreshEstablishmentsAsync(CancellationToken.None);
 
         // Assert
         var nonGiasEstablishments = await dbContext.Establishments
@@ -327,7 +327,7 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
 
     public Task InitializeAsync() => Task.CompletedTask;
 
-    public Task DisposeAsync() => DbFixture.DbHelper.ClearData();
+    public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();
 
     private DbFixture DbFixture { get; }
 

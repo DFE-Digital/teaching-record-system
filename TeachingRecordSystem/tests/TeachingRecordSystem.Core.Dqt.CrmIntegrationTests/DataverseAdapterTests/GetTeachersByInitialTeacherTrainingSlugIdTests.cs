@@ -29,7 +29,7 @@ public class GetTeachersByInitialTeacherTrainingSlugIdTests : IAsyncLifetime
         var slugId = Guid.NewGuid().ToString();
 
         // Act
-        var result = await _dataverseAdapter.GetTeachersByInitialTeacherTrainingSlugId(slugId, columnNames: new[] { Contact.Fields.dfeta_TRN }, null);
+        var result = await _dataverseAdapter.GetTeachersByInitialTeacherTrainingSlugIdAsync(slugId, columnNames: new[] { Contact.Fields.dfeta_TRN }, null);
 
         // Assert
         Assert.Empty(result);
@@ -46,7 +46,7 @@ public class GetTeachersByInitialTeacherTrainingSlugIdTests : IAsyncLifetime
         await _organizationService.CreateAsync(new dfeta_initialteachertraining() { dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacher2Id), dfeta_SlugId = slugId });
 
         // Act
-        var result = await _dataverseAdapter.GetTeachersByInitialTeacherTrainingSlugId(slugId, columnNames: new[] { Contact.Fields.dfeta_TRN }, null);
+        var result = await _dataverseAdapter.GetTeachersByInitialTeacherTrainingSlugIdAsync(slugId, columnNames: new[] { Contact.Fields.dfeta_TRN }, null);
 
         // Assert
         Assert.NotEmpty(result);

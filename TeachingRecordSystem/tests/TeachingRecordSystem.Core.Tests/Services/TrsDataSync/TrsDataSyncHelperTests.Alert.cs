@@ -12,35 +12,35 @@ public partial class TrsDataSyncHelperTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task SyncAlert_NewRecord_WritesNewRowToDb(bool personAlreadySynced)
+    public async Task SyncAlertAsync_NewRecord_WritesNewRowToDb(bool personAlreadySynced)
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn().WithSyncOverride(personAlreadySynced));
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithSyncOverride(personAlreadySynced));
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
 
         // Act
-        await Helper.SyncAlert(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         await AssertDatabaseAlertMatchesEntity(entity);
     }
 
     [Fact]
-    public async Task SyncAlert_SanctionCodeIsRedundant_IsNotWrittenToDb()
+    public async Task SyncAlertAsync_SanctionCodeIsRedundant_IsNotWrittenToDb()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection, redundantType: true);
 
         // Act
-        await Helper.SyncAlert(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(entity, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var alert = await dbContext.Alerts.SingleOrDefaultAsync(p => p.DqtSanctionId == entity.Id);
             Assert.Null(alert);
@@ -48,22 +48,22 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncAlert_WithDeactivatedEvent_SetsDeletedOnAttribute()
+    public async Task SyncAlertAsync_WithDeactivatedEvent_SetsDeletedOnAttribute()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn().WithSyncOverride(false));
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithSyncOverride(false));
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(qualificationId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, dfeta_sanction.EntityLogicalName, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedEntityVersionAsync(entity, dfeta_sanction.EntityLogicalName, auditDetailCollection);
 
         // Act
-        await Helper.SyncAlert(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var mq = await dbContext.Alerts.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtSanctionId == qualificationId);
             Assert.NotNull(mq);
@@ -72,16 +72,16 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncAlert_WithDqtCreateAudit_CreatesExpectedEvents()
+    public async Task SyncAlertAsync_WithDqtCreateAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var qualificationId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(qualificationId, person.ContactId, auditDetailCollection, addCreateAudit: true);
 
         // Act
-        await Helper.SyncAlert(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForAlert(qualificationId);
@@ -92,7 +92,7 @@ public partial class TrsDataSyncHelperTests
             {
                 var createdEvent = Assert.IsType<AlertCreatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserId(), createdEvent.RaisedBy.DqtUserId);
+                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), createdEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, createdEvent.PersonId);
                 await AssertAlertEventMatchesEntity(initialVersion, createdEvent.Alert, expectMigrationMappingsApplied: false);
             },
@@ -108,16 +108,16 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncAlert_WithNoDqtAudit_CreatesExpectedEvents()
+    public async Task SyncAlertAsync_WithNoDqtAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection, addCreateAudit: false);
 
         // Act
-        await Helper.SyncAlert(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(initialVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForAlert(alertId);
@@ -128,7 +128,7 @@ public partial class TrsDataSyncHelperTests
             {
                 var migatedEvent = Assert.IsType<AlertDqtImportedEvent>(e);
                 Assert.Equal(Clock.UtcNow, migatedEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserId(), migatedEvent.RaisedBy.DqtUserId);
+                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), migatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, migatedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(initialVersion, migatedEvent.Alert, expectMigrationMappingsApplied: false);
             },
@@ -144,7 +144,7 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncAlert_WithNoDqtCreateButWithUpdateAudits_CreatesExpectedEvents()
+    public async Task SyncAlertAsync_WithNoDqtCreateButWithUpdateAudits_CreatesExpectedEvents()
     {
         // Many migrated records in DQT don't have a 'Create' audit record, since auditing was turned on after migration.
         // In that case, TrsDataSyncHelper will take the current version and 'un-apply' every Update audit in reverse,
@@ -154,7 +154,7 @@ public partial class TrsDataSyncHelperTests
         // be reconstructed from multiple Update audits.
 
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection, addCreateAudit: false);
@@ -167,7 +167,7 @@ public partial class TrsDataSyncHelperTests
         var updatedVersion = await CreateUpdatedAlertEntityVersion(intermediateVersion, auditDetailCollection, changes: AlertUpdatedEventChanges.Details);
 
         // Act
-        await Helper.SyncAlert(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForAlert(alertId);
@@ -178,7 +178,7 @@ public partial class TrsDataSyncHelperTests
             {
                 var importedEvent = Assert.IsType<AlertDqtImportedEvent>(e);
                 Assert.Equal(created, importedEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserId(), importedEvent.RaisedBy.DqtUserId);
+                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), importedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, importedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(initialVersion, importedEvent.Alert, expectMigrationMappingsApplied: false);
             },
@@ -206,10 +206,10 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact(Skip = "Flaky on CI")]
-    public async Task SyncAlert_WithDqtUpdateAudit_CreatesExpectedEvents()
+    public async Task SyncAlertAsync_WithDqtUpdateAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var initialVersion = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
@@ -218,7 +218,7 @@ public partial class TrsDataSyncHelperTests
         var updatedVersion = await CreateUpdatedAlertEntityVersion(initialVersion, auditDetailCollection);
 
         // Act
-        await Helper.SyncAlert(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(updatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForAlert(alertId);
@@ -235,7 +235,7 @@ public partial class TrsDataSyncHelperTests
             {
                 var updatedEvent = Assert.IsType<AlertUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserId(), updatedEvent.RaisedBy.DqtUserId);
+                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), updatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, updatedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(updatedVersion, updatedEvent.Alert, expectMigrationMappingsApplied: false);
                 Assert.Equal(GetChanges(initialVersion, updatedVersion), updatedEvent.Changes);
@@ -252,22 +252,22 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncAlert_WithDqtDeactivatedAudit_CreatesExpectedEvent()
+    public async Task SyncAlertAsync_WithDqtDeactivatedAudit_CreatesExpectedEvent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, dfeta_sanction.EntityLogicalName, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedEntityVersionAsync(entity, dfeta_sanction.EntityLogicalName, auditDetailCollection);
 
         // Act
-        await Helper.SyncAlert(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(deactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var alert = await dbContext.Alerts.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtSanctionId == alertId);
             Assert.NotNull(alert);
@@ -276,22 +276,22 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncAlert_WithDqtReactivatedAudit_CreatesExpectedEvents()
+    public async Task SyncAlertAsync_WithDqtReactivatedAudit_CreatesExpectedEvents()
     {
         // Arrange
-        var person = await TestData.CreatePerson(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var alertId = Guid.NewGuid();
         var auditDetailCollection = new AuditDetailCollection();
         var entity = await CreateNewAlertEntityVersion(alertId, person.ContactId, auditDetailCollection);
 
         Clock.Advance();
-        var deactivatedVersion = await CreateDeactivatedEntityVersion(entity, dfeta_sanction.EntityLogicalName, auditDetailCollection);
+        var deactivatedVersion = await CreateDeactivatedEntityVersionAsync(entity, dfeta_sanction.EntityLogicalName, auditDetailCollection);
 
         Clock.Advance();
-        var reactivatedVersion = await CreateReactivatedEntityVersion(deactivatedVersion, dfeta_sanction.EntityLogicalName, auditDetailCollection);
+        var reactivatedVersion = await CreateReactivatedEntityVersionAsync(deactivatedVersion, dfeta_sanction.EntityLogicalName, auditDetailCollection);
 
         // Act
-        await Helper.SyncAlert(reactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
+        await Helper.SyncAlertAsync(reactivatedVersion, auditDetailCollection, ignoreInvalid: false, createMigratedEvent: true);
 
         // Assert
         var events = await GetEventsForAlert(alertId);
@@ -312,7 +312,7 @@ public partial class TrsDataSyncHelperTests
             {
                 var reactivatedEvent = Assert.IsType<AlertDqtReactivatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, reactivatedEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserId(), reactivatedEvent.RaisedBy.DqtUserId);
+                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), reactivatedEvent.RaisedBy.DqtUserId);
                 Assert.Equal(person.PersonId, reactivatedEvent.PersonId);
                 await AssertAlertEventMatchesEntity(reactivatedVersion, reactivatedEvent.Alert, expectMigrationMappingsApplied: false);
             },
@@ -335,9 +335,9 @@ public partial class TrsDataSyncHelperTests
     {
         Debug.Assert(auditDetailCollection.Count == 0);
 
-        var sanctionCodes = await TestData.ReferenceDataCache.GetSanctionCodes(activeOnly: false);
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
-        var currentDqtUser = await TestData.GetCurrentCrmUser();
+        var sanctionCodes = await TestData.ReferenceDataCache.GetSanctionCodesAsync(activeOnly: false);
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
+        var currentDqtUser = await TestData.GetCurrentCrmUserAsync();
 
         var createdOn = Clock.UtcNow;
         var modifiedOn = Clock.UtcNow;
@@ -407,8 +407,8 @@ public partial class TrsDataSyncHelperTests
         bool ChangeRequested(AlertUpdatedEventChanges field) =>
             changes is null || changes.Value.HasFlag(field);
 
-        var sanctionCodes = await TestData.ReferenceDataCache.GetSanctionCodes(activeOnly: false);
-        var currentDqtUser = await TestData.GetCurrentCrmUser();
+        var sanctionCodes = await TestData.ReferenceDataCache.GetSanctionCodesAsync(activeOnly: false);
+        var currentDqtUser = await TestData.GetCurrentCrmUserAsync();
 
         var existingExternalLink = existingSanction.dfeta_DetailsLink;
 
@@ -532,10 +532,10 @@ public partial class TrsDataSyncHelperTests
 
     private async Task AssertDatabaseAlertMatchesEntity(dfeta_sanction entity)
     {
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var sanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeById(entity.dfeta_SanctionCodeId.Id);
-            var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+            var sanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByIdAsync(entity.dfeta_SanctionCodeId.Id);
+            var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
             var expectedAlertType = alertTypes.Single(t => t.DqtSanctionCode == sanctionCode.dfeta_Value);
 
             var alert = await dbContext.Alerts.SingleOrDefaultAsync(p => p.DqtSanctionId == entity.Id);
@@ -572,8 +572,8 @@ public partial class TrsDataSyncHelperTests
             Assert.Null(eventModel.DqtSpent);
             Assert.Null(eventModel.DqtSanctionCode);
 
-            var sanctionCodes = await TestData.ReferenceDataCache.GetSanctionCodes(activeOnly: false);
-            var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+            var sanctionCodes = await TestData.ReferenceDataCache.GetSanctionCodesAsync(activeOnly: false);
+            var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
 
             var expectedAlertTypeId = entity.dfeta_SanctionCodeId?.Id is Guid sanctionCodeId ?
                 alertTypes.SingleOrDefault(t => t.DqtSanctionCode == sanctionCodes.Single(sc => sc.Id == sanctionCodeId).dfeta_Value)?.AlertTypeId :
@@ -589,7 +589,7 @@ public partial class TrsDataSyncHelperTests
     }
 
     private Task<EventBase[]> GetEventsForAlert(Guid alertId) =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             var results = await dbContext.Database.SqlQuery<AlertEventQueryResult>(
                 $"""

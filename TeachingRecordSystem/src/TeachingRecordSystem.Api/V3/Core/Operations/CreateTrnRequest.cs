@@ -37,11 +37,11 @@ public class CreateTrnRequestHandler(
     MessageSerializer messageSerializer,
     IClock clock)
 {
-    public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
+    public async Task<TrnRequestInfo> HandleAsync(CreateTrnRequestCommand command)
     {
         var (currentApplicationUserId, currentApplicationUserName) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
         {
             throw new ErrorException(ErrorRegistry.CannotResubmitRequest());
@@ -65,7 +65,7 @@ public class CreateTrnRequestHandler(
                 .ToArrayAsync() :
             [];
 
-        var potentialDuplicates = (await crmQueryDispatcher.ExecuteQuery(
+        var potentialDuplicates = (await crmQueryDispatcher.ExecuteQueryAsync(
             new FindPotentialDuplicateContactsQuery()
             {
                 FirstNames = firstNameSynonyms.Append(firstName),
@@ -107,7 +107,7 @@ public class CreateTrnRequestHandler(
         string? trn = null;
         if (potentialDuplicates.Count == 0)
         {
-            trn = await trnGenerationApiClient.GenerateTrn();
+            trn = await trnGenerationApiClient.GenerateTrnAsync();
         }
 
         var potentialDuplicatePersonIds = potentialDuplicates.Select(d => d.ContactId).ToList();
@@ -135,7 +135,7 @@ public class CreateTrnRequestHandler(
             }));
         }
 
-        await crmQueryDispatcher.ExecuteQuery(new CreateContactQuery()
+        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,

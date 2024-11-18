@@ -13,9 +13,9 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task AddMq()
     {
-        var person = await TestData.CreatePerson();
-        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValue("Hearing");
+        var person = await TestData.CreatePersonAsync();
+        var mqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("959"); // University of Leeds
+        var specialism = await TestData.ReferenceDataCache.GetMqSpecialismByValueAsync("Hearing");
         var startDate = new DateOnly(2021, 3, 1);
         var result = dfeta_qualification_dfeta_MQ_Status.Passed;
         var endDate = new DateOnly(2021, 11, 5);
@@ -24,76 +24,76 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonQualificationsPage(personId);
+        await page.GoToPersonQualificationsPageAsync(personId);
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.ClickButton("Add a mandatory qualification");
+        await page.ClickButtonAsync("Add a mandatory qualification");
 
-        await page.AssertOnAddMqProviderPage();
+        await page.AssertOnAddMqProviderPageAsync();
 
         await page.FillAsync($"label:text-is('Training provider')", mqEstablishment.dfeta_name);
 
         await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddMqSpecialismPage();
+        await page.AssertOnAddMqSpecialismPageAsync();
 
         await page.CheckAsync($"label:text-is('{specialism.dfeta_name}')");
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddMqStartDatePage();
+        await page.AssertOnAddMqStartDatePageAsync();
 
-        await page.FillDateInput(startDate);
+        await page.FillDateInputAsync(startDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddMqStatusPage();
+        await page.AssertOnAddMqStatusPageAsync();
 
         await page.CheckAsync($"label:text-is('{result}')");
 
-        await page.FillDateInput(endDate);
+        await page.FillDateInputAsync(endDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnAddMqCheckAnswersPage();
+        await page.AssertOnAddMqCheckAnswersPageAsync();
 
-        await page.ClickButton("Confirm mandatory qualification");
+        await page.ClickButtonAsync("Confirm mandatory qualification");
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.AssertFlashMessage("Mandatory qualification added");
+        await page.AssertFlashMessageAsync("Mandatory qualification added");
     }
 
     [Fact]
     public async Task EditMqProvider()
     {
-        var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("959"); // University of Leeds
-        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("961"); // University of Manchester
+        var oldMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("959"); // University of Leeds
+        var newMqEstablishment = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("961"); // University of Manchester
         var changeReason = MqChangeProviderReasonOption.ChangeOfTrainingProvider;
         var changeReasonDetail = "My change reason detail";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonQualificationsPage(person.PersonId);
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
 
-        await page.AssertOnPersonQualificationsPage(person.PersonId);
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
 
-        await page.ClickLinkForElementWithTestId($"provider-change-link-{qualificationId}");
+        await page.ClickLinkForElementWithTestIdAsync($"provider-change-link-{qualificationId}");
 
-        await page.AssertOnEditMqProviderPage(qualificationId);
+        await page.AssertOnEditMqProviderPageAsync(qualificationId);
 
         await page.FillAsync($"label:text-is('Training provider')", newMqEstablishment.dfeta_name);
 
         await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqProviderReasonPage(qualificationId);
+        await page.AssertOnEditMqProviderReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
 
@@ -110,15 +110,15 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Buffer = TestCommon.TestData.JpegImage
             });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqProviderConfirmPage(qualificationId);
+        await page.AssertOnEditMqProviderConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.AssertFlashMessage("Mandatory qualification changed");
+        await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
     [Fact]
@@ -128,28 +128,28 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newSpecialism = MandatoryQualificationSpecialism.Visual;
         var changeReason = MqChangeSpecialismReasonOption.ChangeOfSpecialism;
         var changeReasonDetail = "My change reason detail";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonQualificationsPage(person.PersonId);
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
 
-        await page.AssertOnPersonQualificationsPage(person.PersonId);
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
 
-        await page.ClickLinkForElementWithTestId($"specialism-change-link-{qualificationId}");
+        await page.ClickLinkForElementWithTestIdAsync($"specialism-change-link-{qualificationId}");
 
-        await page.AssertOnEditMqSpecialismPage(qualificationId);
+        await page.AssertOnEditMqSpecialismPageAsync(qualificationId);
 
         await page.IsCheckedAsync($"label:text-is('{oldSpecialism.GetTitle()}')");
 
         await page.CheckAsync($"label:text-is('{newSpecialism.GetTitle()}')");
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqSpecialismReasonPage(qualificationId);
+        await page.AssertOnEditMqSpecialismReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
 
@@ -166,15 +166,15 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Buffer = TestCommon.TestData.JpegImage
             });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqSpecialismConfirmPage(qualificationId);
+        await page.AssertOnEditMqSpecialismConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.AssertFlashMessage("Mandatory qualification changed");
+        await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
     [Fact]
@@ -184,26 +184,26 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStartDate = new DateOnly(2021, 10, 6);
         var changeReason = MqChangeStartDateReasonOption.ChangeOfStartDate;
         var changeReasonDetail = "My change reason detail";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStartDate(oldStartDate)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonQualificationsPage(person.PersonId);
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
 
-        await page.AssertOnPersonQualificationsPage(person.PersonId);
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
 
-        await page.ClickLinkForElementWithTestId($"start-date-change-link-{qualificationId}");
+        await page.ClickLinkForElementWithTestIdAsync($"start-date-change-link-{qualificationId}");
 
-        await page.AssertOnEditMqStartDatePage(qualificationId);
+        await page.AssertOnEditMqStartDatePageAsync(qualificationId);
 
-        await page.FillDateInput(newStartDate);
+        await page.FillDateInputAsync(newStartDate);
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqStartDateReasonPage(qualificationId);
+        await page.AssertOnEditMqStartDateReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
 
@@ -220,15 +220,15 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Buffer = TestCommon.TestData.JpegImage
             });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqStartDateConfirmPage(qualificationId);
+        await page.AssertOnEditMqStartDateConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.AssertFlashMessage("Mandatory qualification changed");
+        await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
     [Theory]
@@ -274,20 +274,20 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
 
         var changeReasonDetail = "My change reason detail";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonQualificationsPage(person.PersonId);
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
 
-        await page.AssertOnPersonQualificationsPage(person.PersonId);
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
 
-        await page.ClickLinkForElementWithTestId($"status-change-link-{qualificationId}");
+        await page.ClickLinkForElementWithTestIdAsync($"status-change-link-{qualificationId}");
 
-        await page.AssertOnEditMqStatusPage(qualificationId);
+        await page.AssertOnEditMqStatusPageAsync(qualificationId);
 
         if (isStatusChange)
         {
@@ -298,12 +298,12 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isEndDateChange)
         {
-            await page.FillDateInput(newEndDate!.Value);
+            await page.FillDateInputAsync(newEndDate!.Value);
         }
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqStatusReasonPage(qualificationId);
+        await page.AssertOnEditMqStatusReasonPageAsync(qualificationId);
 
         await page.CheckAsync($"label:text-is('{changeReason}')");
 
@@ -320,15 +320,15 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
                Buffer = TestCommon.TestData.JpegImage
            });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditMqStatusConfirmPage(qualificationId);
+        await page.AssertOnEditMqStatusConfirmPageAsync(qualificationId);
 
-        await page.ClickConfirmChangeButton();
+        await page.ClickConfirmChangeButtonAsync();
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.AssertFlashMessage("Mandatory qualification changed");
+        await page.AssertFlashMessageAsync("Mandatory qualification changed");
     }
 
     [Fact]
@@ -336,20 +336,20 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         var deletionReason = MqDeletionReasonOption.ProviderRequest;
         var deletionReasonDetail = "My deletion reason detail";
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var personId = person.PersonId;
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToPersonQualificationsPage(person.PersonId);
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
 
-        await page.AssertOnPersonQualificationsPage(person.PersonId);
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
 
-        await page.ClickLinkForElementWithTestId($"delete-link-{qualificationId}");
+        await page.ClickLinkForElementWithTestIdAsync($"delete-link-{qualificationId}");
 
-        await page.AssertOnDeleteMqPage(qualificationId);
+        await page.AssertOnDeleteMqPageAsync(qualificationId);
 
         await page.CheckAsync($"label:text-is('{deletionReason.GetDisplayName()}')");
 
@@ -366,14 +366,14 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Buffer = TestCommon.TestData.JpegImage
             });
 
-        await page.ClickContinueButton();
+        await page.ClickContinueButtonAsync();
 
-        await page.AssertOnDeleteMqConfirmPage(qualificationId);
+        await page.AssertOnDeleteMqConfirmPageAsync(qualificationId);
 
-        await page.ClickButton("Delete qualification");
+        await page.ClickButtonAsync("Delete qualification");
 
-        await page.AssertOnPersonQualificationsPage(personId);
+        await page.AssertOnPersonQualificationsPageAsync(personId);
 
-        await page.AssertFlashMessage("Mandatory qualification deleted");
+        await page.AssertFlashMessageAsync("Mandatory qualification deleted");
     }
 }

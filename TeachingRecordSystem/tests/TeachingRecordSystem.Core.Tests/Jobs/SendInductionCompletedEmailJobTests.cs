@@ -70,7 +70,7 @@ public class SendInductionCompletedEmailJobTests : InductionCompletedEmailJobTes
         };
 
         getAnIdentityApiClient
-            .Setup(i => i.CreateTrnToken(It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
+            .Setup(i => i.CreateTrnTokenAsync(It.Is<CreateTrnTokenRequest>(r => r.Trn == trn && r.Email == emailAddress)))
             .ReturnsAsync(tokenResponse);
 
         var job = new SendInductionCompletedEmailJob(
@@ -81,11 +81,11 @@ public class SendInductionCompletedEmailJobTests : InductionCompletedEmailJobTes
             clock);
 
         // Act
-        await job.Execute(inductionCompletedEmailsJobId, personId);
+        await job.ExecuteAsync(inductionCompletedEmailsJobId, personId);
 
         // Assert
         notificationSender
-            .Verify(n => n.SendEmail(It.IsAny<string>(), It.Is<string>(s => s == emailAddress), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
+            .Verify(n => n.SendEmailAsync(It.IsAny<string>(), It.Is<string>(s => s == emailAddress), It.IsAny<IReadOnlyDictionary<string, string>>()), Times.Once);
 
         var updatedJobItem = await dbContext.InductionCompletedEmailsJobItems.SingleOrDefaultAsync(i => i.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && i.PersonId == personId);
         Assert.NotNull(updatedJobItem);

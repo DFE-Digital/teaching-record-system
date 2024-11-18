@@ -17,7 +17,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
 
     public async Task DisposeAsync() => await _dataScope.DisposeAsync();
 
-    public Task InitializeAsync() => DbFixture.DbHelper.EnsureSchema();
+    public Task InitializeAsync() => DbFixture.DbHelper.EnsureSchemaAsync();
 
     [Fact]
     public async Task WhenCalled_WithContactIdForNonExistentContact_ReturnsNullInductionAndInductionPeriods()
@@ -26,7 +26,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         var nonExistentContactId = Guid.NewGuid();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveInductionByContactIdQuery(nonExistentContactId));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveInductionByContactIdQuery(nonExistentContactId));
 
         // Assert
         Assert.Null(result.Induction);
@@ -37,14 +37,14 @@ public class GetInductionByContactIdTests : IAsyncLifetime
     public async Task WhenCalled_WithContactWithInduction_ReturnsResultWithInductionAndNullInductionPeriods()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(new DateOnly(2021, 01, 1));
             x.WithDqtInduction(inductionStatus: dfeta_InductionStatus.Pass, inductionExemptionReason: null, null, null, null, null, null);
         });
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveInductionByContactIdQuery(createPersonResult.ContactId));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveInductionByContactIdQuery(createPersonResult.ContactId));
 
         // Assert
         Assert.NotNull(result.Induction);
@@ -57,19 +57,19 @@ public class GetInductionByContactIdTests : IAsyncLifetime
     {
         // Arrange
         var postcode = Faker.Address.UkPostCode();
-        var establishment1 = await _dataScope.TestData.CreateAccount(x =>
+        var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeAccountName");
         });
 
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(new DateOnly(2021, 01, 1));
             x.WithDqtInduction(inductionStatus: dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionPeriodStartDate: new DateOnly(2021, 01, 01), completedDate: new DateOnly(2022, 01, 01), inductionStartDate: new DateOnly(2021, 01, 01), inductionPeriodEndDate: new DateOnly(2022, 01, 01), appropriateBodyOrgId: establishment1.AccountId);
         });
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveInductionByContactIdQuery(createPersonResult.ContactId));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveInductionByContactIdQuery(createPersonResult.ContactId));
 
         // Assert
         Assert.NotNull(result.Induction);
@@ -99,12 +99,12 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         // Arrange
         var qtlsDate = DateOnly.Parse(qtls);
         var postcode = Faker.Address.UkPostCode();
-        var establishment1 = await _dataScope.TestData.CreateAccount(x =>
+        var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeAccountName");
         });
 
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(new DateOnly(2021, 01, 1));
             x.WithQtlsDate(qtlsDate);
@@ -112,7 +112,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         });
 
         // Act
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_qtlsdate)));
@@ -129,12 +129,12 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         // Arrange
         var qtlsDate = DateOnly.Parse("01/01/2021");
         var postcode = Faker.Address.UkPostCode();
-        var establishment1 = await _dataScope.TestData.CreateAccount(x =>
+        var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeAccountName");
         });
 
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
 
             x.WithQtlsDate(qtlsDate);
@@ -142,7 +142,7 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         });
 
         // Act
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_qtlsdate)));
@@ -167,19 +167,19 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         // Arrange
         var qtlsDate = DateOnly.Parse("01/01/2021");
         var postcode = Faker.Address.UkPostCode();
-        var establishment1 = await _dataScope.TestData.CreateAccount(x =>
+        var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeAccountName");
         });
 
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQts(qtlsDate);
             x.WithDqtInduction(inductionStatus, exemptionReason, null, null, null, null, null);
         });
 
         // Act
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_qtlsdate)));
@@ -194,15 +194,15 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         // Arrange
         var qtlsDate = DateOnly.Parse("01/01/2021");
         var postcode = Faker.Address.UkPostCode();
-        var establishment1 = await _dataScope.TestData.CreateAccount(x =>
+        var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeAccountName");
         });
 
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
 
         // Act
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_qtlsdate)));
@@ -219,18 +219,18 @@ public class GetInductionByContactIdTests : IAsyncLifetime
         // Arrange
         var qtlsDate = DateOnly.Parse("01/01/2021");
         var postcode = Faker.Address.UkPostCode();
-        var establishment1 = await _dataScope.TestData.CreateAccount(x =>
+        var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeAccountName");
         });
 
-        var createPersonResult = await _dataScope.TestData.CreatePerson(x =>
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
             x.WithQtlsDate(qtlsDate);
         });
 
         // Act
-        var person = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
+        var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_QTSDate,
                     Contact.Fields.dfeta_qtlsdate)));

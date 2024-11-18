@@ -22,7 +22,7 @@ public class GetDocumentByIdTests : IAsyncLifetime
         var nonExistentDocumentId = Guid.NewGuid();
 
         // Act
-        var document = await _crmQueryDispatcher.ExecuteQuery(new GetDocumentByIdQuery(nonExistentDocumentId));
+        var document = await _crmQueryDispatcher.ExecuteQueryAsync(new GetDocumentByIdQuery(nonExistentDocumentId));
 
         // Assert
         Assert.Null(document);
@@ -32,12 +32,12 @@ public class GetDocumentByIdTests : IAsyncLifetime
     public async Task WhenCalled_WithDocumentIdForExistingDocument_ReturnsDocument()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
         var documentId = createNameChangeIncidentResult.Evidence[0].DocumentId;
 
         // Act
-        var document = await _crmQueryDispatcher.ExecuteQuery(new GetDocumentByIdQuery(documentId));
+        var document = await _crmQueryDispatcher.ExecuteQueryAsync(new GetDocumentByIdQuery(documentId));
 
         // Assert
         Assert.NotNull(document);

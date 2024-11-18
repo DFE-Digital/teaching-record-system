@@ -33,9 +33,9 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
     PreviousNameHelper previousNameHelper,
     ReferenceDataCache referenceDataCache)
 {
-    public async Task<FindPersonsByTrnAndDateOfBirthResult> Handle(FindPersonsByTrnAndDateOfBirthCommand command)
+    public async Task<FindPersonsByTrnAndDateOfBirthResult> HandleAsync(FindPersonsByTrnAndDateOfBirthCommand command)
     {
-        var contacts = await crmQueryDispatcher.ExecuteQuery(
+        var contacts = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactsByTrnsQuery(
                 command.Persons.Select(p => p.Trn).Where(trn => !string.IsNullOrEmpty(trn)).Distinct(),
                 new ColumnSet(
@@ -66,9 +66,9 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
             .GroupBy(a => a.PersonId)
             .ToDictionaryAsync(a => a.Key, a => a.ToArray());
 
-        var getPreviousNamesTask = crmQueryDispatcher.ExecuteQuery(new GetPreviousNamesByContactIdsQuery(contactsById.Keys));
+        var getPreviousNamesTask = crmQueryDispatcher.ExecuteQueryAsync(new GetPreviousNamesByContactIdsQuery(contactsById.Keys));
 
-        var getQtsRegistrationsTask = crmQueryDispatcher.ExecuteQuery(
+        var getQtsRegistrationsTask = crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveQtsRegistrationsByContactIdsQuery(
                 contactsById.Keys,
                 new ColumnSet(
@@ -143,8 +143,8 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
                             StatusDescription = inductionStatus.GetDescription()
                         } :
                         null,
-                    Qts = await QtsInfo.Create(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache),
-                    Eyts = await EytsInfo.Create(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_EYTSDate is not null), referenceDataCache),
+                    Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache),
+                    Eyts = await EytsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_EYTSDate is not null), referenceDataCache),
                 })
                 .OrderBy(c => c.Trn)
                 .ToArrayAsync());

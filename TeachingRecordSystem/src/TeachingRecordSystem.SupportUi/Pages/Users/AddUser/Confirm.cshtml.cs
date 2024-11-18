@@ -52,7 +52,7 @@ public class ConfirmModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var roles = Roles ?? [];
 
@@ -96,7 +96,7 @@ public class ConfirmModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await userService.GetUserById(UserId!);
+        _user = await userService.GetUserByIdAsync(UserId!);
 
         if (_user is null)
         {
@@ -109,7 +109,7 @@ public class ConfirmModel(
 
         if (AzureAdUserId is not null)
         {
-            var crmUserInfo = await crmQueryDispatcher.ExecuteQuery(
+            var crmUserInfo = await crmQueryDispatcher.ExecuteQueryAsync(
                 new GetSystemUserByAzureActiveDirectoryObjectIdQuery(AzureAdUserId));
 
             if (crmUserInfo is not null)

@@ -36,7 +36,7 @@ public sealed class TestableCrmEntityChangesService : ICrmEntityChangesService, 
         return _entityTypeSubjects.GetOrAdd(entityLogicalName, _ => new System.Reactive.Subjects.ReplaySubject<IChangedItem[]>());
     }
 
-    public IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
+    public IAsyncEnumerable<IChangedItem[]> GetEntityChangesAsync(
         string changesKey,
         string entityLogicalName,
         ColumnSet columns,

@@ -10,7 +10,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/add?applicationUserId={applicationUser.UserId}");
 
@@ -25,7 +25,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ApplicationUserDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var applicationUserId = await TestData.CreateApplicationUser();
+        var applicationUserId = await TestData.CreateApplicationUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/add?applicationUserId={applicationUserId}");
 
@@ -40,7 +40,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/api-keys/add?applicationUserId={applicationUser.UserId}");
 
@@ -48,7 +48,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var key = new string('a', 20);
 
@@ -103,7 +103,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_KeyIsTooLong_RendersErrorMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var key = new string('a', ApiKey.KeyMaxLength + 1);
 
@@ -119,14 +119,14 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Key", "Key must be 100 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key must be 100 characters or less");
     }
 
     [Fact]
     public async Task Post_KeyIsTooShort_RendersErrorMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var key = new string('a', ApiKey.KeyMinLength - 1);
 
@@ -142,15 +142,15 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Key", "Key must be at least 16 characters");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key must be at least 16 characters");
     }
 
     [Fact]
     public async Task Post_KeyAlreadyExists_RendersErrorMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
-        var anotherKey = await TestData.CreateApiKey(applicationUser.UserId);
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var anotherKey = await TestData.CreateApiKeyAsync(applicationUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/api-keys/add?applicationUserId={applicationUser.UserId}")
         {
@@ -164,14 +164,14 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Key", "Key is already in use");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Key", "Key is already in use");
     }
 
     [Fact]
     public async Task Post_ValidRequest_CreatesApiKeyCreatesEventAndRedirectsToApplicationUserWithFlashMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var key = new string('a', 20);
 
@@ -215,8 +215,8 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Assert.Equal(apiKey.Expires, apiKeyCreatedEvent.ApiKey.Expires);
             });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "API key added");
     }
 }

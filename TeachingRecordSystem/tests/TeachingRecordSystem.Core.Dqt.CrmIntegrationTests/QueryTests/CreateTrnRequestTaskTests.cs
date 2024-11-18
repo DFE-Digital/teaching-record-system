@@ -36,7 +36,7 @@ public class CreateTrnRequestTaskTests : IAsyncLifetime
         };
 
         // Act
-        var crmTaskId = await _crmQueryDispatcher.ExecuteQuery(query);
+        var crmTaskId = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

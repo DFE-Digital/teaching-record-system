@@ -15,18 +15,18 @@ public class BlobStorageFileService : IFileService
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task<Guid> UploadFile(Stream stream, string? contentType)
+    public async Task<Guid> UploadFileAsync(Stream stream, string? contentType)
     {
         var fileId = Guid.NewGuid();
-        var blobClient = await GetBlobClient(fileId);
+        var blobClient = await GetBlobClientAsync(fileId);
 
         await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null);
         return fileId;
     }
 
-    public async Task<string> GetFileUrl(Guid fileId, TimeSpan expiresAfter)
+    public async Task<string> GetFileUrlAsync(Guid fileId, TimeSpan expiresAfter)
     {
-        var blobClient = await GetBlobClient(fileId);
+        var blobClient = await GetBlobClientAsync(fileId);
 
         var sasBuilder = new BlobSasBuilder
         {
@@ -40,26 +40,26 @@ public class BlobStorageFileService : IFileService
         return blobClient.GenerateSasUri(sasBuilder).ToString();
     }
 
-    public async Task<Stream> OpenReadStream(Guid fileId)
+    public async Task<Stream> OpenReadStreamAsync(Guid fileId)
     {
-        var blobClient = await GetBlobClient(fileId);
+        var blobClient = await GetBlobClientAsync(fileId);
         var stream = await blobClient.OpenReadAsync();
         return stream;
     }
 
-    public async Task DeleteFile(Guid fileId)
+    public async Task DeleteFileAsync(Guid fileId)
     {
-        var blobClient = await GetBlobClient(fileId);
+        var blobClient = await GetBlobClientAsync(fileId);
         await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots);
     }
 
-    private async Task<BlobClient> GetBlobClient(Guid fileId)
+    private async Task<BlobClient> GetBlobClientAsync(Guid fileId)
     {
-        await EnsureBlobContainerClient();
+        await EnsureBlobContainerClientAsync();
         return _blobContainerClient!.GetBlobClient(fileId.ToString());
     }
 
-    private async Task EnsureBlobContainerClient()
+    private async Task EnsureBlobContainerClientAsync()
     {
         if (_blobContainerClient is null)
         {

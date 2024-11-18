@@ -19,15 +19,15 @@ public class GetActiveIncidentsTests : IAsyncLifetime
     public async Task ReturnsActiveIncidentsOnly()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var cancelledCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
-        var activeCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
-        var rejectedCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithRejectedStatus());
-        var activeCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
-        var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var cancelledCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithCanceledStatus());
+        var activeCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
+        var rejectedCreateNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithRejectedStatus());
+        var activeCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
+        var approvedCreateDateOfBirthChangeIncidentResult = await _dataScope.TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveIncidentsQuery(1, 50));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveIncidentsQuery(1, 50));
 
         // Assert        
         Assert.Contains(result.Incidents, i => i.Id == activeCreateNameChangeIncidentResult.IncidentId);

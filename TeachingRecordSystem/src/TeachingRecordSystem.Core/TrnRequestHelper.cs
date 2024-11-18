@@ -8,23 +8,23 @@ namespace TeachingRecordSystem.Core;
 
 public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task<GetTrnRequestResult?> GetTrnRequestInfo(Guid applicationUserId, string requestId)
+    public async Task<GetTrnRequestResult?> GetTrnRequestInfoAsync(Guid applicationUserId, string requestId)
     {
         var getDbTrnRequestTask = dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
 
         var crmTrnRequestId = GetCrmTrnRequestId(applicationUserId, requestId);
-        var getContactByTrnRequestIdTask = crmQueryDispatcher.ExecuteQuery(
+        var getContactByTrnRequestIdTask = crmQueryDispatcher.ExecuteQueryAsync(
             new GetContactByTrnRequestIdQuery(crmTrnRequestId, new ColumnSet(Contact.Fields.ContactId, Contact.Fields.dfeta_TrnToken)));
 
         if (await getDbTrnRequestTask is TrnRequest dbTrnRequest)
         {
-            var contact = await GetContact(dbTrnRequest.TeacherId);
+            var contact = await GetContactAsync(dbTrnRequest.TeacherId);
             return new(dbTrnRequest.TrnToken, applicationUserId, contact, IsCompleted(contact));
         }
 
         if (await getContactByTrnRequestIdTask is Contact trnRequestContact)
         {
-            var contact = await GetContact(trnRequestContact.Id);
+            var contact = await GetContactAsync(trnRequestContact.Id);
             return new(contact.dfeta_TrnToken, applicationUserId, contact, IsCompleted(contact));
         }
 
@@ -32,8 +32,8 @@ public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQue
 
         bool IsCompleted(Contact contact) => !string.IsNullOrEmpty(contact.dfeta_TRN);
 
-        Task<Contact> GetContact(Guid contactId) =>
-            crmQueryDispatcher.ExecuteQuery(
+        Task<Contact> GetContactAsync(Guid contactId) =>
+            crmQueryDispatcher.ExecuteQueryAsync(
                 new GetContactWithMergeResolutionQuery(
                     contactId,
                     new ColumnSet(
@@ -57,7 +57,7 @@ public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQue
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
         $"{currentApplicationUserId}::{requestId}";
 
-    public Task<TrnRequestMetadata?> GetRequestMetadata(Guid applicationUserId, string requestId) =>
+    public Task<TrnRequestMetadata?> GetRequestMetadataAsync(Guid applicationUserId, string requestId) =>
         dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId);
 }
 

@@ -24,7 +24,7 @@ public class GetActiveContactDetailByIdTests : IAsyncLifetime
         var contactId = Guid.NewGuid();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(contactId, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(contactId, new ColumnSet()));
 
         // Assert
         Assert.Null(result);
@@ -34,10 +34,10 @@ public class GetActiveContactDetailByIdTests : IAsyncLifetime
     public async Task WhenCalled_WithContactIdForExistingContact_ReturnsContactDetail()
     {
         // Arrange        
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(person.ContactId, new ColumnSet()));
+        var results = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(person.ContactId, new ColumnSet()));
 
         // Assert
         Assert.NotNull(results);
@@ -52,11 +52,11 @@ public class GetActiveContactDetailByIdTests : IAsyncLifetime
         var updatedFirstName = _dataScope.TestData.GenerateFirstName();
         var updatedMiddleName = _dataScope.TestData.GenerateMiddleName();
         var updatedLastName = _dataScope.TestData.GenerateLastName();
-        var person = await _dataScope.TestData.CreatePerson();
-        await _dataScope.TestData.UpdatePerson(b => b.WithPersonId(person.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
+        var person = await _dataScope.TestData.CreatePersonAsync();
+        await _dataScope.TestData.UpdatePersonAsync(b => b.WithPersonId(person.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
         // Act
-        var results = await _crmQueryDispatcher.ExecuteQuery(new GetActiveContactDetailByIdQuery(person.ContactId, new ColumnSet()));
+        var results = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(person.ContactId, new ColumnSet()));
 
         // Assert
         Assert.NotNull(results);

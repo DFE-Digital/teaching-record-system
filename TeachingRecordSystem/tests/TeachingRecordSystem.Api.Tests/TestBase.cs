@@ -106,15 +106,15 @@ public abstract class TestBase
         currentUserProvider.Roles = roles.ToArray();
     }
 
-    public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
+    public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         var dbContextFactory = HostFixture.Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
         return await action(dbContext);
     }
 
-    public virtual Task WithDbContext(Func<TrsDbContext, Task> action) =>
-        WithDbContext(async dbContext =>
+    public virtual Task WithDbContextAsync(Func<TrsDbContext, Task> action) =>
+        WithDbContextAsync(async dbContext =>
         {
             await action(dbContext);
             return 0;

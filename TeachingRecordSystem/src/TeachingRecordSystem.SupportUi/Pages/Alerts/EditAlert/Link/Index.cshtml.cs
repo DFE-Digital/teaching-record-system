@@ -35,7 +35,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         Link = JourneyInstance!.State.Link;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (AddLink is null)
         {
@@ -73,7 +73,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
         if (string.IsNullOrEmpty(CurrentLink) && AddLink == false)
         {
-            return await OnPostCancel();
+            return await OnPostCancelAsync();
         }
 
         return Redirect(FromCheckAnswers
@@ -81,7 +81,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
             : linkGenerator.AlertEditLinkReason(AlertId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

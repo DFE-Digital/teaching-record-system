@@ -153,7 +153,7 @@ public class GetInductionCompleteesForDateRangeTests : IAsyncLifetime
             teacher5FinalInductionStatus);
 
         // Act
-        var inductionCompletees = (await _dataverseAdapter.GetInductionCompleteesForDateRange(startDate, endDate).ToListAsync()).Single();
+        var inductionCompletees = (await _dataverseAdapter.GetInductionCompleteesForDateRangeAsync(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(3, inductionCompletees.Count());
@@ -234,7 +234,7 @@ public class GetInductionCompleteesForDateRangeTests : IAsyncLifetime
             dfeta_Result = dfeta_ITTResult.Pass,
         });
 
-        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, null);
+        var teacherStatus = await _dataverseAdapter.GetTeacherStatusAsync(teacherStatusValue, null);
         await _organizationService.CreateAsync(new dfeta_qtsregistration()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),

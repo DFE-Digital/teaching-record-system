@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Services.PersonMatching;
 
 public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingService
 {
-    public async Task<MatchResult?> Match(MatchRequest request)
+    public async Task<MatchResult?> MatchAsync(MatchRequest request)
     {
         var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
         if (fullNames.Length == 0 || !request.DatesOfBirth.Any() || (request.NationalInsuranceNumber is null && request.Trn is null))
@@ -67,7 +67,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatches(GetSuggestedMatchesRequest request)
+    public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatchesAsync(GetSuggestedMatchesRequest request)
     {
         // Return any record that matches on last name and DOB OR NINO OR TRN.
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
@@ -148,7 +148,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributes(GetSuggestedMatchesRequest request, Guid personId)
+    public async Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedMatchesRequest request, Guid personId)
     {
         var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();

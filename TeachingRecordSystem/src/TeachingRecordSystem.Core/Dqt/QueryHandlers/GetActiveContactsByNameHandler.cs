@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveContactsByNameHandler : ICrmQueryHandler<GetActiveContactsByNameQuery, Contact[]>
 {
-    public async Task<Contact[]> Execute(GetActiveContactsByNameQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Contact[]> ExecuteAsync(GetActiveContactsByNameQuery query, IOrganizationServiceAsync organizationService)
     {
         var nameFilter = new FilterExpression(LogicalOperator.Or);
         nameFilter.AddCondition(Contact.Fields.FirstName, ConditionOperator.Like, $"{query.Name}%");

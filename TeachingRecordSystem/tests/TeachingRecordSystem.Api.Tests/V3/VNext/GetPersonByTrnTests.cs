@@ -14,7 +14,7 @@ public class GetPersonByTrnTests : TestBase
         // Arrange
         SetCurrentApiClient([ApiRoles.AppropriateBody]);
 
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -31,7 +31,7 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_BothNationalInsuranceNumberAndDateOfBirthSpecified_ReturnsBadRequest()
     {
         // Arrange
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -48,7 +48,7 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_WithNationalInsuranceNumberMatchingRecord_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -58,14 +58,14 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponse(response, expectedStatusCode: 200);
+        await AssertEx.JsonResponseAsync(response, expectedStatusCode: 200);
     }
 
     [Fact]
     public async Task Get_WithNationalInsuranceNumberNotMatchingRecord_ReturnsNotFound()
     {
         // Arrange
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
         var requestNino = TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
 
         var request = new HttpRequestMessage(
@@ -83,11 +83,11 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_WithNationalInsuranceNumberMatchingWorkforceData_ReturnsOk()
     {
         // Arrange
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
-        var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321");
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
         var employmentNino = TestData.GenerateNationalInsuranceNumber();
-        await TestData.CreateTpsEmployment(
+        await TestData.CreateTpsEmploymentAsync(
             person,
             establishment,
             startDate: new DateOnly(2024, 1, 1),
@@ -104,6 +104,6 @@ public class GetPersonByTrnTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponse(response, expectedStatusCode: 200);
+        await AssertEx.JsonResponseAsync(response, expectedStatusCode: 200);
     }
 }

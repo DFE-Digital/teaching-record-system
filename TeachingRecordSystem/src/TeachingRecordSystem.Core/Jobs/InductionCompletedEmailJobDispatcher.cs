@@ -16,7 +16,7 @@ public class InductionCompletedEmailJobDispatcher
         _backgroundJobScheduler = backgroundJobScheduler;
     }
 
-    public async Task Execute(Guid inductionCompletedEmailsJobId)
+    public async Task ExecuteAsync(Guid inductionCompletedEmailsJobId)
     {
         var jobItems = await _dbContext.InductionCompletedEmailsJobItems
             .Where(i => i.InductionCompletedEmailsJobId == inductionCompletedEmailsJobId && i.EmailSent == false)
@@ -24,7 +24,7 @@ public class InductionCompletedEmailJobDispatcher
 
         foreach (var jobItem in jobItems)
         {
-            await _backgroundJobScheduler.Enqueue<SendInductionCompletedEmailJob>(j => j.Execute(inductionCompletedEmailsJobId, jobItem.PersonId));
+            await _backgroundJobScheduler.EnqueueAsync<SendInductionCompletedEmailJob>(j => j.ExecuteAsync(inductionCompletedEmailsJobId, jobItem.PersonId));
         }
     }
 }

@@ -6,10 +6,10 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ValidRequestWithAlerts_ReturnsExpectedAlertsContent()
     {
         // Arrange
-        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypes();
+        var alertTypes = await TestData.ReferenceDataCache.GetAlertTypesAsync();
         var alertType = alertTypes.Where(at => !at.InternalOnly).RandomOne();
 
-        var person = await TestData.CreatePerson(x => x
+        var person = await TestData.CreatePersonAsync(x => x
             .WithTrn()
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null)));
 
@@ -23,7 +23,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        var jsonResponse = await AssertEx.JsonResponse(response);
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
         var responseAlerts = jsonResponse.RootElement.GetProperty("alerts");
 
         AssertEx.JsonObjectEquals(

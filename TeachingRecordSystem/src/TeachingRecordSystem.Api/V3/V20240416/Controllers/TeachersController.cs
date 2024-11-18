@@ -21,7 +21,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
         [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
@@ -33,7 +33,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             dateOfBirth,
             ApplyLegacyAlertsBehavior: true);
 
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {

@@ -11,7 +11,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: []);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/application-users/{applicationUser.UserId}");
 
@@ -41,9 +41,9 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ValidRequest_RendersExpectedContent()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [ApiRoles.GetPerson, ApiRoles.UpdatePerson], isOidcClient: true);
-        var apiKeyUnexpired = await TestData.CreateApiKey(applicationUser.UserId, expired: false);
-        var apiKeyExpired = await TestData.CreateApiKey(applicationUser.UserId, expired: true);
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: [ApiRoles.GetPerson, ApiRoles.UpdatePerson], isOidcClient: true);
+        var apiKeyUnexpired = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: false);
+        var apiKeyExpired = await TestData.CreateApiKeyAsync(applicationUser.UserId, expired: true);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/application-users/{applicationUser.UserId}");
 
@@ -51,7 +51,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.NotNull(doc.GetElementByLabel(ApiRoles.GetPerson)?.GetAttribute("checked"));
         Assert.NotNull(doc.GetElementByLabel(ApiRoles.UpdatePerson)?.GetAttribute("checked"));
@@ -82,7 +82,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: []);
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
 
@@ -127,7 +127,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Post_NameNotProvided_RendersError()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: []);
         var newName = "";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
@@ -142,14 +142,14 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Enter a name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
     public async Task Post_NameTooLong_RendersError()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: []);
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: []);
         var newName = new string('x', UserBase.NameMaxLength + 1);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
@@ -164,7 +164,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Name must be 200 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
     [Theory]
@@ -183,7 +183,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         string expectedErrorMessage)
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/application-users/{applicationUser.UserId}")
         {
@@ -208,14 +208,14 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, expectedErrorField, expectedErrorMessage);
+        await AssertEx.HtmlResponseHasErrorAsync(response, expectedErrorField, expectedErrorMessage);
     }
 
     [Fact]
     public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettingsAndCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUser(apiRoles: [], isOidcClient: false);
+        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: [], isOidcClient: false);
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
@@ -309,8 +309,8 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                     applicationUserUpdatedEvent.Changes);
             });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user updated");
     }
 

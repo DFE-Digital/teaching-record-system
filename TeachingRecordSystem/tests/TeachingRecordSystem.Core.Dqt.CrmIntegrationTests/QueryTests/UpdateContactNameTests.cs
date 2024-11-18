@@ -19,7 +19,7 @@ public class UpdateContactNameTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
 
         var newFirstName = _dataScope.TestData.GenerateChangedFirstName(person.FirstName);
         var newMiddleName = _dataScope.TestData.GenerateChangedMiddleName(person.MiddleName);
@@ -32,7 +32,7 @@ public class UpdateContactNameTests : IAsyncLifetime
             newLastName);
 
         // Act
-        await _crmQueryDispatcher.ExecuteQuery(query);
+        await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

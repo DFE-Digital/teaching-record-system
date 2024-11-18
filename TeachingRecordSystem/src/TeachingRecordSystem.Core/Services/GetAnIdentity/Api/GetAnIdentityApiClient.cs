@@ -19,7 +19,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
         };
     }
 
-    public async Task<User?> GetUserById(Guid userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         var response = await _httpClient.GetAsync($"api/v1/users/{userId}");
 
@@ -38,7 +38,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
         return user;
     }
 
-    public async Task<CreateTrnTokenResponse> CreateTrnToken(CreateTrnTokenRequest request)
+    public async Task<CreateTrnTokenResponse> CreateTrnTokenAsync(CreateTrnTokenRequest request)
     {
         HttpContent content = JsonContent.Create(request);
         var response = await _httpClient.PostAsync("/api/v1/trn-tokens", content);
@@ -47,7 +47,7 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
         return tokenResponse!;
     }
 
-    public async Task SetTeacherTrn(Guid userId, string trn)
+    public async Task SetTeacherTrnAsync(Guid userId, string trn)
     {
         var request = new SetTeacherTrnRequestBody { Trn = trn };
         var content = JsonContent.Create(request, options: _jsonOptions);

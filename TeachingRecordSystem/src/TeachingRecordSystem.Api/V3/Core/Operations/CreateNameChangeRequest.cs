@@ -20,9 +20,9 @@ public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatch
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<string> Handle(CreateNameChangeRequestCommand command)
+    public async Task<string> HandleAsync(CreateNameChangeRequestCommand command)
     {
-        var contact = await crmQueryDispatcher.ExecuteQuery(
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
 
         if (contact is null)
@@ -51,7 +51,7 @@ public class CreateNameChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatch
         var firstName = firstAndMiddleNames[0];
         var middleName = string.Join(" ", firstAndMiddleNames.Skip(1));
 
-        var (_, ticketNumber) = await crmQueryDispatcher.ExecuteQuery(new CreateNameChangeIncidentQuery()
+        var (_, ticketNumber) = await crmQueryDispatcher.ExecuteQueryAsync(new CreateNameChangeIncidentQuery()
         {
             ContactId = contact.Id,
             FirstName = firstName,

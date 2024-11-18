@@ -2,6 +2,6 @@ namespace TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 public interface IAadUserService
 {
-    Task<User?> GetUserByEmail(string email);
-    Task<User?> GetUserById(string userId);
+    Task<User?> GetUserByEmailAsync(string email);
+    Task<User?> GetUserByIdAsync(string userId);
 }

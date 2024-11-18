@@ -20,13 +20,13 @@ public class CreateReviewTaskTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
         var category = "Category";
         var description = "Description";
         var subject = "Subject";
 
         // Act
-        var crmTaskId = await _crmQueryDispatcher.ExecuteQuery(new CreateTaskQuery()
+        var crmTaskId = await _crmQueryDispatcher.ExecuteQueryAsync(new CreateTaskQuery()
         {
             ContactId = createPersonResult.PersonId,
             Category = category,

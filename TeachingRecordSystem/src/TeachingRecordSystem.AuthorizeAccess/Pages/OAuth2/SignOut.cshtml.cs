@@ -25,7 +25,7 @@ public class SignOutModel(TrsDbContext dbContext) : PageModel
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         // We need to sign out with One Login and then complete the OIDC sign out request.
         // We do it by calling SignOutAsync with OpenIddict first, capturing the Location header from its redirect

@@ -21,7 +21,7 @@ public class GetTeacherTests : TestBase
         var trn = "1234567";
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, It.IsAny<string[]>(), true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, It.IsAny<string[]>(), true))
             .ReturnsAsync((Contact)null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
@@ -46,7 +46,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "trn", expectedError: StringResources.ErrorMessages_TRNMustBe7Digits);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class GetTeacherTests : TestBase
 
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, It.IsAny<string[]>(), true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, It.IsAny<string[]>(), true))
             .ReturnsAsync((Contact)null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v2/teachers/{trn}");
@@ -149,19 +149,19 @@ public class GetTeacherTests : TestBase
         inActiveItt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
+            .Setup(mock => mock.GetQtsRegistrationsByTeacherAsync(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
+            .Setup(mock => mock.GetEarlyYearsStatusAsync(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
                 /*establishmentColumnNames: */It.IsAny<string[]>(),
@@ -176,7 +176,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -295,19 +295,19 @@ public class GetTeacherTests : TestBase
         itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
+            .Setup(mock => mock.GetQtsRegistrationsByTeacherAsync(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
+            .Setup(mock => mock.GetEarlyYearsStatusAsync(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
                 /*establishmentColumnNames: */It.IsAny<string[]>(),
@@ -322,7 +322,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {
@@ -431,19 +431,19 @@ public class GetTeacherTests : TestBase
         itt.Attributes.Add($"establishment.{Account.Fields.dfeta_UKPRN}", new AliasedValue(Account.EntityLogicalName, Account.Fields.dfeta_UKPRN, ittProviderUkprn));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeacherByTrn(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
+            .Setup(mock => mock.GetTeacherByTrnAsync(trn, /* columnNames: */ It.IsAny<string[]>(), /* activeOnly: */ true))
             .ReturnsAsync(contact);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetQtsRegistrationsByTeacher(teacherId, /* columnNames: */ It.IsAny<string[]>()))
+            .Setup(mock => mock.GetQtsRegistrationsByTeacherAsync(teacherId, /* columnNames: */ It.IsAny<string[]>()))
             .ReturnsAsync(new[] { qtsRegistration });
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetEarlyYearsStatus(earlyYearsStatusId))
+            .Setup(mock => mock.GetEarlyYearsStatusAsync(earlyYearsStatusId))
             .ReturnsAsync(earlyYearsStatus);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(
                 teacherId,
                 /* columnNames: */ It.IsAny<string[]>(),
                 /*establishmentColumnNames: */It.IsAny<string[]>(),
@@ -458,7 +458,7 @@ public class GetTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             new
             {

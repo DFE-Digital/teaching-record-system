@@ -30,7 +30,7 @@ public class SendInternationalQtsAwardedEmailJob
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
     }
 
-    public async Task Execute(Guid internationalQtsAwardedEmailsJobId, Guid personId)
+    public async Task ExecuteAsync(Guid internationalQtsAwardedEmailsJobId, Guid personId)
     {
         var item = await _dbContext.InternationalQtsAwardedEmailsJobItems.SingleAsync(i => i.InternationalQtsAwardedEmailsJobId == internationalQtsAwardedEmailsJobId && i.PersonId == personId);
 
@@ -42,11 +42,11 @@ public class SendInternationalQtsAwardedEmailJob
                 Email = item.EmailAddress
             };
 
-            var tokenResponse = await _identityApiClient.CreateTrnToken(request);
+            var tokenResponse = await _identityApiClient.CreateTrnTokenAsync(request);
             item.Personalization[LinkToAccessYourQualificationsServicePersonalisationKey] = $"{_accessYourTeachingQualificationsOptions.BaseAddress}{_accessYourTeachingQualificationsOptions.StartUrlPath}?trn_token={tokenResponse.TrnToken}";
         }
 
-        await _notificationSender.SendEmail(InternationalQtsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
+        await _notificationSender.SendEmailAsync(InternationalQtsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
         _dbContext.AddEvent(new InternationalQtsAwardedEmailSentEvent

@@ -28,9 +28,9 @@ public class IndexModel(
 
     public bool HasOpenAlert { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
-        var contactDetail = await crmQueryDispatcher.ExecuteQuery(
+        var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(

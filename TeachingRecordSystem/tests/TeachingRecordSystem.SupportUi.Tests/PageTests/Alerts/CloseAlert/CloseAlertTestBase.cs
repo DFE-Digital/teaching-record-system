@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
 public abstract class CloseAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<CloseAlertState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<CloseAlertState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<CloseAlertState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new CloseAlertState()
+    protected Task<JourneyInstance<CloseAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new CloseAlertState()
         {
             EndDate = alert.StartDate!.Value.AddDays(2),
             ChangeReason = CloseAlertReasonOption.AnotherReason,
@@ -21,22 +21,22 @@ public abstract class CloseAlertTestBase(HostFixture hostFixture) : TestBase(hos
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<CloseAlertState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert) =>
+    protected Task<JourneyInstance<CloseAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
-                CreateEmptyJourneyInstance(alert.AlertId),
+                CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index =>
-                CreateJourneyInstance(alert.AlertId, new CloseAlertState()
+                CreateJourneyInstanceAsync(alert.AlertId, new CloseAlertState()
                 {
                     EndDate = alert.StartDate!.Value.AddDays(2)
                 }),
             JourneySteps.Reason or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<CloseAlertState>> CreateJourneyInstance(Guid alertId, CloseAlertState state) =>
+    private Task<JourneyInstance<CloseAlertState>> CreateJourneyInstanceAsync(Guid alertId, CloseAlertState state) =>
         CreateJourneyInstance(
             JourneyNames.CloseAlert,
             state,

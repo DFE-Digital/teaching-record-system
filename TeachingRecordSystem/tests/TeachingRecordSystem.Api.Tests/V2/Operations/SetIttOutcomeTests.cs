@@ -49,7 +49,7 @@ public class SetIttOutcomeTests : TestBase
         var dob = new DateOnly(1987, 1, 1);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var requestBody = new SetIttOutcomeRequest()
@@ -69,7 +69,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10001, expectedStatusCode: StatusCodes.Status404NotFound);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class SetIttOutcomeTests : TestBase
         var teacher2 = new Contact() { dfeta_TRN = trn };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(new[] { teacher1, teacher2 });
 
         var requestBody = new SetIttOutcomeRequest()
@@ -102,7 +102,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(requestBody.BirthDate),
             expectedError: "Birthdate is required.");
@@ -157,7 +157,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(requestBody.IttProviderUkprn),
             expectedError: "ITT provider UKPRN is required.");
@@ -187,7 +187,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(requestBody.AssessmentDate),
             expectedError: "Assessment date must be specified when outcome is Pass.");
@@ -221,7 +221,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(requestBody.AssessmentDate),
             expectedError: "Assessment date cannot be specified unless outcome is Pass.");
@@ -251,7 +251,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(requestBody.AssessmentDate),
             expectedError: "QTS date cannot be in the future.");
@@ -270,11 +270,11 @@ public class SetIttOutcomeTests : TestBase
         var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(new[] { contact });
 
         DataverseAdapterMock
-            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
+            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -294,7 +294,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10003, expectedStatusCode: StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -310,11 +310,11 @@ public class SetIttOutcomeTests : TestBase
         var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(new[] { contact });
 
         DataverseAdapterMock
-            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null, It.IsAny<string>()))
+            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null, It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Success(null));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -357,11 +357,11 @@ public class SetIttOutcomeTests : TestBase
         var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(new[] { contact });
 
         DataverseAdapterMock
-            .Setup(mock => mock.SetIttResultForTeacher(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
+            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Failed(failedReason));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -380,7 +380,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode, expectedStatusCode: StatusCodes.Status400BadRequest);
     }
 
     [Fact]
@@ -397,11 +397,11 @@ public class SetIttOutcomeTests : TestBase
         var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrnAsync(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var requestBody = new SetIttOutcomeRequest()
@@ -420,8 +420,8 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        DataverseAdapterMock.Verify(x => x.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
-        DataverseAdapterMock.Verify(x => x.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+        DataverseAdapterMock.Verify(x => x.GetTeachersBySlugIdAndTrnAsync(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+        DataverseAdapterMock.Verify(x => x.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
     }
 
     [Fact]
@@ -438,11 +438,11 @@ public class SetIttOutcomeTests : TestBase
         var contact = new Contact() { dfeta_TRN = trn, Id = Guid.NewGuid() };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrnAsync(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var requestBody = new SetIttOutcomeRequest()
@@ -461,7 +461,7 @@ public class SetIttOutcomeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        DataverseAdapterMock.Verify(x => x.GetTeachersBySlugIdAndTrn(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Never);
-        DataverseAdapterMock.Verify(x => x.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+        DataverseAdapterMock.Verify(x => x.GetTeachersBySlugIdAndTrnAsync(slugId, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Never);
+        DataverseAdapterMock.Verify(x => x.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
     }
 }

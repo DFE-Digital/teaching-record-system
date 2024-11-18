@@ -25,7 +25,7 @@ public class SyncAllPersonsFromCrmJob
         _syncOptionsAccessor = syncOptionsAccessor;
     }
 
-    public async Task Execute(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         const int pageSize = 1000;
 
@@ -65,7 +65,7 @@ public class SyncAllPersonsFromCrmJob
                 continue;
             }
 
-            await _trsDataSyncHelper.SyncPersons(
+            await _trsDataSyncHelper.SyncPersonsAsync(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
                 dryRun: false,

@@ -33,7 +33,7 @@ public static partial class Commands
 
                 var crmQueryDispatcher = services.GetRequiredService<ICrmQueryDispatcher>();
 
-                var entityMetadata = await crmQueryDispatcher.ExecuteQuery(
+                var entityMetadata = await crmQueryDispatcher.ExecuteQueryAsync(
                     new GetEntityMetadataQuery(entityType, EntityFilters.Default | EntityFilters.Attributes));
                 var entityTableMapping = EntityTableMapping.Create(entityMetadata);
                 var sql = entityTableMapping.GetCreateTableSql();

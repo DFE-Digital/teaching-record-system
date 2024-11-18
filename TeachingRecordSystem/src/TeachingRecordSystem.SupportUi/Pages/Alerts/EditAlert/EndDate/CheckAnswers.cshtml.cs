@@ -39,7 +39,7 @@ public class CheckAnswersModel(
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var now = clock.UtcNow;
 
@@ -88,7 +88,7 @@ public class CheckAnswersModel(
         return Redirect(linkGenerator.PersonAlerts(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.AlertDetail(AlertId));
@@ -113,7 +113,7 @@ public class CheckAnswersModel(
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance!.State.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
             null;
 
         await next();

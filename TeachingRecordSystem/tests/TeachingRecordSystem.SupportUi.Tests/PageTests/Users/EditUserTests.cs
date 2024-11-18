@@ -52,11 +52,11 @@ public class EditUserTests : TestBase
         // Arrange
         string[]? dqtRoles = hasDqtRoles ? [.. Faker.Lorem.Words(2)] : null;
         Guid? azureAdUserId = hasCrmAccount ? Guid.NewGuid() : null;
-        var user = await TestData.CreateUser(azureAdUserId: azureAdUserId);
+        var user = await TestData.CreateUserAsync(azureAdUserId: azureAdUserId);
 
         if (hasCrmAccount)
         {
-            await TestData.CreateCrmUser(azureAdUserId: azureAdUserId!.Value, hasDisabledCrmAccount: hasDisabledCrmAccount, dqtRoles: dqtRoles);
+            await TestData.CreateCrmUserAsync(azureAdUserId: azureAdUserId!.Value, hasDisabledCrmAccount: hasDisabledCrmAccount, dqtRoles: dqtRoles);
         }
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(user.UserId));
@@ -65,7 +65,7 @@ public class EditUserTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var noCrmAccountWarning = doc.GetElementByTestId("no-crm-account-warning");
         if (hasCrmAccount)
@@ -122,7 +122,7 @@ public class EditUserTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var user = await TestData.CreateUser();
+        var user = await TestData.CreateUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
         {
@@ -144,7 +144,7 @@ public class EditUserTests : TestBase
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var user = await TestData.CreateUser();
+        var user = await TestData.CreateUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(Guid.NewGuid()))
         {
@@ -166,7 +166,7 @@ public class EditUserTests : TestBase
     public async Task Post_NoName_RendersError()
     {
         // Arrange
-        var user = await TestData.CreateUser();
+        var user = await TestData.CreateUserAsync();
         const string role = UserRoles.Administrator;
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
@@ -181,7 +181,7 @@ public class EditUserTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Enter a name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Theory]
@@ -195,7 +195,7 @@ public class EditUserTests : TestBase
         UserUpdatedEventChanges expectedChanges)
     {
         // Arrange
-        var currentUser = await TestData.CreateUser(roles: new[] { UserRoles.Helpdesk });
+        var currentUser = await TestData.CreateUserAsync(roles: new[] { UserRoles.Helpdesk });
         var newName = changeName ? TestData.GenerateChangedName(currentUser.Name) : currentUser.Name;
         var roles = changeRoles ? new[] { UserRoles.Administrator } : currentUser.Roles;
 
@@ -239,8 +239,8 @@ public class EditUserTests : TestBase
             });
         }
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User updated");
     }
 
@@ -248,7 +248,7 @@ public class EditUserTests : TestBase
     public async Task Post_UserExistsButIsAlreadyDeactivated_ReturnsBadRequest()
     {
         // Arrange
-        var user = await TestData.CreateUser(active: false);
+        var user = await TestData.CreateUserAsync(active: false);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(user.UserId)}/deactivate");
 
@@ -263,7 +263,7 @@ public class EditUserTests : TestBase
     public async Task Post_ValidRequest_DeactivatesUsersEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var currentUser = await TestData.CreateUser();
+        var currentUser = await TestData.CreateUserAsync();
         var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(currentUser.UserId)}/deactivate");
 
         // Act
@@ -285,8 +285,8 @@ public class EditUserTests : TestBase
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
         });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User deactivated");
     }
 
@@ -294,7 +294,7 @@ public class EditUserTests : TestBase
     public async Task Post_UserExistsButIsAlreadyActive_ReturnsBadRequest()
     {
         // Arrange
-        var user = await TestData.CreateUser();
+        var user = await TestData.CreateUserAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(user.UserId)}/activate");
 
@@ -309,7 +309,7 @@ public class EditUserTests : TestBase
     public async Task Post_ValidRequest_ActivatesUsersEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var currentUser = await TestData.CreateUser(active: false);
+        var currentUser = await TestData.CreateUserAsync(active: false);
         var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(currentUser.UserId)}/activate");
 
         // Act
@@ -331,8 +331,8 @@ public class EditUserTests : TestBase
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
         });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User reactivated");
     }
 

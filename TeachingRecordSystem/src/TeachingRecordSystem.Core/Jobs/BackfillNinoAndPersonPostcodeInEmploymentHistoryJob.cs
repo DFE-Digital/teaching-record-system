@@ -6,6 +6,6 @@ public class BackfillNinoAndPersonPostcodeInEmploymentHistoryJob(TpsCsvExtractPr
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await tpsCsvExtractProcessor.BackfillNinoAndPersonPostcodeInEmploymentHistory(cancellationToken);
+        await tpsCsvExtractProcessor.BackfillNinoAndPersonPostcodeInEmploymentHistoryAsync(cancellationToken);
     }
 }

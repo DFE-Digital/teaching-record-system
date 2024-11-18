@@ -20,7 +20,7 @@ public class IndexTests : ReopenAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -36,7 +36,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -52,7 +52,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -68,7 +68,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -84,7 +84,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -92,7 +92,7 @@ public class IndexTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("ChangeReason", journeyInstance.State.ChangeReason!.ToString()!);
         AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
@@ -118,7 +118,7 @@ public class IndexTests : ReopenAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -137,7 +137,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -156,7 +156,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -175,7 +175,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -186,7 +186,7 @@ public class IndexTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "ChangeReason", "Select a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -207,7 +207,7 @@ public class IndexTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re removing the end date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re removing the end date");
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -230,7 +230,7 @@ public class IndexTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "ChangeReasonDetail", "Enter additional detail");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -253,7 +253,7 @@ public class IndexTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
     }
 
     [Fact]
@@ -261,7 +261,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -276,7 +276,7 @@ public class IndexTests : ReopenAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
@@ -284,7 +284,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var reason = ReopenAlertReasonOption.AnotherReason;
         var hasAdditionalReasonDetail = true;
@@ -320,7 +320,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var reason = ReopenAlertReasonOption.AnotherReason;
         var hasAdditionalReasonDetail = false;
@@ -356,7 +356,7 @@ public class IndexTests : ReopenAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/re-open/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 

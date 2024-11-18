@@ -29,11 +29,11 @@ public class SetTsPersonIdTests : IAsyncLifetime
     public async Task Given_valid_id_updates_tspersonid()
     {
         // Arrange
-        var createPersonResult = await _testDataHelper.CreatePerson();
+        var createPersonResult = await _testDataHelper.CreatePersonAsync();
         var tsPersonId = Guid.NewGuid().ToString();
 
         // Act
-        await _dataverseAdapter.SetTsPersonId(createPersonResult.TeacherId, tsPersonId);
+        await _dataverseAdapter.SetTsPersonIdAsync(createPersonResult.TeacherId, tsPersonId);
 
         // Assert
         var teacher = (await _organizationService.RetrieveAsync(

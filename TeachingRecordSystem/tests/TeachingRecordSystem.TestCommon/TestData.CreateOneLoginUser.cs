@@ -7,21 +7,21 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<OneLoginUser> CreateOneLoginUser(CreatePersonResult createPersonResult, Option<string> subject = default, Option<string?> email = default) =>
-        CreateOneLoginUser(
+    public Task<OneLoginUser> CreateOneLoginUserAsync(CreatePersonResult createPersonResult, Option<string> subject = default, Option<string?> email = default) =>
+        CreateOneLoginUserAsync(
             createPersonResult.PersonId,
             subject,
             email,
             verifiedInfo: ([createPersonResult.FirstName, createPersonResult.LastName], createPersonResult.DateOfBirth));
 
-    public Task<OneLoginUser> CreateOneLoginUser(Option<string> subject = default, Option<string?> email = default, bool verified = false) =>
-        CreateOneLoginUser(
+    public Task<OneLoginUser> CreateOneLoginUserAsync(Option<string> subject = default, Option<string?> email = default, bool verified = false) =>
+        CreateOneLoginUserAsync(
             personId: null,
             subject,
             email,
             verifiedInfo: verified ? ([Faker.Name.First(), Faker.Name.Last()], DateOnly.FromDateTime(Faker.Identification.DateOfBirth())) : null);
 
-    public Task<OneLoginUser> CreateOneLoginUser(
+    public Task<OneLoginUser> CreateOneLoginUserAsync(
         Guid? personId,
         Option<string> subject = default,
         Option<string?> email = default,
@@ -32,7 +32,7 @@ public partial class TestData
             throw new ArgumentException("OneLoginUser with a Person must be verified.", nameof(verifiedInfo));
         }
 
-        return WithDbContext(async dbContext =>
+        return WithDbContextAsync(async dbContext =>
         {
             var hasSignedInBefore = email != Option.Some((string?)null);
 

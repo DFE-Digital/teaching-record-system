@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 public class CreateTaskHandler : ICrmQueryHandler<CreateTaskQuery, Guid>
 {
-    public async Task<Guid> Execute(CreateTaskQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<Guid> ExecuteAsync(CreateTaskQuery query, IOrganizationServiceAsync organizationService)
     {
         var crmTaskId = await organizationService.CreateAsync(new CrmTask()
         {

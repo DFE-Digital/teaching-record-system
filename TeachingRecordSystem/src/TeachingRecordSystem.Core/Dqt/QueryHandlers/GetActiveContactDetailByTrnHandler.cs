@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetActiveContactDetailByTrnHandler : ICrmQueryHandler<GetActiveContactDetailByTrnQuery, ContactDetail?>
 {
-    public async Task<ContactDetail?> Execute(GetActiveContactDetailByTrnQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<ContactDetail?> ExecuteAsync(GetActiveContactDetailByTrnQuery query, IOrganizationServiceAsync organizationService)
     {
         var contactFilter = new FilterExpression();
         contactFilter.AddCondition(Contact.Fields.dfeta_TRN, ConditionOperator.Equal, query.Trn);
@@ -60,7 +60,7 @@ public class GetActiveContactDetailByTrnHandler : ICrmQueryHandler<GetActiveCont
         var contactResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(contactRequest);
         var previousNameResponse = requestBuilder.AddRequest<RetrieveMultipleResponse>(previousNameRequest);
 
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         var contact = (await contactResponse.GetResponseAsync()).EntityCollection.Entities.FirstOrDefault()?.ToEntity<Contact>();
         var previousNames = (await previousNameResponse.GetResponseAsync()).EntityCollection.Entities.Select(e => e.ToEntity<dfeta_previousname>()).ToArray();

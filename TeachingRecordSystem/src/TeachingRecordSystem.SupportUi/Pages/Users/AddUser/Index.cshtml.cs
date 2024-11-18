@@ -22,7 +22,7 @@ public class IndexModel(
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
@@ -35,7 +35,7 @@ public class IndexModel(
             email += "@education.gov.uk";
         }
 
-        var user = await userService.GetUserByEmail(email);
+        var user = await userService.GetUserByEmailAsync(email);
 
         if (user is null)
         {

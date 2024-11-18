@@ -19,7 +19,7 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
         var email = _dataScope.TestData.GenerateUniqueEmail();
         var newDateOfBirth = _dataScope.TestData.GenerateChangedDateOfBirth(createPersonResult.DateOfBirth);
         var uniqueId = Guid.NewGuid();
@@ -39,7 +39,7 @@ public class CreateDateOfBirthChangeIncidentTests : IAsyncLifetime
         };
 
         // Act
-        var (incidentId, ticketNumber) = await _crmQueryDispatcher.ExecuteQuery(query);
+        var (incidentId, ticketNumber) = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

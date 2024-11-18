@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task UpdatePerson(Action<UpdatePersonBuilder>? configure)
+    public Task UpdatePersonAsync(Action<UpdatePersonBuilder>? configure)
     {
         var builder = new UpdatePersonBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class UpdatePersonBuilder
@@ -39,7 +39,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task Execute(TestData testData)
+        public async Task ExecuteAsync(TestData testData)
         {
             if (_personId is null)
             {
@@ -59,7 +59,7 @@ public partial class TestData
                     }
                 });
 
-                await testData.SyncConfiguration.SyncIfEnabled(helper => helper.SyncPerson(_personId.Value, ignoreInvalid: false));
+                await testData.SyncConfiguration.SyncIfEnabledAsync(helper => helper.SyncPersonAsync(_personId.Value, ignoreInvalid: false));
             }
         }
     }

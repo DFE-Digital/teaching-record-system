@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.StartD
 
 public abstract class StartDateTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<EditAlertStartDateState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<EditAlertStartDateState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new EditAlertStartDateState()
+    protected Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState()
         {
             Initialized = true,
             CurrentStartDate = alert.StartDate,
@@ -23,28 +23,28 @@ public abstract class StartDateTestBase(HostFixture hostFixture) : TestBase(host
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert) =>
+    protected Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
-                CreateJourneyInstance(alert.AlertId, new EditAlertStartDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState()
                 {
                     Initialized = true,
                     CurrentStartDate = alert.StartDate
                 }),
             JourneySteps.Index =>
-                CreateJourneyInstance(alert.AlertId, new EditAlertStartDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertStartDateState()
                 {
                     Initialized = true,
                     CurrentStartDate = alert.StartDate,
                     StartDate = alert.StartDate!.Value.AddDays(1)
                 }),
             JourneySteps.Reason or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstance(Guid alertId, EditAlertStartDateState state) =>
+    private Task<JourneyInstance<EditAlertStartDateState>> CreateJourneyInstanceAsync(Guid alertId, EditAlertStartDateState state) =>
         CreateJourneyInstance(
             JourneyNames.EditAlertStartDate,
             state,

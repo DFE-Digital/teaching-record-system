@@ -25,7 +25,7 @@ public class SyncAllAlertsFromCrmJob
         _syncOptionsAccessor = syncOptionsAccessor;
     }
 
-    public async Task Execute(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
     {
         const int pageSize = 1000;
 
@@ -61,7 +61,7 @@ public class SyncAllAlertsFromCrmJob
                 continue;
             }
 
-            await _trsDataSyncHelper.SyncAlerts(
+            await _trsDataSyncHelper.SyncAlertsAsync(
                 result.Entities.Select(e => e.ToEntity<dfeta_sanction>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
                 createMigratedEvent,

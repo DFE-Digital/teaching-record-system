@@ -631,7 +631,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
 
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContent.ToString()));
         Mock.Get(tpsExtractStorageService)
-            .Setup(x => x.GetFile(filename, CancellationToken.None))
+            .Setup(x => x.GetFileAsync(filename, CancellationToken.None))
             .ReturnsAsync(stream);
 
         // Act
@@ -639,7 +639,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             tpsExtractStorageService,
             dbContextFactory,
             clock);
-        await importer.ImportFile(tpsCsvExtractId, filename, CancellationToken.None);
+        await importer.ImportFileAsync(tpsCsvExtractId, filename, CancellationToken.None);
 
         // Assert
         using var dbContext = dbContextFactory.CreateDbContext();
@@ -727,7 +727,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             tpsExtractStorageService,
             dbContextFactory,
             clock);
-        await importer.CopyValidFormatDataToStaging(tpsCsvExtractId, CancellationToken.None);
+        await importer.CopyValidFormatDataToStagingAsync(tpsCsvExtractId, CancellationToken.None);
 
         // Assert
         var result = await dbContext.TpsCsvExtractItems

@@ -1,12 +1,7 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.CloseAlert;
 
 public class CheckAnswersTests : CloseAlertTestBase
 {
-    private const string PreviousStep = JourneySteps.Reason;
-    private const string ThisStep = JourneySteps.CheckAnswers;
-
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
@@ -20,7 +15,7 @@ public class CheckAnswersTests : CloseAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -36,7 +31,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -52,7 +47,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -68,7 +63,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange        
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(JourneySteps.Index, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -87,7 +82,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -95,7 +90,7 @@ public class CheckAnswersTests : CloseAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(alert.AlertType.Name, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
         Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
@@ -114,7 +109,7 @@ public class CheckAnswersTests : CloseAlertTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -130,7 +125,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -146,7 +141,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -162,7 +157,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -182,7 +177,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert(!populateOptional);
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional);
 
         EventPublisher.Clear();
 
@@ -194,8 +189,8 @@ public class CheckAnswersTests : CloseAlertTestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert closed");
 
         await WithDbContext(async dbContext =>
@@ -255,7 +250,7 @@ public class CheckAnswersTests : CloseAlertTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true);
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/close/check-answers/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -269,11 +264,5 @@ public class CheckAnswersTests : CloseAlertTestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
     }
-
-    private async Task<JourneyInstance<CloseAlertState>> CreateJourneyInstance(Guid alertId, CloseAlertState? state = null) =>
-        await CreateJourneyInstance(
-            JourneyNames.CloseAlert,
-            state ?? new CloseAlertState(),
-            new KeyValuePair<string, object>("alertId", alertId));
 }
 

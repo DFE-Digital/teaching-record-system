@@ -17,7 +17,7 @@ public class GetIttProvidersHandler : IRequestHandler<GetIttProvidersRequest, Ge
 
     public async Task<GetIttProvidersResponse> Handle(GetIttProvidersRequest request, CancellationToken cancellationToken)
     {
-        var ittProviders = await _dataverseAdapter.GetIttProviders(false);
+        var ittProviders = await _dataverseAdapter.GetIttProvidersAsync(false);
 
         return new GetIttProvidersResponse()
         {

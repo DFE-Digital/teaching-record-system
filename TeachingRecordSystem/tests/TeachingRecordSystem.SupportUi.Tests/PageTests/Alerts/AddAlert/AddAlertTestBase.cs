@@ -5,14 +5,14 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<AddAlertState>> CreateEmptyJourneyInstance(Guid personId) =>
-        CreateJourneyInstance(personId, new());
+    protected Task<JourneyInstance<AddAlertState>> CreateEmptyJourneyInstanceAsync(Guid personId) =>
+        CreateJourneyInstanceAsync(personId, new());
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForAllStepsCompleted(Guid personId, bool populateOptional = true)
+    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Guid personId, bool populateOptional = true)
     {
-        var alertType = await GetKnownAlertType();
+        var alertType = await GetKnownAlertTypeAsync();
 
-        return await CreateJourneyInstance(personId, new AddAlertState()
+        return await CreateJourneyInstanceAsync(personId, new AddAlertState()
         {
             AlertTypeId = alertType.AlertTypeId,
             AlertTypeName = alertType.Name,
@@ -30,30 +30,30 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
         });
     }
 
-    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStep(string step, Guid personId, bool populateOptional = true)
+    protected async Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Guid personId, bool populateOptional = true)
     {
-        var alertType = await GetKnownAlertType();
+        var alertType = await GetKnownAlertTypeAsync();
 
         return await
             (step switch
             {
                 JourneySteps.New or JourneySteps.Index =>
-                    CreateEmptyJourneyInstance(personId),
+                    CreateEmptyJourneyInstanceAsync(personId),
                 JourneySteps.AlertType =>
-                    CreateJourneyInstance(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState()
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name
                     }),
                 JourneySteps.Details =>
-                    CreateJourneyInstance(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState()
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name,
                         Details = "Alert Details"
                     }),
                 JourneySteps.Link =>
-                    CreateJourneyInstance(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState()
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name,
@@ -62,7 +62,7 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
                         Link = populateOptional ? "https://www.example.com" : null
                     }),
                 JourneySteps.StartDate =>
-                    CreateJourneyInstance(personId, new AddAlertState()
+                    CreateJourneyInstanceAsync(personId, new AddAlertState()
                     {
                         AlertTypeId = alertType.AlertTypeId,
                         AlertTypeName = alertType.Name,
@@ -72,15 +72,15 @@ public abstract class AddAlertTestBase(HostFixture hostFixture) : TestBase(hostF
                         StartDate = Clock.Today.AddDays(-30)
                     }),
                 JourneySteps.Reason or JourneySteps.CheckAnswers =>
-                    CreateJourneyInstanceForAllStepsCompleted(personId, populateOptional: true),
+                    CreateJourneyInstanceForAllStepsCompletedAsync(personId, populateOptional: true),
                 _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
             });
     }
 
-    protected Task<AlertType> GetKnownAlertType(bool isDbsAlertType = false) =>
-        isDbsAlertType ? TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCode("") : TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCode("T1");
+    protected Task<AlertType> GetKnownAlertTypeAsync(bool isDbsAlertType = false) =>
+        isDbsAlertType ? TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("") : TestData.ReferenceDataCache.GetAlertTypeByDqtSanctionCodeAsync("T1");
 
-    private Task<JourneyInstance<AddAlertState>> CreateJourneyInstance(Guid personId, AddAlertState state) =>
+    private Task<JourneyInstance<AddAlertState>> CreateJourneyInstanceAsync(Guid personId, AddAlertState state) =>
         CreateJourneyInstance(
             JourneyNames.AddAlert,
             state ?? new AddAlertState(),

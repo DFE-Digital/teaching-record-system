@@ -14,9 +14,9 @@ public class GetEytsCertificateHandler(IDataverseAdapter dataverseAdapter, ICert
     private const string TrnFormField = "TRN";
     private const string EytsDateFormField = "EYTSDate";
 
-    public async Task<FileDownloadInfo?> Handle(GetEytsCertificateCommand command)
+    public async Task<FileDownloadInfo?> HandleAsync(GetEytsCertificateCommand command)
     {
-        var teacher = await dataverseAdapter.GetTeacherByTrn(
+        var teacher = await dataverseAdapter.GetTeacherByTrnAsync(
             command.Trn,
             columnNames: new[]
             {
@@ -48,7 +48,7 @@ public class GetEytsCertificateHandler(IDataverseAdapter dataverseAdapter, ICert
             { EytsDateFormField, teacher.dfeta_EYTSDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true).ToString("d MMMM yyyy") }
         };
 
-        var pdfStream = await certificateGenerator.GenerateCertificate("EYTS certificate.pdf", fieldValues);
+        var pdfStream = await certificateGenerator.GenerateCertificateAsync("EYTS certificate.pdf", fieldValues);
 
         return new FileDownloadInfo(pdfStream, $"EYTSCertificate.pdf", "application/pdf");
     }

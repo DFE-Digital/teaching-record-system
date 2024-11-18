@@ -56,7 +56,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal($"{dateOfBirth:%d}", doc.GetElementById("DateOfBirth.Day")?.GetAttribute("value"));
         Assert.Equal($"{dateOfBirth:%M}", doc.GetElementById("DateOfBirth.Month")?.GetAttribute("value"));
         Assert.Equal($"{dateOfBirth:yyyy}", doc.GetElementById("DateOfBirth.Year")?.GetAttribute("value"));
@@ -99,7 +99,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "DateOfBirth", "Enter your date of birth");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "DateOfBirth", "Enter your date of birth");
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "DateOfBirth", "Date of birth must be in the past");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "DateOfBirth", "Date of birth must be in the past");
     }
 
     [Fact]

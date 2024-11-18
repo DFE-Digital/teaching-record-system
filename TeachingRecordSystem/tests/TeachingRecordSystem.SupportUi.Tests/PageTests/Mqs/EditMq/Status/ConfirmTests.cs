@@ -9,9 +9,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState()
             {
@@ -78,9 +78,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             changeReason = endDateChangeReason.GetDisplayName()!;
         }
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState()
             {
@@ -104,7 +104,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
@@ -148,9 +148,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState()
             {
@@ -224,7 +224,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             changes = MandatoryQualificationUpdatedEventChanges.EndDate;
         }
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus, oldEndDate)));
         var qualification = person.MandatoryQualifications.First();
         var qualificationId = qualification.QualificationId;
         var provider = MandatoryQualificationProvider.GetById(qualification.ProviderId!.Value);
@@ -234,7 +234,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         Guid? evidenceFileId = uploadEvidence ? Guid.NewGuid() : null;
         string? evidenceFileName = uploadEvidence ? "test.pdf" : null;
 
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState()
             {
@@ -262,8 +262,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Mandatory qualification changed");
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -339,9 +339,9 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oldEndDate = (DateOnly?)null;
         var newStatus = MandatoryQualificationStatus.Passed;
         var newEndDate = new DateOnly(2021, 12, 5);
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithStatus(oldStatus)));
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
-        var journeyInstance = await CreateJourneyInstance(
+        var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
             new EditMqStatusState()
             {
@@ -376,7 +376,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         });
     }
 
-    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstance(Guid qualificationId, EditMqStatusState? state = null) =>
+    private async Task<JourneyInstance<EditMqStatusState>> CreateJourneyInstanceAsync(Guid qualificationId, EditMqStatusState? state = null) =>
         await CreateJourneyInstance(
             JourneyNames.EditMqStatus,
             state ?? new EditMqStatusState(),

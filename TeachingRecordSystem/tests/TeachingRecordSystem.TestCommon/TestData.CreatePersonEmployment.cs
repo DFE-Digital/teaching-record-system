@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public async Task<TpsEmployment> CreateTpsEmployment(
+    public async Task<TpsEmployment> CreateTpsEmploymentAsync(
         CreatePersonResult person,
         Establishment establishment,
         DateOnly startDate,
@@ -19,7 +19,7 @@ public partial class TestData
     {
         var key = $"{person.Trn}.{establishment.LaCode}.{establishment.EstablishmentNumber}.{startDate:yyyyMMdd}";
 
-        var personEmployment = await WithDbContext(async dbContext =>
+        var personEmployment = await WithDbContextAsync(async dbContext =>
         {
             var personEmployment = new TpsEmployment
             {

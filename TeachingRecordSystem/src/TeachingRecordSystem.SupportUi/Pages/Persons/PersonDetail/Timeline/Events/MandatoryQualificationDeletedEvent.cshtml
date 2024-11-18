@@ -5,7 +5,7 @@
 @{
     var deletedEvent = Model.ItemModel.Event;
     var mandatoryQualification = deletedEvent.MandatoryQualification;
-    var evidenceFileUrl = deletedEvent.EvidenceFile is not null ? await FileService.GetFileUrl(deletedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+    var evidenceFileUrl = deletedEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(deletedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-mq-deleted-event">

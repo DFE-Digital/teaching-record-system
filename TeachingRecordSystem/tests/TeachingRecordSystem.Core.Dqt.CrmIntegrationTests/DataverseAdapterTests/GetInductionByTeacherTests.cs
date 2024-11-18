@@ -72,7 +72,7 @@ public class GetInductionByTeacherTests : IAsyncLifetime
         });
 
         // Need QTS to be able to get induction records into CRM due to plugin validation
-        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, null);
+        var teacherStatus = await _dataverseAdapter.GetTeacherStatusAsync(teacherStatusValue, null);
         await _organizationService.CreateAsync(new dfeta_qtsregistration()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),
@@ -123,7 +123,7 @@ public class GetInductionByTeacherTests : IAsyncLifetime
         }
 
         // Act
-        var (induction, inductionPeriods) = await _dataverseAdapter.GetInductionByTeacher(
+        var (induction, inductionPeriods) = await _dataverseAdapter.GetInductionByTeacherAsync(
             teacherId,
             columnNames: new[]
             {

@@ -16,7 +16,7 @@ public class SignedInModel : PageModel
     [Display(Name = "Claims")]
     public string? ClaimsJson { get; set; }
 
-    public async Task OnGet()
+    public async Task OnGetAsync()
     {
         AccessToken = await HttpContext.GetTokenAsync(TestAppConfiguration.AuthenticationSchemeName, TokenTypes.AccessToken);
 

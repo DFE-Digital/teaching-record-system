@@ -62,8 +62,10 @@ internal sealed class PooledOrganizationService : IOrganizationServiceAsync2, ID
             return 1;
         });
 
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
     private TResult WithPooledConnection<TResult>(Func<IOrganizationServiceAsync2, TResult> action) =>
         WithPooledConnectionAsync<TResult>(client => Task.FromResult(action(client))).GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
 
     private void WithPooledConnection(Action<IOrganizationServiceAsync2> action) =>
         WithPooledConnection(client =>

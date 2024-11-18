@@ -7,7 +7,7 @@
     var migratedEvent = Model.ItemModel.Event;
     var alert = migratedEvent.Alert;
     var oldAlert = migratedEvent.OldAlert;
-    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId.Value) : null;
+    var alertType = alert.AlertTypeId is not null ? await ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId.Value) : null;
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-alert-migrated-event">

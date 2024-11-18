@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllSpecialismsHandler : ICrmQueryHandler<GetAllSpecialismsQuery, dfeta_specialism[]>
 {
-    public async Task<dfeta_specialism[]> Execute(GetAllSpecialismsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_specialism[]> ExecuteAsync(GetAllSpecialismsQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression(LogicalOperator.And);
 

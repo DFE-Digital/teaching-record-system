@@ -29,9 +29,9 @@ public class ConfirmModel : PageModel
 
     public string? NewValue { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(
+        await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(
             new UpdateContactDateOfBirthQuery(
                 PersonId,
                 JourneyInstance!.State.DateOfBirth));
@@ -52,7 +52,7 @@ public class ConfirmModel : PageModel
             return;
         }
 
-        var person = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(
+        var person = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(
             new GetActiveContactDetailByIdQuery(
                 PersonId,
                 new ColumnSet(

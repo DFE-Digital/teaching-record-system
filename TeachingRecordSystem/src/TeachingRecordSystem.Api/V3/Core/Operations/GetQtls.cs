@@ -10,9 +10,9 @@ public record GetQtlsCommand(string Trn);
 
 public class GetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task<QtlsResult?> Handle(GetQtlsCommand command)
+    public async Task<QtlsResult?> HandleAsync(GetQtlsCommand command)
     {
-        var contact = (await crmQueryDispatcher.ExecuteQuery(
+        var contact = (await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet(

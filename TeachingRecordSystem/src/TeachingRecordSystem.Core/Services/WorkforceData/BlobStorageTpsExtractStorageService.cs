@@ -11,28 +11,28 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
     private const string PendingFolderName = "pending";
     private const string ImportedFolderName = "imported";
 
-    public async Task<string[]> GetPendingImportFileNames(CancellationToken cancellationToken)
+    public async Task<string[]> GetPendingImportFileNamesAsync(CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
-        var fileNames = await GetFileNames(blobContainerClient, PendingFolderName, true, cancellationToken);
+        var fileNames = await GetFileNamesAsync(blobContainerClient, PendingFolderName, true, cancellationToken);
         return fileNames.OrderBy(f => f).ToArray();
     }
 
-    public async Task<string?> GetPendingEstablishmentImportFileName(CancellationToken cancellationToken)
+    public async Task<string?> GetPendingEstablishmentImportFileNameAsync(CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
-        var fileNames = await GetFileNames(blobContainerClient, EstablishmentsFolderName, true, cancellationToken);
+        var fileNames = await GetFileNamesAsync(blobContainerClient, EstablishmentsFolderName, true, cancellationToken);
         return fileNames.FirstOrDefault();
     }
 
-    public async Task<Stream> GetFile(string fileName, CancellationToken cancellationToken)
+    public async Task<Stream> GetFileAsync(string fileName, CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
         var blobClient = blobContainerClient.GetBlobClient(fileName);
         return await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task ArchiveFile(string fileName, CancellationToken cancellationToken)
+    public async Task ArchiveFileAsync(string fileName, CancellationToken cancellationToken)
     {
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(TpsExtractsContainerName);
 
@@ -63,7 +63,7 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
         }
     }
 
-    private async Task<string[]> GetFileNames(BlobContainerClient containerClient, string prefix, bool includeSubfolders, CancellationToken cancellationToken)
+    private async Task<string[]> GetFileNamesAsync(BlobContainerClient containerClient, string prefix, bool includeSubfolders, CancellationToken cancellationToken)
     {
         var fileNames = new List<string>();
         var resultSegment = containerClient.GetBlobsByHierarchyAsync(prefix: prefix, delimiter: "/", cancellationToken: cancellationToken).AsPages();
@@ -79,7 +79,7 @@ public class BlobStorageTpsExtractStorageService(BlobServiceClient blobServiceCl
                     if (includeSubfolders)
                     {
                         // Call recursively with the prefix to traverse the virtual directory.
-                        var subfolderFileNames = await GetFileNames(containerClient, blobhierarchyItem.Prefix, true, cancellationToken);
+                        var subfolderFileNames = await GetFileNamesAsync(containerClient, blobhierarchyItem.Prefix, true, cancellationToken);
                         if (subfolderFileNames != null)
                         {
                             fileNames.AddRange(subfolderFileNames);

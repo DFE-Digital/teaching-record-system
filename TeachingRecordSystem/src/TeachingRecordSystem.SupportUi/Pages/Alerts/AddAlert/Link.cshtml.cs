@@ -33,7 +33,7 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
         Link = JourneyInstance!.State.Link;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (AddLink == true && !TrsUriHelper.TryCreateWebsiteUri(Link, out _))
         {
@@ -56,7 +56,7 @@ public class LinkModel(TrsLinkGenerator linkGenerator) : PageModel
             : linkGenerator.AlertAddStartDate(PersonId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

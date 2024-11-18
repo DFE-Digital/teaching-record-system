@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllActiveHeSubjectsHandler : ICrmQueryHandler<GetAllActiveHeSubjectsQuery, dfeta_hesubject[]>
 {
-    public async Task<dfeta_hesubject[]> Execute(GetAllActiveHeSubjectsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_hesubject[]> ExecuteAsync(GetAllActiveHeSubjectsQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

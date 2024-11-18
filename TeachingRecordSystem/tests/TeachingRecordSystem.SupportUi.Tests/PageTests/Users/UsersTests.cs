@@ -28,7 +28,7 @@ public class UsersTests : TestBase
     public async Task Get_UserWithAdministratorRole_ReturnsOk()
     {
         // Arrange
-        var user = await TestData.CreateUser(roles: new[] { UserRoles.Administrator });
+        var user = await TestData.CreateUserAsync(roles: new[] { UserRoles.Administrator });
         SetCurrentUser(user);
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
@@ -45,7 +45,7 @@ public class UsersTests : TestBase
     public async Task Get_ValidRequestAndUsersFound_RendersUsers()
     {
         // Arrange
-        var user = await TestData.CreateUser(roles: new[] { UserRoles.Administrator });
+        var user = await TestData.CreateUserAsync(roles: new[] { UserRoles.Administrator });
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 
@@ -53,7 +53,7 @@ public class UsersTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var element = doc.GetElementByTestId($"user-{user.UserId}")!.InnerHtml;
 
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);

@@ -30,7 +30,7 @@ public class GetTeachersByTrnAndDobTests : IAsyncLifetime
         var (_, trn) = await CreateTeacher(dob);
 
         // Act
-        var result = await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, dob, columnNames: new[] { Contact.Fields.BirthDate });
+        var result = await _dataverseAdapter.GetTeachersByTrnAndDoBAsync(trn, dob, columnNames: new[] { Contact.Fields.BirthDate });
 
         // Assert
         Assert.NotNull(result);
@@ -45,7 +45,7 @@ public class GetTeachersByTrnAndDobTests : IAsyncLifetime
         var (_, trn) = await CreateTeacher(dob);
 
         // Act
-        var result = await _dataverseAdapter.GetTeachersByTrnAndDoB(trn, new DateOnly(2022, 1, 1), columnNames: new[] { Contact.Fields.BirthDate });
+        var result = await _dataverseAdapter.GetTeachersByTrnAndDoBAsync(trn, new DateOnly(2022, 1, 1), columnNames: new[] { Contact.Fields.BirthDate });
 
         // Assert
         Assert.Empty(result);

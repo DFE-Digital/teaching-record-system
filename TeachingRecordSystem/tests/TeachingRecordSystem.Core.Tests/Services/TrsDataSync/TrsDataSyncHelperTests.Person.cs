@@ -8,53 +8,53 @@ namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
 public partial class TrsDataSyncHelperTests
 {
     [Fact]
-    public async Task SyncPerson_NewRecord_WritesNewRowToDb()
+    public async Task SyncPersonAsync_NewRecord_WritesNewRowToDb()
     {
         // Arrange
         var contactId = Guid.NewGuid();
         var contact = await CreatePersonEntity(contactId);
 
         // Act
-        await Helper.SyncPerson(contact, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(contact, ignoreInvalid: false);
 
         // Assert
         await AssertDatabasePersonMatchesEntity(contact);
     }
 
     [Fact]
-    public async Task SyncPerson_ExistingRecord_UpdatesExistingRowInDb()
+    public async Task SyncPersonAsync_ExistingRecord_UpdatesExistingRowInDb()
     {
         // Arrange
         var contactId = Guid.NewGuid();
         var existingEntity = await CreatePersonEntity(contactId);
 
-        await Helper.SyncPerson(existingEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(existingEntity, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
 
         Clock.Advance();
         var updatedEntity = await CreatePersonEntity(contactId, existingEntity);
 
         // Act
-        await Helper.SyncPerson(updatedEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(updatedEntity, ignoreInvalid: false);
 
         // Assert
         await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync);
     }
 
     [Fact]
-    public async Task DeleteRecords_WithPerson_RemovesRowFromDb()
+    public async Task DeleteRecordsAsync_WithPerson_RemovesRowFromDb()
     {
         // Arrange
         var contactId = Guid.NewGuid();
         var existingEntity = await CreatePersonEntity(contactId);
 
-        await Helper.SyncPerson(existingEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(existingEntity, ignoreInvalid: false);
 
         // Act
-        await Helper.DeleteRecords(TrsDataSyncHelper.ModelTypes.Person, new[] { contactId });
+        await Helper.DeleteRecordsAsync(TrsDataSyncHelper.ModelTypes.Person, new[] { contactId });
 
         // Assert
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.Null(person);
@@ -62,7 +62,7 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
-    public async Task SyncPerson_AlreadyHaveNewerVersion_DoesNotUpdateDatabase()
+    public async Task SyncPersonAsync_AlreadyHaveNewerVersion_DoesNotUpdateDatabase()
     {
         // Arrange
         var contactId = Guid.NewGuid();
@@ -71,12 +71,12 @@ public partial class TrsDataSyncHelperTests
         Clock.Advance();
         var updatedEntity = await CreatePersonEntity(contactId, initialEntity);
 
-        await Helper.SyncPerson(updatedEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(updatedEntity, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
         var expectedLastSync = Clock.UtcNow;
 
         // Act
-        await Helper.SyncPerson(initialEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(initialEntity, ignoreInvalid: false);
 
         // Assert
         await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
@@ -87,7 +87,7 @@ public partial class TrsDataSyncHelperTests
         DateTime? expectedFirstSync = null,
         DateTime? expectedLastSync = null)
     {
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == entity.Id);
             Assert.NotNull(person);
@@ -117,7 +117,7 @@ public partial class TrsDataSyncHelperTests
         var createdOn = Clock.UtcNow;
         var modifiedOn = Clock.UtcNow;
         var state = ContactState.Active;
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
         var firstName = Faker.Name.First();
         var middleName = Faker.Name.Middle();
         var lastName = Faker.Name.Last();

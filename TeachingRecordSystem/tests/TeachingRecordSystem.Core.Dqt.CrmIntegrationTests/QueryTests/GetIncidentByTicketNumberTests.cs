@@ -22,7 +22,7 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
         var nonExistentTicketNumber = Guid.NewGuid().ToString();
 
         // Act
-        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(nonExistentTicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(nonExistentTicketNumber));
 
         // Assert
         Assert.Null(incidentDetail);
@@ -32,11 +32,11 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
     public async Task WhenCalled_ForIncidentWithSingleDocument_ReturnsSingleIncidentAndSingleDocument()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId));
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
         // Act
-        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
 
         // Assert
         Assert.NotNull(incidentDetail);
@@ -47,11 +47,11 @@ public class GetIncidentByTicketNumberTests : IAsyncLifetime
     public async Task WhenCalled_ForIncidentWithMultipleDocument_ReturnsSingleIncidentAndMultipleDocuments()
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
-        var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithMultipleEvidenceFiles());
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
+        var createNameChangeIncidentResult = await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithMultipleEvidenceFiles());
 
         // Act
-        var incidentDetail = await _crmQueryDispatcher.ExecuteQuery(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
+        var incidentDetail = await _crmQueryDispatcher.ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(createNameChangeIncidentResult.TicketNumber));
 
         // Assert
         Assert.NotNull(incidentDetail);

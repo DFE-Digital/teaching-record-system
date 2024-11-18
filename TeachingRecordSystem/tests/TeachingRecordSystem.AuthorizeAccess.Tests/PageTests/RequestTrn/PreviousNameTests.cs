@@ -54,7 +54,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var radioButtons = doc.GetElementsByName("HasPreviousName");
         var selectedRadioButton = radioButtons.Single(r => r.HasAttribute("checked"));
         Assert.Equal("True", selectedRadioButton.GetAttribute("value"));
@@ -117,7 +117,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "HasPreviousName", "Select yes if you’ve ever changed your name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasPreviousName", "Select yes if you’ve ever changed your name");
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "PreviousName", "Enter your previous full name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "PreviousName", "Enter your previous full name");
     }
 
     [Fact]

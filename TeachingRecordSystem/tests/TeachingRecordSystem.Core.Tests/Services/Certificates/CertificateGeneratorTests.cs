@@ -44,7 +44,7 @@ public class CertificateGeneratorTests
 
         // Act
         var certificateGenerator = new CertificateGenerator(blobServiceClient);
-        var stream = await certificateGenerator.GenerateCertificate(templateName, fieldValues);
+        var stream = await certificateGenerator.GenerateCertificateAsync(templateName, fieldValues);
         var pdfGenerated = PdfReader.Open(stream, PdfDocumentOpenMode.ReadOnly);
 
         // Assert

@@ -15,7 +15,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/not-verified");
     }
@@ -23,7 +23,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUser_MatchesWithNino()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber());
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -33,26 +33,26 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Find your teaching record");
+        await page.ClickButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", person.NationalInsuranceNumber!);
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickButton("Access your teaching record");
+        await page.ClickButtonAsync("Access your teaching record");
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithUnmatchedNino_MatchesWithTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -62,31 +62,31 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Find your teaching record");
+        await page.ClickButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('Teacher reference number')", person.Trn!);
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickButton("Access your teaching record");
+        await page.ClickButtonAsync("Access your teaching record");
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithoutNino_MatchesWithTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -96,30 +96,30 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Find your teaching record");
+        await page.ClickButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=No");
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('Teacher reference number')", person.Trn!);
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/found");
-        await page.ClickButton("Access your teaching record");
+        await page.ClickButtonAsync("Access your teaching record");
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownVerifiedUser_DoesNotMatchWithNinoOrTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -129,26 +129,26 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Find your teaching record");
+        await page.ClickButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=Yes");
         await page.FillAsync("label:text-is('National Insurance number')", TestData.GenerateNationalInsuranceNumber());
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("text=Yes");
-        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrn());
-        await page.ClickButton("Continue");
+        await page.FillAsync("label:text-is('Teacher reference number')", await TestData.GenerateTrnAsync());
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickButton("Check your answers");
+        await page.ClickButtonAsync("Check your answers");
 
         await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickButton("Submit support request");
+        await page.ClickButtonAsync("Submit support request");
 
         await page.WaitForUrlPathAsync("/request-submitted");
     }
@@ -156,7 +156,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithNeitherNinoNorTrn_DoesNotMatch()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -166,24 +166,24 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
         await page.WaitForUrlPathAsync("/connect");
-        await page.ClickButton("Find your teaching record");
+        await page.ClickButtonAsync("Find your teaching record");
 
         await page.WaitForUrlPathAsync("/national-insurance-number");
         await page.CheckAsync("text=No");
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/trn");
         await page.CheckAsync("label:text-is('No')");
-        await page.ClickButton("Continue");
+        await page.ClickButtonAsync("Continue");
 
         await page.WaitForUrlPathAsync("/not-found");
-        await page.ClickButton("Check your answers");
+        await page.ClickButtonAsync("Check your answers");
 
         await page.WaitForUrlPathAsync("/check-answers");
-        await page.ClickButton("Submit support request");
+        await page.ClickButtonAsync("Submit support request");
 
         await page.WaitForUrlPathAsync("/request-submitted");
     }
@@ -191,7 +191,7 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithTrnTokenAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn().WithNationalInsuranceNumber(false));
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn().WithNationalInsuranceNumber(false));
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -218,15 +218,15 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage(trnToken: trnToken);
+        await page.GoToTestStartPageAsync(trnToken: trnToken);
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -256,15 +256,15 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedByTrnTokenAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -295,15 +295,15 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownVerifiedUserWithGetAnIdentityAccountWithTrnAssociatedBySupportAndMatchingDetails_MatchesWithTrn()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
 
         var subject = TestData.CreateOneLoginUserSubject();
         var email = Faker.Internet.Email();
@@ -334,73 +334,73 @@ public class SignInTests(HostFixture hostFixture) : TestBase(hostFixture)
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_KnownUser()
     {
-        var person = await TestData.CreatePerson(x => x.WithTrn());
-        var oneLoginUser = await TestData.CreateOneLoginUser(person);
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownUser_OneLoginUserIsAttachedToTrnRequest()
     {
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var trnRequestId = Guid.NewGuid().ToString();
 
         var subject = TestData.CreateOneLoginUserSubject();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true, oneLoginUserSubject: subject));
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(subject: Option.Some(subject));
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(subject: Option.Some(subject));
 
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 
     [Fact]
     public async Task SignIn_UnknownUser_EmailIsAttachedToTrnRequest()
     {
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var trnRequestId = Guid.NewGuid().ToString();
 
         var email = TestData.GenerateUniqueEmail();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithEmail(email)
             .WithTrnRequest(applicationUser.UserId, trnRequestId, identityVerified: true));
 
-        var oneLoginUser = await TestData.CreateOneLoginUser(email: Option.Some((string?)email));
+        var oneLoginUser = await TestData.CreateOneLoginUserAsync(email: Option.Some((string?)email));
 
         SetCurrentOneLoginUser(OneLoginUserInfo.Create(oneLoginUser.Subject, oneLoginUser.Email!));
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
 
-        await page.GoToTestStartPage();
+        await page.GoToTestStartPageAsync();
 
-        await page.AssertSignedIn(person.Trn!);
+        await page.AssertSignedInAsync(person.Trn!);
     }
 }

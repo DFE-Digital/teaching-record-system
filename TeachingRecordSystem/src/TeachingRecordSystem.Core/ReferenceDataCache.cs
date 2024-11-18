@@ -23,208 +23,208 @@ public class ReferenceDataCache(
     private Task<AlertCategory[]>? _alertCategoriesTask;
     private Task<AlertType[]>? _alertTypesTask;
 
-    public async Task<dfeta_sanctioncode> GetSanctionCodeByValue(string value)
+    public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
     {
-        var sanctionCodes = await EnsureSanctionCodes();
+        var sanctionCodes = await EnsureSanctionCodesAsync();
         // build environment has some duplicate sanction codes, which prevent us using Single() here
         return sanctionCodes.First(s => s.dfeta_Value == value, $"Could not find sanction code with value: '{value}'.");
     }
 
-    public async Task<dfeta_sanctioncode> GetSanctionCodeById(Guid sanctionCodeId)
+    public async Task<dfeta_sanctioncode> GetSanctionCodeByIdAsync(Guid sanctionCodeId)
     {
-        var sanctionCodes = await EnsureSanctionCodes();
+        var sanctionCodes = await EnsureSanctionCodesAsync();
         return sanctionCodes.Single(s => s.dfeta_sanctioncodeId == sanctionCodeId, $"Could not find sanction code with ID: '{sanctionCodeId}'.");
     }
 
-    public async Task<dfeta_sanctioncode[]> GetSanctionCodes(bool activeOnly = true)
+    public async Task<dfeta_sanctioncode[]> GetSanctionCodesAsync(bool activeOnly = true)
     {
-        var sanctionCodes = await EnsureSanctionCodes();
+        var sanctionCodes = await EnsureSanctionCodesAsync();
         return sanctionCodes.Where(s => s.StateCode == dfeta_sanctioncodeState.Active || !activeOnly).ToArray();
     }
 
-    public async Task<Subject> GetSubjectByTitle(string title)
+    public async Task<Subject> GetSubjectByTitleAsync(string title)
     {
-        var subjects = await EnsureSubjects();
+        var subjects = await EnsureSubjectsAsync();
         return subjects.Single(s => s.Title == title, $"Could not find subject with title: '{title}'.");
     }
 
-    public async Task<dfeta_teacherstatus> GetTeacherStatusById(Guid id)
+    public async Task<dfeta_teacherstatus> GetTeacherStatusByIdAsync(Guid id)
     {
-        var teacherStatuses = await EnsureTeacherStatuses();
+        var teacherStatuses = await EnsureTeacherStatusesAsync();
         return teacherStatuses.Single(ts => ts.Id == id, $"Could not find teacher status with ID: '{id}'.");
     }
 
-    public async Task<dfeta_teacherstatus> GetTeacherStatusByValue(string value)
+    public async Task<dfeta_teacherstatus> GetTeacherStatusByValueAsync(string value)
     {
-        var teacherStatuses = await EnsureTeacherStatuses();
+        var teacherStatuses = await EnsureTeacherStatusesAsync();
         return teacherStatuses.Single(ts => ts.dfeta_Value == value, $"Could not find teacher status with value: '{value}'.");
     }
 
-    public async Task<dfeta_teacherstatus[]> GetTeacherStatuses()
+    public async Task<dfeta_teacherstatus[]> GetTeacherStatusesAsync()
     {
-        var teacherStatuses = await EnsureTeacherStatuses();
+        var teacherStatuses = await EnsureTeacherStatusesAsync();
         return teacherStatuses;
     }
 
-    public async Task<dfeta_earlyyearsstatus[]> GetEytsStatuses()
+    public async Task<dfeta_earlyyearsstatus[]> GetEytsStatusesAsync()
     {
-        var earlyyearStatuses = await EnsureEarlyYearsStatuses();
+        var earlyyearStatuses = await EnsureEarlyYearsStatusesAsync();
         return earlyyearStatuses;
     }
 
-    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusById(Guid id)
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByIdAsync(Guid id)
     {
-        var earlyYearsStatuses = await EnsureEarlyYearsStatuses();
+        var earlyYearsStatuses = await EnsureEarlyYearsStatusesAsync();
         return earlyYearsStatuses.Single(ey => ey.Id == id, $"Could not find early years teacher status with ID: '{id}'.");
     }
 
-    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValue(string value)
+    public async Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusByValueAsync(string value)
     {
-        var earlyYearsStatuses = await EnsureEarlyYearsStatuses();
+        var earlyYearsStatuses = await EnsureEarlyYearsStatusesAsync();
         return earlyYearsStatuses.Single(ey => ey.dfeta_Value == value, $"Could not find early years teacher status with value: '{value}'.");
     }
 
-    public async Task<dfeta_specialism[]> GetMqSpecialisms()
+    public async Task<dfeta_specialism[]> GetMqSpecialismsAsync()
     {
-        var specialisms = await EnsureSpecialisms();
+        var specialisms = await EnsureSpecialismsAsync();
         return specialisms.ToArray();
     }
 
-    public async Task<dfeta_specialism> GetMqSpecialismByValue(string value)
+    public async Task<dfeta_specialism> GetMqSpecialismByValueAsync(string value)
     {
-        var specialisms = await EnsureSpecialisms();
+        var specialisms = await EnsureSpecialismsAsync();
         // build environment has some duplicate Specialisms, which prevent us using Single() here
         return specialisms.First(s => s.dfeta_Value == value, $"Could not find MQ specialism with value: '{value}'.");
     }
 
-    public async Task<dfeta_specialism> GetMqSpecialismById(Guid specialismId)
+    public async Task<dfeta_specialism> GetMqSpecialismByIdAsync(Guid specialismId)
     {
-        var specialisms = await EnsureSpecialisms();
+        var specialisms = await EnsureSpecialismsAsync();
         return specialisms.Single(s => s.dfeta_specialismId == specialismId, $"Could not find MQ specialism with ID: '{specialismId}'.");
     }
 
-    public async Task<dfeta_mqestablishment[]> GetMqEstablishments()
+    public async Task<dfeta_mqestablishment[]> GetMqEstablishmentsAsync()
     {
-        var mqEstablishments = await EnsureMqEstablishments();
+        var mqEstablishments = await EnsureMqEstablishmentsAsync();
         return mqEstablishments.ToArray();
     }
 
-    public async Task<dfeta_mqestablishment> GetMqEstablishmentByValue(string value)
+    public async Task<dfeta_mqestablishment> GetMqEstablishmentByValueAsync(string value)
     {
-        var mqEstablishments = await EnsureMqEstablishments();
+        var mqEstablishments = await EnsureMqEstablishmentsAsync();
         // build environment has some duplicate MQ Establishments, which prevent us using Single() here
         return mqEstablishments.First(s => s.dfeta_Value == value, $"Could not find MQ establishment with value: '{value}'.");
     }
 
-    public async Task<dfeta_mqestablishment> GetMqEstablishmentById(Guid mqEstablishmentId)
+    public async Task<dfeta_mqestablishment> GetMqEstablishmentByIdAsync(Guid mqEstablishmentId)
     {
-        var mqEstablishments = await EnsureMqEstablishments();
+        var mqEstablishments = await EnsureMqEstablishmentsAsync();
         return mqEstablishments.Single(s => s.dfeta_mqestablishmentId == mqEstablishmentId, $"Could not find MQ establishment with ID: '{mqEstablishmentId}'.");
     }
 
-    public async Task<dfeta_hequalification[]> GetHeQualifications()
+    public async Task<dfeta_hequalification[]> GetHeQualificationsAsync()
     {
-        var heQualifications = await EnsureHeQualifications();
+        var heQualifications = await EnsureHeQualificationsAsync();
         return heQualifications.ToArray();
     }
 
-    public async Task<dfeta_hequalification> GetHeQualificationByValue(string value)
+    public async Task<dfeta_hequalification> GetHeQualificationByValueAsync(string value)
     {
-        var heQualifications = await EnsureHeQualifications();
+        var heQualifications = await EnsureHeQualificationsAsync();
         // build environment has some duplicate HE Qualifications, which prevent us using Single() here
         return heQualifications.First(s => s.dfeta_Value == value, $"Could not find HE qualification with value: '{value}'.");
     }
 
-    public async Task<dfeta_hesubject[]> GetHeSubjects()
+    public async Task<dfeta_hesubject[]> GetHeSubjectsAsync()
     {
-        var heSubjects = await EnsureHeSubjects();
+        var heSubjects = await EnsureHeSubjectsAsync();
         return heSubjects.ToArray();
     }
 
-    public async Task<dfeta_hesubject> GetHeSubjectByValue(string value)
+    public async Task<dfeta_hesubject> GetHeSubjectByValueAsync(string value)
     {
-        var heSubjects = await EnsureHeSubjects();
+        var heSubjects = await EnsureHeSubjectsAsync();
         // build environment has some duplicate HE Subjects, which prevent us using Single() here
         return heSubjects.First(s => s.dfeta_Value == value, $"Could not find HE subject with value: '{value}'.");
     }
 
-    public async Task<AlertCategory[]> GetAlertCategories()
+    public async Task<AlertCategory[]> GetAlertCategoriesAsync()
     {
-        var alertCategories = await EnsureAlertCategories();
+        var alertCategories = await EnsureAlertCategoriesAsync();
         return alertCategories;
     }
 
-    public async Task<AlertCategory> GetAlertCategoryById(Guid alertCategoryId)
+    public async Task<AlertCategory> GetAlertCategoryByIdAsync(Guid alertCategoryId)
     {
-        var alertCategories = await EnsureAlertCategories();
+        var alertCategories = await EnsureAlertCategoriesAsync();
         return alertCategories.Single(ac => ac.AlertCategoryId == alertCategoryId, $"Could not find alert category with ID: '{alertCategoryId}'.");
     }
 
-    public async Task<AlertType[]> GetAlertTypes(bool activeOnly = false)
+    public async Task<AlertType[]> GetAlertTypesAsync(bool activeOnly = false)
     {
-        var alertTypes = await EnsureAlertTypes();
+        var alertTypes = await EnsureAlertTypesAsync();
         return alertTypes.Where(t => !activeOnly || t.IsActive).ToArray();
     }
 
-    public async Task<AlertType> GetAlertTypeById(Guid alertTypeId)
+    public async Task<AlertType> GetAlertTypeByIdAsync(Guid alertTypeId)
     {
-        var alertTypes = await EnsureAlertTypes();
+        var alertTypes = await EnsureAlertTypesAsync();
         return alertTypes.Single(at => at.AlertTypeId == alertTypeId, $"Could not find alert type with ID: '{alertTypeId}'.");
     }
 
-    public async Task<AlertType> GetAlertTypeByDqtSanctionCode(string dqtSanctionCode)
+    public async Task<AlertType> GetAlertTypeByDqtSanctionCodeAsync(string dqtSanctionCode)
     {
-        var alertTypes = await EnsureAlertTypes();
+        var alertTypes = await EnsureAlertTypesAsync();
         return alertTypes.Single(at => at.DqtSanctionCode == dqtSanctionCode, $"Could not find alert type with DQT sanction code: '{dqtSanctionCode}'.");
     }
 
-    public async Task<AlertType?> GetAlertTypeByDqtSanctionCodeIfExists(string dqtSanctionCode)
+    public async Task<AlertType?> GetAlertTypeByDqtSanctionCodeIfExistsAsync(string dqtSanctionCode)
     {
-        var alertTypes = await EnsureAlertTypes();
+        var alertTypes = await EnsureAlertTypesAsync();
         return alertTypes.SingleOrDefault(at => at.DqtSanctionCode == dqtSanctionCode);
     }
 
-    private Task<dfeta_sanctioncode[]> EnsureSanctionCodes() =>
+    private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllSanctionCodesQuery(ActiveOnly: false)));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSanctionCodesQuery(ActiveOnly: false)));
 
-    private Task<Subject[]> EnsureSubjects() =>
+    private Task<Subject[]> EnsureSubjectsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSubjectsQuery()));
 
-    private Task<dfeta_teacherstatus[]> EnsureTeacherStatuses() =>
+    private Task<dfeta_teacherstatus[]> EnsureTeacherStatusesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getTeacherStatusesTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllTeacherStatusesQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllTeacherStatusesQuery()));
 
-    private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatuses() =>
+    private Task<dfeta_earlyyearsstatus[]> EnsureEarlyYearsStatusesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getEarlyYearsStatusesTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveEarlyYearsStatusesQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveEarlyYearsStatusesQuery()));
 
-    private Task<dfeta_specialism[]> EnsureSpecialisms() =>
+    private Task<dfeta_specialism[]> EnsureSpecialismsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSpecialismsTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllSpecialismsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllSpecialismsQuery()));
 
-    private Task<dfeta_mqestablishment[]> EnsureMqEstablishments() =>
+    private Task<dfeta_mqestablishment[]> EnsureMqEstablishmentsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _mqEstablishmentsTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllMqEstablishmentsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllMqEstablishmentsQuery()));
 
-    private Task<dfeta_hequalification[]> EnsureHeQualifications() =>
+    private Task<dfeta_hequalification[]> EnsureHeQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeQualificationsTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeQualificationsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveHeQualificationsQuery()));
 
-    private Task<dfeta_hesubject[]> EnsureHeSubjects() =>
+    private Task<dfeta_hesubject[]> EnsureHeSubjectsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getHeSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQuery(new GetAllActiveHeSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveHeSubjectsQuery()));
 
-    private Task<AlertCategory[]> EnsureAlertCategories() =>
+    private Task<AlertCategory[]> EnsureAlertCategoriesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _alertCategoriesTask,
             async () =>
@@ -233,7 +233,7 @@ public class ReferenceDataCache(
                 return await dbContext.AlertCategories.Include(c => c.AlertTypes).ToArrayAsync();
             });
 
-    private Task<AlertType[]> EnsureAlertTypes() =>
+    private Task<AlertType[]> EnsureAlertTypesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _alertTypesTask,
             async () =>
@@ -242,20 +242,20 @@ public class ReferenceDataCache(
                 return await dbContext.AlertTypes.ToArrayAsync();
             });
 
-    async Task IStartupTask.Execute()
+    async Task IStartupTask.ExecuteAsync()
     {
         // CRM
-        await EnsureSanctionCodes();
-        await EnsureSubjects();
-        await EnsureTeacherStatuses();
-        await EnsureEarlyYearsStatuses();
-        await EnsureSpecialisms();
-        await EnsureMqEstablishments();
-        await EnsureHeQualifications();
-        await EnsureHeSubjects();
+        await EnsureSanctionCodesAsync();
+        await EnsureSubjectsAsync();
+        await EnsureTeacherStatusesAsync();
+        await EnsureEarlyYearsStatusesAsync();
+        await EnsureSpecialismsAsync();
+        await EnsureMqEstablishmentsAsync();
+        await EnsureHeQualificationsAsync();
+        await EnsureHeSubjectsAsync();
 
         // TRS
-        await EnsureAlertCategories();
-        await EnsureAlertTypes();
+        await EnsureAlertCategoriesAsync();
+        await EnsureAlertTypesAsync();
     }
 }

@@ -6,6 +6,6 @@ public class ProcessEndedEmploymentsJob(TpsCsvExtractProcessor tpsCsvExtractProc
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await tpsCsvExtractProcessor.ProcessEndedEmployments(cancellationToken);
+        await tpsCsvExtractProcessor.ProcessEndedEmploymentsAsync(cancellationToken);
     }
 }

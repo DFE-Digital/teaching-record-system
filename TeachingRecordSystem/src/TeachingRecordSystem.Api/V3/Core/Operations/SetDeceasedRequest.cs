@@ -9,9 +9,9 @@ public record SetDeceasedCommand(string Trn, DateOnly DateOfDeath);
 
 public class SetDeceasedHandler(ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task Handle(SetDeceasedCommand command)
+    public async Task HandleAsync(SetDeceasedCommand command)
     {
-        var contact = await crmQueryDispatcher.ExecuteQuery(
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet()));
@@ -21,6 +21,6 @@ public class SetDeceasedHandler(ICrmQueryDispatcher crmQueryDispatcher)
             throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
         }
 
-        await crmQueryDispatcher.ExecuteQuery(new SetDeceasedQuery(contact.Id, command.DateOfDeath))!;
+        await crmQueryDispatcher.ExecuteQueryAsync(new SetDeceasedQuery(contact.Id, command.DateOfDeath))!;
     }
 }

@@ -61,7 +61,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(state.AddressLine1, doc.GetElementById("AddressLine1")?.GetAttribute("value"));
         Assert.Equal(state.AddressLine2, doc.GetElementById("AddressLine2")?.GetAttribute("value"));
         Assert.Equal(state.TownOrCity, doc.GetElementById("TownOrCity")?.GetAttribute("value"));
@@ -156,7 +156,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, emptyAddressLineType.ToString(), errorMessage);
+        await AssertEx.HtmlResponseHasErrorAsync(response, emptyAddressLineType.ToString(), errorMessage);
     }
 
     [Theory]
@@ -200,7 +200,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, overflowAddressLineType.ToString(), errorMessage);
+        await AssertEx.HtmlResponseHasErrorAsync(response, overflowAddressLineType.ToString(), errorMessage);
     }
 
     [Fact]

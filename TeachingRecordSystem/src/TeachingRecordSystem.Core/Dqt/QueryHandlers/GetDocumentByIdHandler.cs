@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetDocumentByIdHandler : ICrmQueryHandler<GetDocumentByIdQuery, dfeta_document?>
 {
-    public async Task<dfeta_document?> Execute(GetDocumentByIdQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_document?> ExecuteAsync(GetDocumentByIdQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_document.PrimaryIdAttribute, ConditionOperator.Equal, query.DocumentId);

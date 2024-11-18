@@ -32,9 +32,9 @@ public sealed class SetQtlsResult
 
 public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock)
 {
-    public async Task<SetQtlsResult> Handle(SetQtlsCommand command)
+    public async Task<SetQtlsResult> HandleAsync(SetQtlsCommand command)
     {
-        var contact = (await crmQueryDispatcher.ExecuteQuery(
+        var contact = (await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet(
@@ -49,11 +49,11 @@ public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
             throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
         }
 
-        var induction = await GetInductionWithAppropriateBody(contact.Id);
+        var induction = await GetInductionWithAppropriateBodyAsync(contact.Id);
         var (canSetQtlsDate, reviewTaskDescription) = CanSetQtlsDate(hasQTS: contact.dfeta_QTSDate.HasValue, overallInductionStatus: contact.dfeta_InductionStatus, inductionStatus: induction?.Induction.dfeta_InductionStatus, hasInductionWithAB: induction?.HasAppropriateBody ?? false, existingQtlsdate: contact.dfeta_qtlsdate, incomingQtlsDate: command.QtsDate);
         if (!canSetQtlsDate)
         {
-            await crmQueryDispatcher.ExecuteQuery(
+            await crmQueryDispatcher.ExecuteQueryAsync(
                 new CreateTaskQuery()
                 {
                     ContactId = contact.Id,
@@ -69,7 +69,7 @@ public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 
         var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == contact.Id && a.IsOpen).AnyAsync();
 
-        await crmQueryDispatcher.ExecuteQuery(
+        await crmQueryDispatcher.ExecuteQueryAsync(
              new SetQtlsDateQuery(contact.Id, command.QtsDate, hasActiveAlert, clock.UtcNow))!;
 
         return SetQtlsResult.Success(new QtlsResult()
@@ -79,9 +79,9 @@ public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         });
     }
 
-    private async Task<(dfeta_induction Induction, bool HasAppropriateBody)?> GetInductionWithAppropriateBody(Guid contactId)
+    private async Task<(dfeta_induction Induction, bool HasAppropriateBody)?> GetInductionWithAppropriateBodyAsync(Guid contactId)
     {
-        var induction = await crmQueryDispatcher.ExecuteQuery(new GetActiveInductionByContactIdQuery(contactId));
+        var induction = await crmQueryDispatcher.ExecuteQueryAsync(new GetActiveInductionByContactIdQuery(contactId));
         if (induction.Induction == null)
         {
             return null;

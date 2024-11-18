@@ -4,15 +4,15 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public interface IDataverseAdapter
 {
-    Task<CreateTeacherResult> CreateTeacher(CreateTeacherCommand command);
+    Task<CreateTeacherResult> CreateTeacherAsync(CreateTeacherCommand command);
 
-    Task<Account[]> GetIttProviders(bool activeOnly);
+    Task<Account[]> GetIttProvidersAsync(bool activeOnly);
 
-    Task<Contact[]> FindTeachers(FindTeachersByTrnBirthDateAndNinoQuery query);
+    Task<Contact[]> FindTeachersAsync(FindTeachersByTrnBirthDateAndNinoQuery query);
 
-    Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(Guid earlyYearsStatusId);
+    Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusAsync(Guid earlyYearsStatusId);
 
-    Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacher(
+    Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingByTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] establishmentColumnNames,
@@ -20,88 +20,88 @@ public interface IDataverseAdapter
         string[] qualificationColumnNames,
         bool activeOnly = true);
 
-    Task<dfeta_qualification[]> GetQualificationsForTeacher(
+    Task<dfeta_qualification[]> GetQualificationsForTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] heQualificationColumnNames = null,
         string[] heSubjectColumnNames = null);
 
-    Task<dfeta_qualification> GetQualificationById(
+    Task<dfeta_qualification> GetQualificationByIdAsync(
         Guid qualificationId,
         string[] columnNames,
         string[] contactColumnNames = null);
 
-    Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacher(
+    Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacherAsync(
         Guid teacherId,
         string[] columnNames,
         string[] inductionPeriodColumnNames = null,
         string[] appropriateBodyColumnNames = null,
         string[] contactColumnNames = null);
 
-    Task<Contact> GetTeacher(Guid teacherId, string[] columnNames, bool resolveMerges = true);
+    Task<Contact> GetTeacherAsync(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
-    Task<Contact> GetTeacherByTrn(string trn, string[] columnNames, bool activeOnly = true);
+    Task<Contact> GetTeacherByTrnAsync(string trn, string[] columnNames, bool activeOnly = true);
 
-    Task<Contact[]> GetTeachersByTrnAndDoB(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true);
+    Task<Contact[]> GetTeachersByTrnAndDoBAsync(string trn, DateOnly birthDate, string[] columnNames, bool activeOnly = true);
 
-    Task<Contact> GetTeacherByTsPersonId(string tsPersonId, string[] columnNames);
+    Task<Contact> GetTeacherByTsPersonIdAsync(string tsPersonId, string[] columnNames);
 
-    Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacher(Guid teacherId, string[] columnNames);
+    Task<dfeta_qtsregistration[]> GetQtsRegistrationsByTeacherAsync(Guid teacherId, string[] columnNames);
 
-    Task<Contact[]> FindTeachers(FindTeachersQuery query);
+    Task<Contact[]> FindTeachersAsync(FindTeachersQuery query);
 
-    Task<Contact[]> FindTeachersStrict(FindTeachersQuery query);
+    Task<Contact[]> FindTeachersStrictAsync(FindTeachersQuery query);
 
-    Task<UpdateTeacherResult> UpdateTeacher(UpdateTeacherCommand command);
+    Task<UpdateTeacherResult> UpdateTeacherAsync(UpdateTeacherCommand command);
 
-    Task UpdateTeacherIdentityInfo(UpdateTeacherIdentityInfoCommand command);
+    Task UpdateTeacherIdentityInfoAsync(UpdateTeacherIdentityInfoCommand command);
 
-    Task<Account[]> GetIttProviderOrganizationsByName(string ukprn, string[] columnNames, bool activeOnly);
+    Task<Account[]> GetIttProviderOrganizationsByNameAsync(string ukprn, string[] columnNames, bool activeOnly);
 
-    Task<Account[]> GetIttProviderOrganizationsByUkprn(string ukprn, string[] columnNames, bool activeOnly);
+    Task<Account[]> GetIttProviderOrganizationsByUkprnAsync(string ukprn, string[] columnNames, bool activeOnly);
 
-    Task<Account[]> GetOrganizationsByName(string providerName, string[] columnNames, bool activeOnly);
+    Task<Account[]> GetOrganizationsByNameAsync(string providerName, string[] columnNames, bool activeOnly);
 
-    Task<Account[]> GetOrganizationsByUkprn(string ukprn, string[] columnNames);
+    Task<Account[]> GetOrganizationsByUkprnAsync(string ukprn, string[] columnNames);
 
-    Task<CrmTask[]> GetCrmTasksForTeacher(Guid teacherId, string[] columnNames);
+    Task<CrmTask[]> GetCrmTasksForTeacherAsync(Guid teacherId, string[] columnNames);
 
-    Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
+    Task<SetIttResultForTeacherResult> SetIttResultForTeacherAsync(
         Guid teacherId,
         string ittProviderUkprn,
         dfeta_ITTResult result,
         DateOnly? assessmentDate,
         string slugId = null);
 
-    Task SetTsPersonId(Guid teacherId, string tsPersonId);
+    Task SetTsPersonIdAsync(Guid teacherId, string tsPersonId);
 
-    Task<dfeta_teacherstatus> GetTeacherStatus(string value, RequestBuilder requestBuilder);
+    Task<dfeta_teacherstatus> GetTeacherStatusAsync(string value, RequestBuilder requestBuilder);
 
-    Task<bool> UnlockTeacherRecord(Guid teacherId);
+    Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
 
-    Task<SetNpqQualificationResult> SetNpqQualification(SetNpqQualificationCommand command);
+    Task<SetNpqQualificationResult> SetNpqQualificationAsync(SetNpqQualificationCommand command);
 
-    Task<Contact[]> GetTeachersByHusId(string husId, string[] columnNames);
+    Task<Contact[]> GetTeachersByHusIdAsync(string husId, string[] columnNames);
 
-    Task<Subject> GetSubjectByTitle(string title);
+    Task<Subject> GetSubjectByTitleAsync(string title);
 
-    Task<Incident[]> GetIncidentsByContactId(Guid contactId, IncidentState? state, string[] columnNames);
+    Task<Incident[]> GetIncidentsByContactIdAsync(Guid contactId, IncidentState? state, string[] columnNames);
 
-    Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
+    Task<Contact[]> GetTeachersByInitialTeacherTrainingSlugIdAsync(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 
-    IAsyncEnumerable<QtsAwardee[]> GetQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<QtsAwardee[]> GetQtsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
 
-    IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
 
-    IAsyncEnumerable<EytsAwardee[]> GetEytsAwardeesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<EytsAwardee[]> GetEytsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
 
-    IAsyncEnumerable<InductionCompletee[]> GetInductionCompleteesForDateRange(DateTime startDate, DateTime endDate);
+    IAsyncEnumerable<InductionCompletee[]> GetInductionCompleteesForDateRangeAsync(DateTime startDate, DateTime endDate);
 
-    Task<Contact[]> GetTeachersBySlugIdAndTrn(string slugId, string trn, string[] columnNames, bool activeOnly = true);
+    Task<Contact[]> GetTeachersBySlugIdAndTrnAsync(string slugId, string trn, string[] columnNames, bool activeOnly = true);
 
-    Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugId(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
+    Task<dfeta_initialteachertraining[]> GetInitialTeacherTrainingBySlugIdAsync(string slugId, string[] columnNames, RequestBuilder requestBuilder, bool activeOnly = true);
 
-    Task ClearTeacherIdentityInfo(Guid identityUserId, DateTime updateTimeUtc);
+    Task ClearTeacherIdentityInfoAsync(Guid identityUserId, DateTime updateTimeUtc);
 
-    Task<bool> DoesTeacherHavePendingPIIChanges(Guid teacherId);
+    Task<bool> DoesTeacherHavePendingPIIChangesAsync(Guid teacherId);
 }

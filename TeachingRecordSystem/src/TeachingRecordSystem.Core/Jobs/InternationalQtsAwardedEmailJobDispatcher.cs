@@ -16,7 +16,7 @@ public class InternationalQtsAwardedEmailJobDispatcher
         _backgroundJobScheduler = backgroundJobScheduler;
     }
 
-    public async Task Execute(Guid internationalQtsAwardedEmailsJobId)
+    public async Task ExecuteAsync(Guid internationalQtsAwardedEmailsJobId)
     {
         var jobItems = await _dbContext.InternationalQtsAwardedEmailsJobItems
             .Where(i => i.InternationalQtsAwardedEmailsJobId == internationalQtsAwardedEmailsJobId && i.EmailSent == false)
@@ -24,7 +24,7 @@ public class InternationalQtsAwardedEmailJobDispatcher
 
         foreach (var jobItem in jobItems)
         {
-            await _backgroundJobScheduler.Enqueue<SendInternationalQtsAwardedEmailJob>(j => j.Execute(internationalQtsAwardedEmailsJobId, jobItem.PersonId));
+            await _backgroundJobScheduler.EnqueueAsync<SendInternationalQtsAwardedEmailJob>(j => j.ExecuteAsync(internationalQtsAwardedEmailsJobId, jobItem.PersonId));
         }
     }
 }

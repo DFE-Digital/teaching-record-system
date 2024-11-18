@@ -136,7 +136,7 @@ public abstract class TestBase : IDisposable
 
     protected async Task<(TestData.CreatePersonResult, Alert)> CreatePersonWithAlert(bool isOpenAlert, bool populateOptional = true, EventModels.RaisedByUserInfo? createdByUser = null)
     {
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithAlert(a =>
             {
                 a.WithStartDate(Clock.Today.AddDays(-30));

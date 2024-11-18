@@ -24,7 +24,7 @@ public class GetHeQualificationByCodeTests : IAsyncLifetime
         var qualificationCode = "400";  // First Degree
 
         // Act
-        var result = await _dataverseAdapter.GetHeQualificationByCode(qualificationCode);
+        var result = await _dataverseAdapter.GetHeQualificationByCodeAsync(qualificationCode);
 
         // Assert
         Assert.NotNull(result);
@@ -38,7 +38,7 @@ public class GetHeQualificationByCodeTests : IAsyncLifetime
         var qualificationCode = "XXXX";
 
         // Act
-        var result = await _dataverseAdapter.GetHeQualificationByCode(qualificationCode);
+        var result = await _dataverseAdapter.GetHeQualificationByCodeAsync(qualificationCode);
 
         // Assert
         Assert.Null(result);

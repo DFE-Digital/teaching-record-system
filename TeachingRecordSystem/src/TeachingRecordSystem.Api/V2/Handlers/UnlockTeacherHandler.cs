@@ -22,7 +22,7 @@ public class UnlockTeacherHandler : IRequestHandler<UnlockTeacherRequest, Unlock
 
     public async Task<UnlockTeacherResponse> Handle(UnlockTeacherRequest request, CancellationToken cancellationToken)
     {
-        var contact = await _dataverseAdapter.GetTeacher(request.TeacherId, columnNames: new[]
+        var contact = await _dataverseAdapter.GetTeacherAsync(request.TeacherId, columnNames: new[]
         {
             Contact.Fields.dfeta_TRN,
             Contact.Fields.dfeta_loginfailedcounter
@@ -48,7 +48,7 @@ public class UnlockTeacherHandler : IRequestHandler<UnlockTeacherRequest, Unlock
             };
         }
 
-        await _dataverseAdapter.UnlockTeacherRecord(request.TeacherId);
+        await _dataverseAdapter.UnlockTeacherRecordAsync(request.TeacherId);
 
         return new UnlockTeacherResponse()
         {

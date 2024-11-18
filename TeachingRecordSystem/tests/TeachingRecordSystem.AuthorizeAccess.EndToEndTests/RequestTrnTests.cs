@@ -14,38 +14,38 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/request-trn");
-        await page.ClickButton("Start now");
+        await page.ClickButtonAsync("Start now");
         await page.WaitForUrlPathAsync("/request-trn/npq-check");
 
         if (isPlanningToTakeAnNpq)
         {
             await page.CheckAsync("text=Yes");
-            await page.ClickButton("Continue");
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/email");
 
             var email = Faker.Internet.Email();
             await page.FillAsync("input[name=Email]", email);
-            await page.ClickButton("Continue");
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/name");
 
             var name = Faker.Name.FullName();
             var previousName = Faker.Name.FullName();
             await page.FillAsync("input[name=Name]", name);
-            await page.ClickButton("Continue");
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/previous-name");
 
             await page.CheckAsync("text=Yes");
             await page.FillAsync("input[name=PreviousName]", previousName);
-            await page.ClickButton("Continue");
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/date-of-birth");
 
             var dateOfBirth = new DateOnly(1980, 10, 12);
-            await page.FillDateInput(dateOfBirth);
-            await page.ClickButton("Continue");
+            await page.FillDateInputAsync(dateOfBirth);
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/identity");
 
@@ -58,7 +58,7 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                             MimeType = "image/jpeg",
                             Buffer = TestData.JpegImage
                         });
-            await page.ClickButton("Continue");
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/national-insurance-number");
 
@@ -67,14 +67,14 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 await page.CheckAsync("text=Yes");
                 await page.FillAsync("input[name=NationalInsuranceNumber]", nationalInsuranceNumber);
-                await page.ClickButton("Continue");
+                await page.ClickButtonAsync("Continue");
 
                 await page.WaitForUrlPathAsync("/request-trn/check-answers");
             }
             else
             {
                 await page.CheckAsync("text=No");
-                await page.ClickButton("Continue");
+                await page.ClickButtonAsync("Continue");
                 await page.WaitForUrlPathAsync("/request-trn/address");
 
                 var addressLine1 = Faker.Address.StreetAddress();
@@ -88,19 +88,19 @@ public class RequestTrnTests(HostFixture hostFixture) : TestBase(hostFixture)
                 await page.FillAsync("input[name=TownOrCity]", townOrCity);
                 await page.FillAsync("input[name=PostalCode]", postalCode);
                 await page.FillAsync("input[name=Country]", country);
-                await page.ClickButton("Continue");
+                await page.ClickButtonAsync("Continue");
 
                 await page.WaitForUrlPathAsync("/request-trn/check-answers");
             }
 
-            await page.ClickButton("Submit request");
+            await page.ClickButtonAsync("Submit request");
 
             await page.WaitForUrlPathAsync("/request-trn/submitted");
         }
         else
         {
             await page.CheckAsync("text=No");
-            await page.ClickButton("Continue");
+            await page.ClickButtonAsync("Continue");
 
             await page.WaitForUrlPathAsync("/request-trn/not-eligible");
         }

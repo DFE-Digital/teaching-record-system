@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Api.Infrastructure.Middleware;
 
 public class AssignRequestedVersionMiddleware(RequestDelegate next)
 {
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         string? requestedMinorVersion = context.Request.Headers.TryGetValue(VersionRegistry.MinorVersionHeaderName, out var requestedVersionValues) ?
             requestedVersionValues.ToString() :

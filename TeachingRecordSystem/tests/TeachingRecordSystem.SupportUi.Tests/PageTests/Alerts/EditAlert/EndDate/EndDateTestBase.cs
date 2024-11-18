@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.EndDat
 
 public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<EditAlertEndDateState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<EditAlertEndDateState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new EditAlertEndDateState()
+    protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState()
         {
             Initialized = true,
             CurrentEndDate = alert.EndDate,
@@ -23,28 +23,28 @@ public abstract class EndDateTestBase(HostFixture hostFixture) : TestBase(hostFi
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert) =>
+    protected Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
-                CreateJourneyInstance(alert.AlertId, new EditAlertEndDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState()
                 {
                     Initialized = true,
                     CurrentEndDate = alert.EndDate
                 }),
             JourneySteps.Index =>
-                CreateJourneyInstance(alert.AlertId, new EditAlertEndDateState()
+                CreateJourneyInstanceAsync(alert.AlertId, new EditAlertEndDateState()
                 {
                     Initialized = true,
                     CurrentEndDate = alert.EndDate,
                     EndDate = alert.EndDate!.Value.AddDays(-5)
                 }),
             JourneySteps.Reason or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstance(Guid alertId, EditAlertEndDateState state) =>
+    private Task<JourneyInstance<EditAlertEndDateState>> CreateJourneyInstanceAsync(Guid alertId, EditAlertEndDateState state) =>
         CreateJourneyInstance(
             JourneyNames.EditAlertEndDate,
             state,

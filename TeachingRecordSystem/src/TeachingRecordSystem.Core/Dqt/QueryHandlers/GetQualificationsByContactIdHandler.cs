@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetQualificationsByContactIdHandler : ICrmQueryHandler<GetQualificationsByContactIdQuery, dfeta_qualification[]>
 {
-    public async Task<dfeta_qualification[]> Execute(GetQualificationsByContactIdQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_qualification[]> ExecuteAsync(GetQualificationsByContactIdQuery query, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_qualification.Fields.dfeta_PersonId, ConditionOperator.Equal, query.ContactId);

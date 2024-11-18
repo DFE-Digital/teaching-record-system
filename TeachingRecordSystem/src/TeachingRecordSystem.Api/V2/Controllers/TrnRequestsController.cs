@@ -26,7 +26,7 @@ public class TrnRequestsController : ControllerBase
         Description = "Gets a TRN request and the associated teacher's TRN")]
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTrnRequest(GetTrnRequest request)
+    public async Task<IActionResult> GetTrnRequestAsync(GetTrnRequest request)
     {
         var response = await _mediator.Send(request);
         return response != null ? Ok(response) : NotFound();
@@ -41,7 +41,7 @@ public class TrnRequestsController : ControllerBase
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 
-    public async Task<IActionResult> GetOrCreateTrnRequest([FromBody] GetOrCreateTrnRequest request)
+    public async Task<IActionResult> GetOrCreateTrnRequestAsync([FromBody] GetOrCreateTrnRequest request)
     {
         var response = await _mediator.Send(request);
         var statusCode = response.WasCreated ? StatusCodes.Status201Created : StatusCodes.Status200OK;

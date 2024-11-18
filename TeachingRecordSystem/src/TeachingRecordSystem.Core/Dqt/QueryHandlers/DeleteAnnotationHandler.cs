@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class DeleteAnnotationHandler : ICrmQueryHandler<DeleteAnnotationQuery, bool>
 {
-    public async Task<bool> Execute(DeleteAnnotationQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<bool> ExecuteAsync(DeleteAnnotationQuery query, IOrganizationServiceAsync organizationService)
     {
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
         requestBuilder.AddRequest(new DeleteRequest() { Target = new(Annotation.EntityLogicalName, query.AnnotationId) });
@@ -20,7 +20,7 @@ public class DeleteAnnotationHandler : ICrmQueryHandler<DeleteAnnotationQuery, b
             }
         });
 
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         return true;
     }

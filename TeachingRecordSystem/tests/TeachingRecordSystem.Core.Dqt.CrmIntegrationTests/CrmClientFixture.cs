@@ -59,7 +59,7 @@ public sealed class CrmClientFixture : IDisposable
             orgService,
             _referenceDataCache,
             Clock,
-            () => _trnGenerationApiClient.GenerateTrn(),
+            () => _trnGenerationApiClient.GenerateTrnAsync(),
             withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock)) : TestDataSyncConfiguration.NoSync()),
         _memoryCache);
 

@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public static partial class AssertEx
 {
-    public static async Task<JsonDocument> JsonResponse(HttpResponseMessage response, int expectedStatusCode = 200)
+    public static async Task<JsonDocument> JsonResponseAsync(HttpResponseMessage response, int expectedStatusCode = 200)
     {
         ArgumentNullException.ThrowIfNull(response);
 
@@ -19,43 +19,43 @@ public static partial class AssertEx
         return result!;
     }
 
-    public static async Task JsonResponseEquals(HttpResponseMessage response, object expected, int expectedStatusCode = 200)
+    public static async Task JsonResponseEqualsAsync(HttpResponseMessage response, object expected, int expectedStatusCode = 200)
     {
         ArgumentNullException.ThrowIfNull(response);
         ArgumentNullException.ThrowIfNull(expected);
 
-        var jsonDocument = await JsonResponse(response, expectedStatusCode);
+        var jsonDocument = await JsonResponseAsync(response, expectedStatusCode);
 
         JsonObjectEquals(expected, jsonDocument);
     }
 
-    public static async Task JsonResponseIsError(HttpResponseMessage response, int expectedErrorCode, int expectedStatusCode)
+    public static async Task JsonResponseIsErrorAsync(HttpResponseMessage response, int expectedErrorCode, int expectedStatusCode)
     {
-        var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+        var problemDetails = await ResponseIsProblemDetailsAsync(response, expectedStatusCode);
 
         Assert.NotNull(problemDetails.Extensions);
         Assert.Contains(problemDetails.Extensions, kvp => kvp.Key == "errorCode");
         Assert.Equal(expectedErrorCode, problemDetails.Extensions?["errorCode"].GetInt32());
     }
 
-    public static async Task JsonResponseHasValidationErrorForProperty(
+    public static async Task JsonResponseHasValidationErrorForPropertyAsync(
         HttpResponseMessage response,
         string propertyName,
         string expectedError,
         int expectedStatusCode = 400)
     {
-        var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+        var problemDetails = await ResponseIsProblemDetailsAsync(response, expectedStatusCode);
 
         Assert.NotNull(problemDetails.Extensions);
         Assert.Equal(expectedError, problemDetails.Errors?[propertyName].Single());
     }
 
-    public static async Task JsonResponseHasValidationErrorsForProperties(
+    public static async Task JsonResponseHasValidationErrorsForPropertiesAsync(
         HttpResponseMessage response,
         IReadOnlyDictionary<string, string> expectedErrors,
         int expectedStatusCode = 400)
     {
-        var problemDetails = await ResponseIsProblemDetails(response, expectedStatusCode);
+        var problemDetails = await ResponseIsProblemDetailsAsync(response, expectedStatusCode);
 
         Assert.NotNull(problemDetails.Extensions);
 
@@ -65,7 +65,7 @@ public static partial class AssertEx
         }
     }
 
-    private static async Task<ProblemDetails> ResponseIsProblemDetails(HttpResponseMessage response, int expectedStatusCode)
+    private static async Task<ProblemDetails> ResponseIsProblemDetailsAsync(HttpResponseMessage response, int expectedStatusCode)
     {
         ArgumentNullException.ThrowIfNull(response);
 

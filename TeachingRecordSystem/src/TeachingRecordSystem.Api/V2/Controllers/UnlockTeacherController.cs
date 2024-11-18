@@ -26,7 +26,7 @@ public class UnlockTeacherController : ControllerBase
         Description = "Unlocks the teacher record allowing the teacher to sign in to the portals")]
     [ProducesResponseType(typeof(UnlockTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UnlockTeacher([FromRoute] UnlockTeacherRequest request)
+    public async Task<IActionResult> UnlockTeacherAsync([FromRoute] UnlockTeacherRequest request)
     {
         try
         {

@@ -21,7 +21,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> Get(
+    public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
         [FromServices] GetPersonHandler handler)
@@ -32,7 +32,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             DateOfBirth: null,
             ApplyLegacyAlertsBehavior: true);
 
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         if (result is null)
         {
@@ -51,7 +51,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
-    public async Task<IActionResult> CreateNameChange(
+    public async Task<IActionResult> CreateNameChangeAsync(
         [FromBody] CreateNameChangeRequestRequest request,
         [FromServices] CreateNameChangeRequestHandler handler)
     {
@@ -66,7 +66,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             EmailAddress = null
         };
 
-        await handler.Handle(command);
+        await handler.HandleAsync(command);
         return NoContent();
     }
 
@@ -78,7 +78,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
-    public async Task<IActionResult> CreateDateOfBirthChange(
+    public async Task<IActionResult> CreateDateOfBirthChangeAsync(
         [FromBody] CreateDateOfBirthChangeRequestRequest request,
         [FromServices] CreateDateOfBirthChangeRequestHandler handler)
     {
@@ -91,7 +91,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
             EmailAddress = null
         };
 
-        await handler.Handle(command);
+        await handler.HandleAsync(command);
         return NoContent();
     }
 
@@ -103,12 +103,12 @@ public class TeachersController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(FindTeachersResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public async Task<IActionResult> FindTeachers(
+    public async Task<IActionResult> FindTeachersAsync(
         FindTeachersRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
     {
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
-        var result = await handler.Handle(command);
+        var result = await handler.HandleAsync(command);
 
         var response = new FindTeachersResponse()
         {

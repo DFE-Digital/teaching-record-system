@@ -31,7 +31,7 @@ public class TrnModel(SignInJourneyHelper helper) : PageModel
         Trn = JourneyInstance!.State.Trn;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (HaveTrn != true)
         {
@@ -45,7 +45,7 @@ public class TrnModel(SignInJourneyHelper helper) : PageModel
 
         await JourneyInstance!.UpdateStateAsync(state => state.SetTrn(HaveTrn!.Value, Trn));
 
-        return await helper.TryMatchToTeachingRecord(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance.InstanceId)) :
+        return await helper.TryMatchToTeachingRecordAsync(JourneyInstance!) ? Redirect(helper.LinkGenerator.Found(JourneyInstance.InstanceId)) :
             Redirect(helper.LinkGenerator.NotFound(JourneyInstance.InstanceId));
     }
 

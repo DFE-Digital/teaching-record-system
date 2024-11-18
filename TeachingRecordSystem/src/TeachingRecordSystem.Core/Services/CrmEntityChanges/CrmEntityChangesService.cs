@@ -16,7 +16,7 @@ public class CrmEntityChangesService(
     IDistributedLockProvider distributedLockProvider,
     IClock clock) : ICrmEntityChangesService
 {
-    public async IAsyncEnumerable<IChangedItem[]> GetEntityChanges(
+    public async IAsyncEnumerable<IChangedItem[]> GetEntityChangesAsync(
         string changesKey,
         string entityLogicalName,
         ColumnSet columns,
@@ -84,7 +84,7 @@ public class CrmEntityChangesService(
                 // This is particularly important for when we have to a do a full sync as we're often deploying so regularly we can't quite catch up.
                 if (queryCount > 0)
                 {
-                    await UpsertEntityChangesJournal(
+                    await UpsertEntityChangesJournalAsync(
                         request.DataVersion,
                         request.PageInfo.PageNumber,
                         request.PageInfo.Count,
@@ -154,7 +154,7 @@ public class CrmEntityChangesService(
 
                 if (!response.EntityChanges.MoreRecords)
                 {
-                    await UpsertEntityChangesJournal(
+                    await UpsertEntityChangesJournalAsync(
                         response.EntityChanges.DataToken,
                         nextQueryPageNumber: null,
                         nextQueryPageSize: null,
@@ -168,7 +168,7 @@ public class CrmEntityChangesService(
             }
         }
 
-        Task UpsertEntityChangesJournal(
+        Task UpsertEntityChangesJournalAsync(
             string? dataToken,
             int? nextQueryPageNumber,
             int? nextQueryPageSize,

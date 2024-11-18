@@ -1,11 +1,8 @@
-using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
-
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.AddAlert;
 
 public class CheckAnswersTests : AddAlertTestBase
 {
     private const string PreviousStep = JourneySteps.Reason;
-    private const string ThisStep = JourneySteps.CheckAnswers;
 
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
     {
@@ -18,8 +15,8 @@ public class CheckAnswersTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -35,7 +32,7 @@ public class CheckAnswersTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -50,8 +47,8 @@ public class CheckAnswersTests : AddAlertTestBase
     public async Task Get_MissingDataInJourneyState_RedirectsToReasonPage()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateEmptyJourneyInstance(person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -69,8 +66,8 @@ public class CheckAnswersTests : AddAlertTestBase
     public async Task Get_WithPersonIdForValidPerson_ReturnsOk(bool populateOptional)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(person.PersonId, populateOptional);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -78,7 +75,7 @@ public class CheckAnswersTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.AlertTypeName, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(journeyInstance.State.Details, doc.GetSummaryListValueForKey("Details"));
         Assert.Equal(populateOptional ? $"{journeyInstance.State.Link} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
@@ -95,8 +92,8 @@ public class CheckAnswersTests : AddAlertTestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
 
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, person.PersonId);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -112,7 +109,7 @@ public class CheckAnswersTests : AddAlertTestBase
     {
         // Arrange
         var personId = Guid.NewGuid();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(PreviousStep, personId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -129,8 +126,8 @@ public class CheckAnswersTests : AddAlertTestBase
     public async Task Post_Confirm_CreatesAlertCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(bool populateOptional)
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(person.PersonId, populateOptional);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional);
 
         EventPublisher.Clear();
 
@@ -142,8 +139,8 @@ public class CheckAnswersTests : AddAlertTestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Alert added");
 
         EventPublisher.AssertEventsSaved(e =>
@@ -186,8 +183,8 @@ public class CheckAnswersTests : AddAlertTestBase
     public async Task Post_Cancel_DeletesJourneyAndRedirects()
     {
         // Arrange
-        var person = await TestData.CreatePerson();
-        var journeyInstance = await CreateJourneyInstanceForAllStepsCompleted(person.PersonId, populateOptional: true);
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceForAllStepsCompletedAsync(person.PersonId, populateOptional: true);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/check-answers/cancel?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -200,10 +197,4 @@ public class CheckAnswersTests : AddAlertTestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Null(journeyInstance);
     }
-
-    private async Task<JourneyInstance<AddAlertState>> CreateJourneyInstance(Guid personId, AddAlertState? state = null) =>
-        await CreateJourneyInstance(
-             JourneyNames.AddAlert,
-             state ?? new AddAlertState(),
-             new KeyValuePair<string, object>("personId", personId));
 }

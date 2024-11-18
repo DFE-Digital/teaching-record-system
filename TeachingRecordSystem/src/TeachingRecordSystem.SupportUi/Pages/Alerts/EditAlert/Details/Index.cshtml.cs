@@ -35,7 +35,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
         Details = JourneyInstance!.State.Details;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (Details == CurrentDetails)
         {
@@ -57,7 +57,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
             : linkGenerator.AlertEditDetailsReason(AlertId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

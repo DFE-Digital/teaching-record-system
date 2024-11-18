@@ -33,7 +33,7 @@ public class EstablishmentRefresherTests
 
     [Fact]
     public Task RefreshEstablishments_WhenCalledforNewUrn_AddsNewEstablishments() =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
@@ -80,7 +80,7 @@ public class EstablishmentRefresherTests
 
             var establishments = new List<Establishment> { establishment1, establishment2 };
             Mock.Get(establishmentMasterDataService)
-                .Setup(s => s.GetEstablishments())
+                .Setup(s => s.GetEstablishmentsAsync())
                 .Returns(establishments.ToAsyncEnumerable());
 
             var establishmentRefresher = new EstablishmentRefresher(
@@ -88,7 +88,7 @@ public class EstablishmentRefresherTests
                 establishmentMasterDataService);
 
             // Act
-            await establishmentRefresher.RefreshEstablishments(CancellationToken.None);
+            await establishmentRefresher.RefreshEstablishmentsAsync(CancellationToken.None);
 
             // Assert
             var establishmentsActual = await dbContext.Establishments.Where(e => e.Urn == establishment1.Urn || e.Urn == establishment2.Urn).OrderBy(e => e.Urn).ToListAsync();
@@ -137,7 +137,7 @@ public class EstablishmentRefresherTests
 
     [Fact]
     public Task RefreshEstablishments_WhenCalledForExistingUrn_UpdatesEstablishment() =>
-        DbFixture.WithDbContext(async dbContext =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
             var establishmentMasterDataService = Mock.Of<IEstablishmentMasterDataService>();
@@ -190,7 +190,7 @@ public class EstablishmentRefresherTests
 
             var establishments = new List<Establishment> { updatedEstablishment };
             Mock.Get(establishmentMasterDataService)
-                .Setup(s => s.GetEstablishments())
+                .Setup(s => s.GetEstablishmentsAsync())
                 .Returns(establishments.ToAsyncEnumerable());
 
             var establishmentRefresher = new EstablishmentRefresher(
@@ -198,7 +198,7 @@ public class EstablishmentRefresherTests
                 establishmentMasterDataService);
 
             // Act
-            await establishmentRefresher.RefreshEstablishments(CancellationToken.None);
+            await establishmentRefresher.RefreshEstablishmentsAsync(CancellationToken.None);
 
             // Assert
             var urnEstablishments = await dbContext.Establishments.Where(e => e.Urn == dbEstablishment.Urn).ToListAsync();

@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class UpdateContactNameHandler : ICrmQueryHandler<UpdateContactNameQuery, bool>
 {
-    public async Task<bool> Execute(UpdateContactNameQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<bool> ExecuteAsync(UpdateContactNameQuery query, IOrganizationServiceAsync organizationService)
     {
         await organizationService.ExecuteAsync(new UpdateRequest()
         {

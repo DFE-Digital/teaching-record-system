@@ -24,7 +24,7 @@ public class GetOrganizationsByUkprnTests : IAsyncLifetime
         var ukprn = "10044534";
 
         // Act
-        var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: new[] { Account.Fields.dfeta_UKPRN });
+        var result = await _dataverseAdapter.GetOrganizationsByUkprnAsync(ukprn, columnNames: new[] { Account.Fields.dfeta_UKPRN });
 
         // Assert
         Assert.Collection(
@@ -39,7 +39,7 @@ public class GetOrganizationsByUkprnTests : IAsyncLifetime
         var ukprn = "xxx";
 
         // Act
-        var result = await _dataverseAdapter.GetOrganizationsByUkprn(ukprn, columnNames: new[] { Account.Fields.dfeta_UKPRN });
+        var result = await _dataverseAdapter.GetOrganizationsByUkprnAsync(ukprn, columnNames: new[] { Account.Fields.dfeta_UKPRN });
 
         // Assert
         Assert.Empty(result);

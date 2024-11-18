@@ -42,7 +42,7 @@ public class ConfirmModel(
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         var now = clock.UtcNow;
 
@@ -79,11 +79,11 @@ public class ConfirmModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         if (JourneyInstance!.State.EvidenceFileId is not null)
         {
-            await fileService.DeleteFile(JourneyInstance!.State.EvidenceFileId.Value);
+            await fileService.DeleteFileAsync(JourneyInstance!.State.EvidenceFileId.Value);
         }
 
         await JourneyInstance!.DeleteAsync();
@@ -112,7 +112,7 @@ public class ConfirmModel(
         DeletionReasonDetail = JourneyInstance?.State.DeletionReasonDetail;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrl(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, _fileUrlExpiresAfter) :
             null;
 
         await next();

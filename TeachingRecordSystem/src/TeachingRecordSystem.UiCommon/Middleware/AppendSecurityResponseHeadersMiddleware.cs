@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.UiCommon.Middleware;
 
 public class AppendSecurityResponseHeadersMiddleware(RequestDelegate next)
 {
-    public Task Invoke(HttpContext context)
+    public Task InvokeAsync(HttpContext context)
     {
         var response = context.Response;
 

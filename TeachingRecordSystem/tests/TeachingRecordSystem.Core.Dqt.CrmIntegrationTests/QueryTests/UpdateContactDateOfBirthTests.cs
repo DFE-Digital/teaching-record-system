@@ -19,7 +19,7 @@ public class UpdateContactDateOfBirthTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var person = await _dataScope.TestData.CreatePerson();
+        var person = await _dataScope.TestData.CreatePersonAsync();
         var newDateOfBirth = _dataScope.TestData.GenerateChangedDateOfBirth(person.DateOfBirth);
 
         var query = new UpdateContactDateOfBirthQuery(
@@ -27,7 +27,7 @@ public class UpdateContactDateOfBirthTests : IAsyncLifetime
             newDateOfBirth);
 
         // Act
-        await _crmQueryDispatcher.ExecuteQuery(query);
+        await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

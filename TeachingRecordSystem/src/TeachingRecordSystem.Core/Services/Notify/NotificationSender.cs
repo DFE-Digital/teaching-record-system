@@ -23,7 +23,7 @@ public class NotificationSender : INotificationSender
         }
     }
 
-    public async Task SendEmail(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
+    public async Task SendEmailAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
     {
         NotificationClient client = _notificationClient;
 
@@ -65,7 +65,7 @@ public class NotificationSender : INotificationSender
         }
     }
 
-    public async Task SendSms(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
+    public async Task SendSmsAsync(string templateId, string to, IReadOnlyDictionary<string, string> personalization)
     {
         NotificationClient client = _notificationClient;
 

@@ -33,7 +33,7 @@ public class IndexModel : PageModel
         DateOfBirth ??= JourneyInstance!.State.DateOfBirth;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (DateOfBirth is null)
         {
@@ -52,7 +52,7 @@ public class IndexModel : PageModel
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitialized(_crmQueryDispatcher, PersonId);
+        await JourneyInstance!.State.EnsureInitializedAsync(_crmQueryDispatcher, PersonId);
 
         await next();
     }

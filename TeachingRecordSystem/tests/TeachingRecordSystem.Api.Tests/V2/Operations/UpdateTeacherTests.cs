@@ -27,11 +27,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         var request = CreateRequest(req => req.Qualification = null);
@@ -58,7 +58,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ""));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}",
             expectedError: "Initial TeacherTraining ProviderUkprn is required.");
@@ -77,7 +77,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: "Birthdate",
             expectedError: "Birthdate is required.");
@@ -93,11 +93,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject2NotFound));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         // Act
@@ -106,7 +106,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.Qualification.Subject2 = "some invalid subject"));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -119,11 +119,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubject3NotFound));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         // Act
@@ -132,7 +132,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.Qualification.Subject3 = "some invalid"));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
 
@@ -151,7 +151,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining = null));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}", $"'Initial Teacher Training' must not be empty.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}", $"'Initial Teacher Training' must not be empty.");
     }
 
     [Fact]
@@ -165,11 +165,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.NoMatchingIttRecord));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         // Act
@@ -178,7 +178,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.ProviderUkprn = ukprn));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}", ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.ProviderUkprn)}", ErrorRegistry.TeacherHasNoIncompleteIttRecord().Title);
     }
 
     [Fact]
@@ -192,11 +192,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject1NotFound));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         // Act
@@ -205,7 +205,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject1 = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject1)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -219,11 +219,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject2NotFound));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         // Act
@@ -232,7 +232,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject2 = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject2)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -246,11 +246,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.Subject3NotFound));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         // Act
@@ -259,7 +259,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.InitialTeacherTraining.Subject3 = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Subject3)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -273,11 +273,11 @@ public class UpdateTeacherTests : TestBase
         var ittQualificationType = (IttQualificationType)(-1);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
             .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.IttQualificationNotFound));
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         var request = CreateRequest(req => req.InitialTeacherTraining.IttQualificationType = ittQualificationType);
@@ -302,11 +302,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationCountryNotFound));
 
         // Act
@@ -315,7 +315,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.Qualification.CountryCode = country));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}", ErrorRegistry.CountryNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.CountryCode)}", ErrorRegistry.CountryNotFound().Title);
     }
 
     [Fact]
@@ -329,11 +329,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationNotFound));
 
         // Act
@@ -356,11 +356,11 @@ public class UpdateTeacherTests : TestBase
         var trn = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound | UpdateTeacherFailedReasons.Subject2NotFound));
 
         // Act
@@ -369,7 +369,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorsForProperties(
+        await AssertEx.JsonResponseHasValidationErrorsForPropertiesAsync(
             response,
             new Dictionary<string, string>()
             {
@@ -389,11 +389,11 @@ public class UpdateTeacherTests : TestBase
         var trn = "xxx";
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(UpdateTeacherResult.Failed(UpdateTeacherFailedReasons.QualificationSubjectNotFound));
 
         // Act
@@ -402,7 +402,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.Qualification)}.{nameof(UpdateTeacherRequest.Qualification.Subject)}", ErrorRegistry.SubjectNotFound().Title);
     }
 
     [Fact]
@@ -416,11 +416,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         var request = CreateRequest(req => req.Qualification = null);
@@ -446,11 +446,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         // Act
@@ -459,7 +459,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest(req => req.Qualification.Subject = subject));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}", StringResources.Errors_10006_Title);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.InitialTeacherTraining)}.{nameof(UpdateTeacherRequest.InitialTeacherTraining.Outcome)}", StringResources.Errors_10006_Title);
     }
 
     [Fact]
@@ -475,11 +475,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrnAsync(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         // Act
@@ -489,9 +489,9 @@ public class UpdateTeacherTests : TestBase
 
         // Assert
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrnAsync(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersByTrnAndDoB(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
+            .Verify(mock => mock.GetTeachersByTrnAndDoBAsync(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
@@ -508,15 +508,15 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersBySlugIdAndTrnAsync(slugid, trn,  /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(Array.Empty<Contact>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         // Act
@@ -526,9 +526,9 @@ public class UpdateTeacherTests : TestBase
 
         // Assert
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrnAsync(slugid, trn,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true), Times.Once);
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersByTrnAndDoB(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
+            .Verify(mock => mock.GetTeachersByTrnAndDoBAsync(It.IsAny<string>(), It.IsAny<DateOnly>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
@@ -544,11 +544,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         // Act
@@ -558,9 +558,9 @@ public class UpdateTeacherTests : TestBase
 
         // Assert
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersByTrnAndDoB(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
+            .Verify(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrnAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
@@ -586,7 +586,7 @@ public class UpdateTeacherTests : TestBase
             $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             expectedErrorPropertyName,
             expectedErrorMessage);
@@ -600,7 +600,7 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(Array.Empty<Contact>());
 
         var requestBody = new UpdateTeacherRequest()
@@ -670,7 +670,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
@@ -682,7 +682,7 @@ public class UpdateTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10002, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -720,7 +720,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
@@ -732,7 +732,7 @@ public class UpdateTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_OutcomeMustBeDeferredInTrainingOrUnderAssessment);
     }
 
 
@@ -771,7 +771,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
@@ -783,7 +783,7 @@ public class UpdateTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_InTrainingOutcomeNotValidForAssessmentOnlyRoute);
     }
 
     [Theory]
@@ -836,7 +836,7 @@ public class UpdateTeacherTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob,/* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
             .ReturnsAsync(contactList);
 
         var request = new HttpRequestMessage(HttpMethod.Patch, $"v2/teachers/update/{trn}?birthdate={dob.ToString("yyyy-MM-dd")}")
@@ -848,7 +848,7 @@ public class UpdateTeacherTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, nameof(UpdateTeacherRequestInitialTeacherTraining.Outcome), StringResources.ErrorMessages_UnderAssessmentOutcomeOnlyValidForAssessmentOnlyRoute);
     }
 
     [Fact]
@@ -863,16 +863,16 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInitialTeacherTrainingByTeacher(It.IsAny<Guid>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), true))
+            .Setup(mock => mock.GetInitialTeacherTrainingByTeacherAsync(It.IsAny<Guid>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), true))
                 .ReturnsAsync(ittRecords);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         // Act
@@ -881,7 +881,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest());
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             $"{nameof(GetOrCreateTrnRequest.InitialTeacherTraining)}",
             StringResources.Errors_10004_Title);
@@ -898,11 +898,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         // Act
@@ -911,7 +911,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest());
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             $"{nameof(GetOrCreateTrnRequest.HusId)}.{nameof(GetOrCreateTrnRequest.HusId)}",
             StringResources.Errors_10018_Title);
@@ -934,7 +934,7 @@ public class UpdateTeacherTests : TestBase
             CreateRequest());
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(UpdateTeacherRequest.SlugId),
             expectedError: Properties.StringResources.ErrorMessages_SlugIdMustBe150CharactersOrFewer);
@@ -959,7 +959,7 @@ public class UpdateTeacherTests : TestBase
         ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
     }
 
     [Fact]
@@ -981,7 +981,7 @@ public class UpdateTeacherTests : TestBase
         ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
     }
 
     [Fact]
@@ -1004,7 +1004,7 @@ public class UpdateTeacherTests : TestBase
         ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.LastName)}", "'Last Name' must not be empty.");
     }
 
     [Fact]
@@ -1027,7 +1027,7 @@ public class UpdateTeacherTests : TestBase
         ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(UpdateTeacherRequest.FirstName)}", "'First Name' must not be empty.");
     }
 
     [Fact]
@@ -1047,7 +1047,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.EmailAddress)}",
             expectedError: $"The length of 'Email Address' must be 100 characters or fewer. You entered {emailAddress.Length} characters.");
@@ -1070,7 +1070,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.FirstName)}",
             expectedError: $"The length of 'First Name' must be 100 characters or fewer. You entered {firstName.Length} characters.");
@@ -1093,7 +1093,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.MiddleName)}",
             expectedError: $"The length of 'Middle Name' must be 100 characters or fewer. You entered {middleName.Length} characters.");
@@ -1116,7 +1116,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.LastName)}",
             expectedError: $"The length of 'Last Name' must be 100 characters or fewer. You entered {lastName.Length} characters.");
@@ -1139,7 +1139,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.FirstName)}",
             expectedError: $"'First Name' must not be empty.");
@@ -1162,7 +1162,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.LastName)}",
             expectedError: $"'Last Name' must not be empty.");
@@ -1185,7 +1185,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.EmailAddress)}",
             expectedError: $"'Email Address' is not a valid email address.");
@@ -1208,7 +1208,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.GenderCode)}",
             expectedError: $"'Gender Code' has a range of values which does not include '-1'.");
@@ -1231,7 +1231,7 @@ public class UpdateTeacherTests : TestBase
             ));
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: $"{nameof(UpdateTeacherRequest.DateOfBirth)}",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -1254,11 +1254,11 @@ public class UpdateTeacherTests : TestBase
         var dob = new DateOnly(1987, 01, 01);
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetTeachersByTrnAndDoB(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
+            .Setup(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, /* activeOnly: */ It.IsAny<string[]>(), /* columnNames: */ true))
                 .ReturnsAsync(contactList);
 
         DataverseAdapterMock
-            .Setup(mock => mock.UpdateTeacher(It.IsAny<UpdateTeacherCommand>()))
+            .Setup(mock => mock.UpdateTeacherAsync(It.IsAny<UpdateTeacherCommand>()))
                 .ReturnsAsync(result);
 
         //Act
@@ -1277,9 +1277,9 @@ public class UpdateTeacherTests : TestBase
 
         // Assert
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersByTrnAndDoB(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
+            .Verify(mock => mock.GetTeachersByTrnAndDoBAsync(trn, dob, It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Once);
         DataverseAdapterMock
-            .Verify(mock => mock.GetTeachersBySlugIdAndTrn(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
+            .Verify(mock => mock.GetTeachersBySlugIdAndTrnAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>(), /* columnNames: */ true /* activeOnly: */), Times.Never);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 

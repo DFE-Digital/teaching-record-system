@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public class FakeTrnGenerationApiClient(FakeTrnGenerator genrator) : ITrnGenerationApiClient
 {
-    public Task<string> GenerateTrn()
+    public Task<string> GenerateTrnAsync()
     {
         var trn = genrator.GenerateTrn();
         return Task.FromResult(trn);

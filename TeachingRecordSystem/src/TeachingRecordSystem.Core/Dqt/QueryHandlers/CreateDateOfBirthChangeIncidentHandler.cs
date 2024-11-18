@@ -13,9 +13,9 @@ public class CreateDateOfBirthChangeIncidentHandler : ICrmQueryHandler<CreateDat
         _referenceDataCache = referenceDataCache;
     }
 
-    public async Task<(Guid IncidentId, string TicketNumber)> Execute(CreateDateOfBirthChangeIncidentQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<(Guid IncidentId, string TicketNumber)> ExecuteAsync(CreateDateOfBirthChangeIncidentQuery query, IOrganizationServiceAsync organizationService)
     {
-        var subject = await _referenceDataCache.GetSubjectByTitle("Change of Date of Birth");
+        var subject = await _referenceDataCache.GetSubjectByTitleAsync("Change of Date of Birth");
 
         var incident = new Incident()
         {
@@ -38,7 +38,7 @@ public class CreateDateOfBirthChangeIncidentHandler : ICrmQueryHandler<CreateDat
             StatusCode = dfeta_document_StatusCode.Active
         };
 
-        var annotationBody = await StreamHelper.GetBase64EncodedFileContent(query.EvidenceFileContent);
+        var annotationBody = await StreamHelper.GetBase64EncodedFileContentAsync(query.EvidenceFileContent);
 
         var annotation = new Annotation()
         {
@@ -62,7 +62,7 @@ public class CreateDateOfBirthChangeIncidentHandler : ICrmQueryHandler<CreateDat
                 ColumnSet = new(Incident.Fields.TicketNumber)
             });
         requestBuilder.AddRequest(new UpdateRequest() { Target = new Contact() { Id = query.ContactId, dfeta_AllowPiiUpdatesFromRegister = false } });
-        await requestBuilder.Execute();
+        await requestBuilder.ExecuteAsync();
 
         var ticketNumber = getIncidentResponse.GetResponse().Entity.ToEntity<Incident>().TicketNumber;
         return (incident.Id, ticketNumber);

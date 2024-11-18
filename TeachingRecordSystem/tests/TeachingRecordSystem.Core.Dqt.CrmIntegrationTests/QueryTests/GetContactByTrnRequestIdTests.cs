@@ -24,7 +24,7 @@ public class GetContactByTrnRequestIdTests : IAsyncLifetime
         var requestId = Guid.NewGuid().ToString();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnRequestIdQuery(requestId, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetContactByTrnRequestIdQuery(requestId, new ColumnSet()));
 
         // Assert
         Assert.Null(result);
@@ -36,12 +36,12 @@ public class GetContactByTrnRequestIdTests : IAsyncLifetime
         // Arrange
         var applicationUserId = Guid.NewGuid();
         var requestId = Guid.NewGuid().ToString();
-        var person = await _dataScope.TestData.CreatePerson(p => p
+        var person = await _dataScope.TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithTrnRequest(applicationUserId, requestId));
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(
             new GetContactByTrnRequestIdQuery(TrnRequestHelper.GetCrmTrnRequestId(applicationUserId, requestId), new ColumnSet()));
 
         // Assert

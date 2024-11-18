@@ -16,7 +16,7 @@ public class GetAllSpecialismsTests
         var query = new GetAllSpecialismsQuery();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(query);
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
         Assert.NotEmpty(result);

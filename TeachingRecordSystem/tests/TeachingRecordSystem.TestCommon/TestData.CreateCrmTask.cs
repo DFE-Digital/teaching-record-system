@@ -8,11 +8,11 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task CreateCrmTask(Action<CreateCrmTaskBuilder>? configure)
+    public Task CreateCrmTaskAsync(Action<CreateCrmTaskBuilder>? configure)
     {
         var builder = new CreateCrmTaskBuilder();
         configure?.Invoke(builder);
-        return builder.Execute(this);
+        return builder.ExecuteAsync(this);
     }
 
     public class CreateCrmTaskBuilder
@@ -124,7 +124,7 @@ public partial class TestData
             return this;
         }
 
-        public async Task Execute(TestData crmTestData)
+        public async Task ExecuteAsync(TestData crmTestData)
         {
             if (_personId is null)
             {
@@ -170,7 +170,7 @@ public partial class TestData
                 });
             }
 
-            await txnRequestBuilder.Execute();
+            await txnRequestBuilder.ExecuteAsync();
         }
     }
 }

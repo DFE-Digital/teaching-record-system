@@ -29,7 +29,7 @@ public class GetTeacherTests : IAsyncLifetime
         var teacherId = Guid.NewGuid();
 
         // Act
-        var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
+        var result = await _dataverseAdapter.GetTeacherAsync(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
 
         // Assert
         Assert.Null(result);
@@ -42,7 +42,7 @@ public class GetTeacherTests : IAsyncLifetime
         var teacherId = await _organizationService.CreateAsync(new Contact());
 
         // Act
-        var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
+        var result = await _dataverseAdapter.GetTeacherAsync(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
 
         // Assert
         Assert.NotNull(result);
@@ -66,7 +66,7 @@ public class GetTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.FirstName }, resolveMerges: true);
+        var result = await _dataverseAdapter.GetTeacherAsync(teacherId, new[] { Contact.Fields.FirstName }, resolveMerges: true);
 
         // Assert
         Assert.NotNull(result);
@@ -90,7 +90,7 @@ public class GetTeacherTests : IAsyncLifetime
         });
 
         // Act
-        var result = await _dataverseAdapter.GetTeacher(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
+        var result = await _dataverseAdapter.GetTeacherAsync(teacherId, new[] { Contact.Fields.StateCode }, resolveMerges: false);
 
         // Assert
         Assert.NotNull(result);

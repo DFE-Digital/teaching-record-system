@@ -22,7 +22,7 @@ public class GetNotesByContactIdTests : IAsyncLifetime
         var nonExistentContactId = Guid.NewGuid();
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(nonExistentContactId));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetNotesByContactIdQuery(nonExistentContactId));
 
         // Assert
         Assert.NotNull(result);
@@ -43,27 +43,27 @@ public class GetNotesByContactIdTests : IAsyncLifetime
     public async Task WhenCalled_WithContactIdForContactWithNoNotes_ReturnsResultWithNotes(bool hasAnnotations, bool hasTasks, bool hasIncidentResolutions)
     {
         // Arrange
-        var createPersonResult = await _dataScope.TestData.CreatePerson();
+        var createPersonResult = await _dataScope.TestData.CreatePersonAsync();
         if (hasAnnotations)
         {
-            await _dataScope.TestData.CreateNote(b => b.WithPersonId(createPersonResult.ContactId));
-            await _dataScope.TestData.CreateNote(b => b.WithPersonId(createPersonResult.ContactId));
+            await _dataScope.TestData.CreateNoteAsync(b => b.WithPersonId(createPersonResult.ContactId));
+            await _dataScope.TestData.CreateNoteAsync(b => b.WithPersonId(createPersonResult.ContactId));
         }
 
         if (hasTasks)
         {
-            await _dataScope.TestData.CreateCrmTask(b => b.WithPersonId(createPersonResult.ContactId));
-            await _dataScope.TestData.CreateCrmTask(b => b.WithPersonId(createPersonResult.ContactId));
+            await _dataScope.TestData.CreateCrmTaskAsync(b => b.WithPersonId(createPersonResult.ContactId));
+            await _dataScope.TestData.CreateCrmTaskAsync(b => b.WithPersonId(createPersonResult.ContactId));
         }
 
         if (hasIncidentResolutions)
         {
-            await _dataScope.TestData.CreateNameChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithRejectedStatus());
-            await _dataScope.TestData.CreateDateOfBirthChangeIncident(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
+            await _dataScope.TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithRejectedStatus());
+            await _dataScope.TestData.CreateDateOfBirthChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId).WithApprovedStatus());
         }
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetNotesByContactIdQuery(createPersonResult.ContactId));
+        var result = await _crmQueryDispatcher.ExecuteQueryAsync(new GetNotesByContactIdQuery(createPersonResult.ContactId));
 
         // Assert
         Assert.NotNull(result);

@@ -30,12 +30,12 @@ public class PublishEventsBackgroundService : BackgroundService
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            await PublishEvents(stoppingToken);
+            await PublishEventsAsync(stoppingToken);
         }
     }
 
     // public for testing
-    public async Task PublishEvents(CancellationToken cancellationToken)
+    public async Task PublishEventsAsync(CancellationToken cancellationToken)
     {
         using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -82,7 +82,7 @@ public class PublishEventsBackgroundService : BackgroundService
                 try
                 {
                     var eventBase = e.ToEventBase();
-                    await _eventPublisher.PublishEvent(eventBase);
+                    await _eventPublisher.PublishEventAsync(eventBase);
 
                     e.Published = true;
 

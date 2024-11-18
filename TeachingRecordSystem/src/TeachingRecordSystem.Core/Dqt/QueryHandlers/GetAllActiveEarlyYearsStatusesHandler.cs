@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class GetAllActiveEarlyYearsStatusesHandler : ICrmQueryHandler<GetAllActiveEarlyYearsStatusesQuery, dfeta_earlyyearsstatus[]>
 {
-    public async Task<dfeta_earlyyearsstatus[]> Execute(GetAllActiveEarlyYearsStatusesQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_earlyyearsstatus[]> ExecuteAsync(GetAllActiveEarlyYearsStatusesQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {

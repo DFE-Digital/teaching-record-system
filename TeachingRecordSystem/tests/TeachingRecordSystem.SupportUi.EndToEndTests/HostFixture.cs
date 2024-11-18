@@ -83,10 +83,10 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     {
                         var fileService = new Mock<IFileService>();
                         fileService
-                            .Setup(s => s.UploadFile(It.IsAny<Stream>(), It.IsAny<string?>()))
+                            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>()))
                             .ReturnsAsync(Guid.NewGuid());
                         fileService
-                            .Setup(s => s.GetFileUrl(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+                            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
                             .ReturnsAsync("https://fake.blob.core.windows.net/fake");
                         return fileService.Object;
                     }
@@ -95,10 +95,10 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     {
                         var userService = new Mock<IAadUserService>();
                         userService
-                            .Setup(s => s.GetUserByEmail(It.IsAny<string>()))
+                            .Setup(s => s.GetUserByEmailAsync(It.IsAny<string>()))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         userService
-                            .Setup(s => s.GetUserById(It.IsAny<string>()))
+                            .Setup(s => s.GetUserByIdAsync(It.IsAny<string>()))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         return userService.Object;
                     }
@@ -114,7 +114,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
         }
     }
 
-    async Task IStartupTask.Execute()
+    async Task IStartupTask.ExecuteAsync()
     {
         _host = CreateHost();
 

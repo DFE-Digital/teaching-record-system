@@ -13,5 +13,5 @@ public abstract class EytsAwardedEmailJobTestBase : IAsyncLifetime
     public Task DisposeAsync() => Task.CompletedTask;
 
     public Task InitializeAsync() =>
-        DbFixture.WithDbContext(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from eyts_awarded_emails_jobs"));
+        DbFixture.WithDbContextAsync(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from eyts_awarded_emails_jobs"));
 }

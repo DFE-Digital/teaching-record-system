@@ -23,6 +23,13 @@
     <Using Include="TeachingRecordSystem.Core.Events.Models" Alias="EventModels" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(IsTestProject)' != 'true' and '$(IsSourceGeneratorProject)' != 'true'">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <Using Include="Moq" />
     <Using Include="Xunit" />

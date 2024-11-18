@@ -14,7 +14,7 @@ public class CertificateGenerator : ICertificateGenerator
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task<Stream> GenerateCertificate(string templateName, IReadOnlyDictionary<string, string> fieldValues)
+    public async Task<Stream> GenerateCertificateAsync(string templateName, IReadOnlyDictionary<string, string> fieldValues)
     {
         var blobContainerClient = _blobServiceClient.GetBlobContainerClient(CertificatesContainerName);
         var blobClient = blobContainerClient.GetBlobClient(templateName);

@@ -11,474 +11,474 @@ public static class PageExtensions
             return asUri.LocalPath == path;
         });
 
-    public static async Task GoToHomePage(this IPage page)
+    public static async Task GoToHomePageAsync(this IPage page)
     {
         await page.GotoAsync("/");
     }
 
-    public static async Task GoToPersonAlertsPage(this IPage page, Guid personId)
+    public static async Task GoToPersonAlertsPageAsync(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/persons/{personId}/alerts");
     }
 
-    public static async Task GoToPersonDetailPage(this IPage page, Guid personId)
+    public static async Task GoToPersonDetailPageAsync(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/persons/{personId}");
     }
 
-    public static async Task GoToPersonQualificationsPage(this IPage page, Guid personId)
+    public static async Task GoToPersonQualificationsPageAsync(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/persons/{personId}/qualifications");
     }
 
-    public static async Task GoToAddAlertPage(this IPage page, Guid personId)
+    public static async Task GoToAddAlertPageAsync(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/alerts/add?personId={personId}");
     }
 
-    public static async Task GoToEditAlertDetailsPage(this IPage page, Guid alertId)
+    public static async Task GoToEditAlertDetailsPageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/details");
     }
 
-    public static async Task GoToEditAlertStartDatePage(this IPage page, Guid alertId)
+    public static async Task GoToEditAlertStartDatePageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/start-date");
     }
 
-    public static async Task GoToEditAlertEndDatePage(this IPage page, Guid alertId)
+    public static async Task GoToEditAlertEndDatePageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/end-date");
     }
 
-    public static async Task GoToEditAlertLinkPage(this IPage page, Guid alertId)
+    public static async Task GoToEditAlertLinkPageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/link");
     }
 
-    public static async Task GoToCloseAlertPage(this IPage page, Guid alertId)
+    public static async Task GoToCloseAlertPageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/close");
     }
 
-    public static async Task GoToReopenAlertPage(this IPage page, Guid alertId)
+    public static async Task GoToReopenAlertPageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/re-open");
     }
 
-    public static async Task GoToDeleteAlertPage(this IPage page, Guid alertId)
+    public static async Task GoToDeleteAlertPageAsync(this IPage page, Guid alertId)
     {
         await page.GotoAsync($"/alerts/{alertId}/delete");
     }
 
-    public static async Task GoToAddMqPage(this IPage page, Guid personId)
+    public static async Task GoToAddMqPageAsync(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/mqs/add?personId={personId}");
     }
 
-    public static async Task GoToUsersPage(this IPage page)
+    public static async Task GoToUsersPageAsync(this IPage page)
     {
         await page.GotoAsync($"/users");
     }
 
-    public static async Task GoToApplicationUsersPage(this IPage page)
+    public static async Task GoToApplicationUsersPageAsync(this IPage page)
     {
         await page.GotoAsync($"/application-users");
     }
 
-    public static Task ClickLinkForElementWithTestId(this IPage page, string testId) =>
+    public static Task ClickLinkForElementWithTestIdAsync(this IPage page, string testId) =>
         page.GetByTestId(testId).ClickAsync();
 
-    public static Task ClickChangeLinkForSummaryListRowWithKey(this IPage page, string key) =>
+    public static Task ClickChangeLinkForSummaryListRowWithKeyAsync(this IPage page, string key) =>
         page.Locator($".govuk-summary-list__row:has(> dt:text('{key}'))").GetByText("Change").ClickAsync();
 
-    public static async Task ClickAddAlertPersonAlertsPage(this IPage page)
+    public static async Task ClickAddAlertPersonAlertsPageAsync(this IPage page)
     {
         await page.GetByTestId($"add-alert").ClickAsync();
     }
 
-    public static async Task ClickCloseAlertPersonAlertsPage(this IPage page, Guid alertId)
+    public static async Task ClickCloseAlertPersonAlertsPageAsync(this IPage page, Guid alertId)
     {
         await page.GetByTestId($"close-{alertId}").ClickAsync();
     }
 
-    public static async Task ClickViewAlertPersonAlertsPage(this IPage page, Guid alertId)
+    public static async Task ClickViewAlertPersonAlertsPageAsync(this IPage page, Guid alertId)
     {
         await page.GetByTestId($"view-alert-link-{alertId}").ClickAsync();
     }
 
-    public static async Task ClickSupportTasksLinkInNavigationBar(this IPage page)
+    public static async Task ClickSupportTasksLinkInNavigationBarAsync(this IPage page)
     {
         await page.ClickAsync("a:text-is('Support tasks')");
     }
 
-    public static async Task AssertOnSupportTasksPage(this IPage page)
+    public static async Task AssertOnSupportTasksPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync("/support-tasks");
     }
 
-    public static async Task ClickCaseReferenceLinkChangeRequestsPage(this IPage page, string caseReference)
+    public static async Task ClickCaseReferenceLinkChangeRequestsPageAsync(this IPage page, string caseReference)
     {
         await page.ClickAsync($"a:text-is('{caseReference}')");
     }
 
-    public static async Task AssertOnChangeRequestDetailPage(this IPage page, string caseReference)
+    public static async Task AssertOnChangeRequestDetailPageAsync(this IPage page, string caseReference)
     {
         await page.WaitForUrlPathAsync($"/change-requests/{caseReference}");
     }
 
-    public static async Task AssertOnAcceptChangeRequestPage(this IPage page, string caseReference)
+    public static async Task AssertOnAcceptChangeRequestPageAsync(this IPage page, string caseReference)
     {
         await page.WaitForUrlPathAsync($"/change-requests/{caseReference}/accept");
     }
 
-    public static async Task AssertOnRejectChangeRequestPage(this IPage page, string caseReference)
+    public static async Task AssertOnRejectChangeRequestPageAsync(this IPage page, string caseReference)
     {
         await page.WaitForUrlPathAsync($"/change-requests/{caseReference}/reject");
     }
 
-    public static async Task AssertOnPersonDetailPage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonDetailPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}");
     }
 
-    public static async Task AssertOnPersonAlertsPage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonAlertsPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
     }
 
-    public static async Task AssertOnPersonQualificationsPage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonQualificationsPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
     }
 
-    public static async Task AssertOnAddAlertTypePage(this IPage page)
+    public static async Task AssertOnAddAlertTypePageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/type");
     }
 
-    public static async Task AssertOnAddAlertDetailsPage(this IPage page)
+    public static async Task AssertOnAddAlertDetailsPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/details");
     }
 
-    public static async Task AssertOnAddAlertConfirmPage(this IPage page)
+    public static async Task AssertOnAddAlertConfirmPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/confirm");
     }
 
-    public static async Task AssertOnAddAlertLinkPage(this IPage page)
+    public static async Task AssertOnAddAlertLinkPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/link");
     }
 
-    public static async Task AssertOnAddAlertStartDatePage(this IPage page)
+    public static async Task AssertOnAddAlertStartDatePageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/start-date");
     }
 
-    public static async Task AssertOnAddAlertEndDatePage(this IPage page)
+    public static async Task AssertOnAddAlertEndDatePageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/end-date");
     }
 
-    public static async Task AssertOnAddAlertReasonPage(this IPage page)
+    public static async Task AssertOnAddAlertReasonPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/reason");
     }
 
-    public static async Task AssertOnAddAlertCheckAnswersPage(this IPage page)
+    public static async Task AssertOnAddAlertCheckAnswersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/check-answers");
     }
 
-    public static async Task AssertOnEditAlertDetailsPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertDetailsPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/details");
     }
 
-    public static async Task AssertOnEditAlertDetailsChangeReasonPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertDetailsChangeReasonPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/details/change-reason");
     }
 
-    public static async Task AssertOnEditAlertDetailsCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertDetailsCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/details/check-answers");
     }
 
-    public static async Task AssertOnEditAlertStartDatePage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertStartDatePageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date");
     }
 
-    public static async Task AssertOnEditAlertStartDateChangeReasonPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertStartDateChangeReasonPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/change-reason");
     }
 
-    public static async Task AssertOnEditAlertStartDateCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertStartDateCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/start-date/check-answers");
     }
 
-    public static async Task AssertOnEditAlertEndDatePage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertEndDatePageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date");
     }
 
-    public static async Task AssertOnEditAlertEndDateChangeReasonPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertEndDateChangeReasonPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/change-reason");
     }
 
-    public static async Task AssertOnEditAlertEndDateCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertEndDateCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/end-date/check-answers");
     }
 
-    public static async Task AssertOnEditAlertLinkPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertLinkPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/link");
     }
 
-    public static async Task AssertOnEditAlertLinkChangeReasonPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertLinkChangeReasonPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/link/change-reason");
     }
 
-    public static async Task AssertOnEditAlertLinkCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnEditAlertLinkCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/link/check-answers");
     }
 
-    public static async Task AssertOnAlertDetailPage(this IPage page, Guid alertId)
+    public static async Task AssertOnAlertDetailPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}");
     }
 
-    public static async Task AssertOnCloseAlertPage(this IPage page, Guid alertId)
+    public static async Task AssertOnCloseAlertPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close");
     }
 
-    public static async Task AssertOnCloseAlertChangeReasonPage(this IPage page, Guid alertId)
+    public static async Task AssertOnCloseAlertChangeReasonPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/change-reason");
     }
 
-    public static async Task AssertOnCloseAlertCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnCloseAlertCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/close/check-answers");
     }
 
-    public static async Task AssertOnReopenAlertPage(this IPage page, Guid alertId)
+    public static async Task AssertOnReopenAlertPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/re-open");
     }
 
-    public static async Task AssertOnReopenAlertCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnReopenAlertCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/re-open/check-answers");
     }
 
-    public static async Task AssertOnDeleteAlertPage(this IPage page, Guid alertId)
+    public static async Task AssertOnDeleteAlertPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete");
     }
 
-    public static async Task AssertOnDeleteAlertCheckAnswersPage(this IPage page, Guid alertId)
+    public static async Task AssertOnDeleteAlertCheckAnswersPageAsync(this IPage page, Guid alertId)
     {
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/check-answers");
     }
 
-    public static async Task AssertOnPersonEditNamePage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonEditNamePageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name");
     }
 
-    public static async Task AssertOnPersonEditNameConfirmPage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonEditNameConfirmPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name/confirm");
     }
 
-    public static async Task AssertOnPersonEditDateOfBirthPage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonEditDateOfBirthPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth");
     }
 
-    public static async Task AssertOnPersonEditDateOfBirthConfirmPage(this IPage page, Guid personId)
+    public static async Task AssertOnPersonEditDateOfBirthConfirmPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth/confirm");
     }
 
-    public static async Task AssertOnAddMqProviderPage(this IPage page)
+    public static async Task AssertOnAddMqProviderPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/mqs/add/provider");
     }
 
-    public static async Task AssertOnAddMqSpecialismPage(this IPage page)
+    public static async Task AssertOnAddMqSpecialismPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/mqs/add/specialism");
     }
 
-    public static async Task AssertOnAddMqStartDatePage(this IPage page)
+    public static async Task AssertOnAddMqStartDatePageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/mqs/add/start-date");
     }
 
-    public static async Task AssertOnAddMqStatusPage(this IPage page)
+    public static async Task AssertOnAddMqStatusPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/mqs/add/status");
     }
 
-    public static async Task AssertOnAddMqCheckAnswersPage(this IPage page)
+    public static async Task AssertOnAddMqCheckAnswersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/mqs/add/check-answers");
     }
 
-    public static async Task AssertOnEditMqProviderPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqProviderPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider");
     }
 
-    public static async Task AssertOnEditMqProviderReasonPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqProviderReasonPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/change-reason");
     }
 
-    public static async Task AssertOnEditMqProviderConfirmPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqProviderConfirmPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/provider/confirm");
     }
 
-    public static async Task AssertOnEditMqSpecialismPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqSpecialismPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism");
     }
 
-    public static async Task AssertOnEditMqSpecialismReasonPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqSpecialismReasonPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/change-reason");
     }
 
-    public static async Task AssertOnEditMqSpecialismConfirmPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqSpecialismConfirmPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/specialism/confirm");
     }
 
-    public static async Task AssertOnEditMqStartDatePage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStartDatePageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date");
     }
 
-    public static async Task AssertOnEditMqStartDateReasonPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStartDateReasonPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/change-reason");
     }
 
-    public static async Task AssertOnEditMqStartDateConfirmPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStartDateConfirmPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/start-date/confirm");
     }
 
-    public static async Task AssertOnEditMqStatusPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStatusPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status");
     }
 
-    public static async Task AssertOnEditMqStatusReasonPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStatusReasonPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/change-reason");
     }
 
-    public static async Task AssertOnEditMqStatusConfirmPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnEditMqStatusConfirmPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/status/confirm");
     }
 
-    public static async Task AssertOnDeleteMqPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnDeleteMqPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete");
     }
 
-    public static async Task AssertOnDeleteMqConfirmPage(this IPage page, Guid qualificationId)
+    public static async Task AssertOnDeleteMqConfirmPageAsync(this IPage page, Guid qualificationId)
     {
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/confirm");
     }
 
-    public static async Task AssertOnUsersPage(this IPage page)
+    public static async Task AssertOnUsersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/users");
     }
 
-    public static async Task AssertOnAddUserPage(this IPage page)
+    public static async Task AssertOnAddUserPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/users/add");
     }
 
-    public static async Task AssertOnAddUserConfirmPage(this IPage page)
+    public static async Task AssertOnAddUserConfirmPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/users/add/confirm");
     }
 
-    public static async Task AssertOnEditUserPage(this IPage page, Guid userId)
+    public static async Task AssertOnEditUserPageAsync(this IPage page, Guid userId)
     {
         await page.WaitForUrlPathAsync($"/users/{userId}");
     }
 
-    public static async Task AssertOnApplicationUsersPage(this IPage page)
+    public static async Task AssertOnApplicationUsersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/application-users");
     }
 
-    public static async Task AssertOnAddApplicationUserPage(this IPage page)
+    public static async Task AssertOnAddApplicationUserPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/application-users/add");
     }
 
-    public static async Task AssertOnEditApplicationUserPage(this IPage page, Guid applicationUserId)
+    public static async Task AssertOnEditApplicationUserPageAsync(this IPage page, Guid applicationUserId)
     {
         await page.WaitForUrlPathAsync($"/application-users/{applicationUserId}");
     }
 
-    public static async Task AssertOnAddApiKeyPage(this IPage page)
+    public static async Task AssertOnAddApiKeyPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/api-keys/add");
     }
 
-    public static async Task AssertOnEditApiKeyPage(this IPage page, Guid apiKeyId)
+    public static async Task AssertOnEditApiKeyPageAsync(this IPage page, Guid apiKeyId)
     {
         await page.WaitForUrlPathAsync($"/api-keys/{apiKeyId}");
     }
 
-    public static async Task AssertFlashMessage(this IPage page, string expectedHeader)
+    public static async Task AssertFlashMessageAsync(this IPage page, string expectedHeader)
     {
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
     }
 
-    public static async Task FillDateInput(this IPage page, DateOnly date)
+    public static async Task FillDateInputAsync(this IPage page, DateOnly date)
     {
         await page.FillAsync("label:text-is('Day')", date.Day.ToString());
         await page.FillAsync("label:text-is('Month')", date.Month.ToString());
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
 
-    public static async Task FillNameInputs(this IPage page, string firstName, string middleName, string lastName)
+    public static async Task FillNameInputsAsync(this IPage page, string firstName, string middleName, string lastName)
     {
         await page.FillAsync("text=First Name", firstName);
         await page.FillAsync("text=Middle Name", middleName);
         await page.FillAsync("text=Last Name", lastName);
     }
 
-    public static async Task FillEmailInput(this IPage page, string email)
+    public static async Task FillEmailInputAsync(this IPage page, string email)
     {
         await page.FillAsync("input[type='email']", email);
     }
 
-    public static async Task SubmitAddAlertIndexPage(this IPage page, string alertType, string? details, string link, DateOnly startDate)
+    public static async Task SubmitAddAlertIndexPageAsync(this IPage page, string alertType, string? details, string link, DateOnly startDate)
     {
-        await page.AssertOnAddAlertTypePage();
+        await page.AssertOnAddAlertTypePageAsync();
         await page.FillAsync("label:text-is('Alert type')", alertType);
         if (details != null)
         {
@@ -486,34 +486,34 @@ public static class PageExtensions
         }
 
         await page.FillAsync("label:text-is('Link')", link);
-        await page.FillDateInput(startDate);
-        await page.ClickContinueButton();
+        await page.FillDateInputAsync(startDate);
+        await page.ClickContinueButtonAsync();
     }
 
-    public static Task ClickAcceptChangeButton(this IPage page)
-        => ClickButton(page, "Accept change");
+    public static Task ClickAcceptChangeButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Accept change");
 
-    public static Task ClickRejectChangeButton(this IPage page)
-        => ClickButton(page, "Reject change");
+    public static Task ClickRejectChangeButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Reject change");
 
-    public static Task ClickConfirmChangeButton(this IPage page)
-        => ClickButton(page, "Confirm change");
+    public static Task ClickConfirmChangeButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Confirm change");
 
-    public static Task ClickConfirmButton(this IPage page)
-        => ClickButton(page, "Confirm");
+    public static Task ClickConfirmButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Confirm");
 
-    public static Task ClickRejectButton(this IPage page)
-        => ClickButton(page, "Reject");
+    public static Task ClickRejectButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Reject");
 
-    public static Task ClickContinueButton(this IPage page)
-        => ClickButton(page, "Continue");
+    public static Task ClickContinueButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Continue");
 
-    public static Task ClickDeactivateButton(this IPage page)
-        => ClickButton(page, "Mark alert as inactive");
+    public static Task ClickDeactivateButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Mark alert as inactive");
 
-    public static Task ClickReactivateButton(this IPage page)
-        => ClickButton(page, "Remove inactive status");
+    public static Task ClickReactivateButtonAsync(this IPage page)
+        => ClickButtonAsync(page, "Remove inactive status");
 
-    public static Task ClickButton(this IPage page, string text) =>
+    public static Task ClickButtonAsync(this IPage page, string text) =>
         page.ClickAsync($".govuk-button:text-is('{text}')");
 }

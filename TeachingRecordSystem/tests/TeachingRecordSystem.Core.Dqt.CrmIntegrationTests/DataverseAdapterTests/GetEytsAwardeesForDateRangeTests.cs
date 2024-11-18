@@ -30,7 +30,7 @@ public class GetEytsAwardeesForDateRangeTests : IAsyncLifetime
         var expectedCount = 18;
 
         // Act
-        var eytsAwardees = (await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
+        var eytsAwardees = (await _dataverseAdapter.GetEytsAwardeesForDateRangeAsync(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(expectedCount, eytsAwardees.Count());
@@ -150,7 +150,7 @@ public class GetEytsAwardeesForDateRangeTests : IAsyncLifetime
             teacher5EarlyYearsStatusValue);
 
         // Act
-        var eytsAwardees = (await _dataverseAdapter.GetEytsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
+        var eytsAwardees = (await _dataverseAdapter.GetEytsAwardeesForDateRangeAsync(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(3, eytsAwardees.Count());
@@ -233,7 +233,7 @@ public class GetEytsAwardeesForDateRangeTests : IAsyncLifetime
             dfeta_Result = dfeta_ITTResult.Pass,
         });
 
-        var earlyYearsTeacherStatus = await _dataverseAdapter.GetEarlyYearsStatus(earlyYearsStatusValue, null);
+        var earlyYearsTeacherStatus = await _dataverseAdapter.GetEarlyYearsStatusAsync(earlyYearsStatusValue, null);
         var qtsRegistration = new dfeta_qtsregistration()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),

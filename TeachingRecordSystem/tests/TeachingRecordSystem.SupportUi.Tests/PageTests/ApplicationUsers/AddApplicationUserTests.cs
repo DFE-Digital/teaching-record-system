@@ -29,7 +29,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponse(response);
+        await AssertEx.HtmlResponseAsync(response);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Enter a name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Name", "Name must be 200 characters or less");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Name must be 200 characters or less");
     }
 
     [Fact]
@@ -136,8 +136,8 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
                 Assert.Equal(name, applicationUserCreatedEvent.ApplicationUser.Name);
             });
 
-        var redirectResponse = await response.FollowRedirect(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocument();
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Application user added");
     }
 }

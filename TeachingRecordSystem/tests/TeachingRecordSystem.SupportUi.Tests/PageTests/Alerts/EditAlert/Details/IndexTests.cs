@@ -2,7 +2,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.EditAlert.Detail
 
 public class IndexTests : DetailsTestBase
 {
-    private const string PreviousStep = JourneySteps.New;
     private const string ThisStep = JourneySteps.Index;
 
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
@@ -18,7 +17,7 @@ public class IndexTests : DetailsTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -34,7 +33,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -50,7 +49,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -66,7 +65,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -74,7 +73,7 @@ public class IndexTests : DetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(alert.Details, doc.GetElementById("Details")?.TextContent);
     }
 
@@ -83,7 +82,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateJourneyInstanceForCompletedStep(ThisStep, alert);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(ThisStep, alert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -91,7 +90,7 @@ public class IndexTests : DetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TextContent);
     }
 
@@ -103,7 +102,7 @@ public class IndexTests : DetailsTestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newDetails = "New details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -123,7 +122,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var alertId = Guid.NewGuid();
-        var journeyInstance = await CreateEmptyJourneyInstance(alertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -139,7 +138,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -155,7 +154,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newDetails = alert.Details;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -167,7 +166,7 @@ public class IndexTests : DetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Details", "Enter changed details");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter changed details");
     }
 
     [Fact]
@@ -175,7 +174,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newDetails = string.Empty;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -187,7 +186,7 @@ public class IndexTests : DetailsTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasError(response, "Details", "Enter details");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
     }
 
     [Fact]
@@ -195,7 +194,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
         var newDetails = "New details";
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -219,7 +218,7 @@ public class IndexTests : DetailsTestBase
     {
         // Arrange
         var (person, alert) = await CreatePersonWithOpenAlert();
-        var journeyInstance = await CreateEmptyJourneyInstance(alert.AlertId);
+        var journeyInstance = await CreateEmptyJourneyInstanceAsync(alert.AlertId);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/{alert.AlertId}/details/cancel?{journeyInstance.GetUniqueIdQueryParameter()}");
 

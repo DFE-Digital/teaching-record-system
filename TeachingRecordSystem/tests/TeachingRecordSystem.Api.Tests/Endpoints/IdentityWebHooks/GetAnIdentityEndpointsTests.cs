@@ -192,7 +192,7 @@ public class GetAnIdentityEndpointsTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode);
-        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfo(mergedUserId, now));
+        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfoAsync(mergedUserId, now));
     }
 
     [Fact]
@@ -219,10 +219,10 @@ public class GetAnIdentityEndpointsTests : TestBase
 
         UpdateTeacherIdentityInfoCommand? actualCommand = null;
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
         DataverseAdapterMock
-            .Setup(d => d.UpdateTeacherIdentityInfo(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
+            .Setup(d => d.UpdateTeacherIdentityInfoAsync(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
             .Returns(Task.CompletedTask)
             .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
 
@@ -270,7 +270,7 @@ public class GetAnIdentityEndpointsTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
@@ -287,7 +287,7 @@ public class GetAnIdentityEndpointsTests : TestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        DataverseAdapterMock.Verify(mock => mock.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()), Times.Never);
+        DataverseAdapterMock.Verify(mock => mock.GetTeacherByTrnAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()), Times.Never);
     }
 
     [Fact]
@@ -313,10 +313,10 @@ public class GetAnIdentityEndpointsTests : TestBase
 
         UpdateTeacherIdentityInfoCommand? actualCommand = null;
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
         DataverseAdapterMock
-            .Setup(d => d.UpdateTeacherIdentityInfo(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
+            .Setup(d => d.UpdateTeacherIdentityInfoAsync(It.IsAny<UpdateTeacherIdentityInfoCommand>()))
             .Returns(Task.CompletedTask)
             .Callback<UpdateTeacherIdentityInfoCommand>(c => actualCommand = c);
 
@@ -370,7 +370,7 @@ public class GetAnIdentityEndpointsTests : TestBase
         };
 
         DataverseAdapterMock
-            .Setup(d => d.GetTeacherByTrn(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
+            .Setup(d => d.GetTeacherByTrnAsync(It.IsAny<string>(), It.IsAny<string[]>(), It.IsAny<bool>()))
             .ReturnsAsync(new Contact());
 
         var jsonContent = JsonSerializer.Serialize(content, GetAnIdentityEndpoints.SerializerOptions);
@@ -387,7 +387,7 @@ public class GetAnIdentityEndpointsTests : TestBase
         var response = await httpClient.SendAsync(request);
 
         // Assert
-        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfo(identityUserId, timeUtc));
+        DataverseAdapterMock.Verify(mock => mock.ClearTeacherIdentityInfoAsync(identityUserId, timeUtc));
     }
 
     private static StringContent CreateJsonContent(string json) => new(json, Encoding.UTF8, "application/json");

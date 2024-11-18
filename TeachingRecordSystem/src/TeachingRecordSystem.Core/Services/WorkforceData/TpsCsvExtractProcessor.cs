@@ -10,7 +10,7 @@ public class TpsCsvExtractProcessor(
 {
     private const string TempEventsTableSuffix = "tps_extract_events";
 
-    public async Task ProcessNonMatchingTrns(Guid tpsCsvExtractId, CancellationToken cancellationToken)
+    public async Task ProcessNonMatchingTrnsAsync(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         int i = 0;
         using var dbContext = dbContextFactory.CreateDbContext();
@@ -30,7 +30,7 @@ public class TpsCsvExtractProcessor(
         }
     }
 
-    public async Task ProcessNonMatchingEstablishments(Guid tpsCsvExtractId, CancellationToken cancellationToken)
+    public async Task ProcessNonMatchingEstablishmentsAsync(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -92,7 +92,7 @@ public class TpsCsvExtractProcessor(
         await dbContext.Database.ExecuteSqlAsync(updateSql, cancellationToken);
     }
 
-    public async Task ProcessNewEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
+    public async Task ProcessNewEmploymentHistoryAsync(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -269,14 +269,14 @@ public class TpsCsvExtractProcessor(
                 events.Add(createdEvent);
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
         while (hasRecordsToUpdate);
     }
 
-    public async Task ProcessUpdatedEmploymentHistory(Guid tpsCsvExtractId, CancellationToken cancellationToken)
+    public async Task ProcessUpdatedEmploymentHistoryAsync(Guid tpsCsvExtractId, CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -441,14 +441,14 @@ public class TpsCsvExtractProcessor(
                 }
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
         while (hasRecordsToUpdate);
     }
 
-    public async Task UpdateLatestEstablishmentVersions(CancellationToken cancellationToken)
+    public async Task UpdateLatestEstablishmentVersionsAsync(CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -594,14 +594,14 @@ public class TpsCsvExtractProcessor(
                 events.Add(updatedEvent);
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
         while (hasRecordsToUpdate);
     }
 
-    public async Task ProcessEndedEmployments(CancellationToken cancellationToken)
+    public async Task ProcessEndedEmploymentsAsync(CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -700,14 +700,14 @@ public class TpsCsvExtractProcessor(
                 events.Add(updatedEvent);
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
         while (hasRecordsToUpdate);
     }
 
-    public async Task BackfillNinoAndPersonPostcodeInEmploymentHistory(CancellationToken cancellationToken)
+    public async Task BackfillNinoAndPersonPostcodeInEmploymentHistoryAsync(CancellationToken cancellationToken)
     {
         using var dbContext = dbContextFactory.CreateDbContext();
         dbContext.Database.SetCommandTimeout(300);
@@ -818,7 +818,7 @@ public class TpsCsvExtractProcessor(
                 }
             }
 
-            await transaction.SaveEvents(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }

@@ -17,7 +17,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var searchForm = doc.GetElementByTestId("search-form");
         Assert.NotNull(searchForm);
@@ -37,7 +37,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var searchForm = doc.GetElementByTestId("search-form");
         Assert.NotNull(searchForm);
@@ -57,7 +57,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var searchForm = doc.GetElementByTestId("search-form");
         Assert.NotNull(searchForm);
@@ -78,9 +78,9 @@ public class IndexTests : TestBase
     {
         // Arrange
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var person1 = await TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
-        var person2 = await TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
-        var person3 = await TestData.CreatePerson(b => b.WithDateOfBirth(dateOfBirth));
+        var person1 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
+        var person2 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
+        var person3 = await TestData.CreatePersonAsync(b => b.WithDateOfBirth(dateOfBirth));
         var search = dateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
@@ -89,7 +89,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.NotNull(searchResults);
@@ -104,9 +104,9 @@ public class IndexTests : TestBase
     {
         // Arrange
         var name = "Andrew";
-        var person1 = await TestData.CreatePerson(b => b.WithFirstName(name));
-        var person2 = await TestData.CreatePerson(b => b.WithMiddleName(name));
-        var person3 = await TestData.CreatePerson(b => b.WithLastName(name));
+        var person1 = await TestData.CreatePersonAsync(b => b.WithFirstName(name));
+        var person2 = await TestData.CreatePersonAsync(b => b.WithMiddleName(name));
+        var person3 = await TestData.CreatePersonAsync(b => b.WithLastName(name));
         var search = "andrew";
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
@@ -115,7 +115,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.NotNull(searchResults);
@@ -129,9 +129,9 @@ public class IndexTests : TestBase
     public async Task Get_WithSearchThatLooksLikeATrn_DisplaysMatchOnTrn()
     {
         // Arrange                
-        var person1 = await TestData.CreatePerson(b => b.WithTrn());
-        var person2 = await TestData.CreatePerson(b => b.WithTrn());
-        var person3 = await TestData.CreatePerson(b => b.WithTrn());
+        var person1 = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var person2 = await TestData.CreatePersonAsync(b => b.WithTrn());
+        var person3 = await TestData.CreatePersonAsync(b => b.WithTrn());
         var search = person1.Trn;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons?search={search}");
@@ -140,7 +140,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var searchResults = doc.GetElementByTestId("search-results");
         Assert.NotNull(searchResults);

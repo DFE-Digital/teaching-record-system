@@ -5,11 +5,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Alerts.DeleteAlert;
 
 public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    protected Task<JourneyInstance<DeleteAlertState>> CreateEmptyJourneyInstance(Guid alertId) =>
-        CreateJourneyInstance(alertId, new());
+    protected Task<JourneyInstance<DeleteAlertState>> CreateEmptyJourneyInstanceAsync(Guid alertId) =>
+        CreateJourneyInstanceAsync(alertId, new());
 
-    protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForAllStepsCompleted(Alert alert, bool populateOptional = true) =>
-        CreateJourneyInstance(alert.AlertId, new DeleteAlertState()
+    protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForAllStepsCompletedAsync(Alert alert, bool populateOptional = true) =>
+        CreateJourneyInstanceAsync(alert.AlertId, new DeleteAlertState()
         {
             HasAdditionalReasonDetail = populateOptional ? true : false,
             DeleteReasonDetail = populateOptional ? "More details" : null,
@@ -19,17 +19,17 @@ public class DeleteAlertTestBase(HostFixture hostFixture) : TestBase(hostFixture
             EvidenceFileSizeDescription = populateOptional ? "5MB" : null
         });
 
-    protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForCompletedStep(string step, Alert alert) =>
+    protected Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceForCompletedStepAsync(string step, Alert alert) =>
         step switch
         {
             JourneySteps.New =>
-                CreateEmptyJourneyInstance(alert.AlertId),
+                CreateEmptyJourneyInstanceAsync(alert.AlertId),
             JourneySteps.Index or JourneySteps.CheckAnswers =>
-                CreateJourneyInstanceForAllStepsCompleted(alert, populateOptional: true),
+                CreateJourneyInstanceForAllStepsCompletedAsync(alert, populateOptional: true),
             _ => throw new ArgumentException($"Unknown {nameof(step)}: '{step}'.", nameof(step))
         };
 
-    private Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstance(Guid alertId, DeleteAlertState state) =>
+    private Task<JourneyInstance<DeleteAlertState>> CreateJourneyInstanceAsync(Guid alertId, DeleteAlertState state) =>
         CreateJourneyInstance(
             JourneyNames.DeleteAlert,
             state,

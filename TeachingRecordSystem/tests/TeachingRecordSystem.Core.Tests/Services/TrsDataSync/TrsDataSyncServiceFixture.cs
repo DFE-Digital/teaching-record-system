@@ -40,20 +40,20 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
 
     public TestData TestData { get; }
 
-    public Task PublishChangedItemAndConsume(string modelType, IChangedItem changedItem)
+    public Task PublishChangedItemAndConsumeAsync(string modelType, IChangedItem changedItem)
     {
         var (entityLogicalname, _) = TrsDataSyncHelper.GetEntityInfoForModelType(modelType);
 
-        return WithService(entityLogicalname, async (service, changesObserver) =>
+        return WithServiceAsync(entityLogicalname, async (service, changesObserver) =>
         {
             changesObserver.OnNext([changedItem]);
-            var processTask = service.ProcessChangesForModelType(modelType, CancellationToken.None);
+            var processTask = service.ProcessChangesForModelTypeAsync(modelType, CancellationToken.None);
             changesObserver.OnCompleted();
             await processTask;
         });
     }
 
-    public async Task WithService(string entityLogicalName, Func<TrsDataSyncService, IObserver<IChangedItem[]>, Task> action)
+    public async Task WithServiceAsync(string entityLogicalName, Func<TrsDataSyncService, IObserver<IChangedItem[]>, Task> action)
     {
         var options = Options.Create(new TrsDataSyncServiceOptions()
         {
@@ -80,5 +80,5 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
 
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.DbHelper.ClearData();
+    Task IAsyncLifetime.InitializeAsync() => DbFixture.DbHelper.ClearDataAsync();
 }

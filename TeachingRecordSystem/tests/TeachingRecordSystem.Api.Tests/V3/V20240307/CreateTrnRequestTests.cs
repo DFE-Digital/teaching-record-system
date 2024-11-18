@@ -54,7 +54,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(CreateTrnRequestRequest.RequestId),
             expectedError: StringResources.ErrorMessages_RequestIdCanOnlyContainCharactersDigitsUnderscoresAndDashes);
@@ -76,7 +76,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             propertyName: nameof(CreateTrnRequestRequest.RequestId),
             expectedError: StringResources.ErrorMessages_RequestIdMustBe100CharactersOrFewer);
@@ -101,7 +101,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.DateOfBirth",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -129,7 +129,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.DateOfBirth",
             StringResources.ErrorMessages_BirthDateIsOutOfRange);
@@ -155,7 +155,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.NationalInsuranceNumber",
             StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
@@ -173,7 +173,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -182,7 +182,7 @@ public class CreateTrnRequestTests : TestBase
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -217,7 +217,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -265,7 +265,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
+        await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
     [Fact]
@@ -318,7 +318,7 @@ public class CreateTrnRequestTests : TestBase
         Assert.Equal(email, contact.EMailAddress1);
         Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -350,7 +350,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var invalidNino = "IvalidNi";
 
-        var existingContact = await TestData.CreatePerson(p => p
+        var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -359,7 +359,7 @@ public class CreateTrnRequestTests : TestBase
             .WithEmail(email)
             .WithNationalInsuranceNumber());
 
-        await WithDbContext(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Add(new TrnRequest()
             {
@@ -394,7 +394,7 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForProperty(
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(
             response,
             "Person.NationalInsuranceNumber",
             StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
@@ -482,7 +482,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        await TestData.CreatePerson(p => p
+        await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
@@ -517,7 +517,7 @@ public class CreateTrnRequestTests : TestBase
         Assert.NotNull(contact);
         Assert.Null(contact.dfeta_TRN);
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -549,7 +549,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        await TestData.CreatePerson(p => p
+        await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(TestData.GenerateChangedFirstName(firstName))
             .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
@@ -585,7 +585,7 @@ public class CreateTrnRequestTests : TestBase
         Assert.NotNull(contact);
         Assert.Null(contact.dfeta_TRN);
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -617,15 +617,15 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(TestData.GenerateChangedFirstName(firstName))
             .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
             .WithLastName(TestData.GenerateChangedLastName(lastName))
             .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth)));
 
-        var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321");
-        await TestData.CreateTpsEmployment(
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
+        await TestData.CreateTpsEmploymentAsync(
             person,
             establishment,
             startDate: new DateOnly(2024, 1, 1),
@@ -662,7 +662,7 @@ public class CreateTrnRequestTests : TestBase
         Assert.NotNull(contact);
         Assert.Null(contact.dfeta_TRN);
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -694,7 +694,7 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(TestData.GenerateChangedFirstName(firstName))
             .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
@@ -727,7 +727,7 @@ public class CreateTrnRequestTests : TestBase
         // Assert
         Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
@@ -759,15 +759,15 @@ public class CreateTrnRequestTests : TestBase
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithFirstName(TestData.GenerateChangedFirstName(firstName))
             .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
             .WithLastName(TestData.GenerateChangedLastName(lastName))
             .WithDateOfBirth(dateOfBirth));
 
-        var establishment = await TestData.CreateEstablishment(localAuthorityCode: "321");
-        await TestData.CreateTpsEmployment(
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
+        await TestData.CreateTpsEmploymentAsync(
             person,
             establishment,
             startDate: new DateOnly(2024, 1, 1),
@@ -801,7 +801,7 @@ public class CreateTrnRequestTests : TestBase
         // Assert
         Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
 
-        await AssertEx.JsonResponseEquals(
+        await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {

@@ -7,14 +7,14 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public async Task<User> CreateUser(
+    public async Task<User> CreateUserAsync(
         bool? active = null,
         string? name = null,
         string? email = null,
         string[]? roles = null,
         Guid? azureAdUserId = null)
     {
-        var user = await WithDbContext(async dbContext =>
+        var user = await WithDbContextAsync(async dbContext =>
         {
             active ??= true;
             name ??= GenerateName();
@@ -41,7 +41,7 @@ public partial class TestData
         return user;
     }
 
-    public async Task CreateCrmUser(
+    public async Task CreateCrmUserAsync(
         Guid azureAdUserId,
         bool hasDisabledCrmAccount = false,
         string[]? dqtRoles = null)
@@ -84,6 +84,6 @@ public partial class TestData
             }
         }
 
-        await txnRequestBuilder.Execute();
+        await txnRequestBuilder.ExecuteAsync();
     }
 }

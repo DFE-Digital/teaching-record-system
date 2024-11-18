@@ -42,9 +42,9 @@ public class AcceptModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new ApproveIncidentQuery(IncidentDetail!.Incident.Id));
+        await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new ApproveIncidentQuery(IncidentDetail!.Incident.Id));
 
         TempData.SetFlashSuccess(
             $"The request has been accepted",
@@ -55,7 +55,7 @@ public class AcceptModel : PageModel
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        IncidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQuery(new GetIncidentByTicketNumberQuery(TicketNumber));
+        IncidentDetail = await _crmQueryDispatcher.WithDqtUserImpersonation().ExecuteQueryAsync(new GetIncidentByTicketNumberQuery(TicketNumber));
         if (IncidentDetail is null)
         {
             context.Result = NotFound();

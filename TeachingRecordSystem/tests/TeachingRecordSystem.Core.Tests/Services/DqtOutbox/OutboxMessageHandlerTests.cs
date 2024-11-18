@@ -34,11 +34,11 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
-        var applicationUser = await TestData.CreateApplicationUser();
+        var applicationUser = await TestData.CreateApplicationUserAsync();
         var oneLoginUserSubject = TestData.CreateOneLoginUserSubject();
         var email = TestData.GenerateUniqueEmail();
 
-        var person = await TestData.CreatePerson(p => p
+        var person = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
             .WithTrnRequest(applicationUser.UserId, requestId, writeMetadata: false));
 
@@ -61,10 +61,10 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         };
 
         // Act
-        await Handler.HandleOutboxMessage(outboxMessage);
+        await Handler.HandleOutboxMessageAsync(outboxMessage);
 
         // Assert
-        await DbFixture.WithDbContext(async dbContext =>
+        await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var oneLoginUser = await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject);
             Assert.Null(oneLoginUser);

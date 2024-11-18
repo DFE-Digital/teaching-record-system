@@ -23,7 +23,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     public async Task Person_WithMandatoryQualificationCreatedEvent_RendersExpectedContent()
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
+        var createdByUser = await TestData.CreateUserAsync();
         var (personId, mq) = await CreateFullyPopulatedMq(createdByUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
@@ -32,7 +32,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-created-event"),
@@ -56,7 +56,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-created-event"),
@@ -68,11 +68,11 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
-        var deletedByUser = await TestData.CreateUser();
+        var deletedByUser = await TestData.CreateUserAsync();
         var deletionReason = "Created in error";
         var deletionReasonDetail = "More information";
         var evidenceFile = (FileId: Guid.NewGuid(), Name: "A file.jpeg");
-        await TestData.DeleteMandatoryQualification(mq.QualificationId, deletedByUser.UserId, deletionReason, deletionReasonDetail, evidenceFile);
+        await TestData.DeleteMandatoryQualificationAsync(mq.QualificationId, deletedByUser.UserId, deletionReason, deletionReasonDetail, evidenceFile);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
 
@@ -80,7 +80,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
@@ -104,9 +104,9 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateEmptyMq();
-        var deletedByUser = await TestData.CreateUser();
+        var deletedByUser = await TestData.CreateUserAsync();
         var deletionReason = "Created in error";
-        await TestData.DeleteMandatoryQualification(mq.QualificationId, deletedByUser.UserId, deletionReason);
+        await TestData.DeleteMandatoryQualificationAsync(mq.QualificationId, deletedByUser.UserId, deletionReason);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
 
@@ -114,7 +114,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
@@ -137,8 +137,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateEmptyMq();
-        var deletedByUser = await TestData.CreateUser();
-        await TestData.DeleteMandatoryQualification(mq.QualificationId, deletedByUser.UserId, evidenceFile: null);
+        var deletedByUser = await TestData.CreateUserAsync();
+        await TestData.DeleteMandatoryQualificationAsync(mq.QualificationId, deletedByUser.UserId, evidenceFile: null);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
 
@@ -146,7 +146,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
@@ -158,8 +158,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq, legacyProvider) = await CreateMqWithLegacyProvider();
-        var deletedByUser = await TestData.CreateUser();
-        await TestData.DeleteMandatoryQualification(mq.QualificationId, deletedByUser.UserId);
+        var deletedByUser = await TestData.CreateUserAsync();
+        await TestData.DeleteMandatoryQualificationAsync(mq.QualificationId, deletedByUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
 
@@ -167,7 +167,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
@@ -179,8 +179,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var (personId, mq) = await CreateMqWithoutProvider();
-        var deletedByUser = await TestData.CreateUser();
-        await TestData.DeleteMandatoryQualification(mq.QualificationId, deletedByUser.UserId);
+        var deletedByUser = await TestData.CreateUserAsync();
+        await TestData.DeleteMandatoryQualificationAsync(mq.QualificationId, deletedByUser.UserId);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{personId}/change-history");
 
@@ -188,7 +188,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
@@ -210,7 +210,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
@@ -241,7 +241,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
@@ -263,7 +263,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
@@ -276,7 +276,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var importedByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
 
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification(q => q.WithImportedByDqtUser(importedByDqtUser)));
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification(q => q.WithImportedByDqtUser(importedByDqtUser)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -284,7 +284,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-imported-event"),
@@ -313,7 +313,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             qualification.DeletedOn = null;
 
             var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-                await TestData.ReferenceDataCache.GetMqEstablishmentById(mqEstablishmentId) :
+                await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
                 null;
 
             var reactivatedEvent = new MandatoryQualificationDqtReactivatedEvent()
@@ -353,7 +353,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-reactivated-event"),
@@ -368,7 +368,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     public async Task Person_WithMandatoryQualificationMigratedEvent_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         Clock.Advance();
 
         await WithDbContext(async dbContext =>
@@ -399,7 +399,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
@@ -414,7 +414,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     public async Task Person_WithMandatoryQualificationMigratedEventWithNoChanges_DoesNotRenderPreviousDataSummaryList()
     {
         // Arrange
-        var person = await TestData.CreatePerson(b => b.WithMandatoryQualification());
+        var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         Clock.Advance();
 
         await WithDbContext(async dbContext =>
@@ -445,7 +445,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
@@ -455,8 +455,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     public async Task Person_WithMandatoryQualificationMigratedEventWithChangedProvider_RendersProviderRowInPreviousDataSummaryList()
     {
         // Arrange
-        var establishmentWithProviderMapping = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("150");  // Postgraduate Diploma in Deaf Education, University of Manchester, School of Psychological Sciences
-        var person = await TestData.CreatePerson(b => b
+        var establishmentWithProviderMapping = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("150");  // Postgraduate Diploma in Deaf Education, University of Manchester, School of Psychological Sciences
+        var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishment(establishmentWithProviderMapping)));
         Clock.Advance();
@@ -496,7 +496,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
@@ -508,8 +508,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
     {
         // Arrange
         var specialism = MandatoryQualificationSpecialism.DeafEducation;
-        var establishmentWithSpecialismMapping = await TestData.ReferenceDataCache.GetMqEstablishmentByValue("961");  // University of Manchester
-        var person = await TestData.CreatePerson(b => b
+        var establishmentWithSpecialismMapping = await TestData.ReferenceDataCache.GetMqEstablishmentByValueAsync("961");  // University of Manchester
+        var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithSpecialism(specialism)
                 .WithDqtMqEstablishment(establishmentWithSpecialismMapping)));
@@ -552,7 +552,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
@@ -565,7 +565,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
         var changeReason = "Update from provider";
         var changeReasonDetail = "More information";
         var evidenceFile = (FileId: Guid.NewGuid(), Name: "A file.jpeg");
@@ -585,7 +585,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -606,7 +606,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
             mq.QualificationId,
@@ -620,7 +620,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -638,7 +638,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
         var oldProviderId = mq.ProviderId!.Value;
         var oldProvider = MandatoryQualificationProvider.GetById(oldProviderId);
 
@@ -654,7 +654,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -667,7 +667,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
             mq.QualificationId,
@@ -681,7 +681,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -694,7 +694,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
         var oldSpecialism = mq.Specialism!.Value;
 
         await UpdateMq(
@@ -709,7 +709,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -722,7 +722,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
             mq.QualificationId,
@@ -736,7 +736,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -749,7 +749,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
         var oldStartDate = mq.StartDate!.Value;
 
         await UpdateMq(
@@ -764,7 +764,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -777,7 +777,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
             mq.QualificationId,
@@ -791,7 +791,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -804,7 +804,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
         var oldStatus = mq.Status!.Value;
 
         await UpdateMq(
@@ -823,7 +823,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -836,7 +836,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
 
         await UpdateMq(
             mq.QualificationId,
@@ -850,7 +850,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -863,7 +863,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         // Arrange
         var (personId, mq) = await CreateFullyPopulatedMq();
         Clock.Advance();
-        var updatedByUser = await TestData.CreateUser();
+        var updatedByUser = await TestData.CreateUserAsync();
         var oldEndDate = mq.EndDate!.Value;
 
         await UpdateMq(
@@ -878,7 +878,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
@@ -889,7 +889,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
     private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification)> CreateFullyPopulatedMq(EventModels.RaisedByUserInfo? createdByUser = null)
     {
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q =>
             {
                 q.WithStatus(MandatoryQualificationStatus.Passed);
@@ -915,7 +915,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
     private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification)> CreateEmptyMq()
     {
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithStartDate(null)
                 .WithSpecialism(null)
@@ -938,7 +938,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
     private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification)> CreateMqWithoutProvider()
     {
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithProvider(null)));
 
@@ -954,9 +954,9 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
     private async Task<(Guid PersonId, MandatoryQualification MandatoryQualification, dfeta_mqestablishment MqEstablishment)> CreateMqWithLegacyProvider()
     {
-        var legacyProvider = (await TestData.ReferenceDataCache.GetMqEstablishments()).RandomOne();
+        var legacyProvider = (await TestData.ReferenceDataCache.GetMqEstablishmentsAsync()).RandomOne();
 
-        var person = await TestData.CreatePerson(b => b
+        var person = await TestData.CreatePersonAsync(b => b
             .WithMandatoryQualification(q => q
                 .WithDqtMqEstablishment(legacyProvider, mandatoryQualificationProviderId: null)));
 
@@ -986,7 +986,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         qualification.DeletedOn = now;
 
         var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-            await TestData.ReferenceDataCache.GetMqEstablishmentById(mqEstablishmentId) :
+            await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
             null;
 
         var deletedEvent = new MandatoryQualificationDqtDeactivatedEvent()
@@ -1038,7 +1038,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .SingleAsync(q => q.QualificationId == qualificationId);
 
             var oldMqEstablishment = qualification.DqtMqEstablishmentId is Guid oldMqEstablishmentId ?
-                await TestData.ReferenceDataCache.GetMqEstablishmentById(oldMqEstablishmentId) :
+                await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(oldMqEstablishmentId) :
                 null;
 
             var oldMq = new EventModels.MandatoryQualification()
@@ -1065,7 +1065,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             qualification.UpdatedOn = now;
 
             var mqEstablishment = qualification.DqtMqEstablishmentId is Guid mqEstablishmentId ?
-                await TestData.ReferenceDataCache.GetMqEstablishmentById(mqEstablishmentId) :
+                await TestData.ReferenceDataCache.GetMqEstablishmentByIdAsync(mqEstablishmentId) :
                 null;
 
             var updatedEvent = new MandatoryQualificationUpdatedEvent()

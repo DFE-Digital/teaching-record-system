@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public partial class DataverseAdapter
 {
-    public async IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRange(DateTime startDate, DateTime endDate)
+    public async IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate)
     {
         var filter = new FilterExpression(LogicalOperator.And);
         filter.AddCondition(dfeta_businesseventaudit.Fields.CreatedOn, ConditionOperator.GreaterEqual, startDate);

@@ -18,7 +18,7 @@ public class CsvDownloadEstablishmentMasterDataService : IEstablishmentMasterDat
         _clock = clock;
     }
 
-    public async IAsyncEnumerable<Establishment> GetEstablishments()
+    public async IAsyncEnumerable<Establishment> GetEstablishmentsAsync()
     {
         var filename = GetLatestEstablishmentsCsvFilename();
         using var response = await _httpClient.GetAsync(filename, HttpCompletionOption.ResponseHeadersRead);

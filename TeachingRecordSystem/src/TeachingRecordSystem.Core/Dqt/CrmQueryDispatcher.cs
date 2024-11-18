@@ -6,10 +6,10 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? serviceClientName) : ICrmQueryDispatcher
 {
-    public Task<TResult> ExecuteQuery<TResult>(ICrmQuery<TResult> query) =>
-        ExecuteQuery(GetOrganizationService, query);
+    public Task<TResult> ExecuteQueryAsync<TResult>(ICrmQuery<TResult> query) =>
+        ExecuteQueryAsync(GetOrganizationService, query);
 
-    public async Task<TResult> ExecuteQuery<TResult>(
+    public async Task<TResult> ExecuteQueryAsync<TResult>(
         Func<IServiceProvider, IOrganizationServiceAsync> getOrganizationService,
         ICrmQuery<TResult> query)
     {
@@ -23,13 +23,13 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
         var wrapperHandlerType = typeof(QueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var wrappedHandler = (QueryHandler<TResult>)Activator.CreateInstance(wrapperHandlerType, handler)!;
 
-        return await wrappedHandler.Execute(query, organizationService);
+        return await wrappedHandler.ExecuteAsync(query, organizationService);
     }
 
-    public IAsyncEnumerable<TResult> ExecuteQuery<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default) =>
-        ExecuteQuery(GetOrganizationService, query, cancellationToken);
+    public IAsyncEnumerable<TResult> ExecuteQueryAsync<TResult>(IEnumerableCrmQuery<TResult> query, CancellationToken cancellationToken = default) =>
+        ExecuteQueryAsync(GetOrganizationService, query, cancellationToken);
 
-    public async IAsyncEnumerable<TResult> ExecuteQuery<TResult>(
+    public async IAsyncEnumerable<TResult> ExecuteQueryAsync<TResult>(
         Func<IServiceProvider, IOrganizationServiceAsync> getOrganizationService,
         IEnumerableCrmQuery<TResult> query,
         [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
         var wrapperHandlerType = typeof(EnumerableQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
         var wrappedHandler = (EnumerableQueryHandler<TResult>)Activator.CreateInstance(wrapperHandlerType, handler)!;
 
-        await foreach (var result in wrappedHandler.Execute(query, organizationService, cancellationToken))
+        await foreach (var result in wrappedHandler.ExecuteAsync(query, organizationService, cancellationToken))
         {
             yield return result;
         }
@@ -62,34 +62,34 @@ public class CrmQueryDispatcher(IServiceProvider serviceProvider, string? servic
 
     private abstract class QueryHandler<T>
     {
-        public abstract Task<T> Execute(ICrmQuery<T> query, IOrganizationServiceAsync organizationService);
+        public abstract Task<T> ExecuteAsync(ICrmQuery<T> query, IOrganizationServiceAsync organizationService);
     }
 
     private class QueryHandler<TQuery, TResult>(ICrmQueryHandler<TQuery, TResult> innerHandler) : QueryHandler<TResult>
         where TQuery : ICrmQuery<TResult>
     {
-        public override Task<TResult> Execute(
+        public override Task<TResult> ExecuteAsync(
             ICrmQuery<TResult> query,
             IOrganizationServiceAsync organizationService)
         {
-            return innerHandler.Execute((TQuery)query, organizationService);
+            return innerHandler.ExecuteAsync((TQuery)query, organizationService);
         }
     }
 
     private abstract class EnumerableQueryHandler<T>
     {
-        public abstract IAsyncEnumerable<T> Execute(IEnumerableCrmQuery<T> query, IOrganizationServiceAsync organizationService, CancellationToken cancellationToken);
+        public abstract IAsyncEnumerable<T> ExecuteAsync(IEnumerableCrmQuery<T> query, IOrganizationServiceAsync organizationService, CancellationToken cancellationToken);
     }
 
     private class EnumerableQueryHandler<TQuery, TResult>(IEnumerableCrmQueryHandler<TQuery, TResult> innerHandler) : EnumerableQueryHandler<TResult>
         where TQuery : IEnumerableCrmQuery<TResult>
     {
-        public override IAsyncEnumerable<TResult> Execute(
+        public override IAsyncEnumerable<TResult> ExecuteAsync(
             IEnumerableCrmQuery<TResult> query,
             IOrganizationServiceAsync organizationService,
             CancellationToken cancellationToken)
         {
-            return innerHandler.Execute((TQuery)query, organizationService, cancellationToken);
+            return innerHandler.ExecuteAsync((TQuery)query, organizationService, cancellationToken);
         }
     }
 }

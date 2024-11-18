@@ -34,7 +34,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
     {
         var (currentApplicationUserId, _) = _currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, request.RequestId);
+        var trnRequest = await _trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, request.RequestId);
         if (trnRequest == null)
         {
             return null;

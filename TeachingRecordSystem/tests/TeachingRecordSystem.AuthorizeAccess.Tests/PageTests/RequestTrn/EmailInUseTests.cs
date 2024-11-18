@@ -27,8 +27,8 @@ public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
         var email = Faker.Internet.Email();
         var state = CreateNewState(email);
         var journeyInstance = await CreateJourneyInstance(state);
-        var person = await TestData.CreatePerson();
-        await TestData.CreateCrmTask(x =>
+        var person = await TestData.CreatePersonAsync();
+        await TestData.CreateCrmTaskAsync(x =>
         {
             x.WithPersonId(person.ContactId);
             x.WithEmailAddress(email);
@@ -40,6 +40,6 @@ public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
     }
 }

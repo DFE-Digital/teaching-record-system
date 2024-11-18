@@ -137,7 +137,7 @@ public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
             teacher5StatusValue);
 
         // Act
-        var qtsAwardees = (await _dataverseAdapter.GetInternationalQtsAwardeesForDateRange(startDate, endDate).ToListAsync()).Single();
+        var qtsAwardees = (await _dataverseAdapter.GetInternationalQtsAwardeesForDateRangeAsync(startDate, endDate).ToListAsync()).Single();
 
         // Assert
         Assert.Equal(2, qtsAwardees.Count());
@@ -210,7 +210,7 @@ public class GetInternationalQtsAwardeesForDateRangeTests : IAsyncLifetime
             dfeta_Result = dfeta_ITTResult.Pass,
         });
 
-        var teacherStatus = await _dataverseAdapter.GetTeacherStatus(teacherStatusValue, null);
+        var teacherStatus = await _dataverseAdapter.GetTeacherStatusAsync(teacherStatusValue, null);
         await _organizationService.CreateAsync(new dfeta_qtsregistration()
         {
             dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, teacherId),

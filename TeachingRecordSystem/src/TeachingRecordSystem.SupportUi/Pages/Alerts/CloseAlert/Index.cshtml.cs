@@ -31,7 +31,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
         EndDate = JourneyInstance!.State.EndDate;
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (EndDate is null)
         {
@@ -58,7 +58,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
             : linkGenerator.AlertCloseReason(AlertId, JourneyInstance!.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonAlerts(PersonId));

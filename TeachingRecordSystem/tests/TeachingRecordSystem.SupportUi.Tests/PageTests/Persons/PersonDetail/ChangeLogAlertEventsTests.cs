@@ -25,10 +25,10 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertCreatedEventGeneratedInTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertCreatedEventFromTrs(person.PersonId, createdByUser.UserId, populateOptional, isOpenAlert: true);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertCreatedEvent.Alert.AlertTypeId!.Value);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertCreatedEventFromTrsAsync(person.PersonId, createdByUser.UserId, populateOptional, isOpenAlert: true);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertCreatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -36,7 +36,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-created-event"),
@@ -65,9 +65,9 @@ public class ChangeLogAlertEventsTests : TestBase
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
 
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertCreatedEventFromTrs(person.PersonId, createdByUser.UserId, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertCreatedEventFromTrsAsync(person.PersonId, createdByUser.UserId, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -75,7 +75,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-created-event");
 
         if (shouldDisplay)
@@ -95,8 +95,8 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertCreatedEventFromDqt(person.PersonId, createdByDqtUser, populateOptional: populateOptional, isOpenAlert: true);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertCreatedEventFromDqtAsync(person.PersonId, createdByDqtUser, populateOptional: populateOptional, isOpenAlert: true);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -104,7 +104,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-created-event"),
@@ -132,8 +132,8 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertCreatedEventFromDqt(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertCreatedEventFromDqtAsync(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -141,7 +141,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-created-event");
 
         if (shouldDisplay)
@@ -162,10 +162,10 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertDeletedEvent_RendersExpectedContent(bool populateOptional, bool isOpenAlert)
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alertDeletedEvent = await CreateAlertDeletedEvent(person.PersonId, createdByUser.UserId, populateOptional, isOpenAlert);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertDeletedEvent.Alert.AlertTypeId!.Value);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alertDeletedEvent = await CreateAlertDeletedEventAsync(person.PersonId, createdByUser.UserId, populateOptional, isOpenAlert);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertDeletedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -173,7 +173,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-deleted-event"),
@@ -202,8 +202,8 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertDeletedEvent(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertDeletedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -211,7 +211,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-deleted-event");
 
         if (shouldDisplay)
@@ -233,8 +233,8 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertDqtDeactivatedEvent = await CreateAlertDqtDeactivatedEvent(person.PersonId, createdByDqtUser, populateOptional, isOpenAlert);
+        var person = await TestData.CreatePersonAsync();
+        var alertDqtDeactivatedEvent = await CreateAlertDqtDeactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional, isOpenAlert);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -242,7 +242,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         var all = doc.GetAllElementsByTestId("timeline-item-alert-dqt-deactivated-event").ToArray();
 
@@ -274,8 +274,8 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertDqtDeactivatedEvent(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertDqtDeactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isOpenAlert: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -283,7 +283,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-dqt-deactivated-event");
 
         if (shouldDisplay)
@@ -303,8 +303,8 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertDqtImportedEvent = await CreateAlertDqtImportedEvent(person.PersonId, createdByDqtUser, populateOptional);
+        var person = await TestData.CreatePersonAsync();
+        var alertDqtImportedEvent = await CreateAlertDqtImportedEventAsync(person.PersonId, createdByDqtUser, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -312,7 +312,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-dqt-imported-event"),
@@ -340,8 +340,8 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertDqtImportedEvent(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertDqtImportedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -349,7 +349,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-dqt-imported-event");
 
         if (shouldDisplay)
@@ -369,8 +369,8 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertDqtImportedEvent = await CreateAlertDqtReactivatedEvent(person.PersonId, createdByDqtUser, populateOptional);
+        var person = await TestData.CreatePersonAsync();
+        var alertDqtImportedEvent = await CreateAlertDqtReactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -378,7 +378,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-dqt-reactivated-event"),
@@ -406,8 +406,8 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertDqtReactivatedEvent(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertDqtReactivatedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -415,7 +415,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-dqt-reactivated-event");
 
         if (shouldDisplay)
@@ -433,9 +433,9 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertMigratedEvent = await CreateAlertMigratedEvent(person.PersonId, createdByDqtUser, populateOptional: true);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertMigratedEvent.Alert.AlertTypeId!.Value);
+        var person = await TestData.CreatePersonAsync();
+        var alertMigratedEvent = await CreateAlertMigratedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertMigratedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -443,7 +443,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-migrated-event"),
@@ -472,8 +472,8 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alertCreatedEvent = await CreateAlertMigratedEvent(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alertCreatedEvent = await CreateAlertMigratedEventAsync(person.PersonId, createdByDqtUser, populateOptional: true, isDbsAlertType: isDbsAlertType);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -481,7 +481,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-migrated-event");
 
         if (shouldDisplay)
@@ -501,11 +501,11 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional, isOpenAlert: true);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = populateOptional ? null : Clock.Today.AddDays(-30) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.StartDate, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.StartDate, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -513,7 +513,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -535,13 +535,13 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventStartChangedFromTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromTrs(person.PersonId, populateOptional, isOpenAlert: true);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = Clock.Today.AddDays(-31) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.StartDate, createdByUser.UserId, hasReason: populateOptional);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertUpdatedEvent.Alert.AlertTypeId!.Value);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.StartDate, createdByUser.UserId, hasReason: populateOptional);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -549,7 +549,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -574,11 +574,11 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional, isOpenAlert: true);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { Details = populateOptional ? null : "Old details" };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -586,7 +586,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -609,13 +609,13 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventDetailsChangedFromTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromTrs(person.PersonId, populateOptional, isOpenAlert: true);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { StartDate = Clock.Today.AddDays(-31) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByUser.UserId, hasReason: populateOptional);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertUpdatedEvent.Alert.AlertTypeId!.Value);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByUser.UserId, hasReason: populateOptional);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -623,7 +623,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -648,13 +648,13 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventExternalLinkChangedFromTrs_RendersExpectedContent(bool populateOptional)
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromTrs(person.PersonId, populateOptional, isOpenAlert: true);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { ExternalLink = populateOptional ? null : TestData.GenerateUrl() };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.ExternalLink, createdByUser.UserId, hasReason: populateOptional);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertUpdatedEvent.Alert.AlertTypeId!.Value);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.ExternalLink, createdByUser.UserId, hasReason: populateOptional);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -662,7 +662,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -689,11 +689,11 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
         var oldAlert = alert with { EndDate = changeType == EndDateChangeType.Close ? null : Clock.Today.AddDays(-6) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.EndDate, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.EndDate, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -701,7 +701,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -725,13 +725,13 @@ public class ChangeLogAlertEventsTests : TestBase
     public async Task Person_WithAlertUpdatedEventEndDateChangedFromTrs_RendersExpectedContent(EndDateChangeType changeType, string expectedHeading)
     {
         // Arrange
-        var createdByUser = await TestData.CreateUser();
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromTrs(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromTrsAsync(person.PersonId, populateOptional: true, isOpenAlert: changeType == EndDateChangeType.Reopen);
         var oldAlert = alert with { EndDate = changeType == EndDateChangeType.Close ? null : Clock.Today.AddDays(-6) };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.EndDate, createdByUser.UserId, hasReason: false);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alertUpdatedEvent.Alert.AlertTypeId!.Value);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.EndDate, createdByUser.UserId, hasReason: false);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alertUpdatedEvent.Alert.AlertTypeId!.Value);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -739,7 +739,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -762,11 +762,11 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional, isOpenAlert: true);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { DqtSpent = populateOptional ? null : true };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -774,7 +774,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -798,11 +798,11 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional, isOpenAlert: true);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { DqtSpent = populateOptional ? null : true };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.DqtSanctionCode, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.DqtSanctionCode, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -810,7 +810,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -841,11 +841,11 @@ public class ChangeLogAlertEventsTests : TestBase
         SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional: true, isOpenAlert: true, isDbsAlertType);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional: true, isOpenAlert: true, isDbsAlertType);
         var oldAlert = alert with { Details = "Old details" };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -853,7 +853,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
         var items = doc.GetAllElementsByTestId("timeline-item-alert-updated-event");
 
         if (shouldDisplay)
@@ -874,11 +874,11 @@ public class ChangeLogAlertEventsTests : TestBase
     {
         // Arrange
         var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
-        var person = await TestData.CreatePerson();
-        var alert = await CreateEventAlertFromDqt(person.PersonId, populateOptional, isOpenAlert: true);
+        var person = await TestData.CreatePersonAsync();
+        var alert = await CreateEventAlertFromDqtAsync(person.PersonId, populateOptional, isOpenAlert: true);
         var oldAlert = alert with { Details = populateOptional ? null : "Old details", DqtSpent = populateOptional ? null : true };
 
-        var alertUpdatedEvent = await CreateAlertUpdatedEvent(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details | AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
+        var alertUpdatedEvent = await CreateAlertUpdatedEventAsync(person.PersonId, alert, oldAlert, AlertUpdatedEventChanges.Details | AlertUpdatedEventChanges.DqtSpent, createdByDqtUser, hasReason: false);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -886,7 +886,7 @@ public class ChangeLogAlertEventsTests : TestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        var doc = await AssertEx.HtmlResponse(response);
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-alert-updated-event"),
@@ -905,9 +905,9 @@ public class ChangeLogAlertEventsTests : TestBase
                 });
     }
 
-    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromDqt(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromDqtAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromDqt(personId, populateOptional, isOpenAlert, isDbsAlertType);
+        var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
 
         var alertCreatedEvent = new AlertCreatedEvent()
         {
@@ -930,9 +930,9 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertCreatedEvent;
     }
 
-    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromTrs(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertCreatedEvent> CreateAlertCreatedEventFromTrsAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromTrs(personId, populateOptional, isOpenAlert, isDbsAlertType);
+        var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
         var reason = populateOptional ? AddAlertReasonOption.RoutineNotificationFromStakeholder.GetDisplayName() : null;
         var reasonDetail = populateOptional ? "Reason detail" : null;
         var evidenceFile = populateOptional ? new EventModels.File
@@ -963,9 +963,9 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertCreatedEvent;
     }
 
-    private async Task<AlertDeletedEvent> CreateAlertDeletedEvent(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertDeletedEvent> CreateAlertDeletedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromTrs(personId, populateOptional, isOpenAlert, isDbsAlertType);
+        var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
         var reasonDetail = populateOptional ? "Reason detail" : null;
         var evidenceFile = populateOptional ? new EventModels.File
         {
@@ -994,9 +994,9 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDeletedEvent;
     }
 
-    private async Task<AlertDqtDeactivatedEvent> CreateAlertDqtDeactivatedEvent(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<AlertDqtDeactivatedEvent> CreateAlertDqtDeactivatedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromDqt(personId, populateOptional, isOpenAlert, isDbsAlertType);
+        var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert, isDbsAlertType);
 
         var alertDqtDeactivatedEvent = new AlertDqtDeactivatedEvent()
         {
@@ -1016,9 +1016,9 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDqtDeactivatedEvent;
     }
 
-    private async Task<AlertDqtImportedEvent> CreateAlertDqtImportedEvent(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
+    private async Task<AlertDqtImportedEvent> CreateAlertDqtImportedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromDqt(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
+        var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
 
         var alertDqtImportedEvent = new AlertDqtImportedEvent()
         {
@@ -1039,9 +1039,9 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDqtImportedEvent;
     }
 
-    private async Task<AlertDqtReactivatedEvent> CreateAlertDqtReactivatedEvent(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
+    private async Task<AlertDqtReactivatedEvent> CreateAlertDqtReactivatedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromDqt(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
+        var alert = await CreateEventAlertFromDqtAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
 
         var alertDqtReactivatedEvent = new AlertDqtReactivatedEvent()
         {
@@ -1061,11 +1061,11 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertDqtReactivatedEvent;
     }
 
-    private async Task<AlertMigratedEvent> CreateAlertMigratedEvent(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
+    private async Task<AlertMigratedEvent> CreateAlertMigratedEventAsync(Guid personId, EventModels.RaisedByUserInfo createdByUser, bool populateOptional, bool isDbsAlertType = false)
     {
-        var alert = await CreateEventAlertFromTrs(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
-        var alertType = await TestData.ReferenceDataCache.GetAlertTypeById(alert.AlertTypeId!.Value);
-        var dqtSanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByValue(alertType.DqtSanctionCode!);
+        var alert = await CreateEventAlertFromTrsAsync(personId, populateOptional, isOpenAlert: true, isDbsAlertType);
+        var alertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId!.Value);
+        var dqtSanctionCode = await TestData.ReferenceDataCache.GetSanctionCodeByValueAsync(alertType.DqtSanctionCode!);
         var oldAlert = alert with
         {
             AlertId = Guid.NewGuid(),
@@ -1098,7 +1098,7 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertMigratedEvent;
     }
 
-    private async Task<AlertUpdatedEvent> CreateAlertUpdatedEvent(Guid personId, EventModels.Alert alert, EventModels.Alert oldAlert, AlertUpdatedEventChanges changes, EventModels.RaisedByUserInfo createdByUser, bool hasReason)
+    private async Task<AlertUpdatedEvent> CreateAlertUpdatedEventAsync(Guid personId, EventModels.Alert alert, EventModels.Alert oldAlert, AlertUpdatedEventChanges changes, EventModels.RaisedByUserInfo createdByUser, bool hasReason)
     {
         var alertUpdatedEvent = new AlertUpdatedEvent()
         {
@@ -1128,10 +1128,10 @@ public class ChangeLogAlertEventsTests : TestBase
         return alertUpdatedEvent;
     }
 
-    private async Task<EventModels.Alert> CreateEventAlertFromTrs(Guid personId, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<EventModels.Alert> CreateEventAlertFromTrsAsync(Guid personId, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeById(AlertType.DbsAlertTypeId);
-        var alertType = (await TestData.ReferenceDataCache.GetAlertTypes()).Where(t => t.IsDbsAlertType == isDbsAlertType).RandomOne();
+        var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(AlertType.DbsAlertTypeId);
+        var alertType = (await TestData.ReferenceDataCache.GetAlertTypesAsync()).Where(t => t.IsDbsAlertType == isDbsAlertType).RandomOne();
 
         var alertDetails = "My alert details";
         var externalLink = populateOptional ? TestData.GenerateUrl() : null;
@@ -1153,13 +1153,13 @@ public class ChangeLogAlertEventsTests : TestBase
         return alert;
     }
 
-    private async Task<EventModels.Alert> CreateEventAlertFromDqt(Guid personId, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
+    private async Task<EventModels.Alert> CreateEventAlertFromDqtAsync(Guid personId, bool populateOptional, bool isOpenAlert, bool isDbsAlertType = false)
     {
-        var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeById(AlertType.DbsAlertTypeId);
-        var migratedSanctionCodes = (await TestData.ReferenceDataCache.GetAlertTypes())
+        var dbsAlertType = await TestData.ReferenceDataCache.GetAlertTypeByIdAsync(AlertType.DbsAlertTypeId);
+        var migratedSanctionCodes = (await TestData.ReferenceDataCache.GetAlertTypesAsync())
             .Where(t => t.DqtSanctionCode is not null)
             .Select(c => c.DqtSanctionCode);
-        var dqtSanctionCode = (await TestData.ReferenceDataCache.GetSanctionCodes(activeOnly: false))
+        var dqtSanctionCode = (await TestData.ReferenceDataCache.GetSanctionCodesAsync(activeOnly: false))
             .Where(s => migratedSanctionCodes.Contains(s.dfeta_Value) && (isDbsAlertType ? s.dfeta_Value == dbsAlertType.DqtSanctionCode : s.dfeta_Value != dbsAlertType.DqtSanctionCode))
             .RandomOne();
         var alertDqtSanctionCode = new AlertDqtSanctionCode

@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<ApiKey> CreateApiKey(Guid applicationUserId, bool expired = false) => WithDbContext(async dbContext =>
+    public Task<ApiKey> CreateApiKeyAsync(Guid applicationUserId, bool expired = false) => WithDbContextAsync(async dbContext =>
     {
         var expires = expired ? Clock.UtcNow.AddMinutes(-1) : (DateTime?)null;
 

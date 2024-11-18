@@ -8,7 +8,7 @@ public class RefreshEstablishmentsJob(IBackgroundJobScheduler backgroundJobSched
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var refreshJobId = await backgroundJobScheduler.Enqueue<EstablishmentRefresher>(j => j.RefreshEstablishments(cancellationToken));
-        await backgroundJobScheduler.ContinueJobWith<TpsCsvExtractProcessor>(refreshJobId, j => j.UpdateLatestEstablishmentVersions(cancellationToken));
+        var refreshJobId = await backgroundJobScheduler.EnqueueAsync<EstablishmentRefresher>(j => j.RefreshEstablishmentsAsync(cancellationToken));
+        await backgroundJobScheduler.ContinueJobWithAsync<TpsCsvExtractProcessor>(refreshJobId, j => j.UpdateLatestEstablishmentVersionsAsync(cancellationToken));
     }
 }

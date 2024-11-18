@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core.Jobs;
 [AutomaticRetry(Attempts = 0)]
 public class ClearAlertsJob(TrsDbContext dbContext)
 {
-    public async Task Execute()
+    public async Task ExecuteAsync()
     {
         await using var txn = await dbContext.Database.BeginTransactionAsync();
         dbContext.Database.SetCommandTimeout(0);

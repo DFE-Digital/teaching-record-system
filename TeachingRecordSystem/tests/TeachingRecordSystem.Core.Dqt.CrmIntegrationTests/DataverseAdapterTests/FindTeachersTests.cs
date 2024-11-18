@@ -22,7 +22,7 @@ public class FindTeachersTests : IClassFixture<FindTeachersFixture>
 
         foreach (var query in queries)
         {
-            var result = await _dataverseAdapter.FindTeachers(query);
+            var result = await _dataverseAdapter.FindTeachersAsync(query);
             AssertDoesNotContainMatch(result);
         }
     }
@@ -34,7 +34,7 @@ public class FindTeachersTests : IClassFixture<FindTeachersFixture>
 
         foreach (var query in queries)
         {
-            var result = await _dataverseAdapter.FindTeachers(query);
+            var result = await _dataverseAdapter.FindTeachersAsync(query);
             AssertContainsMatch(result);
         }
     }
@@ -46,7 +46,7 @@ public class FindTeachersTests : IClassFixture<FindTeachersFixture>
 
         foreach (var query in queries)
         {
-            var result = await _dataverseAdapter.FindTeachers(query);
+            var result = await _dataverseAdapter.FindTeachersAsync(query);
             AssertContainsMatch(result);
         }
     }
@@ -58,7 +58,7 @@ public class FindTeachersTests : IClassFixture<FindTeachersFixture>
 
         foreach (var query in queries)
         {
-            var result = await _dataverseAdapter.FindTeachers(query);
+            var result = await _dataverseAdapter.FindTeachersAsync(query);
             AssertContainsMatch(result);
         }
     }
@@ -140,7 +140,7 @@ public class FindTeachersFixture : IAsyncLifetime
     {
         var testDataHelper = _dataScope.CreateTestDataHelper();
 
-        var createPersonResult = await testDataHelper.CreatePerson();
+        var createPersonResult = await testDataHelper.CreatePersonAsync();
         MatchingTeacherId = createPersonResult.TeacherId;
         MatchingTeacherIttProviderId = createPersonResult.IttProviderId;
         MatchingTeacherFirstName = createPersonResult.FirstName;

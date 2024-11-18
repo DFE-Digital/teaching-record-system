@@ -19,7 +19,7 @@ public class CreateNameChangeTests : TestBase
     {
         // Arrange
         SetCurrentApiClient(roles);
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -80,7 +80,7 @@ public class CreateNameChangeTests : TestBase
         string? evidenceFileUrl)
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/v3/teachers/name-changes")
         {
@@ -106,7 +106,7 @@ public class CreateNameChangeTests : TestBase
     public async Task Post_TeacherWithTrnDoesNotExist_ReturnsBadRequest()
     {
         // Arrange
-        var trn = await TestData.GenerateTrn();
+        var trn = await TestData.GenerateTrnAsync();
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -149,14 +149,14 @@ public class CreateNameChangeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10001, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10001, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_EvidenceFileDoesNotExist_ReturnsError()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();
@@ -181,14 +181,14 @@ public class CreateNameChangeTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        await AssertEx.JsonResponseIsError(response, 10028, StatusCodes.Status400BadRequest);
+        await AssertEx.JsonResponseIsErrorAsync(response, 10028, StatusCodes.Status400BadRequest);
     }
 
     [Fact]
     public async Task Post_ValidRequest_CreatesIncident()
     {
         // Arrange
-        var createPersonResult = await TestData.CreatePerson(p => p.WithTrn());
+        var createPersonResult = await TestData.CreatePersonAsync(p => p.WithTrn());
         var newFirstName = TestData.GenerateFirstName();
         var newMiddleName = TestData.GenerateMiddleName();
         var newLastName = TestData.GenerateLastName();

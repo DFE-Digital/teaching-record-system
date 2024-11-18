@@ -8,19 +8,19 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public partial class DataverseAdapter
 {
-    public async Task<SetIttResultForTeacherResult> SetIttResultForTeacher(
+    public async Task<SetIttResultForTeacherResult> SetIttResultForTeacherAsync(
         Guid teacherId,
         string ittProviderUkprn,
         dfeta_ITTResult result,
         DateOnly? assessmentDate,
         string slugId = null)
     {
-        var (r, _) = await SetIttResultForTeacherImpl(teacherId, ittProviderUkprn, result, assessmentDate, slugId);
+        var (r, _) = await SetIttResultForTeacherImplAsync(teacherId, ittProviderUkprn, result, assessmentDate, slugId);
         return r;
     }
 
     // Helper method that outputs the write requests that were sent for testing
-    internal async Task<(SetIttResultForTeacherResult Result, ExecuteTransactionRequest TransactionRequest)> SetIttResultForTeacherImpl(
+    internal async Task<(SetIttResultForTeacherResult Result, ExecuteTransactionRequest TransactionRequest)> SetIttResultForTeacherImplAsync(
         Guid teacherId,
         string ittProviderUkprn,
         dfeta_ITTResult result,
@@ -52,7 +52,7 @@ public partial class DataverseAdapter
 
         var helper = new SetIttResultForTeacherHelper(this, teacherId, ittProviderUkprn);
 
-        var lookupData = await helper.LookupData();
+        var lookupData = await helper.LookupDataAsync();
 
         if (lookupData.Teacher is null)
         {
@@ -154,7 +154,7 @@ public partial class DataverseAdapter
         {
             if (isEarlyYears)
             {
-                var earlyYearsStatus = await GetEarlyYearsStatus("221");  // 221 == 'Early Years Teacher Status'
+                var earlyYearsStatus = await GetEarlyYearsStatusAsync("221");  // 221 == 'Early Years Teacher Status'
                 Debug.Assert(earlyYearsStatus != null);
 
                 qtsUpdate.dfeta_EarlyYearsStatusId = earlyYearsStatus.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
@@ -162,7 +162,7 @@ public partial class DataverseAdapter
             }
             else
             {
-                var teacherStatus = await GetTeacherStatus(itt.dfeta_ProgrammeType switch
+                var teacherStatus = await GetTeacherStatusAsync(itt.dfeta_ProgrammeType switch
                 {
                     dfeta_ITTProgrammeType.Internationalqualifiedteacherstatus => "90",  // Qualified teacher: by virtue of achieving international qualified teacher status
                     dfeta_ITTProgrammeType.AssessmentOnlyRoute => "100",  // 'Qualified Teacher: Assessment Only Route'
@@ -213,22 +213,22 @@ public partial class DataverseAdapter
 
         return (SetIttResultForTeacherResult.Success(qtsDate), txnRequest);
 
-        Task<dfeta_earlyyearsstatus> GetEarlyYearsStatus(string value)
+        Task<dfeta_earlyyearsstatus> GetEarlyYearsStatusAsync(string value)
         {
             var cacheKey = CacheKeys.GetEarlyYearsStatusKey(value);
 
             return _cache.GetOrCreateAsync(
                 cacheKey,
-                _ => this.GetEarlyYearsStatus(value, null));
+                _ => this.GetEarlyYearsStatusAsync(value, null));
         }
 
-        Task<dfeta_teacherstatus> GetTeacherStatus(string value)
+        Task<dfeta_teacherstatus> GetTeacherStatusAsync(string value)
         {
             var cacheKey = CacheKeys.GetTeacherStatusKey(value);
 
             return _cache.GetOrCreateAsync(
                 cacheKey,
-                _ => this.GetTeacherStatus(value, null));
+                _ => this.GetTeacherStatusAsync(value, null));
         }
     }
 
@@ -266,13 +266,13 @@ public partial class DataverseAdapter
             }
         }
 
-        public async Task<SetIttResultForTeacherLookupResult> LookupData()
+        public async Task<SetIttResultForTeacherLookupResult> LookupDataAsync()
         {
             var requestBuilder = _dataverseAdapter.CreateMultipleRequestBuilder();
-            var getAllEytsTeacherStatusesTask = _dataverseAdapter.GetAllEarlyYearsStatuses(requestBuilder);
-            var getAllTeacherStatuses = _dataverseAdapter.GetAllTeacherStatuses(requestBuilder);
+            var getAllEytsTeacherStatusesTask = _dataverseAdapter.GetAllEarlyYearsStatusesAsync(requestBuilder);
+            var getAllTeacherStatuses = _dataverseAdapter.GetAllTeacherStatusesAsync(requestBuilder);
 
-            var getTeacherTask = _dataverseAdapter.GetTeacher(
+            var getTeacherTask = _dataverseAdapter.GetTeacherAsync(
                 _teacherId,
                 columnNames: new[]
                 {
@@ -286,10 +286,10 @@ public partial class DataverseAdapter
                 .Where(a => a.PersonId == _teacherId && a.IsOpen)
                 .AnyAsync();
 
-            var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationsByUkprn(_ittProviderUkprn, columnNames: Array.Empty<string>(), activeOnly: true)
+            var getIttProviderTask = _dataverseAdapter.GetIttProviderOrganizationsByUkprnAsync(_ittProviderUkprn, columnNames: Array.Empty<string>(), activeOnly: true)
                 .ContinueWith(t => t.Result.SingleOrDefault());
 
-            var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacher(
+            var getIttRecordsTask = _dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
                 _teacherId,
                 columnNames: new[]
                 {
@@ -300,7 +300,7 @@ public partial class DataverseAdapter
                     dfeta_initialteachertraining.Fields.dfeta_SlugId
                 });
 
-            var getQtsRegistrationsTask = _dataverseAdapter.GetQtsRegistrationsByTeacher(
+            var getQtsRegistrationsTask = _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
                 _teacherId,
                 columnNames: new[]
                 {
@@ -310,7 +310,7 @@ public partial class DataverseAdapter
                     dfeta_qtsregistration.Fields.dfeta_QTSDate
                 });
 
-            await requestBuilder.Execute();
+            await requestBuilder.ExecuteAsync();
             await Task.WhenAll(
                 getTeacherTask,
                 getActiveAlertsTask,
