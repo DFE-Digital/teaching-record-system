@@ -135,7 +135,7 @@ public abstract class TestBase : IDisposable
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
 
             var vc = TestData.CreateOneLoginCoreIdentityVc(firstName, lastName, dateOfBirth.Value);
-            claims.Add(new Claim("vc", vc.RootElement.ToString(), "JSON"));
+            claims.Add(new Claim("vc", vc.ToString(), "JSON"));
         }
 
         var identity = new ClaimsIdentity(claims, authenticationType: "OneLogin", nameType: "sub", roleType: null);

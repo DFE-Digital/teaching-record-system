@@ -9,7 +9,7 @@ public record OneLoginUserInfo(string sub, string email, string vot, string sid,
     public static OneLoginUserInfo Create(string sub, string email) =>
         Create(sub, email, (string?)null);
 
-    public static OneLoginUserInfo Create(string sub, string email, JsonDocument? coreIdentityVc)
+    public static OneLoginUserInfo Create(string sub, string email, JsonElement? coreIdentityVc)
     {
         string? coretIdentityVcStr = coreIdentityVc is null ? null : JsonSerializer.Serialize(coreIdentityVc);
         return Create(sub, email, coretIdentityVcStr);
