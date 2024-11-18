@@ -23,7 +23,8 @@ public class SignInJourneyHelper(
     AuthorizeAccessLinkGenerator linkGenerator,
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IUserInstanceStateProvider userInstanceStateProvider,
-    IClock clock)
+    IClock clock,
+    TrnRequestHelper trnRequestHelper)
 {
     public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
     public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
@@ -106,6 +107,16 @@ public class SignInJourneyHelper(
             }
         }
 
+        string? trn = oneLoginUser.Person?.Trn;
+
+        if (oneLoginUser.PersonId is null &&
+            await TryMatchToTrnRequest(oneLoginUser) is { } matchResult)
+        {
+            trn = matchResult.Trn;
+            oneLoginUser.FirstSignIn ??= clock.UtcNow;
+            oneLoginUser.LastSignIn = clock.UtcNow;
+        }
+
         await dbContext.SaveChangesAsync();
 
         await journeyInstance.UpdateStateAsync(state =>
@@ -120,7 +131,7 @@ public class SignInJourneyHelper(
                 state.SetVerified(oneLoginUser.VerifiedNames!, oneLoginUser.VerifiedDatesOfBirth!);
             }
 
-            if (oneLoginUser.Person?.Trn is string trn && !ShowDebugPages)
+            if (trn is not null && !ShowDebugPages)
             {
                 Complete(state, trn);
             }
@@ -329,6 +340,51 @@ public class SignInJourneyHelper(
         return false;
     }
 
+    private async Task<TryMatchToTrnRequestResult?> TryMatchToTrnRequest(OneLoginUser oneLoginUser)
+    {
+        Debug.Assert(oneLoginUser.Email is not null);
+
+        var trnRequestMetadataForUser = await dbContext.TrnRequestMetadata
+            .Where(m => m.OneLoginUserSubject == oneLoginUser.Subject || m.EmailAddress == oneLoginUser.Email)
+            .ToArrayAsync();
+
+        if (trnRequestMetadataForUser is not [var trnRequestMetadata])
+        {
+            return null;
+        }
+
+        if (trnRequestMetadata.IdentityVerified != true)
+        {
+            return null;
+        }
+
+        var trnRequest = await trnRequestHelper.GetTrnRequestInfo(trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
+        if (trnRequest is null)
+        {
+            Debug.Fail("TRN request does not exist.");
+            return null;
+        }
+
+        if (!trnRequest.IsCompleted)
+        {
+            return null;
+        }
+
+        oneLoginUser.SetVerified(
+            verifiedOn: trnRequestMetadata.CreatedOn,
+            route: OneLoginUserVerificationRoute.External,
+            verifiedByApplicationUserId: trnRequestMetadata.ApplicationUserId,
+            verifiedNames: [trnRequestMetadata.Name],
+            verifiedDatesOfBirth: [trnRequestMetadata.DateOfBirth]);
+
+        oneLoginUser.SetMatched(
+            trnRequest.Contact.Id,
+            route: OneLoginUserMatchRoute.TrnRequest,
+            matchedAttributes: null);
+
+        return new(trnRequest.Contact.dfeta_TRN);
+    }
+
     public void Complete(SignInJourneyState state, string trn)
     {
         if (state.OneLoginAuthenticationTicket is null)
@@ -382,4 +438,6 @@ public class SignInJourneyHelper(
         string Trn,
         OneLoginUserMatchRoute? MatchRoute,
         IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>? MatchedAttributes);
+
+    private record TryMatchToTrnRequestResult(string Trn);
 }

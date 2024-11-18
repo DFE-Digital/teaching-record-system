@@ -24,6 +24,9 @@ public class CreateTeacherCommand
     public string SlugId { get; set; }
     public string TrnRequestId { get; set; }
     public Func<string, Task<string>> GetTrnToken { get; set; }
+    public Guid ApplicationUserId { get; set; }
+    public bool IdentityVerified { get; set; }
+    public string OneLoginUserSubject { get; set; }
 }
 
 public class CreateTeacherCommandAddress

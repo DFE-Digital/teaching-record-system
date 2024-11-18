@@ -41,7 +41,7 @@ public partial class TestData
         private DateOnly? _qtlsDate;
         private readonly List<DqtInduction> _dqtInductions = [];
         private readonly List<DqtInductionPeriod> _dqtInductionPeriods = [];
-        private string? _trnRequestId;
+        private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject)? _trnRequest;
         private string? _trnToken;
         private string? _slugId;
         private int? _loginFailedCounter;
@@ -266,9 +266,14 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithTrnRequestId(string trnRequestId)
+        public CreatePersonBuilder WithTrnRequest(
+            Guid applicationUserId,
+            string requestId,
+            bool? identityVerified = null,
+            string? oneLoginUserSubject = null,
+            bool writeMetadata = true)
         {
-            _trnRequestId = trnRequestId;
+            _trnRequest = (applicationUserId, requestId, writeMetadata, identityVerified, oneLoginUserSubject);
             return this;
         }
 
@@ -320,7 +325,7 @@ public partial class TestData
                 dfeta_TRN = trn,
                 GenderCode = gender,
                 dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                dfeta_TrnRequestID = _trnRequestId,
+                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestHelper.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
                 dfeta_SlugId = _slugId,
                 dfeta_loginfailedcounter = _loginFailedCounter
@@ -582,6 +587,8 @@ public partial class TestData
 
             var (mqs, alerts) = await testData.WithDbContext(async dbContext =>
             {
+                await AddTrnRequestMetadata();
+
                 return (
                     await AddMqs(),
                     await AddAlerts());
@@ -619,6 +626,28 @@ public partial class TestData
                         .ToDictionaryAsync(a => a.AlertId, a => a);
 
                     return alertIds.Select(id => alerts[id]).ToArray();
+                }
+
+                async Task AddTrnRequestMetadata()
+                {
+                    if (_trnRequest is not { WriteMetadata: true } trnRequest)
+                    {
+                        return;
+                    }
+
+                    dbContext.TrnRequestMetadata.Add(new TrnRequestMetadata()
+                    {
+                        ApplicationUserId = trnRequest.ApplicationUserId,
+                        RequestId = trnRequest.RequestId,
+                        CreatedOn = testData.Clock.UtcNow,
+                        IdentityVerified = trnRequest.IdentityVerified,
+                        OneLoginUserSubject = trnRequest.OneLoginUserSubject,
+                        EmailAddress = _email,
+                        Name = [firstName, lastName],
+                        DateOfBirth = dateOfBirth
+                    });
+
+                    await dbContext.SaveChangesAsync();
                 }
             });
 

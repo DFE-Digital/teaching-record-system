@@ -34,11 +34,15 @@ public class GetContactByTrnRequestIdTests : IAsyncLifetime
     public async Task WhenCalled_WithTrnForExistingContact_ReturnsContactDetail()
     {
         // Arrange
+        var applicationUserId = Guid.NewGuid();
         var requestId = Guid.NewGuid().ToString();
-        var person = await _dataScope.TestData.CreatePerson(p => p.WithTrn().WithTrnRequestId(requestId));
+        var person = await _dataScope.TestData.CreatePerson(p => p
+            .WithTrn()
+            .WithTrnRequest(applicationUserId, requestId));
 
         // Act
-        var result = await _crmQueryDispatcher.ExecuteQuery(new GetContactByTrnRequestIdQuery(requestId, new ColumnSet()));
+        var result = await _crmQueryDispatcher.ExecuteQuery(
+            new GetContactByTrnRequestIdQuery(TrnRequestHelper.GetCrmTrnRequestId(applicationUserId, requestId), new ColumnSet()));
 
         // Assert
         Assert.NotNull(result);

@@ -21,7 +21,8 @@ public record CreateTrnRequestCommand
     public required DateOnly DateOfBirth { get; init; }
     public required IReadOnlyCollection<string> EmailAddresses { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public required string? VerifiedOneLoginUserSubject { get; init; }
+    public required bool? IdentityVerified { get; init; }
+    public required string? OneLoginUserSubject { get; init; }
 }
 
 public class CreateTrnRequestHandler(
@@ -33,7 +34,8 @@ public class CreateTrnRequestHandler(
 #pragma warning disable CS9113 // Parameter is unread.
     INameSynonymProvider nameSynonymProvider,
 #pragma warning restore CS9113 // Parameter is unread.
-    MessageSerializer messageSerializer)
+    MessageSerializer messageSerializer,
+    IClock clock)
 {
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
     {
@@ -118,13 +120,18 @@ public class CreateTrnRequestHandler(
         var emailAddress = command.EmailAddresses?.FirstOrDefault();
 
         var outboxMessages = new List<dfeta_TrsOutboxMessage>();
-        if (command.VerifiedOneLoginUserSubject is string oneLoginUserId)
+        if (command.OneLoginUserSubject is string oneLoginUserId)
         {
             outboxMessages.Add(messageSerializer.CreateCrmOutboxMessage(new TrnRequestMetadataMessage()
             {
                 ApplicationUserId = currentApplicationUserId,
                 RequestId = command.RequestId,
-                VerifiedOneLoginUserSubject = oneLoginUserId
+                CreatedOn = clock.UtcNow,
+                IdentityVerified = command.IdentityVerified,
+                OneLoginUserSubject = oneLoginUserId,
+                Name = GetNonEmptyValues(command.FirstName, command.MiddleName, command.LastName),
+                DateOfBirth = command.DateOfBirth,
+                EmailAddress = emailAddress
             }));
         }
 
@@ -162,5 +169,20 @@ public class CreateTrnRequestHandler(
             Trn = trn,
             Status = status
         };
+
+        static string[] GetNonEmptyValues(params string?[] values)
+        {
+            var result = new List<string>(values.Length);
+
+            foreach (var value in values)
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    result.Add(value);
+                }
+            }
+
+            return result.ToArray();
+        }
     }
 }

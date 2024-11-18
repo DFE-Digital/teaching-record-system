@@ -25,8 +25,8 @@ public class OneLoginUser
         DateTime verifiedOn,
         OneLoginUserVerificationRoute route,
         Guid? verifiedByApplicationUserId,
-        string[][] verifiedNames,
-        DateOnly[] verifiedDatesOfBirth)
+        string[][]? verifiedNames,
+        DateOnly[]? verifiedDatesOfBirth)
     {
         if (route == OneLoginUserVerificationRoute.External && !verifiedByApplicationUserId.HasValue)
         {
