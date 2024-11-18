@@ -6,7 +6,7 @@ public class WebhookMessage
 {
     public required Guid WebhookMessageId { get; init; }
     public required Guid WebhookEndpointId { get; init; }
-    public virtual WebhookEndpoint WebhookEndpoint { get; } = null!;
+    public virtual WebhookEndpoint WebhookEndpoint { get; internal set; } = null!;
     public required string CloudEventId { get; init; }
     public required string CloudEventType { get; init; }
     public required DateTimeOffset Timestamp { get; init; }

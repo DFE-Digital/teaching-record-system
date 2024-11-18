@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using idunno.Authentication.Basic;
@@ -11,7 +13,6 @@ using Optional;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
-using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Infrastructure.Logging;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.Infrastructure.Middleware;
@@ -23,6 +24,7 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
+using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -157,10 +159,18 @@ public class Program
             {
                 options.OutputFormatters.RemoveType<StringOutputFormatter>();
             })
-            .AddJsonOptions(options =>
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+            options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
             {
-                options.JsonSerializerOptions.Configure();
-            });
+                Modifiers =
+                    {
+                        Modifiers.OptionProperties
+                    }
+            };
+        });
 
         services.Decorate<Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory, CamelCaseErrorKeysProblemDetailsFactory>();
 

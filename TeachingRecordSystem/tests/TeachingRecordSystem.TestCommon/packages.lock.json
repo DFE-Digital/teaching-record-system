@@ -1981,6 +1981,8 @@
         "dependencies": {
           "AngleSharp": "[1.1.2, )",
           "Azure.Storage.Blobs": "[12.19.1, )",
+          "CloudNative.CloudEvents": "[2.8.0, )",
+          "CloudNative.CloudEvents.SystemTextJson": "[2.8.0, )",
           "CsvHelper": "[30.1.0, )",
           "DistributedLock.Azure": "[1.0.0, )",
           "DistributedLock.FileSystem": "[1.0.2, )",
@@ -2052,6 +2054,21 @@
         "contentHash": "rpYtIczkzGpf+EkZgDr9CClTdemhsrwA/W5hMoPjLkRFnXzH44zDLoovXeKtmxb1ykXK9aJVODSpiJml8CTw2g==",
         "dependencies": {
           "System.Diagnostics.EventLog": "6.0.0"
+        }
+      },
+      "CloudNative.CloudEvents": {
+        "type": "CentralTransitive",
+        "requested": "[2.8.0, )",
+        "resolved": "2.8.0",
+        "contentHash": "RvabvAQV7u3FZcZL5UlRmFz3/T5nMl86GpChpRvHKRHbO+/I4LBcZ0xRqYnNfAh30gM+h/JkSBHEnbhl0zmGtA=="
+      },
+      "CloudNative.CloudEvents.SystemTextJson": {
+        "type": "CentralTransitive",
+        "requested": "[2.8.0, )",
+        "resolved": "2.8.0",
+        "contentHash": "En3Bvf7tTbGyB/AWJIPGw8ksh1OgiSI3cBXmNvuH9+PMR4l0vVRlp9YsTu+gY7S/0VFyJDHP66P3uZHzgsRQ7w==",
+        "dependencies": {
+          "CloudNative.CloudEvents": "2.8.0"
         }
       },
       "CsvHelper": {

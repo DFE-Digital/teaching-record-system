@@ -1,11 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using FakeXrmEasy.Abstractions;
 using Microsoft.IdentityModel.Tokens;
-using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
@@ -13,6 +16,21 @@ namespace TeachingRecordSystem.Api.Tests;
 
 public abstract class TestBase
 {
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
+    {
+        Converters =
+        {
+            new JsonStringEnumConverter(),
+        },
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        {
+            Modifiers =
+            {
+                Modifiers.OptionProperties
+            }
+        }
+    };
+
     private readonly TestScopedServices _testServices;
 
     protected TestBase(HostFixture hostFixture)
@@ -45,7 +63,7 @@ public abstract class TestBase
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public JsonContent CreateJsonContent(object requestBody) =>
-        JsonContent.Create(requestBody, options: new System.Text.Json.JsonSerializerOptions().Configure());
+        JsonContent.Create(requestBody, options: _jsonSerializerOptions);
 
     public virtual HttpClient GetHttpClient(string? version = null)
     {

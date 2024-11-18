@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Optional;
 
-namespace TeachingRecordSystem.Api.Infrastructure.Json;
+namespace TeachingRecordSystem.Core.Infrastructure.Json;
 
 public static class Modifiers
 {
