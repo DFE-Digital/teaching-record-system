@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241115120807_InductionSync")]
+    partial class InductionSync
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1832,10 +1835,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("date")
                         .HasColumnName("induction_start_date");
 
-                    b.Property<int>("InductionStatus")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int?>("InductionStatus")
                         .HasColumnType("integer")
-                        .HasDefaultValue(0)
                         .HasColumnName("induction_status");
 
                     b.Property<string>("LastName")
@@ -2685,40 +2686,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("request_id");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
-
-                    b.Property<DateOnly>("DateOfBirth")
-                        .HasColumnType("date")
-                        .HasColumnName("date_of_birth");
-
-                    b.Property<string>("EmailAddress")
-                        .HasColumnType("text")
-                        .HasColumnName("email_address");
-
-                    b.Property<bool?>("IdentityVerified")
-                        .HasColumnType("boolean")
-                        .HasColumnName("identity_verified");
-
-                    b.Property<string[]>("Name")
-                        .IsRequired()
-                        .HasColumnType("text[]")
-                        .HasColumnName("name");
-
-                    b.Property<string>("OneLoginUserSubject")
+                    b.Property<string>("VerifiedOneLoginUserSubject")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
-                        .HasColumnName("one_login_user_subject");
+                        .HasColumnName("verified_one_login_user_subject");
 
                     b.HasKey("ApplicationUserId", "RequestId")
                         .HasName("pk_trn_request_metadata");
-
-                    b.HasIndex("EmailAddress")
-                        .HasDatabaseName("ix_trn_request_metadata_email_address");
-
-                    b.HasIndex("OneLoginUserSubject")
-                        .HasDatabaseName("ix_trn_request_metadata_one_login_user_subject");
 
                     b.ToTable("trn_request_metadata", (string)null);
                 });

@@ -33,6 +33,7 @@ public class TrsDataSyncHelper(
         { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
         { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
         { ModelTypes.Alert, GetModelTypeSyncInfoForAlert() },
+        { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() }
     };
 
     private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
@@ -60,7 +61,7 @@ public class TrsDataSyncHelper(
                 return null;
             }
 
-            throw new InvalidOperationException($"Santion {sanction.Id} does not have a {nameof(dfeta_sanction.Fields.dfeta_SanctionCodeId)}.");
+            throw new InvalidOperationException($"Sanction {sanction.Id} does not have a {nameof(dfeta_sanction.Fields.dfeta_SanctionCodeId)}.");
         }
 
         var sanctionCode = sanctionCodes.Single(c => c.Id == sanction.dfeta_SanctionCodeId.Id).dfeta_Value;
@@ -87,6 +88,80 @@ public class TrsDataSyncHelper(
             DqtCreatedOn = sanction.CreatedOn!.Value,
             DqtModifiedOn = sanction.ModifiedOn!.Value,
         };
+    }
+
+    private static InductionInfo? MapInductionInfoFromDqtInduction(
+        dfeta_induction? induction,
+        Contact contact,
+        bool ignoreInvalid)
+    {
+        // Double check that contact record induction status matches the induction record (if there is one) induction status (which should have been set via CRM plugin)
+        var hasQtls = contact.dfeta_qtlsdate is not null;
+        if (induction is not null && induction.dfeta_InductionStatus != contact.dfeta_InductionStatus)
+        {
+            if (ignoreInvalid)
+            {
+                return null;
+            }
+
+            throw new InvalidOperationException($"Induction status {contact.dfeta_InductionStatus} for contact {contact.ContactId} does not match induction status {induction.dfeta_InductionStatus} for induction {induction!.dfeta_inductionId}.");
+        }
+        // Person with QTLS should be exempt from induction
+        else if (hasQtls && contact.dfeta_InductionStatus != dfeta_InductionStatus.Exempt)
+        {
+            if (ignoreInvalid)
+            {
+                return null;
+            }
+
+            throw new InvalidOperationException($"Induction status for contact {contact.ContactId} with QTLS should be {dfeta_InductionStatus.Exempt} but is {contact.dfeta_InductionStatus}.");
+        }
+
+        return new InductionInfo()
+        {
+            PersonId = contact.ContactId!.Value,
+            InductionStatus = MapInductionStatusFromDqtInductionStatus(contact.dfeta_InductionStatus),
+            InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            InductionExemptionReason = null, // this mapping will be done in a future PR
+            DqtModifiedOn = induction?.ModifiedOn
+        };
+    }
+
+    public static InductionStatus MapInductionStatusFromDqtInductionStatus(dfeta_InductionStatus? dqtInductionStatus)
+    {
+        var inductionStatus = InductionStatus.None;
+
+        switch (dqtInductionStatus)
+        {
+            case dfeta_InductionStatus.Exempt:
+            case dfeta_InductionStatus.PassedinWales:
+                inductionStatus = InductionStatus.Exempt;
+                break;
+            case dfeta_InductionStatus.Fail:
+                inductionStatus = InductionStatus.Failed;
+                break;
+            case dfeta_InductionStatus.FailedinWales:
+                inductionStatus = InductionStatus.FailedInWales;
+                break;
+            case dfeta_InductionStatus.InductionExtended:
+            case dfeta_InductionStatus.InProgress:
+            case dfeta_InductionStatus.NotYetCompleted:
+                inductionStatus = InductionStatus.InProgress;
+                break;
+            case dfeta_InductionStatus.Pass:
+                inductionStatus = InductionStatus.Passed;
+                break;
+            case dfeta_InductionStatus.RequiredtoComplete:
+                inductionStatus = InductionStatus.RequiredToComplete;
+                break;
+            case null:
+                break;
+            default:
+                throw new ArgumentException($"Unrecognized {nameof(dfeta_InductionStatus)}: '{dqtInductionStatus}'.", nameof(dqtInductionStatus));
+        }
+
+        return inductionStatus;
     }
 
     public async Task DeleteRecordsAsync(string modelType, IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
@@ -140,24 +215,28 @@ public class TrsDataSyncHelper(
         return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<bool> SyncPersonAsync(Guid contactId, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(IReadOnlyCollection<Guid> contactIds, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Person);
 
         var contacts = await GetEntitiesAsync<Contact>(
             Contact.EntityLogicalName,
             Contact.PrimaryIdAttribute,
-            [contactId],
+            contactIds,
             modelTypeSyncInfo.AttributeNames,
+            activeOnly: false,
             cancellationToken);
 
-        return await SyncPersonsAsync(contacts, ignoreInvalid, dryRun, cancellationToken) == 1;
+        return await SyncPersonsAsync(contacts, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<bool> SyncPersonAsync(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
-        await SyncPersonsAsync(new[] { entity }, ignoreInvalid, dryRun, cancellationToken) == 1;
+    public async Task<bool> SyncPersonAsync(Guid contactId, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default) =>
+        (await SyncPersonsAsync([contactId], ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
 
-    public async Task<int> SyncPersonsAsync(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
+    public async Task<bool> SyncPersonAsync(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
+        (await SyncPersonsAsync(new[] { entity }, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
+
+    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
         // We're syncing all contacts for now.
         // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
@@ -173,7 +252,7 @@ public class TrsDataSyncHelper(
 
         if (people.Count == 0)
         {
-            return 0;
+            return [];
         }
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo<Person>(ModelTypes.Person);
@@ -203,7 +282,7 @@ public class TrsDataSyncHelper(
         {
             using (var mergeCommand = connection.CreateCommand())
             {
-                mergeCommand.CommandText = modelTypeSyncInfo.InsertStatement;
+                mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
                 mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
                 mergeCommand.Transaction = txn;
                 await mergeCommand.ExecuteNonQueryAsync();
@@ -244,7 +323,159 @@ public class TrsDataSyncHelper(
         }
 
         _syncedEntitiesSubject.OnNext(people.ToArray());
-        return people.Count;
+        return people.Select(p => p.PersonId).ToArray();
+    }
+
+    public async Task<int> SyncInductionsAsync(
+        IReadOnlyCollection<dfeta_induction> inductions,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var contactAttributeNames = new[]
+        {
+            Contact.PrimaryIdAttribute,
+            Contact.Fields.dfeta_InductionStatus,
+            Contact.Fields.dfeta_QtlsDateHasBeenSet
+        };
+
+        var contacts = await GetEntitiesAsync<Contact>(
+            Contact.EntityLogicalName,
+            Contact.PrimaryIdAttribute,
+            inductions.Select(e => e.dfeta_PersonId.Id),
+            contactAttributeNames,
+            activeOnly: false,
+            cancellationToken);
+
+        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    public async Task<int> SyncInductionsAsync(
+        IReadOnlyCollection<Contact> contacts,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var inductionAttributeNames = new[]
+        {
+            dfeta_induction.Fields.dfeta_PersonId,
+            dfeta_induction.Fields.dfeta_CompletionDate,
+            dfeta_induction.Fields.dfeta_InductionExemptionReason,
+            dfeta_induction.Fields.dfeta_StartDate,
+            dfeta_induction.Fields.dfeta_InductionStatus,
+            dfeta_induction.Fields.ModifiedOn
+        };
+
+        var inductions = await GetEntitiesAsync<dfeta_induction>(
+            dfeta_induction.EntityLogicalName,
+            dfeta_induction.Fields.dfeta_PersonId,
+            contacts.Select(c => c.ContactId!.Value),
+            inductionAttributeNames,
+            true,
+            cancellationToken);
+
+        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    public async Task<int> SyncInductionsAsync(
+        IReadOnlyCollection<Contact> contacts,
+        IReadOnlyCollection<dfeta_induction> entities,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var inductions = MapInductions(contacts, entities, ignoreInvalid);
+        return await SyncInductionsAsync(inductions, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    private async Task<int> SyncInductionsAsync(
+        IReadOnlyCollection<InductionInfo> inductions,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var modelTypeSyncInfo = GetModelTypeSyncInfo<InductionInfo>(ModelTypes.Induction);
+
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+
+        var toSync = inductions.ToList();
+
+        do
+        {
+            using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+            using (var createTempTableCommand = connection.CreateCommand())
+            {
+                createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
+                createTempTableCommand.Transaction = txn;
+                await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+            }
+
+            using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
+
+            foreach (var i in toSync)
+            {
+                writer.StartRow();
+                modelTypeSyncInfo.WriteRecord!(writer, i);
+            }
+
+            await writer.CompleteAsync(cancellationToken);
+            await writer.CloseAsync(cancellationToken);
+
+            var syncedInductionPersonIds = new List<Guid>();
+
+            using (var mergeCommand = connection.CreateCommand())
+            {
+                mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
+                mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+                mergeCommand.Transaction = txn;
+                using var reader = await mergeCommand.ExecuteReaderAsync();
+                while (await reader.ReadAsync(cancellationToken))
+                {
+                    syncedInductionPersonIds.Add(reader.GetGuid(0));
+                }
+            }
+
+            var unsyncedContactIds = toSync
+                .Where(i => !syncedInductionPersonIds.Contains(i.PersonId))
+                .Select(i => i.PersonId)
+                .ToArray();
+
+            if (unsyncedContactIds.Length > 0)
+            {
+                var personsSynced = await SyncPersonsAsync(unsyncedContactIds, ignoreInvalid, dryRun: false, cancellationToken);
+                var unableToSyncContactIds = unsyncedContactIds.Where(id => !personsSynced.Contains(id)).ToArray();
+                if (unableToSyncContactIds.Length > 0)
+                {
+                    if (ignoreInvalid)
+                    {
+                        toSync.RemoveAll(i => unableToSyncContactIds.Contains(i.PersonId));
+                        if (toSync.Count == 0)
+                        {
+                            return 0;
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Attempted to sync Induction for persons but the Contact records with IDs [{string.Join(", ", unableToSyncContactIds)}] do not meet the sync criteria.");
+                    }
+                }
+
+                continue;
+            }
+
+            if (!dryRun)
+            {
+                await txn.CommitAsync(cancellationToken);
+            }
+
+            break;
+        }
+        while (true);
+
+        _syncedEntitiesSubject.OnNext([.. toSync]);
+        return toSync.Count;
     }
 
     public async Task<bool> SyncAlertAsync(
@@ -333,7 +564,7 @@ public class TrsDataSyncHelper(
 
                 using (var mergeCommand = connection.CreateCommand())
                 {
-                    mergeCommand.CommandText = modelTypeSyncInfo.InsertStatement;
+                    mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
                     mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
                     mergeCommand.Transaction = txn;
                     await mergeCommand.ExecuteNonQueryAsync();
@@ -614,12 +845,17 @@ public class TrsDataSyncHelper(
         string idAttributeName,
         IEnumerable<Guid> ids,
         string[] attributeNames,
+        bool activeOnly,
         CancellationToken cancellationToken)
         where TEntity : Entity
     {
         var query = new QueryExpression(entityLogicalName);
         query.ColumnSet = new(attributeNames);
         query.Criteria.AddCondition(idAttributeName, ConditionOperator.In, ids.Cast<object>().ToArray());
+        if (activeOnly)
+        {
+            query.Criteria.AddCondition("statecode", ConditionOperator.Equal, 0);
+        }
 
         var response = await organizationService.RetrieveMultipleAsync(query, cancellationToken);
         return response.Entities.Select(e => e.ToEntity<TEntity>()).ToArray();
@@ -715,13 +951,90 @@ public class TrsDataSyncHelper(
         {
             CreateTempTableStatement = createTempTableStatement,
             CopyStatement = copyStatement,
-            InsertStatement = insertStatement,
+            UpsertStatement = insertStatement,
             DeleteStatement = deleteStatement,
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = Contact.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
                 helper.SyncPersonsAsync(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, dryRun, ct),
+            WriteRecord = writeRecord
+        };
+    }
+
+    private static ModelTypeSyncInfo GetModelTypeSyncInfoForInduction()
+    {
+        var tempTableName = "temp_induction_import";
+        var tableName = "persons";
+
+        var columnNames = new[]
+        {
+            "person_id",
+            "induction_completed_date",
+            "induction_exemption_reason",
+            "induction_start_date",
+            "induction_status",
+            "dqt_induction_modified_on"
+        };
+
+        var columnsToUpdate = columnNames.Except(new[] { "person_id" }).ToArray();
+
+        var columnList = string.Join(", ", columnNames);
+
+        var createTempTableStatement =
+            $"""
+            CREATE TEMP TABLE {tempTableName}
+            (
+                person_id uuid NOT NULL,
+                induction_completed_date date,
+                induction_exemption_reason integer,
+                induction_start_date date,
+                induction_status integer,
+                dqt_induction_modified_on timestamp with time zone
+            )
+            """;
+
+        var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
+
+        var updateStatement =
+            $"""
+            UPDATE {tableName} AS t
+            SET dqt_induction_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = temp.{c}"))}
+            FROM {tempTableName} AS temp
+            WHERE t.person_id = temp.person_id
+            RETURNING t.person_id
+            """;
+
+        var getLastModifiedOnStatement = $"SELECT MAX(dqt_induction_modified_on) FROM {tableName}";
+
+        var attributeNames = new[]
+        {
+            Contact.PrimaryIdAttribute,
+            Contact.Fields.dfeta_InductionStatus,
+            Contact.Fields.dfeta_qtlsdate
+        };
+
+        Action<NpgsqlBinaryImporter, InductionInfo> writeRecord = (writer, induction) =>
+        {
+            writer.WriteValueOrNull(induction.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(induction.InductionCompletedDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull((int?)induction.InductionExemptionReason, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(induction.InductionStartDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull((int?)induction.InductionStatus, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+        };
+
+        return new ModelTypeSyncInfo<InductionInfo>()
+        {
+            CreateTempTableStatement = createTempTableStatement,
+            CopyStatement = copyStatement,
+            UpsertStatement = updateStatement,
+            DeleteStatement = null,
+            GetLastModifiedOnStatement = getLastModifiedOnStatement,
+            EntityLogicalName = dfeta_induction.EntityLogicalName,
+            AttributeNames = attributeNames,
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
+                helper.SyncInductionsAsync(entities.Select(e => e.ToEntity<dfeta_induction>()).ToArray(), ignoreInvalid, dryRun, ct),
             WriteRecord = writeRecord
         };
     }
@@ -739,7 +1052,7 @@ public class TrsDataSyncHelper(
         {
             CreateTempTableStatement = null,
             CopyStatement = null,
-            InsertStatement = null,
+            UpsertStatement = null,
             DeleteStatement = null,
             GetLastModifiedOnStatement = null,
             EntityLogicalName = dfeta_TRSEvent.EntityLogicalName,
@@ -833,7 +1146,7 @@ public class TrsDataSyncHelper(
         {
             CreateTempTableStatement = createTempTableStatement,
             CopyStatement = copyStatement,
-            InsertStatement = insertStatement,
+            UpsertStatement = insertStatement,
             DeleteStatement = deleteStatement,
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = dfeta_sanction.EntityLogicalName,
@@ -866,6 +1179,34 @@ public class TrsDataSyncHelper(
             DqtLastName = c.LastName ?? string.Empty
         })
         .ToList();
+
+    private static List<InductionInfo> MapInductions(IReadOnlyCollection<Contact> contacts, IEnumerable<dfeta_induction> inductions, bool ignoreInvalid)
+    {
+        var inductionLookup = inductions
+            .GroupBy(i => i.dfeta_PersonId.Id)
+            .ToDictionary(g => g.Key, g => g.ToArray());
+
+        return contacts
+            .Select(contact =>
+            {
+                dfeta_induction? induction = null;
+                if (inductionLookup.TryGetValue(contact.ContactId!.Value, out var personInductions))
+                {
+                    // We shouldn't have multiple induction records for the same person in prod at all but we might in other environments
+                    // so we'll just take the most recently modified one.
+                    induction = personInductions.OrderByDescending(i => i.ModifiedOn).First();
+                    if (personInductions.Length > 1 && !ignoreInvalid)
+                    {
+                        throw new InvalidOperationException($"Contact '{contact.ContactId!.Value}' has multiple induction records.");
+                    }
+                }
+
+                return MapInductionInfoFromDqtInduction(induction, contact, ignoreInvalid);
+            })
+            .Where(i => i is not null)
+            .Cast<InductionInfo>()
+            .ToList();
+    }
 
     private async Task<(List<Alert> Alerts, List<EventBase> Events)> MapAlertsAndAuditsAsync(
         IEnumerable<dfeta_sanction> sanctions,
@@ -1068,7 +1409,7 @@ public class TrsDataSyncHelper(
     {
         public required string? CreateTempTableStatement { get; init; }
         public required string? CopyStatement { get; init; }
-        public required string? InsertStatement { get; init; }
+        public required string? UpsertStatement { get; init; }
         public required string? DeleteStatement { get; init; }
         public required string? GetLastModifiedOnStatement { get; init; }
         public required string EntityLogicalName { get; init; }
@@ -1090,11 +1431,22 @@ public class TrsDataSyncHelper(
         string UserName)
         where TEntity : Entity;
 
+    private record InductionInfo
+    {
+        public required Guid PersonId { get; init; }
+        public required DateOnly? InductionCompletedDate { get; init; }
+        public required InductionExemptionReason? InductionExemptionReason { get; init; }
+        public required DateOnly? InductionStartDate { get; init; }
+        public required InductionStatus? InductionStatus { get; init; }
+        public required DateTime? DqtModifiedOn { get; init; }
+    }
+
     public static class ModelTypes
     {
         public const string Person = "Person";
         public const string Event = "Event";
         public const string Alert = "Alert";
+        public const string Induction = "Induction";
     }
 }
 
