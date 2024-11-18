@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Api.Infrastructure.OpenApi;
+namespace TeachingRecordSystem.Core;
 
 public static class OpenApiDocumentHelper
 {

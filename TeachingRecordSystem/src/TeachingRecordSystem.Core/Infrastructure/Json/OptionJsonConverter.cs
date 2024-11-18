@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Optional;
 using Optional.Unsafe;
 
-namespace TeachingRecordSystem.Api.Infrastructure.Json;
+namespace TeachingRecordSystem.Core.Infrastructure.Json;
 
 public class OptionJsonConverter<T> : JsonConverter<Option<T>>
 {

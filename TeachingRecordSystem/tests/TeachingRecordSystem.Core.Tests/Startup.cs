@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests;
 
@@ -27,5 +28,6 @@ public class Startup
                 services.AddSingleton<FakeTrnGenerator>();
                 services.AddCrmQueries();
                 services.AddFakeXrm();
+                services.AddSingleton<WebhookReceiver>();
             });
 }

@@ -6,9 +6,9 @@ using System.Text.Json.Serialization.Metadata;
 using Medallion.Threading;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks.Messages;
-using TeachingRecordSystem.Api.Infrastructure.Json;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
