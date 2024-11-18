@@ -2,5 +2,5 @@ namespace TeachingRecordSystem.Api.Infrastructure.Security;
 
 public interface ICurrentUserProvider
 {
-    Guid GetCurrentApplicationUserId();
+    (Guid UserId, string Name) GetCurrentApplicationUser();
 }

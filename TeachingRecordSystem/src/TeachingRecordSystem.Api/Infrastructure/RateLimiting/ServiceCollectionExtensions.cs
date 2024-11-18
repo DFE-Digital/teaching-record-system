@@ -52,7 +52,7 @@ public static class ServiceCollectionExtensions
                 {
                     var rateLimiterOptions = httpContext.RequestServices.GetRequiredService<IOptions<ClientIdRateLimiterOptions>>().Value;
                     var connectionMultiplexerFactory = () => httpContext.RequestServices.GetRequiredService<IConnectionMultiplexer>();
-                    var partitionKey = ClaimsPrincipalCurrentUserProvider.TryGetCurrentClientIdFromHttpContext(httpContext, out var userId) ? userId.ToString() : UnknownUserPartitionKey;
+                    var partitionKey = ClaimsPrincipalCurrentUserProvider.TryGetCurrentApplicationUserFromHttpContext(httpContext, out var userId) ? userId.ToString() : UnknownUserPartitionKey;
                     var clientRateLimit = rateLimiterOptions.ClientRateLimits.TryGetValue(partitionKey, out var windowOptions) ? windowOptions : rateLimiterOptions.DefaultRateLimit;
 
                     // Window isn't available via RateLimitMetadata so stash it on the HttpContext instead

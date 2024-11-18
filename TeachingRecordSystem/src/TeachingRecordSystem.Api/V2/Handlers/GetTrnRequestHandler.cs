@@ -32,7 +32,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
 
     public async Task<TrnRequestInfo> Handle(GetTrnRequest request, CancellationToken cancellationToken)
     {
-        var currentApplicationUserId = _currentUserProvider.GetCurrentApplicationUserId();
+        var (currentApplicationUserId, _) = _currentUserProvider.GetCurrentApplicationUser();
 
         var trnRequest = await _trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, request.RequestId);
         if (trnRequest == null)

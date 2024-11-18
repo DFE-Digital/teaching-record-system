@@ -39,7 +39,7 @@ public class CreateTrnRequestHandler(
 {
     public async Task<TrnRequestInfo> Handle(CreateTrnRequestCommand command)
     {
-        var currentApplicationUserId = currentUserProvider.GetCurrentApplicationUserId();
+        var (currentApplicationUserId, currentApplicationUserName) = currentUserProvider.GetCurrentApplicationUser();
 
         var trnRequest = await trnRequestHelper.GetTrnRequestInfo(currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
@@ -147,6 +147,7 @@ public class CreateTrnRequestHandler(
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
+            ApplicationUserName = currentApplicationUserName,
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
             OutboxMessages = outboxMessages

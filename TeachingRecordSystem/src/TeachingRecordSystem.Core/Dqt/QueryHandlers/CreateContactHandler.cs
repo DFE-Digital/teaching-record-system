@@ -33,11 +33,17 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             dfeta_TRN = query.Trn
         };
 
+        if (query.Trn is null)
+        {
+            // CRM plug-in explodes if TRN is specified but is null
+            contact.Attributes.Remove(Contact.Fields.dfeta_TRN);
+        }
+
         requestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
         foreach (var (duplicate, hasActiveAlert) in query.PotentialDuplicates)
         {
-            var task = CreateDuplicateReviewTaskEntity(duplicate, contactId, hasActiveAlert);
+            var task = CreateDuplicateReviewTaskEntity(duplicate, hasActiveAlert);
             requestBuilder.AddRequest(new CreateRequest() { Target = task });
         }
 
@@ -49,66 +55,66 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         await requestBuilder.Execute();
 
         return contactId;
-    }
 
-    private CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, Guid contactId, bool hasActiveAlert)
-    {
-        var description = GetDescription();
-
-        var category = "DMSImportTrn";
-
-        return new CrmTask()
+        CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, bool hasActiveAlert)
         {
-            RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
-            dfeta_potentialduplicateid = duplicate.ContactId.ToEntityReference(Contact.EntityLogicalName),
-            Category = category,
-            Subject = "Notification for QTS Unit Team",
-            Description = description
-        };
+            var description = GetDescription();
 
-        string GetDescription()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("Potential duplicate");
-            sb.AppendLine("Matched on");
+            var category = $"TRN request from {query.ApplicationUserName}";
 
-            foreach (var matchedAttribute in duplicate.MatchedAttributes)
+            return new CrmTask()
             {
-                sb.AppendLine(matchedAttribute switch
+                RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
+                dfeta_potentialduplicateid = duplicate.ContactId.ToEntityReference(Contact.EntityLogicalName),
+                Category = category,
+                Subject = "Notification for QTS Unit Team",
+                Description = description
+            };
+
+            string GetDescription()
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("Potential duplicate");
+                sb.AppendLine("Matched on");
+
+                foreach (var matchedAttribute in duplicate.MatchedAttributes)
                 {
-                    Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
-                    Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
-                    Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
-                    Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
-                    Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
-                    Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
-                    _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
-                });
+                    sb.AppendLine(matchedAttribute switch
+                    {
+                        Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
+                        Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
+                        Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
+                        Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
+                        Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
+                        Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
+                        _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
+                    });
+                }
+
+                var additionalFlags = new List<string>();
+
+                if (hasActiveAlert)
+                {
+                    additionalFlags.Add("active sanctions");
+                }
+
+                if (duplicate.HasQtsDate)
+                {
+                    additionalFlags.Add("QTS date");
+                }
+
+                if (duplicate.HasEytsDate)
+                {
+                    additionalFlags.Add("EYTS date");
+                }
+
+                if (additionalFlags.Count > 0)
+                {
+                    sb.AppendLine($"Matched record has {string.Join(" & ", additionalFlags)}");
+                }
+
+                return sb.ToString();
             }
-
-            var additionalFlags = new List<string>();
-
-            if (hasActiveAlert)
-            {
-                additionalFlags.Add("active sanctions");
-            }
-
-            if (duplicate.HasQtsDate)
-            {
-                additionalFlags.Add("QTS date");
-            }
-
-            if (duplicate.HasEytsDate)
-            {
-                additionalFlags.Add("EYTS date");
-            }
-
-            if (additionalFlags.Count > 0)
-            {
-                sb.AppendLine($"Matched record has {string.Join(" & ", additionalFlags)}");
-            }
-
-            return sb.ToString();
         }
     }
 }
