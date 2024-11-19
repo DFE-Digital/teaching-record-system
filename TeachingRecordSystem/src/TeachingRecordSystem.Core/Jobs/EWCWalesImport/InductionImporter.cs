@@ -248,7 +248,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
 
         //ReferenceNumber/Trn
         if (String.IsNullOrEmpty(row.ReferenceNumber))
+        {
             errors.Add("Missing Reference No");
+        }
 
         //Date Of birth
         if (String.IsNullOrEmpty(row.DateOfBirth))
@@ -258,7 +260,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         else
         {
             if (!DateTime.TryParse(row.DateOfBirth, out _))
+            {
                 errors.Add("Validation Failed: Invalid Date of Birth");
+            }
         }
 
         //InductionPassedDate
@@ -270,7 +274,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         {
             DateTime date;
             if (!DateTime.TryParse(row.StartDate, out date))
+            {
                 errors.Add("Validation Failed: Invalid Induction start date");
+            }
         }
 
         //InductionPassedDate
@@ -282,7 +288,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         {
             DateTime date;
             if (!DateTime.TryParse(row.PassedDate, out date))
+            {
                 errors.Add("Validation Failed: Invalid Induction passed date");
+            }
         }
 
         switch (lookups.PersonMatchStatus)
@@ -356,10 +364,14 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         var results = await crmQueryDispatcher.ExecuteQueryAsync(query);
 
         if (results.Length == 0)
+        {
             return (EwcWalesMatchStatus.NoMatch, null);
+        }
 
         if (results.Length > 1)
+        {
             return (EwcWalesMatchStatus.MultipleMatchesFound, null);
+        }
 
         var organisationId = results.First().Id;
         return (EwcWalesMatchStatus.OneMatch, organisationId);
@@ -371,7 +383,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         var result = await crmQueryDispatcher.ExecuteQueryAsync(query);
 
         if (result is null)
+        {
             return (EwcWalesMatchStatus.NoMatch, null);
+        }
 
         return (EwcWalesMatchStatus.OneMatch, result);
     }
@@ -388,10 +402,14 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                             Contact.Fields.dfeta_qtlsdate)));
 
         if (contacts.Count == 0 || contacts.First().Value == null)
+        {
             return (EwcWalesMatchStatus.NoMatch, null);
+        }
 
         if (contacts.Count > 1)
+        {
             return (EwcWalesMatchStatus.MultipleTrnMatched, null);
+        }
 
         var contact = contacts.First().Value!;
         if (DateOnly.TryParse(item.DateOfBirth, out DateOnly dob))
@@ -413,9 +431,13 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
             );
 
         if (qtsRegistrations[contact.Id].Length > 0)
+        {
             return (EwcWalesMatchStatus.TeacherHasQts, contact);
+        }
         else
+        {
             return (EwcWalesMatchStatus.NoAssociatedQts, contact);
+        }
     }
 
     public class InductionImportLookupData

@@ -243,7 +243,9 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
 
         //QTS REF
         if (String.IsNullOrEmpty(row.QtsRefNo))
+        {
             errors.Add("Missing QTS Ref Number");
+        }
 
         //Date Of birth
         if (String.IsNullOrEmpty(row.DateOfBirth))
@@ -253,7 +255,9 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         else
         {
             if (!DateOnly.TryParse(row.DateOfBirth, out _))
+            {
                 errors.Add("Validation Failed: Invalid Date of Birth");
+            }
         }
 
         //QTS Date
@@ -264,7 +268,9 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         else
         {
             if (!DateOnly.TryParse(row.QtsDate, out _))
+            {
                 errors.Add("Validation Failed: Invalid QTS Date");
+            }
         }
 
         switch (lookups.PersonMatchStatus)
