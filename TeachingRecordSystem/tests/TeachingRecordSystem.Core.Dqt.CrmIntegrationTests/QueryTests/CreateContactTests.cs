@@ -41,6 +41,7 @@ public class CreateContactTests : IAsyncLifetime
             EmailAddress = email,
             NationalInsuranceNumber = nino,
             DateOfBirth = dateOfBirth,
+            Gender = Contact_GenderCode.Notavailable,
             Trn = trn,
             PotentialDuplicates = [],
             ApplicationUserName = "Tests",
@@ -100,6 +101,7 @@ public class CreateContactTests : IAsyncLifetime
             EmailAddress = email,
             NationalInsuranceNumber = nino,
             DateOfBirth = dateOfBirth,
+            Gender = Contact_GenderCode.Notavailable,
             Trn = null,
             PotentialDuplicates =
             [

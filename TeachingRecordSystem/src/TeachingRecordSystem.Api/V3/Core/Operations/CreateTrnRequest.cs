@@ -144,6 +144,7 @@ public class CreateTrnRequestHandler(
             StatedMiddleName = command.MiddleName ?? "",
             StatedLastName = command.LastName,
             DateOfBirth = command.DateOfBirth,
+            Gender = Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
