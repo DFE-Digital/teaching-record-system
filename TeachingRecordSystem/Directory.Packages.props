@@ -71,6 +71,9 @@
     <PackageVersion Include="Moq" Version="4.20.70" />
     <PackageVersion Include="Npgsql.DependencyInjection" Version="8.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+    <PackageVersion Include="NSign.AspNetCore" Version="1.1.0" />
+    <PackageVersion Include="NSign.Client" Version="1.1.0" />
+    <PackageVersion Include="NSign.SignatureProviders" Version="1.1.0" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="5.2.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />
     <PackageVersion Include="Optional" Version="4.0.0" />

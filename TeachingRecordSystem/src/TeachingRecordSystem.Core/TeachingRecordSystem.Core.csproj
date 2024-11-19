@@ -177,6 +177,8 @@
     <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" />
     <PackageReference Include="Npgsql.DependencyInjection" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="NSign.Client" />
+    <PackageReference Include="NSign.SignatureProviders" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <PackageReference Include="Optional" />
     <PackageReference Include="Parquet.Net" />

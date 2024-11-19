@@ -728,6 +728,18 @@
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0"
         }
       },
+      "NSign.Abstractions": {
+        "type": "Transitive",
+        "resolved": "1.1.0",
+        "contentHash": "UGgFyDoeyz0fLm7P/Qu7TqOqeLEBySIU8qCRCPKoCmn3wmp67OXLkYyxAUL4s9J1SwVhWjPc8AdvBHSJecJ+cw==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
+          "Microsoft.Extensions.Options": "8.0.2",
+          "Microsoft.Extensions.Options.DataAnnotations": "8.0.0",
+          "StructuredFieldValues": "0.6.3",
+          "System.Collections.Immutable": "8.0.0"
+        }
+      },
       "OpenIddict.Abstractions": {
         "type": "Transitive",
         "resolved": "5.2.0",
@@ -877,6 +889,11 @@
         "resolved": "1.1.6",
         "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
       },
+      "StructuredFieldValues": {
+        "type": "Transitive",
+        "resolved": "0.6.3",
+        "contentHash": "EgCsxEnSeXuamDL6AV8ygCI+WHNodfgARlpqBT1MQjy4Qxg8VQA7IHlH5jFbzhXKpWIL2mU8+/Ed3yW/At9vWg=="
+      },
       "System.Buffers": {
         "type": "Transitive",
         "resolved": "4.5.1",
@@ -925,8 +942,8 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "1.5.0",
-        "contentHash": "EXKiDFsChZW0RjrZ4FYHu9aW6+P4MCgEDCklsVseRfhoO0F+dXeMSsMRAlVXIo06kGJ/zv+2w1a2uc2+kxxSaQ=="
+        "resolved": "8.0.0",
+        "contentHash": "AurL6Y5BA1WotzlEvVaIDpqzpIPvYnnldxru8oXJU2yFxFUy3+pNXjXd1ymO+RA0rq0+590Q8gaz2l3Sr7fmqg=="
       },
       "System.Collections.NonGeneric": {
         "type": "Transitive",
@@ -1204,6 +1221,11 @@
         "type": "Transitive",
         "resolved": "6.0.0",
         "contentHash": "Rfm2jYCaUeGysFEZjDe7j1R4x6Z6BzumS/vUT5a1AA/AWJuGX71PoGB0RmpyX3VmrGqVnAwtfMn39OHR8Y/5+g=="
+      },
+      "System.IO.Pipelines": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "FHNOatmUq0sqJOkTx+UF/9YK1f180cnW5FVqnQMvYUN0elp6wFzbtPSiqbo1/ru8ICp43JM1i7kKkk6GsNGHlA=="
       },
       "System.Linq": {
         "type": "Transitive",
@@ -2008,6 +2030,8 @@
           "Microsoft.Extensions.Options.DataAnnotations": "[8.0.0, )",
           "Microsoft.PowerPlatform.Dataverse.Client": "[1.1.27, )",
           "Microsoft.PowerPlatform.Dataverse.Client.Dynamics": "[1.1.27, )",
+          "NSign.Client": "[1.1.0, )",
+          "NSign.SignatureProviders": "[1.1.0, )",
           "Npgsql.DependencyInjection": "[8.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[8.0.10, )",
           "OpenIddict.EntityFrameworkCore": "[5.2.0, )",
@@ -2415,6 +2439,30 @@
           "Microsoft.EntityFrameworkCore.Abstractions": "8.0.10",
           "Microsoft.EntityFrameworkCore.Relational": "8.0.10",
           "Npgsql": "8.0.5"
+        }
+      },
+      "NSign.Client": {
+        "type": "CentralTransitive",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "wfHRl6NDEc92nJXZjPqCgEBvqC8z/+uLWUOQ+YcBna5BHdb+Xx2Rr8Ixc1yjNVC6TioxjJjtqXaVpJhPVLPh/Q==",
+        "dependencies": {
+          "Microsoft.Extensions.Http": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.1",
+          "Microsoft.Extensions.Options": "8.0.2",
+          "NSign.Abstractions": "1.1.0",
+          "StructuredFieldValues": "0.6.3",
+          "System.Collections.Immutable": "8.0.0",
+          "System.IO.Pipelines": "8.0.0"
+        }
+      },
+      "NSign.SignatureProviders": {
+        "type": "CentralTransitive",
+        "requested": "[1.1.0, )",
+        "resolved": "1.1.0",
+        "contentHash": "poa3Qez1ds4w28TWQyPzKa/Yd4WOY9Pto8qWI96wNRHp76ZfV9M2kfZ6JH7ma3uAgInwpYEoAc+2Z0h6/E/sSA==",
+        "dependencies": {
+          "NSign.Abstractions": "1.1.0"
         }
       },
       "OpenIddict.EntityFrameworkCore": {
