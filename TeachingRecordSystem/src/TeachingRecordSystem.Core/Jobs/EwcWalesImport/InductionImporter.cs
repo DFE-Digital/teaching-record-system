@@ -83,8 +83,8 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                             {
                                 Id = inductionId.Value,
                                 PersonId = personId,
-                                StartDate = DateTime.Parse(row.StartDate),
-                                CompletionDate = DateTime.Parse(row.PassedDate),
+                                StartDate = DateTime.ParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                CompletionDate = DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
                                 InductionStatus = dfeta_InductionStatus.PassedinWales
                             };
                             rowTransaction.AppendQuery(createInductionQuery);
@@ -94,7 +94,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                             var updateInductionQuery = new UpdateInductionQuery()
                             {
                                 InductionId = inductionId.Value,
-                                CompletionDate = !string.IsNullOrEmpty(row.PassedDate) ? DateTime.Parse(row.PassedDate) : null,
+                                CompletionDate = !string.IsNullOrEmpty(row.PassedDate) ? DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None) : null,
                                 InductionStatus = dfeta_InductionStatus.PassedinWales
                             };
                             rowTransaction.AppendQuery(updateInductionQuery);
@@ -110,8 +110,8 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                                 Id = inductionPeriodId.Value,
                                 InductionId = inductionId.Value,
                                 AppropriateBodyId = lookupData.OrganisationId,
-                                InductionStartDate = DateTime.Parse(row.StartDate),
-                                InductionEndDate = DateTime.Parse(row.PassedDate),
+                                InductionStartDate = DateTime.ParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionEndDate = DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
                             };
                             rowTransaction.AppendQuery(queryInductionPeriod);
                         }

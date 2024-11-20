@@ -267,7 +267,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         }
         else
         {
-            if (!DateOnly.TryParse(row.QtsDate, CultureInfo.InvariantCulture, out _))
+            if (!DateOnly.TryParseExact(row.QtsDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 errors.Add($"Validation Failed: Invalid QTS Date {row.QtsDate}");
             }
