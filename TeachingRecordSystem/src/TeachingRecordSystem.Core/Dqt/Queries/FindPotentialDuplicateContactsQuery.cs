@@ -26,6 +26,7 @@ public record FindPotentialDuplicateContactsResult
     public required string? StatedFirstName { get; init; }
     public required string? StatedMiddleName { get; init; }
     public required string? StatedLastName { get; init; }
+    public required string? PreviousLastName { get; init; }
     public required DateOnly? DateOfBirth { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
     public required string? EmailAddress { get; init; }

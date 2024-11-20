@@ -118,6 +118,7 @@ public class CreateContactTests : IAsyncLifetime
                     StatedFirstName = firstName,
                     StatedMiddleName = middleName,
                     StatedLastName = lastName,
+                    PreviousLastName = null,
                     DateOfBirth = dateOfBirth,
                     EmailAddress = email,
                     NationalInsuranceNumber = nino

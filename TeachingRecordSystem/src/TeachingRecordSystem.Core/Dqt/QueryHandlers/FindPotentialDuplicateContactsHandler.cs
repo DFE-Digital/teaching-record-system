@@ -129,6 +129,7 @@ public class FindPotentialDuplicateContactsHandler : ICrmQueryHandler<FindPotent
                     StatedFirstName = match.dfeta_StatedFirstName,
                     StatedMiddleName = match.dfeta_StatedMiddleName,
                     StatedLastName = match.dfeta_StatedLastName,
+                    PreviousLastName = match.dfeta_PreviousLastName,
                     DateOfBirth = match.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
                     NationalInsuranceNumber = !string.IsNullOrEmpty(match.dfeta_NINumber) ? match.dfeta_NINumber : null,
                     EmailAddress = match.EMailAddress1
