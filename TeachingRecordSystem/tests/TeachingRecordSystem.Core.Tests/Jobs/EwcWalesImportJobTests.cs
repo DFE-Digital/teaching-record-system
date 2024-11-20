@@ -1,5 +1,6 @@
 using System.Text;
 using Azure.Storage.Blobs;
+using Hangfire.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -10,51 +11,24 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
 [Collection(nameof(DisableParallelization))]
-public class EwcWalesImportJobTests : IAsyncLifetime
+public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
 {
-    public EwcWalesImportJobTests(
-      DbFixture dbFixture,
-      ReferenceDataCache referenceDataCache,
-      FakeTrnGenerator trnGenerator,
-      IServiceProvider provider)
+    public EwcWalesImportJobTests(EwcWalesImportJobFixture fixture)
     {
-        OrganisationService = provider.GetService<IOrganizationServiceAsync2>()!;
-        DbFixture = dbFixture;
-        Clock = new();
-        Helper = new TrsDataSyncHelper(
-            dbFixture.GetDataSource(),
-            OrganisationService,
-            referenceDataCache,
-            Clock);
-
-        var blobServiceClient = new Mock<BlobServiceClient>();
-        var qtsImporter = ActivatorUtilities.CreateInstance<QtsImporter>(provider);
-        var inductionImporter = ActivatorUtilities.CreateInstance<InductionImporter>(provider);
-        Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, blobServiceClient.Object, qtsImporter, inductionImporter);
-        TestData = new TestData(
-            dbFixture.GetDbContextFactory(),
-            OrganisationService,
-            referenceDataCache,
-            Clock,
-            trnGenerator,
-            TestDataSyncConfiguration.Sync(Helper));
+        Fixture = fixture;
     }
 
-    private DbFixture DbFixture { get; }
+    private DbFixture DbFixture => Fixture.DbFixture;
 
-    private TestData TestData { get; }
+    private IClock Clock => Fixture.Clock;
 
-    private TestableClock Clock { get; }
+    private TestData TestData => Fixture.TestData;
 
-    public TrsDataSyncHelper Helper { get; }
+    private EwcWalesImportJobFixture Fixture { get; }
 
-    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
+    public IOrganizationServiceAsync2 OrganisationService => Fixture.OrganisationService;
 
-    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
-
-    private IOrganizationServiceAsync2 OrganisationService { get; }
-
-    public EwcWalesImportJob Job { get; }
+    private EwcWalesImportJob Job => Fixture.Job;
 
     [Theory]
     [InlineData("IND", EwcWalesImportFileType.Induction)]
@@ -62,7 +36,7 @@ public class EwcWalesImportJobTests : IAsyncLifetime
     [InlineData("", EwcWalesImportFileType.Unknown)]
     public void EwcWalesImportJob_GetImportFileType_ReturnsExpected(string filename, EwcWalesImportFileType importType)
     {
-        Job.TryGetImportFileType(filename, out var type);
+        Fixture.Job.TryGetImportFileType(filename, out var type);
         Assert.Equal(importType, type);
     }
 
@@ -590,4 +564,52 @@ public class EwcWalesImportJobTests : IAsyncLifetime
         Assert.Equal(failureRowCount, results.FailureCount);
         Assert.Empty(results.FailureMessage);
     }
+}
+
+
+public class EwcWalesImportJobFixture : IAsyncLifetime
+{
+    public EwcWalesImportJobFixture(
+        DbFixture dbFixture,
+        ReferenceDataCache referenceDataCache,
+        FakeTrnGenerator trnGenerator,
+        IServiceProvider provider)
+    {
+        OrganisationService = provider.GetService<IOrganizationServiceAsync2>()!;
+        DbFixture = dbFixture;
+        Clock = new();
+        Helper = new TrsDataSyncHelper(
+            dbFixture.GetDataSource(),
+            OrganisationService,
+            referenceDataCache,
+            Clock);
+
+        var blobServiceClient = new Mock<BlobServiceClient>();
+        var qtsImporter = ActivatorUtilities.CreateInstance<QtsImporter>(provider);
+        var inductionImporter = ActivatorUtilities.CreateInstance<InductionImporter>(provider);
+        Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, blobServiceClient.Object, qtsImporter, inductionImporter);
+        TestData = new TestData(
+            dbFixture.GetDbContextFactory(),
+            OrganisationService,
+            referenceDataCache,
+            Clock,
+            trnGenerator,
+            TestDataSyncConfiguration.Sync(Helper));
+    }
+
+    public DbFixture DbFixture { get; }
+
+    public TestData TestData { get; }
+
+    public TestableClock Clock { get; }
+
+    public TrsDataSyncHelper Helper { get; }
+
+    Task IAsyncLifetime.InitializeAsync() => DbFixture.WithDbContextAsync(dbContext => dbContext.Events.ExecuteDeleteAsync());
+
+    Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
+
+    public IOrganizationServiceAsync2 OrganisationService { get; }
+
+    public EwcWalesImportJob Job { get; }
 }
