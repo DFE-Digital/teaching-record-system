@@ -206,7 +206,7 @@ public class InductionImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString();
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
         var lookups = await Importer.GetLookupDataAsync(row);
@@ -240,7 +240,7 @@ public class InductionImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString();
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
         var lookups = await Importer.GetLookupDataAsync(row);
@@ -291,7 +291,7 @@ public class InductionImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString();
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
 
@@ -321,7 +321,7 @@ public class InductionImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.ReferenceNumber = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString();
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
             return x;
         });
 
