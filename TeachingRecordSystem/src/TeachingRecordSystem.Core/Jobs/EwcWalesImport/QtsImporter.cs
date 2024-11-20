@@ -256,7 +256,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         {
             if (!DateOnly.TryParse(row.DateOfBirth, out _))
             {
-                errors.Add("Validation Failed: Invalid Date of Birth");
+                errors.Add($"Validation Failed: Invalid Date of Birth {row.DateOfBirth}");
             }
         }
 
@@ -269,7 +269,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         {
             if (!DateOnly.TryParse(row.QtsDate, out _))
             {
-                errors.Add("Validation Failed: Invalid QTS Date");
+                errors.Add($"Validation Failed: Invalid QTS Date {row.QtsDate}");
             }
         }
 
