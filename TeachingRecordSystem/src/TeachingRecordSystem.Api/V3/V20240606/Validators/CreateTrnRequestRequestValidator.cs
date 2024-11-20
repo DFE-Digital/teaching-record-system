@@ -38,6 +38,8 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             });
 
         RuleForEach(r => r.Person.EmailAddresses)
+            .NotNull()
+                .WithMessage("Email address cannot be null.")
             .EmailAddress()
             .MaximumLength(AttributeConstraints.Contact.EMailAddress1MaxLength);
 

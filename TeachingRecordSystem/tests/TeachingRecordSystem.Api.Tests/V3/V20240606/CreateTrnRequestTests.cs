@@ -106,6 +106,41 @@ public class CreateTrnRequestTests : TestBase
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Fact]
+    public async Task Post_RequestWithNullEmail_ReturnsError()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = Faker.Name.First();
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                EmailAddresses = new[] { (string?)null }!
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "person.emailAddresses[0]", "Email address cannot be null.");
+    }
+
     private static CreateTrnRequestRequest CreateDummyRequest() => new()
     {
         RequestId = Guid.NewGuid().ToString(),
