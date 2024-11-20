@@ -1,6 +1,5 @@
 using System.Text;
 using Azure.Storage.Blobs;
-using Hangfire.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt.Models;
