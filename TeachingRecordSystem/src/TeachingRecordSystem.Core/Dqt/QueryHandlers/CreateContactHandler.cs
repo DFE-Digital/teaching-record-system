@@ -85,6 +85,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
                         Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
                         Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
                         Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
+                        Contact.Fields.dfeta_PreviousLastName => $"  - Previous last name: '{duplicate.PreviousLastName}'",
                         Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
                         Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
                         Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
