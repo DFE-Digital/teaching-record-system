@@ -121,8 +121,8 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                             {
                                 Id = lookupData.InductionPeriod.Id,
                                 AppropriateBodyId = lookupData.OrganisationId,
-                                InductionStartDate = DateTime.Parse(row.StartDate),
-                                InductionEndDate = DateTime.Parse(row.PassedDate),
+                                InductionStartDate = DateTime.ParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionEndDate = DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
                             };
                             rowTransaction.AppendQuery(updateInductionPeriodQuery);
                         }

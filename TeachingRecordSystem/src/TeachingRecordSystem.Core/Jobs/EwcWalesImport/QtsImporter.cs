@@ -96,7 +96,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
                         Id = qtsRegistrationId,
                         ContactId = lookupData.PersonId.Value,
                         TeacherStatusId = lookupData.TeacherStatusId!.Value,
-                        QtsDate = DateTime.Parse(row.QtsDate)
+                        QtsDate = DateTime.ParseExact(row.QtsDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None)
                     };
                     rowTransaction.AppendQuery(qtsQuery);
 
