@@ -110,7 +110,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         //Assert.Equal(successCount, results.SuccessCount);
         //Assert.Equal(duplicateRowCount, results.DuplicateCount);
         //Assert.Equal(failureRowCount, results.FailureCount);
-        Assert.Empty(results.FailureMessage);
+        Assert.Equal(String.Empty, results.FailureMessage);
         //Assert.Equal(fileName, integrationTransaction.dfeta_Filename);
     }
 
