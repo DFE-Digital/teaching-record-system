@@ -14,16 +14,16 @@ public class EwcWalesImportJobTests : IAsyncLifetime
 {
     public EwcWalesImportJobTests(
       DbFixture dbFixture,
-      IOrganizationServiceAsync2 organizationService,
       ReferenceDataCache referenceDataCache,
       FakeTrnGenerator trnGenerator,
       IServiceProvider provider)
     {
+        OrganisationService = provider.GetService<IOrganizationServiceAsync2>()!;
         DbFixture = dbFixture;
         Clock = new();
         Helper = new TrsDataSyncHelper(
             dbFixture.GetDataSource(),
-            organizationService,
+            OrganisationService,
             referenceDataCache,
             Clock);
 
