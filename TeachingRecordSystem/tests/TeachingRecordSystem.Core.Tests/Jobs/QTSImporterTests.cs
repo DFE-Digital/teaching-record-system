@@ -79,7 +79,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             return x;
         });
         var lookups = await Importer.GetLookupDataAsync(row);
@@ -193,7 +193,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = accountNumber;
             return x;
         });
@@ -214,7 +214,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = "SomeInvalidOrg";
             return x;
         });
@@ -241,7 +241,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             x.PqSubjectCode1 = "3333333";
             x.PqSubjectCode2 = "5555555";
@@ -273,7 +273,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             return x;
         });
@@ -329,7 +329,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             x.Country = "INVALID";
             return x;
@@ -357,7 +357,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             return x;
         });
@@ -385,7 +385,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             x.IttSubjectCode1 = "Invalid1";
             x.IttSubjectCode2 = "Invalid2";
@@ -415,7 +415,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             x.IttQualCode = "InvalidIttQualCode";
             return x;
@@ -443,7 +443,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
             return x;
         });
@@ -470,7 +470,7 @@ public class QtsImporterTests : IAsyncLifetime
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = "InvalidOrg";
             return x;
         });
@@ -498,7 +498,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = account.AccountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = account.AccountNumber;
             return x;
         });
@@ -526,7 +526,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = "InvalidTrn";
             x.IttEstabCode = account.AccountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = account.AccountNumber;
             return x;
         });
@@ -554,7 +554,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = "Invalid";
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = account.AccountNumber;
             return x;
         });
@@ -587,7 +587,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             return x;
         });
 
@@ -614,7 +614,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttQualCode = "InvalidQual Code";
             return x;
         });
@@ -642,7 +642,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttSubjectCode1 = "Invalid Subject1";
             x.IttSubjectCode2 = "Invalid Subject2";
             return x;
@@ -673,7 +673,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqSubjectCode1 = "InvalidSubject1";
             x.PqSubjectCode2 = "InvalidSubject2";
             x.PqSubjectCode3 = "InvalidSubject3";
@@ -707,7 +707,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqEstabCode = "Invalid Org number";
             return x;
         });
@@ -735,7 +735,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.Country = "Invalid";
             return x;
         });
@@ -763,7 +763,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.PqQualCode = "Invalid Qualification Code";
             return x;
         });
@@ -793,7 +793,7 @@ public class QtsImporterTests : IAsyncLifetime
         {
             x.QtsRefNo = person.Trn!;
             x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString()!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.QtsStatus = qtsStatus;
             return x;
         });
