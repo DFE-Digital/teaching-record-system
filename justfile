@@ -20,7 +20,7 @@ restore:
 
 # Run the trscli
 cli *ARGS:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli"}} && dotnet {{"bin" / "Debug" / "net8.0" / "trscli.dll"}} {{ARGS}}
+  @dotnet {{solution-root / "src" / "TeachingRecordSystem.Cli" / "bin" / "Debug" / "net8.0" / "trscli.dll"}} {{ARGS}}
 
 # Build the .NET solution
 build:

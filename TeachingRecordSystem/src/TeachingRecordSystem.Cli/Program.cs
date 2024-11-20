@@ -16,6 +16,7 @@ var rootCommand = new RootCommand("Development tools for the Teaching Record Sys
     Commands.CreateSyncPersonCommand(configuration),
     Commands.CreateGenerateKeyCommand(configuration),
     Commands.CreateDropDqtReportingReplicationSlotCommand(configuration),
+    Commands.CreateGenerateWebhookSignatureCertificateCommand(configuration),
 };
 
 return await rootCommand.InvokeAsync(args);
