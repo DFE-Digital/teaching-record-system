@@ -254,7 +254,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         }
         else
         {
-            if (!DateOnly.TryParse(row.DateOfBirth, out _))
+            if (!DateOnly.TryParse(row.DateOfBirth, CultureInfo.InvariantCulture, out _))
             {
                 errors.Add($"Validation Failed: Invalid Date of Birth {row.DateOfBirth}");
             }
@@ -267,7 +267,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         }
         else
         {
-            if (!DateOnly.TryParse(row.QtsDate, out _))
+            if (!DateOnly.TryParse(row.QtsDate, CultureInfo.InvariantCulture, out _))
             {
                 errors.Add($"Validation Failed: Invalid QTS Date {row.QtsDate}");
             }
