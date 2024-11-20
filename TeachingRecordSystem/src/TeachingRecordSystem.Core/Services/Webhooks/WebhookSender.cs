@@ -82,7 +82,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
                     .WithCreatedNow()
                     .WithExpires(DateTimeOffset.UtcNow.AddMinutes(5))
                     .WithAlgorithm(SignatureAlgorithm.EcdsaP384Sha384)
-                    .WithKeyId("test")
+                    .WithKeyId(keyId)
                     .WithNonce(Guid.NewGuid().ToString("N"));
 
             return Options.Create(options);

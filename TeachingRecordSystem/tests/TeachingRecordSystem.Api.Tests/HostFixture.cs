@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using JustEat.HttpClientInterception;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -13,6 +14,7 @@ using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Api.Tests;
 
@@ -93,6 +95,25 @@ public class HostFixture : WebApplicationFactory<Program>
                 options.ClientSecret = "dummy";
                 options.BaseAddress = "dummy";
                 options.WebHookClientSecret = "dummy";
+            });
+
+            services.Configure<WebhookOptions>(options =>
+            {
+                using var key = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+                var certRequest = new CertificateRequest("CN=Teaching Record System Tests", key, HashAlgorithmName.SHA384);
+                using var cert = certRequest.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddDays(1));
+                var certPem = cert.ExportCertificatePem();
+                var keyPem = key.ExportECPrivateKeyPem();
+
+                options.CanonicalDomain = "http://localhost";
+                options.SigningKeyId = "testkey";
+                options.Keys = [
+                    new WebhookOptionsKey()
+                    {
+                        KeyId = "testkey",
+                        CertificatePem = certPem,
+                        PrivateKeyPem = keyPem,
+                    }];
             });
 
             services.AddHttpClient("EvidenceFiles")

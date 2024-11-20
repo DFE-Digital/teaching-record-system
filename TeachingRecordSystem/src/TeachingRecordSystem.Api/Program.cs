@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Optional;
+using TeachingRecordSystem.Api.Endpoints;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
 using TeachingRecordSystem.Api.Infrastructure.ApplicationModel;
 using TeachingRecordSystem.Api.Infrastructure.Filters;
@@ -30,6 +31,7 @@ using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 
@@ -221,7 +223,8 @@ public class Program
             .AddDistributedLocks()
             .AddIdentityApi()
             .AddNameSynonyms()
-            .AddDqtOutboxMessageSerializer();
+            .AddDqtOutboxMessageSerializer()
+            .AddWebhookOptions();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();
@@ -274,6 +277,7 @@ public class Program
         });
 
         app.MapWebHookEndpoints();
+        app.MapWebhookJwks();
 
         app.MapControllers();
 
