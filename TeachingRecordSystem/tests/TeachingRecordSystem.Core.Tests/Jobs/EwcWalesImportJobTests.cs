@@ -485,7 +485,7 @@ public class EwcWalesImportJobTests : IAsyncLifetime
         Assert.NotEmpty(results.FailureMessage);
     }
 
-    [Fact](Skip = "disabled until CI tests stop failing")
+    [Fact(Skip = "disabled until CI tests stop failing")]
     public async Task EwcWalesImportJobInduction_WithInvalidTRN_ReturnsExpectedCounts()
     {
         // Arrange
