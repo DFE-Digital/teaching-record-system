@@ -76,10 +76,10 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
     public async Task EwcWalesImportJobQts_ImportsQtsFileSuccessfully()
     {
         // Arrange
-        //var totalRowCount = 1;
-        //var successCount = 1;
-        //var duplicateRowCount = 0;
-        //var failureRowCount = 0;
+        var totalRowCount = 1;
+        var successCount = 1;
+        var duplicateRowCount = 0;
+        var failureRowCount = 0;
         var fileName = "QTS.csv";
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn = person.Trn;
@@ -95,23 +95,23 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         using var ctx = new DqtCrmServiceContext(OrganisationService);
         var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == results.IntegrationTransactionId);
         var ITRecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == results.IntegrationTransactionId);
-        //var qualification = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person.ContactId);
-        //var itt = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person.ContactId);
-        //var qts = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.ContactId);
-        //Assert.NotNull(integrationTransaction);
-        //Assert.Collection(ITRecords, item1 =>
-        //{
-        //    Assert.Empty(item1.dfeta_FailureMessage);
-        //});
-        //Assert.NotNull(qualification);
-        //Assert.NotNull(itt);
-        //Assert.NotNull(qts);
-        //Assert.Equal(totalRowCount, results.TotalCount);
-        //Assert.Equal(successCount, results.SuccessCount);
-        //Assert.Equal(duplicateRowCount, results.DuplicateCount);
-        //Assert.Equal(failureRowCount, results.FailureCount);
-        Assert.Equal(String.Empty, results.FailureMessage);
-        //Assert.Equal(fileName, integrationTransaction.dfeta_Filename);
+        var qualification = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person.ContactId);
+        var itt = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person.ContactId);
+        var qts = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.ContactId);
+        Assert.NotNull(integrationTransaction);
+        Assert.Collection(ITRecords, item1 =>
+        {
+            Assert.Empty(item1.dfeta_FailureMessage);
+        });
+        Assert.NotNull(qualification);
+        Assert.NotNull(itt);
+        Assert.NotNull(qts);
+        Assert.Equal(totalRowCount, results.TotalCount);
+        Assert.Equal(successCount, results.SuccessCount);
+        Assert.Equal(duplicateRowCount, results.DuplicateCount);
+        Assert.Equal(failureRowCount, results.FailureCount);
+        Assert.Empty(results.FailureMessage);
+        Assert.Equal(fileName, integrationTransaction.dfeta_Filename);
     }
 
     [Fact(Skip = "disabled until CI tests stop failing")]
