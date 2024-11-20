@@ -27,12 +27,10 @@ public class EwcWalesImportJobTests : IAsyncLifetime
             referenceDataCache,
             Clock);
 
-
         var blobServiceClient = new Mock<BlobServiceClient>();
         var qtsImporter = ActivatorUtilities.CreateInstance<QtsImporter>(provider);
         var inductionImporter = ActivatorUtilities.CreateInstance<InductionImporter>(provider);
         Job = ActivatorUtilities.CreateInstance<EwcWalesImportJob>(provider, blobServiceClient.Object, qtsImporter, inductionImporter);
-        OrganisationService = provider.GetService<IOrganizationServiceAsync2>()!;
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
             OrganisationService,
