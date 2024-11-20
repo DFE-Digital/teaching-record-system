@@ -553,7 +553,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
             return (EwcWalesMatchStatus.MultipleTrnMatched, null);
 
         var contact = contacts.First().Value!;
-        if (DateOnly.TryParse(item.DateOfBirth, out DateOnly dob))
+        if (DateOnly.TryParse(item.DateOfBirth, CultureInfo.InvariantCulture, out DateOnly dob))
         {
             if (contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) != dob)
             {
