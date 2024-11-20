@@ -39,7 +39,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Equal(importType, type);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJob_InvalidImportFileNameReturnsError()
     {
         // Arrange
@@ -114,7 +114,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Equal(fileName, integrationTransaction.dfeta_Filename);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobQts_SingleSuccessAndFailure_ReturnsExpectedCounts()
     {
         // Arrange
@@ -161,7 +161,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Contains(expectedValueMessage, results.FailureMessage, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobQts_MultipleSuccessMultipleFailure_ReturnsExpectedCounts()
     {
         // Arrange
@@ -231,7 +231,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Contains(expectedValueMessage2, results.FailureMessage, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobQts_WithQualifiedTeacherQTSStatus_ReturnsSuccess()
     {
         // Arrange
@@ -275,7 +275,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Empty(results.FailureMessage);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobInduction_NoExistingInduction_CreatesInductionAndReturnsExpectedCounts()
     {
         // Arrange
@@ -318,7 +318,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Empty(results.FailureMessage);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobInduction_DateOfBirthDoesNotMatch_FailsReturnsExpectedCounts()
     {
         // Arrange
@@ -365,7 +365,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.NotEmpty(results.FailureMessage);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobInduction_ValidRow_ReturnsSuccessAndExpectedCounts()
     {
         // Arrange
@@ -415,7 +415,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Empty(results.FailureMessage);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobInduction_WithInvalidEmployerCode_ReturnsExpectedCounts()
     {
         // Arrange
@@ -456,7 +456,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.NotEmpty(results.FailureMessage);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobInduction_WithInvalidTRN_ReturnsExpectedCounts()
     {
         // Arrange
@@ -504,7 +504,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
     }
 
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJob_ImportsInvalidFileType_ReturnsExpected()
     {
         // Arrange
@@ -537,7 +537,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Equal(failureMessage, results.FailureMessage);
     }
 
-    [Fact(Skip = "disabled until CI tests stop failing")]
+    [Fact]
     public async Task EwcWalesImportJobInduction_ImportsInductionFileSuccessfully()
     {
         // Arrange
