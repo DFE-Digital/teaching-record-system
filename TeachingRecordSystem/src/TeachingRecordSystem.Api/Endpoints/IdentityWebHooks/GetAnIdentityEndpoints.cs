@@ -41,9 +41,9 @@ public static class GetAnIdentityEndpoints
 
     public static IEndpointConventionBuilder MapIdentityEndpoints(this IEndpointRouteBuilder builder)
     {
-        return builder.MapGroup("/identity")
+        return builder
             .MapPost(
-                "",
+                "/webhooks/identity",
                 async (
                     HttpContext context,
                     IOptions<GetAnIdentityOptions> identityOptions,
