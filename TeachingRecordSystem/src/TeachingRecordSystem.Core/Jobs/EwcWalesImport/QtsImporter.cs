@@ -254,7 +254,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         }
         else
         {
-            if (!DateOnly.TryParse(row.DateOfBirth, CultureInfo.InvariantCulture, out _))
+            if (!DateOnly.TryParseExact(row.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 errors.Add($"Validation Failed: Invalid Date of Birth {row.DateOfBirth}");
             }
@@ -555,7 +555,7 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         var contact = contacts.First().Value!;
         if (DateOnly.TryParse(item.DateOfBirth, CultureInfo.InvariantCulture, out DateOnly dob))
         {
-            if (contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) != dob)
+            if (contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dob)
             {
                 return (EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed, null);
             }
