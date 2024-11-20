@@ -259,7 +259,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         }
         else
         {
-            if (!DateTime.TryParse(row.DateOfBirth, out _))
+            if (!DateOnly.TryParseExact(row.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 errors.Add("Validation Failed: Invalid Date of Birth");
             }
@@ -272,8 +272,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         }
         else
         {
-            DateTime date;
-            if (!DateTime.TryParse(row.StartDate, out date))
+            if (!DateOnly.TryParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 errors.Add("Validation Failed: Invalid Induction start date");
             }
@@ -286,8 +285,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         }
         else
         {
-            DateTime date;
-            if (!DateTime.TryParse(row.PassedDate, out date))
+            if (!DateOnly.TryParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
             {
                 errors.Add("Validation Failed: Invalid Induction passed date");
             }
@@ -412,9 +410,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         }
 
         var contact = contacts.First().Value!;
-        if (DateOnly.TryParse(item.DateOfBirth, out DateOnly dob))
+        if (DateOnly.TryParseExact(item.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob))
         {
-            if (contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) != dob)
+            if (contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dob)
             {
                 return (EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed, null);
             }
