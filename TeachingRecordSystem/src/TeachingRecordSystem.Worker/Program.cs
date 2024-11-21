@@ -15,6 +15,7 @@ using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 using TeachingRecordSystem.Worker.Infrastructure.Logging;
 
@@ -42,7 +43,8 @@ builder
     .AddEmail()
     .AddIdentityApi()
     .AddNameSynonyms()
-    .AddDqtOutboxMessageProcessorService();
+    .AddDqtOutboxMessageProcessorService()
+    .AddWebhookDeliveryService();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
