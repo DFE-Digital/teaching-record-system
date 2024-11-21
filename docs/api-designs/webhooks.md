@@ -66,10 +66,17 @@ If after the final retry the message was still not delivered successfully no fur
 
 ## Verifying the webhook
 
-Follow [the spec](https://www.rfc-editor.org/rfc/rfc9421.html#name-verifying-a-signature) for verifying the webhook's signature.
-You will be given a public key to use for verifying webhooks when your endpoint is configured.
+See [the spec](https://www.rfc-editor.org/rfc/rfc9421.html#name-verifying-a-signature) for the details of how to verify the webhook's signature.
 
-The `ping` message can be used to aid verification.
+Signatures are made up of `content-digest`, `content-length`, `ce-id`, `ce-type`, and `ce-time` HTTP header components and the `target-uri` derived component.
+
+Each environment publishes the certificates to use for verification at `/webhook-jwks` (see [README.md](../../README.md#Environments) for the environment-specific base URL).
+Each HTTP message signature contains the ID of the key that was used to sign the request.
+Find the corresponding keys in the `/webhook-jwks` (identified by the `kid` parameter) and use this to verify the signature.
+
+Note that certificates are rotated from time-to-time so these should not be hard-coded anywhere or cached for too long.
+
+The `ping` message can be used during development to help with testing verification.
 
 
 ## Message types
