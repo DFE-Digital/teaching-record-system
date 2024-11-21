@@ -52,12 +52,12 @@ See the [changelog](CHANGELOG.md) for the details of what has changed between ve
 
 ## Environments
 
-| Name           | URL                                                         |
-| -------------- | ----------------------------------------------------------- |
-| Production     | https://teacher-qualifications-api.education.gov.uk         |
+| Name           | API URL |
+| --- | --- |
+| Production     | https://teacher-qualifications-api.education.gov.uk |
 | Pre-production | https://preprod.teacher-qualifications-api.education.gov.uk |
-| Test           | https://test.teacher-qualifications-api.education.gov.uk/   |
-| Development    | https://dev.teacher-qualifications-api.education.gov.uk/    |
+| Test           | https://test.teacher-qualifications-api.education.gov.uk/ |
+| Development    | https://dev.teacher-qualifications-api.education.gov.uk/ |
 
 
 ## Developer setup
