@@ -7,6 +7,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -41,7 +42,7 @@ builder
     .AddEmail()
     .AddIdentityApi()
     .AddNameSynonyms()
-    /*.AddDqtOutboxMessageProcessorService()*/;
+    .AddDqtOutboxMessageProcessorService();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
