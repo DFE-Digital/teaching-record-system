@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
@@ -110,8 +110,8 @@ public class CreateTrnRequestTests : TestBase
                         addressLine2 = addressLine2,
                         addressLine3 = addressLine3,
                         city = city,
-                        postalCode = postcode,
-                        Country = country,
+                        postcode = postcode,
+                        country = country,
                     },
                     genderCode = gender
                 },
@@ -174,8 +174,8 @@ public class CreateTrnRequestTests : TestBase
                         addressLine2 = addressLine2,
                         addressLine3 = addressLine3,
                         city = city,
-                        postalCode = postcode,
-                        Country = country,
+                        postcode = postcode,
+                        country = country,
                     },
                     genderCode = gender
                 },
@@ -195,7 +195,7 @@ public class CreateTrnRequestTests : TestBase
                 { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.AddressLine1)}", $"The length of 'Person Address Address Line1' must be {AttributeConstraints.Contact.Address1_Line1MaxLength} characters or fewer. You entered 255 characters."},
                 { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.AddressLine2)}", $"The length of 'Person Address Address Line2' must be {AttributeConstraints.Contact.Address1_Line2MaxLength} characters or fewer. You entered 255 characters."},
                 { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.AddressLine3)}", $"The length of 'Person Address Address Line3' must be {AttributeConstraints.Contact.Address1_Line3MaxLength} characters or fewer. You entered 255 characters."},
-                { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.PostalCode)}", $"The length of 'Person Address Postal Code' must be {AttributeConstraints.Contact.Address1_PostalCodeLength} characters or fewer. You entered 255 characters."},
+                { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.Postcode)}", $"The length of 'Person Address Postcode' must be {AttributeConstraints.Contact.Address1_PostalCodeLength} characters or fewer. You entered 255 characters."},
                 { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.City)}", $"The length of 'Person Address City' must be {AttributeConstraints.Contact.Address1_CityMaxLength} characters or fewer. You entered 255 characters."},
                 { $"{nameof(CreateTrnRequestRequest.Person)}.{nameof(CreateTrnRequestRequestPerson.Address)}.{nameof(CreateTrnRequestAddress.Country)}", $"The length of 'Person Address Country' must be {AttributeConstraints.Contact.Address1_CountryMaxLength} characters or fewer. You entered 255 characters."},
             });

@@ -4,7 +4,6 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Core.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.ApiModels;
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
@@ -44,9 +43,9 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             AddressLine1 = request.Person.Address?.AddressLine1,
             AddressLine2 = request.Person.Address?.AddressLine2,
             AddressLine3 = request.Person.Address?.AddressLine3,
-            GenderCode = request.Person.GenderCode?.ConvertToContact_GenderCode(),
+            GenderCode = request.Person.GenderCode.HasValue ? Core.SharedModels.GenderExtensions.ConvertToContact_GenderCode(request.Person.GenderCode!.Value) : null,
             City = request.Person.Address?.City,
-            PostalCode = request.Person.Address?.PostalCode,
+            Postcode = request.Person.Address?.Postcode,
             Country = request.Person.Address?.Country,
         };
         var result = await handler.HandleAsync(command);

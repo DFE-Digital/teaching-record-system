@@ -28,7 +28,7 @@ public record CreateTrnRequestCommand
     public required string? AddressLine2 { get; set; }
     public required string? AddressLine3 { get; set; }
     public required string? City { get; set; }
-    public required string? PostalCode { get; set; }
+    public required string? Postcode { get; set; }
     public required string? Country { get; set; }
 }
 
@@ -163,7 +163,7 @@ public class CreateTrnRequestHandler(
             Address1Line2 = command.AddressLine2,
             Address1Line3 = command.AddressLine3,
             Address1City = command.City,
-            Address1PostalCode = command.PostalCode,
+            Address1PostalCode = command.Postcode,
             Address1Country = command.Country
         });
 

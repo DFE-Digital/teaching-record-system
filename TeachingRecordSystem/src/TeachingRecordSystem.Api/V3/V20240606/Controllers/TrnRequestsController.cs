@@ -44,7 +44,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             AddressLine2 = null,
             AddressLine3 = null,
             City = null,
-            PostalCode = null,
+            Postcode = null,
             GenderCode = null,
             Country = null
         };

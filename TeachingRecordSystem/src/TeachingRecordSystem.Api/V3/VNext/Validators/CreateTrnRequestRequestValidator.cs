@@ -28,7 +28,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             .MaximumLength(AttributeConstraints.Contact.Address1_CountryMaxLength)
             .When(r => r.Person.Address != null);
 
-        RuleFor(r => r.Person.Address!.PostalCode)
+        RuleFor(r => r.Person.Address!.Postcode)
             .MaximumLength(AttributeConstraints.Contact.Address1_PostalCodeLength)
             .When(r => r.Person.Address != null);
 

@@ -1,5 +1,5 @@
 
-using TeachingRecordSystem.Api.V3.VNext.ApiModels;
+using TeachingRecordSystem.Api.V3.Core.SharedModels;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Requests;
 
@@ -14,17 +14,17 @@ public partial record CreateTrnRequestRequest
 [GenerateVersionedDto(typeof(V20240606.Requests.CreateTrnRequestRequestPerson))]
 public partial record CreateTrnRequestRequestPerson
 {
-    public CreateTrnRequestAddress? Address { get; set; }
-    public Gender? GenderCode { get; set; }
+    public CreateTrnRequestAddress? Address { get; init; }
+    public Gender? GenderCode { get; init; }
 }
 
 public class CreateTrnRequestAddress
 {
-    public required string? AddressLine1 { get; set; }
-    public required string? AddressLine2 { get; set; }
-    public required string? AddressLine3 { get; set; }
-    public required string? City { get; set; }
-    public required string? PostalCode { get; set; }
-    public required string? Country { get; set; }
+    public string? AddressLine1 { get; init; }
+    public string? AddressLine2 { get; init; }
+    public string? AddressLine3 { get; init; }
+    public string? City { get; init; }
+    public string? Postcode { get; init; }
+    public string? Country { get; init; }
 }
 

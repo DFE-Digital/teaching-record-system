@@ -1,15 +1,12 @@
-#nullable disable
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.VNext.ApiModels;
+namespace TeachingRecordSystem.Api.V3.Core.SharedModels;
 
 public enum Gender
 {
     Male = 1,
     Female = 2,
-    Other = 389040000,
-    NotAvailable = 389040002,
-    NotProvided = 389040001,
+    Other = 3
 }
 
 public static class GenderExtensions
