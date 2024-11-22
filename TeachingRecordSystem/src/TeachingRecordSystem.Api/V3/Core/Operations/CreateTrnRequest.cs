@@ -23,6 +23,13 @@ public record CreateTrnRequestCommand
     public required string? NationalInsuranceNumber { get; init; }
     public required bool? IdentityVerified { get; init; }
     public required string? OneLoginUserSubject { get; init; }
+    public required Contact_GenderCode? GenderCode { get; set; }
+    public required string? AddressLine1 { get; set; }
+    public required string? AddressLine2 { get; set; }
+    public required string? AddressLine3 { get; set; }
+    public required string? City { get; set; }
+    public required string? Postcode { get; set; }
+    public required string? Country { get; set; }
 }
 
 public class CreateTrnRequestHandler(
@@ -144,14 +151,20 @@ public class CreateTrnRequestHandler(
             StatedMiddleName = command.MiddleName ?? "",
             StatedLastName = command.LastName,
             DateOfBirth = command.DateOfBirth,
-            Gender = Contact_GenderCode.Notavailable,
+            Gender = command.GenderCode ?? Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
-            OutboxMessages = outboxMessages
+            OutboxMessages = outboxMessages,
+            Address1Line1 = command.AddressLine1,
+            Address1Line2 = command.AddressLine2,
+            Address1Line3 = command.AddressLine3,
+            Address1City = command.City,
+            Address1PostalCode = command.Postcode,
+            Address1Country = command.Country
         });
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;

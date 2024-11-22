@@ -39,7 +39,14 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             EmailAddresses = request.Person.EmailAddresses ?? [],
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
             IdentityVerified = request.IdentityVerified,
-            OneLoginUserSubject = request.OneLoginUserSubject
+            OneLoginUserSubject = request.OneLoginUserSubject,
+            AddressLine1 = request.Person.Address?.AddressLine1,
+            AddressLine2 = request.Person.Address?.AddressLine2,
+            AddressLine3 = request.Person.Address?.AddressLine3,
+            GenderCode = request.Person.GenderCode.HasValue ? Core.SharedModels.GenderExtensions.ConvertToContact_GenderCode(request.Person.GenderCode!.Value) : null,
+            City = request.Person.Address?.City,
+            Postcode = request.Person.Address?.Postcode,
+            Country = request.Person.Address?.Country,
         };
         var result = await handler.HandleAsync(command);
 
