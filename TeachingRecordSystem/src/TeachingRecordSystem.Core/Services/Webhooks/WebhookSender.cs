@@ -14,7 +14,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.Core.Services.Webhooks;
 
-public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optionsAccessor)
+public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optionsAccessor) : IWebhookSender
 {
     public const string TagName = "trs-webhooks";
     private const string DataContentType = "application/json; charset=utf-8";

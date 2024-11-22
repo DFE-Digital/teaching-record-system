@@ -14,4 +14,16 @@ public static class HostApplicationBuilderExtensions
 
         return builder;
     }
+
+    public static IHostApplicationBuilder AddWebhookDeliveryService(this IHostApplicationBuilder builder)
+    {
+        AddWebhookOptions(builder);
+
+        builder.Services.AddSingleton<IWebhookSender, WebhookSender>();
+        WebhookSender.AddHttpClient(builder.Services);
+
+        builder.Services.AddSingleton<IHostedService, WebhookDeliveryService>();
+
+        return builder;
+    }
 }
