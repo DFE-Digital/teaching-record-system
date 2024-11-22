@@ -1,0 +1,2 @@
+alter table trs_persons add dqt_induction_last_sync datetime
+alter table trs_persons add dqt_induction_modified_on datetime
