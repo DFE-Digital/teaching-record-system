@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240606.ApiModels;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Controllers;
 

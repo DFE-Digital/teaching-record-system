@@ -1,10 +1,10 @@
 using AutoMapper.Configuration.Annotations;
 using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
-using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.Responses;
-using TeachingRecordSystem.Api.V3.V20240920.ApiModels;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
 
@@ -65,13 +65,13 @@ public partial record GetPersonResponseInitialTeacherTraining
     [ValueConverter(typeof(WrapWithOptionValueConverter<DateOnly?>))]
     public required Option<DateOnly?> EndDate { get; init; }
 
-    [ValueConverter(typeof(WrapWithOptionValueConverter<Core.SharedModels.IttProgrammeType?, IttProgrammeType?>))]
+    [ValueConverter(typeof(WrapWithOptionValueConverter<Implementation.Dtos.IttProgrammeType?, IttProgrammeType?>))]
     public required Option<IttProgrammeType?> ProgrammeType { get; init; }
 
     [ValueConverter(typeof(WrapWithOptionValueConverter<string?>))]
     public required Option<string?> ProgrammeTypeDescription { get; init; }
 
-    [ValueConverter(typeof(WrapWithOptionValueConverter<Core.SharedModels.IttOutcome?, IttOutcome?>))]
+    [ValueConverter(typeof(WrapWithOptionValueConverter<Implementation.Dtos.IttOutcome?, IttOutcome?>))]
     public required Option<IttOutcome?> Result { get; init; }
 
     [ValueConverter(typeof(WrapWithOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetPersonResponseInitialTeacherTrainingAgeRange>))]

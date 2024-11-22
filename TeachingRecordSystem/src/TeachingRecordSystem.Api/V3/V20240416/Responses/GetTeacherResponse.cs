@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Api.V3.Core.Operations;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 namespace TeachingRecordSystem.Api.V3.V20240416.Responses;
 

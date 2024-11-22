@@ -1,5 +1,5 @@
 using Microsoft.Xrm.Sdk;
-using TeachingRecordSystem.Api.V3.Core.SharedModels;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.V20240920.Requests;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20240920;

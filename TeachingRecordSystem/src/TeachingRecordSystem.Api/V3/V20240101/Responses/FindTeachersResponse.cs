@@ -1,6 +1,6 @@
-using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240101.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
 
