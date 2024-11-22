@@ -70,6 +70,7 @@
     <None Remove="Services\DqtReporting\Migrations\0035_TrsEventsSyncMetadata.sql" />
     <None Remove="Services\DqtReporting\Migrations\0036_TrsPersonsInduction.sql" />
     <None Remove="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -138,6 +139,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0035_TrsEventsSyncMetadata.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0036_TrsPersonsInduction.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
   </ItemGroup>
 
   <ItemGroup>
