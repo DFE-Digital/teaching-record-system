@@ -6195,6 +6195,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
 			public const string dfeta_PersonId = "dfeta_personid";
 			public const string dfeta_StartDate = "dfeta_startdate";
+			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_induction_dfeta_inductionperiod = "dfeta_dfeta_induction_dfeta_inductionperiod";
 			public const string dfeta_dfeta_induction_dfeta_qtsregistration = "dfeta_dfeta_induction_dfeta_qtsregistration";
@@ -6411,6 +6412,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_StartDate");
 				this.SetAttributeValue("dfeta_startdate", value);
 				this.OnPropertyChanged("dfeta_StartDate");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the record was modified.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("modifiedon")]
+		public System.Nullable<System.DateTime> ModifiedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("modifiedon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("ModifiedOn");
+				this.SetAttributeValue("modifiedon", value);
+				this.OnPropertyChanged("ModifiedOn");
 			}
 		}
 		

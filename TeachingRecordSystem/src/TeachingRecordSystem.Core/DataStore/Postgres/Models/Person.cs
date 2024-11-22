@@ -15,7 +15,7 @@ public class Person
     public required DateOnly? DateOfBirth { get; set; }  // A few DQT records in prod have a null DOB
     public string? EmailAddress { get; set; }
     public string? NationalInsuranceNumber { get; set; }
-    public InductionStatus? InductionStatus { get; private set; }  // Nullable until migration has populated the value for all records
+    public InductionStatus InductionStatus { get; private set; }
     public InductionExemptionReason? InductionExemptionReason { get; private set; }
     public DateOnly? InductionStartDate { get; private set; }
     public DateOnly? InductionCompletedDate { get; private set; }
@@ -32,6 +32,9 @@ public class Person
     public string? DqtFirstName { get; set; }
     public string? DqtMiddleName { get; set; }
     public string? DqtLastName { get; set; }
+    public DateTime? DqtInductionLastSync { get; set; }
+    public DateTime? DqtInductionModifiedOn { get; set; }
+
 
     public void SetInductionStatus(InductionStatus status, DateOnly? startDate, DateOnly? completedDate, InductionExemptionReason? exemptionReason)
     {
