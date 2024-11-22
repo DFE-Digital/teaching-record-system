@@ -29,7 +29,7 @@ public class SetQtlsDateHandler : ICrmQueryHandler<SetQtlsDateQuery, bool>
             Target = new Contact()
             {
                 Id = query.ContactId,
-                dfeta_qtlsdate = query.QtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false)
+                dfeta_qtlsdate = query.QtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: true)
             }
         });
         await requestBuilder.ExecuteAsync();
