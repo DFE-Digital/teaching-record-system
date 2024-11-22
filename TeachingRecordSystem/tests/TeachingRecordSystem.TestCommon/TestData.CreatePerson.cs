@@ -322,7 +322,6 @@ public partial class TestData
                 dfeta_StatedMiddleName = statedMiddleName,
                 dfeta_StatedLastName = lastName,
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
-                dfeta_TRN = trn,
                 GenderCode = gender,
                 dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
                 dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestHelper.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
@@ -330,6 +329,12 @@ public partial class TestData
                 dfeta_SlugId = _slugId,
                 dfeta_loginfailedcounter = _loginFailedCounter
             };
+
+            // The conditional is to work around issue in CRM where an explicit `null` TRN breaks a plugin
+            if (trn is not null)
+            {
+                contact.dfeta_TRN = trn;
+            }
 
             if (_email is not null)
             {
