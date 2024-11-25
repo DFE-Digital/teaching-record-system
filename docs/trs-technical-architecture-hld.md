@@ -8,7 +8,7 @@ group tscloud(cloud)[Teacher Services Cloud]
 service tscfrontdoor(server)[TS Front Door CDN] in tscloud
 service tscloadbalancers(server)[TS Load Balancers] in tscloud
 group clustervn(cloud)[Cluster Virtual Network] in tscloud
-service nginix(server)[TS Nginix ingress controller] in clustervn
+service nginx(server)[TS Nginx ingress controller] in clustervn
 group aks(server)[TRS AKS Pod Workloads] in clustervn
 service trsapi(server)[TRS API] in aks
 service trsworker(server)[TRS Worker] in aks
