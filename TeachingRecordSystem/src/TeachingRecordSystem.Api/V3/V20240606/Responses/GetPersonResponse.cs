@@ -1,6 +1,6 @@
 using Optional;
-using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240606.Responses;
 
@@ -29,11 +29,11 @@ public partial record GetPersonResponse
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
-[AutoMap(typeof(Core.SharedModels.QtsInfo))]
+[AutoMap(typeof(Implementation.Dtos.QtsInfo))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseQts))]
 public partial record GetPersonResponseQts;
 
-[AutoMap(typeof(Core.SharedModels.EytsInfo))]
+[AutoMap(typeof(Implementation.Dtos.EytsInfo))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseEyts))]
 public partial record GetPersonResponseEyts;
 

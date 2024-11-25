@@ -190,7 +190,7 @@ public class Program
         services.Scan(scan =>
         {
             scan.FromAssemblyOf<Program>()
-                .AddClasses(filter => filter.InNamespaces("TeachingRecordSystem.Api.V3.Core.Operations").Where(type => type.Name.EndsWith("Handler")))
+                .AddClasses(filter => filter.InNamespaces("TeachingRecordSystem.Api.V3.Implementation.Operations").Where(type => type.Name.EndsWith("Handler")))
                     .AsSelf()
                     .WithTransientLifetime();
 

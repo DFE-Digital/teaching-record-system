@@ -1,7 +1,7 @@
 using System.Net;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.V20240307.ApiModels;
 using TeachingRecordSystem.Api.V3.V20240307.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240307.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;

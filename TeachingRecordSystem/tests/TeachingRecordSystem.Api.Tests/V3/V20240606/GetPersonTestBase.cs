@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.Xrm.Sdk;
-using TeachingRecordSystem.Api.V3.Core.SharedModels;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.Dqt;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -573,8 +573,8 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
     {
         var ittStartDate = new DateOnly(2021, 9, 7);
         var ittEndDate = new DateOnly(2022, 7, 29);
-        var ittProgrammeType = Api.V3.V20240101.ApiModels.IttProgrammeType.EYITTGraduateEntry;
-        var ittResult = Api.V3.V20240101.ApiModels.IttOutcome.Pass;
+        var ittProgrammeType = Core.ApiSchema.V3.V20240101.Dtos.IttProgrammeType.EYITTGraduateEntry;
+        var ittResult = Core.ApiSchema.V3.V20240101.Dtos.IttOutcome.Pass;
         var ittAgeRangeFrom = dfeta_AgeRange._11;
         var ittAgeRangeTo = dfeta_AgeRange._16;
         var ittProviderName = Faker.Company.Name();

@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using AutoMapper.Configuration.Annotations;
 using Optional;
-using TeachingRecordSystem.Api.V3.Core.Operations;
-using TeachingRecordSystem.Api.V3.V20240101.ApiModels;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240101.Responses;
 
@@ -32,7 +32,7 @@ public record GetTeacherResponse
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
-[AutoMap(typeof(Core.SharedModels.QtsInfo))]
+[AutoMap(typeof(Implementation.Dtos.QtsInfo))]
 public record GetTeacherResponseQts
 {
     public required DateOnly? Awarded { get; init; }
@@ -40,7 +40,7 @@ public record GetTeacherResponseQts
     public required string? StatusDescription { get; init; }
 }
 
-[AutoMap(typeof(Core.SharedModels.EytsInfo))]
+[AutoMap(typeof(Implementation.Dtos.EytsInfo))]
 public record GetTeacherResponseEyts
 {
     public required DateOnly? Awarded { get; init; }
@@ -53,7 +53,7 @@ public record GetTeacherResponseInduction
 {
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
-    public required TeachingRecordSystem.Api.V3.V20240101.ApiModels.InductionStatus? Status { get; init; }
+    public required TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.InductionStatus? Status { get; init; }
     public required string? StatusDescription { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }

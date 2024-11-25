@@ -1,5 +1,5 @@
 using System.Net;
-using TeachingRecordSystem.Api.V3.Core.Operations;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20240920;
