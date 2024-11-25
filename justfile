@@ -1,3 +1,9 @@
+shebang := if os() == 'windows' {
+  'pwsh -nop'
+} else {
+  '/usr/bin/env pwsh -nop'
+}
+
 set shell := ["pwsh", "-nop", "-c"]
 
 solution-root := "TeachingRecordSystem"
@@ -37,7 +43,7 @@ format:
 
 # Format any un-committed .tf or .cs files
 format-changed:
-  #!pwsh -nop
+  #!{{shebang}}
 
   function Get-ChangedFiles {
     param (
