@@ -1,11 +1,13 @@
 # teaching-record-system
-Note: Any diagrams in .jpg files can be rendered using the [.dsl files and https://structurizr.com/dsl](docs/c4-diagrams-as-code/)
+Note: Any diagrams in .jpg files can be rendered using the [.dsl files and https://structurizr.com/dsl](docs/c4-diagrams-as-code)
 
 Provides an API over the Database of Qualified Teachers (DQT). Provides the core Teaching record and will eventually replace the Database of Qualified Teachers (DQT).
 
-# High level architecture (showing one of the citizen facing services that make use of the TRS API)
+# High level architecture
 * [Teaching Record System High Level Architecture (just showing core components)](docs/c4-diagrams-as-code/trs-core-containers.jpg)
 * [Logical Data Model](docs/logical-data-model.md)
+* [Data Integrations](docs/trs-data-integrations.md)
+* [Technical Architecture](docs/trs-technical-architecture-hld.md)
 
 # Data Integrations **
 TRS provides the the core teaching record data to a number of internal and external facing digital services:
