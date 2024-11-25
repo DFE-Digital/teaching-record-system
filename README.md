@@ -68,22 +68,31 @@ See the [changelog](CHANGELOG.md) for the details of what has changed between ve
 
 The API is an ASP.NET Core 8 web application. To develop locally you will need the following installed:
 - Visual Studio 2022 (or the .NET 8 SDK and an alternative IDE/editor);
-- a local Postgres 13+ instance.
-- [SASS]( https://sass-lang.com/install).
+- a local Postgres 15+ instance;
+- NPM.
 
 A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH` as well as [PowerShell](https://microsoft.com/PowerShell).
 
 If you're working on infrastructure you will also need:
 - make;
 - Terraform;
+- Azure CLI;
 - bash.
 
 ### Local tools setup
 
-dotnet-format is required for linting. A `just` recipe will install it:
+A `just` recipe will install the required local tools:
 ```shell
 just install-tools
 ```
+
+### Restore dependencies
+
+As well as NuGet packages, there are some client-side libraries required. A `just` recipe will install both:
+```shell
+just restore
+```
+
 
 ### Database setup
 
@@ -107,8 +116,8 @@ The databases will be created automatically when running the tests.
 #### DQT Reporting database setup
 
 This solution contains a service that synchronises changes from CRM into a SQL Server database used for reporting (this replaces the now-deprecated Data Export Service).
-It also synronises selected tables from TRS.
-By default this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
+It also synchronises selected tables from TRS.
+By default, this is disabled for local development. For the tests to pass, you will need a test database and a connection string defined in user secrets e.g.
 ```shell
 just set-tests-secret DqtReporting:ReportingDbConnectionString "Data Source=(local);Initial Catalog=DqtReportingTests;Integrated Security=Yes;TrustServerCertificate=True"
 ```
