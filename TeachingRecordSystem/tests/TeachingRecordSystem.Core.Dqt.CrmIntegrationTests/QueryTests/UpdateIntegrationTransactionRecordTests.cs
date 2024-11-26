@@ -19,7 +19,6 @@ public class UpdateIntegrationTransactionRecordTests : IAsyncLifetime
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        using var txn = _crmQueryDispatcher.CreateTransactionRequestBuilder();
         var activeNpqQualificationType = dfeta_qualification_dfeta_Type.NPQLT;
         var activeNpqQualificationId = Guid.NewGuid();
         var startDate = new DateTime(2011, 01, 1);
@@ -29,7 +28,7 @@ public class UpdateIntegrationTransactionRecordTests : IAsyncLifetime
         var statusCode = dfeta_integrationtransactionrecord_StatusCode.Fail;
         var failureMessage = "THIS IS A FAILURE MESSAGE";
         var fileName = "QTS_FAILEDFILE.csv";
-        var itrId = Guid.NewGuid();
+        Guid? itrId = null;
 
         var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
@@ -48,23 +47,31 @@ public class UpdateIntegrationTransactionRecordTests : IAsyncLifetime
         };
         var integrationTransactionId = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
-        var recordQuery = new CreateIntegrationTransactionRecordQuery()
+        var recordQuery = new CreateIntegrationTransactionRecordTransactionalQuery()
         {
-            Id = itrId,
             IntegrationTransactionId = integrationTransactionId,
             Reference = reference,
-            PersonId = person.PersonId,
+            ContactId = person.PersonId,
             InitialTeacherTrainingId = null,
             QualificationId = null,
             InductionId = null,
             InductionPeriodId = null,
             DuplicateStatus = dfeta_integrationtransactionrecord_dfeta_DuplicateStatus.Duplicate,
-            FileName = fileName
+            FileName = fileName,
+            FailureMessage = "",
+            StatusCode = dfeta_integrationtransactionrecord_StatusCode.Fail,
+            RowData = "",
         };
-        txn.AppendQuery(recordQuery);
-        var updateRecordQuery = new UpdateIntegrationTransactionRecordQuery()
+        using var txn = _crmQueryDispatcher.CreateTransactionRequestBuilder();
+        var itr = txn.AppendQuery(recordQuery);
+        await txn.ExecuteAsync();
+        itrId = itr();
+
+
+        using var txn2 = _crmQueryDispatcher.CreateTransactionRequestBuilder();
+        var updateRecordQuery = new UpdateIntegrationTransactionRecordTransactionalQuery()
         {
-            IntegrationTransactionRecordId = itrId,
+            IntegrationTransactionRecordId = itrId.Value,
             IntegrationTransactionId = integrationTransactionId,
             Reference = reference,
             PersonId = person.PersonId,
@@ -77,10 +84,10 @@ public class UpdateIntegrationTransactionRecordTests : IAsyncLifetime
             StatusCode = statusCode,
             RowData = rowData,
         };
-        txn.AppendQuery(recordQuery);
+        txn2.AppendQuery(updateRecordQuery);
 
         // Act
-        await txn.ExecuteAsync();
+        await txn2.ExecuteAsync();
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

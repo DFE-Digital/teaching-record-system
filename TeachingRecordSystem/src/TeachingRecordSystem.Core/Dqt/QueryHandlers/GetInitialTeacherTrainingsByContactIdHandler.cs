@@ -4,9 +4,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetInitialTeacherTrainingsByContactIdHandler : ICrmQueryHandler<GetInitialTeacherTrainingsByContactIdQuery, dfeta_initialteachertraining[]>
+public class GetInitialTeacherTrainingsByContactIdHandler : ICrmQueryHandler<GetActiveInitialTeacherTrainingsByContactIdQuery, dfeta_initialteachertraining[]>
 {
-    public async Task<dfeta_initialteachertraining[]> ExecuteAsync(GetInitialTeacherTrainingsByContactIdQuery queryItt, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_initialteachertraining[]> ExecuteAsync(GetActiveInitialTeacherTrainingsByContactIdQuery queryItt, IOrganizationServiceAsync organizationService)
     {
         var filter = new FilterExpression();
         filter.AddCondition(dfeta_initialteachertraining.Fields.dfeta_PersonId, ConditionOperator.Equal, queryItt.ContactId);

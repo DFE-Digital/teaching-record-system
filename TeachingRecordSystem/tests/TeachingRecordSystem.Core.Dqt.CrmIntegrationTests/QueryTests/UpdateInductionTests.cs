@@ -28,10 +28,10 @@ public class UpdateInductionTests : IAsyncLifetime
         {
             x.WithQts(new DateOnly(2024, 01, 01));
         });
-        var queryInduction = new CreateInductionQuery()
+        var queryInduction = new CreateInductionTransactionalQuery()
         {
             Id = inductionId,
-            PersonId = contact.PersonId,
+            ContactId = contact.PersonId,
             StartDate = startDate,
             CompletionDate = null,
             InductionStatus = dfeta_InductionStatus.InProgress,
@@ -39,7 +39,7 @@ public class UpdateInductionTests : IAsyncLifetime
         txn.AppendQuery(queryInduction);
 
         // Act
-        var updateInductionQuery = new UpdateInductionQuery()
+        var updateInductionQuery = new UpdateInductionTransactionalQuery()
         {
             InductionId = inductionId,
             CompletionDate = completionDate,

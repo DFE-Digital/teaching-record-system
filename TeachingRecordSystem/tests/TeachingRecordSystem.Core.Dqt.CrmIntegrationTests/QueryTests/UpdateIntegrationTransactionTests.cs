@@ -39,7 +39,7 @@ public class UpdateIntegrationTransactionTests : IAsyncLifetime
 
         // Act
         var id = await _crmQueryDispatcher.ExecuteQueryAsync(query);
-        var updateQuery = new UpdateIntegrationTransactionQuery()
+        var updateQuery = new UpdateIntegrationTransactionTransactionalQuery()
         {
             IntegrationTransactionId = id,
             EndDate = endDate,

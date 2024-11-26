@@ -28,10 +28,10 @@ public class CreateInductionTests : IAsyncLifetime
         var inductionStatus = dfeta_InductionStatus.InProgress;
         var inductionId = Guid.NewGuid();
 
-        var query = new CreateInductionQuery()
+        var query = new CreateInductionTransactionalQuery()
         {
             Id = inductionId,
-            PersonId = contact.PersonId,
+            ContactId = contact.PersonId,
             StartDate = startDate,
             CompletionDate = completionDate,
             InductionStatus = inductionStatus,
