@@ -31,7 +31,7 @@ public class CreateInitialTeacherTrainingTests : IAsyncLifetime
             x.WithQts(new DateOnly(2024, 01, 01));
             x.WithQualification(qualificationId, dfeta_qualification_dfeta_Type.NPQH);
         });
-        var query = new CreateInitialTeacherTrainingQuery()
+        var query = new CreateInitialTeacherTrainingTransactionalQuery()
         {
             Id = ittId,
             ContactId = contact.PersonId,

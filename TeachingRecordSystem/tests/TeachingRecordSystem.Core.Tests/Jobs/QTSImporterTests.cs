@@ -882,9 +882,9 @@ public class QtsImporterTests : IAsyncLifetime
         Assert.NotNull(lookups.ClassDivision);
     }
 
-    private EwcWalesQTSFileImportData GetDefaultRow(Func<EwcWalesQTSFileImportData, EwcWalesQTSFileImportData>? configurator = null)
+    private EwcWalesQtsFileImportData GetDefaultRow(Func<EwcWalesQtsFileImportData, EwcWalesQtsFileImportData>? configurator = null)
     {
-        var row = new EwcWalesQTSFileImportData()
+        var row = new EwcWalesQtsFileImportData()
         {
             QtsRefNo = "",
             Forename = Faker.Name.First(),

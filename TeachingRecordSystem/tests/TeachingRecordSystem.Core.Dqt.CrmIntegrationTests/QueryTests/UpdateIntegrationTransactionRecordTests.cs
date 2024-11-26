@@ -48,12 +48,12 @@ public class UpdateIntegrationTransactionRecordTests : IAsyncLifetime
         };
         var integrationTransactionId = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
-        var recordQuery = new CreateIntegrationTransactionRecordQuery()
+        var recordQuery = new CreateIntegrationTransactionRecordTransactionalQuery()
         {
             Id = itrId,
             IntegrationTransactionId = integrationTransactionId,
             Reference = reference,
-            PersonId = person.PersonId,
+            ContactId = person.PersonId,
             InitialTeacherTrainingId = null,
             QualificationId = null,
             InductionId = null,
@@ -62,7 +62,7 @@ public class UpdateIntegrationTransactionRecordTests : IAsyncLifetime
             FileName = fileName
         };
         txn.AppendQuery(recordQuery);
-        var updateRecordQuery = new UpdateIntegrationTransactionRecordQuery()
+        var updateRecordQuery = new UpdateIntegrationTransactionRecordTransactionalQuery()
         {
             IntegrationTransactionRecordId = itrId,
             IntegrationTransactionId = integrationTransactionId,

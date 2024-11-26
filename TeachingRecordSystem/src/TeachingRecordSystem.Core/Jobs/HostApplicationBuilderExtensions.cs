@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
+using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 
@@ -35,10 +36,6 @@ public static class HostApplicationBuilderExtensions
                     .ValidateOnStart();
                 builder.Services.AddOptions<BatchSendInductionCompletedEmailsJobOptions>()
                     .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
-
-                builder.Services.AddOptions<EwcWalesImportJobOptions>()
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
 
@@ -83,7 +80,7 @@ public static class HostApplicationBuilderExtensions
                     recurringJobManager.AddOrUpdate<EwcWalesImportJob>(
                         nameof(EwcWalesImportJob),
                         job => job.ExecuteAsync(CancellationToken.None),
-                        options.EwcWalesImport.JobSchedule);
+                        EwcWalesImportJob.JobSchedule);
 
                     return Task.CompletedTask;
                 });

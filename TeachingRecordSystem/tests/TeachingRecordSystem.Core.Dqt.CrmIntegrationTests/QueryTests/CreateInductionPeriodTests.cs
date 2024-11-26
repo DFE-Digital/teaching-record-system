@@ -37,15 +37,15 @@ public class CreateInductionPeriodTests : IAsyncLifetime
         var inductionEndDate = new DateTime(2024, 02, 01);
         var inductionId = Guid.NewGuid();
         var inductionPeriodId = Guid.NewGuid();
-        var queryInduction = new CreateInductionQuery()
+        var queryInduction = new CreateInductionTransactionalQuery()
         {
             Id = inductionId,
-            PersonId = contact.PersonId,
+            ContactId = contact.PersonId,
             StartDate = startDate,
             CompletionDate = completionDate,
             InductionStatus = inductionStatus,
         };
-        var queryInductionPeriod = new CreateInductionPeriodQuery()
+        var queryInductionPeriod = new CreateInductionPeriodTransactionalQuery()
         {
             Id = inductionPeriodId,
             InductionId = inductionId,

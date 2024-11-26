@@ -26,10 +26,7 @@ public class FindOrganisationsByOrgNumberTests : IAsyncLifetime
             x.WithName(accountName);
             x.WithAccountNumber(accountNumber);
         });
-        var query = new FindActiveOrganisationsByOrgNumberQuery()
-        {
-            OrganisationNumber = accountNumber
-        };
+        var query = new FindActiveOrganisationsByAccountNumberQuery(accountNumber);
 
         // Act
         var results = await _crmQueryDispatcher.ExecuteQueryAsync(query);
@@ -62,10 +59,7 @@ public class FindOrganisationsByOrgNumberTests : IAsyncLifetime
             x.WithName(accountName2);
             x.WithAccountNumber(accountNumber);
         });
-        var query = new FindActiveOrganisationsByOrgNumberQuery()
-        {
-            OrganisationNumber = accountNumber
-        };
+        var query = new FindActiveOrganisationsByAccountNumberQuery(accountNumber);
 
         // Act
         var results = await _crmQueryDispatcher.ExecuteQueryAsync(query);

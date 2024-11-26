@@ -6,15 +6,26 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger)
 {
-    public async Task<(int TotalCount, int SuccessCount, int DuplicateCount, int FailureCount, string FailureMessage)> ImportAsync(StreamReader csvReaderStream, Guid IntegrationTransactionId, string fileName)
+    private const string DATE_FORMAT = "dd/MM/yyyy";
+
+    public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
         using (var csv = new CsvReader(csvReaderStream, CultureInfo.InvariantCulture))
         {
+            var integrationJob = new CreateIntegrationTransactionQuery()
+            {
+                StartDate = DateTime.Now,
+                TypeId = (int)dfeta_IntegrationInterface.GTCWalesImport,
+                FileName = fileName
+            };
+            var integrationId = await crmQueryDispatcher.ExecuteQueryAsync(integrationJob);
+
             var records = csv.GetRecords<EwcWalesInductionImportData>().ToList();
             var validationMessages = new List<string>();
 
@@ -35,12 +46,12 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
 
                 try
                 {
-                    var createIntegrationTransactionRecord = new CreateIntegrationTransactionRecordQuery()
+                    var createIntegrationTransactionRecord = new CreateIntegrationTransactionRecordTransactionalQuery()
                     {
                         Id = itrId,
-                        IntegrationTransactionId = IntegrationTransactionId,
+                        IntegrationTransactionId = integrationId,
                         Reference = totalRowCount.ToString(),
-                        PersonId = null,
+                        ContactId = null,
                         InitialTeacherTrainingId = null,
                         QualificationId = null,
                         InductionId = null,
@@ -79,22 +90,22 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                         if (!inductionId.HasValue)
                         {
                             inductionId = Guid.NewGuid();
-                            var createInductionQuery = new CreateInductionQuery()
+                            var createInductionQuery = new CreateInductionTransactionalQuery()
                             {
                                 Id = inductionId.Value,
-                                PersonId = personId,
-                                StartDate = DateTime.ParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
-                                CompletionDate = DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                ContactId = personId!.Value,
+                                StartDate = DateTime.ParseExact(row.StartDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
                                 InductionStatus = dfeta_InductionStatus.PassedinWales
                             };
                             rowTransaction.AppendQuery(createInductionQuery);
                         }
                         else
                         {
-                            var updateInductionQuery = new UpdateInductionQuery()
+                            var updateInductionQuery = new UpdateInductionTransactionalQuery()
                             {
                                 InductionId = inductionId.Value,
-                                CompletionDate = !string.IsNullOrEmpty(row.PassedDate) ? DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None) : null,
+                                CompletionDate = !string.IsNullOrEmpty(row.PassedDate) ? DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None) : null,
                                 InductionStatus = dfeta_InductionStatus.PassedinWales
                             };
                             rowTransaction.AppendQuery(updateInductionQuery);
@@ -105,24 +116,24 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                         if (lookupData.InductionPeriod is null)
                         {
                             inductionPeriodId = Guid.NewGuid();
-                            var queryInductionPeriod = new CreateInductionPeriodQuery()
+                            var queryInductionPeriod = new CreateInductionPeriodTransactionalQuery()
                             {
                                 Id = inductionPeriodId.Value,
                                 InductionId = inductionId.Value,
                                 AppropriateBodyId = lookupData.OrganisationId,
-                                InductionStartDate = DateTime.ParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
-                                InductionEndDate = DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionStartDate = DateTime.ParseExact(row.StartDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
                             };
                             rowTransaction.AppendQuery(queryInductionPeriod);
                         }
                         else
                         {
-                            var updateInductionPeriodQuery = new UpdateInductionPeriodQuery()
+                            var updateInductionPeriodQuery = new UpdateInductionPeriodTransactionalQuery()
                             {
-                                Id = lookupData.InductionPeriod.Id,
+                                InductionPeriodId = lookupData.InductionPeriod.Id,
                                 AppropriateBodyId = lookupData.OrganisationId,
-                                InductionStartDate = DateTime.ParseExact(row.StartDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
-                                InductionEndDate = DateTime.ParseExact(row.PassedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionStartDate = DateTime.ParseExact(row.StartDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
                             };
                             rowTransaction.AppendQuery(updateInductionPeriodQuery);
                         }
@@ -147,10 +158,10 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                     }
 
                     //update ITR row with status of import row
-                    var updateIntegrationTransactionRecordQuery = new UpdateIntegrationTransactionRecordQuery()
+                    var updateIntegrationTransactionRecordQuery = new UpdateIntegrationTransactionRecordTransactionalQuery()
                     {
                         IntegrationTransactionRecordId = itrId,
-                        IntegrationTransactionId = IntegrationTransactionId,
+                        IntegrationTransactionId = integrationId,
                         Reference = totalRowCount.ToString(),
                         PersonId = personId,
                         InitialTeacherTrainingId = null,
@@ -166,9 +177,9 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
 
                     //update IntegrationTransaction so that it's always up to date with
                     //counts of rows
-                    var updateIntegrationTransactionQuery = new UpdateIntegrationTransactionQuery()
+                    var updateIntegrationTransactionQuery = new UpdateIntegrationTransactionTransactionalQuery()
                     {
-                        IntegrationTransactionId = IntegrationTransactionId,
+                        IntegrationTransactionId = integrationId,
                         EndDate = null,
                         TotalCount = totalRowCount,
                         SuccessCount = successCount,
@@ -184,9 +195,24 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                     failureRowCount++;
                     logger.LogError(e.ToString());
                 }
-
             }
-            return (totalRowCount, successCount, duplicateRowCount, failureRowCount, failureMessage.ToString());
+
+            var updateIntTrxQuery = new UpdateIntegrationTransactionTransactionalQuery()
+            {
+                IntegrationTransactionId = integrationId,
+                EndDate = DateTime.Now,
+                TotalCount = totalRowCount,
+                SuccessCount = successCount,
+                DuplicateCount = duplicateRowCount,
+                FailureCount = failureRowCount,
+                FailureMessage = failureMessage.ToString()
+            };
+
+            using var txn = crmQueryDispatcher.CreateTransactionRequestBuilder();
+            txn.AppendQuery(updateIntTrxQuery);
+            await txn.ExecuteAsync();
+
+            return new InductionImportResult(totalRowCount, successCount, duplicateRowCount, failureRowCount, failureMessage.ToString(), integrationId);
         }
     }
 
@@ -211,16 +237,16 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         EwcWalesMatchStatus? inductionPeriodMatchStatus = null;
         if (contact != null)
         {
-            var (indStatus, ind) = await FindActiveInductionByPersonAsync(contact.ContactId!.Value);
+            var (indStatus, ind) = await FindActiveInductionByContactAsync(contact.ContactId!.Value);
             inductionMatchStatus = indStatus;
             induction = ind?.Induction;
 
-            if (ind!.InductionPeriods?.Length == 1)
+            if (ind?.InductionPeriods?.Length == 1)
             {
                 inductionPeriodMatchStatus = EwcWalesMatchStatus.OneMatch;
                 inductionPeriod = ind.InductionPeriods.First();
             }
-            else if (ind.InductionPeriods?.Length > 1)
+            else if (ind?.InductionPeriods?.Length > 1)
             {
                 inductionPeriodMatchStatus = EwcWalesMatchStatus.MultipleMatchesFound;
                 inductionPeriod = null;
@@ -293,21 +319,15 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
 
         switch (lookups.PersonMatchStatus)
         {
-            case EwcWalesMatchStatus.NoAssociatedQts:
+            case PersonLookupResult.NoAssociatedQts:
                 break;
-            case EwcWalesMatchStatus.NoMatch:
+            case PersonLookupResult.NoMatch:
                 errors.Add($"Teacher with TRN {row.ReferenceNumber} was not found.");
                 break;
-            case EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed:
-                errors.Add($"For TRN {row.ReferenceNumber} Date of Birth does not match with the existing record."); //No Test
+            case PersonLookupResult.TrnAndDateOfBirthMatchFailed:
+                errors.Add($"For TRN {row.ReferenceNumber} Date of Birth does not match with the existing record.");
                 break;
-            case EwcWalesMatchStatus.MultipleTrnMatched:
-                errors.Add($"TRN {row.ReferenceNumber} was matched to more than one record in the system.");
-                break;
-            case EwcWalesMatchStatus.TeacherInactive:
-                errors.Add($"Teacher with TRN {row.ReferenceNumber} is inactive."); //No Test
-                break;
-            case EwcWalesMatchStatus.TeacherHasQts:
+            case PersonLookupResult.TeacherHasQts:
                 errors.Add($"Teacher with TRN {row.ReferenceNumber} has QTS already.");
                 break;
         }
@@ -355,10 +375,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
     }
     public async Task<(EwcWalesMatchStatus, Guid? OrganisationId)> FindMatchingOrganisationsRecordAsync(string OrgNumber)
     {
-        var query = new FindActiveOrganisationsByOrgNumberQuery()
-        {
-            OrganisationNumber = OrgNumber
-        };
+        var query = new FindActiveOrganisationsByAccountNumberQuery(OrgNumber);
         var results = await crmQueryDispatcher.ExecuteQueryAsync(query);
 
         if (results.Length == 0)
@@ -375,7 +392,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         return (EwcWalesMatchStatus.OneMatch, organisationId);
     }
 
-    public async Task<(EwcWalesMatchStatus, InductionRecord?)> FindActiveInductionByPersonAsync(Guid personId)
+    public async Task<(EwcWalesMatchStatus, InductionRecord?)> FindActiveInductionByContactAsync(Guid personId)
     {
         var query = new GetActiveInductionByContactIdQuery(personId);
         var result = await crmQueryDispatcher.ExecuteQueryAsync(query);
@@ -388,60 +405,50 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         return (EwcWalesMatchStatus.OneMatch, result);
     }
 
-    public async Task<(EwcWalesMatchStatus, Contact? contact)> FindMatchingTeacherRecordAsync(EwcWalesInductionImportData item)
+    public async Task<(PersonLookupResult, Contact? contact)> FindMatchingTeacherRecordAsync(EwcWalesInductionImportData item)
     {
-        var contacts = await crmQueryDispatcher.ExecuteQueryAsync(
-                    new GetActiveContactsByTrnsQuery(
-                        new[] { item.ReferenceNumber },
-                        new ColumnSet(
-                            Contact.Fields.dfeta_TRN,
-                            Contact.Fields.BirthDate,
-                            Contact.Fields.dfeta_QTSDate,
-                            Contact.Fields.dfeta_qtlsdate)));
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
+            new GetActiveContactByTrnQuery(item.ReferenceNumber,
+                new ColumnSet(
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.dfeta_QTSDate,
+                    Contact.Fields.dfeta_qtlsdate)));
 
-        if (contacts.Count == 0 || contacts.First().Value == null)
+        if (contact == null)
         {
-            return (EwcWalesMatchStatus.NoMatch, null);
+            return (PersonLookupResult.NoMatch, null);
         }
 
-        if (contacts.Count > 1)
+        if (DateOnly.TryParseExact(item.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob) && contact!.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dob)
         {
-            return (EwcWalesMatchStatus.MultipleTrnMatched, null);
-        }
-
-        var contact = contacts.First().Value!;
-        if (DateOnly.TryParseExact(item.DateOfBirth, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob))
-        {
-            if (contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dob)
-            {
-                return (EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed, null);
-            }
+            return (PersonLookupResult.TrnAndDateOfBirthMatchFailed, null);
         }
 
         var qtsRegistrations = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveQtsRegistrationsByContactIdsQuery(
-                new[] { contact.ContactId!.Value },
-                new ColumnSet(
-                    dfeta_qtsregistration.Fields.dfeta_PersonId,
-                    dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId)
-                )
-            );
+                new GetActiveQtsRegistrationsByContactIdsQuery(
+                    new[] { contact!.ContactId!.Value },
+                    new ColumnSet(
+                        dfeta_qtsregistration.Fields.dfeta_PersonId,
+                        dfeta_qtsregistration.Fields.dfeta_QTSDate,
+                        dfeta_qtsregistration.Fields.dfeta_TeacherStatusId)
+                    )
+                );
 
         if (qtsRegistrations[contact.Id].Length > 0)
         {
-            return (EwcWalesMatchStatus.TeacherHasQts, contact);
+            return (PersonLookupResult.TeacherHasQts, contact);
         }
         else
         {
-            return (EwcWalesMatchStatus.NoAssociatedQts, contact);
+            return (PersonLookupResult.NoAssociatedQts, contact);
         }
     }
 
     public class InductionImportLookupData
     {
         public required Contact? Person { get; set; }
-        public required EwcWalesMatchStatus? PersonMatchStatus { get; set; }
+        public required PersonLookupResult? PersonMatchStatus { get; set; }
         public required dfeta_induction? Induction { get; set; }
         public required EwcWalesMatchStatus? InductionMatchStatus { get; set; }
         public required dfeta_inductionperiod? InductionPeriod { get; set; }
@@ -449,4 +456,27 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
         public required Guid? OrganisationId { get; set; }
         public required EwcWalesMatchStatus? OrganisationMatchStatus { get; set; }
     }
+}
+
+public enum InductionLookupResult
+{
+
+}
+
+public enum PersonLookupResult
+{
+    NoMatch,
+    TrnAndDateOfBirthMatchFailed,
+    NoAssociatedQts,
+    TeacherHasQts
+}
+
+public enum InductionPeriodLookupResult
+{
+
+}
+
+public enum OrganisationLookupResult
+{
+
 }

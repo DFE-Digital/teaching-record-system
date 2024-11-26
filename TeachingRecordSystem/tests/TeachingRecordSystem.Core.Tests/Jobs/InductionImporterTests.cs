@@ -273,7 +273,7 @@ public class InductionImporterTests : IAsyncLifetime
         var lookups = await Importer.GetLookupDataAsync(row);
 
         // Assert
-        Assert.Equal(lookups.PersonMatchStatus, EwcWalesMatchStatus.NoMatch);
+        Assert.Equal(PersonLookupResult.NoMatch, PersonLookupResult.NoMatch);
         Assert.Null(lookups.Person);
     }
 
@@ -299,7 +299,7 @@ public class InductionImporterTests : IAsyncLifetime
         var lookups = await Importer.GetLookupDataAsync(row);
 
         // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoAssociatedQts, lookups.PersonMatchStatus);
+        Assert.Equal(PersonLookupResult.NoAssociatedQts, lookups.PersonMatchStatus);
         Assert.NotNull(lookups.Person);
         Assert.Equal(person.ContactId, lookups.Person!.ContactId);
     }
@@ -329,7 +329,7 @@ public class InductionImporterTests : IAsyncLifetime
         var lookups = await Importer.GetLookupDataAsync(row);
 
         // Assert
-        Assert.Equal(EwcWalesMatchStatus.TeacherHasQts, lookups.PersonMatchStatus);
+        Assert.Equal(PersonLookupResult.TeacherHasQts, lookups.PersonMatchStatus);
         Assert.NotNull(lookups.Person);
         Assert.Equal(person.ContactId, lookups.Person!.ContactId);
     }

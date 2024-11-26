@@ -45,12 +45,12 @@ public class CreateIntegrationTransactionRecordTests : IAsyncLifetime
         };
         var integrationTransactionId = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
-        var recordQuery = new CreateIntegrationTransactionRecordQuery()
+        var recordQuery = new CreateIntegrationTransactionRecordTransactionalQuery()
         {
             Id = itrId,
             IntegrationTransactionId = integrationTransactionId,
             Reference = reference,
-            PersonId = person.PersonId,
+            ContactId = person.PersonId,
             InitialTeacherTrainingId = null,
             QualificationId = null,
             InductionId = person.DqtInductions.First().InductionId,
