@@ -28,7 +28,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(state);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/trn?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -50,7 +50,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/trn?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -72,7 +72,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         Debug.Assert(state.NationalInsuranceNumber is null);
 
@@ -98,7 +98,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var existingTrn = haveExistingValueInState ? await TestData.GenerateTrnAsync() : null;
 
@@ -159,7 +159,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var trn = await TestData.GenerateTrnAsync();
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, createCoreIdentityVc: false);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/trn?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -188,7 +188,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(person);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = person.Trn!;
 
@@ -219,7 +219,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = await TestData.GenerateTrnAsync();
 
@@ -252,7 +252,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, TestData.GenerateNationalInsuranceNumber()));
 
@@ -280,7 +280,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = "";
 
@@ -312,7 +312,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = "xxx";
 
@@ -344,7 +344,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = await TestData.GenerateTrnAsync();
 
@@ -382,7 +382,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(verified: true);
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = await TestData.GenerateTrnAsync();
 
@@ -424,7 +424,7 @@ public class TrnTests(HostFixture hostFixture) : TestBase(hostFixture)
             verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
 
         var ticket = CreateOneLoginAuthenticationTicket(vtr: SignInJourneyHelper.AuthenticationOnlyVtr, oneLoginUser);
-        await GetSignInJourneyHelper().OnOneLoginCallbackAsync(journeyInstance, ticket);
+        await WithSignInJourneyHelper(helper => helper.OnOneLoginCallbackAsync(journeyInstance, ticket));
 
         var trn = person.Trn!;
 

@@ -101,7 +101,12 @@ public abstract class TestBase : IDisposable
             return 0;
         });
 
-    public SignInJourneyHelper GetSignInJourneyHelper() => HostFixture.Services.GetRequiredService<SignInJourneyHelper>();
+    public async Task WithSignInJourneyHelper(Func<SignInJourneyHelper, Task> action)
+    {
+        using var scope = HostFixture.Services.CreateScope();
+        var signInJourneyHelper = scope.ServiceProvider.GetRequiredService<SignInJourneyHelper>();
+        await action(signInJourneyHelper);
+    }
 
     public AuthenticationTicket CreateOneLoginAuthenticationTicket(
         string vtr,

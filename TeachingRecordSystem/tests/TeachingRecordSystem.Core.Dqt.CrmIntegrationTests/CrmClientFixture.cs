@@ -50,18 +50,25 @@ public sealed class CrmClientFixture : IDisposable
     /// Creates a scope that owns an implementation of <see cref="IOrganizationServiceAsync2"/> that tracks the entities created through it.
     /// When <see cref="IAsyncDisposable.DisposeAsync"/> is called the created entities will be deleted from CRM.
     /// </summary>
-    public TestDataScope CreateTestDataScope(bool withSync = false) => new(
-        _baseServiceClient,
-        orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient, DbFixture.GetDbContext()),
-        orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache), serviceClientName: null),
-        orgService => TestData.CreateWithCustomTrnGeneration(
-            DbFixture.GetDbContextFactory(),
-            orgService,
-            _referenceDataCache,
-            Clock,
-            () => _trnGenerationApiClient.GenerateTrnAsync(),
-            withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock)) : TestDataSyncConfiguration.NoSync()),
-        _memoryCache);
+    public TestDataScope CreateTestDataScope(bool withSync = false)
+    {
+        var dbContext = DbFixture.GetDbContextFactory().CreateDbContext();
+        var onAsyncDispose = () => dbContext.DisposeAsync();
+
+        return new(
+            _baseServiceClient,
+            orgService => new DataverseAdapter(orgService, Clock, _memoryCache, _trnGenerationApiClient, dbContext),
+            orgService => new CrmQueryDispatcher(CreateQueryServiceProvider(orgService, _referenceDataCache), serviceClientName: null),
+            orgService => TestData.CreateWithCustomTrnGeneration(
+                DbFixture.GetDbContextFactory(),
+                orgService,
+                _referenceDataCache,
+                Clock,
+                () => _trnGenerationApiClient.GenerateTrnAsync(),
+                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock)) : TestDataSyncConfiguration.NoSync()),
+            _memoryCache,
+            onAsyncDispose);
+    }
 
     public void Dispose()
     {
@@ -98,17 +105,20 @@ public sealed class CrmClientFixture : IDisposable
         private readonly Func<IOrganizationServiceAsync2, DataverseAdapter> _createDataverseAdapter;
         private readonly Func<IOrganizationServiceAsync2, CrmQueryDispatcher> _createCrmQueryDispatcher;
         private readonly IMemoryCache _memoryCache;
+        private readonly Func<ValueTask> _onAsyncDispose;
 
         internal TestDataScope(
             ServiceClient serviceClient,
             Func<IOrganizationServiceAsync2, DataverseAdapter> createDataverseAdapter,
             Func<IOrganizationServiceAsync2, CrmQueryDispatcher> createCrmQueryDispatcher,
             Func<IOrganizationServiceAsync2, TestData> createTestData,
-            IMemoryCache memoryCache)
+            IMemoryCache memoryCache,
+            Func<ValueTask> onAsyncDispose)
         {
             _createDataverseAdapter = createDataverseAdapter;
             _createCrmQueryDispatcher = createCrmQueryDispatcher;
             _memoryCache = memoryCache;
+            _onAsyncDispose = onAsyncDispose;
 
             OrganizationService = EntityTrackingOrganizationService.CreateProxy(serviceClient);
             TestData = createTestData(OrganizationService);
@@ -124,7 +134,11 @@ public sealed class CrmClientFixture : IDisposable
 
         public TestDataHelper CreateTestDataHelper() => new TestDataHelper(this, _memoryCache);
 
-        public ValueTask DisposeAsync() => OrganizationService.DisposeAsync();
+        public async ValueTask DisposeAsync()
+        {
+            await OrganizationService.DisposeAsync();
+            await _onAsyncDispose();
+        }
     }
 
     private class EnvironmentLockManager

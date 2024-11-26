@@ -60,15 +60,14 @@ public class BatchSendEytsAwardedEmailsJobTests : EytsAwardedEmailJobTestBase
 
     [Theory]
     [MemberData(nameof(DateRangeEvaluationTestData))]
-    public async Task Execute_ForMultipleScenarios_EvaluatesDateRangeCorrectly(
+    public Task Execute_ForMultipleScenarios_EvaluatesDateRangeCorrectly(
         DateTime initialLastAwardedToUtc,
         DateTime? previousJobLastAwardedToUtc,
         DateTime utcNow,
         DateTime startExpected,
-        DateTime endExpected)
+        DateTime endExpected) => DbFixture.WithDbContextAsync(async dbContext =>
     {
         // Arrange
-        using var dbContext = DbFixture.GetDbContext();
         var clock = new TestableClock();
         var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
         var dataverseAdapter = new Mock<IDataverseAdapter>();
@@ -119,160 +118,171 @@ public class BatchSendEytsAwardedEmailsJobTests : EytsAwardedEmailJobTestBase
         // Assert
         Assert.Equal(startExpected, startActual);
         Assert.Equal(endExpected, endActual);
-    }
+    });
 
     [Fact]
-    public async Task Execute_WhenHasAwardeesForDateRange_UpdatesDatabaseAndEnqueuesJobToSendEmail()
-    {
-        // Arrange
-        var initialLastAwardedToUtc = new DateTime(2023, 02, 03, 0, 0, 0, DateTimeKind.Utc);
-        var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
-        using var dbContext = DbFixture.GetDbContext();
-        var clock = new TestableClock();
-        var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
-        var dataverseAdapter = new Mock<IDataverseAdapter>();
-        var jobOptions = Options.Create(
-            new BatchSendEytsAwardedEmailsJobOptions
-            {
-                EmailDelayDays = 3,
-                InitialLastAwardedToUtc = initialLastAwardedToUtc,
-                JobSchedule = "0 8 * * *"
-            });
-
-        clock.UtcNow = today;
-
-        var eytsAwardee1 = new EytsAwardee
+    public Task Execute_WhenHasAwardeesForDateRange_UpdatesDatabaseAndEnqueuesJobToSendEmail() =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
-            TeacherId = Guid.NewGuid(),
-            Trn = "1234567",
-            FirstName = Faker.Name.First(),
-            LastName = Faker.Name.Last(),
-            EmailAddress = Faker.Internet.Email()
-        };
+            // Arrange
+            var initialLastAwardedToUtc = new DateTime(2023, 02, 03, 0, 0, 0, DateTimeKind.Utc);
+            var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
+            var clock = new TestableClock();
+            var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
+            var dataverseAdapter = new Mock<IDataverseAdapter>();
+            var jobOptions = Options.Create(
+                new BatchSendEytsAwardedEmailsJobOptions
+                {
+                    EmailDelayDays = 3,
+                    InitialLastAwardedToUtc = initialLastAwardedToUtc,
+                    JobSchedule = "0 8 * * *"
+                });
 
-        var eytsAwardees = new[] { eytsAwardee1 };
+            clock.UtcNow = today;
 
-        dataverseAdapter
-            .Setup(d => d.GetEytsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsyncEnumerable(eytsAwardees);
+            var eytsAwardee1 = new EytsAwardee
+            {
+                TeacherId = Guid.NewGuid(),
+                Trn = "1234567",
+                FirstName = Faker.Name.First(),
+                LastName = Faker.Name.Last(),
+                EmailAddress = Faker.Internet.Email()
+            };
 
-        var job = new BatchSendEytsAwardedEmailsJob(
-            jobOptions,
-            dbContext,
-            dataverseAdapter.Object,
-            backgroundJobScheduler.Object,
-            clock);
+            var eytsAwardees = new[] { eytsAwardee1 };
 
-        // Act
-        await job.ExecuteAsync(CancellationToken.None);
+            dataverseAdapter
+                .Setup(d => d.GetEytsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsyncEnumerable(eytsAwardees);
 
-        // Assert
-        var jobItem = await dbContext.EytsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.PersonId == eytsAwardee1.TeacherId);
-        Assert.NotNull(jobItem);
-        Assert.Equal(eytsAwardee1.Trn, jobItem.Trn);
-        Assert.Equal(eytsAwardee1.EmailAddress, jobItem.EmailAddress);
-        Assert.Equal(eytsAwardee1.FirstName, jobItem.Personalization["first name"]);
-        Assert.Equal(eytsAwardee1.LastName, jobItem.Personalization["last name"]);
+            var job = new BatchSendEytsAwardedEmailsJob(
+                jobOptions,
+                dbContext,
+                dataverseAdapter.Object,
+                backgroundJobScheduler.Object,
+                clock);
 
-        backgroundJobScheduler
-            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<EytsAwardedEmailJobDispatcher, Task>>>()), Times.Once);
-    }
+            // Act
+            await job.ExecuteAsync(CancellationToken.None);
+
+            // Assert
+            var jobItem =
+                await dbContext.EytsAwardedEmailsJobItems.SingleOrDefaultAsync(
+                    i => i.PersonId == eytsAwardee1.TeacherId);
+            Assert.NotNull(jobItem);
+            Assert.Equal(eytsAwardee1.Trn, jobItem.Trn);
+            Assert.Equal(eytsAwardee1.EmailAddress, jobItem.EmailAddress);
+            Assert.Equal(eytsAwardee1.FirstName, jobItem.Personalization["first name"]);
+            Assert.Equal(eytsAwardee1.LastName, jobItem.Personalization["last name"]);
+
+            backgroundJobScheduler
+                .Verify(
+                    s => s.EnqueueAsync(It
+                        .IsAny<System.Linq.Expressions.Expression<Func<EytsAwardedEmailJobDispatcher, Task>>>()),
+                    Times.Once);
+        });
 
     [Fact]
-    public async Task Execute_WhenDoesNotHaveAwardeesForDateRange_UpdatesDatabaseOnly()
-    {
-        // Arrange
-        var initialLastAwardedToUtc = new DateTime(2023, 02, 03, 0, 0, 0, DateTimeKind.Utc);
-        var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
-        using var dbContext = DbFixture.GetDbContext();
-        var clock = new TestableClock();
-        var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
-        var dataverseAdapter = new Mock<IDataverseAdapter>();
-        var jobOptions = Options.Create(
-            new BatchSendEytsAwardedEmailsJobOptions
-            {
-                EmailDelayDays = 3,
-                InitialLastAwardedToUtc = initialLastAwardedToUtc,
-                JobSchedule = "0 8 * * *"
-            });
-
-        clock.UtcNow = today;
-
-        dataverseAdapter
-            .Setup(d => d.GetEytsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsyncEnumerable(new EytsAwardee[] { });
-
-        var job = new BatchSendEytsAwardedEmailsJob(
-            jobOptions,
-            dbContext,
-            dataverseAdapter.Object,
-            backgroundJobScheduler.Object,
-            clock);
-
-        // Act
-        await job.ExecuteAsync(CancellationToken.None);
-
-        // Assert
-        var jobInfo = await dbContext.EytsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
-        Assert.NotNull(jobInfo);
-
-        backgroundJobScheduler
-            .Verify(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<EytsAwardedEmailJobDispatcher, Task>>>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Execute_WhenEnqueueFails_DoesNotUpdateDatabase()
-    {
-        // Arrange
-        var initialLastAwardedToUtc = new DateTime(2023, 02, 02, 0, 0, 0, DateTimeKind.Utc);
-        var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
-        using var dbContext = DbFixture.GetDbContext();
-        var clock = new TestableClock();
-        var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
-        var dataverseAdapter = new Mock<IDataverseAdapter>();
-        var jobOptions = Options.Create(
-            new BatchSendEytsAwardedEmailsJobOptions
-            {
-                EmailDelayDays = 3,
-                InitialLastAwardedToUtc = initialLastAwardedToUtc,
-                JobSchedule = "0 8 * * *"
-            });
-
-        clock.UtcNow = today;
-
-        var eytsAwardee1 = new EytsAwardee
+    public Task Execute_WhenDoesNotHaveAwardeesForDateRange_UpdatesDatabaseOnly() =>
+        DbFixture.WithDbContextAsync(async dbContext =>
         {
-            TeacherId = Guid.NewGuid(),
-            Trn = "1234567",
-            FirstName = Faker.Name.First(),
-            LastName = Faker.Name.Last(),
-            EmailAddress = Faker.Internet.Email()
-        };
+            // Arrange
+            var initialLastAwardedToUtc = new DateTime(2023, 02, 03, 0, 0, 0, DateTimeKind.Utc);
+            var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
+            var clock = new TestableClock();
+            var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
+            var dataverseAdapter = new Mock<IDataverseAdapter>();
+            var jobOptions = Options.Create(
+                new BatchSendEytsAwardedEmailsJobOptions
+                {
+                    EmailDelayDays = 3,
+                    InitialLastAwardedToUtc = initialLastAwardedToUtc,
+                    JobSchedule = "0 8 * * *"
+                });
 
-        var eytsAwardees = new[] { eytsAwardee1 };
+            clock.UtcNow = today;
 
-        dataverseAdapter
-            .Setup(d => d.GetEytsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-            .ReturnsAsyncEnumerable(eytsAwardees);
+            dataverseAdapter
+                .Setup(d => d.GetEytsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsyncEnumerable(new EytsAwardee[] { });
 
-        backgroundJobScheduler
-            .Setup(s => s.EnqueueAsync(It.IsAny<System.Linq.Expressions.Expression<Func<EytsAwardedEmailJobDispatcher, Task>>>()))
-            .Throws<Exception>();
+            var job = new BatchSendEytsAwardedEmailsJob(
+                jobOptions,
+                dbContext,
+                dataverseAdapter.Object,
+                backgroundJobScheduler.Object,
+                clock);
 
-        var job = new BatchSendEytsAwardedEmailsJob(
-            jobOptions,
-            dbContext,
-            dataverseAdapter.Object,
-            backgroundJobScheduler.Object,
-            clock);
+            // Act
+            await job.ExecuteAsync(CancellationToken.None);
 
-        // Act
-        await Assert.ThrowsAsync<Exception>(() => job.ExecuteAsync(CancellationToken.None));
+            // Assert
+            var jobInfo = await dbContext.EytsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
+            Assert.NotNull(jobInfo);
 
-        // Assert
-        var jobInfo = await dbContext.EytsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
-        Assert.Null(jobInfo);
-        var jobItem = await dbContext.EytsAwardedEmailsJobItems.SingleOrDefaultAsync(i => i.PersonId == eytsAwardee1.TeacherId);
-        Assert.Null(jobItem);
-    }
+            backgroundJobScheduler
+                .Verify(
+                    s => s.EnqueueAsync(It
+                        .IsAny<System.Linq.Expressions.Expression<Func<EytsAwardedEmailJobDispatcher, Task>>>()),
+                    Times.Never);
+        });
+
+    [Fact]
+    public Task Execute_WhenEnqueueFails_DoesNotUpdateDatabase() =>
+        DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            // Arrange
+            var initialLastAwardedToUtc = new DateTime(2023, 02, 02, 0, 0, 0, DateTimeKind.Utc);
+            var today = new DateTime(2023, 02, 06, 08, 00, 00, DateTimeKind.Utc);
+            var clock = new TestableClock();
+            var backgroundJobScheduler = new Mock<IBackgroundJobScheduler>();
+            var dataverseAdapter = new Mock<IDataverseAdapter>();
+            var jobOptions = Options.Create(
+                new BatchSendEytsAwardedEmailsJobOptions
+                {
+                    EmailDelayDays = 3,
+                    InitialLastAwardedToUtc = initialLastAwardedToUtc,
+                    JobSchedule = "0 8 * * *"
+                });
+
+            clock.UtcNow = today;
+
+            var eytsAwardee1 = new EytsAwardee
+            {
+                TeacherId = Guid.NewGuid(),
+                Trn = "1234567",
+                FirstName = Faker.Name.First(),
+                LastName = Faker.Name.Last(),
+                EmailAddress = Faker.Internet.Email()
+            };
+
+            var eytsAwardees = new[] { eytsAwardee1 };
+
+            dataverseAdapter
+                .Setup(d => d.GetEytsAwardeesForDateRangeAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsyncEnumerable(eytsAwardees);
+
+            backgroundJobScheduler
+                .Setup(s => s.EnqueueAsync(It
+                    .IsAny<System.Linq.Expressions.Expression<Func<EytsAwardedEmailJobDispatcher, Task>>>()))
+                .Throws<Exception>();
+
+            var job = new BatchSendEytsAwardedEmailsJob(
+                jobOptions,
+                dbContext,
+                dataverseAdapter.Object,
+                backgroundJobScheduler.Object,
+                clock);
+
+            // Act
+            await Assert.ThrowsAsync<Exception>(() => job.ExecuteAsync(CancellationToken.None));
+
+            // Assert
+            var jobInfo = await dbContext.EytsAwardedEmailsJobs.SingleOrDefaultAsync(j => j.ExecutedUtc == today);
+            Assert.Null(jobInfo);
+            var jobItem =
+                await dbContext.EytsAwardedEmailsJobItems.SingleOrDefaultAsync(
+                    i => i.PersonId == eytsAwardee1.TeacherId);
+            Assert.Null(jobItem);
+        });
 }
