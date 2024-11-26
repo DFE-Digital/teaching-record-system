@@ -20,6 +20,6 @@ service trsstorage(disk)[Storage Account] in trs
 service trsredis(server)[Redis Cache] in trs
 service trskeyvaults(server)[TRS Key Vaults] in trs
 tscfrontdoor:R --> L:tscloadbalancers
-tscloadbalancers{group}:B --> T:nginix{group}
+tscloadbalancers{group}:B --> T:nginx{group}
 usr:B --> T: tscfrontdoor{group}
 ```
