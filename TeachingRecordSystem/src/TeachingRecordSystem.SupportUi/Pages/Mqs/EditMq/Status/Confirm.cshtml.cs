@@ -44,51 +44,36 @@ public class ConfirmModel(
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public bool? IsEndDateChange { get; set; }
+    public bool IsEndDateChange { get; set; }
 
-    public bool? IsStatusChange { get; set; }
+    public bool IsStatusChange { get; set; }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
-        var qualification = await dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
-            .SingleAsync(q => q.QualificationId == QualificationId);
-
-        var changes = MandatoryQualificationUpdatedEventChanges.None |
-            (NewStatus != qualification.Status ? MandatoryQualificationUpdatedEventChanges.Status : 0) |
-            (NewEndDate != qualification.EndDate ? MandatoryQualificationUpdatedEventChanges.EndDate : 0);
-
-        if (changes != MandatoryQualificationUpdatedEventChanges.None)
-        {
-            var oldMqEventModel = EventModels.MandatoryQualification.FromModel(qualification);
-
-            qualification.Status = NewStatus;
-            qualification.EndDate = NewEndDate;
-            qualification.UpdatedOn = now;
-
-            var updatedEvent = new MandatoryQualificationUpdatedEvent()
+        qualification.Update(
+            q =>
             {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = User.GetUserId(),
-                PersonId = PersonId,
-                MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification),
-                OldMandatoryQualification = oldMqEventModel,
-                ChangeReason = (IsEndDateChange!.Value && !IsStatusChange!.Value) ? EndDateChangeReason!.GetDisplayName() : StatusChangeReason!.GetDisplayName(),
-                ChangeReasonDetail = ChangeReasonDetail,
-                EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                    new EventModels.File()
-                    {
-                        FileId = fileId,
-                        Name = JourneyInstance.State.EvidenceFileName!
-                    } :
-                    null,
-                Changes = changes
-            };
-            dbContext.AddEvent(updatedEvent);
+                q.Status = NewStatus;
+                q.EndDate = NewEndDate;
+            },
+            changeReason: IsEndDateChange && !IsStatusChange ? EndDateChangeReason!.GetDisplayName() : StatusChangeReason!.GetDisplayName(),
+            ChangeReasonDetail,
+            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+                new EventModels.File()
+                {
+                    FileId = fileId,
+                    Name = JourneyInstance.State.EvidenceFileName!
+                } :
+                null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
 
+        if (updatedEvent is not null)
+        {
+            dbContext.AddEvent(updatedEvent);
             await dbContext.SaveChangesAsync();
         }
 

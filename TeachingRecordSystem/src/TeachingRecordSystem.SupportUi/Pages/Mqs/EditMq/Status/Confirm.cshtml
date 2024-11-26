@@ -15,18 +15,18 @@
             <h1 class="govuk-heading-l" data-testid="title">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
-                @if (Model.IsStatusChange!.Value)
+                @if (Model.IsStatusChange)
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Current status</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="current-status">@(Model.CurrentStatus.HasValue ? Model.CurrentStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>                
+                    </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>New status</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="new-status">@(Model.NewStatus.HasValue ? Model.NewStatus.Value.GetTitle() : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                @if (Model.IsEndDateChange!.Value)
+                @if (Model.IsEndDateChange)
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Current end date</govuk-summary-list-row-key>
@@ -37,7 +37,7 @@
                         <govuk-summary-list-row-value data-testid="new-end-date">@(Model.NewEndDate.HasValue ? Model.NewEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                @if (Model.IsEndDateChange!.Value && !Model.IsStatusChange!.Value)
+                @if (Model.IsEndDateChange && !Model.IsStatusChange)
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
