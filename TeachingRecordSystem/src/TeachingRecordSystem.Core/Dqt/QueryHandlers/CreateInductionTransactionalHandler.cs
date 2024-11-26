@@ -18,6 +18,6 @@ public class CreateInductionTransactionalHandler : ICrmTransactionalQueryHandler
                 dfeta_InductionStatus = query.InductionStatus,
             }
         });
-        return () => query.Id;
+        return () => createResponse.GetResponse().id;
     }
 }

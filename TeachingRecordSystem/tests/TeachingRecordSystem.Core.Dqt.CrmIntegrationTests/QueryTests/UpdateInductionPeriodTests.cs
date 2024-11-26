@@ -41,7 +41,7 @@ public class UpdateInductionPeriodTests : IAsyncLifetime
             x.WithQts(new DateOnly(2024, 01, 01));
         });
 
-        var queryInduction = new CreateInductionTransactionalQuery()
+        var createInductionQuery = new CreateInductionTransactionalQuery()
         {
             Id = inductionId,
             ContactId = contact.PersonId,
@@ -49,7 +49,7 @@ public class UpdateInductionPeriodTests : IAsyncLifetime
             CompletionDate = inductionEndDate,
             InductionStatus = inductionStatus,
         };
-        var queryInductionPeriod = new CreateInductionPeriodTransactionalQuery()
+        var createInductionPeriodQuery = new CreateInductionPeriodTransactionalQuery()
         {
             Id = inductionPeriodId,
             InductionId = inductionId,
@@ -64,8 +64,8 @@ public class UpdateInductionPeriodTests : IAsyncLifetime
             InductionStartDate = updatedInductionPeriodStartDate,
             InductionEndDate = updatedInductionPeriodEndDate,
         };
-        txn.AppendQuery(queryInduction);
-        txn.AppendQuery(queryInductionPeriod);
+        txn.AppendQuery(createInductionQuery);
+        txn.AppendQuery(createInductionPeriodQuery);
         txn.AppendQuery(updatedInductionPeriodQuery);
 
         // Act

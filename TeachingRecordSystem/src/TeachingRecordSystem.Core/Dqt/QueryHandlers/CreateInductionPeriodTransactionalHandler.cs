@@ -11,13 +11,14 @@ public class CreateInductionPeriodTransactionalHandler : ICrmTransactionalQueryH
         {
             Target = new dfeta_inductionperiod()
             {
-                dfeta_InductionId = query.Id.ToEntityReference(dfeta_induction.EntityLogicalName),
+                Id = query.Id,
+                dfeta_InductionId = query.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
                 dfeta_AppropriateBodyId = query.AppropriateBodyId?.ToEntityReference(Account.EntityLogicalName),
                 dfeta_StartDate = query.InductionStartDate,
                 dfeta_EndDate = query.InductionEndDate,
             }
         });
 
-        return () => query.Id;
+        return () => createResponse.GetResponse().id;
     }
 }

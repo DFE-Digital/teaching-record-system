@@ -11,8 +11,7 @@ public class CreateIntegrationTransactionRecordTransactionalHandler : ICrmTransa
         {
             Target = new dfeta_integrationtransactionrecord()
             {
-                Id = query.Id,
-                dfeta_IntegrationTransactionId = query.IntegrationTransactionId.ToEntityReference(dfeta_integrationtransaction.EntitySchemaName),
+                dfeta_IntegrationTransactionId = query.IntegrationTransactionId.ToEntityReference(dfeta_integrationtransaction.EntityLogicalName),
                 dfeta_id = query.Reference,
                 dfeta_PersonId = query.ContactId?.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_InitialTeacherTrainingId = query.InitialTeacherTrainingId?.ToEntityReference(dfeta_initialteachertraining.EntityLogicalName),
@@ -20,10 +19,13 @@ public class CreateIntegrationTransactionRecordTransactionalHandler : ICrmTransa
                 dfeta_InductionId = query.InductionId?.ToEntityReference(dfeta_induction.EntityLogicalName),
                 dfeta_InductionPeriodId = query.InductionPeriodId?.ToEntityReference(dfeta_inductionperiod.EntityLogicalName),
                 dfeta_DuplicateStatus = query.DuplicateStatus,
+                StatusCode = query.StatusCode,
+                dfeta_FailureMessage = query.FailureMessage,
+                dfeta_RowData = query.RowData,
                 dfeta_Filename = query.FileName
             }
         });
 
-        return () => query.Id;
+        return () => createResponse.GetResponse().id;
     }
 }

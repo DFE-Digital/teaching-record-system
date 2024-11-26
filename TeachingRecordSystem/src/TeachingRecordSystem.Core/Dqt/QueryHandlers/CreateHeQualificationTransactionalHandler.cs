@@ -11,6 +11,7 @@ public class CreateHeQualificationTransactionalHandler : ICrmTransactionalQueryH
         {
             Target = new dfeta_qualification()
             {
+                Id = query.Id,
                 dfeta_HE_CountryId = query.HECountryId?.ToEntityReference(dfeta_country.EntityLogicalName),
                 dfeta_HE_ClassDivision = query.HEClassDivision,
                 dfeta_HE_HEQualificationId = query.HEQualificationId?.ToEntityReference(dfeta_hequalification.EntityLogicalName),

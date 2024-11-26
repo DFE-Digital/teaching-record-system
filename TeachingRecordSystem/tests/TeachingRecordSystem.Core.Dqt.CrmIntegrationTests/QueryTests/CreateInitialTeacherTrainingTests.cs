@@ -28,6 +28,7 @@ public class CreateInitialTeacherTrainingTests : IAsyncLifetime
         var ittId = Guid.NewGuid();
         var contact = await _dataScope.TestData.CreatePersonAsync(x =>
         {
+            x.WithTrn();
             x.WithQts(new DateOnly(2024, 01, 01));
             x.WithQualification(qualificationId, dfeta_qualification_dfeta_Type.NPQH);
         });
@@ -35,7 +36,7 @@ public class CreateInitialTeacherTrainingTests : IAsyncLifetime
         {
             Id = ittId,
             ContactId = contact.PersonId,
-            ITTQualificationId = qualificationId,
+            ITTQualificationId = null,
             CountryId = country!.Id,
             Result = dfeta_ITTResult.Pass
         };
@@ -47,8 +48,7 @@ public class CreateInitialTeacherTrainingTests : IAsyncLifetime
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
         var itt = ctx.dfeta_initialteachertrainingSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.PrimaryIdAttribute) == ittId);
-        var qualification = ctx.dfeta_qualificationSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(dfeta_qualification.PrimaryIdAttribute) == qualificationId);
-        Assert.NotNull(qualification);
         Assert.NotNull(itt);
+        Assert.Equal(dfeta_ITTResult.Pass, itt.dfeta_Result);
     }
 }

@@ -35,30 +35,14 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         {
             totalRowCount++;
             var qualificationId = Guid.NewGuid();
-            var itrId = Guid.NewGuid();
             var ittId = Guid.NewGuid();
             var qtsRegistrationId = Guid.NewGuid();
             Guid? inductionId = null;
             var itrFailureMessage = new StringBuilder();
             using var rowTransaction = crmQueryDispatcher.CreateTransactionRequestBuilder();
 
-            //create ITR
             try
             {
-                var createIntegrationTransactionRecord = new CreateIntegrationTransactionRecordTransactionalQuery()
-                {
-                    Id = itrId,
-                    IntegrationTransactionId = integrationId,
-                    Reference = totalRowCount.ToString(),
-                    ContactId = null,
-                    InitialTeacherTrainingId = null,
-                    QualificationId = null,
-                    InductionId = null,
-                    InductionPeriodId = null,
-                    DuplicateStatus = null,
-                    FileName = fileName
-                };
-                rowTransaction.AppendQuery(createIntegrationTransactionRecord);
                 var lookupData = await GetLookupDataAsync(row);
                 var validationFailures = Validate(row, lookupData);
 
@@ -134,13 +118,12 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
                     }
                 }
 
-                //update ITR row with status of import row
-                var updateIntegrationTransactionRecordQuery = new UpdateIntegrationTransactionRecordTransactionalQuery()
+                //create ITR row with status of import row
+                var createIntegrationTransactionRecord = new CreateIntegrationTransactionRecordTransactionalQuery()
                 {
-                    IntegrationTransactionRecordId = itrId,
                     IntegrationTransactionId = integrationId,
                     Reference = totalRowCount.ToString(),
-                    PersonId = lookupData.PersonId,
+                    ContactId = lookupData.PersonId,
                     InitialTeacherTrainingId = ittId,
                     QualificationId = qualificationId,
                     InductionId = inductionId,
@@ -149,8 +132,9 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
                     FailureMessage = itrFailureMessage.ToString(),
                     StatusCode = string.IsNullOrEmpty(itrFailureMessage.ToString()) ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
                     RowData = ConvertToCsvString(row),
+                    FileName = fileName
                 };
-                rowTransaction.AppendQuery(updateIntegrationTransactionRecordQuery);
+                rowTransaction.AppendQuery(createIntegrationTransactionRecord);
 
                 //update IntegrationTransaction so that it's always up to date with
                 //counts of rows

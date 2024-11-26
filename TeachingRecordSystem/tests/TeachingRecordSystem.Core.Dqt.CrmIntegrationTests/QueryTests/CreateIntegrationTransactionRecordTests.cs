@@ -26,7 +26,10 @@ public class CreateIntegrationTransactionRecordTests : IAsyncLifetime
         var typeId = dfeta_IntegrationInterface.GTCWalesImport;
         var reference = "1";
         var fileName = "QTS_FILE.csv";
-        var itrId = Guid.NewGuid();
+        Guid? itrId = null;
+        var rowData = "SOMEROWDATA";
+        var statusCode = dfeta_integrationtransactionrecord_StatusCode.Fail;
+        var failureMessage = "SOME FAILURE";
 
         var establishment1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
@@ -47,7 +50,6 @@ public class CreateIntegrationTransactionRecordTests : IAsyncLifetime
 
         var recordQuery = new CreateIntegrationTransactionRecordTransactionalQuery()
         {
-            Id = itrId,
             IntegrationTransactionId = integrationTransactionId,
             Reference = reference,
             ContactId = person.PersonId,
@@ -56,18 +58,22 @@ public class CreateIntegrationTransactionRecordTests : IAsyncLifetime
             InductionId = person.DqtInductions.First().InductionId,
             InductionPeriodId = person.DqtInductionPeriods.First().InductionPeriodId,
             DuplicateStatus = dfeta_integrationtransactionrecord_dfeta_DuplicateStatus.Duplicate,
-            FileName = fileName
+            FileName = fileName,
+            RowData = rowData,
+            StatusCode = statusCode,
+            FailureMessage = failureMessage
         };
 
         // Act
-        txn.AppendQuery(recordQuery);
+        var itr = txn.AppendQuery(recordQuery);
         await txn.ExecuteAsync();
+        itrId = itr();
 
         // Assert
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
 
         var createdIntegrationTransaction = ctx.dfeta_integrationtransactionSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
-        var createdIntegrationTransactionRecord = ctx.dfeta_integrationtransactionrecordSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.PrimaryIdAttribute) == itrId);
+        var createdIntegrationTransactionRecord = ctx.dfeta_integrationtransactionrecordSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.PrimaryIdAttribute) == itrId.Value);
         Assert.NotNull(createdIntegrationTransaction);
         Assert.NotNull(createdIntegrationTransactionRecord);
         Assert.Equal(fileName, createdIntegrationTransaction.dfeta_Filename);
@@ -78,5 +84,8 @@ public class CreateIntegrationTransactionRecordTests : IAsyncLifetime
         Assert.Equal(person.DqtInductionPeriods.First().InductionPeriodId, createdIntegrationTransactionRecord.dfeta_InductionPeriodId.Id);
         Assert.Equal(dfeta_integrationtransactionrecord_dfeta_DuplicateStatus.Duplicate, createdIntegrationTransactionRecord.dfeta_DuplicateStatus);
         Assert.Equal(fileName, createdIntegrationTransactionRecord.dfeta_Filename);
+        Assert.Equal(rowData, createdIntegrationTransactionRecord.dfeta_RowData);
+        Assert.Equal(failureMessage, createdIntegrationTransactionRecord.dfeta_FailureMessage);
+        Assert.Equal(statusCode, createdIntegrationTransactionRecord.StatusCode);
     }
 }

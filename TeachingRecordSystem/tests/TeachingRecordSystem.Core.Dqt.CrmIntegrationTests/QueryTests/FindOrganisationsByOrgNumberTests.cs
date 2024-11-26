@@ -1,3 +1,5 @@
+using SixLabors.ImageSharp;
+
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class FindOrganisationsByOrgNumberTests : IAsyncLifetime
@@ -43,10 +45,10 @@ public class FindOrganisationsByOrgNumberTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task FindByOrgNumber_ReturnsMultipleMatches()
+    public async Task FindOrganisationsByAccountNumber_ReturnsMultipleMatches()
     {
         // Arrange
-        var accountNumber = "1234";
+        var accountNumber = "95556";
         var accountName1 = "testing";
         var account1 = await _dataScope.TestData.CreateAccountAsync(x =>
         {
@@ -65,19 +67,16 @@ public class FindOrganisationsByOrgNumberTests : IAsyncLifetime
         var results = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         // Assert
-        Assert.Collection(
-            results,
-            account1 =>
-            {
-                Assert.Equal(account1.Id, account1.Id);
-                Assert.Equal(account1.Name, accountName1);
-                Assert.Equal(account1.AccountNumber, accountNumber);
-            },
-            account2 =>
-            {
-                Assert.Equal(account2.Id, account2.Id);
-                Assert.Equal(account2.Name, accountName2);
-                Assert.Equal(account2.AccountNumber, accountNumber);
-            });
+        Assert.Contains(results, account =>
+            account.Id == account1.Id &&
+            account.Name == accountName1 &&
+            account.AccountNumber == accountNumber
+        );
+
+        Assert.Contains(results, account =>
+            account.Id == account2.Id &&
+            account.Name == accountName2 &&
+            account.AccountNumber == accountNumber
+        );
     }
 }

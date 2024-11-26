@@ -11,12 +11,13 @@ public class CreateQtsRegistrationTransactionalHandler : ICrmTransactionalQueryH
         {
             Target = new dfeta_qtsregistration()
             {
+                Id = query.Id,
                 dfeta_PersonId = query.ContactId.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_TeacherStatusId = query.TeacherStatusId.ToEntityReference(dfeta_teacherstatus.EntityLogicalName),
                 dfeta_QTSDate = query.QtsDate
             }
         });
 
-        return () => query.Id;
+        return () => createResponse.GetResponse().id;
     }
 }

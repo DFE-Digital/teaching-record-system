@@ -20,9 +20,13 @@ public class CreateQTSTests : IAsyncLifetime
     {
         // Arrange
         using var txn = _crmQueryDispatcher.CreateTransactionRequestBuilder();
-        var contact = await _dataScope.TestData.CreatePersonAsync();
+        var contact = await _dataScope.TestData.CreatePersonAsync(x =>
+        {
+            x.WithTrn();
+            x.WithQts();
+        });
         var qtsDate = new DateTime(2024, 01, 01);
-        var teacherStatusQualifiedTeacherTrained = "211";
+        var teacherStatusQualifiedTeacherTrained = "213";
         var query = new GetAllTeacherStatusesQuery();
         var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);
         var teacherStatusId = result.FirstOrDefault(x => x.dfeta_Value == teacherStatusQualifiedTeacherTrained);

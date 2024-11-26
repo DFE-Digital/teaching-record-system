@@ -18,6 +18,6 @@ public class CreateInitialTeacherTrainingTransactionalHandler : ICrmTransactiona
                 dfeta_Result = query.Result
             }
         });
-        return () => query.Id;
+        return () => createResponse.GetResponse().id;
     }
 }
