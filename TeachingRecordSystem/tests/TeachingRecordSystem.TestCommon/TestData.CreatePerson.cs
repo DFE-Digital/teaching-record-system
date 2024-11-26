@@ -698,14 +698,12 @@ public partial class TestData
         private Option<Guid?> _alertTypeId;
         private Option<string?> _details;
         private Option<string?> _externalLink;
-        private Option<DateOnly?> _startDate;
+        private Option<DateOnly> _startDate;
         private Option<DateOnly?> _endDate;
         private Option<string?> _reason;
         private Option<string?> _reasonDetail;
         private Option<EventModels.RaisedByUserInfo> _createdByUser;
         private Option<DateTime?> _createdUtc;
-
-        public Guid AlertId { get; } = Guid.NewGuid();
 
         public CreatePersonAlertBuilder WithAlertTypeId(Guid? alertTypeId)
         {
@@ -725,7 +723,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonAlertBuilder WithStartDate(DateOnly? startDate)
+        public CreatePersonAlertBuilder WithStartDate(DateOnly startDate)
         {
             _startDate = Option.Some(startDate);
             return this;
@@ -785,36 +783,24 @@ public partial class TestData
             var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
-            var alert = new Alert()
-            {
-                AlertId = AlertId,
-                PersonId = personId,
-                AlertTypeId = alertTypeId!.Value,
-                Details = details,
-                ExternalLink = externalLink,
-                StartDate = startDate,
-                EndDate = endDate,
-                CreatedOn = createdUtc!.Value,
-                UpdatedOn = createdUtc!.Value
-            };
+            var alert = Alert.Create(
+                alertTypeId!.Value,
+                personId,
+                details,
+                externalLink,
+                startDate,
+                endDate,
+                reason,
+                reasonDetail,
+                evidenceFile: null,
+                createdByUser,
+                createdUtc!.Value,
+                out var @createdEvent);
 
             dbContext.Alerts.Add(alert);
-
-            var createdEvent = new AlertCreatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = createdUtc!.Value,
-                RaisedBy = createdByUser,
-                Alert = EventModels.Alert.FromModel(alert),
-                PersonId = personId,
-                AddReason = reason,
-                AddReasonDetail = reasonDetail,
-                EvidenceFile = null
-            };
-
             dbContext.AddEvent(createdEvent);
 
-            return AlertId;
+            return alert.AlertId;
         }
     }
 
@@ -934,8 +920,8 @@ public partial class TestData
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
             var provider = providerId.HasValue ?
-                    await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
-                    null;
+                await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
+                null;
 
             var mq = new MandatoryQualification()
             {

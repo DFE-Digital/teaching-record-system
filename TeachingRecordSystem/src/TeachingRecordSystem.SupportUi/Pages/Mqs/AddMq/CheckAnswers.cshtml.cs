@@ -30,30 +30,19 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var qualification = new MandatoryQualification()
-        {
-            QualificationId = Guid.NewGuid(),
-            CreatedOn = clock.UtcNow,
-            UpdatedOn = clock.UtcNow,
-            PersonId = PersonId,
-            ProviderId = ProviderId,
-            Status = Status,
-            Specialism = Specialism,
-            StartDate = StartDate,
-            EndDate = EndDate
-        };
+        var qualification = MandatoryQualification.Create(
+            PersonId,
+            ProviderId,
+            Specialism,
+            Status,
+            StartDate,
+            EndDate,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var createdEvent);
+
         dbContext.MandatoryQualifications.Add(qualification);
-
-        var createdEvent = new MandatoryQualificationCreatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = clock.UtcNow,
-            RaisedBy = User.GetUserId(),
-            PersonId = PersonId,
-            MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification, providerNameHint: ProviderName)
-        };
         dbContext.AddEvent(createdEvent);
-
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
