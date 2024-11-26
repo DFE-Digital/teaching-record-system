@@ -21,8 +21,6 @@ public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
     public Task AdvanceReplicationSlotToCurrentWalLsnAsync(string slot) => WithDbContextAsync(dbContext =>
         dbContext.Database.ExecuteSqlAsync($"select * from pg_replication_slot_advance({slot}, pg_current_wal_lsn());"));
 
-    public TrsDbContext GetDbContext() => Services.GetRequiredService<TrsDbContext>();
-
     public IDbContextFactory<TrsDbContext> GetDbContextFactory() => Services.GetRequiredService<IDbContextFactory<TrsDbContext>>();
 
     public virtual async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)

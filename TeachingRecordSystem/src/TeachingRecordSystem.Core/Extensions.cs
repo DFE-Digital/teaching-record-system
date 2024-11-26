@@ -43,7 +43,7 @@ public static class Extensions
 
         services.AddDbContext<TrsDbContext>(
             options => TrsDbContext.ConfigureOptions(options),
-            contextLifetime: ServiceLifetime.Transient,
+            contextLifetime: ServiceLifetime.Scoped,
             optionsLifetime: ServiceLifetime.Singleton);
 
         services.AddDbContextFactory<TrsDbContext>(options => TrsDbContext.ConfigureOptions(options));
