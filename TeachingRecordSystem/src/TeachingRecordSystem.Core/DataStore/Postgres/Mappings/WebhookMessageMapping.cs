@@ -11,5 +11,6 @@ public class WebhookMessageMapping : IEntityTypeConfiguration<WebhookMessage>
         builder.Property(m => m.CloudEventId).HasMaxLength(50);
         builder.Property(m => m.CloudEventType).HasMaxLength(100);
         builder.Property(m => m.ApiVersion).HasMaxLength(50);
+        builder.HasIndex(m => m.NextDeliveryAttempt).HasFilter("next_delivery_attempt is not null");
     }
 }

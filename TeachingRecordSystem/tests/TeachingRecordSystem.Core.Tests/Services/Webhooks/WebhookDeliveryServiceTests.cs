@@ -158,7 +158,7 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
         {
             // Set up a message that's been attempted multiple times before and has failed every time but has a single retry left
 
-            var attemptsAndErrors = WebhookDeliveryService.RetryInvervals.SkipLast(0).Prepend(TimeSpan.Zero).Aggregate(
+            var attemptsAndErrors = WebhookDeliveryService.RetryIntervals.SkipLast(0).Prepend(TimeSpan.Zero).Aggregate(
                 (Attempts: Array.Empty<DateTime>(), Errors: Array.Empty<string>()),
                 (t, interval) => t with
                 {
