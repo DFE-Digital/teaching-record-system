@@ -1,4 +1,7 @@
-namespace TeachingRecordSystem.Api;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
+namespace TeachingRecordSystem.Core;
 
 public static class EnumHelper
 {
@@ -59,6 +62,34 @@ public static class EnumHelper
         {
             result = default;
             return false;
+        }
+    }
+
+    public static string? GetDisplayName(this Enum enumValue)
+    {
+        var displayAttribute = enumValue.GetType()
+            .GetMember(enumValue.ToString())
+            .Single()
+            .GetCustomAttribute<DisplayAttribute>();
+
+        return displayAttribute is null ? enumValue.ToString() : displayAttribute.GetName();
+    }
+
+    public static IReadOnlyCollection<TEnum> SplitFlags<TEnum>(this TEnum input)
+        where TEnum : struct, Enum
+    {
+        return Impl().ToArray();
+
+        IEnumerable<TEnum> Impl()
+        {
+            foreach (int v in Enum.GetValuesAsUnderlyingType<TEnum>())
+            {
+                if (((int)(object)input & v) != 0 &&
+                    (v != 0) && ((v & (v - 1)) == 0))  // Exclude 0 and non powers of two
+                {
+                    yield return (TEnum)(object)v;
+                }
+            }
         }
     }
 }

@@ -230,7 +230,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.AlertCategories.Include(c => c.AlertTypes).ToArrayAsync();
+                return await dbContext.AlertCategories.AsNoTracking().Include(c => c.AlertTypes).ToArrayAsync();
             });
 
     private Task<AlertType[]> EnsureAlertTypesAsync() =>
@@ -239,7 +239,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.AlertTypes.ToArrayAsync();
+                return await dbContext.AlertTypes.AsNoTracking().Include(at => at.AlertCategory).ToArrayAsync();
             });
 
     async Task IStartupTask.ExecuteAsync()

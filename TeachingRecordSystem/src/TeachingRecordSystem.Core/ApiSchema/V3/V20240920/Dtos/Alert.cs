@@ -7,4 +7,32 @@ public record Alert
     public required string? Details { get; init; }
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
+
+    public static async Task<Alert> FromEventAsync(EventModels.Alert alert, ReferenceDataCache referenceDataCache)
+    {
+        if (alert.AlertTypeId is null)
+        {
+            throw new ArgumentNullException("", nameof(alert.AlertTypeId));
+        }
+
+        var alertType = await referenceDataCache.GetAlertTypeByIdAsync(alert.AlertTypeId!.Value);
+
+        return new()
+        {
+            AlertId = alert.AlertId,
+            AlertType = new()
+            {
+                AlertTypeId = alertType.AlertTypeId,
+                Name = alertType.Name,
+                AlertCategory = new()
+                {
+                    AlertCategoryId = alertType.AlertCategoryId,
+                    Name = alertType.AlertCategory.Name,
+                }
+            },
+            Details = alert.Details,
+            StartDate = alert.StartDate,
+            EndDate = alert.EndDate,
+        };
+    }
 }
