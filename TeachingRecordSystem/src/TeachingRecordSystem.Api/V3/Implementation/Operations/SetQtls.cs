@@ -1,6 +1,5 @@
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
-using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -32,25 +31,32 @@ public sealed class SetQtlsResult
 
 public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock)
 {
-    public async Task<SetQtlsResult> HandleAsync(SetQtlsCommand command)
+    public async Task<ApiResult<SetQtlsResult>> HandleAsync(SetQtlsCommand command)
     {
-        var contact = (await crmQueryDispatcher.ExecuteQueryAsync(
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
                     Contact.Fields.dfeta_InductionStatus,
                     Contact.Fields.dfeta_qtlsdate,
-                    Contact.Fields.dfeta_QTSDate))
-            ))!;
+                    Contact.Fields.dfeta_QTSDate)));
 
-        if (contact == null)
+        if (contact is null)
         {
-            throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
+            return ApiError.PersonNotFound(command.Trn);
         }
 
         var induction = await GetInductionWithAppropriateBodyAsync(contact.Id);
-        var (canSetQtlsDate, reviewTaskDescription) = CanSetQtlsDate(hasQTS: contact.dfeta_QTSDate.HasValue, overallInductionStatus: contact.dfeta_InductionStatus, inductionStatus: induction?.Induction.dfeta_InductionStatus, hasInductionWithAB: induction?.HasAppropriateBody ?? false, existingQtlsdate: contact.dfeta_qtlsdate, incomingQtlsDate: command.QtsDate);
+
+        var (canSetQtlsDate, reviewTaskDescription) = CanSetQtlsDate(
+            hasQTS: contact.dfeta_QTSDate.HasValue,
+            overallInductionStatus: contact.dfeta_InductionStatus,
+            inductionStatus: induction?.Induction.dfeta_InductionStatus,
+            hasInductionWithAB: induction?.HasAppropriateBody ?? false,
+            existingQtlsdate: contact.dfeta_qtlsdate,
+            incomingQtlsDate: command.QtsDate);
+
         if (!canSetQtlsDate)
         {
             await crmQueryDispatcher.ExecuteQueryAsync(

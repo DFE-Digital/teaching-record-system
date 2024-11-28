@@ -71,12 +71,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
         var result = await handler.HandleAsync(command);
 
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        var response = GetPersonResponse.Map(result, mapper, User.IsInRole(ApiRoles.AppropriateBody));
-        return Ok(response);
+        return result
+            .ToActionResult(r => Ok(GetPersonResponse.Map(r, mapper, User.IsInRole(ApiRoles.AppropriateBody))))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 }

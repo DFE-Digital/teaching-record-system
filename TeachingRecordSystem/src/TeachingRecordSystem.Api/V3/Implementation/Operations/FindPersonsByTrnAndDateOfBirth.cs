@@ -33,7 +33,7 @@ public class FindPersonsByTrnAndDateOfBirthHandler(
     PreviousNameHelper previousNameHelper,
     ReferenceDataCache referenceDataCache)
 {
-    public async Task<FindPersonsByTrnAndDateOfBirthResult> HandleAsync(FindPersonsByTrnAndDateOfBirthCommand command)
+    public async Task<ApiResult<FindPersonsByTrnAndDateOfBirthResult>> HandleAsync(FindPersonsByTrnAndDateOfBirthCommand command)
     {
         var contacts = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactsByTrnsQuery(

@@ -32,7 +32,8 @@ public class PersonController(IMapper mapper) : ControllerBase
             ApplyLegacyAlertsBehavior: false);
 
         var result = await handler.HandleAsync(command);
-        var response = mapper.Map<GetPersonResponse?>(result);
-        return response is null ? Forbid() : Ok(response);
+
+        return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
     }
 }

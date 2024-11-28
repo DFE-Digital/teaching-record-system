@@ -19,7 +19,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
         Description = "Gets the details of the teacher corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
@@ -35,12 +35,7 @@ public class TeachersController(IMapper mapper) : ControllerBase
 
         var result = await handler.HandleAsync(command);
 
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        var response = mapper.Map<GetTeacherResponse>(result);
-        return Ok(response);
+        return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 }
