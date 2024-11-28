@@ -48,9 +48,10 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             Postcode = request.Person.Address?.Postcode,
             Country = request.Person.Address?.Country,
         };
+
         var result = await handler.HandleAsync(command);
 
-        var response = mapper.Map<TrnRequestInfo>(result);
-        return Ok(response);
+        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
     }
 }

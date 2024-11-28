@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.StaticFiles;
-using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -14,18 +13,20 @@ public record CreateDateOfBirthChangeRequestCommand
     public required string? EmailAddress { get; init; }
 }
 
+public record CreateDateOfBirthChangeRequestResult(string CaseNumber);
+
 public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryDispatcher, IHttpClientFactory httpClientFactory)
 {
     private readonly HttpClient _downloadEvidenceFileHttpClient = httpClientFactory.CreateClient("EvidenceFiles");
 
-    public async Task<string> HandleAsync(CreateDateOfBirthChangeRequestCommand command)
+    public async Task<ApiResult<CreateDateOfBirthChangeRequestResult>> HandleAsync(CreateDateOfBirthChangeRequestCommand command)
     {
         var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(command.Trn, new Microsoft.Xrm.Sdk.Query.ColumnSet()));
 
         if (contact is null)
         {
-            throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
+            return ApiError.PersonNotFound(command.Trn);
         }
 
         using var evidenceFileResponse = await _downloadEvidenceFileHttpClient.GetAsync(
@@ -34,11 +35,10 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
 
         if (!evidenceFileResponse.IsSuccessStatusCode)
         {
-            throw new ErrorException(ErrorRegistry.SpecifiedUrlDoesNotExist());
+            return ApiError.SpecifiedResourceUrlDoesNotExist(command.EvidenceFileUrl);
         }
 
         var fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
-
         if (!fileExtensionContentTypeProvider.TryGetContentType(command.EvidenceFileName, out var evidenceFileMimeType))
         {
             evidenceFileMimeType = "application/octet-stream";
@@ -55,6 +55,6 @@ public class CreateDateOfBirthChangeRequestHandler(ICrmQueryDispatcher crmQueryD
             EmailAddress = command.EmailAddress,
         });
 
-        return ticketNumber;
+        return new CreateDateOfBirthChangeRequestResult(ticketNumber);
     }
 }

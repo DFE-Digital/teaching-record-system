@@ -25,29 +25,15 @@ public class TeacherController(IMapper mapper) : ControllerBase
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetTeacherRequestIncludes? include,
         [FromServices] GetPersonHandler handler)
     {
-        var trn = User.FindFirstValue("trn");
-
-        if (trn is null)
-        {
-            return MissingOrInvalidTrn();
-        }
-
         var command = new GetPersonCommand(
-            trn,
+            Trn: User.FindFirstValue("trn")!,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
             DateOfBirth: null,
             ApplyLegacyAlertsBehavior: true);
 
         var result = await handler.HandleAsync(command);
 
-        if (result is null)
-        {
-            return MissingOrInvalidTrn();
-        }
-
-        var response = mapper.Map<GetTeacherResponse>(result);
-        return Ok(response);
-
-        IActionResult MissingOrInvalidTrn() => Forbid();
+        return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
     }
 }

@@ -27,20 +27,9 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         var alert = person.Alerts.Single();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
-        {
-            Content = JsonContent.Create(new
-            {
-                persons = new[]
-                {
-                    new
-                    {
-                        trn = person.Trn,
-                        dateOfBirth = person.DateOfBirth
-                    }
-                }
-            })
-        };
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/v3/persons?findBy=LastNameAndDateOfBirth&lastName={lastName}&dateOfBirth={dateOfBirth:yyyy-MM-dd}");
 
         // Act
         var response = await GetHttpClientWithApiKey().SendAsync(request);

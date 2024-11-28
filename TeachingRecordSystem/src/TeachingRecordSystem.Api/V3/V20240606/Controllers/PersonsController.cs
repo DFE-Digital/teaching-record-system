@@ -19,7 +19,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Gets the details of the person corresponding to the given TRN.")]
     [ProducesResponseType(typeof(GetPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
     public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
@@ -35,13 +35,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
         var result = await handler.HandleAsync(command);
 
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        var response = mapper.Map<GetPersonResponse>(result);
-        return Ok(response);
+        return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [HttpGet("")]
@@ -59,13 +54,12 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
         var result = await handler.HandleAsync(command);
 
-        var response = new FindPersonResponse()
-        {
-            Total = result.Total,
-            Query = request,
-            Results = result.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
-        };
-
-        return Ok(response);
+        return result.ToActionResult(r =>
+            Ok(new FindPersonResponse()
+            {
+                Total = r.Total,
+                Query = request,
+                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+            }));
     }
 }

@@ -24,7 +24,6 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
     [ProducesResponseType(typeof(TrnRequestInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    [MapError(10029, statusCode: StatusCodes.Status409Conflict)]
     public async Task<IActionResult> CreateTrnRequestAsync(
         [FromBody] CreateTrnRequestRequest request,
         [FromServices] CreateTrnRequestHandler handler)
@@ -48,10 +47,11 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             GenderCode = null,
             Country = null
         };
+
         var result = await handler.HandleAsync(command);
 
-        var response = mapper.Map<TrnRequestInfo>(result);
-        return Ok(response);
+        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.TrnRequestAlreadyCreated, StatusCodes.Status409Conflict);
     }
 
     [HttpGet("")]
@@ -71,12 +71,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
         var command = new GetTrnRequestCommand(requestId);
         var result = await handler.HandleAsync(command);
 
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        var response = mapper.Map<TrnRequestInfo>(result);
-        return Ok(response);
+        return result.ToActionResult(r => Ok(mapper.Map<TrnRequestInfo>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.TrnRequestDoesNotExist, StatusCodes.Status404NotFound);
     }
 }

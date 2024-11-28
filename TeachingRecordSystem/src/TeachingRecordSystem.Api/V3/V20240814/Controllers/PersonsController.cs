@@ -25,8 +25,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     {
         var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
         var result = await handler.HandleAsync(command);
-        var response = mapper.Map<FindPersonsResponse>(result);
-        return Ok(response);
+        return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
     }
 
     [HttpGet("")]
@@ -44,13 +43,12 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
         var result = await handler.HandleAsync(command);
 
-        var response = new FindPersonResponse()
-        {
-            Total = result.Total,
-            Query = request,
-            Results = result.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
-        };
-
-        return Ok(response);
+        return result.ToActionResult(r =>
+            Ok(new FindPersonResponse()
+            {
+                Total = r.Total,
+                Query = request,
+                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+            }));
     }
 }
