@@ -118,7 +118,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                             {
                                 InductionId = inductionId!.Value,
                                 CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
-                                InductionStatus = lookupData.Induction!.dfeta_InductionStatus.Value
+                                InductionStatus = lookupData.Induction!.dfeta_InductionStatus!.Value
                             };
                             rowTransaction.AppendQuery(updateInduction);
 
