@@ -113,11 +113,20 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
                         }
                         else
                         {
+                            inductionPeriodId = lookupData.InductionPeriod.dfeta_inductionperiodId;
+                            var updateInduction = new UpdateInductionTransactionalQuery()
+                            {
+                                InductionId = inductionId!.Value,
+                                CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionStatus = lookupData.Induction!.dfeta_InductionStatus.Value
+                            };
+                            rowTransaction.AppendQuery(updateInduction);
+
                             var updateInductionPeriodQuery = new UpdateInductionPeriodTransactionalQuery()
                             {
-                                InductionPeriodId = lookupData.InductionPeriod.Id,
+                                InductionPeriodId = inductionPeriodId!.Value,
                                 AppropriateBodyId = lookupData.OrganisationId,
-                                InductionStartDate = DateTime.ParseExact(row.StartDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionStartDate = lookupData.InductionPeriod.dfeta_StartDate,
                                 InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
                             };
                             rowTransaction.AppendQuery(updateInductionPeriodQuery);
@@ -215,7 +224,7 @@ public class InductionImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<I
     public async Task<InductionImportLookupData> GetLookupDataAsync(EwcWalesInductionImportData row)
     {
         var (personMatchStatus, contact) = await FindMatchingTeacherRecordAsync(row);
-        var (orgMatchStatus, organisationId) = await FindMatchingOrganisationsRecordAsync(row.EmployerName);
+        var (orgMatchStatus, organisationId) = await FindMatchingOrganisationsRecordAsync(row.EmployerCode);
         InductionLookupResult? inductionMatchStatus = null;
         dfeta_induction? induction = null;
         dfeta_inductionperiod? inductionPeriod = null;

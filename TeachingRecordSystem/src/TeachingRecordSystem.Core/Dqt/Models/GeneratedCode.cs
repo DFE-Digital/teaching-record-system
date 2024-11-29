@@ -6874,6 +6874,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_AppropriateBodyId = "dfeta_appropriatebodyid";
 			public const string dfeta_EndDate = "dfeta_enddate";
 			public const string dfeta_InductionId = "dfeta_inductionid";
+			public const string dfeta_inductionperiodId = "dfeta_inductionperiodid";
+			public const string Id = "dfeta_inductionperiodid";
 			public const string dfeta_Numberofterms = "dfeta_numberofterms";
 			public const string dfeta_StartDate = "dfeta_startdate";
 			public const string StateCode = "statecode";
@@ -6989,6 +6991,49 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_InductionId");
 				this.SetAttributeValue("dfeta_inductionid", value);
 				this.OnPropertyChanged("dfeta_InductionId");
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier for entity instances
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionperiodid")]
+		public System.Nullable<System.Guid> dfeta_inductionperiodId
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.Guid>>("dfeta_inductionperiodid");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_inductionperiodId");
+				this.SetAttributeValue("dfeta_inductionperiodid", value);
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+				this.OnPropertyChanged("dfeta_inductionperiodId");
+			}
+		}
+		
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_inductionperiodid")]
+		public override System.Guid Id
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return base.Id;
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.dfeta_inductionperiodId = value;
 			}
 		}
 		

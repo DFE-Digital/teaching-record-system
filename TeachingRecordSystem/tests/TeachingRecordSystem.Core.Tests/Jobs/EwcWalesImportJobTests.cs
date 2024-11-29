@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
@@ -496,7 +497,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Import filename must begin with IND or QTS")),
                 null,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -508,10 +509,17 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var successCount = 1;
         var duplicateRowCount = 0;
         var failureRowCount = 0;
-        var account = await TestData.CreateAccountAsync(x => x.WithName("SomeName"));
+        var accountNumber = "54321";
+        var startDate = DateTime.Parse("17/09/2014");
+        var passDate = DateTime.Parse("28/09/2017");
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn = person.Trn;
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},17/09/2014,28/09/2017,,{account.Name},{account.AccountNumber},Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{startDate.ToString("dd/MM/yyyy")},{passDate.ToString("dd/MM/yyyy")},,{account.Name},{accountNumber},Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -522,12 +530,110 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         //Assert
         using var ctx = new DqtCrmServiceContext(OrganisationService);
         var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
-        var Itrrecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
+        var itrRecord = ctx.dfeta_integrationtransactionrecordSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
+        var induction = ctx.dfeta_inductionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_induction.PrimaryIdAttribute) == itrRecord.dfeta_InductionId.Id);
+        var inductionPeriod = ctx.dfeta_inductionperiodSet.Single(i => i.GetAttributeValue<Guid>(dfeta_inductionperiod.PrimaryIdAttribute) == itrRecord.dfeta_InductionPeriodId.Id);
         Assert.Equal(totalRowCount, integrationTransaction.dfeta_TotalCount);
         Assert.Equal(successCount, integrationTransaction.dfeta_SuccessCount);
         Assert.Equal(duplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
         Assert.Equal(failureRowCount, integrationTransaction.dfeta_FailureCount);
         Assert.Empty(integrationTransaction.dfeta_FailureMessage);
+        Assert.Equal(startDate, induction.dfeta_StartDate);
+        Assert.Equal(passDate, induction.dfeta_CompletionDate);
+        Assert.Equal(startDate, inductionPeriod.dfeta_StartDate);
+        Assert.Equal(passDate, inductionPeriod.dfeta_EndDate);
+        Assert.Equal(account.Id, inductionPeriod.dfeta_AppropriateBodyId.Id);
+    }
+
+    [Fact]
+    public async Task EwcWalesImportJobInductionWithoutAppropriateBody_ImportsInductionFileSuccessfully()
+    {
+        // Arrange
+        var totalRowCount = 1;
+        var successCount = 1;
+        var duplicateRowCount = 0;
+        var failureRowCount = 0;
+        var startDate = DateTime.Parse("17/09/2014");
+        var passDate = DateTime.Parse("28/09/2017");
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var trn = person.Trn;
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{startDate.ToString("dd/MM/yyyy")},{passDate.ToString("dd/MM/yyyy")},,,,Pass\r\n";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+
+        //Assert
+        using var ctx = new DqtCrmServiceContext(OrganisationService);
+        var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
+        var itrRecord = ctx.dfeta_integrationtransactionrecordSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
+        var induction = ctx.dfeta_inductionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_induction.PrimaryIdAttribute) == itrRecord.dfeta_InductionId.Id);
+        var inductionPeriod = ctx.dfeta_inductionperiodSet.Single(i => i.GetAttributeValue<Guid>(dfeta_inductionperiod.PrimaryIdAttribute) == itrRecord.dfeta_InductionPeriodId.Id);
+        Assert.Equal(totalRowCount, integrationTransaction.dfeta_TotalCount);
+        Assert.Equal(successCount, integrationTransaction.dfeta_SuccessCount);
+        Assert.Equal(duplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
+        Assert.Equal(failureRowCount, integrationTransaction.dfeta_FailureCount);
+        Assert.Empty(integrationTransaction.dfeta_FailureMessage);
+        Assert.Equal(startDate, induction.dfeta_StartDate);
+        Assert.Equal(passDate, induction.dfeta_CompletionDate);
+        Assert.Equal(startDate, inductionPeriod.dfeta_StartDate);
+        Assert.Equal(passDate, inductionPeriod.dfeta_EndDate);
+        Assert.Null(inductionPeriod.dfeta_AppropriateBodyId);
+    }
+
+    [Fact]
+    public async Task EwcWalesImportJobInduction_UpdatesExistingInduction()
+    {
+        // Arrange
+        var accountNumber = "678910";
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var totalRowCount = 1;
+        var successCount = 1;
+        var duplicateRowCount = 0;
+        var failureRowCount = 0;
+        var startDate = DateTime.Parse("17/09/2014");
+        var passDate = DateTime.Parse("28/09/2017");
+        var person = await TestData.CreatePersonAsync(x =>
+        {
+            x.WithTrn();
+            x.WithDqtInduction(dfeta_InductionStatus.InProgress,
+                null, startDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                completedDate: passDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                inductionPeriodStartDate: startDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                inductionPeriodEndDate: passDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                appropriateBodyOrgId: account.Id);
+        });
+        var trn = person.Trn;
+        var updatedStartDate = DateTime.Parse("17/09/2019");
+        var updatedPassDate = DateTime.Parse("28/09/2020");
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{updatedStartDate.ToString("dd/MM/yyyy")},{updatedPassDate.ToString("dd/MM/yyyy")},,,{account.AccountNumber},Pass\r\n";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync("IND", reader);
+
+        //Assert
+        using var ctx = new DqtCrmServiceContext(OrganisationService);
+        var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
+        var itrRecord = ctx.dfeta_integrationtransactionrecordSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
+        var induction = ctx.dfeta_inductionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_induction.PrimaryIdAttribute) == itrRecord.dfeta_InductionId.Id);
+        var inductionPeriod = ctx.dfeta_inductionperiodSet.Single(i => i.GetAttributeValue<Guid>(dfeta_inductionperiod.PrimaryIdAttribute) == itrRecord.dfeta_InductionPeriodId.Id);
+        Assert.Equal(totalRowCount, integrationTransaction.dfeta_TotalCount);
+        Assert.Equal(successCount, integrationTransaction.dfeta_SuccessCount);
+        Assert.Equal(duplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
+        Assert.Equal(failureRowCount, integrationTransaction.dfeta_FailureCount);
+        Assert.Empty(integrationTransaction.dfeta_FailureMessage);
+        Assert.Equal(updatedPassDate, induction.dfeta_CompletionDate);
+        Assert.Equal(updatedPassDate, inductionPeriod.dfeta_EndDate);
+        Assert.Equal(account.Id, inductionPeriod.dfeta_AppropriateBodyId.Id);
     }
 }
 

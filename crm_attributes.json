@@ -132,11 +132,13 @@
     "modifiedon"
   ],
   "dfeta_inductionperiod": [
+    "dfeta_inductionperiodid",
     "dfeta_startdate",
     "dfeta_enddate",
     "dfeta_inductionid",
     "dfeta_numberofterms",
     "dfeta_appropriatebodyid",
+    "dfeta_inductionStatus",
     "statecode"
   ],
   "dfeta_initialteachertraining": [
