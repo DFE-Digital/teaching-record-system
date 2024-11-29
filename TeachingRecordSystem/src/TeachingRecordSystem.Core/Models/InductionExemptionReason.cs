@@ -1,5 +1,7 @@
 namespace TeachingRecordSystem.Core.Models;
 
-public enum InductionExemptionReason
+[Flags]
+public enum InductionExemptionReasons
 {
+    None = 0
 }
