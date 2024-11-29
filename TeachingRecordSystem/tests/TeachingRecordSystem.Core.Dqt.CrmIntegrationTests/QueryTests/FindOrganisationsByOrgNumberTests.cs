@@ -1,5 +1,3 @@
-using SixLabors.ImageSharp;
-
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class FindOrganisationsByOrgNumberTests : IAsyncLifetime

@@ -397,9 +397,13 @@ public class QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ReferenceDataCa
         if (!string.IsNullOrEmpty(row.PqSubjectCode1))
         {
             if (lookups.PQSubject1MatchStatus == EwcWalesMatchStatus.NoMatch)
+            {
                 validationFailures.Add($"Subject with PQ Subject Code {row.PqSubjectCode1} was not found.");
+            }
             else if (lookups.PQSubject1MatchStatus == EwcWalesMatchStatus.MultipleMatchesFound)
+            {
                 validationFailures.Add($"Multiple subjects with PQ Subject Code {row.PqSubjectCode1} found.");
+            }
         }
 
         // PQ Subject 2
