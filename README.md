@@ -10,7 +10,7 @@ Provides an API over the Database of Qualified Teachers (DQT). Provides the core
 * [Technical Architecture](docs/trs-technical-architecture-hld.md)
 
 # Data Integrations **
-TRS provides the the core teaching record data to a number of internal and external facing digital services:
+TRS provides the core teaching record data to a number of internal and external facing digital services:
 * Register Trainee Teachers
 * Apply For QTS
 * Access Your Teaching Qualifications
@@ -21,13 +21,13 @@ TRS provides the the core teaching record data to a number of internal and exter
 * [Teaching Record System : Data Integrations Pattern](docs/c4-diagrams-as-code/trs-core-containers.jpg)
 * [Teaching Record System : Teacher Pensions Integrations](docs/c4-diagrams-as-code/trs-tps.jpg)
 
-** None exhaustive list
+** Non-exhaustive list
 ## What does it do?
 
-It is the primary source of teaching records for DfE. It holds data to meet UK Government statutory obligations as well as allow individuals working in the UK education system (including, but not limited to) teachers in schools withing England, Wales, Scotland and Northern Ireland to access digital services provided by the DfE.
+It is the primary source of teaching records for DfE. It holds data to meet UK Government statutory obligations as well as allow individuals working in the UK education system (including, but not limited to) teachers in schools within England, Wales, Scotland and Northern Ireland to access digital services provided by the DfE.
 
 ## Authorising Access using GOV.UK One Login
-All DfE services will adopt the standard GOV.UK One-Login service to provide standard access to citizen facing services. However, for Teacher Services digital services, it is sometime necessary to implement further authorisation to access a teaching record (e.g. for a teacher to view certificates). TRS will provide this authorisation seamlessly (from a user POV) by handling the redirection between calling service --> GOV.UK OneLogin sign in screen -->TRS (to check access) and back to the calling service.
+All DfE services will adopt the standard GOV.UK One-Login service to provide standard access to citizen facing services. However, for Teacher Services digital services, it is sometimes necessary to implement further authorisation to access a teaching record (e.g. for a teacher to view certificates). TRS will provide this authorisation seamlessly (from a user point of view) by handling the redirection between calling service --> GOV.UK OneLogin sign in screen -->TRS (to check access) and back to the calling service.
 
 * [Authorisation flow for services using GOVUK.One Login](docs/trs-gov.one-login-flow.md)
 
@@ -71,7 +71,7 @@ The API is an ASP.NET Core 8 web application. To develop locally you will need t
 - a local Postgres 15+ instance;
 - NPM.
 
-A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH` as well as [PowerShell](https://microsoft.com/PowerShell).
+A `justfile` defines various recipes for development. Ensure [just](https://just.systems/) is installed and available on your `$PATH` as well as [PowerShell](https://microsoft.com/PowerShell) v7+.
 
 If you're working on infrastructure you will also need:
 - make;
@@ -105,13 +105,13 @@ just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=pos
 just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
-To set up the initial database schema run:
+To set up the initial trs database schema run:
 ```shell
 just build
 just cli migrate-db
 ```
 
-The databases will be created automatically when running the tests.
+The trs_tests database will be created automatically when running the tests.
 
 #### DQT Reporting database setup
 
