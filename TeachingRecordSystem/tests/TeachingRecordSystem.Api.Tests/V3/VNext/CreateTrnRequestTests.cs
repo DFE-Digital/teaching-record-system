@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Api.V3.Core.SharedModels;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox;

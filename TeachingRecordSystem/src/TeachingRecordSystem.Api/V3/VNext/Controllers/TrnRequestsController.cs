@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
+using TrnRequestInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos.TrnRequestInfo;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
@@ -43,7 +44,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             AddressLine1 = request.Person.Address?.AddressLine1,
             AddressLine2 = request.Person.Address?.AddressLine2,
             AddressLine3 = request.Person.Address?.AddressLine3,
-            GenderCode = request.Person.GenderCode.HasValue ? Core.SharedModels.GenderExtensions.ConvertToContact_GenderCode(request.Person.GenderCode!.Value) : null,
+            GenderCode = request.Person.GenderCode.HasValue ? GenderExtensions.ConvertToContact_GenderCode(request.Person.GenderCode!.Value) : null,
             City = request.Person.Address?.City,
             Postcode = request.Person.Address?.Postcode,
             Country = request.Person.Address?.Country,

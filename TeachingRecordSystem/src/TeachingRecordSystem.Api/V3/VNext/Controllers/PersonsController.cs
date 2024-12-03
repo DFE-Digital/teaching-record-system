@@ -16,17 +16,33 @@ namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 [Route("persons")]
 public class PersonsController(IMapper mapper) : ControllerBase
 {
-    [HttpPut("{trn}/induction")]
+    [HttpPut("{trn}/cpd-induction")]
     [SwaggerOperation(
         OperationId = "SetPersonInductionStatus",
         Summary = "Set person induction status",
         Description = "Sets the induction details of the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
-    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetInduction)]
-    public IActionResult SetInductionStatus([FromRoute] string trn, [FromBody] SetInductionStatusRequest request) =>
-        NoContent();
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetCpdInduction)]
+    public async Task<IActionResult> SetCpdInductionStatusAsync(
+        [FromRoute] string trn,
+        [FromBody] SetCpdInductionStatusRequest request,
+        [FromServices] SetCpdInductionStatusHandler handler)
+    {
+        var command = new SetCpdInductionStatusCommand(
+            trn,
+            mapper.Map<InductionStatus>(request.Status),
+            request.StartDate,
+            request.CompletedDate,
+            request.ModifiedOn.UtcDateTime);
+
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(_ => NoContent())
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.StaleRequest, StatusCodes.Status409Conflict);
+    }
 
     [HttpGet("{trn}")]
     [SwaggerOperation(

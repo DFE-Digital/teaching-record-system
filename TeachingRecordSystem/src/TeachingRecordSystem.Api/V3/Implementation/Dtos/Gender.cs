@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.Core.SharedModels;
+namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 public enum Gender
 {
