@@ -35,7 +35,6 @@ public partial class TestData
         private string? _nationalInsuranceNumber;
         private readonly List<Qualification> _qualifications = new();
         private readonly List<QtsRegistration> _qtsRegistrations = new();
-        private readonly List<Sanction> _sanctions = [];
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private DateOnly? _qtlsDate;
@@ -120,23 +119,6 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithSanction(
-            string sanctionCode,
-            DateOnly? startDate = null,
-            DateOnly? endDate = null,
-            DateOnly? reviewDate = null,
-            bool spent = false,
-            string? details = null,
-            string? detailsLink = null,
-            bool isActive = true)
-        {
-            EnsureTrn();
-
-            _sanctions.Add(new(Guid.NewGuid(), sanctionCode, startDate, endDate, reviewDate, spent, details, detailsLink, isActive));
-
-            return this;
-        }
-
         public CreatePersonBuilder WithAlert(Action<CreatePersonAlertBuilder>? configure = null)
         {
             EnsureTrn();
@@ -183,8 +165,7 @@ public partial class TestData
                 _mqBuilders.Any() ||
                 _qtlsDate.HasValue ||
                 _qtsRegistrations.Any() ||
-                _qualifications.Any() ||
-                _sanctions.Any())
+                _qualifications.Any())
             {
                 throw new InvalidOperationException("Person requires a TRN.");
             }
@@ -539,44 +520,6 @@ public partial class TestData
                 });
             }
 
-            foreach (var sanction in _sanctions)
-            {
-                var sanctionCode = await testData.ReferenceDataCache.GetSanctionCodeByValueAsync(sanction.SanctionCode);
-                var crmSanction = new dfeta_sanction()
-                {
-                    Id = sanction.SanctionId,
-                    dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
-                    dfeta_SanctionCodeId = sanctionCode.Id.ToEntityReference(dfeta_sanctioncode.EntityLogicalName),
-                    dfeta_StartDate = sanction.StartDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_EndDate = sanction.EndDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_NoReAppuntildate = sanction.ReviewDate?.ToDateTimeWithDqtBstFix(isLocalTime: true),
-                    dfeta_Spent = sanction.Spent,
-                    dfeta_SanctionDetails = sanction.Details
-                };
-
-                if (!string.IsNullOrWhiteSpace(sanction.DetailsLink))
-                {
-                    crmSanction.dfeta_DetailsLink = sanction.DetailsLink;
-                }
-
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = crmSanction
-                });
-
-                if (!sanction.IsActive)
-                {
-                    txnRequestBuilder.AddRequest(new UpdateRequest()
-                    {
-                        Target = new dfeta_sanction()
-                        {
-                            Id = sanction.SanctionId,
-                            StateCode = dfeta_sanctionState.Inactive
-                        }
-                    });
-                }
-            }
-
             var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
             {
                 ColumnSet = new(allColumns: true),
@@ -681,7 +624,6 @@ public partial class TestData
                 NationalInsuranceNumber = contact.dfeta_NINumber,
                 QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
-                Sanctions = [.. _sanctions],
                 MandatoryQualifications = mqs,
                 DqtInductions = [.. _dqtInductions],
                 DqtInductionPeriods = [.. _dqtInductionPeriods],
@@ -1039,7 +981,6 @@ public partial class TestData
         public required string? NationalInsuranceNumber { get; init; }
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
-        public required IReadOnlyCollection<Sanction> Sanctions { get; init; }
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<DqtInduction> DqtInductions { get; init; }
         public required IReadOnlyCollection<DqtInductionPeriod> DqtInductionPeriods { get; init; }
@@ -1049,8 +990,6 @@ public partial class TestData
     public record DqtInduction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
 
     public record DqtInductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
-
-    public record Sanction(Guid SanctionId, string SanctionCode, DateOnly? StartDate, DateOnly? EndDate, DateOnly? ReviewDate, bool Spent, string? Details, string? DetailsLink, bool IsActive);
 
     public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
 
