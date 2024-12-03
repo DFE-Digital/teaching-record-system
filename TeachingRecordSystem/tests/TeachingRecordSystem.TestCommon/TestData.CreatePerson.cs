@@ -1,3 +1,6 @@
+using FakeXrmEasy.Extensions;
+using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
@@ -646,6 +649,23 @@ public partial class TestData
                 }
             });
 
+            var currentDqtUser = await testData.GetCurrentCrmUserAsync();
+            var auditId = Guid.NewGuid();
+            var auditDetail = new AttributeAuditDetail()
+            {
+                AuditRecord = new Audit()
+                {
+                    Action = Audit_Action.Create,
+                    AuditId = auditId,
+                    CreatedOn = testData.Clock.UtcNow,
+                    Id = auditId,
+                    Operation = Audit_Operation.Create,
+                    UserId = currentDqtUser
+                },
+                OldValue = new Entity(),
+                NewValue = contact.Clone()
+            };
+
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
@@ -669,7 +689,8 @@ public partial class TestData
                 MandatoryQualifications = mqs,
                 DqtInductions = [.. _dqtInductions],
                 DqtInductionPeriods = [.. _dqtInductionPeriods],
-                Alerts = alerts
+                Alerts = alerts,
+                DqtContactAuditDetail = auditDetail
             };
         }
 
@@ -1208,6 +1229,7 @@ public partial class TestData
         public required IReadOnlyCollection<DqtInduction> DqtInductions { get; init; }
         public required IReadOnlyCollection<DqtInductionPeriod> DqtInductionPeriods { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
+        public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
 
     public record DqtInduction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);

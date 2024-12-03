@@ -2307,6 +2307,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string BirthDate = "birthdate";
 			public const string ContactId = "contactid";
 			public const string Id = "contactid";
+			public const string CreatedBy = "createdby";
 			public const string CreatedOn = "createdon";
 			public const string dfeta_AllowIDSignInWithProhibitions = "dfeta_allowidsigninwithprohibitions";
 			public const string dfeta_AllowPiiUpdatesFromRegister = "dfeta_allowpiiupdatesfromregister";
@@ -2343,6 +2344,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string MobilePhone = "mobilephone";
 			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
 			public const string Telephone1 = "telephone1";
 			public const string account_primary_contact = "account_primary_contact";
 			public const string Contact_Annotation = "Contact_Annotation";
@@ -2607,6 +2609,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			set
 			{
 				this.ContactId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Shows who created the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
 			}
 		}
 		
@@ -3342,6 +3364,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
 				}
 				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Reason for the status of the contact.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual Contact_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((Contact_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
 			}
 		}
 		
@@ -6187,6 +6229,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		/// </summary>
 		public static class Fields
 		{
+			public const string CreatedBy = "createdby";
 			public const string CreatedOn = "createdon";
 			public const string dfeta_CompletionDate = "dfeta_completiondate";
 			public const string dfeta_InductionExemptionReason = "dfeta_inductionexemptionreason";
@@ -6197,6 +6240,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_StartDate = "dfeta_startdate";
 			public const string ModifiedOn = "modifiedon";
 			public const string StateCode = "statecode";
+			public const string StatusCode = "statuscode";
 			public const string dfeta_dfeta_induction_dfeta_inductionperiod = "dfeta_dfeta_induction_dfeta_inductionperiod";
 			public const string dfeta_dfeta_induction_dfeta_qtsregistration = "dfeta_dfeta_induction_dfeta_qtsregistration";
 			public const string business_unit_dfeta_induction = "business_unit_dfeta_induction";
@@ -6249,6 +6293,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			if ((this.PropertyChanging != null))
 			{
 				this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the record.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
 			}
 		}
 		
@@ -6467,6 +6531,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 					this.SetAttributeValue("statecode", new Microsoft.Xrm.Sdk.OptionSetValue(((int)(value))));
 				}
 				this.OnPropertyChanged("StateCode");
+			}
+		}
+		
+		/// <summary>
+		/// Reason for the status of the Induction
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("statuscode")]
+		public virtual dfeta_induction_StatusCode? StatusCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return ((dfeta_induction_StatusCode?)(EntityOptionSetEnum.GetEnum(this, "statuscode")));
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("StatusCode");
+				this.SetAttributeValue("statuscode", value.HasValue ? new Microsoft.Xrm.Sdk.OptionSetValue((int)value) : null);
+				this.OnPropertyChanged("StatusCode");
 			}
 		}
 		
