@@ -18,7 +18,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Description = "Sets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
-    [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> PutQtlsAsync(
         [FromRoute] string trn,
@@ -27,7 +27,9 @@ public class PersonsController(IMapper mapper) : ControllerBase
     {
         var command = new SetQtlsCommand(trn, request.QtsDate);
         var result = await handler.HandleAsync(command);
-        return result is { Succeeded: true } ? Ok(result.QtlsInfo!) : Accepted();
+
+        return result.ToActionResult(r => r is { Succeeded: true } ? Ok(mapper.Map<QtlsResponse>(r.QtlsInfo)) : Accepted())
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [HttpGet("{trn}/qtls")]
@@ -36,14 +38,15 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Summary = "Get QTLS status for a teacher",
         Description = "Gets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> GetQtlsAsync(
-    [FromRoute] string trn,
+        [FromRoute] string trn,
         [FromServices] GetQtlsHandler handler)
     {
         var command = new GetQtlsCommand(trn);
         var result = await handler.HandleAsync(command);
-        var response = mapper.Map<QtlsResponse?>(result);
-        return response is not null ? Ok(response) : NotFound();
+        return result.ToActionResult(r => Ok(mapper.Map<QtlsResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 }

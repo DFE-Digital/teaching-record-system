@@ -44,34 +44,22 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var alert = HttpContext.GetCurrentAlertFeature().Alert;
 
-        var alert = await dbContext.Alerts
-            .SingleAsync(a => a.AlertId == AlertId);
-
-        var oldAlertEventModel = EventModels.Alert.FromModel(alert);
-        alert.DeletedOn = now;
-        alert.UpdatedOn = now;
-
-        var deletedEvent = new AlertDeletedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            PersonId = PersonId,
-            Alert = oldAlertEventModel,
-            DeletionReasonDetail = DeleteReasonDetail,
-            EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                new EventModels.File()
+        alert.Delete(
+            DeleteReasonDetail,
+            JourneyInstance!.State.EvidenceFileId is Guid fileId
+                ? new EventModels.File()
                 {
                     FileId = fileId,
                     Name = JourneyInstance.State.EvidenceFileName!
-                } :
-                null,
-        };
+                }
+                : null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var deletedEvent);
 
         dbContext.AddEvent(deletedEvent);
-
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

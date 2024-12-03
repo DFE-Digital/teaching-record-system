@@ -312,6 +312,8 @@ public partial class TestData
             var dateOfBirth = _dateOfBirth ?? testData.GenerateDateOfBirth();
             var gender = _gender ?? testData.GenerateGender();
 
+            var events = new List<EventBase>();
+
             var contact = new Contact()
             {
                 Id = PersonId,
@@ -603,7 +605,9 @@ public partial class TestData
                     var mqIds = new List<Guid>();
                     foreach (var builder in _mqBuilders)
                     {
-                        mqIds.Add(await builder.ExecuteAsync(this, testData, dbContext));
+                        var (mqId, mqEvents) = await builder.ExecuteAsync(this, testData, dbContext);
+                        mqIds.Add(mqId);
+                        events.AddRange(mqEvents);
                     }
                     await dbContext.SaveChangesAsync();
 
@@ -620,7 +624,9 @@ public partial class TestData
                     var alertIds = new List<Guid>();
                     foreach (var builder in _alertBuilders)
                     {
-                        alertIds.Add(await builder.ExecuteAsync(this, testData, dbContext));
+                        var (alertId, alertEvents) = await builder.ExecuteAsync(this, testData, dbContext);
+                        alertIds.Add(alertId);
+                        events.AddRange(alertEvents);
                     }
                     await dbContext.SaveChangesAsync();
 
@@ -659,6 +665,7 @@ public partial class TestData
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
+                Events = events.AsReadOnly(),
                 Contact = contact,
                 Trn = trn,
                 DateOfBirth = dateOfBirth,
@@ -698,14 +705,12 @@ public partial class TestData
         private Option<Guid?> _alertTypeId;
         private Option<string?> _details;
         private Option<string?> _externalLink;
-        private Option<DateOnly?> _startDate;
+        private Option<DateOnly> _startDate;
         private Option<DateOnly?> _endDate;
         private Option<string?> _reason;
         private Option<string?> _reasonDetail;
         private Option<EventModels.RaisedByUserInfo> _createdByUser;
         private Option<DateTime?> _createdUtc;
-
-        public Guid AlertId { get; } = Guid.NewGuid();
 
         public CreatePersonAlertBuilder WithAlertTypeId(Guid? alertTypeId)
         {
@@ -725,7 +730,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonAlertBuilder WithStartDate(DateOnly? startDate)
+        public CreatePersonAlertBuilder WithStartDate(DateOnly startDate)
         {
             _startDate = Option.Some(startDate);
             return this;
@@ -766,7 +771,10 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> ExecuteAsync(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
+        internal async Task<(Guid AlertId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
+            CreatePersonBuilder createPersonBuilder,
+            TestData testData,
+            TrsDbContext dbContext)
         {
             var personId = createPersonBuilder.PersonId;
 
@@ -785,36 +793,24 @@ public partial class TestData
             var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
-            var alert = new Alert()
-            {
-                AlertId = AlertId,
-                PersonId = personId,
-                AlertTypeId = alertTypeId!.Value,
-                Details = details,
-                ExternalLink = externalLink,
-                StartDate = startDate,
-                EndDate = endDate,
-                CreatedOn = createdUtc!.Value,
-                UpdatedOn = createdUtc!.Value
-            };
+            var alert = Alert.Create(
+                alertTypeId!.Value,
+                personId,
+                details,
+                externalLink,
+                startDate,
+                endDate,
+                reason,
+                reasonDetail,
+                evidenceFile: null,
+                createdByUser,
+                createdUtc!.Value,
+                out var @createdEvent);
 
             dbContext.Alerts.Add(alert);
-
-            var createdEvent = new AlertCreatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = createdUtc!.Value,
-                RaisedBy = createdByUser,
-                Alert = EventModels.Alert.FromModel(alert),
-                PersonId = personId,
-                AddReason = reason,
-                AddReasonDetail = reasonDetail,
-                EvidenceFile = null
-            };
-
             dbContext.AddEvent(createdEvent);
 
-            return AlertId;
+            return (alert.AlertId, [createdEvent]);
         }
     }
 
@@ -922,7 +918,10 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> ExecuteAsync(CreatePersonBuilder createPersonBuilder, TestData testData, TrsDbContext dbContext)
+        internal async Task<(Guid QualificationId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
+            CreatePersonBuilder createPersonBuilder,
+            TestData testData,
+            TrsDbContext dbContext)
         {
             var personId = createPersonBuilder.PersonId;
 
@@ -934,8 +933,8 @@ public partial class TestData
             var createdUtc = _createdUtc.ValueOr(testData.Clock.UtcNow);
 
             var provider = providerId.HasValue ?
-                    await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
-                    null;
+                await dbContext.MandatoryQualificationProviders.SingleAsync(p => p.MandatoryQualificationProviderId == providerId) :
+                null;
 
             var mq = new MandatoryQualification()
             {
@@ -953,6 +952,8 @@ public partial class TestData
             };
 
             dbContext.MandatoryQualifications.Add(mq);
+
+            var events = new List<EventBase>();
 
             if (_importedByUser.HasValue)
             {
@@ -979,7 +980,9 @@ public partial class TestData
                     },
                     DqtState = 0
                 };
+
                 dbContext.AddEvent(createdEvent);
+                events.Add(createdEvent);
             }
             else
             {
@@ -1007,10 +1010,12 @@ public partial class TestData
                         EndDate = endDate
                     }
                 };
+
                 dbContext.AddEvent(createdEvent);
+                events.Add(createdEvent);
             }
 
-            return QualificationId;
+            return (QualificationId, events);
         }
     }
 
@@ -1018,6 +1023,7 @@ public partial class TestData
     {
         public required Guid PersonId { get; init; }
         public Guid ContactId => PersonId;
+        public required IReadOnlyCollection<EventBase> Events { get; init; }
         public required Contact Contact { get; init; }
         public required string? Trn { get; init; }
         public required DateOnly DateOfBirth { get; init; }

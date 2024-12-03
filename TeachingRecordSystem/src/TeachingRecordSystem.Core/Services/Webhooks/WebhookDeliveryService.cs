@@ -24,7 +24,7 @@ public class WebhookDeliveryService(
         })
         .Build();
 
-    public static TimeSpan[] RetryInvervals { get; } =
+    public static TimeSpan[] RetryIntervals { get; } =
     [
         TimeSpan.FromSeconds(5),
         TimeSpan.FromMinutes(5),
@@ -46,7 +46,7 @@ public class WebhookDeliveryService(
             try
             {
                 await _resiliencePipeline.ExecuteAsync(
-                    async (_, ct) =>
+                    async ct =>
                     {
                         SendMessagesResult result;
                         do
@@ -55,7 +55,7 @@ public class WebhookDeliveryService(
                         }
                         while (result.MoreRecords);
                     },
-                    stoppingToken);
+                    cancellationToken: stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -109,9 +109,9 @@ public class WebhookDeliveryService(
 
                     message.DeliveryErrors.Add(ex.Message);
 
-                    if (message.DeliveryAttempts.Count <= RetryInvervals.Length)
+                    if (message.DeliveryAttempts.Count <= RetryIntervals.Length)
                     {
-                        var nextRetryInterval = RetryInvervals[message.DeliveryAttempts.Count - 1];
+                        var nextRetryInterval = RetryIntervals[message.DeliveryAttempts.Count - 1];
                         message.NextDeliveryAttempt = now.Add(nextRetryInterval);
 
                         // If next retry is due before we'll next be polling then ensure we return 'true' for MoreRecords.

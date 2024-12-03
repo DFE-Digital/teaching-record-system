@@ -10,19 +10,18 @@ public record GetQtlsCommand(string Trn);
 
 public class GetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task<QtlsResult?> HandleAsync(GetQtlsCommand command)
+    public async Task<ApiResult<QtlsResult>> HandleAsync(GetQtlsCommand command)
     {
-        var contact = (await crmQueryDispatcher.ExecuteQueryAsync(
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet(
                     Contact.Fields.dfeta_TRN,
-                    Contact.Fields.dfeta_qtlsdate))
-            ))!;
+                    Contact.Fields.dfeta_qtlsdate)));
 
         if (contact is null)
         {
-            return null;
+            return ApiError.PersonNotFound(command.Trn);
         }
 
         return new QtlsResult()

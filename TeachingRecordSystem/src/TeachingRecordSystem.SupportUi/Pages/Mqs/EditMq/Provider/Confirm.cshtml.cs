@@ -45,44 +45,26 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
-        var qualification = await dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
-            .SingleAsync(q => q.QualificationId == QualificationId);
+        qualification.Update(
+            q => q.ProviderId = ProviderId,
+            ChangeReason.GetDisplayName(),
+            ChangeReasonDetail,
+            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+                new EventModels.File()
+                {
+                    FileId = fileId,
+                    Name = JourneyInstance.State.EvidenceFileName!
+                } :
+                null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
 
-        var changes = ProviderId != qualification.ProviderId ?
-            MandatoryQualificationUpdatedEventChanges.Provider :
-            MandatoryQualificationUpdatedEventChanges.None;
-
-        if (changes != MandatoryQualificationUpdatedEventChanges.None)
+        if (updatedEvent is not null)
         {
-            var oldMqEventModel = EventModels.MandatoryQualification.FromModel(qualification);
-
-            qualification.ProviderId = ProviderId;
-            qualification.UpdatedOn = now;
-
-            var updatedEvent = new MandatoryQualificationUpdatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = User.GetUserId(),
-                PersonId = PersonId,
-                MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification, providerNameHint: ProviderName),
-                OldMandatoryQualification = oldMqEventModel,
-                ChangeReason = ChangeReason!.GetDisplayName(),
-                ChangeReasonDetail = ChangeReasonDetail,
-                EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                    new EventModels.File()
-                    {
-                        FileId = fileId,
-                        Name = JourneyInstance.State.EvidenceFileName!
-                    } :
-                    null,
-                Changes = changes
-            };
             dbContext.AddEvent(updatedEvent);
-
             await dbContext.SaveChangesAsync();
         }
 

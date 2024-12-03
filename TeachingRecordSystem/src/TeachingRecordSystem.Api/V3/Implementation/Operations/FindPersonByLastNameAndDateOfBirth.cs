@@ -33,7 +33,7 @@ public class FindPersonByLastNameAndDateOfBirthHandler(
     PreviousNameHelper previousNameHelper,
     ReferenceDataCache referenceDataCache)
 {
-    public async Task<FindPersonByLastNameAndDateOfBirthResult> HandleAsync(FindPersonByLastNameAndDateOfBirthCommand command)
+    public async Task<ApiResult<FindPersonByLastNameAndDateOfBirthResult>> HandleAsync(FindPersonByLastNameAndDateOfBirthCommand command)
     {
         var matched = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactsByLastNameAndDateOfBirthQuery(

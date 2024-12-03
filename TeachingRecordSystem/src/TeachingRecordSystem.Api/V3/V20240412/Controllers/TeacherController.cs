@@ -10,7 +10,7 @@ using TeachingRecordSystem.Api.V3.V20240412.Responses;
 namespace TeachingRecordSystem.Api.V3.V20240412.Controllers;
 
 [Route("teacher")]
-public class TeacherController : ControllerBase
+public class TeacherController(IMapper mapper) : ControllerBase
 {
     [HttpPost("name-changes")]
     [SwaggerOperation(
@@ -35,9 +35,9 @@ public class TeacherController : ControllerBase
             EmailAddress = request.Email
         };
 
-        var caseNumber = await handler.HandleAsync(command);
-        var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
-        return Ok(response);
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(r => Ok(mapper.Map<CreateNameChangeResponse>(r)));
     }
 
     [HttpPost("date-of-birth-changes")]
@@ -61,8 +61,8 @@ public class TeacherController : ControllerBase
             EmailAddress = request.Email
         };
 
-        var caseNumber = await handler.HandleAsync(command);
-        var response = new CreateNameChangeResponse() { CaseNumber = caseNumber };
-        return Ok(response);
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(r => Ok(mapper.Map<CreateDateOfBirthChangeResponse>(r)));
     }
 }

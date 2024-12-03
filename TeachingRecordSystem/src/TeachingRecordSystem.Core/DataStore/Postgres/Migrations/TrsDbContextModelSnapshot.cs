@@ -1745,6 +1745,30 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("person_id");
 
+                    b.Property<DateOnly?>("CpdInductionCompletedDate")
+                        .HasColumnType("date")
+                        .HasColumnName("cpd_induction_completed_date");
+
+                    b.Property<DateTime?>("CpdInductionCpdModifiedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cpd_induction_cpd_modified_on");
+
+                    b.Property<DateTime?>("CpdInductionFirstModifiedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cpd_induction_first_modified_on");
+
+                    b.Property<DateTime?>("CpdInductionModifiedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cpd_induction_modified_on");
+
+                    b.Property<DateOnly?>("CpdInductionStartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("cpd_induction_start_date");
+
+                    b.Property<int?>("CpdInductionStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("cpd_induction_status");
+
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
@@ -1824,9 +1848,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("date")
                         .HasColumnName("induction_completed_date");
 
-                    b.Property<int?>("InductionExemptionReason")
+                    b.Property<int>("InductionExemptionReasons")
                         .HasColumnType("integer")
-                        .HasColumnName("induction_exemption_reason");
+                        .HasColumnName("induction_exemption_reasons");
+
+                    b.Property<DateTime?>("InductionModifiedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("induction_modified_on");
 
                     b.Property<DateOnly?>("InductionStartDate")
                         .HasColumnType("date")
@@ -2776,6 +2804,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasKey("WebhookMessageId")
                         .HasName("pk_webhook_messages");
+
+                    b.HasIndex("NextDeliveryAttempt")
+                        .HasDatabaseName("ix_webhook_messages_next_delivery_attempt")
+                        .HasFilter("next_delivery_attempt is not null");
 
                     b.ToTable("webhook_messages", (string)null);
                 });

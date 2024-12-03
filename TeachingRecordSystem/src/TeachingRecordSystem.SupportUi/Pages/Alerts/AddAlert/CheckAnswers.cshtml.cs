@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
@@ -49,39 +50,28 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        var alert = new Core.DataStore.Postgres.Models.Alert()
-        {
-            AlertId = Guid.NewGuid(),
-            CreatedOn = now,
-            UpdatedOn = now,
-            PersonId = PersonId,
-            AlertTypeId = AlertTypeId,
-            Details = Details,
-            ExternalLink = Link,
-            StartDate = StartDate,
-            EndDate = null
-        };
-        dbContext.Alerts.Add(alert);
-
-        var createdEvent = new AlertCreatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            PersonId = PersonId,
-            Alert = EventModels.Alert.FromModel(alert),
-            AddReason = AddReason.GetDisplayName(),
-            AddReasonDetail = AddReasonDetail,
-            EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                new EventModels.File()
+        var alert = Alert.Create(
+            AlertTypeId,
+            PersonId,
+            Details,
+            Link,
+            StartDate,
+            endDate: null,
+            AddReason.GetDisplayName(),
+            AddReasonDetail,
+            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId
+                ? new EventModels.File()
                 {
                     FileId = fileId,
                     Name = JourneyInstance.State.EvidenceFileName!
-                } :
-                null
-        };
-        dbContext.AddEvent(createdEvent);
+                }
+                : null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var createdEvent);
 
+        dbContext.Alerts.Add(alert);
+        dbContext.AddEvent(createdEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

@@ -153,7 +153,7 @@ public class GetPersonHandler(
     IDataverseAdapter dataverseAdapter,
     PreviousNameHelper previousNameHelper)
 {
-    public async Task<GetPersonResult?> HandleAsync(GetPersonCommand command)
+    public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
     {
         var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactDetailByTrnQuery(
@@ -176,14 +176,14 @@ public class GetPersonHandler(
 
         if (contactDetail is null)
         {
-            return null;
+            return ApiError.PersonNotFound(command.Trn);
         }
 
         // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches
         if (command.DateOfBirth is DateOnly dateOfBirth &&
             contactDetail.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dateOfBirth)
         {
-            return null;
+            return ApiError.PersonNotFound(command.Trn, dateOfBirth: dateOfBirth);
         }
         if (command.NationalInsuranceNumber is not null)
         {
@@ -202,7 +202,7 @@ public class GetPersonHandler(
 
                 if (!employmentNinos.Any(n => n!.Equals(normalizedNino, StringComparison.OrdinalIgnoreCase)))
                 {
-                    return null;
+                    return ApiError.PersonNotFound(command.Trn, nationalInsuranceNumber: command.NationalInsuranceNumber);
                 }
             }
         }

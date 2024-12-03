@@ -44,33 +44,23 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var qualification = HttpContext.GetCurrentMandatoryQualificationFeature().MandatoryQualification;
 
-        var qualification = await dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
-            .SingleAsync(q => q.QualificationId == QualificationId);
-
-        qualification.DeletedOn = now;
-
-        var deletedEvent = new MandatoryQualificationDeletedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            PersonId = PersonId,
-            MandatoryQualification = EventModels.MandatoryQualification.FromModel(qualification),
-            DeletionReason = DeletionReason!.GetDisplayName(),
-            DeletionReasonDetail = DeletionReasonDetail,
-            EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
+        qualification.Delete(
+            DeletionReason!.GetDisplayName(),
+            DeletionReasonDetail,
+            JourneyInstance!.State.EvidenceFileId is Guid fileId ?
                 new EventModels.File()
                 {
                     FileId = fileId,
                     Name = JourneyInstance.State.EvidenceFileName!
                 } :
-                null
-        };
-        dbContext.AddEvent(deletedEvent);
+                null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var deletedEvent);
 
+        dbContext.AddEvent(deletedEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

@@ -47,38 +47,28 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var alert = HttpContext.GetCurrentAlertFeature().Alert;
 
-        var alert = await dbContext.Alerts
-            .SingleAsync(a => a.AlertId == AlertId);
-
-        var oldAlertEventModel = EventModels.Alert.FromModel(alert);
-        alert.EndDate = null;
-        alert.UpdatedOn = now;
-
-        var updatedEvent = new AlertUpdatedEvent()
-        {
-            EventId = Guid.NewGuid(),
-            CreatedUtc = now,
-            RaisedBy = User.GetUserId(),
-            PersonId = PersonId,
-            Alert = EventModels.Alert.FromModel(alert),
-            OldAlert = oldAlertEventModel,
-            ChangeReason = ChangeReason.GetDisplayName(),
-            ChangeReasonDetail = ChangeReasonDetail,
-            EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                new EventModels.File()
+        alert.Update(
+            a => a.EndDate = null,
+            ChangeReason.GetDisplayName(),
+            ChangeReasonDetail,
+            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId
+                ? new EventModels.File()
                 {
                     FileId = fileId,
                     Name = JourneyInstance.State.EvidenceFileName!
-                } :
-                null,
-            Changes = AlertUpdatedEventChanges.EndDate
-        };
+                }
+                : null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
 
-        dbContext.AddEvent(updatedEvent);
-
-        await dbContext.SaveChangesAsync();
+        if (updatedEvent is not null)
+        {
+            dbContext.AddEvent(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        }
 
         await JourneyInstance!.CompleteAsync();
         TempData.SetFlashSuccess("Alert re-opened");

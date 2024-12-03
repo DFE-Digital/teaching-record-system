@@ -41,44 +41,26 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var now = clock.UtcNow;
+        var alert = HttpContext.GetCurrentAlertFeature().Alert;
 
-        var alert = await dbContext.Alerts
-            .SingleAsync(a => a.AlertId == AlertId);
+        alert.Update(
+            a => a.Details = NewDetails,
+            ChangeReason.GetDisplayName(),
+            ChangeReasonDetail,
+            evidenceFile: JourneyInstance!.State.EvidenceFileId is Guid fileId
+                ? new EventModels.File()
+                {
+                    FileId = fileId,
+                    Name = JourneyInstance.State.EvidenceFileName!
+                }
+                : null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
 
-        var changes = NewDetails != alert.Details ?
-            AlertUpdatedEventChanges.Details :
-            AlertUpdatedEventChanges.None;
-
-        if (changes != AlertUpdatedEventChanges.None)
+        if (updatedEvent is not null)
         {
-            var oldAlertEventModel = EventModels.Alert.FromModel(alert);
-
-            alert.Details = NewDetails;
-            alert.UpdatedOn = now;
-
-            var updatedEvent = new AlertUpdatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                CreatedUtc = now,
-                RaisedBy = User.GetUserId(),
-                PersonId = PersonId,
-                Alert = EventModels.Alert.FromModel(alert),
-                OldAlert = oldAlertEventModel,
-                ChangeReason = ChangeReason!.GetDisplayName(),
-                ChangeReasonDetail = ChangeReasonDetail,
-                EvidenceFile = JourneyInstance!.State.EvidenceFileId is Guid fileId ?
-                    new EventModels.File()
-                    {
-                        FileId = fileId,
-                        Name = JourneyInstance.State.EvidenceFileName!
-                    } :
-                    null,
-                Changes = changes
-            };
-
             dbContext.AddEvent(updatedEvent);
-
             await dbContext.SaveChangesAsync();
         }
 

@@ -50,13 +50,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
         var result = await handler.HandleAsync(command);
 
-        if (result is null)
-        {
-            return NotFound();
-        }
-
-        var response = GetPersonResponse.Map(result, mapper, User.IsInRole(ApiRoles.AppropriateBody));
-        return Ok(response);
+        return result.ToActionResult(r => Ok(GetPersonResponse.Map(r, mapper, User.IsInRole(ApiRoles.AppropriateBody))))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [HttpPost("find")]
@@ -92,14 +87,13 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
         var result = await handler.HandleAsync(command);
 
-        var response = new FindPersonResponse()
-        {
-            Total = result.Total,
-            Query = request,
-            Results = result.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
-        };
-
-        return Ok(response);
+        return result.ToActionResult(r =>
+            Ok(new FindPersonResponse()
+            {
+                Total = r.Total,
+                Query = request,
+                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+            }));
     }
 
     [HttpPut("deceased/{trn}")]
@@ -107,7 +101,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
         OperationId = "SetDeceased",
         Summary = "Mark person as deceased",
         Description = "Marks a person as deceased.")]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
     public async Task<IActionResult> DeceasedAsync(
         [FromRoute] string trn,
@@ -115,7 +110,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         [FromServices] SetDeceasedHandler handler)
     {
         var command = new SetDeceasedCommand(trn, request.DateOfDeath);
-        await handler.HandleAsync(command);
-        return NoContent();
+        var result = await handler.HandleAsync(command);
+        return result.ToActionResult(_ => NoContent());
     }
 }

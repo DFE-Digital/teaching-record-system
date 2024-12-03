@@ -1,5 +1,4 @@
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -9,18 +8,20 @@ public record SetDeceasedCommand(string Trn, DateOnly DateOfDeath);
 
 public class SetDeceasedHandler(ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task HandleAsync(SetDeceasedCommand command)
+    public async Task<ApiResult<Unit>> HandleAsync(SetDeceasedCommand command)
     {
         var contact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(
                 command.Trn,
                 new ColumnSet()));
 
-        if (contact == null)
+        if (contact is null)
         {
-            throw new ErrorException(ErrorRegistry.TeacherWithSpecifiedTrnNotFound());
+            return ApiError.PersonNotFound(command.Trn);
         }
 
         await crmQueryDispatcher.ExecuteQueryAsync(new SetDeceasedQuery(contact.Id, command.DateOfDeath))!;
+
+        return Unit.Instance;
     }
 }

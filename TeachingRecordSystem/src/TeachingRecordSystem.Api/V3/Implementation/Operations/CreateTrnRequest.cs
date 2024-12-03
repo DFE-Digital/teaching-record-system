@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
-using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -44,14 +43,14 @@ public class CreateTrnRequestHandler(
     MessageSerializer messageSerializer,
     IClock clock)
 {
-    public async Task<TrnRequestInfo> HandleAsync(CreateTrnRequestCommand command)
+    public async Task<ApiResult<TrnRequestInfo>> HandleAsync(CreateTrnRequestCommand command)
     {
         var (currentApplicationUserId, currentApplicationUserName) = currentUserProvider.GetCurrentApplicationUser();
 
         var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
         {
-            throw new ErrorException(ErrorRegistry.CannotResubmitRequest());
+            return ApiError.TrnRequestAlreadyCreated(command.RequestId);
         }
 
         // Normalize names; DQT matching process requires a single-word first name :-|
@@ -142,7 +141,7 @@ public class CreateTrnRequestHandler(
             }));
         }
 
-        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
+        var contactId = await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,

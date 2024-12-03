@@ -8,14 +8,14 @@ public record GetTrnRequestCommand(string RequestId);
 
 public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUserProvider currentUserProvider)
 {
-    public async Task<TrnRequestInfo?> HandleAsync(GetTrnRequestCommand command)
+    public async Task<ApiResult<TrnRequestInfo>> HandleAsync(GetTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
         var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
         if (trnRequest is null)
         {
-            return null;
+            return ApiError.TrnRequestDoesNotExist(command.RequestId);
         }
 
         var contact = trnRequest.Contact;
