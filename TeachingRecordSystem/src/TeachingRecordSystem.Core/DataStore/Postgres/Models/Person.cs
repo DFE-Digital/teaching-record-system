@@ -214,8 +214,8 @@ public class Person
         }
         else if (status is InductionStatus.Failed)
         {
-            EnsureArgumentIsNull(startDate);
-            EnsureArgumentIsNull(completedDate);
+            EnsureArgumentIsNotNull(startDate);
+            EnsureArgumentIsNotNull(completedDate);
             EnsureExemptionReasonsAreNone();
         }
         else if (status is InductionStatus.FailedInWales)
