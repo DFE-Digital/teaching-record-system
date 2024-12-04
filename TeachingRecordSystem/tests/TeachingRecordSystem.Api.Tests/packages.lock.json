@@ -2429,8 +2429,7 @@
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
-          "TeachingRecordSystem.ServiceDefaults": "[1.0.0, )",
-          "idunno.Authentication.Basic": "[2.3.1, )"
+          "TeachingRecordSystem.ServiceDefaults": "[1.0.0, )"
         }
       },
       "teachingrecordsystem.core": {
@@ -2750,12 +2749,6 @@
         "requested": "[6.2.0, )",
         "resolved": "6.2.0",
         "contentHash": "4AXZ6Tp+DNwrSSeBziiX/231i8ZpD77A9nEMyc68gLSCWG0kgWsIBeFquYcBebiIPkfB7GEXzCYuuLeR1QZJIQ=="
-      },
-      "idunno.Authentication.Basic": {
-        "type": "CentralTransitive",
-        "requested": "[2.3.1, )",
-        "resolved": "2.3.1",
-        "contentHash": "99EoiqTy6hYDvHehG1JLlprkB08ioR/hsnCpPhvDJJeZ0JOKNpoL+7C2jLC1r5vo0G5kerOPqdhdSHF3Ss2blw=="
       },
       "MediatR": {
         "type": "CentralTransitive",

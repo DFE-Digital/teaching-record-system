@@ -35,7 +35,6 @@
     <PackageVersion Include="Hangfire.PostgreSql" Version="1.20.10" />
     <PackageVersion Include="Humanizer.Core" Version="2.14.1" />
     <PackageVersion Include="IdentityModel" Version="6.2.0" />
-    <PackageVersion Include="idunno.Authentication.Basic" Version="2.3.1" />
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="5.0.0" />
     <PackageVersion Include="JustEat.HttpClientInterception" Version="4.3.0" />
     <PackageVersion Include="LinqKit" Version="1.2.5" />
