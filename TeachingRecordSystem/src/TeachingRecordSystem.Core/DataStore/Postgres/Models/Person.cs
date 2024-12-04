@@ -27,6 +27,10 @@ public class Person
     public DateOnly? CpdInductionCompletedDate { get; private set; }
     public DateTime? CpdInductionModifiedOn { get; private set; }
     public DateTime? CpdInductionFirstModifiedOn { get; private set; }
+    /// <summary>
+    /// The timestamp given to us by CPD the last time they updated us.
+    /// This is different to <see cref="CpdInductionModifiedOn"/> (which is our timestamp).
+    /// </summary>
     public DateTime? CpdInductionCpdModifiedOn { get; private set; }
     public ICollection<Qualification> Qualifications { get; } = new List<Qualification>();
     public ICollection<Alert> Alerts { get; } = new List<Alert>();
@@ -61,7 +65,7 @@ public class Person
         }
 
         // FUTURE When we have QTS in TRS - assert person has QTS
-        AssertInductionChangeIsValid(status, startDate, completedDate, exemptionReason: null);
+        AssertInductionChangeIsValid(status, startDate, completedDate, exemptionReasons: InductionExemptionReasons.None);
 
         // If the CPD status is not Passed and we know the person is Exempt then the overall status is Exempt.
         // Otherwise, the overall status is set to match the CPD status.
@@ -182,47 +186,59 @@ public class Person
         InductionStatus status,
         DateOnly? startDate,
         DateOnly? completedDate,
-        InductionExemptionReasons? exemptionReason)
+        InductionExemptionReasons exemptionReasons)
     {
         if (status is InductionStatus.None or InductionStatus.RequiredToComplete)
         {
-            EnsureArgumentIsNullForInduction(startDate);
-            EnsureArgumentIsNullForInduction(completedDate);
-            EnsureArgumentIsNullForInduction(exemptionReason);
+            EnsureArgumentIsNull(startDate);
+            EnsureArgumentIsNull(completedDate);
+            EnsureExemptionReasonsAreNone();
         }
         else if (status is InductionStatus.Exempt)
         {
-            EnsureArgumentIsNullForInduction(startDate);
-            EnsureArgumentIsNullForInduction(completedDate);
-            EnsureArgumentIsNotNullForInduction(exemptionReason);
+            EnsureArgumentIsNull(startDate);
+            EnsureArgumentIsNull(completedDate);
+            EnsureExemptionReasonsAreNotNone();
         }
         else if (status is InductionStatus.InProgress)
         {
-            EnsureArgumentIsNotNullForInduction(startDate);
-            EnsureArgumentIsNullForInduction(completedDate);
-            EnsureArgumentIsNullForInduction(exemptionReason);
+            EnsureArgumentIsNotNull(startDate);
+            EnsureArgumentIsNull(completedDate);
+            EnsureExemptionReasonsAreNone();
         }
         else if (status is InductionStatus.Passed)
         {
-            EnsureArgumentIsNotNullForInduction(startDate);
-            EnsureArgumentIsNotNullForInduction(completedDate);
-            EnsureArgumentIsNullForInduction(exemptionReason);
+            EnsureArgumentIsNotNull(startDate);
+            EnsureArgumentIsNotNull(completedDate);
+            EnsureExemptionReasonsAreNone();
+        }
+        else if (status is InductionStatus.Failed)
+        {
+            EnsureArgumentIsNull(startDate);
+            EnsureArgumentIsNull(completedDate);
+            EnsureExemptionReasonsAreNone();
         }
         else if (status is InductionStatus.FailedInWales)
         {
-            EnsureArgumentIsNullForInduction(startDate);
-            EnsureArgumentIsNullForInduction(completedDate);
-            EnsureArgumentIsNullForInduction(exemptionReason);
+            EnsureArgumentIsNull(startDate);
+            EnsureArgumentIsNull(completedDate);
+            EnsureExemptionReasonsAreNone();
         }
         else
         {
             throw new ArgumentException($"Unknown status: '{status}'.", nameof(status));
         }
 
-        void EnsureArgumentIsNullForInduction(object? arg, [CallerArgumentExpression(nameof(arg))] string? paramName = "") =>
+        void EnsureArgumentIsNull(object? arg, [CallerArgumentExpression(nameof(arg))] string? paramName = "") =>
             Debug.Assert(arg is null, $"{paramName} must be null when the status is '{status}'.");
 
-        void EnsureArgumentIsNotNullForInduction(object? arg, [CallerArgumentExpression(nameof(arg))] string? paramName = "") =>
+        void EnsureArgumentIsNotNull(object? arg, [CallerArgumentExpression(nameof(arg))] string? paramName = "") =>
             Debug.Assert(arg is not null, $"{paramName} cannot be null when the status is '{status}'.");
+
+        void EnsureExemptionReasonsAreNone() =>
+            Debug.Assert(exemptionReasons == InductionExemptionReasons.None, $"{nameof(InductionExemptionReasons)} should be {InductionExemptionReasons.None}.");
+
+        void EnsureExemptionReasonsAreNotNone() =>
+            Debug.Assert(exemptionReasons != InductionExemptionReasons.None, $"{nameof(InductionExemptionReasons)} should not be {InductionExemptionReasons.None}.");
     }
 }
