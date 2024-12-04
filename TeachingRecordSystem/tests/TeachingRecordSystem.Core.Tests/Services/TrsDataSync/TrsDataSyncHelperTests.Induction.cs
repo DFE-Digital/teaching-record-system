@@ -4,7 +4,6 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
 
@@ -197,7 +196,7 @@ public partial class TrsDataSyncHelperTests
                 AssertInductionEventMatchesEntity(initialVersion, migratedEvent.DqtInduction);
                 Assert.Equal(initialVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
                 Assert.Equal(initialVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(TrsDataSyncHelper.MapInductionStatusFromDqtInductionStatus(initialVersion.dfeta_InductionStatus).ToString(), migratedEvent.InductionStatus);
+                Assert.Equal(initialVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
                 Assert.Equal(InductionExemptionReasons.None.ToString(), migratedEvent.InductionExemptionReason);
                 return Task.CompletedTask;
             });
@@ -245,7 +244,7 @@ public partial class TrsDataSyncHelperTests
                 AssertInductionEventMatchesEntity(initialVersion, migratedEvent.DqtInduction);
                 Assert.Equal(initialVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
                 Assert.Equal(initialVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(TrsDataSyncHelper.MapInductionStatusFromDqtInductionStatus(initialVersion.dfeta_InductionStatus).ToString(), migratedEvent.InductionStatus);
+                Assert.Equal(initialVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
                 Assert.Equal(InductionExemptionReasons.None.ToString(), migratedEvent.InductionExemptionReason);
                 return Task.CompletedTask;
             });
@@ -319,7 +318,7 @@ public partial class TrsDataSyncHelperTests
                 AssertInductionEventMatchesEntity(updatedVersion, migratedEvent.DqtInduction);
                 Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
                 Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(TrsDataSyncHelper.MapInductionStatusFromDqtInductionStatus(updatedVersion.dfeta_InductionStatus).ToString(), migratedEvent.InductionStatus);
+                Assert.Equal(updatedVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
                 Assert.Equal(InductionExemptionReasons.None.ToString(), migratedEvent.InductionExemptionReason);
                 return Task.CompletedTask;
             });

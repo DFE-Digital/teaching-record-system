@@ -1,6 +1,7 @@
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240814.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
+using InductionStatusInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos.InductionStatusInfo;
 
 namespace TeachingRecordSystem.Api.V3.V20240814.Responses;
 
