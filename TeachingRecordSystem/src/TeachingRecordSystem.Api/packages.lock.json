@@ -31,12 +31,6 @@
           "FluentValidation.DependencyInjectionExtensions": "11.5.1"
         }
       },
-      "idunno.Authentication.Basic": {
-        "type": "Direct",
-        "requested": "[2.3.1, )",
-        "resolved": "2.3.1",
-        "contentHash": "99EoiqTy6hYDvHehG1JLlprkB08ioR/hsnCpPhvDJJeZ0JOKNpoL+7C2jLC1r5vo0G5kerOPqdhdSHF3Ss2blw=="
-      },
       "MediatR": {
         "type": "Direct",
         "requested": "[12.2.0, )",
