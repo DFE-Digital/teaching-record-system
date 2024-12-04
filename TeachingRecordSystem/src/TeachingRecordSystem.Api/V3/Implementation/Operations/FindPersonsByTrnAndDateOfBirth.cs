@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using InductionStatusInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.InductionStatusInfo;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 

@@ -120,48 +120,12 @@ public class TrsDataSyncHelper(
         return new InductionInfo()
         {
             PersonId = contact.ContactId!.Value,
-            InductionStatus = MapInductionStatusFromDqtInductionStatus(contact.dfeta_InductionStatus),
+            InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionExemptionReasons = InductionExemptionReasons.None, // this mapping will be done in a future PR
             DqtModifiedOn = induction?.ModifiedOn
         };
-    }
-
-    public static InductionStatus MapInductionStatusFromDqtInductionStatus(dfeta_InductionStatus? dqtInductionStatus)
-    {
-        var inductionStatus = InductionStatus.None;
-
-        switch (dqtInductionStatus)
-        {
-            case dfeta_InductionStatus.Exempt:
-            case dfeta_InductionStatus.PassedinWales:
-                inductionStatus = InductionStatus.Exempt;
-                break;
-            case dfeta_InductionStatus.Fail:
-                inductionStatus = InductionStatus.Failed;
-                break;
-            case dfeta_InductionStatus.FailedinWales:
-                inductionStatus = InductionStatus.FailedInWales;
-                break;
-            case dfeta_InductionStatus.InductionExtended:
-            case dfeta_InductionStatus.InProgress:
-            case dfeta_InductionStatus.NotYetCompleted:
-                inductionStatus = InductionStatus.InProgress;
-                break;
-            case dfeta_InductionStatus.Pass:
-                inductionStatus = InductionStatus.Passed;
-                break;
-            case dfeta_InductionStatus.RequiredtoComplete:
-                inductionStatus = InductionStatus.RequiredToComplete;
-                break;
-            case null:
-                break;
-            default:
-                throw new ArgumentException($"Unrecognized {nameof(dfeta_InductionStatus)}: '{dqtInductionStatus}'.", nameof(dqtInductionStatus));
-        }
-
-        return inductionStatus;
     }
 
     public async Task DeleteRecordsAsync(string modelType, IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)

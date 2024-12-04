@@ -1061,7 +1061,11 @@ public partial class TestData
 
                 if (status != InductionStatus.None && !qtsDate.HasValue)
                 {
-                    createPersonBuilder.EnsureQts();
+                    throw new InvalidOperationException("Person requires QTS.");
+                }
+                else if (status == InductionStatus.None && qtsDate.HasValue)
+                {
+                    throw new InvalidOperationException($"Status cannot be '{status}' when person has QTS.");
                 }
 
                 _status = Option.Some(status);
@@ -1082,22 +1086,14 @@ public partial class TestData
 
                 var status = _status.ValueOrFailure();
 
-                if (status is not InductionStatus.InProgress and not InductionStatus.Passed and not InductionStatus.Failed &&
-                    startDate is not null)
+                if (!Person.ValidateInductionData(
+                        status,
+                        startDate,
+                        GetDefaultCompletedDate(status, startDate),
+                        GetDefaultExemptionReasons(status),
+                        out var error))
                 {
-                    throw new InvalidOperationException($"Start date cannot be non-null when the status is {status}.");
-                }
-
-                if (status is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed &&
-                    startDate is null)
-                {
-                    throw new InvalidOperationException($"Start date cannot be null when the status is {status}.");
-                }
-
-                var qtsDate = createPersonBuilder.GetQtsDate();
-                if (startDate <= qtsDate)
-                {
-                    throw new InvalidOperationException("Start date must be after QTS date.");
+                    throw new InvalidOperationException(error);
                 }
 
                 _startDate = Option.Some(startDate);
@@ -1124,19 +1120,14 @@ public partial class TestData
                 var status = _status.ValueOrFailure();
                 var startDate = _startDate.ValueOrFailure();
 
-                if (status is not InductionStatus.Passed and not InductionStatus.Failed && completedDate is not null)
+                if (!Person.ValidateInductionData(
+                        status,
+                        startDate,
+                        completedDate,
+                        GetDefaultExemptionReasons(status),
+                        out var error))
                 {
-                    throw new InvalidOperationException($"Completed date cannot be non-null when the status is {status}.");
-                }
-
-                if (status is InductionStatus.Passed or InductionStatus.Failed && completedDate is null)
-                {
-                    throw new InvalidOperationException($"Completed date cannot be null when the status is {status}.");
-                }
-
-                if (completedDate <= startDate)
-                {
-                    throw new InvalidOperationException($"Completed date must be after the start date.");
+                    throw new InvalidOperationException(error);
                 }
 
                 _completedDate = Option.Some(completedDate);
@@ -1180,9 +1171,19 @@ public partial class TestData
                 var qtsDate = createPersonBuilder.GetQtsDate();
 
                 var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
-                var startDate = _startDate.ValueOr(status is InductionStatus.InProgress or InductionStatus.Passed ? qtsDate!.Value.AddMonths(6) : null);
-                var completedDate = _completedDate.ValueOr(status is InductionStatus.Passed ? startDate!.Value.AddMonths(12) : null);
-                var exemptionReasons = _exemptionReasons.ValueOr(status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None);
+                var startDate = _startDate.ValueOr(GetDefaultStartDate(status, qtsDate));
+                var completedDate = _completedDate.ValueOr(GetDefaultCompletedDate(status, startDate));
+                var exemptionReasons = _exemptionReasons.ValueOr(GetDefaultExemptionReasons(status));
+
+                if (!Person.ValidateInductionData(
+                        status,
+                        startDate,
+                        completedDate,
+                        exemptionReasons,
+                        out var error))
+                {
+                    throw new InvalidOperationException(error);
+                }
 
                 person.SetInductionStatus(
                     status,
@@ -1201,6 +1202,15 @@ public partial class TestData
 
                 return [];
             }
+
+            private static DateOnly? GetDefaultStartDate(InductionStatus status, DateOnly? qtsDate) =>
+                status.RequiresStartDate() ? qtsDate!.Value.AddMonths(6) : null;
+
+            private static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
+                status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
+
+            private static InductionExemptionReasons GetDefaultExemptionReasons(InductionStatus status) =>
+                status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None;
         }
     }
 
