@@ -291,6 +291,9 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string PersonQualifications(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Qualifications", routeValues: new { personId });
 
+    public string PersonInduction(Guid personId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Induction", routeValues: new { personId });
+
     public string PersonAlerts(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Alerts", routeValues: new { personId });
 

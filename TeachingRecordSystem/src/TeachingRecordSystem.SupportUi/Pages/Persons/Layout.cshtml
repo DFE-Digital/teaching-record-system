@@ -26,6 +26,9 @@
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Qualifications</a>
                 </li>
 
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Induction ? "page" : null)" href="@LinkGenerator.PersonInduction(personId)">Induction</a>
+                </li>
                 @if (FeatureProvider.IsEnabled(FeatureNames.Alerts))
                 {
                     <li class="moj-sub-navigation__item">
