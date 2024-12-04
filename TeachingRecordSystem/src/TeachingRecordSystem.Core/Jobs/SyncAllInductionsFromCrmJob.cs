@@ -25,7 +25,7 @@ public class SyncAllInductionsFromCrmJob
         _syncOptionsAccessor = syncOptionsAccessor;
     }
 
-    public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
+    public async Task ExecuteAsync(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
     {
         const int pageSize = 1000;
 
@@ -64,6 +64,7 @@ public class SyncAllInductionsFromCrmJob
             await _trsDataSyncHelper.SyncInductionsAsync(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
                 ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
+                createMigratedEvent,
                 dryRun,
                 cancellationToken);
 

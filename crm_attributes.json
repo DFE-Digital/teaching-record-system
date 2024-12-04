@@ -43,6 +43,7 @@
     "birthdate",
     "contactid",
     "createdon",
+    "createdby",
     "dfeta_eytsdate",
     "dfeta_husid",
     "dfeta_inductionStatus",
@@ -71,6 +72,7 @@
     "mobilephone",
     "modifiedon",
     "statecode",
+    "statuscode",
     "telephone1",
     "dfeta_slugid",
     "dfeta_allowpiiupdatesfromregister",
@@ -127,7 +129,9 @@
     "dfeta_personid",
     "dfeta_startdate",
     "statecode",
+    "statuscode",
     "CreatedOn",
+    "createdby",
     "modifiedon"
   ],
   "dfeta_inductionperiod": [
