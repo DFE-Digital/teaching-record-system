@@ -1082,13 +1082,13 @@ public partial class TestData
 
                 var status = _status.ValueOrFailure();
 
-                if (status is not InductionStatus.InProgress and not InductionStatus.Passed &&
+                if (status is not InductionStatus.InProgress and not InductionStatus.Passed and not InductionStatus.Failed &&
                     startDate is not null)
                 {
                     throw new InvalidOperationException($"Start date cannot be non-null when the status is {status}.");
                 }
 
-                if (status is InductionStatus.InProgress or InductionStatus.Passed &&
+                if (status is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed &&
                     startDate is null)
                 {
                     throw new InvalidOperationException($"Start date cannot be null when the status is {status}.");
@@ -1124,12 +1124,12 @@ public partial class TestData
                 var status = _status.ValueOrFailure();
                 var startDate = _startDate.ValueOrFailure();
 
-                if (status is not InductionStatus.Passed && completedDate is not null)
+                if (status is not InductionStatus.Passed and not InductionStatus.Failed && completedDate is not null)
                 {
                     throw new InvalidOperationException($"Completed date cannot be non-null when the status is {status}.");
                 }
 
-                if (status is InductionStatus.Passed && completedDate is null)
+                if (status is InductionStatus.Passed or InductionStatus.Failed && completedDate is null)
                 {
                     throw new InvalidOperationException($"Completed date cannot be null when the status is {status}.");
                 }
