@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -21,6 +22,8 @@ public partial class TestData
     public class CreatePersonBuilder
     {
         private const string TeacherStatusQualifiedTeacherTrained = "71";
+
+        private static readonly DateOnly _defaultQtsDate = new DateOnly(2022, 9, 1);
 
         private bool? _syncEnabledOverride;
         private DateOnly? _dateOfBirth;
@@ -44,6 +47,7 @@ public partial class TestData
         private string? _trnToken;
         private string? _slugId;
         private int? _loginFailedCounter;
+        private CreatePersonMandatoryQualificationBuilder.CreatePersonInductionBuilder? _inductionBuilder;
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -165,7 +169,8 @@ public partial class TestData
                 _mqBuilders.Any() ||
                 _qtlsDate.HasValue ||
                 _qtsRegistrations.Any() ||
-                _qualifications.Any())
+                _qualifications.Any() ||
+                _inductionBuilder?.HasStatusRequiringQts == true)
             {
                 throw new InvalidOperationException("Person requires a TRN.");
             }
@@ -211,7 +216,7 @@ public partial class TestData
 
             _qtsRegistrations.Add(
                 new QtsRegistration(
-                    qtsDate ?? new DateOnly(2022, 9, 1),
+                    qtsDate ?? _defaultQtsDate,
                     TeacherStatusValue: TeacherStatusQualifiedTeacherTrained,
                     CreatedOn: null,
                     EytsDate: null,
@@ -278,6 +283,19 @@ public partial class TestData
             }
 
             _loginFailedCounter = loginFailedCounter;
+            return this;
+        }
+
+        public CreatePersonBuilder WithInductionStatus(InductionStatus status) =>
+            WithInductionStatus(i => i.WithStatus(status));
+
+        public CreatePersonBuilder WithInductionStatus(Action<CreatePersonMandatoryQualificationBuilder.CreatePersonInductionBuilder> configure)
+        {
+            EnsureTrn();
+
+            _inductionBuilder ??= new(this);
+            configure(_inductionBuilder);
+
             return this;
         }
 
@@ -531,58 +549,83 @@ public partial class TestData
             // Read the contact record back (plugins may have added/amended data so our original record will be stale)
             contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
 
-            await testData.SyncConfiguration.SyncIfEnabledAsync(
+            var syncedPerson = await testData.SyncConfiguration.SyncIfEnabledAsync(
                 helper => helper.SyncPersonAsync(contact, ignoreInvalid: false),
                 _syncEnabledOverride);
 
-            var (mqs, alerts) = await testData.WithDbContextAsync(async dbContext =>
+            var (mqs, alerts, person) = await testData.WithDbContextAsync(async dbContext =>
             {
-                await AddTrnRequestMetadataAsync();
+                if (!syncedPerson)
+                {
+                    if (_alertBuilders.Any() ||
+                        _mqBuilders.Any() ||
+                        _trnRequest is { WriteMetadata: true } ||
+                        _inductionBuilder != null)
+                    {
+                        throw new InvalidOperationException("Cannot write TRS-owned data unless sync is enabled.");
+                    }
 
-                return (
-                    await AddMqsAsync(),
-                    await AddAlertsAsync());
+                    return default;
+                }
 
-                async Task<MandatoryQualification[]> AddMqsAsync()
+                var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
+
+                AddTrnRequestMetadata();
+                _inductionBuilder?.Execute(person, this, testData, dbContext);
+                var mqIds = await AddMqsAsync();
+                var alertIds = await AddAlertsAsync();
+
+                await dbContext.SaveChangesAsync();
+
+                person = await dbContext.Persons
+                    .Include(p => p.Alerts)
+                    .ThenInclude(a => a.AlertType)
+                    .ThenInclude(at => at.AlertCategory)
+                    .AsSplitQuery()
+                    .SingleAsync(p => p.PersonId == contact.Id);
+
+                // Can't include this above https://github.com/dotnet/efcore/issues/7623
+                var personMqs = await dbContext.MandatoryQualifications
+                    .Where(q => q.PersonId == PersonId)
+                    .Include(q => q.Provider)
+                    .Where(p => p.PersonId == contact.Id)
+                    .ToArrayAsync();
+
+                // Get MQs and Alerts that we've added *in the same order they were specified*.
+                var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
+                var alerts = alertIds.Select(id => person.Alerts.Single(a => a.AlertId == id)).AsReadOnly();
+
+                return (mqs, alerts, person);
+
+                async Task<IReadOnlyCollection<Guid>> AddMqsAsync()
                 {
                     var mqIds = new List<Guid>();
+
                     foreach (var builder in _mqBuilders)
                     {
                         var (mqId, mqEvents) = await builder.ExecuteAsync(this, testData, dbContext);
                         mqIds.Add(mqId);
                         events.AddRange(mqEvents);
                     }
-                    await dbContext.SaveChangesAsync();
 
-                    var mqs = await dbContext.MandatoryQualifications
-                        .Where(mq => mq.PersonId == PersonId)
-                        .Include(mq => mq.Provider)
-                        .ToDictionaryAsync(mq => mq.QualificationId, mq => mq);
-
-                    return mqIds.Select(id => mqs[id]).ToArray();
+                    return mqIds;
                 }
 
-                async Task<Alert[]> AddAlertsAsync()
+                async Task<IReadOnlyCollection<Guid>> AddAlertsAsync()
                 {
                     var alertIds = new List<Guid>();
+
                     foreach (var builder in _alertBuilders)
                     {
                         var (alertId, alertEvents) = await builder.ExecuteAsync(this, testData, dbContext);
                         alertIds.Add(alertId);
                         events.AddRange(alertEvents);
                     }
-                    await dbContext.SaveChangesAsync();
 
-                    var alerts = await dbContext.Alerts
-                        .Where(a => a.PersonId == PersonId)
-                        .Include(a => a.AlertType)
-                        .ThenInclude(at => at.AlertCategory)
-                        .ToDictionaryAsync(a => a.AlertId, a => a);
-
-                    return alertIds.Select(id => alerts[id]).ToArray();
+                    return alertIds;
                 }
 
-                async Task AddTrnRequestMetadataAsync()
+                void AddTrnRequestMetadata()
                 {
                     if (_trnRequest is not { WriteMetadata: true } trnRequest)
                     {
@@ -600,14 +643,13 @@ public partial class TestData
                         Name = [firstName, lastName],
                         DateOfBirth = dateOfBirth
                     });
-
-                    await dbContext.SaveChangesAsync();
                 }
             });
 
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
+                Person = person,
                 Events = events.AsReadOnly(),
                 Contact = contact,
                 Trn = trn,
@@ -631,6 +673,21 @@ public partial class TestData
             };
         }
 
+        internal DateOnly? GetQtsDate()
+        {
+            var qtsDates = _qtsRegistrations
+                .Where(q => q.QtsDate != null)
+                .Select(q => q.QtsDate!.Value)
+                .ToArray();
+
+            if (qtsDates.Length == 0)
+            {
+                return null;
+            }
+
+            return qtsDates.Min();
+        }
+
         private void EnsureTrn()
         {
             _hasTrn ??= true;
@@ -640,6 +697,9 @@ public partial class TestData
                 throw new InvalidOperationException("Person requires a TRN.");
             }
         }
+
+        internal DateOnly EnsureQts() => GetQtsDate() ??
+            throw new InvalidOperationException("Person requires QTS.");
     }
 
     public class CreatePersonAlertBuilder
@@ -928,7 +988,7 @@ public partial class TestData
             }
             else
             {
-                var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId));
+                var createdByUser = _createdByUser.ValueOr(EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId));
 
                 var createdEvent = new MandatoryQualificationCreatedEvent()
                 {
@@ -959,11 +1019,174 @@ public partial class TestData
 
             return (QualificationId, events);
         }
+
+        public class CreatePersonInductionBuilder(CreatePersonBuilder createPersonBuilder)
+        {
+            private Option<InductionStatus> _status;
+            private Option<DateOnly?> _startDate;
+            private Option<DateOnly?> _completedDate;
+            private Option<InductionExemptionReasons> _exemptionReasons;
+
+            public bool HasStatusRequiringQts => _status.HasValue && _status.ValueOrFailure() != InductionStatus.None;
+
+            public CreatePersonInductionBuilder WithStatus(InductionStatus status)
+            {
+                if (_status.HasValue && _status.ValueOrFailure() != status)
+                {
+                    throw new InvalidOperationException("Status has already been set.");
+                }
+
+                var qtsDate = createPersonBuilder.GetQtsDate();
+
+                if (status != InductionStatus.None && !qtsDate.HasValue)
+                {
+                    createPersonBuilder.EnsureQts();
+                }
+
+                _status = Option.Some(status);
+                return this;
+            }
+
+            public CreatePersonInductionBuilder WithStartDate(DateOnly? startDate)
+            {
+                if (_startDate.HasValue)
+                {
+                    throw new InvalidOperationException("Start date has already been set.");
+                }
+
+                if (!_status.HasValue)
+                {
+                    throw new InvalidOperationException("Status must be specified before the start date.");
+                }
+
+                var status = _status.ValueOrFailure();
+
+                if (status is not InductionStatus.InProgress and not InductionStatus.Passed &&
+                    startDate is not null)
+                {
+                    throw new InvalidOperationException($"Start date cannot be non-null when the status is {status}.");
+                }
+
+                if (status is InductionStatus.InProgress or InductionStatus.Passed &&
+                    startDate is null)
+                {
+                    throw new InvalidOperationException($"Start date cannot be null when the status is {status}.");
+                }
+
+                var qtsDate = createPersonBuilder.GetQtsDate();
+                if (startDate <= qtsDate)
+                {
+                    throw new InvalidOperationException("Start date must be after QTS date.");
+                }
+
+                _startDate = Option.Some(startDate);
+                return this;
+            }
+
+            public CreatePersonInductionBuilder WithCompletedDate(DateOnly? completedDate)
+            {
+                if (_completedDate.HasValue)
+                {
+                    throw new InvalidOperationException("Completed date has already been set.");
+                }
+
+                if (!_status.HasValue)
+                {
+                    throw new InvalidOperationException("Status must be specified before the start date.");
+                }
+
+                if (!_startDate.HasValue)
+                {
+                    throw new InvalidOperationException("Start date must be specified before the completed date.");
+                }
+
+                var status = _status.ValueOrFailure();
+                var startDate = _startDate.ValueOrFailure();
+
+                if (status is not InductionStatus.Passed && completedDate is not null)
+                {
+                    throw new InvalidOperationException($"Completed date cannot be non-null when the status is {status}.");
+                }
+
+                if (status is InductionStatus.Passed && completedDate is null)
+                {
+                    throw new InvalidOperationException($"Completed date cannot be null when the status is {status}.");
+                }
+
+                if (completedDate <= startDate)
+                {
+                    throw new InvalidOperationException($"Completed date must be after the start date.");
+                }
+
+                _completedDate = Option.Some(completedDate);
+                return this;
+            }
+
+            public CreatePersonInductionBuilder WithExemptionReasons(InductionExemptionReasons exemptionReasons)
+            {
+                if (_exemptionReasons.HasValue)
+                {
+                    throw new InvalidOperationException("Exemption reasons have already been set.");
+                }
+
+                if (!_status.HasValue)
+                {
+                    throw new InvalidOperationException("Status must be specified before the exemption reasons.");
+                }
+
+                var status = _status.ValueOrFailure();
+
+                if (status is not InductionStatus.Exempt && exemptionReasons != InductionExemptionReasons.None)
+                {
+                    throw new InvalidOperationException($"Exemption reasons cannot be specified unless the status is {InductionStatus.Exempt}.");
+                }
+
+                if (status is InductionStatus.Exempt && exemptionReasons == InductionExemptionReasons.None)
+                {
+                    throw new InvalidOperationException($"Exemption reasons cannot be {InductionExemptionReasons.None} when the status is {InductionStatus.Exempt}.");
+                }
+
+                _exemptionReasons = Option.Some(exemptionReasons);
+                return this;
+            }
+
+            internal IReadOnlyCollection<EventBase> Execute(
+                Person person,
+                CreatePersonBuilder createPersonBuilder,
+                TestData testData,
+                TrsDbContext dbContext)
+            {
+                var qtsDate = createPersonBuilder.GetQtsDate();
+
+                var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
+                var startDate = _startDate.ValueOr(status is InductionStatus.InProgress or InductionStatus.Passed ? qtsDate!.Value.AddMonths(6) : null);
+                var completedDate = _completedDate.ValueOr(status is InductionStatus.Passed ? startDate!.Value.AddMonths(12) : null);
+                var exemptionReasons = _exemptionReasons.ValueOr(status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None);
+
+                person.SetInductionStatus(
+                    status,
+                    startDate,
+                    completedDate,
+                    exemptionReasons,
+                    updatedBy: SystemUser.SystemUserId,
+                    testData.Clock.UtcNow,
+                    out var @event);
+
+                if (@event is not null)
+                {
+                    dbContext.AddEvent(@event);
+                    return [@event];
+                }
+
+                return [];
+            }
+        }
     }
 
     public record CreatePersonResult
     {
         public required Guid PersonId { get; init; }
+        public required Person Person { get; init; }
         public Guid ContactId => PersonId;
         public required IReadOnlyCollection<EventBase> Events { get; init; }
         public required Contact Contact { get; init; }
