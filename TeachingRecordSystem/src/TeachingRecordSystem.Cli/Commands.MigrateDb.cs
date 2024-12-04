@@ -29,13 +29,13 @@ public static partial class Commands
             {
                 using var dbContext = TrsDbContext.Create(connectionString, commandTimeout: (int)TimeSpan.FromMinutes(10).TotalSeconds);
 
+                await dbContext.GetService<IMigrator>().MigrateAsync(targetMigration);
+
                 // Ensure the user has the replication permission
                 var user = new NpgsqlConnectionStringBuilder(connectionString).Username;
 #pragma warning disable EF1002 // Risk of vulnerability to SQL injection.
                 await dbContext.Database.ExecuteSqlRawAsync($"alter user {user} with replication");
 #pragma warning restore EF1002 // Risk of vulnerability to SQL injection.
-
-                await dbContext.GetService<IMigrator>().MigrateAsync(targetMigration);
             },
             connectionStringOption,
             targetMigrationOption);

@@ -293,7 +293,7 @@ public sealed class TestDataSyncConfiguration
 
     public static TestDataSyncConfiguration Sync(TrsDataSyncHelper helper) => new(true, helper);
 
-    public async Task SyncIfEnabledAsync(Func<TrsDataSyncHelper, Task> action, bool? overrideSync = null)
+    public async Task<bool> SyncIfEnabledAsync(Func<TrsDataSyncHelper, Task> action, bool? overrideSync = null)
     {
         if (overrideSync == true && !SyncEnabled)
         {
@@ -303,6 +303,9 @@ public sealed class TestDataSyncConfiguration
         if (SyncEnabled && overrideSync != false)
         {
             await action(TrsDataSyncHelper);
+            return true;
         }
+
+        return false;
     }
 }
