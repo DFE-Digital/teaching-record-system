@@ -11,6 +11,8 @@ public class InductionModel(TrsDbContext dbContext) : PageModel
 
     public InductionStatus Status { get; set; }
 
+    public string? ExemptionReason { get; set; }
+
     public DateOnly? StartDate { get; set; }
 
     public DateOnly? CompletionDate { get; set; }

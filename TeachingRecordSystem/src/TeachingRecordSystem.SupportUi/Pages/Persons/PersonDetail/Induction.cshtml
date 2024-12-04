@@ -27,6 +27,18 @@
             </govuk-summary-list-row-value>
         </govuk-summary-list-row>
 
+        @if (Model.ExemptionReason != null)
+        {
+            <govuk-summary-list-row data-testid="induction-exemption-reason">
+                <govuk-summary-list-row-key>
+                    Exemption reason
+                </govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>
+                    @Model.ExemptionReason
+                </govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        }
+
         @if (Model.StartDate != null)
         {
             <govuk-summary-list-row data-testid="induction-start-date">
