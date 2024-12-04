@@ -35,7 +35,8 @@ public class GetInductionByContactIdHandler : ICrmQueryHandler<GetActiveInductio
             dfeta_inductionperiod.Fields.dfeta_StartDate,
             dfeta_inductionperiod.Fields.dfeta_EndDate,
             dfeta_inductionperiod.Fields.dfeta_Numberofterms,
-            dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId
+            dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId,
+            dfeta_inductionperiod.PrimaryIdAttribute,
         });
         inductionPeriodLink.EntityAlias = dfeta_inductionperiod.EntityLogicalName;
 
