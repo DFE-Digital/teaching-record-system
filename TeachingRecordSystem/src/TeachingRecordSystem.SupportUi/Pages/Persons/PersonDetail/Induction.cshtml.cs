@@ -6,21 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class InductionModel(TrsDbContext dbContext) : PageModel
 {
-    // CML TODO - where do we set this - resx / DB?
-    private static Dictionary<InductionStatus, string> StatusStrings = new() {
-        {InductionStatus.RequiredToComplete, "Required to complete" },
-        {InductionStatus.Exempt, "Exempt" },
-        {InductionStatus.InProgress, "In progress" },
-        {InductionStatus.Passed, "Passed" },
-        {InductionStatus.Failed, "Failed" },
-        {InductionStatus.FailedInWales, "Failed in Wales" }
-    };
-
     [FromRoute]
     public Guid PersonId { get; set; }
 
     public InductionStatus Status { get; set; }
-    public string StatusString => StatusStrings[Status];
 
     public DateOnly? StartDate { get; set; }
 
@@ -57,7 +46,7 @@ public class InductionModel(TrsDbContext dbContext) : PageModel
         Status = person?.InductionStatus ?? InductionStatus.None;
         StartDate = person?.InductionStartDate;
         CompletionDate = person?.InductionCompletedDate;
-        ExemptionReasons = person?.InductionExemptionReasons != InductionExemptionReasons.None
+        ExemptionReasons = person != null && person?.InductionExemptionReasons != InductionExemptionReasons.None
             ? new List<InductionExemptionReasons> { person!.InductionExemptionReasons }
             : null;
     }
