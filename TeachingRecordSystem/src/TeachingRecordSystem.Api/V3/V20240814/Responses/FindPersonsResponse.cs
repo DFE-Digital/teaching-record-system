@@ -3,18 +3,19 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
 using InductionStatusInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos.InductionStatusInfo;
+using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
 
 namespace TeachingRecordSystem.Api.V3.V20240814.Responses;
 
-[AutoMap(typeof(FindPersonsByTrnAndDateOfBirthResult))]
+[AutoMap(typeof(FindPersonsResult))]
 public record FindPersonsResponse
 {
     public required int Total { get; init; }
-    [SourceMember(nameof(FindPersonsByTrnAndDateOfBirthResult.Items))]
+    [SourceMember(nameof(FindPersonsResult.Items))]
     public required IReadOnlyCollection<FindPersonsResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonsByTrnAndDateOfBirthResultItem))]
+[AutoMap(typeof(FindPersonsResultItem))]
 public record FindPersonsResponseResult
 {
     public required string Trn { get; init; }

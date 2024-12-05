@@ -11,7 +11,7 @@ public partial record FindPersonResponse
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonByLastNameAndDateOfBirthResultItem))]
+[AutoMap(typeof(FindPersonsResultItem))]
 [GenerateVersionedDto(typeof(V20240814.Responses.FindPersonResponseResult), excludeMembers: ["Sanctions"])]
 public partial record FindPersonResponseResult
 {
