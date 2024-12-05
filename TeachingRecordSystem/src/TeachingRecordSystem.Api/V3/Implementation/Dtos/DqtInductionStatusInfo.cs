@@ -1,7 +1,7 @@
 namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
-public record InductionStatusInfo
+public record DqtInductionStatusInfo
 {
-    public required InductionStatus Status { get; init; }
+    public required DqtInductionStatus Status { get; init; }
     public required string StatusDescription { get; init; }
 }

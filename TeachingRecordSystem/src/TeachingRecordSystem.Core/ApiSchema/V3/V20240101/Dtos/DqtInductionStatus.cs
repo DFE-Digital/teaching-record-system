@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
-public enum InductionStatus
+public enum DqtInductionStatus
 {
     Exempt,
     Fail,

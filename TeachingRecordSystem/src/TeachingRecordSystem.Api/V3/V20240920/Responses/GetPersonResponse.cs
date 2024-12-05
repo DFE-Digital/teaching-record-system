@@ -1,6 +1,5 @@
 using AutoMapper.Configuration.Annotations;
 using Optional;
-using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240606.Responses;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
@@ -13,41 +12,12 @@ namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
 public partial record GetPersonResponse
 {
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
+    [SourceMember(nameof(GetPersonResult.DqtInduction))]
     public required Option<GetPersonResponseInduction?> Induction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
-
-    public static GetPersonResponse Map(GetPersonResult result, IMapper mapper, bool userHasAppropriateBodyRole)
-    {
-        var response = mapper.Map<GetPersonResponse>(result);
-
-        if (userHasAppropriateBodyRole)
-        {
-            response = response with
-            {
-                InitialTeacherTraining = response.InitialTeacherTraining
-                    .Map(itts => itts
-                        .Select(itt => new GetPersonResponseInitialTeacherTraining()
-                        {
-                            Provider = itt.Provider,
-                            Qualification = default,
-                            StartDate = default,
-                            EndDate = default,
-                            ProgrammeType = default,
-                            ProgrammeTypeDescription = default,
-                            Result = default,
-                            AgeRange = default,
-                            Subjects = default
-                        })
-                        .Where(itt => itt.Provider is not null)
-                        .AsReadOnly())
-            };
-        }
-
-        return response;
-    }
 }
 
-[AutoMap(typeof(GetPersonResultInduction))]
+[AutoMap(typeof(GetPersonResultDqtInduction))]
 [GenerateVersionedDto(typeof(V20240606.Responses.GetPersonResponseInduction), excludeMembers: ["Periods"])]
 public partial record GetPersonResponseInduction;
 
@@ -55,28 +25,12 @@ public partial record GetPersonResponseInduction;
 public partial record GetPersonResponseInitialTeacherTraining
 {
     public required GetPersonResponseInitialTeacherTrainingProvider? Provider { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<GetPersonResultInitialTeacherTrainingQualification, GetPersonResponseInitialTeacherTrainingQualification>))]
     public required Option<GetPersonResponseInitialTeacherTrainingQualification?> Qualification { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<DateOnly?>))]
     public required Option<DateOnly?> StartDate { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<DateOnly?>))]
     public required Option<DateOnly?> EndDate { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<Implementation.Dtos.IttProgrammeType?, IttProgrammeType?>))]
     public required Option<IttProgrammeType?> ProgrammeType { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<string?>))]
     public required Option<string?> ProgrammeTypeDescription { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<Implementation.Dtos.IttOutcome?, IttOutcome?>))]
     public required Option<IttOutcome?> Result { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetPersonResponseInitialTeacherTrainingAgeRange>))]
     public required Option<GetPersonResponseInitialTeacherTrainingAgeRange?> AgeRange { get; init; }
-
-    [ValueConverter(typeof(WrapWithOptionValueConverter<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject>>))]
     public required Option<IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject>> Subjects { get; init; }
 }

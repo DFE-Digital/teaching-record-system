@@ -1,3 +1,4 @@
+using System.Text.Json;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using static TeachingRecordSystem.TestCommon.TestData;
 
@@ -211,6 +212,24 @@ public class GetTeacherTests : GetTeacherTestBase
                 }
             },
             responseInduction);
+    }
+
+    [Fact]
+    public async Task Get_ValidRequestWithInductionAndPersonHasNullDqtStatus_ReturnsNullInductionContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, "/v3/teacher?include=Induction");
+
+        // Act
+        var response = await GetHttpClientWithIdentityAccessToken(person.Trn!).SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseInduction = jsonResponse.RootElement.GetProperty("induction");
+        Assert.Equal(JsonValueKind.Null, responseInduction.ValueKind);
     }
 
     [Fact]

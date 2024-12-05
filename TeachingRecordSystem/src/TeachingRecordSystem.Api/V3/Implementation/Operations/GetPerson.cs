@@ -14,6 +14,7 @@ public record GetPersonCommand(
     GetPersonCommandIncludes Include,
     DateOnly? DateOfBirth,
     bool ApplyLegacyAlertsBehavior,
+    bool ApplyAppropriateBodyUserRestrictions,
     string? NationalInsuranceNumber = null);
 
 [Flags]
@@ -45,7 +46,8 @@ public record GetPersonResult
     public required string? EmailAddress { get; set; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
-    public required Option<GetPersonResultInduction?> Induction { get; init; }
+    public required Option<GetPersonResultInduction> Induction { get; init; }
+    public required Option<GetPersonResultDqtInduction?> DqtInduction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
@@ -56,17 +58,22 @@ public record GetPersonResult
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
 }
 
-public record GetPersonResultInduction
+public record GetPersonResultInduction : InductionInfo
+{
+    public required string? CertificateUrl { get; init; }
+}
+
+public record GetPersonResultDqtInduction
 {
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
-    public required Dtos.InductionStatus? Status { get; init; }
+    public required DqtInductionStatus Status { get; init; }
     public required string? StatusDescription { get; init; }
     public required string? CertificateUrl { get; init; }
-    public required IReadOnlyCollection<GetPersonResultInductionPeriod> Periods { get; init; }
+    public required IReadOnlyCollection<GetPersonResultDqtInductionPeriod> Periods { get; init; }
 }
 
-public record GetPersonResultInductionPeriod
+public record GetPersonResultDqtInductionPeriod
 {
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
@@ -81,15 +88,15 @@ public record GetPersonResultInductionPeriodAppropriateBody
 
 public record GetPersonResultInitialTeacherTraining
 {
-    public required GetPersonResultInitialTeacherTrainingQualification? Qualification { get; init; }
-    public required DateOnly? StartDate { get; init; }
-    public required DateOnly? EndDate { get; init; }
-    public required IttProgrammeType? ProgrammeType { get; init; }
-    public required string? ProgrammeTypeDescription { get; init; }
-    public required IttOutcome? Result { get; init; }
-    public required GetPersonResultInitialTeacherTrainingAgeRange? AgeRange { get; init; }
+    public required Option<GetPersonResultInitialTeacherTrainingQualification?> Qualification { get; init; }
+    public required Option<DateOnly?> StartDate { get; init; }
+    public required Option<DateOnly?> EndDate { get; init; }
+    public required Option<IttProgrammeType?> ProgrammeType { get; init; }
+    public required Option<string?> ProgrammeTypeDescription { get; init; }
+    public required Option<IttOutcome?> Result { get; init; }
+    public required Option<GetPersonResultInitialTeacherTrainingAgeRange?> AgeRange { get; init; }
     public required GetPersonResultInitialTeacherTrainingProvider? Provider { get; init; }
-    public required IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject> Subjects { get; init; }
+    public required Option<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>> Subjects { get; init; }
 }
 
 public record GetPersonResultInitialTeacherTrainingQualification
@@ -155,6 +162,20 @@ public class GetPersonHandler(
 {
     public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
     {
+        if (command.ApplyAppropriateBodyUserRestrictions)
+        {
+            if ((command.Include & ~(GetPersonCommandIncludes.Induction | GetPersonCommandIncludes.Alerts |
+                GetPersonCommandIncludes.InitialTeacherTraining)) != 0)
+            {
+                return ApiError.ForbiddenForAppropriateBody();
+            }
+
+            if (command.DateOfBirth is null)
+            {
+                return ApiError.ForbiddenForAppropriateBody();
+            }
+        }
+
         var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactDetailByTrnQuery(
                 command.Trn,
@@ -321,7 +342,7 @@ public class GetPersonHandler(
             WithTrsDbLockAsync(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
             null;
 
-        IEnumerable<NameInfo>? previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
+        IEnumerable<NameInfo> previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
             .Select(name => new NameInfo()
             {
                 FirstName = name.FirstName,
@@ -356,6 +377,15 @@ public class GetPersonHandler(
             Option.Some(contact.dfeta_AllowIDSignInWithProhibitions == true) :
             default;
 
+        Option<GetPersonResultDqtInduction?> dqtInduction = default;
+        Option<GetPersonResultInduction> induction = default;
+        if (command.Include.HasFlag(GetPersonCommandIncludes.Induction))
+        {
+            var mappedInduction = MapInduction((await getInductionTask!).Induction, (await getInductionTask!).InductionPeriods, contact);
+            dqtInduction = Option.Some(mappedInduction.DqtInduction);
+            induction = Option.Some(mappedInduction.Induction);
+        }
+
         return new GetPersonResult()
         {
             Trn = command.Trn,
@@ -369,25 +399,10 @@ public class GetPersonHandler(
             Qts = await QtsInfo.CreateAsync(qts, referenceDataCache),
             Eyts = await EytsInfo.CreateAsync(eyts, referenceDataCache),
             EmailAddress = contact.EMailAddress1,
-            Induction = command.Include.HasFlag(GetPersonCommandIncludes.Induction) ?
-                Option.Some(MapInduction(await getInductionTask!, contact)) :
-                default,
+            Induction = induction,
+            DqtInduction = dqtInduction,
             InitialTeacherTraining = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
-                Option.Some((await getIttTask!)
-                    .Select(i => new GetPersonResultInitialTeacherTraining()
-                    {
-                        Qualification = MapIttQualification(i),
-                        ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
-                        ProgrammeTypeDescription = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
-                        StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                        EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                        Result = i.dfeta_Result.HasValue ? i.dfeta_Result.Value.ConvertFromITTResult() : null,
-                        AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
-                        Provider = MapIttProvider(i),
-                        Subjects = MapSubjects(i)
-                    })
-                    .OrderByDescending(i => i.StartDate)
-                    .AsReadOnly()) :
+                Option.Some(MapInitialTeacherTraining((await getIttTask!), command.ApplyAppropriateBodyUserRestrictions)) :
                 default,
             NpqQualifications = command.Include.HasFlag(GetPersonCommandIncludes.NpqQualifications) ?
                 Option.Some(MapNpqQualifications(await getQualificationsTask!)) :
@@ -420,26 +435,23 @@ public class GetPersonHandler(
 
                         return !a.AlertType.InternalOnly;
                     })
-                    .Select(a =>
+                    .Select(a => new Alert()
                     {
-                        return new Alert()
+                        AlertId = a.AlertId,
+                        AlertType = new()
                         {
-                            AlertId = a.AlertId,
-                            AlertType = new()
+                            AlertTypeId = a.AlertType.AlertTypeId,
+                            AlertCategory = new()
                             {
-                                AlertTypeId = a.AlertType.AlertTypeId,
-                                AlertCategory = new()
-                                {
-                                    AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
-                                    Name = a.AlertType.AlertCategory.Name
-                                },
-                                Name = a.AlertType.Name,
-                                DqtSanctionCode = a.AlertType.DqtSanctionCode!
+                                AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
+                                Name = a.AlertType.AlertCategory.Name
                             },
-                            Details = a.Details,
-                            StartDate = a.StartDate,
-                            EndDate = a.EndDate
-                        };
+                            Name = a.AlertType.Name,
+                            DqtSanctionCode = a.AlertType.DqtSanctionCode!
+                        },
+                        Details = a.Details,
+                        StartDate = a.StartDate,
+                        EndDate = a.EndDate
                     })
                     .AsReadOnly()) :
                 default,
@@ -450,41 +462,55 @@ public class GetPersonHandler(
         };
     }
 
-    private static GetPersonResultInduction? MapInduction(InductionRecord data, TeachingRecordSystem.Core.Dqt.Models.Contact contact)
+    private static (GetPersonResultDqtInduction? DqtInduction, GetPersonResultInduction Induction) MapInduction(
+        dfeta_induction? induction,
+        IEnumerable<dfeta_inductionperiod>? inductionPeriods,
+        Contact contact)
     {
-        var inductionStatus = contact.dfeta_InductionStatus?.ConvertToInductionStatus();
-        return data.Induction != null ?
-            new GetPersonResultInduction()
+        var status = contact.dfeta_InductionStatus.ToInductionStatus();
+        var dqtStatus = contact.dfeta_InductionStatus?.ConvertToDqtInductionStatus();
+
+        var startDate = status.RequiresStartDate()
+            ? induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+            : null;
+
+        var completedDate = status.RequiresCompletedDate()
+            ? induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+            : null;
+
+        var canGenerateCertificate = dqtStatus is DqtInductionStatus.Pass or DqtInductionStatus.PassedInWales
+            && completedDate.HasValue;
+
+        var certificateUrl = canGenerateCertificate ? "/v3/certificates/induction" : null;
+
+        var dqtInduction = dqtStatus is not null
+            ? new GetPersonResultDqtInduction()
             {
-                StartDate = data.Induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = data.Induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Status = inductionStatus,
+                StartDate = startDate,
+                EndDate = completedDate,
+                Status = dqtStatus.Value,
                 StatusDescription = contact.dfeta_InductionStatus?.GetDescription(),
-                CertificateUrl =
-                    (data.Induction.dfeta_InductionStatus == dfeta_InductionStatus.Pass || data.Induction.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales) &&
-                        data.Induction.dfeta_CompletionDate is not null ?
-                    "/v3/certificates/induction" :
-                    null,
-                Periods = data.InductionPeriods.Select(MapInductionPeriod).ToArray()
-            } :
-            inductionStatus.HasValue ?
-                    new GetPersonResultInduction()
-                    {
-                        StartDate = null,
-                        EndDate = null,
-                        Status = inductionStatus,
-                        StatusDescription = contact.dfeta_InductionStatus?.GetDescription(),
-                        CertificateUrl = null,
-                        Periods = Array.Empty<GetPersonResultInductionPeriod>()
-                    } :
-            null;
+                CertificateUrl = certificateUrl,
+                Periods = (inductionPeriods ?? []).Select(MapInductionPeriod).ToArray()
+            }
+            : null;
+
+        var inductionInfo = new GetPersonResultInduction()
+        {
+            Status = status,
+            StartDate = startDate,
+            CompletedDate = completedDate,
+            CertificateUrl = certificateUrl,
+        };
+
+        return (dqtInduction, inductionInfo);
     }
 
-    private static GetPersonResultInductionPeriod MapInductionPeriod(dfeta_inductionperiod inductionPeriod)
+    private static GetPersonResultDqtInductionPeriod MapInductionPeriod(dfeta_inductionperiod inductionPeriod)
     {
         var appropriateBody = inductionPeriod.Extract<Account>("appropriatebody", Account.PrimaryIdAttribute);
 
-        return new GetPersonResultInductionPeriod()
+        return new GetPersonResultDqtInductionPeriod()
         {
             StartDate = inductionPeriod.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EndDate = inductionPeriod.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
@@ -496,6 +522,59 @@ public class GetPersonHandler(
                 } :
                 null
         };
+    }
+
+    private static IReadOnlyCollection<GetPersonResultInitialTeacherTraining> MapInitialTeacherTraining(
+        dfeta_initialteachertraining[] itt,
+        bool userHasAppropriateBodyRole)
+    {
+        if (userHasAppropriateBodyRole)
+        {
+            return itt
+                .SelectMany(i =>
+                {
+                    var provider = MapIttProvider(i);
+                    if (provider is null)
+                    {
+                        return Array.Empty<GetPersonResultInitialTeacherTraining>();
+                    }
+
+                    return
+                    [
+                        new GetPersonResultInitialTeacherTraining
+                        {
+                            Provider = provider,
+                            Qualification = default,
+                            StartDate = default,
+                            EndDate = default,
+                            ProgrammeType = default,
+                            ProgrammeTypeDescription = default,
+                            Result = default,
+                            AgeRange = default,
+                            Subjects = default,
+                        }
+                    ];
+                })
+                .AsReadOnly();
+        }
+
+        IEnumerable<GetPersonResultInitialTeacherTraining> mapped = itt
+            .Select(i => new GetPersonResultInitialTeacherTraining()
+            {
+                Qualification = Option.Some(MapIttQualification(i)),
+                ProgrammeType = Option.Some(i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>()),
+                ProgrammeTypeDescription = Option.Some(
+                    i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription()),
+                StartDate = Option.Some(i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)),
+                EndDate = Option.Some(i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)),
+                Result = Option.Some(i.dfeta_Result?.ConvertFromITTResult()),
+                AgeRange = Option.Some(MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo)),
+                Provider = MapIttProvider(i),
+                Subjects = Option.Some(MapSubjects(i))
+            })
+            .OrderByDescending(i => i.StartDate);
+
+        return mapped.AsReadOnly();
     }
 
     private static GetPersonResultInitialTeacherTrainingQualification? MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)

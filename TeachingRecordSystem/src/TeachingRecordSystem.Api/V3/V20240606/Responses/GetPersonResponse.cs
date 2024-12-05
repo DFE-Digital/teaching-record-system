@@ -1,4 +1,6 @@
+using AutoMapper.Configuration.Annotations;
 using Optional;
+using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
@@ -18,6 +20,7 @@ public partial record GetPersonResponse
     public required string? EmailAddress { get; set; }
     public required GetPersonResponseQts? Qts { get; init; }
     public required GetPersonResponseEyts? Eyts { get; init; }
+    [SourceMember(nameof(GetPersonResult.DqtInduction))]
     public required Option<GetPersonResponseInduction?> Induction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseNpqQualification>> NpqQualifications { get; init; }
@@ -37,14 +40,14 @@ public partial record GetPersonResponseQts;
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseEyts))]
 public partial record GetPersonResponseEyts;
 
-[AutoMap(typeof(GetPersonResultInduction))]
+[AutoMap(typeof(GetPersonResultDqtInduction))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInduction), excludeMembers: ["Periods"])]
 public partial record GetPersonResponseInduction
 {
     public required IReadOnlyCollection<GetPersonResponseInductionPeriod> Periods { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInductionPeriod))]
+[AutoMap(typeof(GetPersonResultDqtInductionPeriod))]
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInductionPeriod), excludeMembers: ["AppropriateBody"])]
 public partial record GetPersonResponseInductionPeriod
 {
@@ -59,9 +62,12 @@ public partial record GetPersonResponseInductionPeriodAppropriateBody;
 [GenerateVersionedDto(typeof(V20240101.Responses.GetTeacherResponseInitialTeacherTraining), excludeMembers: ["Qualification", "AgeRange", "Provider", "Subjects"])]
 public partial record GetPersonResponseInitialTeacherTraining
 {
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingQualification, GetPersonResponseInitialTeacherTrainingQualification>))]
     public required GetPersonResponseInitialTeacherTrainingQualification? Qualification { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetPersonResponseInitialTeacherTrainingAgeRange>))]
     public required GetPersonResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetPersonResponseInitialTeacherTrainingProvider? Provider { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject>>))]
     public required IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 

@@ -2,8 +2,6 @@ using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
-using InductionStatusInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos.InductionStatusInfo;
-using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
 
 namespace TeachingRecordSystem.Api.V3.V20240814.Responses;
 
@@ -25,7 +23,8 @@ public record FindPersonsResponseResult
     public required string LastName { get; init; }
     public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
-    public required InductionStatusInfo InductionStatus { get; init; }
+    [SourceMember(nameof(FindPersonsResultItem.DqtInductionStatus))]
+    public required DqtInductionStatusInfo InductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
 }

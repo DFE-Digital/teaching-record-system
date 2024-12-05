@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Api.V3.V20240920.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
+using FindPersonRequest = TeachingRecordSystem.Api.V3.V20240920.Requests.FindPersonRequest;
 
 namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
 

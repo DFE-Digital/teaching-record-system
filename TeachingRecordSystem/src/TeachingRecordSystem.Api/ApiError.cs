@@ -10,6 +10,7 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int SpecifiedResourceUrlDoesNotExist => 10028;
         public static int TrnRequestAlreadyCreated => 10029;
         public static int TrnRequestDoesNotExist => 10031;
+        public static int ForbiddenForAppropriateBody => 10040;
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -37,6 +38,9 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
 
     public static ApiError TrnRequestDoesNotExist(string requestId) =>
         new(ErrorCodes.TrnRequestDoesNotExist, "TRN request does not exist.", $"TRN request ID: '{requestId}'");
+
+    public static ApiError ForbiddenForAppropriateBody() =>
+        new(ErrorCodes.ForbiddenForAppropriateBody, "Forbidden.", "");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {

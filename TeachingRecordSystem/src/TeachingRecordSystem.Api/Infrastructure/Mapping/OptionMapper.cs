@@ -1,4 +1,5 @@
 using Optional;
+using Optional.Unsafe;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Mapping;
 
@@ -20,3 +21,14 @@ public class WrapWithOptionValueConverter<T> : IValueConverter<T, Option<T>>
         Option.Some(sourceMember);
 }
 
+public class UnwrapFromOptionValueConverter<TSource, TDestination> : IValueConverter<Option<TSource>, TDestination>
+{
+    public TDestination Convert(Option<TSource> sourceMember, ResolutionContext context) =>
+        context.Mapper.Map<TDestination>(sourceMember.ValueOrFailure());
+}
+
+public class UnwrapFromOptionValueConverter<T> : IValueConverter<Option<T>, T>
+{
+    public T Convert(Option<T> sourceMember, ResolutionContext context) =>
+        sourceMember.ValueOrFailure();
+}

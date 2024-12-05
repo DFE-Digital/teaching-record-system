@@ -1,7 +1,7 @@
+using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.V20240814.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
-using InductionStatusInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos.InductionStatusInfo;
 
 namespace TeachingRecordSystem.Api.V3.V20240814.Responses;
 
@@ -16,7 +16,8 @@ public partial record FindPersonResponse
 [GenerateVersionedDto(typeof(V20240101.Responses.FindTeachersResponseResult))]
 public partial record FindPersonResponseResult
 {
-    public required InductionStatusInfo InductionStatus { get; init; }
+    [SourceMember(nameof(FindPersonsResultItem.DqtInductionStatus))]
+    public required DqtInductionStatusInfo InductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
 }

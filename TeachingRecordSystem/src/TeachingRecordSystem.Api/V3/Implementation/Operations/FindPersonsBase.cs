@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using InductionStatusInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.InductionStatusInfo;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -20,7 +19,8 @@ public record FindPersonsResultItem
     public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
     public required IReadOnlyCollection<Alert> Alerts { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
-    public required InductionStatusInfo? InductionStatus { get; init; }
+    public required InductionStatus InductionStatus { get; init; }
+    public required DqtInductionStatusInfo? DqtInductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
 }
@@ -123,8 +123,9 @@ public abstract class FindPersonsHandlerBase(
                         LastName = name.LastName
                     })
                     .AsReadOnly(),
-                InductionStatus = r.dfeta_InductionStatus?.ConvertToInductionStatus() is Dtos.InductionStatus inductionStatus ?
-                    new InductionStatusInfo()
+                InductionStatus = r.dfeta_InductionStatus.ToInductionStatus(),
+                DqtInductionStatus = r.dfeta_InductionStatus?.ConvertToDqtInductionStatus() is Dtos.DqtInductionStatus inductionStatus ?
+                    new DqtInductionStatusInfo()
                     {
                         Status = inductionStatus,
                         StatusDescription = inductionStatus.GetDescription()
