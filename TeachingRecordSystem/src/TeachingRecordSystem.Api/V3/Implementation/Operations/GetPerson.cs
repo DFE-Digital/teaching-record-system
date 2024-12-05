@@ -242,30 +242,9 @@ public class GetPersonHandler(
         var contact = contactDetail.Contact;
         var personId = contact.Id;
 
-        var getInductionTask = command.Include.HasFlag(GetPersonCommandIncludes.Induction) ?
-            WithDataverseAdapterLockAsync(() => dataverseAdapter.GetInductionByTeacherAsync(
-                contact.Id,
-                columnNames:
-                [
-                    dfeta_induction.PrimaryIdAttribute,
-                    dfeta_induction.Fields.dfeta_StartDate,
-                    dfeta_induction.Fields.dfeta_CompletionDate,
-                    dfeta_induction.Fields.dfeta_InductionStatus
-                ],
-                inductionPeriodColumnNames:
-                [
-                    dfeta_inductionperiod.Fields.dfeta_InductionId,
-                    dfeta_inductionperiod.Fields.dfeta_StartDate,
-                    dfeta_inductionperiod.Fields.dfeta_EndDate,
-                    dfeta_inductionperiod.Fields.dfeta_Numberofterms,
-                    dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId
-                ],
-                appropriateBodyColumnNames:
-                [
-                    Account.PrimaryIdAttribute,
-                    Account.Fields.Name
-                ])) :
-            null;
+        var getInductionTask = command.Include.HasFlag(GetPersonCommandIncludes.Induction)
+            ? crmQueryDispatcher.ExecuteQueryAsync(new GetActiveInductionByContactIdQuery(contact.Id))
+            : null;
 
         var getIttTask = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
             WithDataverseAdapterLockAsync(() => dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
@@ -471,7 +450,7 @@ public class GetPersonHandler(
         };
     }
 
-    private static GetPersonResultInduction? MapInduction((dfeta_induction Induction, dfeta_inductionperiod[] Inductionperiods) data, TeachingRecordSystem.Core.Dqt.Models.Contact contact)
+    private static GetPersonResultInduction? MapInduction(InductionRecord data, TeachingRecordSystem.Core.Dqt.Models.Contact contact)
     {
         var inductionStatus = contact.dfeta_InductionStatus?.ConvertToInductionStatus();
         return data.Induction != null ?
@@ -486,7 +465,7 @@ public class GetPersonHandler(
                         data.Induction.dfeta_CompletionDate is not null ?
                     "/v3/certificates/induction" :
                     null,
-                Periods = data.Inductionperiods.Select(MapInductionPeriod).ToArray()
+                Periods = data.InductionPeriods.Select(MapInductionPeriod).ToArray()
             } :
             inductionStatus.HasValue ?
                     new GetPersonResultInduction()

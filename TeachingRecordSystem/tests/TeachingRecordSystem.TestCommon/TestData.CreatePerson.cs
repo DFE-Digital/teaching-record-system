@@ -97,7 +97,8 @@ public partial class TestData
             DateOnly? completedDate,
             DateOnly? inductionPeriodStartDate = null,
             DateOnly? inductionPeriodEndDate = null,
-            Guid? appropriateBodyOrgId = null)
+            Guid? appropriateBodyOrgId = null,
+            int? numberOfTerms = null)
         {
             EnsureTrn();
 
@@ -115,7 +116,7 @@ public partial class TestData
             }
             if (appropriateBodyOrgId.HasValue)
             {
-                _dqtInductionPeriods.Add(new DqtInductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
+                _dqtInductionPeriods.Add(new DqtInductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value, numberOfTerms));
             }
             return this;
         }
@@ -536,7 +537,8 @@ public partial class TestData
                         dfeta_InductionId = inductionperiod!.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
                         dfeta_StartDate = inductionperiod.startDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
                         dfeta_EndDate = inductionperiod.endDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                        dfeta_AppropriateBodyId = inductionperiod.AppropriateBodyOrgId.ToEntityReference(Core.Dqt.Models.Account.EntityLogicalName)
+                        dfeta_AppropriateBodyId = inductionperiod.AppropriateBodyOrgId.ToEntityReference(Core.Dqt.Models.Account.EntityLogicalName),
+                        dfeta_Numberofterms = inductionperiod.NumberOfTerms
                     }
                 });
             }
@@ -1244,7 +1246,7 @@ public partial class TestData
 
     public record DqtInduction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
 
-    public record DqtInductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
+    public record DqtInductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId, int? NumberOfTerms);
 
     public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
 

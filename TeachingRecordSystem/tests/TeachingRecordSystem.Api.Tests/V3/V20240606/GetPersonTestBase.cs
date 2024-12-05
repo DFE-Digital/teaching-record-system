@@ -122,51 +122,6 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             StatusCodes.Status200OK);
     }
 
-    protected async Task ValidRequestWithInduction_ReturnsExpectedInductionContent(
-        HttpClient httpClient,
-        string baseUrl,
-        Contact contact)
-    {
-        // Arrange
-        var induction = CreateInduction();
-        var inductionPeriods = CreateInductionPeriods();
-
-        await ConfigureMocks(contact, induction: induction, inductionPeriods: inductionPeriods);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?include=Induction");
-
-        // Act
-        var response = await httpClient.SendAsync(request);
-
-        // Assert
-        var expectedJson = JsonSerializer.SerializeToNode(new
-        {
-            startDate = induction.dfeta_StartDate?.ToString("yyyy-MM-dd"),
-            endDate = induction.dfeta_CompletionDate?.ToString("yyyy-MM-dd"),
-            status = contact.dfeta_InductionStatus?.ToString(),
-            statusDescription = contact.dfeta_InductionStatus?.GetDescription(),
-            certificateUrl = "/v3/certificates/induction",
-            periods = new[]
-            {
-                new
-                {
-                    startDate = inductionPeriods[0].dfeta_StartDate?.ToString("yyyy-MM-dd"),
-                    endDate = inductionPeriods[0].dfeta_EndDate?.ToString("yyyy-MM-dd"),
-                    terms = inductionPeriods[0].dfeta_Numberofterms,
-                    appropriateBody = new
-                    {
-                        name = inductionPeriods[0].GetAttributeValue<AliasedValue>($"appropriatebody.{Account.Fields.Name}").Value
-                    }
-                }
-            }
-        })!;
-
-        var jsonResponse = await AssertEx.JsonResponseAsync(response);
-        var responseInduction = jsonResponse.RootElement.GetProperty("induction");
-
-        AssertEx.JsonObjectEquals(expectedJson, responseInduction);
-    }
-
     protected async Task ValidRequestWithInitialTeacherTraining_ReturnsExpectedInitialTeacherTrainingContent(
         HttpClient httpClient,
         string baseUrl,
@@ -617,43 +572,6 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
         itt.Attributes.Add($"subject3.{dfeta_ittsubject.Fields.dfeta_name}", new AliasedValue(dfeta_ittsubject.EntityLogicalName, dfeta_ittsubject.Fields.dfeta_name, ittSubject3Name));
 
         return itt;
-    }
-
-    private static dfeta_induction CreateInduction()
-    {
-        var inductionStartDate = new DateOnly(1996, 2, 3);
-        var inductionEndDate = new DateOnly(1996, 6, 7);
-        var inductionStatus = dfeta_InductionStatus.Pass;
-
-        return new dfeta_induction()
-        {
-            dfeta_StartDate = inductionStartDate.ToDateTime(),
-            dfeta_CompletionDate = inductionEndDate.ToDateTime(),
-            dfeta_InductionStatus = inductionStatus
-        };
-    }
-
-    private static dfeta_inductionperiod[] CreateInductionPeriods()
-    {
-        var inductionPeriodStartDate = new DateOnly(1996, 2, 3);
-        var inductionPeriodEndDate = new DateOnly(1996, 6, 7);
-        var inductionPeriodTerms = 3;
-        var inductionPeriodAppropriateBodyName = "My appropriate body";
-
-        var inductionPeriod = new dfeta_inductionperiod()
-        {
-            dfeta_StartDate = inductionPeriodStartDate.ToDateTime(),
-            dfeta_EndDate = inductionPeriodEndDate.ToDateTime(),
-            dfeta_Numberofterms = inductionPeriodTerms
-        };
-
-        inductionPeriod.Attributes.Add($"appropriatebody.{Account.PrimaryIdAttribute}", new AliasedValue(Account.EntityLogicalName, Account.PrimaryIdAttribute, Guid.NewGuid()));
-        inductionPeriod.Attributes.Add($"appropriatebody.{Account.Fields.Name}", new AliasedValue(Account.EntityLogicalName, Account.Fields.Name, inductionPeriodAppropriateBodyName));
-
-        return new[]
-        {
-            inductionPeriod
-        };
     }
 
     private static dfeta_qualification CreateQualification(
