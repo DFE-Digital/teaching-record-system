@@ -8,14 +8,14 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
+    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)" data-testid="induction-backlink">Back to record</govuk-back-link>
 }
 @if (!String.IsNullOrEmpty(Model.StatusWarningMessage))
 {
     <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>
 }
 
-<govuk-summary-card>
+<govuk-summary-card data-testid="induction-card">
     <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
     <govuk-summary-list>
         <govuk-summary-list-row data-testid="induction-status">
@@ -23,21 +23,9 @@
                 Induction status
             </govuk-summary-list-row-key>
             <govuk-summary-list-row-value>
-                @Model.Status
+                @Model.StatusString
             </govuk-summary-list-row-value>
         </govuk-summary-list-row>
-
-        @if (Model.ExemptionReason != null)
-        {
-            <govuk-summary-list-row data-testid="induction-exemption-reason">
-                <govuk-summary-list-row-key>
-                    Exemption reason
-                </govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>
-                    @Model.ExemptionReason
-                </govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-        }
 
         @if (Model.StartDate != null)
         {
@@ -46,7 +34,7 @@
                     Induction start date
                 </govuk-summary-list-row-key>
                 <govuk-summary-list-row-value>
-                    @Model.StartDate
+                    @Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
         }
@@ -58,7 +46,7 @@
                     Induction completion date
                 </govuk-summary-list-row-key>
                 <govuk-summary-list-row-value>
-                    @Model.CompletionDate
+                    @Model.CompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
         }
