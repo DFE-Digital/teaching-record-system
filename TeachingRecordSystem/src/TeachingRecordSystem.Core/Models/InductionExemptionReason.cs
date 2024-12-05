@@ -4,5 +4,5 @@ namespace TeachingRecordSystem.Core.Models;
 public enum InductionExemptionReasons
 {
     None = 0,
-    SomethingMadeUpForNow = 1
+    SomethingMadeUpForNow = 1 << 0
 }
