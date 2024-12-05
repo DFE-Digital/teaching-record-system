@@ -1,0 +1,8 @@
+alter table trs_persons add cpd_induction_status int
+alter table trs_persons add cpd_induction_start_date date
+alter table trs_persons add cpd_induction_completed_date date
+alter table trs_persons add cpd_induction_modified_on datetime
+alter table trs_persons add cpd_induction_cpd_modified_on datetime
+alter table trs_persons add cpd_induction_first_modified_on datetime
+alter table trs_persons add induction_exemption_reasons int
+alter table trs_persons add induction_modified_on datetime
