@@ -29,7 +29,7 @@
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
 
-            @if (Model.ExemptionReasons != null && Model.ExemptionReasons.Any())
+            @if (Model.ExemptionReasons != InductionExemptionReasons.None) // how to enforce that InductionExemptionReasons.None means no other flags are set?
             {
                 <govuk-summary-list-row data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>
@@ -41,7 +41,7 @@
                 </govuk-summary-list-row>
             }
 
-            @if (Model.StartDate != null) // CML logic should be based on status?
+            @if (Model.ShowStartDate)
             {
                 <govuk-summary-list-row data-testid="induction-start-date">
                     <govuk-summary-list-row-key>
@@ -53,7 +53,7 @@
                 </govuk-summary-list-row>
             }
 
-            @if (Model.CompletionDate != null) //CML logic should be based on status?
+            @if (Model.ShowCompletionDate)
             {
                 <govuk-summary-list-row data-testid="induction-completion-date">
                     <govuk-summary-list-row-key>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
@@ -15,11 +16,22 @@ public class InductionModel(TrsDbContext dbContext) : PageModel
 
     public DateOnly? CompletionDate { get; set; }
 
-    public IEnumerable<InductionExemptionReasons>? ExemptionReasons { get; set; }
+    public InductionExemptionReasons ExemptionReasons { get; set; }
+
+    public bool ShowStartDate =>
+        Status is InductionStatus.Failed
+        or InductionStatus.FailedInWales
+        or InductionStatus.InProgress
+        or InductionStatus.Passed;
+
+    public bool ShowCompletionDate =>
+        Status is InductionStatus.Passed
+        or InductionStatus.Failed
+        or InductionStatus.FailedInWales;
 
     public string? ExemptionReasonsText
     {
-        get => ExemptionReasons != null ? string.Join(", ", ExemptionReasons) : null;
+        get => string.Join(", ", ExemptionReasons.SplitFlags());
     }
 
     public string StatusWarningMessage // CML TODO change logic to match test spec (criteria based on cpd fields)
@@ -41,13 +53,11 @@ public class InductionModel(TrsDbContext dbContext) : PageModel
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons
-            .SingleOrDefaultAsync(q => q.PersonId == PersonId);
-        //CML TODO - logic for no person found?
-        Status = person?.InductionStatus ?? InductionStatus.None;
-        StartDate = person?.InductionStartDate;
-        CompletionDate = person?.InductionCompletedDate;
-        ExemptionReasons = person != null && person?.InductionExemptionReasons != InductionExemptionReasons.None
-            ? new List<InductionExemptionReasons> { person!.InductionExemptionReasons }
-            : null;
+            .SingleAsync(q => q.PersonId == PersonId);
+
+        Status = person!.InductionStatus;
+        StartDate = person!.InductionStartDate;
+        CompletionDate = person!.InductionCompletedDate;
+        ExemptionReasons = person!.InductionExemptionReasons;
     }
 }

@@ -119,7 +119,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         //var expectedWarning = "To change a teacher's induction status ";
-        var setStartDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-1));
+        var setStartDate = Clock.Today.AddMonths(-1);
         var person = await TestData.CreatePersonAsync(
                 x => x
                 .WithQts()
@@ -146,14 +146,42 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     [Theory]
     [InlineData(InductionStatus.Passed)]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDateButStartDateIsNull_DisplaysExpectedContent(InductionStatus setInductionStatus)
+    {
+        // Arrange
+        //var expectedWarning = "To change a teacher's induction status ";
+        var person = await TestData.CreatePersonAsync(
+                x => x
+                .WithQts()
+                .WithInductionStatus(setInductionStatus)
+                );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        //Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent); // to be covered by other test (below)
+        var inductionStatus = doc.GetElementByTestId("induction-status");
+        Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
+        var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
+        Assert.True(String.IsNullOrWhiteSpace(startDate.Trim()));
+        Assert.Null(doc.GetElementByTestId("induction-exemption-reasons"));
+        Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.Failed)]
     [InlineData(InductionStatus.FailedInWales)]
     // CML TODO - method name - completed vs completion -when the decision comes in
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletionDate_DisplaysExpectedCompletionDate(InductionStatus setInductionStatus)
     {
         // Arrange
-        var setStartDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(-1));
-        var setCompletionDate = DateOnly.FromDateTime(DateTime.Now);
+        var setStartDate = Clock.Today.AddMonths(-1);
+        var setCompletionDate = Clock.Today;
         var person = await TestData.CreatePersonAsync(
                 x => x
                 .WithQts()
@@ -210,7 +238,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     //{
     //    //Arrange
     //    var expectedWarning = "To change a teacher's induction status ";
-    //    var sevenYearsAgo = DateTime.Now.AddDays(-1).AddYears(-7); // more than 7 years ago
+    //    var sevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1); // more than 7 years ago
     //    var setCompletionDate = DateOnly.FromDateTime(sevenYearsAgo);
     //    var person = await TestData.CreatePersonAsync(
     //            x => x
