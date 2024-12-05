@@ -1,6 +1,6 @@
 @page "/persons/{personId}/induction"
 @using TeachingRecordSystem.SupportUi.Pages.Common;
-@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.InductionModel
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.InductionModel;
 @{
     Layout = "Layout";
     ViewBag.SelectedTab = PersonSubNavigationTab.Induction;
@@ -15,41 +15,56 @@
     <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>
 }
 
-<govuk-summary-card data-testid="induction-card">
-    <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
-    <govuk-summary-list>
-        <govuk-summary-list-row data-testid="induction-status">
-            <govuk-summary-list-row-key>
-                Induction status
-            </govuk-summary-list-row-key>
-            <govuk-summary-list-row-value>
-                @Model.StatusString
-            </govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-
-        @if (Model.StartDate != null)
-        {
-            <govuk-summary-list-row data-testid="induction-start-date">
+@if (Model.Status != InductionStatus.None)
+{
+    <govuk-summary-card data-testid="induction-card">
+        <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
+        <govuk-summary-list>
+            <govuk-summary-list-row data-testid="induction-status">
                 <govuk-summary-list-row-key>
-                    Induction start date
+                    Induction status
                 </govuk-summary-list-row-key>
                 <govuk-summary-list-row-value>
-                    @Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
+                    @Model.StatusString
                 </govuk-summary-list-row-value>
             </govuk-summary-list-row>
-        }
 
-        @if (Model.CompletionDate != null)
-        {
-            <govuk-summary-list-row data-testid="induction-completion-date">
-                <govuk-summary-list-row-key>
-                    Induction completion date
-                </govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>
-                    @Model.CompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
-                </govuk-summary-list-row-value>
-            </govuk-summary-list-row>
-        }
+            @if (Model.ExemptionReasons != null && Model.ExemptionReasons.Any())
+            {
+                <govuk-summary-list-row data-testid="induction-exemption-reasons">
+                    <govuk-summary-list-row-key>
+                        Exemption reason
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.ExemptionReasonsText
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
 
-    </govuk-summary-list>
-</govuk-summary-card>
+            @if (Model.StartDate != null) // CML logic should be based on status?
+            {
+                <govuk-summary-list-row data-testid="induction-start-date">
+                    <govuk-summary-list-row-key>
+                        Induction start date
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+            @if (Model.CompletionDate != null) //CML logic should be based on status?
+            {
+                <govuk-summary-list-row data-testid="induction-completion-date">
+                    <govuk-summary-list-row-key>
+                        Induction completion date
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.CompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+        </govuk-summary-list>
+    </govuk-summary-card>
+}

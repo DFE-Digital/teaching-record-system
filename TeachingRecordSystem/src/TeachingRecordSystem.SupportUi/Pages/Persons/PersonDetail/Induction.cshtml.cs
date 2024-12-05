@@ -6,14 +6,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class InductionModel(TrsDbContext dbContext) : PageModel
 {
+    // CML TODO - where do we set this - resx / DB?
     private static Dictionary<InductionStatus, string> StatusStrings = new() {
-        {InductionStatus.None, "Required to complete" },
+        {InductionStatus.RequiredToComplete, "Required to complete" },
         {InductionStatus.Exempt, "Exempt" },
         {InductionStatus.InProgress, "In progress" },
         {InductionStatus.Passed, "Passed" },
-        {InductionStatus.Failed, "Failed" }
+        {InductionStatus.Failed, "Failed" },
+        {InductionStatus.FailedInWales, "Failed in Wales" }
     };
-
 
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -23,11 +24,16 @@ public class InductionModel(TrsDbContext dbContext) : PageModel
 
     public DateOnly? StartDate { get; set; }
 
-    public string? StartDateAsString => StartDate?.ToString("dd MMMM yyyy");
-
     public DateOnly? CompletionDate { get; set; }
 
-    public string StatusWarningMessage
+    public IEnumerable<InductionExemptionReasons>? ExemptionReasons { get; set; }
+
+    public string? ExemptionReasonsText
+    {
+        get => ExemptionReasons != null ? string.Join(", ", ExemptionReasons) : null;
+    }
+
+    public string StatusWarningMessage // CML TODO change logic to match test spec (criteria based on cpd fields)
     {
         get
         {
@@ -47,11 +53,12 @@ public class InductionModel(TrsDbContext dbContext) : PageModel
     {
         var person = await dbContext.Persons
             .SingleOrDefaultAsync(q => q.PersonId == PersonId);
+        //CML TODO - logic for no person found?
         Status = person?.InductionStatus ?? InductionStatus.None;
-
         StartDate = person?.InductionStartDate;
-
         CompletionDate = person?.InductionCompletedDate;
+        ExemptionReasons = person?.InductionExemptionReasons != InductionExemptionReasons.None
+            ? new List<InductionExemptionReasons> { person!.InductionExemptionReasons }
+            : null;
     }
-
 }
