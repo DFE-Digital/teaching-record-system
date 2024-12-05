@@ -12,7 +12,7 @@ public class IndexTests : TestBase
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
-        // Arrange        
+        // Arrange
         var nonExistentPersonId = Guid.NewGuid().ToString();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{nonExistentPersonId}");

@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.UiCommon.FormFlow.State;
 
@@ -20,7 +21,7 @@ public abstract class TestBase : IDisposable
     {
         HostFixture = hostFixture;
 
-        _testServices = TestScopedServices.Reset();
+        _testServices = TestScopedServices.Reset(hostFixture.Services);
         SetCurrentUser(TestUsers.GetUser(UserRoles.Administrator));
 
         HttpClient = hostFixture.CreateClient(new()
@@ -56,6 +57,8 @@ public abstract class TestBase : IDisposable
     public TestUsers TestUsers => HostFixture.Services.GetRequiredService<TestUsers>();
 
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
+
+    public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 
     public async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
             string journeyName,

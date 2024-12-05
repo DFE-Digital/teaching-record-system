@@ -51,6 +51,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
+            services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
             services.AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
