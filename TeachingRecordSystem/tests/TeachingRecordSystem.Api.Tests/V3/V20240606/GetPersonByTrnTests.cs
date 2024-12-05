@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20240606;
@@ -76,10 +77,59 @@ public class GetPersonByTrnTests : GetPersonTestBase
     [Fact]
     public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
-        var contact = await CreateContact();
-        var baseUrl = $"/v3/persons/{contact.dfeta_TRN}";
+        // Arrange
+        var dqtStatus = dfeta_InductionStatus.Pass;
+        var startDate = new DateOnly(1996, 2, 3);
+        var completedDate = new DateOnly(1996, 6, 7);
+        var abName = "Test AB";
+        var appropriateBody = await TestData.CreateAccountAsync(a => a.WithName(abName));
+        var numberOfTerms = 3;
 
-        await ValidRequestWithInduction_ReturnsExpectedInductionContent(GetHttpClientWithApiKey(), baseUrl, contact);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithDqtInduction(
+                dqtStatus,
+                inductionExemptionReason: null,
+                startDate,
+                completedDate,
+                inductionPeriodStartDate: startDate,
+                inductionPeriodEndDate: completedDate,
+                appropriateBodyOrgId: appropriateBody.Id,
+                numberOfTerms: numberOfTerms));
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var responseInduction = jsonResponse.RootElement.GetProperty("induction");
+
+        AssertEx.JsonObjectEquals(
+            new
+            {
+                startDate = startDate.ToString("yyyy-MM-dd"),
+                endDate = completedDate.ToString("yyyy-MM-dd"),
+                status = dqtStatus.ToString(),
+                statusDescription = dqtStatus.GetDescription(),
+                certificateUrl = "/v3/certificates/induction",
+                periods = new[]
+                {
+                    new
+                    {
+                        startDate = startDate.ToString("yyyy-MM-dd"),
+                        endDate = completedDate.ToString("yyyy-MM-dd"),
+                        terms = numberOfTerms,
+                        appropriateBody = new
+                        {
+                            name = abName
+                        }
+                    }
+                }
+            },
+            responseInduction);
     }
 
     [Fact]

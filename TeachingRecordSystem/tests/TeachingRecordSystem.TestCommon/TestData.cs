@@ -263,6 +263,21 @@ public partial class TestData
 
     public string GenerateUrl() => Faker.Internet.Url();
 
+    public T GenerateEnumValue<T>() where T : Enum => Faker.Enum.Random<T>();
+
+    public T GenerateChangedEnumValue<T>(T? currentValue) where T : struct, Enum
+    {
+        T newValue;
+
+        do
+        {
+            newValue = GenerateEnumValue<T>();
+        }
+        while (newValue.Equals(currentValue));
+
+        return newValue;
+    }
+
     protected async Task<T> WithDbContextAsync<T>(Func<TrsDbContext, Task<T>> action)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();

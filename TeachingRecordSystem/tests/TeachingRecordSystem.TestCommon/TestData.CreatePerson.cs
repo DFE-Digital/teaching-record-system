@@ -1,3 +1,6 @@
+using FakeXrmEasy.Extensions;
+using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Optional;
 using Optional.Unsafe;
@@ -94,7 +97,8 @@ public partial class TestData
             DateOnly? completedDate,
             DateOnly? inductionPeriodStartDate = null,
             DateOnly? inductionPeriodEndDate = null,
-            Guid? appropriateBodyOrgId = null)
+            Guid? appropriateBodyOrgId = null,
+            int? numberOfTerms = null)
         {
             EnsureTrn();
 
@@ -112,7 +116,7 @@ public partial class TestData
             }
             if (appropriateBodyOrgId.HasValue)
             {
-                _dqtInductionPeriods.Add(new DqtInductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value));
+                _dqtInductionPeriods.Add(new DqtInductionPeriod(inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value, numberOfTerms));
             }
             return this;
         }
@@ -533,7 +537,8 @@ public partial class TestData
                         dfeta_InductionId = inductionperiod!.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
                         dfeta_StartDate = inductionperiod.startDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
                         dfeta_EndDate = inductionperiod.endDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                        dfeta_AppropriateBodyId = inductionperiod.AppropriateBodyOrgId.ToEntityReference(Core.Dqt.Models.Account.EntityLogicalName)
+                        dfeta_AppropriateBodyId = inductionperiod.AppropriateBodyOrgId.ToEntityReference(Core.Dqt.Models.Account.EntityLogicalName),
+                        dfeta_Numberofterms = inductionperiod.NumberOfTerms
                     }
                 });
             }
@@ -646,6 +651,23 @@ public partial class TestData
                 }
             });
 
+            var currentDqtUser = await testData.GetCurrentCrmUserAsync();
+            var auditId = Guid.NewGuid();
+            var auditDetail = new AttributeAuditDetail()
+            {
+                AuditRecord = new Audit()
+                {
+                    Action = Audit_Action.Create,
+                    AuditId = auditId,
+                    CreatedOn = testData.Clock.UtcNow,
+                    Id = auditId,
+                    Operation = Audit_Operation.Create,
+                    UserId = currentDqtUser
+                },
+                OldValue = new Entity(),
+                NewValue = contact.Clone()
+            };
+
             return new CreatePersonResult()
             {
                 PersonId = PersonId,
@@ -669,7 +691,8 @@ public partial class TestData
                 MandatoryQualifications = mqs,
                 DqtInductions = [.. _dqtInductions],
                 DqtInductionPeriods = [.. _dqtInductionPeriods],
-                Alerts = alerts
+                Alerts = alerts,
+                DqtContactAuditDetail = auditDetail
             };
         }
 
@@ -1040,7 +1063,11 @@ public partial class TestData
 
                 if (status != InductionStatus.None && !qtsDate.HasValue)
                 {
-                    createPersonBuilder.EnsureQts();
+                    throw new InvalidOperationException("Person requires QTS.");
+                }
+                else if (status == InductionStatus.None && qtsDate.HasValue)
+                {
+                    throw new InvalidOperationException($"Status cannot be '{status}' when person has QTS.");
                 }
 
                 _status = Option.Some(status);
@@ -1061,22 +1088,14 @@ public partial class TestData
 
                 var status = _status.ValueOrFailure();
 
-                if (status is not InductionStatus.InProgress and not InductionStatus.Passed &&
-                    startDate is not null)
+                if (!Person.ValidateInductionData(
+                        status,
+                        startDate,
+                        GetDefaultCompletedDate(status, startDate),
+                        GetDefaultExemptionReasons(status),
+                        out var error))
                 {
-                    throw new InvalidOperationException($"Start date cannot be non-null when the status is {status}.");
-                }
-
-                if (status is InductionStatus.InProgress or InductionStatus.Passed &&
-                    startDate is null)
-                {
-                    throw new InvalidOperationException($"Start date cannot be null when the status is {status}.");
-                }
-
-                var qtsDate = createPersonBuilder.GetQtsDate();
-                if (startDate <= qtsDate)
-                {
-                    throw new InvalidOperationException("Start date must be after QTS date.");
+                    throw new InvalidOperationException(error);
                 }
 
                 _startDate = Option.Some(startDate);
@@ -1103,19 +1122,14 @@ public partial class TestData
                 var status = _status.ValueOrFailure();
                 var startDate = _startDate.ValueOrFailure();
 
-                if (status is not InductionStatus.Passed && completedDate is not null)
+                if (!Person.ValidateInductionData(
+                        status,
+                        startDate,
+                        completedDate,
+                        GetDefaultExemptionReasons(status),
+                        out var error))
                 {
-                    throw new InvalidOperationException($"Completed date cannot be non-null when the status is {status}.");
-                }
-
-                if (status is InductionStatus.Passed && completedDate is null)
-                {
-                    throw new InvalidOperationException($"Completed date cannot be null when the status is {status}.");
-                }
-
-                if (completedDate <= startDate)
-                {
-                    throw new InvalidOperationException($"Completed date must be after the start date.");
+                    throw new InvalidOperationException(error);
                 }
 
                 _completedDate = Option.Some(completedDate);
@@ -1159,9 +1173,19 @@ public partial class TestData
                 var qtsDate = createPersonBuilder.GetQtsDate();
 
                 var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
-                var startDate = _startDate.ValueOr(status is InductionStatus.InProgress or InductionStatus.Passed ? qtsDate!.Value.AddMonths(6) : null);
-                var completedDate = _completedDate.ValueOr(status is InductionStatus.Passed ? startDate!.Value.AddMonths(12) : null);
-                var exemptionReasons = _exemptionReasons.ValueOr(status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None);
+                var startDate = _startDate.ValueOr(GetDefaultStartDate(status, qtsDate));
+                var completedDate = _completedDate.ValueOr(GetDefaultCompletedDate(status, startDate));
+                var exemptionReasons = _exemptionReasons.ValueOr(GetDefaultExemptionReasons(status));
+
+                if (!Person.ValidateInductionData(
+                        status,
+                        startDate,
+                        completedDate,
+                        exemptionReasons,
+                        out var error))
+                {
+                    throw new InvalidOperationException(error);
+                }
 
                 person.SetInductionStatus(
                     status,
@@ -1180,6 +1204,15 @@ public partial class TestData
 
                 return [];
             }
+
+            private static DateOnly? GetDefaultStartDate(InductionStatus status, DateOnly? qtsDate) =>
+                status.RequiresStartDate() ? qtsDate!.Value.AddMonths(6) : null;
+
+            private static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
+                status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
+
+            private static InductionExemptionReasons GetDefaultExemptionReasons(InductionStatus status) =>
+                status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None;
         }
     }
 
@@ -1208,11 +1241,12 @@ public partial class TestData
         public required IReadOnlyCollection<DqtInduction> DqtInductions { get; init; }
         public required IReadOnlyCollection<DqtInductionPeriod> DqtInductionPeriods { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
+        public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
 
     public record DqtInduction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
 
-    public record DqtInductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId);
+    public record DqtInductionPeriod(Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId, int? NumberOfTerms);
 
     public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
 

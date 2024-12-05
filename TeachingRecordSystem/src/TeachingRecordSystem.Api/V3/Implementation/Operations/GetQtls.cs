@@ -27,7 +27,7 @@ public class GetQtlsHandler(ICrmQueryDispatcher crmQueryDispatcher)
         return new QtlsResult()
         {
             Trn = command.Trn,
-            QtsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            QtsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
         };
     }
 }

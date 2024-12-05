@@ -1,6 +1,11 @@
 namespace TeachingRecordSystem.SupportUi;
 
-public class FeatureProvider(IConfiguration configuration)
+public interface IFeatureProvider
+{
+    bool IsEnabled(string featureName);
+}
+
+public class ConfigurationFeatureProvider(IConfiguration configuration) : IFeatureProvider
 {
     private readonly HashSet<string> _features = new(configuration.GetSection("EnabledFeatures").Get<string[]>() ?? [], StringComparer.OrdinalIgnoreCase);
 

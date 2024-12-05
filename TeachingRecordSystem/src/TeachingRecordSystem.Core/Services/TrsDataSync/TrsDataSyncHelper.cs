@@ -120,48 +120,12 @@ public class TrsDataSyncHelper(
         return new InductionInfo()
         {
             PersonId = contact.ContactId!.Value,
-            InductionStatus = MapInductionStatusFromDqtInductionStatus(contact.dfeta_InductionStatus),
+            InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionExemptionReasons = InductionExemptionReasons.None, // this mapping will be done in a future PR
             DqtModifiedOn = induction?.ModifiedOn
         };
-    }
-
-    public static InductionStatus MapInductionStatusFromDqtInductionStatus(dfeta_InductionStatus? dqtInductionStatus)
-    {
-        var inductionStatus = InductionStatus.None;
-
-        switch (dqtInductionStatus)
-        {
-            case dfeta_InductionStatus.Exempt:
-            case dfeta_InductionStatus.PassedinWales:
-                inductionStatus = InductionStatus.Exempt;
-                break;
-            case dfeta_InductionStatus.Fail:
-                inductionStatus = InductionStatus.Failed;
-                break;
-            case dfeta_InductionStatus.FailedinWales:
-                inductionStatus = InductionStatus.FailedInWales;
-                break;
-            case dfeta_InductionStatus.InductionExtended:
-            case dfeta_InductionStatus.InProgress:
-            case dfeta_InductionStatus.NotYetCompleted:
-                inductionStatus = InductionStatus.InProgress;
-                break;
-            case dfeta_InductionStatus.Pass:
-                inductionStatus = InductionStatus.Passed;
-                break;
-            case dfeta_InductionStatus.RequiredtoComplete:
-                inductionStatus = InductionStatus.RequiredToComplete;
-                break;
-            case null:
-                break;
-            default:
-                throw new ArgumentException($"Unrecognized {nameof(dfeta_InductionStatus)}: '{dqtInductionStatus}'.", nameof(dqtInductionStatus));
-        }
-
-        return inductionStatus;
     }
 
     public async Task DeleteRecordsAsync(string modelType, IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
@@ -347,12 +311,13 @@ public class TrsDataSyncHelper(
             activeOnly: false,
             cancellationToken);
 
-        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, createMigratedEvent: false, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<Contact> contacts,
         bool ignoreInvalid,
+        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
@@ -374,23 +339,44 @@ public class TrsDataSyncHelper(
             true,
             cancellationToken);
 
-        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<Contact> contacts,
         IReadOnlyCollection<dfeta_induction> entities,
         bool ignoreInvalid,
+        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var inductions = MapInductions(contacts, entities, ignoreInvalid);
-        return await SyncInductionsAsync(inductions, ignoreInvalid, dryRun, cancellationToken);
+        var contactAuditDetails = await GetAuditRecordsAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
+        var inductionAuditDetails = await GetAuditRecordsAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+        var auditDetails = contactAuditDetails
+            .Concat(inductionAuditDetails)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        return await SyncInductionsAsync(contacts, entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+    }
+
+    public async Task<int> SyncInductionsAsync(
+        IReadOnlyCollection<Contact> contacts,
+        IReadOnlyCollection<dfeta_induction> entities,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool ignoreInvalid,
+        bool createMigratedEvent,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var (inductions, events) = MapInductionsAndAudits(contacts, entities, auditDetails, ignoreInvalid, createMigratedEvent);
+        return await SyncInductionsAsync(inductions, events, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
     }
 
     private async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<InductionInfo> inductions,
+        IReadOnlyCollection<EventBase> events,
         bool ignoreInvalid,
+        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
@@ -465,6 +451,12 @@ public class TrsDataSyncHelper(
                 continue;
             }
 
+            var eventsForSyncedContacts = events
+                .Where(e => e is IEventWithPersonId && !unsyncedContactIds.Any(c => c == ((IEventWithPersonId)e).PersonId))
+                .ToArray();
+
+            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_import", clock, cancellationToken);
+
             if (!dryRun)
             {
                 await txn.CommitAsync(cancellationToken);
@@ -474,7 +466,7 @@ public class TrsDataSyncHelper(
         }
         while (true);
 
-        _syncedEntitiesSubject.OnNext([.. toSync]);
+        _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
         return toSync.Count;
     }
 
@@ -1209,6 +1201,244 @@ public class TrsDataSyncHelper(
             .Where(i => i is not null)
             .Cast<InductionInfo>()
             .ToList();
+    }
+
+    private (List<InductionInfo> Inductions, List<EventBase> Events) MapInductionsAndAudits(
+        IReadOnlyCollection<Contact> contacts,
+        IEnumerable<dfeta_induction> inductionEntities,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool ignoreInvalid,
+        bool createMigratedEvent)
+    {
+        var inductionLookup = inductionEntities
+            .GroupBy(i => i.dfeta_PersonId.Id)
+            .ToDictionary(g => g.Key, g => g.ToArray());
+
+        var inductions = new List<InductionInfo>();
+        var events = new List<EventBase>();
+
+        foreach (var contact in contacts)
+        {
+            dfeta_induction? induction = null;
+            if (inductionLookup.TryGetValue(contact.ContactId!.Value, out var personInductions))
+            {
+                // We shouldn't have multiple induction records for the same person in prod at all but we might in other environments
+                // so we'll just take the most recently modified one.
+                induction = personInductions.OrderByDescending(i => i.ModifiedOn).First();
+                if (personInductions.Length > 1 && !ignoreInvalid)
+                {
+                    throw new InvalidOperationException($"Contact '{contact.ContactId!.Value}' has multiple induction records.");
+                }
+            }
+
+            var mapped = MapInductionInfoFromDqtInduction(induction, contact, ignoreInvalid);
+            if (mapped is null)
+            {
+                continue;
+            }
+
+            if (induction is not null)
+            {
+                var inductionAttributeNames = new[]
+                {
+                    dfeta_induction.Fields.dfeta_CompletionDate,
+                    dfeta_induction.Fields.dfeta_InductionExemptionReason,
+                    dfeta_induction.Fields.dfeta_StartDate,
+                    dfeta_induction.Fields.dfeta_InductionStatus,
+                    dfeta_induction.Fields.ModifiedOn
+                };
+                var inductionAudits = auditDetails[induction!.Id].AuditDetails;
+                var inductionVersions = GetEntityVersions(induction, inductionAudits, inductionAttributeNames);
+
+                events.Add(inductionAudits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
+                    MapCreatedEvent(inductionVersions.First()) :
+                    MapImportedEvent(inductionVersions.First()));
+
+                foreach (var (thisVersion, previousVersion) in inductionVersions.Skip(1).Zip(inductionVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                {
+                    var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+
+                    if (mappedEvent is not null)
+                    {
+                        events.Add(mappedEvent);
+                    }
+                }
+
+                if (createMigratedEvent)
+                {
+                    events.Add(MapMigratedEvent(inductionVersions.Last(), mapped));
+                }
+            }
+
+            var contactAudits = auditDetails[contact.ContactId!.Value].AuditDetails;
+            var contactVersions = GetEntityVersions(contact, contactAudits, GetModelTypeSyncInfo(ModelTypes.Person).AttributeNames);
+
+            foreach (var (thisVersion, previousVersion) in contactVersions.Skip(1).Zip(contactVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+            {
+                var mappedEvent = MapContactInductionStatusChangedEvent(thisVersion, previousVersion);
+
+                if (mappedEvent is not null)
+                {
+                    events.Add(mappedEvent);
+                }
+            }
+
+            inductions.Add(mapped);
+        }
+
+        return (inductions, events);
+
+        EventBase MapCreatedEvent(EntityVersionInfo<dfeta_induction> snapshot)
+        {
+            return new DqtInductionCreatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Imported",
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Induction = GetEventDqtInduction(snapshot.Entity)
+            };
+        }
+
+        EventBase? MapUpdatedEvent(EntityVersionInfo<dfeta_induction> snapshot, EntityVersionInfo<dfeta_induction> previous)
+        {
+            if (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.StateCode))
+            {
+                var nonStateAttributes = snapshot.ChangedAttributes
+                    .Where(a => !(a is dfeta_induction.Fields.StateCode or dfeta_induction.Fields.StatusCode))
+                    .ToArray();
+
+                if (nonStateAttributes.Length > 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                }
+
+                if (snapshot.Entity.StateCode == dfeta_inductionState.Inactive)
+                {
+                    return new DqtInductionDeactivatedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        Key = $"{snapshot.Id}",  // The CRM Audit ID
+                        CreatedUtc = snapshot.Timestamp,
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                        Induction = GetEventDqtInduction(snapshot.Entity)
+                    };
+                }
+                else
+                {
+                    return new DqtInductionReactivatedEvent()
+                    {
+                        EventId = Guid.NewGuid(),
+                        Key = $"{snapshot.Id}",  // The CRM Audit ID
+                        CreatedUtc = snapshot.Timestamp,
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                        Induction = GetEventDqtInduction(snapshot.Entity)
+                    };
+                }
+            }
+
+            var changes = DqtInductionUpdatedEventChanges.None |
+                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_StartDate) ? DqtInductionUpdatedEventChanges.StartDate : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_CompletionDate) ? DqtInductionUpdatedEventChanges.CompletionDate : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_InductionStatus) ? DqtInductionUpdatedEventChanges.Status : 0) |
+                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_InductionExemptionReason) ? DqtInductionUpdatedEventChanges.ExemptionReason : 0);
+
+            if (changes == DqtInductionUpdatedEventChanges.None)
+            {
+                return null;
+            }
+
+            return new DqtInductionUpdatedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Id}",  // The CRM Audit ID
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Induction = GetEventDqtInduction(snapshot.Entity),
+                OldInduction = GetEventDqtInduction(previous.Entity),
+                Changes = changes
+            };
+        }
+
+        EventBase? MapContactInductionStatusChangedEvent(EntityVersionInfo<Contact> snapshot, EntityVersionInfo<Contact> previous)
+        {
+            if (snapshot.ChangedAttributes.Contains(Contact.Fields.StateCode))
+            {
+                var nonStateAttributes = snapshot.ChangedAttributes
+                    .Where(a => !(a is Contact.Fields.StateCode or Contact.Fields.StatusCode))
+                    .ToArray();
+
+                if (nonStateAttributes.Length > 0)
+                {
+                    throw new InvalidOperationException(
+                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                }
+            }
+
+            if (!snapshot.ChangedAttributes.Contains(Contact.Fields.dfeta_InductionStatus))
+            {
+                return null;
+            }
+
+            return new DqtContactInductionStatusChangedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Id}",  // The CRM Audit ID
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.Id,
+                InductionStatus = snapshot.Entity.dfeta_InductionStatus.ToString(),
+                OldInductionStatus = previous.Entity.dfeta_InductionStatus.ToString()
+            };
+        }
+
+        EventBase MapImportedEvent(EntityVersionInfo<dfeta_induction> snapshot)
+        {
+            return new DqtInductionImportedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Imported",
+                CreatedUtc = snapshot.Timestamp,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                Induction = GetEventDqtInduction(snapshot.Entity),
+                DqtState = (int)snapshot.Entity.StateCode!
+            };
+        }
+
+        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_induction> snapshot, InductionInfo mappedInduction)
+        {
+            return new InductionMigratedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{snapshot.Entity.Id}-Migrated",
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                InductionStartDate = mappedInduction.InductionStartDate,
+                InductionCompletedDate = mappedInduction.InductionCompletedDate,
+                InductionStatus = mappedInduction.InductionStatus.ToString(),
+                InductionExemptionReason = mappedInduction.InductionExemptionReasons.ToString(),
+                DqtInduction = GetEventDqtInduction(snapshot.Entity)
+            };
+        }
+
+        EventModels.DqtInduction GetEventDqtInduction(dfeta_induction induction)
+        {
+            return new EventModels.DqtInduction()
+            {
+                InductionId = induction.Id,
+                StartDate = induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                CompletionDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                InductionStatus = induction.dfeta_InductionStatus.ToString(),
+                InductionExemptionReason = induction.dfeta_InductionExemptionReason.ToString()
+            };
+        }
     }
 
     private async Task<(List<Alert> Alerts, List<EventBase> Events)> MapAlertsAndAuditsAsync(

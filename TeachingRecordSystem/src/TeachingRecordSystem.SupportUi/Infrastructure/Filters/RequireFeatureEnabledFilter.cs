@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class RequireFeatureEnabledFilter(FeatureProvider featureProvider, string featureName) : IResourceFilter
+public class RequireFeatureEnabledFilter(IFeatureProvider featureProvider, string featureName) : IResourceFilter
 {
     public void OnResourceExecuting(ResourceExecutingContext context)
     {
