@@ -1,7 +1,6 @@
 .DEFAULT_GOAL		:=help
 SHELL				:=/bin/bash
 
-TERRAFILE_VERSION=0.8
 RG_TAGS={"Product" : "Teaching Record System"}
 ARM_TEMPLATE_TAG=1.1.10
 REGION=UK South
@@ -60,11 +59,11 @@ ci:	## Run in automation environment
 	$(eval CONFIRM_DEPLOY=true)
 	$(eval SKIP_CONFIRM=true)
 
-bin/terrafile: ## Install terrafile to manage terraform modules
-	curl -sL https://github.com/coretech/terrafile/releases/download/v${TERRAFILE_VERSION}/terrafile_${TERRAFILE_VERSION}_$$(uname)_$$(uname -m).tar.gz \
-		| tar xz -C ./bin terrafile
+vendor-modules:
+	rm -rf terraform/aks/vendor/modules/aks
+	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_TAG} https://github.com/DFE-Digital/terraform-modules.git terraform/aks/vendor/modules/aks
 
-terraform-init: bin/terrafile
+terraform-init: vendor-modules
 	$(eval export TF_VAR_service_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_service_short_name=$(SERVICE_SHORT))
 	$(eval export TF_VAR_config=${CONFIG})
@@ -72,7 +71,7 @@ terraform-init: bin/terrafile
 	$(eval export TF_VAR_azure_resource_prefix=$(AZURE_RESOURCE_PREFIX))
 
 	[[ "${SP_AUTH}" != "true" ]] && az account set -s $(AZURE_SUBSCRIPTION) || true
-	./bin/terrafile -p terraform/aks/vendor/modules -f terraform/aks/config/${CONFIG}_Terrafile
+
 	terraform -chdir=terraform/aks init -upgrade -backend-config config/${CONFIG}.backend.tfvars $(backend_key) -reconfigure
 
 terraform-plan: terraform-init # make [env] terraform-plan init
@@ -91,8 +90,10 @@ deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONF
 validate-azure-resources: set-azure-account # make dev validate-azure-resources
 	az deployment sub create --name "resourcedeploy-trs-$(shell date +%Y%m%d%H%M%S)" -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}tfstate${CONFIG_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-api-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-authz-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-ui-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-worker-kv']" --what-if
 
-domains-init: bin/terrafile domains set-azure-pd-subscription ## make [env] domains-init - terraform init for environment dns/afd resources
-	./bin/terrafile -p terraform/domains/environment_domains/vendor/modules -f terraform/domains/environment_domains/config/${CONFIG}_Terrafile
+domains-init: domains set-azure-pd-subscription ## make [env] domains-init - terraform init for environment dns/afd resources
+	rm -rf terraform/domains/environment_domains/vendor/modules/domains
+	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_TAG} https://github.com/DFE-Digital/terraform-modules.git terraform/domains/environment_domains/vendor/modules/domains
+
 	terraform -chdir=terraform/domains/environment_domains init -reconfigure -upgrade -backend-config=config/${CONFIG}_backend.tfvars
 
 domains-plan: domains-init ## terraform plan for environment dns/afd resources
@@ -101,8 +102,10 @@ domains-plan: domains-init ## terraform plan for environment dns/afd resources
 domains-apply: domains-init ## terraform apply for environment dns/afd resources, needs CONFIRM_DEPLOY=1 for production
 	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${CONFIG}.tfvars.json
 
-domains-infra-init: bin/terrafile domains set-azure-pd-subscription ## make domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
-	./bin/terrafile -p terraform/domains/infrastructure/vendor/modules -f terraform/domains/infrastructure/config/trs_Terrafile
+domains-infra-init: domains set-azure-pd-subscription ## make domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
+	rm -rf terraform/domains/infrastructure/vendor/modules/domains
+	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_TAG} https://github.com/DFE-Digital/terraform-modules.git terraform/domains/infrastructure/vendor/modules/domains
+
 	terraform -chdir=terraform/domains/infrastructure init -reconfigure -upgrade
 
 domains-infra-plan: domains-infra-init ## terraform plan for dns core resources
