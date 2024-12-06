@@ -16,7 +16,8 @@ default:
 # Install local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
-  npm install -g sass
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.AuthorizeAccess.EndToEndTests"}} && pwsh bin/Debug/net8.0/playwright.ps1 install chromium
+  @npm install -g sass
 
 # Restore dependencies
 restore:

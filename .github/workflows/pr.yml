@@ -154,14 +154,6 @@ jobs:
         run: dotnet build -c Release --no-restore
         working-directory: TeachingRecordSystem/tests/${{ matrix.project }}
 
-      - name: Check for Playwright
-        run: |
-          playwright_script=./bin/Release/net8.0/playwright.ps1
-          if [ -f $playwright_script ]; then
-            pwsh $playwright_script install chromium
-          fi
-        working-directory: TeachingRecordSystem/tests/${{ matrix.project }}
-
       - name: Run tests
         uses: ./.github/workflows/actions/test
         with:
