@@ -43,9 +43,6 @@ public static class MandatoryQualificationSpecialismRegistry
 
     public static bool IsLegacy(this MandatoryQualificationSpecialism specialism) => _info[specialism].Legacy;
 
-    public static MandatoryQualificationSpecialism ToMandatoryQualificationSpecialism(this dfeta_specialism specialism) =>
-        GetByDqtValue(specialism.dfeta_Value);
-
     public static bool TryMapFromDqtMqEstablishment(string mqestablishmentValue, string dqtValue, [NotNullWhen(true)] out MandatoryQualificationSpecialism? specialism)
     {
         switch ((mqestablishmentValue, dqtValue))

@@ -4,17 +4,17 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum MandatoryQualificationStatus
 {
-    [MandatoryQualificationStatusInfo(name: "in progress", dfeta_qualification_dfeta_MQ_Status.InProgress)]
+    [MandatoryQualificationStatusInfo(name: "in progress")]
     InProgress = 0,
-    [MandatoryQualificationStatusInfo(name: "passed", dfeta_qualification_dfeta_MQ_Status.Passed)]
+    [MandatoryQualificationStatusInfo(name: "passed")]
     Passed = 1,
-    [MandatoryQualificationStatusInfo(name: "deferred", dfeta_qualification_dfeta_MQ_Status.Deferred)]
+    [MandatoryQualificationStatusInfo(name: "deferred")]
     Deferred = 2,
-    [MandatoryQualificationStatusInfo(name: "extended", dfeta_qualification_dfeta_MQ_Status.Extended)]
+    [MandatoryQualificationStatusInfo(name: "extended")]
     Extended = 3,
-    [MandatoryQualificationStatusInfo(name: "failed", dfeta_qualification_dfeta_MQ_Status.Failed)]
+    [MandatoryQualificationStatusInfo(name: "failed")]
     Failed = 4,
-    [MandatoryQualificationStatusInfo(name: "withdrawn", dfeta_qualification_dfeta_MQ_Status.Withdrawn)]
+    [MandatoryQualificationStatusInfo(name: "withdrawn")]
     Withdrawn = 5,
 }
 
@@ -29,11 +29,6 @@ public static class MandatoryQualificationStatusRegistry
 
     public static string GetTitle(this MandatoryQualificationStatus status) => _info[status].Title;
 
-    public static dfeta_qualification_dfeta_MQ_Status GetDqtStatus(this MandatoryQualificationStatus status) => _info[status].DqtStatus;
-
-    public static MandatoryQualificationStatus ToMandatoryQualificationStatus(this dfeta_qualification_dfeta_MQ_Status status) =>
-        _info.Values.Single(s => s.DqtStatus == status, $"Failed mapping '{status}' to {nameof(MandatoryQualificationStatus)}.").Value;
-
     private static MandatoryQualificationStatusInfo GetInfo(MandatoryQualificationStatus status)
     {
         var attr = status.GetType()
@@ -42,18 +37,17 @@ public static class MandatoryQualificationStatusRegistry
             .GetCustomAttribute<MandatoryQualificationStatusInfoAttribute>() ??
             throw new Exception($"{nameof(MandatoryQualificationStatus)}.{status} is missing the {nameof(MandatoryQualificationStatusInfoAttribute)} attribute.");
 
-        return new MandatoryQualificationStatusInfo(status, attr.Name, attr.DqtStatus);
+        return new MandatoryQualificationStatusInfo(status, attr.Name);
     }
 }
 
-public sealed record MandatoryQualificationStatusInfo(MandatoryQualificationStatus Value, string Name, dfeta_qualification_dfeta_MQ_Status DqtStatus)
+public sealed record MandatoryQualificationStatusInfo(MandatoryQualificationStatus Value, string Name)
 {
     public string Title => Name[0..1].ToUpper() + Name[1..];
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-file sealed class MandatoryQualificationStatusInfoAttribute(string name, dfeta_qualification_dfeta_MQ_Status dqtStatus) : Attribute
+file sealed class MandatoryQualificationStatusInfoAttribute(string name) : Attribute
 {
     public string Name => name;
-    public dfeta_qualification_dfeta_MQ_Status DqtStatus => dqtStatus;
 }
