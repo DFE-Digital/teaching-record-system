@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
@@ -144,16 +146,15 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
-    [Theory]
-    [InlineData(InductionStatus.Passed)]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDateButStartDateIsNull_DisplaysExpectedContent(InductionStatus setInductionStatus)
+    [Fact(Skip ="TestData setup doesn't allow null start date")]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDateButStartDateIsNull_DisplaysExpectedContent()
     {
         // Arrange
         //var expectedWarning = "To change a teacher's induction status ";
         var person = await TestData.CreatePersonAsync(
                 x => x
                 .WithQts()
-                .WithInductionStatus(setInductionStatus)
+                .WithInductionStatus(InductionStatus.InProgress)
                 );
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
@@ -163,20 +164,14 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        //Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent); // to be covered by other test (below)
-        var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
         Assert.True(String.IsNullOrWhiteSpace(startDate.Trim()));
-        Assert.Null(doc.GetElementByTestId("induction-exemption-reasons"));
-        Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
     [Theory]
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.Failed)]
     [InlineData(InductionStatus.FailedInWales)]
-    // CML TODO - method name - completed vs completion -when the decision comes in
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletionDate_DisplaysExpectedCompletionDate(InductionStatus setInductionStatus)
     {
         // Arrange
@@ -204,57 +199,67 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(setCompletionDate.ToString("d MMMM yyyy"), completionDate);
     }
 
-    //[Theory]
-    //[InlineData(InductionStatus.InProgress)]
-    //[InlineData(InductionStatus.Passed)]
-    //[InlineData(InductionStatus.Failed)]
-    // CL - what I had inferred from page designs
-    //public async Task Get_WithPersonIdForPersonWithInductionStatusMangedByCPD_DisplaysWarning(InductionStatus setInductionStatus)
-    //{
-    //    // Arrange
-    //    var expectedWarning = "To change a teacher's induction status ";
-    //    var setStartDate = DateOnly.FromDateTime(DateTime.Now);
-    //    var person = await TestData.CreatePersonAsync(
-    //            x => x
-    //            .WithQts()
-    //            .WithInductionStatus(builder => builder
-    //                .WithStatus(setInductionStatus)
-    //                .WithStartDate(setStartDate)
-    //            ));
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCPD_ShowsWarning()
+    {
+        //Arrange
+        var expectedWarning = "To change a teacher’s induction status ";
+        var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
 
-    //    var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var person = await TestData.CreatePersonAsync();
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.SetCpdInductionStatus(
+                InductionStatus.Passed,
+                startDate: Clock.Today.AddYears(-7).AddMonths(-6),
+                completedDate: overSevenYearsAgo,
+                cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            await dbContext.SaveChangesAsync();
+        });
 
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
-    //    // Assert
-    //    var doc = await AssertEx.HtmlResponseAsync(response);
-    //    Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent);
-    //}
+        // Act
+        var response = await HttpClient.SendAsync(request);
 
-    //[Fact]
-    //// replacement for above, when TestData builder methods are there - plus add tests for these conditions not met
-    //public async Task Get_WithPersonIdForPersonWithInductionStatusMangedByCPD_DisplaysWarning()
-    //{
-    //    //Arrange
-    //    var expectedWarning = "To change a teacher's induction status ";
-    //    var sevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1); // more than 7 years ago
-    //    var setCompletionDate = DateOnly.FromDateTime(sevenYearsAgo);
-    //    var person = await TestData.CreatePersonAsync(
-    //            x => x
-    //        .WithQts()
-    //        .WithCpdInductionStatus(builder => builder
-    //            .WithStatus(It.IsAny<CpdInductionStatus>)
-    //            .WithCompletionDate(setCompletionDate)
-    //        ));
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+    }
 
-    //    var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCPD_NoWarning()
+    {
+        //Arrange
+        var underSevenYearsAgo = Clock.Today.AddYears(-6);
 
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
+        var person = await TestData.CreatePersonAsync();
 
-    //    // Assert
-    //    var doc = await AssertEx.HtmlResponseAsync(response);
-    //    Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent);
-    //}
+        await WithDbContext(async dbContext =>
+            {
+                dbContext.Attach(person.Person);
+                person.Person.SetCpdInductionStatus(
+                    InductionStatus.Passed,
+                    startDate: underSevenYearsAgo.AddYears(-1),
+                    completedDate: underSevenYearsAgo,
+                    cpdModifiedOn: Clock.UtcNow,
+                    updatedBy: SystemUser.SystemUserId,
+                    now: Clock.UtcNow,
+                    out _);
+                await dbContext.SaveChangesAsync();
+            });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("induction-status-warning"));
+    }
 }
