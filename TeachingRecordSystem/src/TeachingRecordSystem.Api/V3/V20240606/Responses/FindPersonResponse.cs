@@ -10,6 +10,6 @@ public partial record FindPersonResponse
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonByLastNameAndDateOfBirthResultItem))]
+[AutoMap(typeof(FindPersonsResultItem))]
 [GenerateVersionedDto(typeof(V20240101.Responses.FindTeachersResponseResult))]
 public partial record FindPersonResponseResult;

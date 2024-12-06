@@ -185,7 +185,9 @@ public class Program
                 cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionToOptionTypeConverter<,>));
             })
             .AddTransient(typeof(WrapWithOptionValueConverter<>))
-            .AddTransient(typeof(WrapWithOptionValueConverter<,>));
+            .AddTransient(typeof(WrapWithOptionValueConverter<,>))
+            .AddTransient(typeof(UnwrapFromOptionValueConverter<>))
+            .AddTransient(typeof(UnwrapFromOptionValueConverter<,>));
 
         services.Scan(scan =>
         {

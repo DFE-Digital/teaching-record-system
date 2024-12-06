@@ -1,11 +1,10 @@
 using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 
-namespace TeachingRecordSystem.Api.V3.V20240920.Responses;
+namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
 [AutoMap(typeof(FindPersonsResult))]
-[GenerateVersionedDto(typeof(V20240814.Responses.FindPersonsResponse), excludeMembers: ["Results"])]
+[GenerateVersionedDto(typeof(V20240920.Responses.FindPersonsResponse), excludeMembers: ["Results"])]
 public partial record FindPersonsResponse
 {
     [SourceMember(nameof(FindPersonsResult.Items))]
@@ -13,8 +12,8 @@ public partial record FindPersonsResponse
 }
 
 [AutoMap(typeof(FindPersonsResultItem))]
-[GenerateVersionedDto(typeof(V20240814.Responses.FindPersonsResponseResult), excludeMembers: ["Sanctions"])]
+[GenerateVersionedDto(typeof(V20240920.Responses.FindPersonsResponseResult), excludeMembers: ["InductionStatus"])]
 public partial record FindPersonsResponseResult
 {
-    public required IReadOnlyCollection<Alert> Alerts { get; init; }
+    public required InductionStatus InductionStatus { get; init; }
 }
