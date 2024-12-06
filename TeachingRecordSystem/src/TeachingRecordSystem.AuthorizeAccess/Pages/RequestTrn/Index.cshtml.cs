@@ -17,7 +17,7 @@ public class IndexModel(IConfiguration configuration) : PageModel
         var whitelistedAccessToken = configuration.GetRequiredValue("RequestTrnAccessToken");
         if (!whitelistedAccessToken.Equals(AccessToken, StringComparison.Ordinal))
         {
-            return BadRequest();
+            return NotFound();
         }
         return Page();
     }
