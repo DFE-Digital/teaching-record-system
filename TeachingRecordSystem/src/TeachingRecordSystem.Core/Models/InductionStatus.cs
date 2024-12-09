@@ -35,6 +35,9 @@ public static class InductionStatusRegistry
 
     public static bool RequiresCompletedDate(this InductionStatus status) => _info[status].RequiresCompletedDate;
 
+    public static InductionStatus ToInductionStatus(this dfeta_InductionStatus status) =>
+        ToInductionStatus((dfeta_InductionStatus?)status);
+
     public static InductionStatus ToInductionStatus(this dfeta_InductionStatus? status) => status switch
     {
         null => InductionStatus.None,

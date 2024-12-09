@@ -140,8 +140,8 @@ public class Person
         DateTime now,
         out PersonInductionUpdatedEvent? @event)
     {
-        // FUTURE When we have QTS in TRS - assert person has QTS
-        AssertInductionChangeIsValid(status, startDate, completedDate, exemptionReasons);
+        // N.B. We allow missing data fields as some migrated data has missing fields
+        // and we want to be able to test such scenarios.
 
         var changes = PersonInductionUpdatedEventChanges.None |
             (InductionStatus != status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |

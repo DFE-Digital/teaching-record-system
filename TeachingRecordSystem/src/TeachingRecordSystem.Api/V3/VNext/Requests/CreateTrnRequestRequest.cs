@@ -1,5 +1,5 @@
 
-using TeachingRecordSystem.Api.V3.Core.SharedModels;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Requests;
 

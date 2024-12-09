@@ -6,7 +6,6 @@ docs/build
 docs/source/dqt-api.yaml
 **/.DS_Store
 
-bin/terrafile
 terraform/domains/environment_domains/vendor/
 terraform/domains/infrastructure/vendor/
 terraform/aks/vendor/

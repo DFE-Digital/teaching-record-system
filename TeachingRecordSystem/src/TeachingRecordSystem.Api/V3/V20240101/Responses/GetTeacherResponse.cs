@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using AutoMapper.Configuration.Annotations;
 using Optional;
+using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
@@ -21,6 +22,7 @@ public record GetTeacherResponse
     public required string? Email { get; set; }
     public required GetTeacherResponseQts? Qts { get; init; }
     public required GetTeacherResponseEyts? Eyts { get; init; }
+    [SourceMember(nameof(GetPersonResult.DqtInduction))]
     public required Option<GetTeacherResponseInduction?> Induction { get; init; }
     public required Option<IReadOnlyCollection<GetTeacherResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetTeacherResponseNpqQualification>> NpqQualifications { get; init; }
@@ -48,19 +50,19 @@ public record GetTeacherResponseEyts
     public required string? StatusDescription { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInduction))]
+[AutoMap(typeof(GetPersonResultDqtInduction))]
 public record GetTeacherResponseInduction
 {
     public required DateOnly? StartDate { get; init; }
     public required DateOnly? EndDate { get; init; }
-    public required TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.InductionStatus? Status { get; init; }
+    public required TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.DqtInductionStatus? Status { get; init; }
     public required string? StatusDescription { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required string? CertificateUrl { get; init; }
     public required IReadOnlyCollection<GetTeacherResponseInductionPeriod> Periods { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultInductionPeriod))]
+[AutoMap(typeof(GetPersonResultDqtInductionPeriod))]
 public record GetTeacherResponseInductionPeriod
 {
     public required DateOnly? StartDate { get; init; }
@@ -78,14 +80,22 @@ public record GetTeacherResponseInductionPeriodAppropriateBody
 [AutoMap(typeof(GetPersonResultInitialTeacherTraining))]
 public record GetTeacherResponseInitialTeacherTraining
 {
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingQualification, GetTeacherResponseInitialTeacherTrainingQualification>))]
     public required GetTeacherResponseInitialTeacherTrainingQualification? Qualification { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<DateOnly?>))]
     public required DateOnly? StartDate { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<DateOnly?>))]
     public required DateOnly? EndDate { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<TeachingRecordSystem.Api.V3.Implementation.Dtos.IttProgrammeType?, IttProgrammeType?>))]
     public required IttProgrammeType? ProgrammeType { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<string?>))]
     public required string? ProgrammeTypeDescription { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<TeachingRecordSystem.Api.V3.Implementation.Dtos.IttOutcome?, IttOutcome?>))]
     public required IttOutcome? Result { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetTeacherResponseInitialTeacherTrainingAgeRange>))]
     public required GetTeacherResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetTeacherResponseInitialTeacherTrainingProvider? Provider { get; init; }
+    [ValueConverter(typeof(UnwrapFromOptionValueConverter<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>, IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject>>))]
     public required IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 

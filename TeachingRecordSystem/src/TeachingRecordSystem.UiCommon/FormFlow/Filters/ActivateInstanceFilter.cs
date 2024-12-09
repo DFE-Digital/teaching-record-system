@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -36,8 +35,10 @@ internal class ActivateInstanceFilter(JourneyInstanceProvider journeyInstancePro
         if (journeyDescriptor.AppendUniqueKey)
         {
             // Need to redirect back to ourselves with the unique ID appended
-            var currentUrl = context.HttpContext.Request.GetEncodedUrl();
-            var newUrl = QueryHelpers.AddQueryString(currentUrl, Constants.UniqueKeyQueryParameterName, newInstance.InstanceId.UniqueKey!);
+            var request = context.HttpContext.Request;
+            var qs = QueryHelpers.ParseQuery(request.QueryString.ToString());
+            qs[Constants.UniqueKeyQueryParameterName] = newInstance.InstanceId.UniqueKey!;
+            var newUrl = QueryHelpers.AddQueryString(request.Path, qs);
             context.Result = new RedirectResult(newUrl);
             return;
         }

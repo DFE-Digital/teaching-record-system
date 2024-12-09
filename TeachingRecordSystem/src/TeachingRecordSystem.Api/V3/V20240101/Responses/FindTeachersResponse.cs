@@ -11,7 +11,7 @@ public record FindTeachersResponse
     public required IReadOnlyCollection<FindTeachersResponseResult> Results { get; init; }
 }
 
-[AutoMap(typeof(FindPersonByLastNameAndDateOfBirthResultItem))]
+[AutoMap(typeof(FindPersonsResultItem))]
 public record FindTeachersResponseResult
 {
     public required string Trn { get; init; }
