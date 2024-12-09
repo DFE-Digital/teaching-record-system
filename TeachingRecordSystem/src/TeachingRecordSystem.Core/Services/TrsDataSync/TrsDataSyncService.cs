@@ -61,6 +61,7 @@ public class TrsDataSyncService(
         var modelTypesToSync = optionsAccessor.Value.ModelTypes;
 
         // Order is important here; the dependees should come before dependents
+        await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Induction);
         await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Person);
         await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Event);
         await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Alert);
