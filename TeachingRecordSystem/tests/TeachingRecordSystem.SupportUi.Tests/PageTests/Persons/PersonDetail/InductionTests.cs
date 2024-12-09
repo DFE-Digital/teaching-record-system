@@ -163,7 +163,6 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        //Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent); // to be covered by other test (below)
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
@@ -172,15 +171,14 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
-    [Fact(Skip ="TestData setup doesn't allow null start date")]
+    [Fact]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDateButStartDateIsNull_DisplaysExpectedContent()
     {
         // Arrange
-        //var expectedWarning = "To change a teacher's induction status ";
         var person = await TestData.CreatePersonAsync(
-                x => x
-                .WithQts()
-                .WithInductionStatus(InductionStatus.InProgress)
+                builder => builder
+                    .WithQts()
+                    .WithInductionStatus(InductionStatus.InProgress)
                 );
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
