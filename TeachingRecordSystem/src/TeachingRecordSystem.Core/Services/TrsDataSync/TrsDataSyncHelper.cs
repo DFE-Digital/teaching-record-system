@@ -328,6 +328,8 @@ public class TrsDataSyncHelper(
             dfeta_induction.Fields.dfeta_InductionExemptionReason,
             dfeta_induction.Fields.dfeta_StartDate,
             dfeta_induction.Fields.dfeta_InductionStatus,
+            dfeta_induction.Fields.CreatedOn,
+            dfeta_induction.Fields.CreatedBy,
             dfeta_induction.Fields.ModifiedOn
         };
 
@@ -907,6 +909,7 @@ public class TrsDataSyncHelper(
             Contact.Fields.ContactId,
             Contact.Fields.StateCode,
             Contact.Fields.CreatedOn,
+            Contact.Fields.CreatedBy,
             Contact.Fields.ModifiedOn,
             Contact.Fields.dfeta_TRN,
             Contact.Fields.FirstName,
