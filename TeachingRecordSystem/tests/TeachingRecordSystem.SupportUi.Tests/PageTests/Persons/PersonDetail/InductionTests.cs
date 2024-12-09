@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
@@ -17,6 +16,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_FeatureFlagOff_NoInductionTabShown()
     {
+        FeatureProvider.Features.Clear();
         throw new NotImplementedException();
     }
 
