@@ -82,6 +82,13 @@ As well as NuGet packages, there are some client-side libraries required. A `jus
 just restore
 ```
 
+### Install Playwright
+
+Playwright is used for end-to-end testing. Install it with a `just` recipe:
+```shell
+just install-playwright
+```
+
 
 ### Database setup
 
