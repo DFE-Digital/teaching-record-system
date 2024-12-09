@@ -8,9 +8,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock) : PageModel
 {
-    private static readonly string NoQualifiedTeacherStatusWarning = "This teacher doesn\u2019t have QTS and, therefore, is ineligible for induction.";
-    private static readonly string InductionManagedByCpdWarning = "To change a teacher\u2019s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
-    private bool StatusManagedByCPD;
+    private static readonly string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
+    private static readonly string InductionIsManagedByCpdWarning = "To change a teacher\u2019s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
+    private bool StatusIsManagedByCPD;
     private bool TeacherHoldsQualifiedTeacherStatus;
 
     [FromRoute]
@@ -44,9 +44,9 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
     {
         get
         {
-            if (StatusManagedByCPD)
+            if (StatusIsManagedByCPD)
             {
-                return InductionManagedByCpdWarning;
+                return InductionIsManagedByCpdWarning;
             }
             else if (TeacherHoldsQualifiedTeacherStatus)
             {
@@ -70,15 +70,24 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 
         var result = await crmQueryDispatcher.ExecuteQueryAsync(query);
 
-        TeacherHoldsQualifiedTeacherStatus = result?.Contact.dfeta_QTSDate is null;
-
         Status = person!.InductionStatus;
         StartDate = person!.InductionStartDate;
         CompletionDate = person!.InductionCompletedDate;
         ExemptionReasons = person!.InductionExemptionReasons;
+        StatusIsManagedByCPD = StatusManagedByCPDRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
+        TeacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
+    }
+
+    private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)
+    {
+        return qtsDate is null;
+    }
+
+    private bool StatusManagedByCPDRule(InductionStatus? status, DateOnly? inductionCompletedDate)
+    {
         var sevenYearsAgo = clock.Today.AddYears(-7);
-        StatusManagedByCPD = person!.CpdInductionStatus is not null
-            && person.CpdInductionCompletedDate is not null
-            && person.CpdInductionCompletedDate < sevenYearsAgo;
+        return status is not null
+            && inductionCompletedDate is not null
+            && inductionCompletedDate < sevenYearsAgo;
     }
 }

@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
@@ -24,7 +25,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var expectedWarning = "This teacher doesn’t have QTS ";
+        var expectedWarning = "This teacher has not been awarded QTS ";
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -40,7 +41,10 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForPersonWithInductionStatusNone_DisplaysExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(builder => builder.WithInductionStatus(InductionStatus.None));
+        var person = await TestData.CreatePersonAsync(builder =>
+            builder
+                .WithInductionStatus(InductionStatus.None)
+                .WithQtlsDate(Clock.Today));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -237,8 +241,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         //Arrange
         var underSevenYearsAgo = Clock.Today.AddYears(-6);
 
-        var person = await TestData.CreatePersonAsync();
-
+        var person = await TestData.CreatePersonAsync(
+            builder => builder.WithQtlsDate(Clock.Today));
+        
         await WithDbContext(async dbContext =>
             {
                 dbContext.Attach(person.Person);
@@ -252,7 +257,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     out _);
                 await dbContext.SaveChangesAsync();
             });
-
+        
+  
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
         // Act
