@@ -149,9 +149,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         //var expectedWarning = "To change a teacher's induction status ";
         var setStartDate = Clock.Today.AddMonths(-1);
         var person = await TestData.CreatePersonAsync(
-                x => x
+                personBuilder => personBuilder
                 .WithQts()
-                .WithInductionStatus(builder => builder
+                .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(setInductionStatus)
                     .WithStartDate(setStartDate)
                 ));
@@ -176,9 +176,10 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(
-                builder => builder
+                personBuilder => personBuilder
                     .WithQts()
-                    .WithInductionStatus(InductionStatus.InProgress)
+                    .WithInductionStatus(inductionBuilder =>
+                        inductionBuilder.WithStatus(InductionStatus.InProgress))
                 );
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
@@ -202,9 +203,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var setStartDate = Clock.Today.AddMonths(-1);
         var setCompletionDate = Clock.Today;
         var person = await TestData.CreatePersonAsync(
-                x => x
+                personBuilder => personBuilder
                 .WithQts()
-                .WithInductionStatus(builder => builder
+                .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(setInductionStatus)
                     .WithStartDate(setStartDate)
                     .WithCompletedDate(setCompletionDate)
