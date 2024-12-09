@@ -264,7 +264,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var person = await TestData.CreatePersonAsync(
             builder => builder.WithQtlsDate(Clock.Today));
-        
+
         await WithDbContext(async dbContext =>
             {
                 dbContext.Attach(person.Person);
@@ -278,8 +278,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                     out _);
                 await dbContext.SaveChangesAsync();
             });
-        
-  
+
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
         // Act
