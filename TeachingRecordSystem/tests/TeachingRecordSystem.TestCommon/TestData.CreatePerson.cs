@@ -50,7 +50,7 @@ public partial class TestData
         private string? _trnToken;
         private string? _slugId;
         private int? _loginFailedCounter;
-        private CreatePersonMandatoryQualificationBuilder.CreatePersonInductionBuilder? _inductionBuilder;
+        private CreatePersonInductionBuilder? _inductionBuilder;
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -291,13 +291,30 @@ public partial class TestData
         }
 
         public CreatePersonBuilder WithInductionStatus(InductionStatus status) =>
-            WithInductionStatus(i => i.WithStatus(status));
+            WithInductionStatus(i =>
+            {
+                var qtsDate = GetQtsDate();
+                var startDate = CreatePersonInductionBuilder.GetDefaultStartDate(status, qtsDate);
+                var completedDate = CreatePersonInductionBuilder.GetDefaultCompletedDate(status, startDate);
+                var exemptionReasons = CreatePersonInductionBuilder.GetDefaultExemptionReasons(status);
 
-        public CreatePersonBuilder WithInductionStatus(Action<CreatePersonMandatoryQualificationBuilder.CreatePersonInductionBuilder> configure)
+                if (!Person.ValidateInductionData(status, startDate, completedDate, exemptionReasons, out var error))
+                {
+                    throw new InvalidOperationException(error);
+                }
+
+                i
+                    .WithStatus(status)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)
+                    .WithExemptionReasons(exemptionReasons);
+            });
+
+        public CreatePersonBuilder WithInductionStatus(Action<CreatePersonInductionBuilder> configure)
         {
             EnsureTrn();
 
-            _inductionBuilder ??= new(this);
+            _inductionBuilder ??= new();
             configure(_inductionBuilder);
 
             return this;
@@ -1042,178 +1059,100 @@ public partial class TestData
 
             return (QualificationId, events);
         }
+    }
 
-        public class CreatePersonInductionBuilder(CreatePersonBuilder createPersonBuilder)
+    public class CreatePersonInductionBuilder
+    {
+        private Option<InductionStatus> _status;
+        private Option<DateOnly?> _startDate;
+        private Option<DateOnly?> _completedDate;
+        private Option<InductionExemptionReasons> _exemptionReasons;
+
+        public bool HasStatusRequiringQts => _status.HasValue && _status.ValueOrFailure() != InductionStatus.None;
+
+        public CreatePersonInductionBuilder WithStatus(InductionStatus status)
         {
-            private Option<InductionStatus> _status;
-            private Option<DateOnly?> _startDate;
-            private Option<DateOnly?> _completedDate;
-            private Option<InductionExemptionReasons> _exemptionReasons;
-
-            public bool HasStatusRequiringQts => _status.HasValue && _status.ValueOrFailure() != InductionStatus.None;
-
-            public CreatePersonInductionBuilder WithStatus(InductionStatus status)
+            if (_status.HasValue && _status.ValueOrFailure() != status)
             {
-                if (_status.HasValue && _status.ValueOrFailure() != status)
-                {
-                    throw new InvalidOperationException("Status has already been set.");
-                }
-
-                var qtsDate = createPersonBuilder.GetQtsDate();
-
-                if (status != InductionStatus.None && !qtsDate.HasValue)
-                {
-                    throw new InvalidOperationException("Person requires QTS.");
-                }
-                else if (status == InductionStatus.None && qtsDate.HasValue)
-                {
-                    throw new InvalidOperationException($"Status cannot be '{status}' when person has QTS.");
-                }
-
-                _status = Option.Some(status);
-                return this;
+                throw new InvalidOperationException("Status has already been set.");
             }
 
-            public CreatePersonInductionBuilder WithStartDate(DateOnly? startDate)
-            {
-                if (_startDate.HasValue)
-                {
-                    throw new InvalidOperationException("Start date has already been set.");
-                }
-
-                if (!_status.HasValue)
-                {
-                    throw new InvalidOperationException("Status must be specified before the start date.");
-                }
-
-                var status = _status.ValueOrFailure();
-
-                if (!Person.ValidateInductionData(
-                        status,
-                        startDate,
-                        GetDefaultCompletedDate(status, startDate),
-                        GetDefaultExemptionReasons(status),
-                        out var error))
-                {
-                    throw new InvalidOperationException(error);
-                }
-
-                _startDate = Option.Some(startDate);
-                return this;
-            }
-
-            public CreatePersonInductionBuilder WithCompletedDate(DateOnly? completedDate)
-            {
-                if (_completedDate.HasValue)
-                {
-                    throw new InvalidOperationException("Completed date has already been set.");
-                }
-
-                if (!_status.HasValue)
-                {
-                    throw new InvalidOperationException("Status must be specified before the start date.");
-                }
-
-                if (!_startDate.HasValue)
-                {
-                    throw new InvalidOperationException("Start date must be specified before the completed date.");
-                }
-
-                var status = _status.ValueOrFailure();
-                var startDate = _startDate.ValueOrFailure();
-
-                if (!Person.ValidateInductionData(
-                        status,
-                        startDate,
-                        completedDate,
-                        GetDefaultExemptionReasons(status),
-                        out var error))
-                {
-                    throw new InvalidOperationException(error);
-                }
-
-                _completedDate = Option.Some(completedDate);
-                return this;
-            }
-
-            public CreatePersonInductionBuilder WithExemptionReasons(InductionExemptionReasons exemptionReasons)
-            {
-                if (_exemptionReasons.HasValue)
-                {
-                    throw new InvalidOperationException("Exemption reasons have already been set.");
-                }
-
-                if (!_status.HasValue)
-                {
-                    throw new InvalidOperationException("Status must be specified before the exemption reasons.");
-                }
-
-                var status = _status.ValueOrFailure();
-
-                if (status is not InductionStatus.Exempt && exemptionReasons != InductionExemptionReasons.None)
-                {
-                    throw new InvalidOperationException($"Exemption reasons cannot be specified unless the status is {InductionStatus.Exempt}.");
-                }
-
-                if (status is InductionStatus.Exempt && exemptionReasons == InductionExemptionReasons.None)
-                {
-                    throw new InvalidOperationException($"Exemption reasons cannot be {InductionExemptionReasons.None} when the status is {InductionStatus.Exempt}.");
-                }
-
-                _exemptionReasons = Option.Some(exemptionReasons);
-                return this;
-            }
-
-            internal IReadOnlyCollection<EventBase> Execute(
-                Person person,
-                CreatePersonBuilder createPersonBuilder,
-                TestData testData,
-                TrsDbContext dbContext)
-            {
-                var qtsDate = createPersonBuilder.GetQtsDate();
-
-                var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
-                var startDate = _startDate.ValueOr(GetDefaultStartDate(status, qtsDate));
-                var completedDate = _completedDate.ValueOr(GetDefaultCompletedDate(status, startDate));
-                var exemptionReasons = _exemptionReasons.ValueOr(GetDefaultExemptionReasons(status));
-
-                if (!Person.ValidateInductionData(
-                        status,
-                        startDate,
-                        completedDate,
-                        exemptionReasons,
-                        out var error))
-                {
-                    throw new InvalidOperationException(error);
-                }
-
-                person.SetInductionStatus(
-                    status,
-                    startDate,
-                    completedDate,
-                    exemptionReasons,
-                    updatedBy: SystemUser.SystemUserId,
-                    testData.Clock.UtcNow,
-                    out var @event);
-
-                if (@event is not null)
-                {
-                    dbContext.AddEvent(@event);
-                    return [@event];
-                }
-
-                return [];
-            }
-
-            private static DateOnly? GetDefaultStartDate(InductionStatus status, DateOnly? qtsDate) =>
-                status.RequiresStartDate() ? qtsDate!.Value.AddMonths(6) : null;
-
-            private static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
-                status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
-
-            private static InductionExemptionReasons GetDefaultExemptionReasons(InductionStatus status) =>
-                status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None;
+            _status = Option.Some(status);
+            return this;
         }
+
+        public CreatePersonInductionBuilder WithStartDate(DateOnly? startDate)
+        {
+            if (_startDate.HasValue)
+            {
+                throw new InvalidOperationException("Start date has already been set.");
+            }
+
+            _startDate = Option.Some(startDate);
+            return this;
+        }
+
+        public CreatePersonInductionBuilder WithCompletedDate(DateOnly? completedDate)
+        {
+            if (_completedDate.HasValue)
+            {
+                throw new InvalidOperationException("Completed date has already been set.");
+            }
+
+            _completedDate = Option.Some(completedDate);
+            return this;
+        }
+
+        public CreatePersonInductionBuilder WithExemptionReasons(InductionExemptionReasons exemptionReasons)
+        {
+            if (_exemptionReasons.HasValue)
+            {
+                throw new InvalidOperationException("Exemption reasons have already been set.");
+            }
+
+            _exemptionReasons = Option.Some(exemptionReasons);
+            return this;
+        }
+
+        internal IReadOnlyCollection<EventBase> Execute(
+            Person person,
+            CreatePersonBuilder createPersonBuilder,
+            TestData testData,
+            TrsDbContext dbContext)
+        {
+            var qtsDate = createPersonBuilder.GetQtsDate();
+
+            var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
+            var startDate = _startDate.ValueOrDefault();
+            var completedDate = _completedDate.ValueOrDefault();
+            var exemptionReasons = _exemptionReasons.ValueOr(InductionExemptionReasons.None);
+
+            person.SetInductionStatus(
+                status,
+                startDate,
+                completedDate,
+                exemptionReasons,
+                updatedBy: SystemUser.SystemUserId,
+                testData.Clock.UtcNow,
+                out var @event);
+
+            if (@event is not null)
+            {
+                dbContext.AddEvent(@event);
+                return [@event];
+            }
+
+            return [];
+        }
+
+        internal static DateOnly? GetDefaultStartDate(InductionStatus status, DateOnly? qtsDate) =>
+            status.RequiresStartDate() ? qtsDate!.Value.AddMonths(6) : null;
+
+        internal static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
+            status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
+
+        internal static InductionExemptionReasons GetDefaultExemptionReasons(InductionStatus status) =>
+            status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None;
     }
 
     public record CreatePersonResult
