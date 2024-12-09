@@ -52,6 +52,8 @@ public partial class Commands
                 }
 
                 await syncHelper.SyncPersonAsync(contact, ignoreInvalid: false, dryRun: false);
+
+                await syncHelper.SyncInductionsAsync([contact], ignoreInvalid: false, createMigratedEvent: false, dryRun: false);
                 //return 0;
             },
             connectionStringOption,

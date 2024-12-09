@@ -319,7 +319,7 @@ public class TrsDataSyncHelper(
         bool ignoreInvalid,
         bool createMigratedEvent,
         bool dryRun,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var inductionAttributeNames = new[]
         {
@@ -328,6 +328,8 @@ public class TrsDataSyncHelper(
             dfeta_induction.Fields.dfeta_InductionExemptionReason,
             dfeta_induction.Fields.dfeta_StartDate,
             dfeta_induction.Fields.dfeta_InductionStatus,
+            dfeta_induction.Fields.CreatedOn,
+            dfeta_induction.Fields.CreatedBy,
             dfeta_induction.Fields.ModifiedOn
         };
 
@@ -774,7 +776,7 @@ public class TrsDataSyncHelper(
         IEnumerable<Guid> ids,
         CancellationToken cancellationToken)
     {
-        return (await Task.WhenAll(ids
+        return (IsFakeXrm ? new Dictionary<Guid, AuditDetailCollection>() : (await Task.WhenAll(ids
             .Chunk(MaxAuditRequestsPerBatch)
             .Select(async chunk =>
             {
@@ -788,6 +790,7 @@ public class TrsDataSyncHelper(
                     }
                 };
 
+                // The following is not supported by FakeXrmEasy hence the check above to allow more test coverage
                 request.Requests.AddRange(chunk.Select(e => new RetrieveRecordChangeHistoryRequest() { Target = e.ToEntityReference(entityLogicalName) }));
 
                 ExecuteMultipleResponse response;
@@ -829,7 +832,7 @@ public class TrsDataSyncHelper(
                     (r, e) => (Id: e, ((RetrieveRecordChangeHistoryResponse)r.Response).AuditDetailCollection));
             })))
             .SelectMany(b => b)
-            .ToDictionary(t => t.Id, t => t.AuditDetailCollection);
+            .ToDictionary(t => t.Id, t => t.AuditDetailCollection));
     }
 
     private async Task<TEntity[]> GetEntitiesAsync<TEntity>(
@@ -876,7 +879,8 @@ public class TrsDataSyncHelper(
             "dqt_modified_on",
             "dqt_first_name",
             "dqt_middle_name",
-            "dqt_last_name"
+            "dqt_last_name",
+            "induction_status",
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -905,6 +909,7 @@ public class TrsDataSyncHelper(
             Contact.Fields.ContactId,
             Contact.Fields.StateCode,
             Contact.Fields.CreatedOn,
+            Contact.Fields.CreatedBy,
             Contact.Fields.ModifiedOn,
             Contact.Fields.dfeta_TRN,
             Contact.Fields.FirstName,
@@ -915,7 +920,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_StatedLastName,
             Contact.Fields.BirthDate,
             Contact.Fields.dfeta_NINumber,
-            Contact.Fields.EMailAddress1
+            Contact.Fields.EMailAddress1,
+            Contact.Fields.dfeta_InductionStatus
         };
 
         Action<NpgsqlBinaryImporter, Person> writeRecord = (writer, person) =>
@@ -937,6 +943,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull((int?)person.InductionStatus, NpgsqlDbType.Integer);
         };
 
         return new ModelTypeSyncInfo<Person>()
@@ -1171,37 +1178,10 @@ public class TrsDataSyncHelper(
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty
+            DqtLastName = c.LastName ?? string.Empty,
+            InductionStatus = c.dfeta_InductionStatus.ToInductionStatus()
         })
         .ToList();
-
-    private static List<InductionInfo> MapInductions(IReadOnlyCollection<Contact> contacts, IEnumerable<dfeta_induction> inductions, bool ignoreInvalid)
-    {
-        var inductionLookup = inductions
-            .GroupBy(i => i.dfeta_PersonId.Id)
-            .ToDictionary(g => g.Key, g => g.ToArray());
-
-        return contacts
-            .Select(contact =>
-            {
-                dfeta_induction? induction = null;
-                if (inductionLookup.TryGetValue(contact.ContactId!.Value, out var personInductions))
-                {
-                    // We shouldn't have multiple induction records for the same person in prod at all but we might in other environments
-                    // so we'll just take the most recently modified one.
-                    induction = personInductions.OrderByDescending(i => i.ModifiedOn).First();
-                    if (personInductions.Length > 1 && !ignoreInvalid)
-                    {
-                        throw new InvalidOperationException($"Contact '{contact.ContactId!.Value}' has multiple induction records.");
-                    }
-                }
-
-                return MapInductionInfoFromDqtInduction(induction, contact, ignoreInvalid);
-            })
-            .Where(i => i is not null)
-            .Cast<InductionInfo>()
-            .ToList();
-    }
 
     private (List<InductionInfo> Inductions, List<EventBase> Events) MapInductionsAndAudits(
         IReadOnlyCollection<Contact> contacts,
@@ -1247,39 +1227,46 @@ public class TrsDataSyncHelper(
                     dfeta_induction.Fields.dfeta_InductionStatus,
                     dfeta_induction.Fields.ModifiedOn
                 };
-                var inductionAudits = auditDetails[induction!.Id].AuditDetails;
-                var inductionVersions = GetEntityVersions(induction, inductionAudits, inductionAttributeNames);
 
-                events.Add(inductionAudits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
-                    MapCreatedEvent(inductionVersions.First()) :
-                    MapImportedEvent(inductionVersions.First()));
-
-                foreach (var (thisVersion, previousVersion) in inductionVersions.Skip(1).Zip(inductionVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                if (auditDetails.TryGetValue(induction!.Id, out var inductionAudits))
                 {
-                    var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+                    var inductionAuditDetails = inductionAudits.AuditDetails;
+                    var inductionVersions = GetEntityVersions(induction, inductionAuditDetails, inductionAttributeNames);
+
+                    events.Add(inductionAuditDetails.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
+                        MapCreatedEvent(inductionVersions.First()) :
+                        MapImportedEvent(inductionVersions.First()));
+
+                    foreach (var (thisVersion, previousVersion) in inductionVersions.Skip(1).Zip(inductionVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                    {
+                        var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+
+                        if (mappedEvent is not null)
+                        {
+                            events.Add(mappedEvent);
+                        }
+                    }
+
+                    if (createMigratedEvent)
+                    {
+                        events.Add(MapMigratedEvent(inductionVersions.Last(), mapped));
+                    }
+                }
+            }
+
+            if (auditDetails.TryGetValue(contact.ContactId!.Value, out var contactAudits))
+            {
+                var contactAuditDetails = contactAudits.AuditDetails;
+                var contactVersions = GetEntityVersions(contact, contactAuditDetails, GetModelTypeSyncInfo(ModelTypes.Person).AttributeNames);
+
+                foreach (var (thisVersion, previousVersion) in contactVersions.Skip(1).Zip(contactVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                {
+                    var mappedEvent = MapContactInductionStatusChangedEvent(thisVersion, previousVersion);
 
                     if (mappedEvent is not null)
                     {
                         events.Add(mappedEvent);
                     }
-                }
-
-                if (createMigratedEvent)
-                {
-                    events.Add(MapMigratedEvent(inductionVersions.Last(), mapped));
-                }
-            }
-
-            var contactAudits = auditDetails[contact.ContactId!.Value].AuditDetails;
-            var contactVersions = GetEntityVersions(contact, contactAudits, GetModelTypeSyncInfo(ModelTypes.Person).AttributeNames);
-
-            foreach (var (thisVersion, previousVersion) in contactVersions.Skip(1).Zip(contactVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
-            {
-                var mappedEvent = MapContactInductionStatusChangedEvent(thisVersion, previousVersion);
-
-                if (mappedEvent is not null)
-                {
-                    events.Add(mappedEvent);
                 }
             }
 

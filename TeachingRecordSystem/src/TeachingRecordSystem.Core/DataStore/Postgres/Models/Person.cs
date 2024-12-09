@@ -17,7 +17,7 @@ public class Person
     public required DateOnly? DateOfBirth { get; set; }  // A few DQT records in prod have a null DOB
     public string? EmailAddress { get; set; }
     public string? NationalInsuranceNumber { get; set; }
-    public InductionStatus InductionStatus { get; private set; }
+    public InductionStatus InductionStatus { get; set; }
     public InductionExemptionReasons InductionExemptionReasons { get; private set; }
     public DateOnly? InductionStartDate { get; private set; }
     public DateOnly? InductionCompletedDate { get; private set; }
