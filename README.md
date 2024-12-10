@@ -1,34 +1,23 @@
 # teaching-record-system
-Note: Any diagrams in .jpg files can be rendered using the [.dsl files and https://structurizr.com/dsl](docs/c4-diagrams-as-code)
+The TRS is a database of people who work in Education in the UK. It is the primary source of teaching records for DfE. It holds data to meet UK Government statutory obligations as well as allow individuals working in the UK education system (including, but not limited to) teachers in schools within England, Wales, Scotland and Northern Ireland to access digital services provided by the DfE. It is also a DfE web service used by DfE support teams. It is the source of Teaching Reference Number (TRN) used in a number of Education services and processes both inside and outside of DfE.
 
-Provides an API over the Database of Qualified Teachers (DQT). Provides the core Teaching record and will eventually replace the Database of Qualified Teachers (DQT).
 
+## Teaching Reference Number
+The TRN is a unique 7  digit reference given to identify a person who's data is in the Teaching Record System (formerly Database Of Qualified Teachers). TRN's are given to trainee teachers, qualified teachers (QTS and many other teaching related qualifications), anyone eligible for a teaching pension and other related services.
+
+It is a character string of len(7). E.G:
+```shell
+'1234567', '0001234'
+```
 # High level architecture
-* [Teaching Record System High Level Architecture (just showing core components)](docs/c4-diagrams-as-code/trs-core-containers.jpg)
 * [Logical Data Model](docs/logical-data-model.md)
-* [Data Integrations](docs/trs-data-integrations.md)
 * [Technical Architecture](docs/trs-technical-architecture-hld.md)
-
-# Data Integrations **
-TRS provides the core teaching record data to a number of internal and external facing digital services:
-* Register Trainee Teachers
-* Apply For QTS
-* Access Your Teaching Qualifications
-* Check a Teachers Record
-* Register for an National Professional Qualification
-* Claim Teacher Payments
-* Teaching Councils and Societies (Wales, NI, Scotland)
-* [Teaching Record System : Data Integrations Pattern](docs/c4-diagrams-as-code/trs-core-containers.jpg)
-* [Teaching Record System : Teacher Pensions Integrations](docs/c4-diagrams-as-code/trs-tps.jpg)
-
-** Non-exhaustive list
-## What does it do?
-
-It is the primary source of teaching records for DfE. It holds data to meet UK Government statutory obligations as well as allow individuals working in the UK education system (including, but not limited to) teachers in schools within England, Wales, Scotland and Northern Ireland to access digital services provided by the DfE.
+# Data Integrations
+* [High Level Data Integrations](docs/trs-data-integrations.md)
+* [Low level example using Access Your Teaching Qualifications](docs/c4-diagrams-as-code/trs-core-containers.jpg)
+* [Low level example showing Teacher Pensions Service](docs/c4-diagrams-as-code/trs-tps.jpg)
 
 ## Authorising Access using GOV.UK One Login
-All DfE services will adopt the standard GOV.UK One-Login service to provide standard access to citizen facing services. However, for Teacher Services digital services, it is sometimes necessary to implement further authorisation to access a teaching record (e.g. for a teacher to view certificates). TRS will provide this authorisation seamlessly (from a user point of view) by handling the redirection between calling service --> GOV.UK OneLogin sign in screen -->TRS (to check access) and back to the calling service.
-
 * [Authorisation flow for services using GOVUK.One Login](docs/trs-gov.one-login-flow.md)
 
 ## Calling the API
