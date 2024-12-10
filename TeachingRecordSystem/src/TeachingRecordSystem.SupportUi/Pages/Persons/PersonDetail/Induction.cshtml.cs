@@ -79,7 +79,7 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         return qtsDate is null;
     }
 
-    private bool StatusManagedByCPDRule(InductionStatus? status, DateOnly? inductionCompletedDate)
+    private bool StatusManagedByCpdRule(InductionStatus? status, DateOnly? inductionCompletedDate)
     {
         var sevenYearsAgo = clock.Today.AddYears(-7);
         return status is not null
