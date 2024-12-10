@@ -4,19 +4,19 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum InductionStatus
 {
-    [InductionStatusInfo("None", requiresStartDate: false, requiresCompletedDate: false)]
+    [InductionStatusInfo("none", requiresStartDate: false, requiresCompletedDate: false)]
     None = 0,
-    [InductionStatusInfo("Required to complete", requiresStartDate: false, requiresCompletedDate: false)]
+    [InductionStatusInfo("required to complete", requiresStartDate: false, requiresCompletedDate: false)]
     RequiredToComplete = 1,
-    [InductionStatusInfo("Exempt", requiresStartDate: false, requiresCompletedDate: false)]
+    [InductionStatusInfo("exempt", requiresStartDate: false, requiresCompletedDate: false)]
     Exempt = 2,
-    [InductionStatusInfo("In progress", requiresStartDate: true, requiresCompletedDate: false)]
+    [InductionStatusInfo("in progress", requiresStartDate: true, requiresCompletedDate: false)]
     InProgress = 3,
-    [InductionStatusInfo("Passed", requiresStartDate: true, requiresCompletedDate: true)]
+    [InductionStatusInfo("passed", requiresStartDate: true, requiresCompletedDate: true)]
     Passed = 4,
-    [InductionStatusInfo("Failed", requiresStartDate: true, requiresCompletedDate: true)]
+    [InductionStatusInfo("failed", requiresStartDate: true, requiresCompletedDate: true)]
     Failed = 5,
-    [InductionStatusInfo("Failed in Wales", requiresStartDate: true, requiresCompletedDate: true)]
+    [InductionStatusInfo("failed in Wales", requiresStartDate: true, requiresCompletedDate: true)]
     FailedInWales = 6,
 }
 
