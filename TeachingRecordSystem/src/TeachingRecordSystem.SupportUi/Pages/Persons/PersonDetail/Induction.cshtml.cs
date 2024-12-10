@@ -24,11 +24,7 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 
     public InductionExemptionReasons ExemptionReasons { get; set; }
 
-    public bool ShowStartDate =>
-        Status is InductionStatus.Failed
-        or InductionStatus.FailedInWales
-        or InductionStatus.InProgress
-        or InductionStatus.Passed;
+    public bool ShowStartDate => Status.RequiresStartDate();
 
     public bool ShowCompletionDate =>
         Status is InductionStatus.Passed
