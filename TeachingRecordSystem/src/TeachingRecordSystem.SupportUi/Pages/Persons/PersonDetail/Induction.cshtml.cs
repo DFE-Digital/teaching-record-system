@@ -37,11 +37,11 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
     {
         get
         {
-            if (StatusIsManagedByCPD)
+            if (_statusIsManagedByCpd)
             {
                 return InductionIsManagedByCpdWarning;
             }
-            else if (TeacherHoldsQualifiedTeacherStatus)
+            else if (_teacherHoldsQualifiedTeacherStatus)
             {
                 return NoQualifiedTeacherStatusWarning;
             }
@@ -67,8 +67,8 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         StartDate = person!.InductionStartDate;
         CompletionDate = person!.InductionCompletedDate;
         ExemptionReasons = person!.InductionExemptionReasons;
-        StatusIsManagedByCPD = StatusManagedByCpdRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
-        TeacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
+        _statusIsManagedByCpd = StatusManagedByCpdRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
+        _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
     }
 
     private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)
