@@ -10,8 +10,8 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
     private const string InductionIsManagedByCpdWarning = "To change a teacher\u2019s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
-    private bool StatusIsManagedByCPD;
-    private bool TeacherHoldsQualifiedTeacherStatus;
+    private bool _statusIsManagedByCpd;
+    private bool _teacherHoldsQualifiedTeacherStatus;
 
     [FromRoute]
     public Guid PersonId { get; set; }
