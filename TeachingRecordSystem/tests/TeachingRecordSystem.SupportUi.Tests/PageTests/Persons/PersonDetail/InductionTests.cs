@@ -145,8 +145,6 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionStatus.FailedInWales)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringStartDate_DisplaysExpectedContent(InductionStatus setInductionStatus)
     {
-        // Arrange
-        //var expectedWarning = "To change a teacher's induction status ";
         var setStartDate = Clock.Today.AddMonths(-1);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder

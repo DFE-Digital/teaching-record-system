@@ -26,10 +26,7 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 
     public bool ShowStartDate => Status.RequiresStartDate();
 
-    public bool ShowCompletionDate =>
-        Status is InductionStatus.Passed
-        or InductionStatus.Failed
-        or InductionStatus.FailedInWales;
+    public bool ShowCompletionDate => Status.RequiresCompletedDate();
 
     public string? ExemptionReasonsText
     {
@@ -70,7 +67,7 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         StartDate = person!.InductionStartDate;
         CompletionDate = person!.InductionCompletedDate;
         ExemptionReasons = person!.InductionExemptionReasons;
-        StatusIsManagedByCPD = StatusManagedByCPDRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
+        StatusIsManagedByCPD = StatusManagedByCpdRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
         TeacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
     }
 
