@@ -12,3 +12,4 @@ terraform/aks/vendor/
 bin/konduit.sh
 
 .idea
+.vs/

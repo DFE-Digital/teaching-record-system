@@ -26,6 +26,13 @@
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Qualifications</a>
                 </li>
 
+                @if (FeatureProvider.IsEnabled(FeatureNames.Induction))
+                {
+                    <li class="moj-sub-navigation__item" data-testid="induction-tab">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Induction ? "page" : null)" href="@LinkGenerator.PersonInduction(personId)">Induction</a>
+                    </li>
+                }
+
                 @if (FeatureProvider.IsEnabled(FeatureNames.Alerts))
                 {
                     <li class="moj-sub-navigation__item">

@@ -1,0 +1,70 @@
+@page "/persons/{personId}/induction"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.InductionModel;
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.Induction;
+    var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)" data-testid="induction-backlink">Back to record</govuk-back-link>
+}
+@if (!String.IsNullOrEmpty(Model.StatusWarningMessage))
+{
+    <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>
+}
+
+@if (Model.Status != InductionStatus.None)
+{
+    <govuk-summary-card data-testid="induction-card">
+        <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
+        <govuk-summary-list>
+            <govuk-summary-list-row data-testid="induction-status">
+                <govuk-summary-list-row-key>
+                    Induction status
+                </govuk-summary-list-row-key>
+                <govuk-summary-list-row-value>
+                    @Model.Status.GetTitle()
+                </govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+
+            @if (Model.ExemptionReasons != InductionExemptionReasons.None) // how to enforce that InductionExemptionReasons.None means no other flags are set?
+            {
+                <govuk-summary-list-row data-testid="induction-exemption-reasons">
+                    <govuk-summary-list-row-key>
+                        Exemption reason
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.ExemptionReasonsText
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+            @if (Model.ShowStartDate)
+            {
+                <govuk-summary-list-row data-testid="induction-start-date">
+                    <govuk-summary-list-row-key>
+                        Induction start date
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+            @if (Model.ShowCompletionDate)
+            {
+                <govuk-summary-list-row data-testid="induction-completion-date">
+                    <govuk-summary-list-row-key>
+                        Induction completion date
+                    </govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @Model.CompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+
+        </govuk-summary-list>
+    </govuk-summary-card>
+}
