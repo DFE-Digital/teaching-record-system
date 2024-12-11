@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Induction.Status;
@@ -8,12 +9,11 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditInductionStatusState>? JourneyInstance { get; set; }
 
-    //[FromRoute]
+    [FromRoute]
     public Guid PersonId { get; set; }
 
-    public void OnGet(Guid personId)
+    public void OnGet()
     {
-        PersonId = personId;
     }
 
     public void OnPost()

@@ -1,18 +1,18 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.SupportUi.Pages.Induction.CompletionDate;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Induction.EditInduction.CompletionDate;
+namespace TeachingRecordSystem.SupportUi.Pages.Induction.CompletionDate;
 
 [Journey(JourneyNames.EditInductionCompletionDate)]
 public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditInductionCompletionDateState>? JourneyInstance { get; set; }
 
+    [FromRoute]
     public Guid PersonId { get; set; }
 
-    public void OnGet(Guid personId)
+    public void OnGet()
     {
-        PersonId = personId;
     }
 
     public void OnPost()
