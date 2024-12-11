@@ -286,4 +286,28 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("induction-status-warning"));
     }
+
+    [Fact]
+    public async Task Get_WithPersonId_ShowsLinkToChangeStatus()
+    {
+        // Arrange
+        var setInductionStatus = InductionStatus.RequiredToComplete;
+        var person = await TestData.CreatePersonAsync(
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(builder => builder
+                    .WithStatus(setInductionStatus)
+                    )
+                );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var inductionStatus = doc.GetElementByTestId("induction-status");
+        Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TextContent);
+    }
 }

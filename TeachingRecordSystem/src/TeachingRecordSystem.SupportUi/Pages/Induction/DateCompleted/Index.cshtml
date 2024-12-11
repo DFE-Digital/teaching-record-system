@@ -1,0 +1,18 @@
+@page
+@model TeachingRecordSystem.SupportUi.Pages.Induction.EditInduction.CompletionDate.IndexModel
+
+@section BeforeContent {
+    <govuk-back-link>Back</govuk-back-link>
+}
+
+<span class="govuk-caption-l">Select completion date</span>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        @* <form action="@LinkGenerator.InductionEditCompletionDate(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post"> 
+             <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button formaction="@LinkGenerator.PersonInduction(Model.PersonId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form> *@
+    </div>
+</div>

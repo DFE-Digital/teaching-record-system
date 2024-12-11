@@ -169,6 +169,15 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertDeleteCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
+    public string InductionEditStatus(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Induction/Status/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditStartDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Induction/StartDate/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditCompletionDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+    GetRequiredPathByPage("/Induction/DateCompleted/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 
     public string ChangeRequestDocument(string ticketNumber, Guid documentId) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", "documents", routeValues: new { ticketNumber, id = documentId });
