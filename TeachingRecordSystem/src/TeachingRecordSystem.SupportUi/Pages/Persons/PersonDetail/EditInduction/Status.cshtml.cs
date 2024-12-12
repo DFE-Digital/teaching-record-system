@@ -13,21 +13,21 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext)
     public Guid PersonId { get; set; }
 
     [BindProperty]
-    public InductionStatus Status { get; set; }
+    public InductionStatus InductionStatus { get; set; }
 
 
     public async Task OnGetAsync()
     {
+        InductionStatus = JourneyInstance!.State.InductionStatus;
         var person = await dbContext.Persons
             .SingleAsync(q => q.PersonId == PersonId);
-
-        Status = person!.InductionStatus;
+        InductionStatus = person!.InductionStatus;
     }
 
     public async Task OnPostAsync()
     {
         // TODO - store the induction status
-        await JourneyInstance!.UpdateStateAsync(state => state.InductionStatus = Status);
+        await JourneyInstance!.UpdateStateAsync(state => state.InductionStatus = InductionStatus);
 
         // TODO - figure out where to go next and redirect to that page
         Redirect(linkGenerator.InductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId));
