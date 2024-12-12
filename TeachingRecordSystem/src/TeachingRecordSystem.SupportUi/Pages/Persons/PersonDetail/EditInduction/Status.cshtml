@@ -1,7 +1,7 @@
 @page "/persons/{PersonId}/edit-induction/status"
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction.StatusModel
 @{
-    ViewBag.Title = "Edit status";
+    ViewBag.Title = "Edit status: " + Model.Status;
 }
 
 @section BeforeContent {
