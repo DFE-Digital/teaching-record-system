@@ -1,0 +1,20 @@
+@page "/persons/{PersonId}/edit-induction/exemption-reasons"
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction.ExemptionReasonModel
+@{
+    ViewBag.Title = "Exemption reason";
+}
+
+@section BeforeContent {
+    <govuk-back-link>Back</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-button type="submit">Continue</govuk-button>
+            <govuk-button formaction="@LinkGenerator.PersonInduction(Model.PersonId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+        </form>
+    </div>
+</div>

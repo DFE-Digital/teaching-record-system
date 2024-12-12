@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Induction.Status;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-
-[Journey(JourneyNames.EditInductionStatus), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
+public class ExemptionReasonModel(TrsLinkGenerator linkGenerator) : PageModel
 {
-    public JourneyInstance<EditInductionStatusState>? JourneyInstance { get; set; }
+    public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
 
     [FromRoute]
     public Guid PersonId { get; set; }

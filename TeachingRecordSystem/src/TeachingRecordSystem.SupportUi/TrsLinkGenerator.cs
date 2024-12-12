@@ -170,13 +170,13 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
         GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
     public string InductionEditStatus(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Induction/Status/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditExemptionReason(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/ExemptionReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string InductionEditStartDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Induction/StartDate/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-
-    public string InductionEditCompletionDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-    GetRequiredPathByPage("/Induction/DateCompleted/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/StartDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 
