@@ -15,7 +15,6 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext)
     [BindProperty]
     public InductionStatus InductionStatus { get; set; }
 
-
     public async Task OnGetAsync()
     {
         InductionStatus = JourneyInstance!.State.InductionStatus;
@@ -26,10 +25,25 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext)
 
     public async Task OnPostAsync()
     {
-        // TODO - store the induction status
         await JourneyInstance!.UpdateStateAsync(state => state.InductionStatus = InductionStatus);
 
-        // TODO - figure out where to go next and redirect to that page
-        Redirect(linkGenerator.InductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId));
+        // Use the delegate to determine where to go next and redirect to that page
+        Redirect(SetNextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId));
+    }
+
+    private Func<Guid, JourneyInstanceId, string> SetNextPage(InductionStatus status)
+    {
+        if (InductionStatus == InductionStatus.Exempt)
+        {
+            return (personId, journeyInstanceId) => linkGenerator.InductionEditExemptionReason(personId, journeyInstanceId);
+        }
+        //if (InductionStatus == InductionStatus.RequiredToComplete)
+        //{
+        //    return (personId, journeyInstanceId) => linkGenerator.InductionChangeReason(personId, journeyInstanceId);
+        //}
+        else 
+        {
+            return (personId, journeyInstanceId) => linkGenerator.InductionEditStartDate(personId, journeyInstanceId);
+        }
     }
 }
