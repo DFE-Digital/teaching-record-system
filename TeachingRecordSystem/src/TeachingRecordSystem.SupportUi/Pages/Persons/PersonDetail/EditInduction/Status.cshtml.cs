@@ -48,10 +48,10 @@ public class StatusModel : CommonJourneyPage
         {
             return (Id, journeyInstanceId) => _linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
         }
-        //if (status == InductionStatus.RequiredToComplete)
-        //{
-        //    return (personId, journeyInstanceId) => linkGenerator.InductionChangeReason(personId, journeyInstanceId);
-        //}
+        if (status == InductionStatus.RequiredToComplete)
+        {
+            return (personId, journeyInstanceId) => _linkGenerator.InductionChangeReason(personId, journeyInstanceId);
+        }
         else
         {
             return (Id, journeyInstanceId) => _linkGenerator.InductionEditStartDate(Id, journeyInstanceId);

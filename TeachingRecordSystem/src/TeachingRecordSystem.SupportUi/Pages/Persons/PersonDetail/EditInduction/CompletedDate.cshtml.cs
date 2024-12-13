@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-[Journey(JourneyNames.EditInduction), RequireJourneyInstance]
-public class ExemptionReasonModel : CommonJourneyPage
+[Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
+public class CompletedDateModel : CommonJourneyPage
 {
-    public ExemptionReasonModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
+    public CompletedDateModel(TrsLinkGenerator linkGenerator) :base(linkGenerator)
     {
     }
 
@@ -17,8 +17,8 @@ public class ExemptionReasonModel : CommonJourneyPage
     {
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            // TODO - store the exemption reason
-            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.ExemptionReason;
+            // TODO - store the completed date
+            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.CompletedDate;
         });
 
         return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
@@ -28,5 +28,4 @@ public class ExemptionReasonModel : CommonJourneyPage
     {
         return (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId);
     }
-
 }

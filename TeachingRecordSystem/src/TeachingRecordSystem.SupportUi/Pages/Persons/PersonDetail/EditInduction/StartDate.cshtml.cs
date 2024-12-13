@@ -18,13 +18,14 @@ public class StartDateModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
+        InductionStatus = JourneyInstance!.State.InductionStatus;
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the start date
-            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.Status;
+            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.StartDate;
         });
 
-        return Redirect(_linkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId)); //TODO add the other pages
+        return Redirect(NextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId));
     }
 
     private Func<Guid, JourneyInstanceId, string> NextPage(InductionStatus status)
