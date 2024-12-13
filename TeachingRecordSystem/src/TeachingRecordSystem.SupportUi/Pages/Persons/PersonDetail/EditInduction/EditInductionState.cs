@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres;
+
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 public class EditInductionState : IRegisterJourney
@@ -16,14 +18,16 @@ public class EditInductionState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
-    public void EnsureInitialized(InductionStatus status)
+    public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId)
     {
         if (Initialized)
         {
             return;
         }
+        var person = await dbContext.Persons
+            .SingleAsync(q => q.PersonId == personId);
+        InductionStatus = person!.InductionStatus;
 
-        InductionStatus = status;
         Initialized = true;
     }
 }
