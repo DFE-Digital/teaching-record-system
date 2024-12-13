@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Services.InductionRouting;
+using TeachingRecordSystem.SupportUi.Services.InductionWizardPageLogic;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -27,12 +29,11 @@ public class StatusModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.InductionStatus = InductionStatus;
-            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.Status;
+            state.PageBreadcrumb = InductionJourneyPage.Status;
         });
 
         // Determine where to go next and redirect to that page
-        string url = NextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId);
-        return Redirect(url);
+        return Redirect(PageLink(InductionWizardPageLogicService.NextPageFromStatusPage(InductionStatus)));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -42,19 +43,19 @@ public class StatusModel : CommonJourneyPage
         await next();
     }
 
-    private Func<Guid, JourneyInstanceId, string> NextPage(InductionStatus status)
+    private InductionJourneyPage NextJourneyPage(InductionStatus status)
     {
         if (status == InductionStatus.Exempt)
         {
-            return (Id, journeyInstanceId) => _linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
+            return InductionJourneyPage.ExemptionReason;
         }
         if (status == InductionStatus.RequiredToComplete)
         {
-            return (personId, journeyInstanceId) => _linkGenerator.InductionChangeReason(personId, journeyInstanceId);
+            return InductionJourneyPage.ChangeReason;
         }
         else
         {
-            return (Id, journeyInstanceId) => _linkGenerator.InductionEditStartDate(Id, journeyInstanceId);
+            return InductionJourneyPage.StartDate;
         }
     }
 }

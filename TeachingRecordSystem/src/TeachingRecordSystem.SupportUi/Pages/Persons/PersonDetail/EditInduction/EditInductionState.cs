@@ -1,18 +1,10 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Services.InductionWizardPageLogic;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 public class EditInductionState : IRegisterJourney
 {
-    public enum InductionJourneyPage
-    {
-        Status,
-        ExemptionReason,
-        StartDate,
-        CompletedDate,
-        ChangeReason
-    }
-
     public static JourneyDescriptor Journey => new(
         JourneyNames.EditInduction,
         typeof(EditInductionState),

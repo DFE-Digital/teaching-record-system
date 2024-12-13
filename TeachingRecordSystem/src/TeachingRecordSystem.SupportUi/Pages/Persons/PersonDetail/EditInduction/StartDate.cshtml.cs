@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TeachingRecordSystem.SupportUi.Services.InductionWizardPageLogic;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -22,7 +23,7 @@ public class StartDateModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the start date
-            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.StartDate;
+            state.PageBreadcrumb = InductionJourneyPage.StartDate;
         });
 
         return Redirect(NextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId));

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TeachingRecordSystem.SupportUi.Services.InductionWizardPageLogic;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -18,7 +19,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the change reason
-            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.ChangeReason;
+            state.PageBreadcrumb = InductionJourneyPage.ChangeReason;
         });
 
         return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
