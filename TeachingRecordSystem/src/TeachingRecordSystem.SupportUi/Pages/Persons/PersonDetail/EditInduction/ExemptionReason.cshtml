@@ -14,7 +14,7 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-button type="submit">Continue</govuk-button>
-            <govuk-button formaction="@LinkGenerator.PersonInduction(Model.PersonId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            <govuk-button formaction="@LinkGenerator.InductionEditExemptionReasonCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
         </form>
     </div>
 </div>

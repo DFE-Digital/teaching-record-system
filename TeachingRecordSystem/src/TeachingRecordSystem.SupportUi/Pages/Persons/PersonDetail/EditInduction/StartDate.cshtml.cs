@@ -1,52 +1,45 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StartDateModel(TrsLinkGenerator linkGenerator) : PageModel
+public class StartDateModel : CommonJourneyPage
 {
-    public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
-
     public InductionStatus InductionStatus { get; set; }
 
-    public string BackLink => BackPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId);
-
-    [FromRoute]
-    public Guid PersonId { get; set; }
+    public StartDateModel(TrsLinkGenerator linkGenerator) :base(linkGenerator)
+    {
+    }
 
     public void OnGet()
     {
         InductionStatus = JourneyInstance!.State.InductionStatus;
     }
 
-    public void OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        // TODO - store the start date
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            // TODO - store the start date
+            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.Status;
+        });
 
-        // TODO - figure out where to go next and redirect to that page
-        //Redirect(linkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(_linkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId)); //TODO add the other pages
     }
 
     private Func<Guid, JourneyInstanceId, string> NextPage(InductionStatus status)
     {
         if (status == InductionStatus.InProgress)
         {
-            return (Id, journeyInstanceId) => linkGenerator.InductionChangeReason(Id, journeyInstanceId);
+            return (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId);
         }
         else if (status.RequiresCompletedDate())
         {
-            return (Id, journeyInstanceId) => linkGenerator.InductionEditCompletedDate(Id, journeyInstanceId);
+            return (Id, journeyInstanceId) => _linkGenerator.InductionEditCompletedDate(Id, journeyInstanceId);
         }
         else
         {
-            return (Id, journeyInstanceId) => linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
+            return (Id, journeyInstanceId) => _linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
         }
-    }
-
-    private Func<Guid, JourneyInstanceId, string> BackPage(InductionStatus status)
-    {
-        // TODO - determine the correct back link - it's either Change status page, or Induction details
-        return (Id, journeyInstanceId) => linkGenerator.PersonInduction(Id);
     }
 }

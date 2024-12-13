@@ -1,38 +1,43 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : PageModel
+public class StatusModel : CommonJourneyPage
 {
-    public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
-    public string BackLink => BackPage()(PersonId, JourneyInstance!.InstanceId);
-
-    [FromRoute]
-    public Guid PersonId { get; set; }
+    protected TrsDbContext _dbContext;
 
     [BindProperty]
     public InductionStatus InductionStatus { get; set; }
+
+    public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
+    {
+        _dbContext = dbContext;
+    }
 
     public void OnGet()
     {
         InductionStatus = JourneyInstance!.State.InductionStatus;
     }
 
-    public async Task OnPostAsync()
+    public async Task<IActionResult> OnPostAsync()
     {
-        await JourneyInstance!.UpdateStateAsync(state => state.InductionStatus = InductionStatus);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.InductionStatus = InductionStatus;
+            state.PageBreadcrumb = EditInductionState.InductionJourneyPage.Status;
+        });
 
         // Determine where to go next and redirect to that page
-        Redirect(NextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId));
+        string url = NextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId);
+        return Redirect(url);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId);
+        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId);
 
         await next();
     }
@@ -41,7 +46,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext)
     {
         if (status == InductionStatus.Exempt)
         {
-            return (Id, journeyInstanceId) => linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
+            return (Id, journeyInstanceId) => _linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
         }
         //if (status == InductionStatus.RequiredToComplete)
         //{
@@ -49,12 +54,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext)
         //}
         else
         {
-            return (Id, journeyInstanceId) => linkGenerator.InductionEditStartDate(Id, journeyInstanceId);
+            return (Id, journeyInstanceId) => _linkGenerator.InductionEditStartDate(Id, journeyInstanceId);
         }
-    }
-
-    private Func<Guid, JourneyInstanceId, string> BackPage()
-    {
-        return (Id, journeyInstanceId) => linkGenerator.PersonInduction(Id);
     }
 }

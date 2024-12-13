@@ -4,6 +4,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 
 public class EditInductionState : IRegisterJourney
 {
+    public enum InductionJourneyPage
+    {
+        Status,
+        ExemptionReason,
+        StartDate,
+        CompletedDate,
+        ChangeReason
+    }
+
     public static JourneyDescriptor Journey => new(
         JourneyNames.EditInduction,
         typeof(EditInductionState),
@@ -15,6 +24,7 @@ public class EditInductionState : IRegisterJourney
     public DateOnly? CompletedDate { get; set; }
     public InductionExemptionReasons? ExemptionReasons { get; set; }
     public string? ChangeReason { get; set; }
+    public InductionJourneyPage? PageBreadcrumb { get; set; }
 
     public bool Initialized { get; set; }
 
