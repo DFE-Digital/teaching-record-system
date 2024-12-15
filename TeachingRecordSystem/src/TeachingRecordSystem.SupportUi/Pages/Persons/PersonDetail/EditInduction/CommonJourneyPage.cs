@@ -26,20 +26,6 @@ public abstract class CommonJourneyPage : PageModel
         return Redirect(_linkGenerator.PersonInduction(PersonId));
     }
 
-    //protected Func<Guid, JourneyInstanceId, string> PageLinkFunction(EditInductionState.InductionJourneyPage? pageName)
-    //{
-    //    return pageName switch
-    //    {
-    //        EditInductionState.InductionJourneyPage.Status => (Id, journeyInstanceId) => _linkGenerator.InductionEditStatus(Id, journeyInstanceId),
-    //        EditInductionState.InductionJourneyPage.CompletedDate => (Id, journeyInstanceId) => _linkGenerator.InductionEditCompletedDate(Id, journeyInstanceId),
-    //        EditInductionState.InductionJourneyPage.ExemptionReason => (Id, journeyInstanceId) => _linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId),
-    //        EditInductionState.InductionJourneyPage.StartDate => (Id, journeyInstanceId) => _linkGenerator.InductionEditStartDate(Id, journeyInstanceId),
-    //        EditInductionState.InductionJourneyPage.ChangeReason => (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId),
-    //        EditInductionState.InductionJourneyPage.CheckYourAnswers => (Id, journeyInstanceId) => _linkGenerator.InductionCheckYourAnswers(Id, journeyInstanceId),
-    //        _ => throw new NotImplementedException()
-    //    };
-    //}
-
     protected string PageLink(InductionJourneyPage? pageName)
     {
         return pageName switch

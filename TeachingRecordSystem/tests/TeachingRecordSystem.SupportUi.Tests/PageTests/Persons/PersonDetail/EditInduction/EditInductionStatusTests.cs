@@ -6,13 +6,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Theory]
-    [InlineData(InductionStatus.Exempt)]
-    [InlineData(InductionStatus.Passed)]
-    [InlineData(InductionStatus.RequiredToComplete)]
-    public async Task Buttons_PostToExpectedPage(InductionStatus inductionStatus)
+    [Fact]
+    public async Task Buttons_PostToExpectedPage()
     {
         // Arrange
+        InductionStatus inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -35,6 +33,41 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var buttons = form.GetElementsByTagName("button").Select(button => button as IHtmlButtonElement);
         Assert.Equal(2, buttons.Count());
         Assert.Equal($"/persons/{person.PersonId}/induction", buttons.ElementAt(1)!.FormAction);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Exempt, "Select exemption reason")]
+    [InlineData(InductionStatus.InProgress, "Start date")]
+    [InlineData(InductionStatus.Failed, "Start date")]
+    [InlineData(InductionStatus.FailedInWales, "Start date")]
+    [InlineData(InductionStatus.Passed, "Start date")]
+    [InlineData(InductionStatus.RequiredToComplete, "Change reason")]
+    public async Task Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string expectedNextPage)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState()
+            {
+                Initialized = true,
+                InductionStatus = inductionStatus
+            });
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+
+        // Assert
+        var title = redirectDoc.GetElementById("page-title")!.TextContent;
+        Assert.Contains(expectedNextPage, title);
     }
 
     [Fact]

@@ -33,7 +33,7 @@ public class StatusModel : CommonJourneyPage
         });
 
         // Determine where to go next and redirect to that page
-        return Redirect(PageLink(InductionWizardPageLogicService.NextPageFromStatusPage(InductionStatus)));
+        return Redirect(PageLink(NextPageInJourney(InductionStatus)));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -43,7 +43,7 @@ public class StatusModel : CommonJourneyPage
         await next();
     }
 
-    private InductionJourneyPage NextJourneyPage(InductionStatus status)
+    private InductionJourneyPage NextPageInJourney(InductionStatus status)
     {
         if (status == InductionStatus.Exempt)
         {
