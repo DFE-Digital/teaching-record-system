@@ -57,8 +57,6 @@ public static class Extensions
     {
         if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
-            var pgConnectionString = GetPostgresConnectionString(builder.Configuration);
-
             builder.Services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
