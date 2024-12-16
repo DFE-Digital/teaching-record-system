@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.Services.InductionWizardPageLogic;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 public enum InductionJourneyPage
 {

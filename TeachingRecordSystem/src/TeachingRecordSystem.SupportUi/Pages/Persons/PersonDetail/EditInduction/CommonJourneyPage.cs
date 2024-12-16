@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
-using TeachingRecordSystem.SupportUi.Services.InductionWizardPageLogic;
 
 public abstract class CommonJourneyPage : PageModel
 {
