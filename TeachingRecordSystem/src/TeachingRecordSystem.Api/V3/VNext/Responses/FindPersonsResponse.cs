@@ -1,6 +1,7 @@
 using AutoMapper.Configuration.Annotations;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionStatus;
+using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.QtlsStatus;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
@@ -13,8 +14,9 @@ public partial record FindPersonsResponse
 }
 
 [AutoMap(typeof(FindPersonsResultItem))]
-[GenerateVersionedDto(typeof(V20240920.Responses.FindPersonsResponseResult), excludeMembers: ["InductionStatus"])]
+[GenerateVersionedDto(typeof(V20240920.Responses.FindPersonsResponseResult), excludeMembers: ["InductionStatus", "QtlsStatus"])]
 public partial record FindPersonsResponseResult
 {
     public required InductionStatus InductionStatus { get; init; }
+    public required QtlsStatus QtlsStatus { get; set; }
 }

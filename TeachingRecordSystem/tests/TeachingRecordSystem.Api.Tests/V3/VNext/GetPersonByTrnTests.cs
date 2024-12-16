@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+
 namespace TeachingRecordSystem.Api.Tests.V3.VNext;
 
 public class GetPersonByTrnTests : TestBase
@@ -143,6 +145,98 @@ public class GetPersonByTrnTests : TestBase
                 certificateUrl = "/v3/certificates/induction"
             },
             responseInduction);
+    }
+
+    [Fact]
+    public async Task Get_WithQtlsDate_ReturnsActiveQtlsStatus()
+    {
+        // Arrange
+        var dqtStatus = dfeta_InductionStatus.Pass;
+        var status = dqtStatus.ToInductionStatus();
+        var startDate = new DateOnly(1996, 2, 3);
+        var completedDate = new DateOnly(1996, 6, 7);
+        var qtlsDate = new DateOnly(2020, 01, 01);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithQtlsDate(qtlsDate)
+            .WithDqtInduction(
+                dqtStatus,
+                inductionExemptionReason: null,
+                startDate,
+                completedDate));
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var qtlsStatus = jsonResponse.RootElement.GetProperty("qtlsStatus").GetString();
+        Assert.Equal(QtlsStatus.Active.ToString(), qtlsStatus!);
+    }
+
+    [Fact]
+    public async Task Get_WithExpiredQtlsDate_ReturnsExpiredQtlsStatus()
+    {
+        // Arrange
+        var dqtStatus = dfeta_InductionStatus.Pass;
+        var status = dqtStatus.ToInductionStatus();
+        var startDate = new DateOnly(1996, 2, 3);
+        var completedDate = new DateOnly(1996, 6, 7);
+        var qtlsDate = new DateOnly(2020, 01, 01);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithQtlsDate(qtlsDate)
+            .WithDqtInduction(
+                dqtStatus,
+                inductionExemptionReason: null,
+                startDate,
+                completedDate));
+
+        var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
+        entity[Contact.Fields.dfeta_qtlsdate] = null;
+        await TestData.OrganizationService.UpdateAsync(entity);
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var qtlsStatus = jsonResponse.RootElement.GetProperty("qtlsStatus").GetString();
+        Assert.Equal(QtlsStatus.Expired.ToString(), qtlsStatus!);
+    }
+
+    [Fact]
+    public async Task Get_WithoutQtlsDate_ReturnsNoneQtlsStatus()
+    {
+        // Arrange
+        var dqtStatus = dfeta_InductionStatus.Pass;
+        var status = dqtStatus.ToInductionStatus();
+        var startDate = new DateOnly(1996, 2, 3);
+        var completedDate = new DateOnly(1996, 6, 7);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithDqtInduction(
+                dqtStatus,
+                inductionExemptionReason: null,
+                startDate,
+                completedDate));
+
+        // Arrange
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var jsonResponse = await AssertEx.JsonResponseAsync(response);
+        var qtlsStatus = jsonResponse.RootElement.GetProperty("qtlsStatus").GetString();
+        Assert.Equal(QtlsStatus.None.ToString(), qtlsStatus!);
     }
 
     [Fact]
