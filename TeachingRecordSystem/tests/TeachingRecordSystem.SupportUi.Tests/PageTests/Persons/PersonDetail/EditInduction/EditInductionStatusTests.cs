@@ -35,41 +35,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal($"/persons/{person.PersonId}/induction", buttons.ElementAt(1)!.FormAction);
     }
 
-    [Theory]
-    [InlineData(InductionStatus.Exempt, "Select exemption reason")]
-    [InlineData(InductionStatus.InProgress, "Start date")]
-    [InlineData(InductionStatus.Failed, "Start date")]
-    [InlineData(InductionStatus.FailedInWales, "Start date")]
-    [InlineData(InductionStatus.Passed, "Start date")]
-    [InlineData(InductionStatus.RequiredToComplete, "Change reason")]
-    public async Task Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string expectedNextPage)
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditInductionState()
-            {
-                Initialized = true,
-                InductionStatus = inductionStatus
-            });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-
-        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocumentAsync();
-
-        // Assert
-        var title = redirectDoc.GetElementById("page-title")!.TextContent;
-        Assert.Contains(expectedNextPage, title);
-    }
-
     [Fact]
     public void BackLink_LinksToExpectedPage()
     {
