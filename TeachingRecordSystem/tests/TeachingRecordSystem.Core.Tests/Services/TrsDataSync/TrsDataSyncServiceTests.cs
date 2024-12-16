@@ -8,6 +8,8 @@ public partial class TrsDataSyncServiceTests(TrsDataSyncServiceFixture fixture) 
 
     private TestData TestData => fixture.TestData;
 
+    private TestableAuditRepository AuditRepository => fixture.AuditRepository;
+
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
     Task IAsyncLifetime.InitializeAsync() => fixture.DbFixture.DbHelper.ClearDataAsync();

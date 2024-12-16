@@ -1,5 +1,6 @@
 using FakeXrmEasy.Extensions;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -14,7 +15,8 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        FakeTrnGenerator trnGenerator,
+        ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -24,7 +26,8 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
             organizationService,
             referenceDataCache,
             Clock,
-            new TestableAuditRepository());
+            new TestableAuditRepository(),
+            loggerFactory.CreateLogger<TrsDataSyncHelper>());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

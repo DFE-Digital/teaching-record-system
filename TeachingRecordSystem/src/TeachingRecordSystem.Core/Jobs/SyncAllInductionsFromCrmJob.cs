@@ -1,5 +1,6 @@
 using System.ServiceModel;
 using Hangfire;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -9,27 +10,17 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Jobs;
 
 [AutomaticRetry(Attempts = 0)]
-public class SyncAllInductionsFromCrmJob
-{
-    private readonly ICrmServiceClientProvider _crmServiceClientProvider;
-    private readonly TrsDataSyncHelper _trsDataSyncHelper;
-    private readonly IOptions<TrsDataSyncServiceOptions> _syncOptionsAccessor;
-
-    public SyncAllInductionsFromCrmJob(
+public class SyncAllInductionsFromCrmJob(
         ICrmServiceClientProvider crmServiceClientProvider,
         TrsDataSyncHelper trsDataSyncHelper,
-        IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor)
-    {
-        _crmServiceClientProvider = crmServiceClientProvider;
-        _trsDataSyncHelper = trsDataSyncHelper;
-        _syncOptionsAccessor = syncOptionsAccessor;
-    }
-
+        IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
+        ILogger<SyncAllInductionsFromCrmJob> logger)
+{
     public async Task ExecuteAsync(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
     {
         const int pageSize = 1000;
 
-        var serviceClient = _crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
+        var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
         var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Induction).AttributeNames);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
@@ -57,13 +48,15 @@ public class SyncAllInductionsFromCrmJob
             }
             catch (FaultException<OrganizationServiceFault> fex) when (fex.IsCrmRateLimitException(out var retryAfter))
             {
+                logger.LogWarning("Hit CRM service limits; error code: {ErrorCode}.  Retrying after {retryAfter} seconds.", fex.Detail.ErrorCode, retryAfter.TotalSeconds);
                 await Task.Delay(retryAfter, cancellationToken);
                 continue;
             }
 
-            await _trsDataSyncHelper.SyncInductionsAsync(
+            await trsDataSyncHelper.SyncInductionsAsync(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
-                ignoreInvalid: _syncOptionsAccessor.Value.IgnoreInvalidData,
+                syncAudit: false,
+                ignoreInvalid: syncOptionsAccessor.Value.IgnoreInvalidData,
                 createMigratedEvent,
                 dryRun,
                 cancellationToken);
