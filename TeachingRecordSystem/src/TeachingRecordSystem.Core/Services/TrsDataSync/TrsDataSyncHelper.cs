@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
@@ -16,11 +17,7 @@ using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
-public class TrsDataSyncHelper(
-    NpgsqlDataSource trsDbDataSource,
-    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
-    ReferenceDataCache referenceDataCache,
-    IClock clock)
+public class TrsDataSyncHelper
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -37,10 +34,41 @@ public class TrsDataSyncHelper(
     };
 
     private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
+    private readonly NpgsqlDataSource _trsDbDataSource;
+    private readonly IOrganizationServiceAsync2 _organizationService;
+    private readonly ReferenceDataCache _referenceDataCache;
+    private readonly IClock _clock;
+    private readonly ILogger<TrsDataSyncHelper> _logger;
+    private bool? isFakeXrm;
+
+    public TrsDataSyncHelper(
+        NpgsqlDataSource trsDbDataSource,
+        [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+        ReferenceDataCache referenceDataCache,
+        IClock clock,
+        ILoggerFactory loggerFactory)
+    {
+        _trsDbDataSource = trsDbDataSource;
+        _organizationService = organizationService;
+        _referenceDataCache = referenceDataCache;
+        _clock = clock;
+        _logger = loggerFactory.CreateLogger<TrsDataSyncHelper>();
+    }
 
     public IObservable<object[]> GetSyncedEntitiesObservable() => _syncedEntitiesSubject;
 
-    private bool IsFakeXrm { get; } = organizationService.GetType().FullName == "Castle.Proxies.ObjectProxy_2";
+    private bool IsFakeXrm
+    {
+        get
+        {
+            if (isFakeXrm is null)
+            {
+                isFakeXrm = _organizationService.GetType().FullName == "Castle.Proxies.ObjectProxy_2";
+            }
+
+            return isFakeXrm!.Value;
+        }
+    }
 
     public static (string EntityLogicalName, string[] AttributeNames) GetEntityInfoForModelType(string modelType)
     {
@@ -142,7 +170,7 @@ public class TrsDataSyncHelper(
             throw new NotSupportedException($"Cannot delete a {modelType}.");
         }
 
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        await using var connection = await _trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         using (var cmd = connection.CreateCommand())
         {
@@ -161,7 +189,7 @@ public class TrsDataSyncHelper(
             return null;
         }
 
-        await using var connection = await trsDbDataSource.OpenConnectionAsync();
+        await using var connection = await _trsDbDataSource.OpenConnectionAsync();
 
         using (var cmd = connection.CreateCommand())
         {
@@ -221,7 +249,7 @@ public class TrsDataSyncHelper(
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo<Person>(ModelTypes.Person);
 
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        await using var connection = await _trsDbDataSource.OpenConnectionAsync(cancellationToken);
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
 
         using (var createTempTableCommand = connection.CreateCommand())
@@ -247,7 +275,7 @@ public class TrsDataSyncHelper(
             using (var mergeCommand = connection.CreateCommand())
             {
                 mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
-                mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+                mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, _clock.UtcNow));
                 mergeCommand.Transaction = txn;
                 await mergeCommand.ExecuteNonQueryAsync();
             }
@@ -330,7 +358,8 @@ public class TrsDataSyncHelper(
             dfeta_induction.Fields.dfeta_InductionStatus,
             dfeta_induction.Fields.CreatedOn,
             dfeta_induction.Fields.CreatedBy,
-            dfeta_induction.Fields.ModifiedOn
+            dfeta_induction.Fields.ModifiedOn,
+            dfeta_induction.Fields.StateCode
         };
 
         var inductions = await GetEntitiesAsync<dfeta_induction>(
@@ -384,7 +413,7 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<InductionInfo>(ModelTypes.Induction);
 
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        await using var connection = await _trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         var toSync = inductions.ToList();
 
@@ -415,7 +444,7 @@ public class TrsDataSyncHelper(
             using (var mergeCommand = connection.CreateCommand())
             {
                 mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
-                mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+                mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, _clock.UtcNow));
                 mergeCommand.Transaction = txn;
                 using var reader = await mergeCommand.ExecuteReaderAsync();
                 while (await reader.ReadAsync(cancellationToken))
@@ -457,7 +486,7 @@ public class TrsDataSyncHelper(
                 .Where(e => e is IEventWithPersonId && !unsyncedContactIds.Any(c => c == ((IEventWithPersonId)e).PersonId))
                 .ToArray();
 
-            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_import", clock, cancellationToken);
+            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_import", _clock, cancellationToken);
 
             if (!dryRun)
             {
@@ -528,7 +557,7 @@ public class TrsDataSyncHelper(
 
         var modelTypeSyncInfo = GetModelTypeSyncInfo<Alert>(ModelTypes.Alert);
 
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        await using var connection = await _trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         var toSync = alerts.ToList();
 
@@ -559,12 +588,12 @@ public class TrsDataSyncHelper(
                 using (var mergeCommand = connection.CreateCommand())
                 {
                     mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
-                    mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+                    mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, _clock.UtcNow));
                     mergeCommand.Transaction = txn;
                     await mergeCommand.ExecuteNonQueryAsync();
                 }
 
-                await txn.SaveEventsAsync(events, "events_import", clock, cancellationToken);
+                await txn.SaveEventsAsync(events, "events_import", _clock, cancellationToken);
 
                 if (!dryRun)
                 {
@@ -620,10 +649,10 @@ public class TrsDataSyncHelper(
 
         var mapped = events.Select(e => EventInfo.Deserialize(e.dfeta_Payload).Event).ToArray();
 
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        await using var connection = await _trsDbDataSource.OpenConnectionAsync(cancellationToken);
 
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
-        await txn.SaveEventsAsync(mapped, tempTableSuffix: "events_import", clock, cancellationToken);
+        await txn.SaveEventsAsync(mapped, tempTableSuffix: "events_import", _clock, cancellationToken);
 
         if (!dryRun)
         {
@@ -644,6 +673,7 @@ public class TrsDataSyncHelper(
             .OfType<AttributeAuditDetail>()
             .Select(a => (AuditDetail: a, AuditRecord: a.AuditRecord.ToEntity<Audit>()))
             .OrderBy(a => a.AuditRecord.CreatedOn)
+            .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
             .ToArray();
 
         if (ordered.Length == 0)
@@ -798,10 +828,11 @@ public class TrsDataSyncHelper(
                 {
                     try
                     {
-                        response = (ExecuteMultipleResponse)await organizationService.ExecuteAsync(request, cancellationToken);
+                        response = (ExecuteMultipleResponse)await _organizationService.ExecuteAsync(request, cancellationToken);
                     }
                     catch (FaultException fex) when (fex.IsCrmRateLimitException(out var retryAfter))
                     {
+                        _logger.LogWarning("Hit CRM service limits; Fault exception");
                         await Task.Delay(retryAfter, cancellationToken);
                         continue;
                     }
@@ -812,11 +843,13 @@ public class TrsDataSyncHelper(
 
                         if (firstFault.IsCrmRateLimitFault(out var retryAfter))
                         {
+                            _logger.LogWarning("Hit CRM service limits; CRM rate limit fault");
                             await Task.Delay(retryAfter, cancellationToken);
                             continue;
                         }
                         else if (firstFault.Message.Contains("The HTTP status code of the response was not expected (429)"))
                         {
+                            _logger.LogWarning("Hit CRM service limits; 429 too many requests");
                             await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
                             continue;
                         }
@@ -852,7 +885,25 @@ public class TrsDataSyncHelper(
             query.Criteria.AddCondition("statecode", ConditionOperator.Equal, 0);
         }
 
-        var response = await organizationService.RetrieveMultipleAsync(query, cancellationToken);
+        EntityCollection response;
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                response = await _organizationService.RetrieveMultipleAsync(query, cancellationToken);
+            }
+            catch (FaultException<OrganizationServiceFault> fex) when (fex.IsCrmRateLimitException(out var retryAfter))
+            {
+                _logger.LogWarning("Hit CRM service limits; error code: {ErrorCode}", fex.Detail.ErrorCode);
+                await Task.Delay(retryAfter, cancellationToken);
+                continue;
+            }
+
+            break;
+        }
+
         return response.Entities.Select(e => e.ToEntity<TEntity>()).ToArray();
     }
 
@@ -1012,7 +1063,21 @@ public class TrsDataSyncHelper(
         {
             Contact.PrimaryIdAttribute,
             Contact.Fields.dfeta_InductionStatus,
-            Contact.Fields.dfeta_qtlsdate
+            Contact.Fields.dfeta_qtlsdate,
+            Contact.Fields.CreatedOn,
+            Contact.Fields.CreatedBy,
+            Contact.Fields.StateCode,
+            Contact.Fields.ModifiedOn,
+            Contact.Fields.dfeta_TRN,
+            Contact.Fields.FirstName,
+            Contact.Fields.MiddleName,
+            Contact.Fields.LastName,
+            Contact.Fields.dfeta_StatedFirstName,
+            Contact.Fields.dfeta_StatedMiddleName,
+            Contact.Fields.dfeta_StatedLastName,
+            Contact.Fields.BirthDate,
+            Contact.Fields.dfeta_NINumber,
+            Contact.Fields.EMailAddress1,
         };
 
         Action<NpgsqlBinaryImporter, InductionInfo> writeRecord = (writer, induction) =>
@@ -1225,7 +1290,8 @@ public class TrsDataSyncHelper(
                     dfeta_induction.Fields.dfeta_InductionExemptionReason,
                     dfeta_induction.Fields.dfeta_StartDate,
                     dfeta_induction.Fields.dfeta_InductionStatus,
-                    dfeta_induction.Fields.ModifiedOn
+                    dfeta_induction.Fields.ModifiedOn,
+                    dfeta_induction.Fields.StateCode
                 };
 
                 if (auditDetails.TryGetValue(induction!.Id, out var inductionAudits))
@@ -1404,7 +1470,7 @@ public class TrsDataSyncHelper(
             {
                 EventId = Guid.NewGuid(),
                 Key = $"{snapshot.Entity.Id}-Migrated",
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = _clock.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 InductionStartDate = mappedInduction.InductionStartDate,
@@ -1434,8 +1500,8 @@ public class TrsDataSyncHelper(
         bool ignoreInvalid,
         bool createMigratedEvent)
     {
-        var sanctionCodes = await referenceDataCache.GetSanctionCodesAsync(activeOnly: false);
-        var alertTypes = await referenceDataCache.GetAlertTypesAsync();
+        var sanctionCodes = await _referenceDataCache.GetSanctionCodesAsync(activeOnly: false);
+        var alertTypes = await _referenceDataCache.GetAlertTypesAsync();
 
         var alerts = new List<Alert>();
         var events = new List<EventBase>();
@@ -1469,7 +1535,7 @@ public class TrsDataSyncHelper(
             // If the record is deactivated then it's migrated as deleted
             if (s.StateCode == dfeta_sanctionState.Inactive)
             {
-                mapped.DeletedOn = clock.UtcNow;
+                mapped.DeletedOn = _clock.UtcNow;
             }
             else if (createMigratedEvent)
             {
@@ -1586,7 +1652,7 @@ public class TrsDataSyncHelper(
             {
                 EventId = Guid.NewGuid(),
                 Key = $"{snapshot.Entity.Id}-Migrated",
-                CreatedUtc = clock.UtcNow,
+                CreatedUtc = _clock.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                 PersonId = snapshot.Entity.dfeta_PersonId.Id,
                 Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: true),

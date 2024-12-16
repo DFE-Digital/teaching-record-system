@@ -6,6 +6,7 @@ using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.TestCommon;
@@ -18,10 +19,11 @@ public sealed class CrmClientFixture : IDisposable
     private readonly CancellationTokenSource _completedCts;
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ITrnGenerationApiClient _trnGenerationApiClient;
     private readonly ReferenceDataCache _referenceDataCache;
 
-    public CrmClientFixture(ServiceClient serviceClient, DbFixture dbFixture, IConfiguration configuration, IMemoryCache memoryCache)
+    public CrmClientFixture(ServiceClient serviceClient, DbFixture dbFixture, IConfiguration configuration, IMemoryCache memoryCache, ILoggerFactory loggerFactory)
     {
         Clock = new Clock();
         Configuration = configuration;
@@ -31,6 +33,7 @@ public sealed class CrmClientFixture : IDisposable
         _lockManager = new EnvironmentLockManager(Configuration);
         _lockManager.AcquireLock(_completedCts.Token);
         _memoryCache = memoryCache;
+        _loggerFactory = loggerFactory;
         _trnGenerationApiClient = GetTrnGenerationApiClient();
         _referenceDataCache = new ReferenceDataCache(
             new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, referenceDataCache: null), serviceClientName: null),
@@ -65,7 +68,7 @@ public sealed class CrmClientFixture : IDisposable
                 _referenceDataCache,
                 Clock,
                 () => _trnGenerationApiClient.GenerateTrnAsync(),
-                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock)) : TestDataSyncConfiguration.NoSync()),
+                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock, _loggerFactory)) : TestDataSyncConfiguration.NoSync()),
             _memoryCache,
             onAsyncDispose);
     }
