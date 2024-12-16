@@ -1,6 +1,6 @@
 using Optional;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
@@ -9,6 +9,7 @@ namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 public partial record GetPersonResponse
 {
     public required Option<GetPersonResponseInduction> Induction { get; init; }
+    public required QtlsStatus QtlsStatus { get; set; }
 }
 
 [AutoMap(typeof(GetPersonResultInduction))]

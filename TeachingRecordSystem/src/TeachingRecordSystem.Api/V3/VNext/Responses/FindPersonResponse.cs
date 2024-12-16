@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionStatus;
 
@@ -14,4 +15,5 @@ public partial record FindPersonResponse
 public partial record FindPersonResponseResult
 {
     public required InductionStatus InductionStatus { get; init; }
+    public required QtlsStatus QtlsStatus { get; set; }
 }
