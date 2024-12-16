@@ -4,8 +4,11 @@ public abstract class TestBase : Tests.TestBase
 {
     public const string Version = VersionRegistry.V3MinorVersions.VNext;
 
+    public ReferenceDataCache ReferenceCache { get; }
+
     protected TestBase(HostFixture hostFixture) : base(hostFixture)
     {
+        ReferenceCache = hostFixture.Services.GetRequiredService<ReferenceDataCache>();
     }
 
     public HttpClient GetHttpClientWithApiKey() =>

@@ -28,6 +28,7 @@ public record GetPersonResponse
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
+    public required QtlsStatus QtlsStatus { get; set; }
 }
 
 [AutoMap(typeof(Implementation.Dtos.QtsInfo))]
