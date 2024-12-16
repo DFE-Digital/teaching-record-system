@@ -102,6 +102,36 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/persons/{person.PersonId}/induction", location);
     }
 
+    [Theory]
+    [InlineData("edit-induction/status", InductionJourneyPage.Status)]
+    [InlineData("edit-induction/exemption-reasons", InductionJourneyPage.ExemptionReason)]
+    [InlineData("edit-induction/start-date", InductionJourneyPage.StartDate)]
+    [InlineData("edit-induction/date-completed", InductionJourneyPage.CompletedDate)]
+    [InlineData("edit-induction/change-reason", InductionJourneyPage.ChangeReason)]
+    [InlineData("edit-induction/check-answers", InductionJourneyPage.CheckYourAnswers)]
+    public async Task Post_UpdateJourneyStateBacklinkBreadcrumb(string page, InductionJourneyPage pageName)
+    {
+        // Arrange
+        InductionStatus inductionStatus = InductionStatus.Passed;
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState()
+            {
+                Initialized = true,
+                InductionStatus = inductionStatus
+            });
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(pageName, journeyInstance.State.PageBreadcrumb);
+    }
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,

@@ -5,6 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class InductionChangeReasonModel : CommonJourneyPage
 {
+    public InductionJourneyPage NextPage => InductionJourneyPage.CheckYourAnswers;
+
     public InductionChangeReasonModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
     }
@@ -21,12 +23,6 @@ public class InductionChangeReasonModel : CommonJourneyPage
             state.PageBreadcrumb = InductionJourneyPage.ChangeReason;
         });
 
-        return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
+        return Redirect(PageLink(NextPage));
     }
-
-    private Func<Guid, JourneyInstanceId, string> NextPage()
-    {
-        return (Id, journeyInstanceId) => _linkGenerator.InductionCheckYourAnswers(Id, journeyInstanceId);
-    }
-
 }

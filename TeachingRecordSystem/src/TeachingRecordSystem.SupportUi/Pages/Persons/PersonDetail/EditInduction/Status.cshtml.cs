@@ -12,6 +12,19 @@ public class StatusModel : CommonJourneyPage
     [BindProperty]
     public InductionStatus InductionStatus { get; set; }
 
+    public InductionJourneyPage NextPageInJourney
+    {
+        get
+        {
+            return InductionStatus switch
+            {
+                InductionStatus.Exempt => InductionJourneyPage.ExemptionReason,
+                _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
+                _ => InductionJourneyPage.ChangeReason
+            };
+        }
+    }
+
     public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
     {
         _dbContext = dbContext;
@@ -30,8 +43,7 @@ public class StatusModel : CommonJourneyPage
             state.PageBreadcrumb = InductionJourneyPage.Status;
         });
 
-        // Determine where to go next and redirect to that page
-        return Redirect(PageLink(NextPageInJourney(InductionStatus)));
+        return Redirect(PageLink(NextPageInJourney));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -41,19 +53,4 @@ public class StatusModel : CommonJourneyPage
         await next();
     }
 
-    private InductionJourneyPage NextPageInJourney(InductionStatus status)
-    {
-        if (status == InductionStatus.Exempt)
-        {
-            return InductionJourneyPage.ExemptionReason;
-        }
-        else if (status.RequiresStartDate())
-        {
-            return InductionJourneyPage.StartDate;
-        }
-        else
-        {
-            return InductionJourneyPage.ChangeReason;
-        }
-    }
 }

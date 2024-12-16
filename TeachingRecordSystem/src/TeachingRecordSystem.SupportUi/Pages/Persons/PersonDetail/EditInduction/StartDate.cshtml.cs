@@ -7,6 +7,16 @@ public class StartDateModel : CommonJourneyPage
 {
     public InductionStatus InductionStatus { get; set; }
 
+    public InductionJourneyPage NextPage
+    {
+        get
+        {
+            return InductionStatus.RequiresCompletedDate()
+                ? InductionJourneyPage.CompletedDate
+                : InductionJourneyPage.ChangeReason;
+        }
+    }
+
     public StartDateModel(TrsLinkGenerator linkGenerator) :base(linkGenerator)
     {
     }
@@ -25,18 +35,6 @@ public class StartDateModel : CommonJourneyPage
             state.PageBreadcrumb = InductionJourneyPage.StartDate;
         });
 
-        return Redirect(NextPage(InductionStatus)(PersonId, JourneyInstance!.InstanceId));
-    }
-
-    private Func<Guid, JourneyInstanceId, string> NextPage(InductionStatus status)
-    {
-        if (status.RequiresCompletedDate())
-        {
-            return (Id, journeyInstanceId) => _linkGenerator.InductionEditCompletedDate(Id, journeyInstanceId);
-        }
-        else
-        {
-            return (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId);
-        }
+        return Redirect(PageLink(NextPage));
     }
 }

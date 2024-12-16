@@ -5,6 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class CompletedDateModel : CommonJourneyPage
 {
+    public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReason;
+
     public CompletedDateModel(TrsLinkGenerator linkGenerator) :base(linkGenerator)
     {
     }
@@ -21,11 +23,6 @@ public class CompletedDateModel : CommonJourneyPage
             state.PageBreadcrumb = InductionJourneyPage.CompletedDate;
         });
 
-        return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
-    }
-
-    private Func<Guid, JourneyInstanceId, string> NextPage()
-    {
-        return (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId);
+        return Redirect(PageLink(NextPage));
     }
 }

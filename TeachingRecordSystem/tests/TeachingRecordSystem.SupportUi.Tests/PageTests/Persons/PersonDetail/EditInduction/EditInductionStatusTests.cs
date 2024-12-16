@@ -36,28 +36,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TextContent);
     }
 
-    [Fact]
-    public async Task BackLink_LinksToExpectedPage()
-    {
-        // Arrange
-        InductionStatus inductionStatus = InductionStatus.Passed;
-        var person = await TestData.CreatePersonAsync();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditInductionState()
-            {
-                Initialized = true,
-                InductionStatus = inductionStatus
-            });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        throw new NotImplementedException("Test not implemented");
-    }
-
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,

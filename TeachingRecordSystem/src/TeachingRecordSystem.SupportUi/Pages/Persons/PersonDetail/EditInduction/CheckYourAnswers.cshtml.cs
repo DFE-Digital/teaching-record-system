@@ -13,14 +13,18 @@ public class CheckYourAnswersModel : CommonJourneyPage
     {
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        // Final page - complete the journey
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.PageBreadcrumb = InductionJourneyPage.CheckYourAnswers;
+        });
+        // TODO - end of journey logic
 
         return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
     }
 
-    private Func<Guid, JourneyInstanceId, string> NextPage()
+    public Func<Guid, JourneyInstanceId, string> NextPage()
     {
         return (Id, journeyInstanceId) => _linkGenerator.PersonInduction(Id);
     }
