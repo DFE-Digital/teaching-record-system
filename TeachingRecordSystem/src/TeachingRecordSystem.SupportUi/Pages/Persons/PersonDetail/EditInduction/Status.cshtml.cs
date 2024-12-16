@@ -12,7 +12,7 @@ public class StatusModel : CommonJourneyPage
     [BindProperty]
     public InductionStatus InductionStatus { get; set; }
 
-    public InductionJourneyPage NextPageInJourney
+    public InductionJourneyPage NextPage
     {
         get
         {
@@ -43,7 +43,7 @@ public class StatusModel : CommonJourneyPage
             state.PageBreadcrumb = InductionJourneyPage.Status;
         });
 
-        return Redirect(PageLink(NextPageInJourney));
+        return Redirect(PageLink(NextPage));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
