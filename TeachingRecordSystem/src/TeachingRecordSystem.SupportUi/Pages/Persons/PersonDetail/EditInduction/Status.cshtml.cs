@@ -18,7 +18,7 @@ public class StatusModel : CommonJourneyPage
         {
             return InductionStatus switch
             {
-                InductionStatus.Exempt => InductionJourneyPage.ExemptionReason,
+                _ when InductionStatus.RequiresExemptionReason() => InductionJourneyPage.ExemptionReason,
                 _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
                 _ => InductionJourneyPage.ChangeReason
             };
