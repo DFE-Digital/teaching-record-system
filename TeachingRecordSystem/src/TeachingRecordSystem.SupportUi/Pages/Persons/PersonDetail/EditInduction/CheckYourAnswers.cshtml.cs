@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
@@ -11,10 +13,15 @@ public class CheckYourAnswersModel : CommonJourneyPage
     {
     }
 
-    public void OnPost()
+    public async Task<IActionResult> OnPost()
     {
-        // TODO - store the exemption reason
+        // Final page - complete the journey
 
-        // Final page - do all the special stuff
+        return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
+    }
+
+    private Func<Guid, JourneyInstanceId, string> NextPage()
+    {
+        return (Id, journeyInstanceId) => _linkGenerator.PersonInduction(Id);
     }
 }

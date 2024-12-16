@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Buttons_PostToExpectedPage()
+    public async Task ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
         InductionStatus inductionStatus = InductionStatus.Passed;
@@ -32,18 +32,35 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Contains($"/persons/{person.PersonId}/edit-induction/status", form.Action);
         var buttons = form.GetElementsByTagName("button").Select(button => button as IHtmlButtonElement);
         Assert.Equal(2, buttons.Count());
-        Assert.Equal($"/persons/{person.PersonId}/induction", buttons.ElementAt(1)!.FormAction);
+        Assert.Equal("Continue", buttons.ElementAt(0)!.TextContent);
+        Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TextContent);
     }
 
     [Fact]
-    public void BackLink_LinksToExpectedPage()
+    public async Task BackLink_LinksToExpectedPage()
     {
-        throw new NotImplementedException();
+        // Arrange
+        InductionStatus inductionStatus = InductionStatus.Passed;
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState()
+            {
+                Initialized = true,
+                InductionStatus = inductionStatus
+            });
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        throw new NotImplementedException("Test not implemented");
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
-    CreateJourneyInstance(
-        JourneyNames.EditInduction,
-        state ?? new EditInductionState(),
-        new KeyValuePair<string, object>("personId", personId));
+        CreateJourneyInstance(
+            JourneyNames.EditInduction,
+            state ?? new EditInductionState(),
+            new KeyValuePair<string, object>("personId", personId));
 }

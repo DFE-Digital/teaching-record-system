@@ -30,17 +30,13 @@ public class StartDateModel : CommonJourneyPage
 
     private Func<Guid, JourneyInstanceId, string> NextPage(InductionStatus status)
     {
-        if (status == InductionStatus.InProgress)
-        {
-            return (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId);
-        }
-        else if (status.RequiresCompletedDate())
+        if (status.RequiresCompletedDate())
         {
             return (Id, journeyInstanceId) => _linkGenerator.InductionEditCompletedDate(Id, journeyInstanceId);
         }
         else
         {
-            return (Id, journeyInstanceId) => _linkGenerator.InductionEditExemptionReason(Id, journeyInstanceId);
+            return (Id, journeyInstanceId) => _linkGenerator.InductionChangeReason(Id, journeyInstanceId);
         }
     }
 }

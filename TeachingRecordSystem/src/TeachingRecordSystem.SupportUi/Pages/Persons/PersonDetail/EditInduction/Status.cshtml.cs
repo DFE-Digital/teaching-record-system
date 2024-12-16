@@ -47,13 +47,13 @@ public class StatusModel : CommonJourneyPage
         {
             return InductionJourneyPage.ExemptionReason;
         }
-        if (status == InductionStatus.RequiredToComplete)
+        else if (status.RequiresStartDate())
         {
-            return InductionJourneyPage.ChangeReason;
+            return InductionJourneyPage.StartDate;
         }
         else
         {
-            return InductionJourneyPage.StartDate;
+            return InductionJourneyPage.ChangeReason;
         }
     }
 }

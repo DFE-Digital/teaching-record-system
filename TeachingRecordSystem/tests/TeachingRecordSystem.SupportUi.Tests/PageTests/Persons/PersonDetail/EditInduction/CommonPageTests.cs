@@ -6,26 +6,27 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Theory]
-    [InlineData("edit-induction/status", InductionStatus.Exempt, "exemption-reasons")]
-    [InlineData("edit-induction/status", InductionStatus.InProgress, "start-date")]
-    [InlineData("edit-induction/status", InductionStatus.Failed, "start-date")]
-    [InlineData("edit-induction/status", InductionStatus.FailedInWales, "start-date")]
-    [InlineData("edit-induction/status", InductionStatus.Passed, "start-date")]
-    [InlineData("edit-induction/status", InductionStatus.RequiredToComplete, "change-reason")]
-    [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt, "change-reason")]
-    [InlineData("edit-induction/start-date", InductionStatus.InProgress, "change-reason")]
-    [InlineData("edit-induction/start-date", InductionStatus.Failed, "date-completed")]
-    [InlineData("edit-induction/start-date", InductionStatus.FailedInWales, "date-completed")]
-    [InlineData("edit-induction/start-date", InductionStatus.Passed, "date-completed")]
-    [InlineData("edit-induction/date-completed", InductionStatus.Failed, "change-reason")]
-    [InlineData("edit-induction/date-completed", InductionStatus.FailedInWales, "change-reason")]
-    [InlineData("edit-induction/date-completed", InductionStatus.Passed, "change-reason")]
-    [InlineData("edit-induction/change-reason", InductionStatus.Exempt, "check-answers")]
-    [InlineData("edit-induction/change-reason", InductionStatus.InProgress, "check-answers")]
-    [InlineData("edit-induction/change-reason", InductionStatus.Failed, "check-answers")]
-    [InlineData("edit-induction/change-reason", InductionStatus.FailedInWales, "check-answers")]
-    [InlineData("edit-induction/change-reason", InductionStatus.Passed, "check-answers")]
-    [InlineData("edit-induction/change-reason", InductionStatus.RequiredToComplete, "check-answers")]
+    [InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
+    [InlineData("edit-induction/status", InductionStatus.InProgress, "edit-induction/start-date")]
+    [InlineData("edit-induction/status", InductionStatus.Failed, "edit-induction/start-date")]
+    [InlineData("edit-induction/status", InductionStatus.FailedInWales, "edit-induction/start-date")]
+    [InlineData("edit-induction/status", InductionStatus.Passed, "edit-induction/start-date")]
+    [InlineData("edit-induction/status", InductionStatus.RequiredToComplete, "edit-induction/change-reason")]
+    [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/change-reason")]
+    [InlineData("edit-induction/start-date", InductionStatus.InProgress, "edit-induction/change-reason")]
+    [InlineData("edit-induction/start-date", InductionStatus.Failed, "edit-induction/date-completed")]
+    [InlineData("edit-induction/start-date", InductionStatus.FailedInWales, "edit-induction/date-completed")]
+    [InlineData("edit-induction/start-date", InductionStatus.Passed, "edit-induction/date-completed")]
+    [InlineData("edit-induction/date-completed", InductionStatus.Failed, "edit-induction/change-reason")]
+    [InlineData("edit-induction/date-completed", InductionStatus.FailedInWales, "edit-induction/change-reason")]
+    [InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/change-reason")]
+    [InlineData("edit-induction/change-reason", InductionStatus.Exempt, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.InProgress, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.Failed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.FailedInWales, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.RequiredToComplete, "edit-induction/check-answers")]
+    [InlineData("edit-induction/check-answers", InductionStatus.RequiredToComplete, "induction")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
@@ -57,7 +58,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var location = response.Headers.Location?.OriginalString;
-        Assert.Contains(expectedNextPageUrl, location);
+        var expectedUrl = expectedNextPageUrl == "induction"
+            ? $"/persons/{person.PersonId}/{expectedNextPageUrl}"
+            : $"/persons/{person.PersonId}/{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        Assert.Equal(expectedUrl, location);
     }
 
     [Theory]
