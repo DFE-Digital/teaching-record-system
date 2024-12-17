@@ -923,7 +923,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertCreatedEvent);
+            dbContext.AddEventWithoutBroadcast(alertCreatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -956,7 +956,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertCreatedEvent);
+            dbContext.AddEventWithoutBroadcast(alertCreatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -987,7 +987,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertDeletedEvent);
+            dbContext.AddEventWithoutBroadcast(alertDeletedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -1009,7 +1009,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertDqtDeactivatedEvent);
+            dbContext.AddEventWithoutBroadcast(alertDqtDeactivatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -1032,7 +1032,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertDqtImportedEvent);
+            dbContext.AddEventWithoutBroadcast(alertDqtImportedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -1054,7 +1054,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertDqtReactivatedEvent);
+            dbContext.AddEventWithoutBroadcast(alertDqtReactivatedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -1091,7 +1091,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertMigratedEvent);
+            dbContext.AddEventWithoutBroadcast(alertMigratedEvent);
             await dbContext.SaveChangesAsync();
         });
 
@@ -1121,7 +1121,7 @@ public class ChangeLogAlertEventsTests : TestBase
 
         await WithDbContext(async dbContext =>
         {
-            dbContext.AddEvent(alertUpdatedEvent);
+            dbContext.AddEventWithoutBroadcast(alertUpdatedEvent);
             await dbContext.SaveChangesAsync();
         });
 

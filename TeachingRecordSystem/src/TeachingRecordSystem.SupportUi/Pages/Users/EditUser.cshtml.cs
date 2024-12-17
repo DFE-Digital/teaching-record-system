@@ -83,7 +83,7 @@ public class EditUser(
             user.Roles = newRoles;
             user.Name = Name!;
 
-            dbContext.AddEvent(new UserUpdatedEvent
+            await dbContext.AddEventAndBroadcastAsync(new UserUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
                 User = Core.Events.Models.User.FromModel(user),
@@ -110,7 +110,7 @@ public class EditUser(
 
         user.Active = false;
 
-        dbContext.AddEvent(new UserDeactivatedEvent
+        await dbContext.AddEventAndBroadcastAsync(new UserDeactivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(user),
@@ -135,7 +135,7 @@ public class EditUser(
 
         user.Active = true;
 
-        dbContext.AddEvent(new UserActivatedEvent
+        await dbContext.AddEventAndBroadcastAsync(new UserActivatedEvent
         {
             EventId = Guid.NewGuid(),
             User = Core.Events.Models.User.FromModel(user),

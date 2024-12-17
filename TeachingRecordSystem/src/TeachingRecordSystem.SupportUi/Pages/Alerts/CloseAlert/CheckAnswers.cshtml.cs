@@ -78,7 +78,7 @@ public class CheckAnswersModel(
             Changes = AlertUpdatedEventChanges.EndDate
         };
 
-        dbContext.AddEvent(updatedEvent);
+        await dbContext.AddEventAndBroadcastAsync(updatedEvent);
 
         await dbContext.SaveChangesAsync();
 

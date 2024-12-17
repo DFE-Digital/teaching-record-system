@@ -48,7 +48,7 @@ public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenera
             OldApiKey = oldApiKey,
             Changes = ApiKeyUpdatedEventChanges.Expires
         };
-        dbContext.AddEvent(@event);
+        await dbContext.AddEventAndBroadcastAsync(@event);
 
         await dbContext.SaveChangesAsync();
 

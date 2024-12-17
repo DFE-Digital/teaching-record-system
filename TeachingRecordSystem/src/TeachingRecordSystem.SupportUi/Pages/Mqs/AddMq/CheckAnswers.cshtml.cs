@@ -42,7 +42,7 @@ public class CheckAnswersModel(TrsDbContext dbContext, TrsLinkGenerator linkGene
             out var createdEvent);
 
         dbContext.MandatoryQualifications.Add(qualification);
-        dbContext.AddEvent(createdEvent);
+        await dbContext.AddEventAndBroadcastAsync(createdEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

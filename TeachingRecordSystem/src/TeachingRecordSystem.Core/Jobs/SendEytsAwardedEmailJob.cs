@@ -49,7 +49,7 @@ public class SendEytsAwardedEmailJob
         await _notificationSender.SendEmailAsync(EytsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
-        _dbContext.AddEvent(new EytsAwardedEmailSentEvent
+        _dbContext.AddEventWithoutBroadcast(new EytsAwardedEmailSentEvent
         {
             EventId = Guid.NewGuid(),
             EytsAwardedEmailsJobId = eytsAwardedEmailsJobId,

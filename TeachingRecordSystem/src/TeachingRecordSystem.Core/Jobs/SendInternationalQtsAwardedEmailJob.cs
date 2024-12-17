@@ -49,7 +49,7 @@ public class SendInternationalQtsAwardedEmailJob
         await _notificationSender.SendEmailAsync(InternationalQtsAwardedEmailConfirmationTemplateId, item.EmailAddress, item.Personalization);
         item.EmailSent = true;
 
-        _dbContext.AddEvent(new InternationalQtsAwardedEmailSentEvent
+        _dbContext.AddEventWithoutBroadcast(new InternationalQtsAwardedEmailSentEvent
         {
             EventId = Guid.NewGuid(),
             InternationalQtsAwardedEmailsJobId = internationalQtsAwardedEmailsJobId,

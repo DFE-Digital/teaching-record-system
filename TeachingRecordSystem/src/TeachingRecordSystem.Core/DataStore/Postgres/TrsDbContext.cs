@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using OpenIddict.EntityFrameworkCore.Models;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
+using TeachingRecordSystem.Core.Services.Webhooks;
 using Establishment = TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment;
 using User = TeachingRecordSystem.Core.DataStore.Postgres.Models.User;
 
@@ -11,7 +13,15 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres;
 
 public class TrsDbContext : DbContext
 {
-    public TrsDbContext(DbContextOptions<TrsDbContext> options)
+    private readonly IServiceProvider? _serviceProvider;
+
+    public TrsDbContext(DbContextOptions<TrsDbContext> options, IServiceProvider serviceProvider)
+        : base(options)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    private TrsDbContext(DbContextOptions<TrsDbContext> options)
         : base(options)
     {
     }
@@ -121,9 +131,19 @@ public class TrsDbContext : DbContext
             });
     }
 
-    public void AddEvent(EventBase @event, DateTime? inserted = null)
+    public async Task AddEventAndBroadcastAsync(EventBase @event)
     {
-        Events.Add(Event.FromEventBase(@event, inserted));
+        Events.Add(Event.FromEventBase(@event, inserted: null));
+
+        _ = _serviceProvider ?? throw new InvalidOperationException("No ServiceProvider on DbContext.");
+        var webhookMessageFactory = _serviceProvider.GetRequiredService<WebhookMessageFactory>();
+        var messages = await webhookMessageFactory.CreateMessagesAsync(this, @event, _serviceProvider);
+        WebhookMessages.AddRange(messages);
+    }
+
+    public void AddEventWithoutBroadcast(EventBase @event)
+    {
+        Events.Add(Event.FromEventBase(@event, inserted: null));
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

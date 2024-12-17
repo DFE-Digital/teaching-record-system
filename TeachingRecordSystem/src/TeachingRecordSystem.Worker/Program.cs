@@ -44,7 +44,8 @@ builder
     .AddIdentityApi()
     .AddNameSynonyms()
     .AddDqtOutboxMessageProcessorService()
-    .AddWebhookDeliveryService();
+    .AddWebhookDeliveryService()
+    .AddWebhookMessageFactory();
 
 var crmServiceClient = new ServiceClient(builder.Configuration.GetRequiredValue("ConnectionStrings:Crm"))
 {
