@@ -850,7 +850,7 @@ public partial class TestData
                 out var @createdEvent);
 
             dbContext.Alerts.Add(alert);
-            dbContext.AddEvent(createdEvent);
+            dbContext.AddEventWithoutBroadcast(createdEvent);
 
             return (alert.AlertId, [createdEvent]);
         }
@@ -1023,7 +1023,7 @@ public partial class TestData
                     DqtState = 0
                 };
 
-                dbContext.AddEvent(createdEvent);
+                dbContext.AddEventWithoutBroadcast(createdEvent);
                 events.Add(createdEvent);
             }
             else
@@ -1053,7 +1053,7 @@ public partial class TestData
                     }
                 };
 
-                dbContext.AddEvent(createdEvent);
+                dbContext.AddEventWithoutBroadcast(createdEvent);
                 events.Add(createdEvent);
             }
 
@@ -1138,7 +1138,7 @@ public partial class TestData
 
             if (@event is not null)
             {
-                dbContext.AddEvent(@event);
+                dbContext.AddEventWithoutBroadcast(@event);
                 return [@event];
             }
 

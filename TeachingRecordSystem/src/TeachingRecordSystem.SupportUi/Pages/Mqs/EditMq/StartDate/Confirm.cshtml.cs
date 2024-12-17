@@ -59,7 +59,7 @@ public class ConfirmModel(
 
         if (updatedEvent is not null)
         {
-            dbContext.AddEvent(updatedEvent);
+            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
             await dbContext.SaveChangesAsync();
         }
 

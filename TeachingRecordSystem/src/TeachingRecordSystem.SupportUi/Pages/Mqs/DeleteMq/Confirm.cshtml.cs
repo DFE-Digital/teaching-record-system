@@ -60,7 +60,7 @@ public class ConfirmModel(
             clock.UtcNow,
             out var deletedEvent);
 
-        dbContext.AddEvent(deletedEvent);
+        await dbContext.AddEventAndBroadcastAsync(deletedEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();

@@ -54,7 +54,7 @@ public class AddApiKeyModel(TrsDbContext dbContext, IClock clock, TrsLinkGenerat
             RaisedBy = User.GetUserId(),
             ApiKey = Core.Events.Models.ApiKey.FromModel(apiKey)
         };
-        dbContext.AddEvent(@event);
+        await dbContext.AddEventAndBroadcastAsync(@event);
 
         try
         {

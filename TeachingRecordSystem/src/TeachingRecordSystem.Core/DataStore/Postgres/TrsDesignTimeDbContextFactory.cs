@@ -13,9 +13,6 @@ public class TrsDesignTimeDbContextFactory : IDesignTimeDbContextFactory<TrsDbCo
 
         var connectionString = configuration.GetPostgresConnectionString();
 
-        var optionsBuilder = new DbContextOptionsBuilder<TrsDbContext>();
-        TrsDbContext.ConfigureOptions(optionsBuilder, connectionString);
-
-        return new TrsDbContext(optionsBuilder.Options);
+        return TrsDbContext.Create(connectionString);
     }
 }

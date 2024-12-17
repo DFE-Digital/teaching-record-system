@@ -229,7 +229,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
                 OldApplicationUser = oldApplicationUser,
                 Changes = changes
             };
-            dbContext.AddEvent(@event);
+            await dbContext.AddEventAndBroadcastAsync(@event);
 
             await dbContext.SaveChangesAsync();
         }

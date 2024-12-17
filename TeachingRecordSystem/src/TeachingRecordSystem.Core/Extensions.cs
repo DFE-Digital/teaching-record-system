@@ -3,12 +3,14 @@ using Hangfire.PostgreSql;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core;
 
@@ -68,6 +70,15 @@ public static class Extensions
                         UseSlidingInvisibilityTimeout = true
                     }));
         }
+
+        return builder;
+    }
+
+    public static IHostApplicationBuilder AddWebhookMessageFactory(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<WebhookMessageFactory>();
+        builder.Services.AddSingleton<EventMapperRegistry>();
+        builder.Services.TryAddSingleton<PersonInfoCache>();
 
         return builder;
     }
