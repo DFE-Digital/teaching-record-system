@@ -18,7 +18,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
     {
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    public IActionResult OnPost()
     {
         // TODO - end of journey logic
 
