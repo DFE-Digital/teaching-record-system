@@ -18,7 +18,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
 {
     [HttpPut("{trn}/cpd-induction")]
     [SwaggerOperation(
-        OperationId = "SetPersonInductionStatus",
+        OperationId = "SetPersonCpdInductionStatus",
         Summary = "Set person induction status",
         Description = "Sets the induction details of the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
@@ -42,6 +42,32 @@ public class PersonsController(IMapper mapper) : ControllerBase
         return result.ToActionResult(_ => NoContent())
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.StaleRequest, StatusCodes.Status409Conflict);
+    }
+
+    [HttpPut("{trn}/welsh-induction")]
+    [SwaggerOperation(
+        OperationId = "SetPersonWelshInductionStatus",
+        Summary = "Set person induction status",
+        Description = "Sets the induction details of the person with the given TRN.")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetWelshInduction)]
+    public async Task<IActionResult> SetWelshInductionStatusAsync(
+        [FromRoute] string trn,
+        [FromBody] SetWelshInductionStatusRequest request,
+        [FromServices] SetWelshInductionStatusHandler handler)
+    {
+        var command = new SetWelshInductionStatusCommand(
+            trn,
+            request.Passed,
+            request.StartDate,
+            request.CompletedDate);
+
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(_ => NoContent())
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 
     [HttpGet("{trn}")]

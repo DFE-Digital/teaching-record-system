@@ -182,6 +182,95 @@ public class Person
         };
     }
 
+    public bool TrySetWelshInductionStatus(
+        bool passed,
+        DateOnly? startDate,
+        DateOnly? completedDate,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now,
+        [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
+    {
+        var newStatus = GetInductionStatusFromWelshOutcome(passed, out var exemptionReasons);
+
+        // FUTURE When we have QTS in TRS - assert person has QTS
+        AssertInductionChangeIsValid(newStatus, startDate, completedDate, exemptionReasons);
+
+        if (InductionStatus is InductionStatus.RequiredToComplete)
+        {
+            if (newStatus == InductionStatus.Exempt)
+            {
+                InductionStatus = newStatus;
+                InductionExemptionReasons = exemptionReasons;
+                InductionModifiedOn = now;
+
+                @event = new PersonInductionUpdatedEvent
+                {
+                    PersonId = PersonId,
+                    InductionStatus = newStatus,
+                    InductionStartDate = startDate,
+                    InductionCompletedDate = completedDate,
+                    InductionExemptionReasons = InductionExemptionReasons,
+                    CpdInductionStatus = default,
+                    CpdInductionStartDate = default,
+                    CpdInductionCompletedDate = default,
+                    CpdInductionCpdModifiedOn = default,
+                    ChangeReason = null,
+                    ChangeReasonDetail = null,
+                    EvidenceFile = null,
+                    Changes = PersonInductionUpdatedEventChanges.InductionStatus |
+                        PersonInductionUpdatedEventChanges.InductionStartDate |
+                        PersonInductionUpdatedEventChanges.InductionCompletedDate,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = now,
+                    RaisedBy = updatedBy
+                };
+
+                return true;
+            }
+            else if (newStatus == InductionStatus.FailedInWales)
+            {
+                InductionStatus = newStatus;
+                InductionModifiedOn = now;
+
+                @event = new PersonInductionUpdatedEvent
+                {
+                    PersonId = PersonId,
+                    InductionStatus = newStatus,
+                    InductionStartDate = null,
+                    InductionCompletedDate = null,
+                    InductionExemptionReasons = exemptionReasons,
+                    CpdInductionStatus = default,
+                    CpdInductionStartDate = default,
+                    CpdInductionCompletedDate = default,
+                    CpdInductionCpdModifiedOn = default,
+                    ChangeReason = null,
+                    ChangeReasonDetail = null,
+                    EvidenceFile = null,
+                    Changes = PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons,
+                    EventId = Guid.NewGuid(),
+                    CreatedUtc = now,
+                    RaisedBy = updatedBy
+                };
+
+                return true;
+            }
+        }
+
+        @event = null;
+        return false;
+    }
+
+    public static InductionStatus GetInductionStatusFromWelshOutcome(bool passed, out InductionExemptionReasons exemptionReasons)
+    {
+        var status = passed ? InductionStatus.Exempt : InductionStatus.FailedInWales;
+
+        exemptionReasons = passed
+            ? InductionExemptionReasons.PassedInductionInWales
+            : InductionExemptionReasons.None;
+
+        return status;
+    }
+
     public static bool ValidateInductionData(
         InductionStatus status,
         DateOnly? startDate,
