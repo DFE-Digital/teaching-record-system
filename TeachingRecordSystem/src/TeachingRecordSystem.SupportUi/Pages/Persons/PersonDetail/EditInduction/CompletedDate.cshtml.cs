@@ -7,7 +7,7 @@ public class CompletedDateModel : CommonJourneyPage
 {
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReason;
 
-    public CompletedDateModel(TrsLinkGenerator linkGenerator) :base(linkGenerator)
+    public CompletedDateModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
     }
 

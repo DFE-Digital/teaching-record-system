@@ -17,7 +17,7 @@ public class StartDateModel : CommonJourneyPage
         }
     }
 
-    public StartDateModel(TrsLinkGenerator linkGenerator) :base(linkGenerator)
+    public StartDateModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
     }
 
