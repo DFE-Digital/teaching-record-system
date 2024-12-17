@@ -24,7 +24,7 @@ public class StatusModel : CommonJourneyPage
             };
         }
     }
-    public string BackLink => _linkGenerator.PersonInduction(PersonId);
+    public string BackLink => LinkGenerator.PersonInduction(PersonId);
 
     public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
     {

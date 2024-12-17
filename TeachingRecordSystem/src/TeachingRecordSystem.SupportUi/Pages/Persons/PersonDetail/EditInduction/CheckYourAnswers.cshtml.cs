@@ -24,6 +24,6 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public Func<Guid, JourneyInstanceId, string> NextPage()
     {
-        return (Id, journeyInstanceId) => _linkGenerator.PersonInduction(Id);
+        return (Id, journeyInstanceId) => LinkGenerator.PersonInduction(Id);
     }
 }
