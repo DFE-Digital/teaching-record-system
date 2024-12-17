@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class ExemptionReasonModel : CommonJourneyPage
 {
-    public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReason;
+    public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
     public string BackLink
     {
         // TODO - more logic needed when other routes to exemption reason are added

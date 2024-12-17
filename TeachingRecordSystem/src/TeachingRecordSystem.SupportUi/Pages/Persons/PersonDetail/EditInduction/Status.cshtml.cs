@@ -10,7 +10,7 @@ public class StatusModel : CommonJourneyPage
     protected TrsDbContext _dbContext;
 
     [BindProperty]
-    public override InductionStatus InductionStatus { get; set; }
+    public InductionStatus InductionStatus { get; set; }
 
     public InductionJourneyPage NextPage
     {
@@ -18,9 +18,9 @@ public class StatusModel : CommonJourneyPage
         {
             return InductionStatus switch
             {
-                _ when InductionStatus.RequiresExemptionReason() => InductionJourneyPage.ExemptionReason,
+                _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
                 _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
-                _ => InductionJourneyPage.ChangeReason
+                _ => InductionJourneyPage.ChangeReasons
             };
         }
     }
@@ -41,10 +41,6 @@ public class StatusModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.InductionStatus = InductionStatus;
-            if (state.JourneyStartPage == null)
-            {
-                state.JourneyStartPage = InductionJourneyPage.Status;
-            }
         });
 
         return Redirect(PageLink(NextPage));
@@ -52,9 +48,8 @@ public class StatusModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId);
+        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
 
         await next();
     }
-
 }

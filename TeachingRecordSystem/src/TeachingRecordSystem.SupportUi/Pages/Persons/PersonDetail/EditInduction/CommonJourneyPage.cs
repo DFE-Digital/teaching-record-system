@@ -7,11 +7,11 @@ public abstract class CommonJourneyPage : PageModel
 {
     protected TrsLinkGenerator _linkGenerator;
     public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
-    public virtual InductionStatus InductionStatus
-    {
-        get { return JourneyInstance!.State.InductionStatus; }
-        set { }
-    }
+    //public virtual InductionStatus InductionStatus
+    //{
+    //    get { return JourneyInstance!.State.InductionStatus; }
+    //    set { }
+    //}
 
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -35,8 +35,8 @@ public abstract class CommonJourneyPage : PageModel
             InductionJourneyPage.CompletedDate => _linkGenerator.InductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId),
             InductionJourneyPage.ExemptionReason => _linkGenerator.InductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId),
             InductionJourneyPage.StartDate => _linkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId),
-            InductionJourneyPage.ChangeReason => _linkGenerator.InductionChangeReason(PersonId, JourneyInstance!.InstanceId),
-            InductionJourneyPage.CheckYourAnswers => _linkGenerator.InductionCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
+            InductionJourneyPage.ChangeReasons => _linkGenerator.InductionChangeReason(PersonId, JourneyInstance!.InstanceId),
+            InductionJourneyPage.CheckAnswers => _linkGenerator.InductionCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => _linkGenerator.PersonInduction(PersonId)
         };
     }

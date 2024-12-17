@@ -6,6 +6,6 @@ public enum InductionJourneyPage
     ExemptionReason,
     StartDate,
     CompletedDate,
-    ChangeReason,
-    CheckYourAnswers
+    ChangeReasons,
+    CheckAnswers
 }

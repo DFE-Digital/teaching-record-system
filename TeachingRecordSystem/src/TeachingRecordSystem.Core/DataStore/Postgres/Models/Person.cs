@@ -191,7 +191,7 @@ public class Person
     {
         var requiresStartDate = status.RequiresStartDate();
         var requiresCompletedDate = status.RequiresCompletedDate();
-        var requiresExemptionReason = status.RequiresExemptionReason();
+        var requiresExemptionReason = status.RequiresExemptionReasons();
 
         if (requiresStartDate && startDate is null)
         {

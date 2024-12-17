@@ -31,8 +31,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(
-            personBuilder => personBuilder
-                .WithInductionStatus(inductionBuilder => inductionBuilder
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
                     .WithStatus(inductionStatus)));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -74,7 +75,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_RedirectsToExpectedPage(string fromPage)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -111,7 +112,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         InductionStatus inductionStatus = InductionStatus.Passed;
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -154,7 +155,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task FollowingRedirect_BacklinkContainsExpected(string fromPage, InductionStatus inductionStatus)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

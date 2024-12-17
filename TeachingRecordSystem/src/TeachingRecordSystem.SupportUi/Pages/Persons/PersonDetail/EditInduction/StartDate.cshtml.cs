@@ -5,13 +5,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StartDateModel : CommonJourneyPage
 {
+    public InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+
     public InductionJourneyPage NextPage
     {
         get
         {
             return InductionStatus.RequiresCompletedDate()
                 ? InductionJourneyPage.CompletedDate
-                : InductionJourneyPage.ChangeReason;
+                : InductionJourneyPage.ChangeReasons;
         }
     }
 
@@ -31,7 +33,7 @@ public class StartDateModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
-        InductionStatus = JourneyInstance!.State.InductionStatus;
+        //InductionStatus = JourneyInstance!.State.InductionStatus;
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the start date

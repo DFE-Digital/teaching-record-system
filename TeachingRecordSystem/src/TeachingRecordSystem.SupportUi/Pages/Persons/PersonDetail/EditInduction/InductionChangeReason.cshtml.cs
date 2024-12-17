@@ -5,7 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class InductionChangeReasonModel : CommonJourneyPage
 {
-    public InductionJourneyPage NextPage => InductionJourneyPage.CheckYourAnswers;
+    public InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    public InductionJourneyPage NextPage => InductionJourneyPage.CheckAnswers;
     public string BackLink
     {
         get
@@ -14,7 +15,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
             {
                 _ when InductionStatus.RequiresCompletedDate() => PageLink(InductionJourneyPage.CompletedDate),
                 _ when InductionStatus.RequiresStartDate() => PageLink(InductionJourneyPage.StartDate),
-                _ when InductionStatus.RequiresExemptionReason() => PageLink(InductionJourneyPage.ExemptionReason),
+                _ when InductionStatus.RequiresExemptionReasons() => PageLink(InductionJourneyPage.ExemptionReason),
                 _ => PageLink(InductionJourneyPage.Status),
             };
         }

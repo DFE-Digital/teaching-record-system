@@ -19,7 +19,7 @@ public class EditInductionState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
-    public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId)
+    public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId, InductionJourneyPage startPage)
     {
         if (Initialized)
         {
@@ -28,6 +28,10 @@ public class EditInductionState : IRegisterJourney
         var person = await dbContext.Persons
             .SingleAsync(q => q.PersonId == personId);
         InductionStatus = person!.InductionStatus;
+        if (JourneyStartPage == null)
+        {
+            JourneyStartPage = startPage;
+        }
 
         Initialized = true;
     }

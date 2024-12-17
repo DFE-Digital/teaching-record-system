@@ -53,7 +53,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Author
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gen", "gen", "{5E273A79-2EA3-46CD-9049-769F880868FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Api.Generator", "gen\TeachingRecordSystem.Api.Generator\TeachingRecordSystem.Api.Generator.csproj", "{7EA8C0A7-C149-4928-8E37-55D44976D765}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.Api.Generator", "gen\TeachingRecordSystem.Api.Generator\TeachingRecordSystem.Api.Generator.csproj", "{7EA8C0A7-C149-4928-8E37-55D44976D765}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
