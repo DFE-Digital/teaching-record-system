@@ -9,16 +9,17 @@ public class CheckYourAnswersModel : CommonJourneyPage
     {
     }
 
+    public string BackLink
+    {
+        get => PageLink(InductionJourneyPage.ChangeReason);
+    }
+
     public void OnGet()
     {
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            state.PageBreadcrumb = InductionJourneyPage.CheckYourAnswers;
-        });
         // TODO - end of journey logic
 
         return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));

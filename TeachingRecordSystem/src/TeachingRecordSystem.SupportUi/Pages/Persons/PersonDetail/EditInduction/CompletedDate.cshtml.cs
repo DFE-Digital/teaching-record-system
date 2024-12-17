@@ -6,6 +6,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class CompletedDateModel : CommonJourneyPage
 {
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReason;
+    public string BackLink
+    {
+        // TODO - more logic needed when other routes to completed-date are added
+        get => PageLink(InductionJourneyPage.StartDate);
+    }
 
     public CompletedDateModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
@@ -20,7 +25,10 @@ public class CompletedDateModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the completed date
-            state.PageBreadcrumb = InductionJourneyPage.CompletedDate;
+            if (state.JourneyStartPage == null)
+            {
+                state.JourneyStartPage = InductionJourneyPage.CompletedDate;
+            }
         });
 
         return Redirect(PageLink(NextPage));

@@ -6,6 +6,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class ExemptionReasonModel : CommonJourneyPage
 {
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReason;
+    public string BackLink
+    {
+        // TODO - more logic needed when other routes to exemption reason are added
+        get => PageLink(InductionJourneyPage.Status);
+    }
 
     public ExemptionReasonModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
@@ -20,7 +25,10 @@ public class ExemptionReasonModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the exemption reason
-            state.PageBreadcrumb = InductionJourneyPage.ExemptionReason;
+            if (state.JourneyStartPage == null)
+            {
+                state.JourneyStartPage = InductionJourneyPage.ExemptionReason;
+            }
         });
 
         return Redirect(PageLink(NextPage));

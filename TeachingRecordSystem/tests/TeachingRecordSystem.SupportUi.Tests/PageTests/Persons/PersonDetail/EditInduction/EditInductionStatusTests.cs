@@ -3,7 +3,6 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-
 public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]

@@ -10,7 +10,7 @@ public class StatusModel : CommonJourneyPage
     protected TrsDbContext _dbContext;
 
     [BindProperty]
-    public InductionStatus InductionStatus { get; set; }
+    public override InductionStatus InductionStatus { get; set; }
 
     public InductionJourneyPage NextPage
     {
@@ -24,6 +24,7 @@ public class StatusModel : CommonJourneyPage
             };
         }
     }
+    public string BackLink => _linkGenerator.PersonInduction(PersonId);
 
     public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
     {
@@ -40,7 +41,10 @@ public class StatusModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.InductionStatus = InductionStatus;
-            state.PageBreadcrumb = InductionJourneyPage.Status;
+            if (state.JourneyStartPage == null)
+            {
+                state.JourneyStartPage = InductionJourneyPage.Status;
+            }
         });
 
         return Redirect(PageLink(NextPage));

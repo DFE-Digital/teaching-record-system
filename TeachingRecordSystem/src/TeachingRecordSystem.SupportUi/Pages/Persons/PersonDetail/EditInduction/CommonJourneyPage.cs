@@ -6,13 +6,16 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 public abstract class CommonJourneyPage : PageModel
 {
     public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
+    public virtual InductionStatus InductionStatus
+    {
+        get { return JourneyInstance!.State.InductionStatus; }
+        set { }
+    }
 
     protected TrsLinkGenerator _linkGenerator;
 
     [FromRoute]
     public Guid PersonId { get; set; }
-
-    public string BackLink => PageLink(JourneyInstance!.State.PageBreadcrumb);
 
     protected CommonJourneyPage(TrsLinkGenerator linkGenerator)
     {

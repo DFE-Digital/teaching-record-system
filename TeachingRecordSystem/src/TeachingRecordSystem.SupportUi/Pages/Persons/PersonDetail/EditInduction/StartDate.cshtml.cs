@@ -5,8 +5,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StartDateModel : CommonJourneyPage
 {
-    public InductionStatus InductionStatus { get; set; }
-
     public InductionJourneyPage NextPage
     {
         get
@@ -17,13 +15,18 @@ public class StartDateModel : CommonJourneyPage
         }
     }
 
+    public string BackLink
+    {
+        // TODO - more logic needed when other routes to start-date are added
+        get => PageLink(InductionJourneyPage.Status);
+    }
+
     public StartDateModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
     }
 
     public void OnGet()
     {
-        InductionStatus = JourneyInstance!.State.InductionStatus;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -32,7 +35,10 @@ public class StartDateModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the start date
-            state.PageBreadcrumb = InductionJourneyPage.StartDate;
+            if (state.JourneyStartPage == null)
+            {
+                state.JourneyStartPage = InductionJourneyPage.StartDate;
+            }
         });
 
         return Redirect(PageLink(NextPage));

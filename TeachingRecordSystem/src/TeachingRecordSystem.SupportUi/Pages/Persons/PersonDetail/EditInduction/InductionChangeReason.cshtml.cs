@@ -6,6 +6,19 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class InductionChangeReasonModel : CommonJourneyPage
 {
     public InductionJourneyPage NextPage => InductionJourneyPage.CheckYourAnswers;
+    public string BackLink
+    {
+        get
+        {
+            return InductionStatus switch
+            {
+                _ when InductionStatus.RequiresCompletedDate() => PageLink(InductionJourneyPage.CompletedDate),
+                _ when InductionStatus.RequiresStartDate() => PageLink(InductionJourneyPage.StartDate),
+                _ when InductionStatus.RequiresExemptionReason() => PageLink(InductionJourneyPage.ExemptionReason),
+                _ => PageLink(InductionJourneyPage.Status),
+            };
+        }
+    }
 
     public InductionChangeReasonModel(TrsLinkGenerator linkGenerator) : base(linkGenerator)
     {
@@ -20,7 +33,6 @@ public class InductionChangeReasonModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the change reason
-            state.PageBreadcrumb = InductionJourneyPage.ChangeReason;
         });
 
         return Redirect(PageLink(NextPage));
