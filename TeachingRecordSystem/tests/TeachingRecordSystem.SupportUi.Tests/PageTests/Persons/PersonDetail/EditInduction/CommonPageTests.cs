@@ -108,7 +108,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("edit-induction/exemption-reasons", InductionJourneyPage.ExemptionReason)]
     [InlineData("edit-induction/start-date", InductionJourneyPage.StartDate)]
     [InlineData("edit-induction/date-completed", InductionJourneyPage.CompletedDate)]
-    public async Task Post_PersistsBacklinkBreadcrumb(string page, InductionJourneyPage pageName)
+    public async Task Post_PersistsStartPage(string page, InductionJourneyPage pageName)
     {
         // Arrange
         InductionStatus inductionStatus = InductionStatus.Passed;

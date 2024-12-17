@@ -41,6 +41,10 @@ public class StatusModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.InductionStatus = InductionStatus;
+            if (state.JourneyStartPage == null)
+            {
+                state.JourneyStartPage = InductionJourneyPage.Status;
+            }
         });
 
         return Redirect(PageLink(NextPage));

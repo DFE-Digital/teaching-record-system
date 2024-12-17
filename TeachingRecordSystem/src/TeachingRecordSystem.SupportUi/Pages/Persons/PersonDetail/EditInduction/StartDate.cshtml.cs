@@ -33,7 +33,6 @@ public class StartDateModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
-        //InductionStatus = JourneyInstance!.State.InductionStatus;
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             // TODO - store the start date
