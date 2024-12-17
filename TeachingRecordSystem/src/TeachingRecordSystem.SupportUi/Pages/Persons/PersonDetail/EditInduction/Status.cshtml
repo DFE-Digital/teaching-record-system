@@ -1,7 +1,7 @@
 @page "/persons/{PersonId}/edit-induction/status"
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction.StatusModel
 @{
-    ViewBag.Title = "Edit status: " + Model.InductionStatus.GetName();
+    ViewBag.Title = "What is their induction status?";
 }
 
 @section BeforeContent {
@@ -12,7 +12,17 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Induction - @Model.PersonName</span>
         <form data-testid="submit-form" action="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-radios asp-for="InductionStatus">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+                    @foreach (var inductionStatus in InductionStatusRegistry.All)
+                    {
+                        <govuk-radios-item value="@inductionStatus">@inductionStatus.Name</govuk-radios-item>
+                    }
+                </govuk-radios-fieldset>
+            </govuk-radios>
             <input type="hidden" name="InductionStatus" value="@Model.InductionStatus" />
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>

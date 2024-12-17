@@ -68,20 +68,12 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         StartDate = person!.InductionStartDate;
         CompletionDate = person!.InductionCompletedDate;
         ExemptionReasons = person!.InductionExemptionReasons;
-        _statusIsManagedByCpd = StatusManagedByCpdRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
+        _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
     }
 
     private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)
     {
         return qtsDate is null;
-    }
-
-    private bool StatusManagedByCpdRule(InductionStatus? status, DateOnly? inductionCompletedDate)
-    {
-        var sevenYearsAgo = clock.Today.AddYears(-7);
-        return status is not null
-            && inductionCompletedDate is not null
-            && inductionCompletedDate < sevenYearsAgo;
     }
 }

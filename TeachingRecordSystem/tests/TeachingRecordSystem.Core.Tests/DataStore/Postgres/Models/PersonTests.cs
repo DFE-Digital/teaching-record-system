@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Core.Tests.DataStore.Postgres.Models;
 
@@ -227,5 +228,34 @@ public class PersonTests
         Assert.True(result);
         Assert.Equal(expectedStatus, person.InductionStatus);
         Assert.Equal(expectedExemptionReasons, person.InductionExemptionReasons);
+    }
+
+    [Theory]
+    [InlineData(-3, false)]
+    [InlineData(-7, true)]
+    public void InductionManagedByCpd_ReturnsTrue(int yearsSinceCompleted, bool expected)
+    {
+        // CML TODO figure out the date-time types
+        // Arrange
+        var dateTimeCompleted = Clock.UtcNow.AddYears(yearsSinceCompleted).AddDays(-1);
+        var dateCompleted = dateTimeCompleted.ToDateOnlyWithDqtBstFix(true);
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            CreatedOn = dateTimeCompleted,
+            UpdatedOn = dateTimeCompleted,
+            Trn = "1234567",
+            FirstName = "Joe",
+            MiddleName = "",
+            LastName = "Bloggs",
+            DateOfBirth = new(1990, 1, 1),
+        };
+        person.SetInductionStatus(InductionStatus.Passed, dateCompleted, dateCompleted, InductionExemptionReasons.None, SystemUser.SystemUserId, Clock.UtcNow, out _);
+
+        // Act
+        var result = person.InductionStatusManagedByCpd(Clock.UtcNow.ToDateOnlyWithDqtBstFix(true));
+
+        // Assert
+        Assert.Equal(expected,result);
     }
 }

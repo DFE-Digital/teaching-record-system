@@ -10,6 +10,7 @@ public class EditInductionState : IRegisterJourney
         requestDataKeys: ["personId"],
         appendUniqueKey: true);
 
+    public string? PersonName { get; set; }
     public InductionStatus InductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
@@ -28,6 +29,7 @@ public class EditInductionState : IRegisterJourney
         var person = await dbContext.Persons
             .SingleAsync(q => q.PersonId == personId);
         InductionStatus = person!.InductionStatus;
+        PersonName = person.LastName;
         if (JourneyStartPage == null)
         {
             JourneyStartPage = startPage;

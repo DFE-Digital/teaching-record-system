@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -10,7 +11,10 @@ public class StatusModel : CommonJourneyPage
     protected TrsDbContext _dbContext;
 
     [BindProperty]
+    [Display(Name = "Select a status")]
+    [Required(ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
+    public string? PersonName { get; set; }
 
     public InductionJourneyPage NextPage
     {
@@ -34,6 +38,7 @@ public class StatusModel : CommonJourneyPage
     public void OnGet()
     {
         InductionStatus = JourneyInstance!.State.InductionStatus;
+        PersonName = JourneyInstance!.State.PersonName;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -53,6 +58,10 @@ public class StatusModel : CommonJourneyPage
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
 
         await next();
     }
