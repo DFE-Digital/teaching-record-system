@@ -5,14 +5,13 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 public abstract class CommonJourneyPage : PageModel
 {
+    protected TrsLinkGenerator _linkGenerator;
     public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
     public virtual InductionStatus InductionStatus
     {
         get { return JourneyInstance!.State.InductionStatus; }
         set { }
     }
-
-    protected TrsLinkGenerator _linkGenerator;
 
     [FromRoute]
     public Guid PersonId { get; set; }

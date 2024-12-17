@@ -9,10 +9,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
     {
     }
 
-    public string BackLink
-    {
-        get => PageLink(InductionJourneyPage.ChangeReason);
-    }
+    public string BackLink => PageLink(InductionJourneyPage.ChangeReason);
 
     public void OnGet()
     {
