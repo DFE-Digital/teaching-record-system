@@ -10,50 +10,19 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record SetCpdInductionStatusCommand(
-    string Trn,
-    InductionStatus Status,
-    DateOnly? StartDate,
-    DateOnly? CompletedDate,
-    DateTime CpdModifiedOn);
+public record SetWelshInductionStatusCommand(string Trn, bool Passed, DateOnly StartDate, DateOnly CompletedDate);
 
-public record SetCpdInductionStatusResult;
+public record SetWelshInductionStatusResult;
 
-public class SetCpdInductionStatusHandler(
+public class SetWelshInductionStatusHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     TrsDataSyncHelper syncHelper,
     ICurrentUserProvider currentUserProvider,
     IClock clock)
 {
-    public async Task<ApiResult<SetCpdInductionStatusResult>> HandleAsync(SetCpdInductionStatusCommand command)
+    public async Task<ApiResult<SetWelshInductionStatusResult>> HandleAsync(SetWelshInductionStatusCommand command)
     {
-        if (command.Status is not InductionStatus.RequiredToComplete and not InductionStatus.InProgress
-            and not InductionStatus.Passed and not InductionStatus.Failed)
-        {
-            return ApiError.InvalidInductionStatus(command.Status);
-        }
-
-        if (command.Status.RequiresStartDate() && command.StartDate is null)
-        {
-            return ApiError.InductionStartDateIsRequired(command.Status);
-        }
-
-        if (!command.Status.RequiresStartDate() && command.StartDate is not null)
-        {
-            return ApiError.InductionStartDateIsNotPermitted(command.Status);
-        }
-
-        if (command.Status.RequiresCompletedDate() && command.CompletedDate is null)
-        {
-            return ApiError.InductionCompletedDateIsRequired(command.Status);
-        }
-
-        if (!command.Status.RequiresCompletedDate() && command.CompletedDate is not null)
-        {
-            return ApiError.InductionCompletedDateIsNotPermitted(command.Status);
-        }
-
         var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveContactByTrnQuery(command.Trn, new ColumnSet(Contact.Fields.dfeta_QTSDate)));
 
@@ -84,19 +53,12 @@ public class SetCpdInductionStatusHandler(
             Debug.Assert(person is not null);
         }
 
-        if (person.CpdInductionCpdModifiedOn is DateTime cpdInductionCpdModifiedOn &&
-            command.CpdModifiedOn < cpdInductionCpdModifiedOn)
-        {
-            return ApiError.StaleRequest(cpdInductionCpdModifiedOn);
-        }
-
         var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        person.SetCpdInductionStatus(
-            command.Status,
-            command.StartDate,
-            command.CompletedDate,
-            command.CpdModifiedOn,
+        person.TrySetWelshInductionStatus(
+            command.Passed,
+            !command.Passed ? command.StartDate : null,
+            !command.Passed ? command.CompletedDate : null,
             currentUserId,
             clock.UtcNow,
             out var updatedEvent);
@@ -109,7 +71,7 @@ public class SetCpdInductionStatusHandler(
         await dbContext.SaveChangesAsync();
         await txn.CommitAsync();
 
-        return new SetCpdInductionStatusResult();
+        return new SetWelshInductionStatusResult();
 
         Task<Person?> GetPersonAsync() => dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
     }
