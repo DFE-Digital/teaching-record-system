@@ -18,4 +18,5 @@ public static class JourneyNames
     public const string CloseAlert = nameof(CloseAlert);
     public const string ReopenAlert = nameof(ReopenAlert);
     public const string DeleteAlert = nameof(DeleteAlert);
+    public const string EditInduction = nameof(EditInduction);
 }

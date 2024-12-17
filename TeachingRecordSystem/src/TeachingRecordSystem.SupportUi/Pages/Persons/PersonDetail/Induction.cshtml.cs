@@ -16,6 +16,7 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
     [FromRoute]
     public Guid PersonId { get; set; }
 
+    [BindProperty]
     public InductionStatus Status { get; set; }
 
     public DateOnly? StartDate { get; set; }

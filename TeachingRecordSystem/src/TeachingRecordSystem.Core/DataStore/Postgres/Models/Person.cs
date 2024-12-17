@@ -280,6 +280,7 @@ public class Person
     {
         var requiresStartDate = status.RequiresStartDate();
         var requiresCompletedDate = status.RequiresCompletedDate();
+        var requiresExemptionReason = status.RequiresExemptionReasons();
 
         if (requiresStartDate && startDate is null)
         {
@@ -305,13 +306,13 @@ public class Person
             return false;
         }
 
-        if (status is InductionStatus.Exempt && exemptionReasons == InductionExemptionReasons.None)
+        if (requiresExemptionReason && exemptionReasons == InductionExemptionReasons.None)
         {
             error = $"Exemption reasons cannot be {nameof(InductionExemptionReasons.None)} when the status is: '{status}'.";
             return false;
         }
 
-        if (status is not InductionStatus.Exempt && exemptionReasons != InductionExemptionReasons.None)
+        if (!requiresExemptionReason && exemptionReasons != InductionExemptionReasons.None)
         {
             error = $"Exemption reasons must be {nameof(InductionExemptionReasons.None)} when the status is: '{status}'.";
             return false;

@@ -169,6 +169,42 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string AlertDeleteCheckAnswersCancel(Guid alertId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Alerts/DeleteAlert/CheckAnswers", "cancel", routeValues: new { alertId }, journeyInstanceId: journeyInstanceId);
 
+    public string InductionEditStatus(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditStatusCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/Status", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditExemptionReason(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/ExemptionReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditExemptionReasonCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/ExemptionReason", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditStartDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/StartDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditStartDateCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/StartDate", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditCompletedDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CompletedDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionEditCompletedDateCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CompletedDate", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionChangeReason(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/InductionChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionChangeReasonCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/InductionChangeReason", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionCheckYourAnswers(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string InductionCheckYourAnswersCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+    GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 
     public string ChangeRequestDocument(string ticketNumber, Guid documentId) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", "documents", routeValues: new { ticketNumber, id = documentId });

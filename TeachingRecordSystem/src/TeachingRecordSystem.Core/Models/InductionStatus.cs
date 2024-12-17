@@ -8,7 +8,7 @@ public enum InductionStatus
     None = 0,
     [InductionStatusInfo("required to complete", requiresStartDate: false, requiresCompletedDate: false)]
     RequiredToComplete = 1,
-    [InductionStatusInfo("exempt", requiresStartDate: false, requiresCompletedDate: false)]
+    [InductionStatusInfo("exempt", requiresStartDate: false, requiresCompletedDate: false, requiresExemptionReasons: true)]
     Exempt = 2,
     [InductionStatusInfo("in progress", requiresStartDate: true, requiresCompletedDate: false)]
     InProgress = 3,
@@ -34,6 +34,8 @@ public static class InductionStatusRegistry
     public static bool RequiresStartDate(this InductionStatus status) => _info[status].RequiresStartDate;
 
     public static bool RequiresCompletedDate(this InductionStatus status) => _info[status].RequiresCompletedDate;
+
+    public static bool RequiresExemptionReasons(this InductionStatus status) => _info[status].RequiresExemptionReasons;
 
     public static InductionStatus ToInductionStatus(this dfeta_InductionStatus status) =>
         ToInductionStatus((dfeta_InductionStatus?)status);
@@ -61,19 +63,20 @@ public static class InductionStatusRegistry
                .GetCustomAttribute<InductionStatusInfoAttribute>() ??
            throw new Exception($"{nameof(InductionStatus)}.{status} is missing the {nameof(InductionStatusInfoAttribute)} attribute.");
 
-        return new InductionStatusInfo(status, attr.Name, attr.RequiresStartDate, attr.RequiresCompletedDate);
+        return new InductionStatusInfo(status, attr.Name, attr.RequiresStartDate, attr.RequiresCompletedDate, attr.RequiresExemptionReason);
     }
 }
 
-public sealed record InductionStatusInfo(InductionStatus Value, string Name, bool RequiresStartDate, bool RequiresCompletedDate)
+public sealed record InductionStatusInfo(InductionStatus Value, string Name, bool RequiresStartDate, bool RequiresCompletedDate, bool RequiresExemptionReasons = false)
 {
     public string Title => Name[0..1].ToUpper() + Name[1..];
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-file sealed class InductionStatusInfoAttribute(string name, bool requiresStartDate, bool requiresCompletedDate) : Attribute
+file sealed class InductionStatusInfoAttribute(string name, bool requiresStartDate, bool requiresCompletedDate, bool requiresExemptionReasons = false) : Attribute
 {
     public string Name => name;
     public bool RequiresStartDate => requiresStartDate;
     public bool RequiresCompletedDate => requiresCompletedDate;
+    public bool RequiresExemptionReason => requiresExemptionReasons;
 }
