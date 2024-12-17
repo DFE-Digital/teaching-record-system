@@ -118,7 +118,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithQts()
                 .WithInductionStatus(builder => builder
                     .WithStatus(setInductionStatus)
-                    .WithExemptionReasons(InductionExemptionReasons.SomethingMadeUpForNow)
+                    .WithExemptionReasons(InductionExemptionReasons.QualifiedBefore07052000)
                     )
                 );
 
@@ -132,7 +132,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
         var exemptionReason = doc.GetElementByTestId("induction-exemption-reasons")!.Children[1].TextContent;
-        Assert.Contains("SomethingMadeUpForNow", exemptionReason); // CML TODO - needs proper mapping to string
+        Assert.Contains("QualifiedBefore07052000", exemptionReason); // CML TODO - needs proper mapping to string
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
         Assert.Null(doc.GetElementByTestId("induction-end-date"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
