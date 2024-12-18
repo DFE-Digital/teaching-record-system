@@ -31,6 +31,7 @@ using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
@@ -226,7 +227,8 @@ public class Program
             .AddIdentityApi()
             .AddNameSynonyms()
             .AddDqtOutboxMessageSerializer()
-            .AddWebhookOptions();
+            .AddWebhookOptions()
+            .AddTrsSyncHelper();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();

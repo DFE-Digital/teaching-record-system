@@ -17,6 +17,7 @@ using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.ServiceDefaults;
 using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 using TeachingRecordSystem.SupportUi;
@@ -152,7 +153,9 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     }
 }
 
-builder.AddBlobStorage();
+builder
+    .AddBlobStorage()
+    .AddTrsSyncHelper();
 
 builder.Services
     .AddTrsBaseServices()
