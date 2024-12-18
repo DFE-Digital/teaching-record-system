@@ -11,7 +11,7 @@ public class EditInductionState : IRegisterJourney
         appendUniqueKey: true);
 
     public InductionStatus InductionStatus { get; set; }
-    public InductionStatus InitialInductionStatus{ get; set; }
+    public InductionStatus InitialInductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
     public InductionExemptionReasons? ExemptionReasons { get; set; }

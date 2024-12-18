@@ -67,7 +67,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Theory]
-    [InlineData(InductionStatus.RequiredToComplete, new InductionStatus[] {InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.RequiredToComplete, new InductionStatus[] { InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Exempt, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.InProgress, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Failed, InductionStatus.FailedInWales })]

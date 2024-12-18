@@ -256,6 +256,6 @@ public class PersonTests
         var result = person.InductionStatusManagedByCpd(Clock.UtcNow.ToDateOnlyWithDqtBstFix(true));
 
         // Assert
-        Assert.Equal(expected,result);
+        Assert.Equal(expected, result);
     }
 }
