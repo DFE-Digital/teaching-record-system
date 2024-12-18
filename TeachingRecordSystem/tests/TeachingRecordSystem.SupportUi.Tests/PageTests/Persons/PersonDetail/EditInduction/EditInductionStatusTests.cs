@@ -173,6 +173,34 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Exempt", journeyInstance.State.InductionStatus.GetTitle());
     }
 
+    [Fact]
+    public async Task Post_NoSelectedStatus_ShowsPageError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState()
+            {
+                Initialized = true,
+                InductionStatus = InductionStatus.Passed
+            });
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["InductionStatus"] = InductionStatus.None.ToString()
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
+    }
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,
