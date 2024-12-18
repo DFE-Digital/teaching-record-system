@@ -1,4 +1,6 @@
-namespace TeachingRecordSystem.Api;
+using Microsoft.Extensions.Configuration;
+
+namespace TeachingRecordSystem.Core.ApiSchema;
 
 public static class VersionRegistry
 {

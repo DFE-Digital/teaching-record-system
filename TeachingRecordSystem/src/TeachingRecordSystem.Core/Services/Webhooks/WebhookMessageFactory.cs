@@ -35,7 +35,11 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
             async e =>
             {
                 e.SetAbsoluteExpiration(_webhookEndpointsCacheDuration);
-                return await dbContext.WebhookEndpoints.AsNoTracking().Where(e => e.Enabled).ToArrayAsync();
+
+                return await dbContext.WebhookEndpoints
+                    .AsNoTracking()
+                    .Where(e => e.Enabled && e.ApplicationUser.Active)
+                    .ToArrayAsync();
             });
 
         var endpointCloudEventTypeVersions = endpoints!
