@@ -68,6 +68,10 @@ public class StatusModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.InductionStatus = InductionStatus;
