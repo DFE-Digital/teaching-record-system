@@ -226,7 +226,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCPD_ShowsWarning()
     {
         //Arrange
-        var expectedWarning = "To change a teacher’s induction status ";
+        var expectedWarning = "To change this teacher’s induction status ";
         var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
 
         var person = await TestData.CreatePersonAsync();

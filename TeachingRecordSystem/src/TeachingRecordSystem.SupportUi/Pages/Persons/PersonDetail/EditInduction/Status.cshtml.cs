@@ -9,7 +9,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StatusModel : CommonJourneyPage
 {
-    private static List<InductionStatus> ValidStatusesWhenManagedByCpd = new() { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales };
+    private static readonly List<InductionStatus> ValidStatusesWhenManagedByCpd = new() { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales };
+    private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
 
     protected TrsDbContext _dbContext;
     protected IClock _clock;
@@ -30,6 +31,20 @@ public class StatusModel : CommonJourneyPage
                 : InductionStatusRegistry.All.ToArray()[1..].Where(i => i.Value != InitialInductionStatus);
         }
     }
+    public string? StatusWarningMessage
+    {
+        get
+        {
+            if (InductionStatusManagedByCpd)
+            {
+                return InductionIsManagedByCpdWarning;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
 
     public InductionJourneyPage NextPage
     {
@@ -43,6 +58,7 @@ public class StatusModel : CommonJourneyPage
             };
         }
     }
+
     public string BackLink => LinkGenerator.PersonInduction(PersonId);
 
     public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)

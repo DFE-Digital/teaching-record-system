@@ -9,7 +9,10 @@
 }
 
 <h1 data-testid="page-title" class="govuk-heading-l">@ViewBag.Title</h1>
-
+@if (!String.IsNullOrEmpty(Model.StatusWarningMessage))
+{
+    <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <span data-testid="induction-status-caption" class="govuk-caption-l">Induction - @Model.PersonName</span>

@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
-    private const string InductionIsManagedByCpdWarning = "To change a teacher\u2019s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
+    private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
     private bool _statusIsManagedByCpd;
     private bool _teacherHoldsQualifiedTeacherStatus;
 
