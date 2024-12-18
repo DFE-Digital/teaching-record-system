@@ -45,7 +45,9 @@ public class WebhookSenderTests(WebhookReceiver receiver)
                 Address = receiver.Server.BaseAddress + WebhookReceiver.Endpoint.TrimStart('/'),
                 ApiVersion = apiVersion,
                 CloudEventTypes = [cloudEventType],
-                Enabled = true
+                Enabled = true,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
             },
             CloudEventId = cloudEventId,
             CloudEventType = cloudEventType,

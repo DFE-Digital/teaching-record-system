@@ -220,6 +220,8 @@ public class WebhookDeliveryServiceTests(DbFixture dbFixture)
                 CloudEventTypes = [],
                 Enabled = true,
                 WebhookEndpointId = Guid.NewGuid(),
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
             };
             dbContext.WebhookEndpoints.Add(endpoint);
 
