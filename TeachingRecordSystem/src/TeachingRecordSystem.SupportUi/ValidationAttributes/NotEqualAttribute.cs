@@ -11,7 +11,7 @@ public class NotEqualAttribute : ValidationAttribute
         _notAllowedValue = notAllowedValue;
     }
 
-    protected override ValidationResult? IsValid(object value, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         if (value != null && value.Equals(_notAllowedValue))
         {

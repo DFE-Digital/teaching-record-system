@@ -54,7 +54,7 @@ public class StatusModel : CommonJourneyPage
     public async Task OnGetAsync()
     {
         var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
-        InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.UtcNow.ToDateOnlyWithDqtBstFix(true)); // CML TODO understand date-time stuff
+        InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
         InductionStatus = JourneyInstance!.State.InductionStatus;
         InitialInductionStatus = JourneyInstance!.State.InitialInductionStatus;
         await JourneyInstance!.UpdateStateAsync(state =>
