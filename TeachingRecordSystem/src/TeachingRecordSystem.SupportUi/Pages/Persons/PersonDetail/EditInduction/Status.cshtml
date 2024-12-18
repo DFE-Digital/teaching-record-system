@@ -12,14 +12,14 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <span class="govuk-caption-l">Induction - @Model.PersonName</span>
+        <span data-testid="induction-status-caption" class="govuk-caption-l">Induction - @Model.PersonName</span>
         <form data-testid="submit-form" action="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <govuk-radios asp-for="InductionStatus">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
-                    @foreach (var inductionStatus in InductionStatusRegistry.All)
+                    <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--m" />
+                    @foreach (var inductionStatus in Model.StatusChoices)
                     {
-                        <govuk-radios-item value="@inductionStatus">@inductionStatus.Name</govuk-radios-item>
+                        <govuk-radios-item value="@inductionStatus.Value" checked="@Model.InductionStatus==inductionStatus.Value">@inductionStatus.Title</govuk-radios-item>
                     }
                 </govuk-radios-fieldset>
             </govuk-radios>

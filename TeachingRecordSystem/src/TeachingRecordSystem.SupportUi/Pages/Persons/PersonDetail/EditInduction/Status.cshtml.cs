@@ -2,19 +2,34 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StatusModel : CommonJourneyPage
 {
+    private static List<InductionStatus> ValidStatusesWhenManagedByCpd = new() { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales };
+
     protected TrsDbContext _dbContext;
+    protected IClock _clock;
+    protected bool InductionStatusManagedByCpd;
 
     [BindProperty]
     [Display(Name = "Select a status")]
-    [Required(ErrorMessage = "Select a status")]
+    [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
+    public InductionStatus InitialInductionStatus { get; set; }
     public string? PersonName { get; set; }
+    public IEnumerable<InductionStatusInfo> StatusChoices
+    {
+        get
+        {
+            return InductionStatusManagedByCpd ?
+                 InductionStatusRegistry.All.Where(i => ValidStatusesWhenManagedByCpd.Contains(i.Value) && i.Value != InitialInductionStatus)
+                : InductionStatusRegistry.All.ToArray()[1..].Where(i => i.Value != InitialInductionStatus);
+        }
+    }
 
     public InductionJourneyPage NextPage
     {
@@ -30,15 +45,25 @@ public class StatusModel : CommonJourneyPage
     }
     public string BackLink => LinkGenerator.PersonInduction(PersonId);
 
-    public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
+    public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
     {
         _dbContext = dbContext;
+        _clock = clock;
     }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
+        var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.UtcNow.ToDateOnlyWithDqtBstFix(true)); // CML TODO understand date-time stuff
         InductionStatus = JourneyInstance!.State.InductionStatus;
-        PersonName = JourneyInstance!.State.PersonName;
+        InitialInductionStatus = JourneyInstance!.State.InitialInductionStatus;
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            if (state.InitialInductionStatus == InductionStatus.None)
+            {
+                state.InitialInductionStatus = InitialInductionStatus;
+            }
+        });
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -58,11 +83,10 @@ public class StatusModel : CommonJourneyPage
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
+        
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
-
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-
         await next();
     }
 }
