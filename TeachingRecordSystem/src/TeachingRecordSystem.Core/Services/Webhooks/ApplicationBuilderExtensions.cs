@@ -19,8 +19,7 @@ public static class HostApplicationBuilderExtensions
     {
         AddWebhookOptions(builder);
 
-        builder.Services.AddSingleton<IWebhookSender, WebhookSender>();
-        WebhookSender.AddHttpClient(builder.Services);
+        WebhookSender.Register(builder.Services);
 
         builder.Services.AddSingleton<IHostedService, WebhookDeliveryService>();
 
