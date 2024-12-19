@@ -29,7 +29,6 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
 
     public async Task<IActionResult> OnPostAsync()
     {
-        dbContext.SupportTasks.Attach(_supportTask!);
         var data = (ConnectOneLoginUserData)_supportTask!.Data;
         _supportTask.Data = data with
         {

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http.Features;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -20,15 +19,6 @@ public static class HttpContextExtensions
                 person.FirstName,
                 person.MiddleName,
                 person.LastName));
-
-    public static void SetCurrentPersonFeature(this HttpContext context, ContactDetail contactDetail) =>
-        SetCurrentPersonFeature(
-            context,
-            new CurrentPersonFeature(
-                contactDetail.Contact.Id,
-                contactDetail.Contact.FirstName,
-                contactDetail.Contact.MiddleName ?? "",
-                contactDetail.Contact.LastName));
 
     public static CurrentMandatoryQualificationFeature GetCurrentMandatoryQualificationFeature(this HttpContext context) =>
         context.Features.GetRequiredFeature<CurrentMandatoryQualificationFeature>();
