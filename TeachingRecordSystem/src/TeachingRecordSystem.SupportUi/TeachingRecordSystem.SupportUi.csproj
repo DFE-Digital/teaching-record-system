@@ -1,9 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-
   <Target Name="CompileSass" BeforeTargets="Build">
     <Exec Command="sass -q wwwroot/Styles/site.scss wwwroot/Styles/site.css" />
   </Target>
@@ -23,5 +19,5 @@
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.UiCommon\TeachingRecordSystem.UiCommon.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj" />
-  </ItemGroup>  
+  </ItemGroup>
 </Project>
