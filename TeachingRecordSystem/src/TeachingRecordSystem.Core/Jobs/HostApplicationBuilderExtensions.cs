@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
+using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 
@@ -75,6 +77,10 @@ public static class HostApplicationBuilderExtensions
                     return Task.CompletedTask;
                 });
             }
+
+            builder.Services.AddTransient<EwcWalesImportJob>();
+            builder.Services.AddTransient<QtsImporter>();
+            builder.Services.AddTransient<InductionImporter>();
 
             builder.Services.AddStartupTask(sp =>
             {
@@ -188,6 +194,11 @@ public static class HostApplicationBuilderExtensions
                     nameof(BackfillDqtReportingAlertTypes),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
+
+                recurringJobManager.AddOrUpdate<EwcWalesImportJob>(
+                    nameof(EwcWalesImportJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    EwcWalesImportJob.JobSchedule);
 
                 return Task.CompletedTask;
             });
