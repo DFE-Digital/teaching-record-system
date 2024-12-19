@@ -1,5 +1,6 @@
 using System.ServiceModel;
 using Hangfire;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -14,15 +15,18 @@ public class SyncAllInductionsFromCrmJob
     private readonly ICrmServiceClientProvider _crmServiceClientProvider;
     private readonly TrsDataSyncHelper _trsDataSyncHelper;
     private readonly IOptions<TrsDataSyncServiceOptions> _syncOptionsAccessor;
+    private readonly ILogger<SyncAllInductionsFromCrmJob> _logger;
 
     public SyncAllInductionsFromCrmJob(
         ICrmServiceClientProvider crmServiceClientProvider,
         TrsDataSyncHelper trsDataSyncHelper,
-        IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor)
+        IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
+        ILoggerFactory loggerFactory)
     {
         _crmServiceClientProvider = crmServiceClientProvider;
         _trsDataSyncHelper = trsDataSyncHelper;
         _syncOptionsAccessor = syncOptionsAccessor;
+        _logger = loggerFactory.CreateLogger<SyncAllInductionsFromCrmJob>();
     }
 
     public async Task ExecuteAsync(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
@@ -57,6 +61,7 @@ public class SyncAllInductionsFromCrmJob
             }
             catch (FaultException<OrganizationServiceFault> fex) when (fex.IsCrmRateLimitException(out var retryAfter))
             {
+                _logger.LogWarning("Hit CRM service limits; error code: {ErrorCode}", fex.Detail.ErrorCode);
                 await Task.Delay(retryAfter, cancellationToken);
                 continue;
             }

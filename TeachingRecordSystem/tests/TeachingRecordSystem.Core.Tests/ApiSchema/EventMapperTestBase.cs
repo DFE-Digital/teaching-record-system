@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -30,7 +31,8 @@ public class EventMapperFixture
         IOrganizationServiceAsync2 organizationService,
         ICrmQueryDispatcher crmQueryDispatcher,
         FakeTrnGenerator trnGenerator,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        ILoggerFactory loggerFactory)
     {
         Clock = new TestableClock();
         DbFixture = dbFixture;
@@ -40,7 +42,8 @@ public class EventMapperFixture
             dbFixture.GetDataSource(),
             organizationService,
             ReferenceDataCache,
-            Clock);
+            Clock,
+            loggerFactory);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
