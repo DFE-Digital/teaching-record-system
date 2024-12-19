@@ -29,6 +29,7 @@ jobs:
       - name: Lint
         run: |
           git fetch origin main --quiet --depth=1
+
           CHANGED_FILES=$(git diff --name-only origin/main $GITHUB_SHA | { grep -oP '^TeachingRecordSystem\/\K.*\.cs(proj)?$' || true; })
 
           if [ "$CHANGED_FILES" == "" ]; then
@@ -46,7 +47,7 @@ jobs:
             echo "::notice::Linting changed files only"
           fi
 
-          dotnet format --verify-no-changes $INCLUDE_ARG
+          dotnet dotnet-format --verify-no-changes $INCLUDE_ARG
         working-directory: TeachingRecordSystem
 
   validate_terraform:

@@ -42,7 +42,7 @@ test:
 
 # Format the .NET solution and Terraform code
 format:
-  @cd {{solution-root}} && dotnet format
+  @cd {{solution-root}} && dotnet dotnet-format
   @terraform fmt terraform/aks
 
 # Format any un-committed .tf or .cs files
@@ -64,7 +64,7 @@ format-changed:
 
   $changedCsFiles = (Get-ChangedFiles "{{solution-root}}/**/*.cs") | foreach { $_ -Replace "^{{solution-root}}/", "" }
   if ($changedCsFiles.Length -gt 0) {
-    $dotnetArgs = @("format", "--no-restore", "--include") + $changedCsFiles
+    $dotnetArgs = @("dotnet-format", "--no-restore", "--include") + $changedCsFiles
     cd {{solution-root}} && dotnet $dotnetArgs
   }
 
