@@ -97,6 +97,32 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Fact]
+    public async Task SyncInductionsAsync_WithExistingDqtInduction_UpdatesPersonRecord()
+    {
+        // Arrange
+        var inductionStatus = dfeta_InductionStatus.InProgress;
+        var inductionStartDate = Clock.Today.AddYears(-1);
+
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn()
+                .WithQts()
+                .WithDqtInduction(inductionStatus, null, inductionStartDate, null)
+                .WithSyncOverride(false));
+
+        // Act
+        await Helper.SyncInductionsAsync([person.Contact], ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+
+        // Assert
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == person.ContactId);
+            Assert.Equal(inductionStatus.ToInductionStatus(), updatedPerson!.InductionStatus);
+            Assert.Equal(inductionStartDate, updatedPerson.InductionStartDate);
+
+        });
+    }
+
+    [Fact]
     public async Task SyncInductionsAsync_WithQtlsButNotExemptAndIgnoreInvalidSetToFalse_ThrowsException()
     {
         // Arrange
@@ -691,7 +717,7 @@ public partial class TrsDataSyncHelperTests
                 FROM events as e
                 WHERE (e.payload -> 'Induction' ->> 'InductionId')::uuid = {inductionId}
                   OR (e.payload -> 'DqtInduction' ->> 'InductionId')::uuid = {inductionId}
-                ORDER BY e.created
+                ORDER BY e.created, (CASE WHEN e.event_name = 'InductionMigratedEvent' THEN 1 ELSE 0 END)
                 """).ToArrayAsync();
 
             return results.Select(r => EventBase.Deserialize(r.Payload, r.EventName)).ToArray();

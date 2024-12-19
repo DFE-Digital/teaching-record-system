@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
@@ -87,7 +88,8 @@ public class OutboxMessageHandlerFixture
         IOrganizationServiceAsync2 organizationService,
         IDbContextFactory<TrsDbContext> dbContextFactory,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        FakeTrnGenerator trnGenerator,
+        ILoggerFactory loggerFactory)
     {
         Clock = new TestableClock();
         DbFixture = dbFixture;
@@ -97,7 +99,8 @@ public class OutboxMessageHandlerFixture
             dbFixture.GetDataSource(),
             organizationService,
             referenceDataCache,
-            Clock);
+            Clock,
+            loggerFactory);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
