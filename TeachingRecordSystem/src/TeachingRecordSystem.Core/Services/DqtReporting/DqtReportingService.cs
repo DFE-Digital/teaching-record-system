@@ -2,8 +2,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Text;
 using Medallion.Threading;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,7 +49,6 @@ public partial class DqtReportingService : BackgroundService
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly IDistributedLockProvider _distributedLockProvider;
     private readonly IClock _clock;
-    private readonly TelemetryClient _telemetryClient;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DqtReportingService> _logger;
     private readonly Dictionary<string, (EntityMetadata EntityMetadata, EntityTableMapping EntityTableMapping)> _entityMetadata = new();
@@ -62,7 +59,6 @@ public partial class DqtReportingService : BackgroundService
         [FromKeyedServices(CrmClientName)] ICrmQueryDispatcher crmQueryDispatcher,
         IDistributedLockProvider distributedLockProvider,
         IClock clock,
-        TelemetryClient telemetryClient,
         IConfiguration configuration,
         ILogger<DqtReportingService> logger)
     {
@@ -71,7 +67,6 @@ public partial class DqtReportingService : BackgroundService
         _crmQueryDispatcher = crmQueryDispatcher;
         _distributedLockProvider = distributedLockProvider;
         _clock = clock;
-        _telemetryClient = telemetryClient;
         _configuration = configuration;
         _logger = logger;
     }
@@ -170,8 +165,6 @@ public partial class DqtReportingService : BackgroundService
 
     internal async Task ProcessCrmChangesAsync(CancellationToken cancellationToken)
     {
-        using var operation = _telemetryClient.StartOperation<DependencyTelemetry>(ProcessChangesOperationName);
-
         await Parallel.ForEachAsync(
             _options.Entities,
             new ParallelOptions()
@@ -214,48 +207,37 @@ public partial class DqtReportingService : BackgroundService
                 .ToArray());
         }
 
-        try
+        // We don't populate modifiedSince here since it's so slow to query in the reporting DB
+        var changesEnumerable = _crmEntityChangesService.GetEntityChangesAsync(ChangesKey, entityLogicalName, columns, modifiedSince: null, PageSize)
+            .WithCancellation(cancellationToken);
+
+        await foreach (var changes in changesEnumerable)
         {
-            // We don't populate modifiedSince here since it's so slow to query in the reporting DB
-            var changesEnumerable = _crmEntityChangesService.GetEntityChangesAsync(ChangesKey, entityLogicalName, columns, modifiedSince: null, PageSize)
-                .WithCancellation(cancellationToken);
+            var newOrUpdatedItems = new List<NewOrUpdatedItem>();
+            var removedOrDeletedItems = new List<RemovedOrDeletedItem>();
 
-            await foreach (var changes in changesEnumerable)
+            foreach (var change in changes)
             {
-                var newOrUpdatedItems = new List<NewOrUpdatedItem>();
-                var removedOrDeletedItems = new List<RemovedOrDeletedItem>();
-
-                foreach (var change in changes)
+                if (change is NewOrUpdatedItem newOrUpdatedItem)
                 {
-                    if (change is NewOrUpdatedItem newOrUpdatedItem)
-                    {
-                        newOrUpdatedItems.Add(newOrUpdatedItem);
-                    }
-                    else if (change is RemovedOrDeletedItem removedOrDeletedItem)
-                    {
-                        removedOrDeletedItems.Add(removedOrDeletedItem);
-                    }
-                    else
-                    {
-                        throw new Exception($"Received unknown change type: '{change.GetType().Name}'.");
-                    }
+                    newOrUpdatedItems.Add(newOrUpdatedItem);
                 }
-
-                await HandleNewOrUpdatedItemsAsync(newOrUpdatedItems, cancellationToken);
-                totalProcessed += newOrUpdatedItems.Count;
-
-                // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
-                await HandleRemovedOrDeletedItemsAsync(removedOrDeletedItems, cancellationToken);
-                totalProcessed += removedOrDeletedItems.Count;
+                else if (change is RemovedOrDeletedItem removedOrDeletedItem)
+                {
+                    removedOrDeletedItems.Add(removedOrDeletedItem);
+                }
+                else
+                {
+                    throw new Exception($"Received unknown change type: '{change.GetType().Name}'.");
+                }
             }
-        }
-        finally
-        {
-            _telemetryClient.TrackMetric(new MetricTelemetry()
-            {
-                Name = $"DqtReporting: updates processed",
-                Sum = totalProcessed
-            });
+
+            await HandleNewOrUpdatedItemsAsync(newOrUpdatedItems, cancellationToken);
+            totalProcessed += newOrUpdatedItems.Count;
+
+            // It's important deleted items are processed *after* upserts, otherwise we may resurrect a deleted record
+            await HandleRemovedOrDeletedItemsAsync(removedOrDeletedItems, cancellationToken);
+            totalProcessed += removedOrDeletedItems.Count;
         }
     }
 
