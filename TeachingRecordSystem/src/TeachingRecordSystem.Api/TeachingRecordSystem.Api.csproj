@@ -9,7 +9,6 @@
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="FluentValidation.AspNetCore" />
-    <PackageReference Include="idunno.Authentication.Basic" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
