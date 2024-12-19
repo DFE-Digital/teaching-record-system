@@ -73,7 +73,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Failed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
-    public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus inductionStatus, InductionStatus[] expectedStatuses)
+    public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus initialInductionStatus, InductionStatus[] expectedStatuses)
     {
         // Arrange
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
@@ -85,7 +85,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             new EditInductionState()
             {
                 Initialized = true,
-                InitialInductionStatus = inductionStatus
+                InitialInductionStatus = initialInductionStatus
             });
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -104,7 +104,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt })]
-    public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus inductionStatus, InductionStatus[] expectedStatuses)
+    public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus initialInductionStatus, InductionStatus[] expectedStatuses)
     {
         // Arrange
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
@@ -129,7 +129,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             new EditInductionState()
             {
                 Initialized = true,
-                InitialInductionStatus = inductionStatus
+                InitialInductionStatus = initialInductionStatus
             });
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -155,7 +155,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             new EditInductionState()
             {
                 Initialized = true,
-                InductionStatus = InductionStatus.Passed
+                InitialInductionStatus = InductionStatus.Passed
             });
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -173,8 +173,15 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Exempt", journeyInstance.State.InductionStatus.GetTitle());
     }
 
-    [Fact]
-    public async Task Post_NoSelectedStatus_ShowsPageError()
+    [Theory]
+    [InlineData(InductionStatus.RequiredToComplete, new InductionStatus[] { InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.Exempt, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.InProgress, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Failed, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
+
+    public async Task Post_NoSelectedStatus_ShowsPageError(InductionStatus initialInductionStatus, InductionStatus[] expectedStatusChoices)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -184,7 +191,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             new EditInductionState()
             {
                 Initialized = true,
-                InductionStatus = InductionStatus.Passed
+                InitialInductionStatus = initialInductionStatus
             });
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -199,6 +206,11 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
+        var doc = await response.GetDocumentAsync();
+        var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
+        var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
+        Assert.Equal("Select a status", statusChoicesLegend!.TextContent);
+        Assert.Equal(expectedStatusChoices.Select(c => c.ToString()), statusChoices);
     }
 
     [Theory]
