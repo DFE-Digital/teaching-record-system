@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sentry.Extensibility;
 using Serilog;
-using TeachingRecordSystem.ServiceDefaults.Infrastructure.ApplicationInsights;
 
 namespace TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 
@@ -19,9 +18,6 @@ public static class WebApplicationBuilderExtensions
         }
 
         builder.Services.AddSingleton<ISentryEventProcessor, RemoveRedactedUrlParametersEventProcessor>();
-
-        builder.Services.AddApplicationInsightsTelemetry()
-            .AddApplicationInsightsTelemetryProcessor<RedactedUrlTelemetryProcessor>();
 
         builder.Services.AddTransient<RemoveRedactedUrlParametersEnricher>();
 

@@ -65,12 +65,6 @@ builder.Services
     .AddWorkforceData()
     .AddMemoryCache();
 
-// Filter telemetry emitted by DqtReportingService;
-// annoyingly we can't put this into the AddDqtReporting extension method since the method for adding Telemetry Processors
-// is different depending on whether you're in a Worker app or Web app :-/
-builder.Services.AddApplicationInsightsTelemetryWorkerService()
-    .AddApplicationInsightsTelemetryProcessor<IgnoreDependencyTelemetryProcessor>();
-
 var host = builder.Build();
 
 await host.RunAsync();

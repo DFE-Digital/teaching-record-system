@@ -1,6 +1,5 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -89,7 +88,6 @@ public static class Extensions
     {
         config
             .ReadFrom.Configuration(configuration)
-            .WriteTo.ApplicationInsights(services.GetRequiredService<TelemetryConfiguration>(), TelemetryConverter.Traces)
             .WriteTo.Sentry(o => o.InitializeSdk = false);
 
         if (environment.IsProduction())

@@ -1,5 +1,4 @@
 using Medallion.Threading.FileSystem;
-using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
@@ -62,8 +61,6 @@ public class DqtReportingFixture
         var lockFileDirectory = Path.Combine(Path.GetTempPath(), "trstestlocks");
         var distributedLockProvider = new FileDistributedSynchronizationProvider(new DirectoryInfo(lockFileDirectory));
 
-        var telemetryClient = new TelemetryClient(new Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration());
-
         var logger = new NullLogger<DqtReportingService>();
 
         var service = new DqtReportingService(
@@ -72,7 +69,6 @@ public class DqtReportingFixture
             _crmClientFixture.CreateQueryDispatcher(),
             distributedLockProvider,
             Clock,
-            telemetryClient,
             _crmClientFixture.Configuration,
             logger);
 
