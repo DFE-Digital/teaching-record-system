@@ -54,7 +54,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
         response.EnsureSuccessStatusCode();
     }
 
-    public static void AddHttpClient(IServiceCollection services, Func<HttpMessageHandler>? getPrimaryHandler = null)
+    public static void Register(IServiceCollection services, Func<HttpMessageHandler>? getPrimaryHandler = null)
     {
         // We configure the options here manually rather than using the library-provided extension methods so that they don't 'bleed out' globally;
         // it's feasible we could want a different configuration of, say, AddContentDigestOptions for use elsewhere.
@@ -108,8 +108,10 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
             return new ECDsaP382Sha384SignatureProvider(cert, signingKeyId);
         });
 
+        services.AddSingleton<IWebhookSender, WebhookSender>();
+
         var httpClientBuilder = services
-            .AddHttpClient<WebhookSender>(client =>
+            .AddHttpClient<IWebhookSender, WebhookSender>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(TimeoutSeconds);
                 client.DefaultRequestHeaders.ExpectContinue = false;
