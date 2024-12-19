@@ -201,8 +201,56 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
     }
 
+    [Theory]
+    [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
+    [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt })]
+    public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError(InductionStatus initialInductionStatus, InductionStatus[] expectedChoices)
+    {
+        var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.SetCpdInductionStatus(
+                InductionStatus.Passed,
+                startDate: Clock.Today.AddYears(-7).AddMonths(-6),
+                completedDate: overSevenYearsAgo,
+                cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            await dbContext.SaveChangesAsync();
+        });
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionState()
+            {
+                Initialized = true,
+                InitialInductionStatus = initialInductionStatus
+            });
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["InductionStatus"] = InductionStatus.None.ToString()
+            })
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
+        var doc = await response.GetDocumentAsync();
+        var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
+        var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
+        Assert.Equal("Select a status", statusChoicesLegend!.TextContent);
+        Assert.Equal(expectedChoices.Select(c => c.ToString()), statusChoices);
+    }
+
     [Fact]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCPD_ShowsWarning()
+    public async Task Get_ForPersonWithInductionStatusManagedByCPD_ShowsWarning()
     {
         //Arrange
         var expectedWarning = "To change this teacher’s induction status ";
@@ -230,7 +278,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+        Assert.Contains(expectedWarning, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>

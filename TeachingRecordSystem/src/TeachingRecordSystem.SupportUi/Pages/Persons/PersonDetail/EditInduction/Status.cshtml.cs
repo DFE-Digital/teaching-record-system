@@ -86,6 +86,9 @@ public class StatusModel : CommonJourneyPage
     {
         if (!ModelState.IsValid)
         {
+            var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+            InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
+            InitialInductionStatus = JourneyInstance!.State.InitialInductionStatus;
             return this.PageWithErrors();
         }
         await JourneyInstance!.UpdateStateAsync(state =>
