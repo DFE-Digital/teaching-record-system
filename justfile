@@ -16,13 +16,17 @@ default:
 # Install local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
-  npm install -g sass
+  @npm install -g sass
 
 # Restore dependencies
 restore:
   @cd {{solution-root}} && dotnet restore --locked-mode
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet libman restore --verbosity quiet
   @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess" }} && dotnet libman restore --verbosity quiet
+
+# Install Playwright
+install-playwright:
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.AuthorizeAccess.EndToEndTests"}} && pwsh bin/Debug/net8.0/playwright.ps1 install chromium
 
 # Run the trscli
 cli *ARGS:
