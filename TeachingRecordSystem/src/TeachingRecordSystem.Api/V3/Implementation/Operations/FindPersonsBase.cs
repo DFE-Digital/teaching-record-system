@@ -23,6 +23,7 @@ public record FindPersonsResultItem
     public required DqtInductionStatusInfo? DqtInductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
+    public required QtlsStatus QtlsStatus { get; init; }
 }
 
 public abstract class FindPersonsHandlerBase(
@@ -45,7 +46,20 @@ public abstract class FindPersonsHandlerBase(
         Contact.Fields.dfeta_StatedFirstName,
         Contact.Fields.dfeta_StatedMiddleName,
         Contact.Fields.dfeta_StatedLastName,
-        Contact.Fields.dfeta_InductionStatus);
+        Contact.Fields.dfeta_InductionStatus,
+        Contact.Fields.dfeta_qtlsdate,
+        Contact.Fields.dfeta_QtlsDateHasBeenSet);
+
+    private static QtlsStatus MapQtlsStatus(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
+    {
+        return (qtlsDate, qtlsDateHasBeenSet) switch
+        {
+            (not null, _) => QtlsStatus.Active,
+            (null, true) => QtlsStatus.Expired,
+            (null, false) => QtlsStatus.None,
+            (_, _) => QtlsStatus.None,
+        };
+    }
 
     protected async Task<FindPersonsResult> CreateResultAsync(IEnumerable<Contact> matched)
     {
@@ -81,6 +95,7 @@ public abstract class FindPersonsHandlerBase(
             .ToAsyncEnumerable()
             .SelectAwait(async r => new FindPersonsResultItem()
             {
+                QtlsStatus = MapQtlsStatus(r.dfeta_qtlsdate, r.dfeta_QtlsDateHasBeenSet),
                 Trn = r.dfeta_TRN,
                 DateOfBirth = r.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
                 FirstName = r.ResolveFirstName(),
@@ -95,26 +110,26 @@ public abstract class FindPersonsHandlerBase(
                     })
                     .AsReadOnly(),
                 Alerts = alerts.GetValueOrDefault(r.Id, [])
-                    .Where(a => !a.AlertType.InternalOnly)
-                    .Select(a => new Alert()
-                    {
-                        AlertId = a.AlertId,
-                        AlertType = new()
+                        .Where(a => !a.AlertType.InternalOnly)
+                        .Select(a => new Alert()
                         {
-                            AlertTypeId = a.AlertType.AlertTypeId,
-                            AlertCategory = new()
+                            AlertId = a.AlertId,
+                            AlertType = new()
                             {
-                                AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
-                                Name = a.AlertType.AlertCategory.Name
+                                AlertTypeId = a.AlertType.AlertTypeId,
+                                AlertCategory = new()
+                                {
+                                    AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
+                                    Name = a.AlertType.AlertCategory.Name
+                                },
+                                Name = a.AlertType.Name,
+                                DqtSanctionCode = a.AlertType.DqtSanctionCode!
                             },
-                            Name = a.AlertType.Name,
-                            DqtSanctionCode = a.AlertType.DqtSanctionCode!
-                        },
-                        Details = a.Details,
-                        StartDate = a.StartDate,
-                        EndDate = a.EndDate
-                    })
-                    .AsReadOnly(),
+                            Details = a.Details,
+                            StartDate = a.StartDate,
+                            EndDate = a.EndDate
+                        })
+                        .AsReadOnly(),
                 PreviousNames = previousNameHelper.GetFullPreviousNames(previousNames[r.Id], contactsById[r.Id])
                     .Select(name => new NameInfo()
                     {
@@ -131,7 +146,7 @@ public abstract class FindPersonsHandlerBase(
                         StatusDescription = inductionStatus.GetDescription()
                     } :
                     null,
-                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache),
+                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache, r.dfeta_qtlsdate),
                 Eyts = await EytsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_EYTSDate is not null), referenceDataCache),
             })
             .OrderBy(c => c.Trn)
