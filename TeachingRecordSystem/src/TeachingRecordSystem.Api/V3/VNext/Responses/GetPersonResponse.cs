@@ -24,7 +24,6 @@ public record GetPersonResponse
     public required Option<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseMandatoryQualification>> MandatoryQualifications { get; init; }
-    public required Option<IReadOnlyCollection<GetPersonResponseHigherEducationQualification>> HigherEducationQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
@@ -107,21 +106,6 @@ public record GetPersonResponseMandatoryQualification
 {
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
-}
-
-[AutoMap(typeof(GetPersonResultHigherEducationQualification))]
-public record GetPersonResponseHigherEducationQualification
-{
-    public required string? Name { get; init; }
-    public required DateOnly? Awarded { get; init; }
-    public required IReadOnlyCollection<GetPersonResponseHigherEducationQualificationSubject> Subjects { get; init; }
-}
-
-[AutoMap(typeof(GetPersonResultHigherEducationQualificationSubject))]
-public record GetPersonResponseHigherEducationQualificationSubject
-{
-    public required string Code { get; init; }
-    public required string Name { get; init; }
 }
 
 [AutoMap(typeof(GetPersonResultInduction))]
