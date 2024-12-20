@@ -8,8 +8,8 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
 using TeachingRecordSystem.TestCommon.Infrastructure;
-using TeachingRecordSystem.UiCommon.FormFlow.State;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 

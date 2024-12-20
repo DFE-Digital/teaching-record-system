@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
-using TeachingRecordSystem.UiCommon.FormFlow;
-using TeachingRecordSystem.UiCommon.FormFlow.State;
+using TeachingRecordSystem.WebCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 

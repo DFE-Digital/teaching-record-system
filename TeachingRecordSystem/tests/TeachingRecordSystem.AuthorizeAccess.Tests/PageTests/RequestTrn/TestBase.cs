@@ -3,8 +3,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.UiCommon.FormFlow;
-using TeachingRecordSystem.UiCommon.FormFlow.State;
+using TeachingRecordSystem.WebCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 

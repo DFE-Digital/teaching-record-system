@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 

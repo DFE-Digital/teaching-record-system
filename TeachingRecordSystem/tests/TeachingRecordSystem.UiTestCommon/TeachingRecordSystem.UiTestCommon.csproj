@@ -7,7 +7,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TeachingRecordSystem.UiCommon\TeachingRecordSystem.UiCommon.csproj" />
+    <ProjectReference Include="..\..\src\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.TestCommon\TeachingRecordSystem.TestCommon.csproj" />
   </ItemGroup>
 

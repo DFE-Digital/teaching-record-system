@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow;
 using static TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security.FormFlowJourneySignInHandler;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;

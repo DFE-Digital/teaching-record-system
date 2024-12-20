@@ -2343,7 +2343,7 @@
           "dbup-sqlserver": "[5.0.37, )"
         }
       },
-      "teachingrecordsystem.servicedefaults": {
+      "teachingrecordsystem.webcommon": {
         "type": "Project",
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[8.0.0, )",

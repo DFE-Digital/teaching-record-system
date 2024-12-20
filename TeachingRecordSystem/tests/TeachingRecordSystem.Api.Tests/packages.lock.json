@@ -2284,7 +2284,7 @@
           "Swashbuckle.AspNetCore": "[6.6.2, )",
           "Swashbuckle.AspNetCore.Annotations": "[6.6.2, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
-          "TeachingRecordSystem.ServiceDefaults": "[1.0.0, )"
+          "TeachingRecordSystem.WebCommon": "[1.0.0, )"
         }
       },
       "teachingrecordsystem.core": {
@@ -2340,19 +2340,6 @@
           "dbup-sqlserver": "[5.0.37, )"
         }
       },
-      "teachingrecordsystem.servicedefaults": {
-        "type": "Project",
-        "dependencies": {
-          "AspNetCore.HealthChecks.NpgSql": "[8.0.0, )",
-          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.3.4, )",
-          "Hangfire.AspNetCore": "[1.8.14, )",
-          "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[8.0.8, )",
-          "Sentry.AspNetCore": "[4.9.0, )",
-          "Serilog.AspNetCore": "[8.0.3, )",
-          "TeachingRecordSystem.Core": "[1.0.0, )",
-          "prometheus-net.AspNetCore": "[8.2.1, )"
-        }
-      },
       "teachingrecordsystem.testcommon": {
         "type": "Project",
         "dependencies": {
@@ -2363,6 +2350,19 @@
           "System.Linq.Async": "[6.0.1, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "xunit.assert": "[2.9.0, )"
+        }
+      },
+      "teachingrecordsystem.webcommon": {
+        "type": "Project",
+        "dependencies": {
+          "AspNetCore.HealthChecks.NpgSql": "[8.0.0, )",
+          "Azure.Extensions.AspNetCore.DataProtection.Blobs": "[1.3.4, )",
+          "Hangfire.AspNetCore": "[1.8.14, )",
+          "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[8.0.8, )",
+          "Sentry.AspNetCore": "[4.9.0, )",
+          "Serilog.AspNetCore": "[8.0.3, )",
+          "TeachingRecordSystem.Core": "[1.0.0, )",
+          "prometheus-net.AspNetCore": "[8.2.1, )"
         }
       },
       "AngleSharp": {
