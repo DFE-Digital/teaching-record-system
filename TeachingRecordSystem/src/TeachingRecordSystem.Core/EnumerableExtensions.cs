@@ -60,8 +60,8 @@ public static class EnumerableExtensions
 
         return valuesArray switch
         {
-            [] => string.Empty,
-            [var only] => only,
+        [] => string.Empty,
+        [var only] => only,
             _ => string.Join(", ", valuesArray[0..^2].Append(string.Join($" {finalValuesConjunction} ", valuesArray[^2..])))
         };
     }

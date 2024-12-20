@@ -55,7 +55,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         return results switch
         {
-            [MatchQueryResult r] => new MatchResult(r.person_id, r.trn, MapMatchedAttrs(r.matched_attrs)),
+        [MatchQueryResult r] => new MatchResult(r.person_id, r.trn, MapMatchedAttrs(r.matched_attrs)),
             _ => null
         };
 
