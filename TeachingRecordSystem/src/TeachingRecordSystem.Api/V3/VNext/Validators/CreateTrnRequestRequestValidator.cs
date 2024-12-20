@@ -32,7 +32,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             .MaximumLength(AttributeConstraints.Contact.Address1_PostalCodeLength)
             .When(r => r.Person.Address != null);
 
-        RuleFor(r => r.Person.GenderCode)
+        RuleFor(r => r.Person.Gender)
             .IsInEnum();
     }
 }

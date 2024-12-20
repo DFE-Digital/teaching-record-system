@@ -1,17 +1,30 @@
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionStatus;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
-[GenerateVersionedDto(typeof(V20240920.Responses.FindPersonResponse), excludeMembers: ["Results"])]
-public partial record FindPersonResponse
+public record FindPersonResponse
 {
+    public required int Total { get; init; }
+    public required FindPersonRequest Query { get; init; }
     public required IReadOnlyCollection<FindPersonResponseResult> Results { get; init; }
 }
 
 [AutoMap(typeof(FindPersonsResultItem))]
-[GenerateVersionedDto(typeof(V20240920.Responses.FindPersonResponseResult), excludeMembers: ["InductionStatus"])]
-public partial record FindPersonResponseResult
+public record FindPersonResponseResult
 {
+    public required string Trn { get; init; }
+    public required DateOnly DateOfBirth { get; init; }
+    public required string FirstName { get; init; }
+    public required string MiddleName { get; init; }
+    public required string LastName { get; init; }
+    public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
+    public required QtsInfo? Qts { get; init; }
+    public required EytsInfo? Eyts { get; init; }
+    public required IReadOnlyCollection<Alert> Alerts { get; init; }
     public required InductionStatus InductionStatus { get; init; }
 }

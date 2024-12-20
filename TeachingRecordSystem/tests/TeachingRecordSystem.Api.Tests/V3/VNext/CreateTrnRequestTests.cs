@@ -113,7 +113,7 @@ public class CreateTrnRequestTests : TestBase
                         postcode = postcode,
                         country = country,
                     },
-                    genderCode = gender
+                    gender = gender
                 },
                 identityVerified = identityVerified,
                 oneLoginUserSubject = oneLoginUserSubject
@@ -177,7 +177,7 @@ public class CreateTrnRequestTests : TestBase
                         postcode = postcode,
                         country = country,
                     },
-                    genderCode = gender
+                    gender = gender
                 },
                 identityVerified = identityVerified,
                 oneLoginUserSubject = oneLoginUserSubject
