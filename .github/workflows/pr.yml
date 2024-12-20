@@ -96,6 +96,7 @@ jobs:
             TeachingRecordSystem.AuthorizeAccess.Tests,
             TeachingRecordSystem.SupportUi.EndToEndTests,
             TeachingRecordSystem.AuthorizeAccess.EndToEndTests,
+            TeachingRecordSystem.WebCommon.Tests,
           ]
 
     services:

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.WebUtilities;
-using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess;
 

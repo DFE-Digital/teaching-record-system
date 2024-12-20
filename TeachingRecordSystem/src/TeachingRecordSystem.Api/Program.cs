@@ -32,8 +32,8 @@ using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
-using TeachingRecordSystem.ServiceDefaults;
-using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
+using TeachingRecordSystem.WebCommon;
+using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 
 [assembly: ApiController]
 namespace TeachingRecordSystem.Api;

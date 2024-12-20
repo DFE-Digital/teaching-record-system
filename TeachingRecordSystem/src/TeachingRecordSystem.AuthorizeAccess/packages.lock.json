@@ -2415,7 +2415,7 @@
           "dbup-sqlserver": "[5.0.37, )"
         }
       },
-      "teachingrecordsystem.servicedefaults": {
+      "teachingrecordsystem.webcommon": {
         "type": "Project",
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "[8.0.0, )",
@@ -2426,12 +2426,6 @@
           "Serilog.AspNetCore": "[8.0.3, )",
           "TeachingRecordSystem.Core": "[1.0.0, )",
           "prometheus-net.AspNetCore": "[8.2.1, )"
-        }
-      },
-      "teachingrecordsystem.uicommon": {
-        "type": "Project",
-        "dependencies": {
-          "TeachingRecordSystem.Core": "[1.0.0, )"
         }
       },
       "AngleSharp": {

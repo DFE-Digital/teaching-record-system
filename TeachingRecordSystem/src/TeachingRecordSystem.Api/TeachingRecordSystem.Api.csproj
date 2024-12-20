@@ -36,7 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\gen\TeachingRecordSystem.Api.Generator\TeachingRecordSystem.Api.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
-    <ProjectReference Include="..\TeachingRecordSystem.ServiceDefaults\TeachingRecordSystem.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
   </ItemGroup>
 
 </Project>

@@ -26,12 +26,12 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.PersonMatching;
-using TeachingRecordSystem.ServiceDefaults;
-using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
-using TeachingRecordSystem.UiCommon.Filters;
-using TeachingRecordSystem.UiCommon.FormFlow;
-using TeachingRecordSystem.UiCommon.Middleware;
+using TeachingRecordSystem.WebCommon;
+using TeachingRecordSystem.WebCommon.Filters;
+using TeachingRecordSystem.WebCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
+using TeachingRecordSystem.WebCommon.Middleware;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow;
 using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailAddressAttribute;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
