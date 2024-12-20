@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <!--<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->  <!-- Uncomment this to debug the source generator output -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\gen\TeachingRecordSystem.Api.Generator\TeachingRecordSystem.Api.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\TeachingRecordSystem.Core\TeachingRecordSystem.Core.csproj" />
     <ProjectReference Include="..\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
   </ItemGroup>
