@@ -34,6 +34,7 @@ public static class EntityExtensions
 
         var entity = new T()
         {
+            Id = (Guid)attributes[idAttribute],
             Attributes = attributes
         };
 
