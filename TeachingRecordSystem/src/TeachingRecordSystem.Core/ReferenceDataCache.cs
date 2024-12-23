@@ -1,3 +1,5 @@
+using System.ServiceModel;
+using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -201,6 +203,12 @@ public class ReferenceDataCache(
         return countries.FirstOrDefault(at => at.dfeta_Value == countryCode);
     }
 
+    public async Task<dfeta_country> GetCountryByIdAsync(Guid countryId)
+    {
+        var countries = await EnsureCountriesAsync();
+        return countries.Single(c => c.Id == countryId, $"Could not find country with ID: '{countryId}'.");
+    }
+
     public async Task<dfeta_ittsubject?> GetIttSubjectBySubjectCodeAsync(string subjectCode)
     {
         var ittSubjects = await EnsureIttSubjectsAsync();
@@ -208,10 +216,16 @@ public class ReferenceDataCache(
         return ittSubjects.FirstOrDefault(at => at.dfeta_Value == subjectCode);
     }
 
-    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync()
+    public async Task<dfeta_ittsubject> GetIttSubjectBySubjectIdAsync(Guid subjectId)
+    {
+        var ittSubjects = await EnsureIttSubjectsAsync();
+        return ittSubjects.Single(s => s.Id == subjectId, $"Could not find ITT subject with ID: '{subjectId}'.");
+    }
+
+    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync(bool activeOnly = true)
     {
         var ittQualifications = await EnsureIttQualificationsAsync();
-        return ittQualifications.ToArray();
+        return ittQualifications.Where(q => !activeOnly || q.StateCode == dfeta_ittqualificationState.Active).ToArray();
     }
 
     public async Task<dfeta_ittqualification> GetIttQualificationByValueAsync(string value)
@@ -219,6 +233,12 @@ public class ReferenceDataCache(
         var ittQualifications = await EnsureIttQualificationsAsync();
         // build environment has some duplicate ITT Qualifications, which prevent us using Single() here
         return ittQualifications.First(s => s.dfeta_Value == value, $"Could not find ITT qualification with value: '{value}'.");
+    }
+
+    public async Task<dfeta_ittqualification> GetIttQualificationByIdAsync(Guid ittQualificationId)
+    {
+        var ittQualifications = await EnsureIttQualificationsAsync();
+        return ittQualifications.Single(q => q.Id == ittQualificationId, $"Could not find ITT qualification with ID: '{ittQualificationId}'.");
     }
 
     public async Task<Account?> GetIttProviderByUkPrnAsync(string ukPrn)
@@ -231,6 +251,12 @@ public class ReferenceDataCache(
     {
         var ittProviders = await EnsureIttProvidersAsync();
         return ittProviders.SingleOrDefault(p => p.Name == name);
+    }
+
+    public async Task<Account?> GetIttProviderByIdAsync(Guid providerId)
+    {
+        var ittProviders = await EnsureIttProvidersAsync();
+        return ittProviders.Single(p => p.AccountId == providerId, $"Could not find ITT provider with ID: '{providerId}'.");
     }
 
     public async Task<InductionExemptionReason[]> GetPersonLevelInductionExemptionReasonsAsync(bool activeOnly = false)
@@ -275,6 +301,12 @@ public class ReferenceDataCache(
         return trainingSubjects.Single(e => e.TrainingSubjectId == id, $"Could not find subject with ID: '{id}'.");
     }
 
+    public async Task<TrainingSubject?> GetTrainingSubjectByReferenceAsync(string reference)
+    {
+        var trainingSubjects = await EnsureTrainingSubjectsAsync();
+        return trainingSubjects.Single(e => e.Reference == reference, $"Could not find subject with reference: '{reference}'.");
+    }
+
     public async Task<Country[]> GetTrainingCountriesAsync()
     {
         return (await EnsureTrainingCountriesAsync()).OrderBy(x => x.Name).ToArray();
@@ -307,6 +339,12 @@ public class ReferenceDataCache(
     {
         var trainingProviders = await EnsureTrainingProvidersAsync();
         return trainingProviders.Single(tp => tp.TrainingProviderId == trainingProviderId, $"Could not find training provider with ID: '{trainingProviderId}'.");
+    }
+
+    public async Task<TrainingProvider?> GetTrainingProviderByUkprnAsync(string ukprn)
+    {
+        var trainingProviders = await EnsureTrainingProvidersAsync();
+        return trainingProviders.SingleOrDefault(tp => tp.Ukprn == ukprn);
     }
 
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
@@ -375,17 +413,48 @@ public class ReferenceDataCache(
     private Task<dfeta_ittsubject[]> EnsureIttSubjectsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttSubjectsQuery()));
 
     private Task<dfeta_ittqualification[]> EnsureIttQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttQualificationsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttQualificationsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttQualificationsQuery()));
 
     private Task<Account[]> EnsureIttProvidersAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttProvidersTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttProvidersQuery()));
+            async () =>
+            {
+                var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 1, Pagesize: 1000);
+                var ittProviders = new List<Account>();
+
+                while (true)
+                {
+                    PagedProviderResults result;
+                    try
+                    {
+                        result = await crmQueryDispatcher.ExecuteQueryAsync(crmQuery);
+                    }
+                    catch (FaultException<OrganizationServiceFault> e) when (e.IsCrmRateLimitException(out var retryAfter))
+                    {
+                        await Task.Delay(retryAfter);
+                        continue;
+                    }
+
+                    ittProviders.AddRange(result.Providers);
+
+                    if (result.MoreRecords)
+                    {
+                        crmQuery = crmQuery with { PageNumber = crmQuery.PageNumber + 1, PagingCookie = result.PagingCookie };
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                return ittProviders.ToArray();
+            });
 
     private Task<InductionExemptionReason[]> EnsureInductionExemptionReasonsAsync() =>
         LazyInitializer.EnsureInitialized(

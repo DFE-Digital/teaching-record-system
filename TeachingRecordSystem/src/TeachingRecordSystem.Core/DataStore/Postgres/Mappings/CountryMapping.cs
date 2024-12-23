@@ -99,6 +99,7 @@ public class CountryMapping : IEntityTypeConfiguration<Country>
           new Country { CountryId = "GY", Name = "Guyana", OfficialName = "The Co-operative Republic of Guyana", CitizenNames = "Guyanese" },
           new Country { CountryId = "HT", Name = "Haiti", OfficialName = "The Republic of Haiti", CitizenNames = "Haitian" },
           new Country { CountryId = "HN", Name = "Honduras", OfficialName = "The Republic of Honduras", CitizenNames = "Honduran" },
+          new Country { CountryId = "HK", Name = "Hong Kong", OfficialName = "Hong Kong Special Administrative Region of the People's Republic of China", CitizenNames = "Hongkonger or Cantonese" },
           new Country { CountryId = "HU", Name = "Hungary", OfficialName = "Hungary", CitizenNames = "Hungarian" },
           new Country { CountryId = "IS", Name = "Iceland", OfficialName = "Iceland", CitizenNames = "Icelandic" },
           new Country { CountryId = "IN", Name = "India", OfficialName = "The Republic of India", CitizenNames = "Indian" },
