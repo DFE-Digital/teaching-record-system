@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Net;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.DependencyInjection;
@@ -1571,6 +1573,546 @@ public class TrsDataSyncHelper(
             InductionStatus = inductionStatusOption,
             InductionExemptionReason = inductionExemptionReasonOption
         };
+    }
+
+    public async Task<IttQtsMapResult[]> MapIttAndQtsRegistrationsAsync(
+        IEnumerable<dfeta_qtsregistration> qts,
+        IEnumerable<dfeta_initialteachertraining> itt,
+        //IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool createMigratedEvent)
+    {
+        var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusesAsync(activeOnly: false);
+
+        // TODO Events, inc. for deactivated
+
+        var ittByContact = itt.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
+        var qtsByContact = qts.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
+
+        // TODO Consider QTLS
+
+        if (ittByContact.Count == 0 && qtsByContact.Count == 0)
+        {
+            return [];
+        }
+
+        var result = new List<IttQtsMapResult>();
+
+        foreach (var contactId in ittByContact.Keys.Concat(qtsByContact.Keys).Distinct())
+        {
+            try
+            {
+                var ps = await MapContactIttAndQtsAsync(contactId);
+                result.AddRange(ps.Select(IttQtsMapResult.Succeeded));
+            }
+            catch (IttQtsMapException ex)
+            {
+                result.Add(ex.Result);
+            }
+        }
+
+        return result.ToArray();
+
+        async Task<IEnumerable<ProfessionalStatus>> MapContactIttAndQtsAsync(Guid contactId)
+        {
+            var contactItt = ittByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
+            var contactQts = qtsByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
+
+            var mapped = new List<ProfessionalStatus>();
+
+            foreach (var qts in contactQts)
+            {
+                if (qts.dfeta_TeacherStatusId is null && qts.dfeta_EarlyYearsStatusId is null)
+                {
+                    throw new IttQtsMapException(IttQtsMapResult.Failed(
+                        contactId,
+                        IttQtsMapResultFailedReason.QtsRegistrationHasNoStatus,
+                        qts.Id,
+                        ittId: null));
+                }
+
+                // A qtsregistration can have a teacher status, EY status or both
+                foreach (var isEy in new[] { true, false })
+                {
+                    var teacherStatus = !isEy && qts.dfeta_TeacherStatusId is not null
+                        ? await referenceDataCache.GetTeacherStatusByIdAsync(qts.dfeta_TeacherStatusId.Id)
+                        : null;
+
+                    if (!isEy && teacherStatus is null)
+                    {
+                        continue;
+                    }
+
+                    var eyStatus = isEy && qts.dfeta_EarlyYearsStatusId is not null
+                        ? await referenceDataCache.GetEarlyYearsStatusByIdAsync(qts.dfeta_EarlyYearsStatusId.Id)
+                        : null;
+
+                    if (isEy && eyStatus is null)
+                    {
+                        continue;
+                    }
+
+                    Guid routeId;
+                    Guid? inductionExemptionReasonId = null;
+
+                    var compatibleProgrammeTypes = Enum.GetValues<dfeta_ITTProgrammeType>()
+                        .Where(i => isEy == i.IsEarlyYears())
+                        .ToArray();
+
+                    dfeta_initialteachertraining? itt = null;
+
+                    var matchingItt = contactItt
+                        .Where(itt =>
+                            itt.dfeta_ProgrammeType is null ||
+                            compatibleProgrammeTypes.Contains(itt.dfeta_ProgrammeType!.Value) &&
+                            itt.StateCode == dfeta_initialteachertrainingState.Active)
+                        .ToArray();
+
+                    if (matchingItt.Length == 1)
+                    {
+                        itt = matchingItt[0];
+                        contactItt.Remove(itt);
+                    }
+                    else if (matchingItt.Length > 1)
+                    {
+                        throw new IttQtsMapException(
+                            IttQtsMapResult.Failed(
+                                contactId,
+                                IttQtsMapResultFailedReason.MultipleIttRecordsForQtsRegistration,
+                                qts.Id,
+                                ittId: null));
+                    }
+
+                    DateOnly? awardedDate = isEy
+                        ? qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                        : qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
+
+                    if (itt?.dfeta_Result is dfeta_ITTResult.ApplicationReceived
+                            or dfeta_ITTResult.ApplicationUnsuccessful
+                            or dfeta_ITTResult.NoResultSubmitted ||
+                        (awardedDate is null && itt?.dfeta_Result is null))
+                    {
+                        continue;
+                    }
+
+                    var status = (isEy && qts.dfeta_EYTSDate is not null) || (!isEy && qts.dfeta_QTSDate is not null)
+                        ? ProfessionalStatusStatus.Awarded
+                        : itt?.dfeta_Result switch
+                        {
+                            dfeta_ITTResult.Approved => ProfessionalStatusStatus.Approved,
+                            dfeta_ITTResult.Deferred => ProfessionalStatusStatus.Deferred,
+                            dfeta_ITTResult.DeferredforSkillsTests => ProfessionalStatusStatus.DeferredForSkillsTest,
+                            dfeta_ITTResult.Fail => ProfessionalStatusStatus.Failed,
+                            dfeta_ITTResult.InTraining => ProfessionalStatusStatus.InTraining,
+                            dfeta_ITTResult.Pass => throw new IttQtsMapException(
+                                IttQtsMapResult.Failed(
+                                    contactId,
+                                    IttQtsMapResultFailedReason.PassResultHasNoAwardDate,
+                                    qts.Id,
+                                    ittId: itt.Id)),
+                            dfeta_ITTResult.UnderAssessment => ProfessionalStatusStatus.UnderAssessment,
+                            dfeta_ITTResult.Withdrawn => ProfessionalStatusStatus.Withdrawn,
+                            _ => throw new IttQtsMapException(
+                                IttQtsMapResult.Failed(
+                                    contactId,
+                                    IttQtsMapResultFailedReason.CannotMapStatus,
+                                    qts.Id,
+                                    itt?.Id))
+                        };
+
+                    Guid GetRouteFromIttProgrammeType(out Guid? inductionExemptionReasonId)
+                    {
+                        if (itt is null)
+                        {
+                            throw new IttQtsMapException(
+                                IttQtsMapResult.Failed(
+                                    contactId,
+                                    IttQtsMapResultFailedReason.CannotMapRouteTypeWithoutItt,
+                                    qts.Id,
+                                    ittId: null));
+                        }
+
+                        inductionExemptionReasonId = null; // FIXME
+
+                        switch (itt.dfeta_ProgrammeType)
+                        {
+                            case dfeta_ITTProgrammeType.Apprenticeship:
+                                return new("6987240E-966E-485F-B300-23B54937FB3A");
+                            case dfeta_ITTProgrammeType.AssessmentOnlyRoute:
+                                return new("57B86CEF-98E2-4962-A74A-D47C7A34B838");
+                            case dfeta_ITTProgrammeType.Core:
+                                return new("4163C2FB-6163-409F-85FD-56E7C70A54DD");
+                            case dfeta_ITTProgrammeType.CoreFlexible:
+                                return new("4BD7A9F0-28CA-4977-A044-A7B7828D469B");
+                            case dfeta_ITTProgrammeType.EYITTAssessmentOnly:
+                                return new("D9EEF3F8-FDE6-4A3F-A361-F6655A42FA1E");
+                            case dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased:
+                                return new("4477E45D-C531-4C63-9F4B-E157766366FB");
+                            case dfeta_ITTProgrammeType.EYITTGraduateEntry:
+                                return new("DBC4125B-9235-41E4-ABD2-BAABBF63F829");
+                            case dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears:
+                                return new("7F09002C-5DAD-4839-9693-5E030D037AE9");
+                            case dfeta_ITTProgrammeType.EYITTUndergraduate:
+                                return new("C97C0FD2-FD84-4949-97C7-B0E2422FB3C8");
+                            case dfeta_ITTProgrammeType.FutureTeachingScholars:
+                                return new("F85962C9-CF0C-415D-9DE5-A397F95AE261");
+                            case dfeta_ITTProgrammeType.HEI:
+                                return new("10078157-E8C3-42F7-A050-D8B802E83F7B");
+                            case dfeta_ITTProgrammeType.HighpotentialITT:
+                                return new("BFEF20B2-5AC4-486D-9493-E5A4538E1BE9");
+                            case dfeta_ITTProgrammeType.Internationalqualifiedteacherstatus:
+                                return new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1");
+                            case dfeta_ITTProgrammeType.LicensedTeacherProgramme:
+                                return new("2B4862CA-BD30-4A3A-BFCE-52B57C2946C7");
+                            case dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme:
+                                return new("51756384-CFEA-4F63-80E5-F193686E0F71");
+                            case dfeta_ITTProgrammeType.Primaryandsecondarypostgraduatefeefunded:
+                                return new("EF46FF51-8DC0-481E-B158-61CCEA9943D9");
+                            case dfeta_ITTProgrammeType.Primaryandsecondaryundergraduatefeefunded:
+                                return new("321D5F9A-9581-4936-9F63-CFDDD2A95FE2");
+                            case dfeta_ITTProgrammeType.Providerled_postgrad:
+                                return new("97497716-5AC5-49AA-A444-27FA3E2C152A");
+                            case dfeta_ITTProgrammeType.Providerled_undergrad:
+                                return new("53A7FBDA-25FD-4482-9881-5CF65053888D");
+                            case dfeta_ITTProgrammeType.RegisteredTeacherProgramme:
+                                return new("70368FF2-8D2B-467E-AD23-EFE7F79995D7");
+                            case dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme:
+                                return new("D9490E58-ACDC-4A38-B13E-5A5C21417737");
+                            case dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried:
+                                return new("12A742C3-1CD4-43B7-A2FA-1000BD4CC373");
+                            case dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Selffunded:
+                                return new("97E1811B-D46C-483E-AEC3-4A2DD51A55FE");
+                            case dfeta_ITTProgrammeType.TeachFirstProgramme:
+                                return new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8");
+                            case dfeta_ITTProgrammeType.UndergraduateOptIn:
+                                return new("20f67e38-f117-4b42-bbfc-5812aa717b94");
+                            default:
+                                throw new IttQtsMapException(
+                                    IttQtsMapResult.Failed(
+                                        contactId,
+                                        IttQtsMapResultFailedReason.CannotMapRouteTypeFromItt, qts.Id, ittId: itt.Id));
+                        }
+                    }
+
+                    switch (teacherStatus?.dfeta_name ?? eyStatus?.dfeta_name)
+                    {
+                        case "Qualified teacher (trained)":
+                            routeId = GetRouteFromIttProgrammeType(out inductionExemptionReasonId);
+                            break;
+                        case
+                            "Qualified teacher: Following at least one term's service on the Graduate Teacher Programme"
+                            :
+                            routeId = new("34222549-ED59-4C4A-811D-C0894E78D4C3");
+                            break;
+                        case "Qualified Teacher: Under the EC Directive":
+                            routeId = new("F4DA123B-5C37-4060-AB00-52DE4BD3599E");
+                            break;
+                        case "Qualified teacher (graduate non-trained)":
+                            routeId = new("88867B43-897B-49B5-97CC-F4F81A1D5D44");
+                            break;
+                        case "Qualified Teacher: QTS awarded in Wales":
+                            routeId = new("877ba701-fe26-4951-9f15-171f3755d50d");
+                            break;
+                        case "Trainee Teacher":
+                            routeId = GetRouteFromIttProgrammeType(out inductionExemptionReasonId);
+                            break;
+                        case "Qualified teacher following a school centred Initial Teacher Training course (SCITT)":
+                            routeId = new("ABCB0A14-0C21-4598-A42C-A007D4B048AC");
+                            break;
+                        case "Qualified teacher (by virtue of other qualifications)":
+                            routeId = new("88867B43-897B-49B5-97CC-F4F81A1D5D44");
+                            break;
+                        case "Qualified Teacher: By virtue of overseas qualifications":
+                            routeId = new("51756384-CFEA-4F63-80E5-F193686E0F71");
+                            break;
+                        case "Qualified Teacher: Assessment Only Route":
+                            routeId = new("57B86CEF-98E2-4962-A74A-D47C7A34B838");
+                            break;
+                        case "Early Years Professional Status":
+                            routeId = new("8F5C0431-D006-4EDA-9336-16DFC6A26A78");
+                            break;
+                        case "Qualified Teacher (under the Flexible Post-graduate route)":
+                            routeId = new("700EC96F-6BBF-4080-87BD-94EF65A6A879");
+                            break;
+                        case "Qualified Teacher: Teachers trained/registered in Scotland":
+                            routeId = new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB");
+                            break;
+                        case "Qualified Teacher (Overseas Trained Teacher exempt from induction)":
+                            routeId = new("51756384-CFEA-4F63-80E5-F193686E0F71");
+                            inductionExemptionReasonId = new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"); // REVIEW
+                            break;
+                        case "Early Years Teacher Status":
+                            routeId = GetRouteFromIttProgrammeType(out inductionExemptionReasonId);
+                            break;
+                        case "Qualified Teacher (by virtue of non-UK teaching qualifications)":
+                            routeId = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713");
+                            break;
+                        case
+                            "Qualified teacher: Following at least one school year's service on the Teach First Programme"
+                            :
+                            routeId = new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8");
+                            break;
+                        //"Qualified teacher (trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959" => ???,
+                        case "Qualified Teacher (Overseas Trained Teacher needing to complete induction)":
+                            routeId = new("51756384-CFEA-4F63-80E5-F193686E0F71");
+                            break;
+                        case
+                            "Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)"
+                            :
+                            routeId = new("3604EF30-8F11-4494-8B52-A2F9C5371E03");
+                            break;
+                        case
+                            "Qualified teacher: Following at least one year's service on the Registered Teacher Programme"
+                            :
+                            routeId = new("70368FF2-8D2B-467E-AD23-EFE7F79995D7");
+                            break;
+                        case "Qualified Teacher (by virtue of European teaching qualifications)":
+                            routeId = new("2B106B9D-BA39-4E2D-A42E-0CE827FDC324");
+                            break;
+                        case "Qualified Teacher: following at least 2 year's service as a licensed teacher":
+                            routeId = new("2B4862CA-BD30-4A3A-BFCE-52B57C2946C7");
+                            break;
+                        //"Qualified teacher (trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959"
+                        case
+                            "Qualified teacher following at least one terms employment as an authorized teacher with at least one years teaching experience (from 1 september 1991)"
+                            :
+                            routeId = new("4B6FC697-BE67-43D3-9021-CC662C4A559F");
+                            break;
+                        case
+                            "Qualified Teacher: following at least one term's service as a licensed teacher (in respect of 3 year's overseas trained teachers)"
+                            :
+                            routeId = new("779BD3C6-6B3A-4204-9489-1BBB381B52BF");
+                            break;
+                        case "Early Years Trainee":
+                            routeId = GetRouteFromIttProgrammeType(out inductionExemptionReasonId);
+                            break;
+                        case "Qualified teacher: by virtue of achieving international qualified teacher status":
+                            routeId = new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1");
+                            break;
+                        case
+                            "Qualified teacher following at least one years employment as a licensed teacher with at least two years previous experience as an instructor in a maintained school (from 1 September 1991)"
+                            :
+                            routeId = new("E5C198FA-35F0-4A13-9D07-8B0239B4957A");
+                            break;
+                        case
+                            "Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in further education)"
+                            :
+                            routeId = new("D5EB09CC-C64F-45DF-A46D-08277A25DE7A");
+                            break;
+                        case "Partial qualified teacher status: qualified to teach in SEN establishments":
+                            routeId = new("EC95C276-25D9-491F-99A2-8D92F10E1E94");
+                            break;
+                        case "AOR Candidate":
+                            routeId = new("57B86CEF-98E2-4962-A74A-D47C7A34B838");
+                            break;
+                        //"Qualified teacher of children with Multi-sensory Impairments (from 1 June 1991)"
+                        case
+                            "Qualified Teacher: following at least one school year's service as a licensed teacher (in respect of those with 2 year's or more experience in an independent school)"
+                            :
+                            routeId = new("64C28594-4B63-42B3-8B47-E3F140879E66");
+                            break;
+                        case "Qualified Teacher: Teach First Programme (TNP)":
+                            routeId = new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8");
+                            break;
+                        case "Qualified Teacher (Further Education)":
+                            routeId = new("45C93B5B-B4DC-4D0F-B0DE-D612521E0A13");
+                            break;
+                        case
+                            "Qualified teacher (by virtue of other qualifications) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations"
+                            :
+                            routeId = new("88867B43-897B-49B5-97CC-F4F81A1D5D44");
+                            break;
+                        case
+                            "Qualified teacher (graduate non-trained) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959"
+                            :
+                            routeId = new("88867B43-897B-49B5-97CC-F4F81A1D5D44");
+                            break;
+                        case
+                            "Qualified teacher (graduate non-trained) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959"
+                            :
+                            routeId = new("88867B43-897B-49B5-97CC-F4F81A1D5D44");
+                            break;
+                        case "Qualified teacher (by virtue of long service)":
+                            routeId = new("AA1EFD16-D59C-4E18-A496-16E39609B389");
+                            break;
+                        case
+                            "Qualified Teacher: following at least one schoolyear's service as a licensed teacher (in respect of those with 2 year's or more experience in the educational services of the Armed Forces)"
+                            :
+                            routeId = new("FC16290C-AC1E-4830-B7E9-35708F1BDED3");
+                            break;
+                        case
+                            "Qualified teacher (by virtue of other qualifications) further qualified to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959 a maintained school."
+                            :
+                            routeId = new("88867B43-897B-49B5-97CC-F4F81A1D5D44");
+                            break;
+                        case "Qualified teacher: TCMH  3 year,s experience.":
+                            routeId = new("82AA14D3-EF6A-4B46-A10C-DC850DDCEF5F");
+                            break;
+                        case
+                            "Qualified teacher (under the EC Directive) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959"
+                            :
+                            routeId = new("F4DA123B-5C37-4060-AB00-52DE4BD3599E");
+                            break;
+                        case
+                            "Qualified teacher following successful completion of a period of Registration in a CTC or CCTA"
+                            :
+                            routeId = new("5748D41D-7B53-4EE6-833A-83080A3BD8EF");
+                            break;
+                        case "Trainee on Graduate Teacher Programme":
+                            routeId = new("34222549-ED59-4C4A-811D-C0894E78D4C3");
+                            break;
+                        case
+                            "Qualified teacher (under the EC Directive) further qualifed to teach the blind under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959"
+                            :
+                            routeId = new("F4DA123B-5C37-4060-AB00-52DE4BD3599E");
+                            break;
+                        case
+                            "Qualified Teacher: Teacher trained/registered in Scotland, further qualified to teach the deaf or partially hearing impaired under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959."
+                            :
+                            routeId = new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB");
+                            break;
+                        //"QTS Awarded in error":
+                        case
+                            "Qualified teacher (by virtue of long service) further qualified to teach the deaf or partially hearing under Regulation 15(2) of the Special Schools and Handicapped Pupils Regulations 1959"
+                            :
+                            routeId = new("AA1EFD16-D59C-4E18-A496-16E39609B389");
+                            break;
+                        case
+                            "Qualified Teacher: following at least 1 school yrs service as a licensed teacher (in respect of those with 2 years or more experience in an independent school), further qualified to teach the deaf or partially hearing impaired under Re"
+                            :
+                            routeId = new("64C28594-4B63-42B3-8B47-E3F140879E66");
+                            break;
+                        case "Qualified Teacher: Troops to Teach Programme":
+                            routeId = new("50D18F17-EE26-4DAD-86CA-1AAE3F956BFC");
+                            break;
+                        default:
+                            throw new IttQtsMapException(IttQtsMapResult.Failed(
+                                contactId,
+                                IttQtsMapResultFailedReason.UnknownTeacherStatus, qts.Id, ittId: null));
+                    }
+
+                    mapped.Add(CreateProfessionalStatus(allRoutes, contactId, routeId, status, inductionExemptionReasonId, awardedDate, qts, itt, teacherStatus, eyStatus));
+                }
+            }
+
+            //foreach (var itt in contactItt)
+            //{
+                //throw new NotImplementedException();
+            //}
+
+            return mapped;
+
+            static ProfessionalStatus CreateProfessionalStatus(
+                RouteToProfessionalStatus[] allRoutes,
+                Guid personId,
+                Guid routeId,
+                ProfessionalStatusStatus status,
+                Guid? inductionExemptionReasonId,
+                DateOnly? awardedDate,
+                dfeta_qtsregistration? qts,
+                dfeta_initialteachertraining? itt,
+                dfeta_teacherstatus? teacherStatus,
+                dfeta_earlyyearsstatus? eyStatus)
+            {
+                var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == routeId);
+                var professionalStatusType = route.ProfessionalStatusType;
+
+                return new ProfessionalStatus
+                {
+                    QualificationId = (qts?.Id ?? itt?.Id)!.Value,
+                    ProfessionalStatusType = professionalStatusType,
+                    CreatedOn = MinDate(
+                        qts?.GetAttributeValue<DateTime>("createdon"),
+                        itt?.GetAttributeValue<DateTime>("createdon")),
+                    UpdatedOn = MaxDate(
+                        qts?.GetAttributeValue<DateTime>("createdon"),
+                        itt?.GetAttributeValue<DateTime>("createdon")),
+                    DeletedOn = null,
+                    PersonId = personId,
+                    RouteToProfessionalStatusId = routeId,
+                    Status = status,
+                    TrainingStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    TrainingEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    TrainingAgeSpecialismType = default, // TODO
+                    TrainingAgeSpecialismRangeFrom = default, // itt?.dfeta_AgeRangeFrom
+                    TrainingAgeSpecialismRangeTo = default, // itt?.dfeta_AgeRangeTo
+                    AwardedDate = awardedDate,
+                    InductionExemptionReasonId = inductionExemptionReasonId,
+                    TrainingSubjectIds = [], // TODO
+                    TrainingCountryId = null, // TODO
+                    TrainingProviderId = null, // TODO
+                    DqtTeacherStatusName = teacherStatus?.dfeta_name,
+                    DqtTeacherStatusValue = teacherStatus?.dfeta_Value,
+                    DqtEarlyYearsStatusName = eyStatus?.dfeta_name,
+                    DqtEarlyYearsStatusValue = eyStatus?.dfeta_Value,
+                    DqtInitialTeacherTrainingId = itt?.Id,
+                    DqtQtsRegistrationId = qts?.Id
+                };
+            }
+        }
+
+        static DateTime MinDate(params DateTime?[] dts) => dts.Where(d => d.HasValue).Min(d => d!.Value);
+        static DateTime MaxDate(params DateTime?[] dts) => dts.Where(d => d.HasValue).Max(d => d!.Value);
+    }
+
+    public sealed class IttQtsMapResult
+    {
+        private IttQtsMapResult()
+        {
+        }
+
+        public bool Success { get; private set; }
+
+        public ProfessionalStatus? ProfessionalStatus { get; private set; }
+
+        public Guid ContactId { get; private set; }
+
+        public IttQtsMapResultFailedReason? FailedReason { get; private set; }
+
+        public Guid? QtsRegistrationId { get; private set; }
+
+        public Guid? IttId { get; private set; }
+
+        public static IttQtsMapResult Succeeded(ProfessionalStatus ps)
+        {
+            return new IttQtsMapResult()
+            {
+                Success = true,
+                ProfessionalStatus = ps,
+                ContactId = ps.PersonId
+            };
+        }
+
+        public static IttQtsMapResult Failed(
+            Guid contactId,
+            IttQtsMapResultFailedReason reason,
+            Guid? qtsRegistrationId,
+            Guid? ittId)
+        {
+            return new IttQtsMapResult()
+            {
+                Success = false,
+                ContactId = contactId,
+                FailedReason = reason,
+                QtsRegistrationId = qtsRegistrationId,
+                IttId = ittId
+            };
+        }
+    }
+
+    public enum IttQtsMapResultFailedReason
+    {
+        UnknownTeacherStatus,
+        MultipleIttRecordsForQtsRegistration,
+        QtsRegistrationHasNoStatus,
+        CannotMapStatus,
+        CannotMapRouteTypeWithoutItt,
+        PassResultHasNoAwardDate,
+        CannotMapRouteTypeFromItt
+    }
+
+    private class IttQtsMapException(IttQtsMapResult result) : Exception
+    {
+        public IttQtsMapResult Result { get; } = result;
     }
 
     private record ModelTypeSyncInfo
