@@ -204,7 +204,8 @@
     "dfeta_personid",
     "dfeta_qtsdate",
     "dfeta_teacherstatusid",
-    "statecode"
+    "statecode",
+    "dfeta_dateofrecognition"
   ],
   "dfeta_qualification": [
     "dfeta_completionorawarddate",

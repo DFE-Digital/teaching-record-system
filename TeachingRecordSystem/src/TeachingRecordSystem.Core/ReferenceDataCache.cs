@@ -208,10 +208,10 @@ public class ReferenceDataCache(
         return ittSubjects.FirstOrDefault(at => at.dfeta_Value == subjectCode);
     }
 
-    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync()
+    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync(bool activeOnly = true)
     {
         var ittQualifications = await EnsureIttQualificationsAsync();
-        return ittQualifications.ToArray();
+        return ittQualifications.Where(q => !activeOnly || q.StateCode == dfeta_ittqualificationState.Active).ToArray();
     }
 
     public async Task<dfeta_ittqualification> GetIttQualificationByValueAsync(string value)
@@ -219,6 +219,12 @@ public class ReferenceDataCache(
         var ittQualifications = await EnsureIttQualificationsAsync();
         // build environment has some duplicate ITT Qualifications, which prevent us using Single() here
         return ittQualifications.First(s => s.dfeta_Value == value, $"Could not find ITT qualification with value: '{value}'.");
+    }
+
+    public async Task<dfeta_ittqualification> GetIttQualificationByIdAsync(Guid ittQualificationId)
+    {
+        var ittQualifications = await EnsureIttQualificationsAsync();
+        return ittQualifications.Single(q => q.Id == ittQualificationId, $"Could not find ITT qualification with ID: '{ittQualificationId}'.");
     }
 
     public async Task<Account?> GetIttProviderByUkPrnAsync(string ukPrn)
@@ -380,7 +386,7 @@ public class ReferenceDataCache(
     private Task<dfeta_ittqualification[]> EnsureIttQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttQualificationsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttQualificationsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttQualificationsQuery()));
 
     private Task<Account[]> EnsureIttProvidersAsync() =>
         LazyInitializer.EnsureInitialized(
