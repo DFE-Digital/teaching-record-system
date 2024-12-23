@@ -17839,14 +17839,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.WebhookEndpoint", b =>
                 {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApplicationUser", "ApplicationUser")
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_webhook_endpoints_application_users_application_user_id");
-
-                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.WebhookMessage", b =>
