@@ -40,7 +40,8 @@ public class EventMapperFixture
             dbFixture.GetDataSource(),
             organizationService,
             ReferenceDataCache,
-            Clock);
+            Clock,
+            new TestableAuditRepository());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

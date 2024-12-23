@@ -39,6 +39,8 @@ public static class HostApplicationBuilderExtensions
                     .GetRequiredValue("TrsSyncService:CrmConnectionString")));
 
             builder.Services.AddCrmEntityChangesService(name: TrsDataSyncService.CrmClientName);
+
+            builder.Services.AddSingleton<IAuditRepository, BlobStorageAuditRepository>();
         }
 
         builder.Services.TryAddSingleton<TrsDataSyncHelper>();

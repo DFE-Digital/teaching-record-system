@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
@@ -20,7 +19,8 @@ public class TrsDataSyncHelper(
     NpgsqlDataSource trsDbDataSource,
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     ReferenceDataCache referenceDataCache,
-    IClock clock)
+    IClock clock,
+    IAuditRepository auditRepository)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -46,6 +46,16 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
+    }
+
+    public async Task SyncAuditAsync(string entityLogicalName, IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        var audits = await GetAuditRecordsAsync(entityLogicalName, ids, cancellationToken);
+
+        foreach (var (id, audit) in audits)
+        {
+            await auditRepository.SetAuditDetailAsync(entityLogicalName, id, audit);
+        }
     }
 
     public static Alert? MapAlertFromDqtSanction(
