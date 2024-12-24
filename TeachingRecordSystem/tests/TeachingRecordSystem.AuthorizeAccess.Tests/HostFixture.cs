@@ -61,6 +61,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddFakeXrm();
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
             services.AddSingleton<FakeTrnGenerator>();
+            services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton(GetMockFileService());
 

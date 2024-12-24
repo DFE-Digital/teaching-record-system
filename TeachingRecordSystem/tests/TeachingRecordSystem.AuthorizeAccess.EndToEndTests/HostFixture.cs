@@ -89,6 +89,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<TrsDataSyncHelper>();
+                    services.AddSingleton<IAuditRepository, TestableAuditRepository>();
                     services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
                     services.AddSingleton(GetMockFileService());
 
