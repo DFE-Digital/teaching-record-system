@@ -44,7 +44,7 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
         _serializer.WriteObject(ms, auditDetailCollection);
         ms.Seek(0L, SeekOrigin.Begin);
 
-        await blobClient.UploadAsync(ms);
+        await blobClient.UploadAsync(ms, overwrite: true);
     }
 
     private static string GetBlobName(string entityLogicalName, Guid id) => $"{entityLogicalName}/{id:N}.xml";
