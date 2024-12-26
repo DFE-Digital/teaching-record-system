@@ -11,6 +11,9 @@ public class TestableAuditRepository : IAuditRepository
     public Task<AuditDetailCollection?> GetAuditDetailAsync(string entityLogicalName, Guid id) =>
         Task.FromResult(_audits.TryGetValue((entityLogicalName, id), out var audit) ? audit : null);
 
+    public Task<bool> HaveAuditDetailAsync(string entityLogicalName, Guid id) =>
+        Task.FromResult(_audits.ContainsKey((entityLogicalName, id)));
+
     public Task SetAuditDetailAsync(string entityLogicalName, Guid id, AuditDetailCollection auditDetailCollection)
     {
         _audits[(entityLogicalName, id)] = auditDetailCollection;
