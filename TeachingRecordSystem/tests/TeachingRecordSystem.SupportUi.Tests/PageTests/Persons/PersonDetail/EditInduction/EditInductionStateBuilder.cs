@@ -24,7 +24,7 @@ public class EditInductionStateBuilder
 
     public EditInductionStateBuilder WithUpdatedState(InductionStatus inductionStatus)
     {
-        if(InitialInductionStatus == InductionStatus.None)
+        if (InitialInductionStatus == InductionStatus.None)
         {
             throw new NotSupportedException("Initialised state must be set using WithInitialisedState");
         }
@@ -42,7 +42,7 @@ public class EditInductionStateBuilder
             CompletedDate = CompletedDate,
             ExemptionReasons = ExemptionReasons,
             ChangeReason = ChangeReason,
-            JourneyStartPage =JourneyStartPage,
+            JourneyStartPage = JourneyStartPage,
             RecordManagedInCpd = RecordManagedInCpd,
             Initialized = Initialized
         };
