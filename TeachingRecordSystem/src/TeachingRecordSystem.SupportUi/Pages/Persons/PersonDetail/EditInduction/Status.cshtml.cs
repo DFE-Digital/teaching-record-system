@@ -9,7 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
 public class StatusModel : CommonJourneyPage
 {
-    private static readonly List<InductionStatus> ValidStatusesWhenManagedByCpd = new() { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales };
     private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
 
     protected TrsDbContext _dbContext;
@@ -27,7 +26,7 @@ public class StatusModel : CommonJourneyPage
         get
         {
             return InductionStatusManagedByCpd ?
-                 InductionStatusRegistry.All.Where(i => ValidStatusesWhenManagedByCpd.Contains(i.Value) && i.Value != CurrentInductionStatus)
+                 InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd.Where(i => i.Value != CurrentInductionStatus)
                 : InductionStatusRegistry.All.ToArray()[1..].Where(i => i.Value != CurrentInductionStatus);
         }
     }

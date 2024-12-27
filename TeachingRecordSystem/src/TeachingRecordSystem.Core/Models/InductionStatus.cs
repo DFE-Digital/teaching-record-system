@@ -27,6 +27,12 @@ public static class InductionStatusRegistry
 
     public static IReadOnlyCollection<InductionStatusInfo> All => _info.Values.ToArray();
 
+    public static IReadOnlyCollection<InductionStatusInfo> ValidStatusChangesWhenManagedByCpd =>
+        _info
+            .Where(s => s.Key is InductionStatus.RequiredToComplete or InductionStatus.Exempt or InductionStatus.FailedInWales)
+            .Select(s => s.Value)
+            .ToArray();
+
     public static string GetName(this InductionStatus status) => _info[status].Name;
 
     public static string GetTitle(this InductionStatus status) => _info[status].Title;
