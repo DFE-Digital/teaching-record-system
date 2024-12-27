@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using TeachingRecordSystem.SupportUi.EndToEndTests.Shared;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
