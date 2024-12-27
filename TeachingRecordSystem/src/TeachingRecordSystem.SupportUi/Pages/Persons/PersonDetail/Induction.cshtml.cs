@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
-    private const string InductionIsManagedByCpdWarning = "To change a teacher\u2019s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
+    private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
     private bool _statusIsManagedByCpd;
     private bool _teacherHoldsQualifiedTeacherStatus;
 
@@ -68,20 +68,12 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         StartDate = person!.InductionStartDate;
         CompletionDate = person!.InductionCompletedDate;
         ExemptionReasons = person!.InductionExemptionReasons;
-        _statusIsManagedByCpd = StatusManagedByCpdRule(person!.CpdInductionStatus, person.CpdInductionCompletedDate);
+        _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
     }
 
     private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)
     {
         return qtsDate is null;
-    }
-
-    private bool StatusManagedByCpdRule(InductionStatus? status, DateOnly? inductionCompletedDate)
-    {
-        var sevenYearsAgo = clock.Today.AddYears(-7);
-        return status is not null
-            && inductionCompletedDate is not null
-            && inductionCompletedDate < sevenYearsAgo;
     }
 }
