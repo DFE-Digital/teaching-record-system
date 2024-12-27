@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using AzAdUser = TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory.User;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.Shared;
 
 public static class TestUsers
 {

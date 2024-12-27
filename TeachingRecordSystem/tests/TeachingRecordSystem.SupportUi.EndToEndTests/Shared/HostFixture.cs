@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.Shared;
 
 public sealed class HostFixture : IAsyncDisposable, IStartupTask
 {
@@ -71,7 +71,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
 
                     services.AddSingleton<CurrentUserProvider>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
-                    services.AddSingleton<TestData>(
+                    services.AddSingleton(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();

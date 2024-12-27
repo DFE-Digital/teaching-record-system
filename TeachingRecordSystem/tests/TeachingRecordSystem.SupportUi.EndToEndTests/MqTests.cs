@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.SupportUi.EndToEndTests.Shared;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.DeleteMq;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Provider;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;

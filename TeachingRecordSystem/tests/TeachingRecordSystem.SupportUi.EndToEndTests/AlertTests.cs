@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using TeachingRecordSystem.SupportUi.EndToEndTests.Shared;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.AddAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.CloseAlert;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Details;

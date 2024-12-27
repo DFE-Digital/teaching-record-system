@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.EndToEndTests.Shared;
+
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
 public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
