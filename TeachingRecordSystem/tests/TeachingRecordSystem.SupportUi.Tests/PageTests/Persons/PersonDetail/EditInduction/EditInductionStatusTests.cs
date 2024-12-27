@@ -72,7 +72,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Failed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
-    public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus initialInductionStatus, InductionStatus[] expectedStatuses)
+    public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus, InductionStatus[] expectedStatuses)
     {
         // Arrange
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
@@ -82,7 +82,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(initialInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
                 .Create());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -102,7 +102,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt })]
-    public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus initialInductionStatus, InductionStatus[] expectedStatuses)
+    public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus, InductionStatus[] expectedStatuses)
     {
         // Arrange
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
@@ -125,7 +125,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(initialInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
                 .Create());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -148,7 +148,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, InductionStatus.InProgress)]
     [InlineData(InductionStatus.Failed, InductionStatus.FailedInWales)]
     [InlineData(InductionStatus.FailedInWales, InductionStatus.Failed)]
-    public async Task Get_InductionstatusHasBeenSet_ShowsSelectedRadioButton(InductionStatus initialInductionStatus, InductionStatus selectedInductionStatus)
+    public async Task Get_InductionstatusHasBeenSet_ShowsSelectedRadioButton(InductionStatus currentInductionStatus, InductionStatus selectedInductionStatus)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -156,7 +156,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(initialInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
                 .WithUpdatedState(selectedInductionStatus)
                 .Create());
 
@@ -207,7 +207,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
 
-    public async Task Post_NoSelectedStatus_ShowsPageError(InductionStatus initialInductionStatus, InductionStatus[] expectedStatusChoices)
+    public async Task Post_NoSelectedStatus_ShowsPageError(InductionStatus currentInductionStatus, InductionStatus[] expectedStatusChoices)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -215,7 +215,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(initialInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -242,7 +242,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
     [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt })]
-    public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError(InductionStatus initialInductionStatus, InductionStatus[] expectedChoices)
+    public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError(InductionStatus currentInductionStatus, InductionStatus[] expectedChoices)
     {
         var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -262,7 +262,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(initialInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")

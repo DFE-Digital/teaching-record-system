@@ -20,15 +20,15 @@ public class StatusModel : CommonJourneyPage
     [Display(Name = "Select a status")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
-    public InductionStatus InitialInductionStatus { get; set; }
+    public InductionStatus CurrentInductionStatus { get; set; }
     public string? PersonName { get; set; }
     public IEnumerable<InductionStatusInfo> StatusChoices
     {
         get
         {
             return InductionStatusManagedByCpd ?
-                 InductionStatusRegistry.All.Where(i => ValidStatusesWhenManagedByCpd.Contains(i.Value) && i.Value != InitialInductionStatus)
-                : InductionStatusRegistry.All.ToArray()[1..].Where(i => i.Value != InitialInductionStatus);
+                 InductionStatusRegistry.All.Where(i => ValidStatusesWhenManagedByCpd.Contains(i.Value) && i.Value != CurrentInductionStatus)
+                : InductionStatusRegistry.All.ToArray()[1..].Where(i => i.Value != CurrentInductionStatus);
         }
     }
     public string? StatusWarningMessage
@@ -72,12 +72,12 @@ public class StatusModel : CommonJourneyPage
         var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
         InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
         InductionStatus = JourneyInstance!.State.InductionStatus;
-        InitialInductionStatus = JourneyInstance!.State.InitialInductionStatus;
+        CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            if (state.InitialInductionStatus == InductionStatus.None)
+            if (state.CurrentInductionStatus == InductionStatus.None)
             {
-                state.InitialInductionStatus = InitialInductionStatus;
+                state.CurrentInductionStatus = CurrentInductionStatus;
             }
         });
     }
@@ -88,7 +88,7 @@ public class StatusModel : CommonJourneyPage
         {
             var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
             InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
-            InitialInductionStatus = JourneyInstance!.State.InitialInductionStatus;
+            CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
             return this.PageWithErrors();
         }
         await JourneyInstance!.UpdateStateAsync(state =>
