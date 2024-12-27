@@ -56,6 +56,7 @@ public record GetPersonResult
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
     public required Option<bool> AllowIdSignInWithProhibitions { get; init; }
+    public required QtlsStatus QtlsStatus { get; set; }
 }
 
 public record GetPersonResultInduction : InductionInfo
@@ -193,7 +194,9 @@ public class GetPersonHandler(
                     Contact.Fields.dfeta_EYTSDate,
                     Contact.Fields.EMailAddress1,
                     Contact.Fields.dfeta_AllowIDSignInWithProhibitions,
-                    Contact.Fields.dfeta_InductionStatus)));
+                    Contact.Fields.dfeta_InductionStatus,
+                    Contact.Fields.dfeta_QtlsDateHasBeenSet,
+                    Contact.Fields.dfeta_qtlsdate)));
 
         if (contactDetail is null)
         {
@@ -386,6 +389,8 @@ public class GetPersonHandler(
             induction = Option.Some(mappedInduction.Induction);
         }
 
+        var qtlsStatus = MapQtlsStatus(contact.dfeta_qtlsdate, contact.dfeta_QtlsDateHasBeenSet);
+
         return new GetPersonResult()
         {
             Trn = command.Trn,
@@ -396,7 +401,8 @@ public class GetPersonHandler(
             NationalInsuranceNumber = contact.dfeta_NINumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
-            Qts = await QtsInfo.CreateAsync(qts, referenceDataCache),
+            Qts = await QtsInfo.CreateAsync(qts, referenceDataCache, contact.dfeta_qtlsdate),
+            QtlsStatus = qtlsStatus,
             Eyts = await EytsInfo.CreateAsync(eyts, referenceDataCache),
             EmailAddress = contact.EMailAddress1,
             Induction = induction,
@@ -459,6 +465,17 @@ public class GetPersonHandler(
                 Option.Some(previousNames.Select(n => n).AsReadOnly()) :
                 default,
             AllowIdSignInWithProhibitions = allowIdSignInWithProhibitions
+        };
+    }
+
+    private static QtlsStatus MapQtlsStatus(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
+    {
+        return (qtlsDate, qtlsDateHasBeenSet) switch
+        {
+            (not null, _) => QtlsStatus.Active,
+            (null, true) => QtlsStatus.Expired,
+            (null, false) => QtlsStatus.None,
+            (_, _) => QtlsStatus.None,
         };
     }
 

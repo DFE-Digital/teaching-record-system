@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240814.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
 using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionStatus;
+using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.QtlsStatus;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
@@ -27,4 +28,5 @@ public record FindPersonResponseResult
     public required EytsInfo? Eyts { get; init; }
     public required IReadOnlyCollection<Alert> Alerts { get; init; }
     public required InductionStatus InductionStatus { get; init; }
+    public required QtlsStatus QtlsStatus { get; set; }
 }
