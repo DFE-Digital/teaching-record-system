@@ -45,7 +45,9 @@ public class WebhookSenderTests(WebhookReceiver receiver)
                 Address = receiver.Server.BaseAddress + WebhookReceiver.Endpoint.TrimStart('/'),
                 ApiVersion = apiVersion,
                 CloudEventTypes = [cloudEventType],
-                Enabled = true
+                Enabled = true,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
             },
             CloudEventId = cloudEventId,
             CloudEventType = cloudEventType,
@@ -132,10 +134,8 @@ public sealed class WebhookReceiver : IDisposable
             ];
         });
 
-        builder.Services.AddSingleton<WebhookSender>();
-
         builder.Services.AddSingleton<WebhookMessageRecorder>();
-        WebhookSender.AddHttpClient(builder.Services, () => _server!.CreateHandler());
+        WebhookSender.Register(builder.Services, () => _server!.CreateHandler());
 
         builder.Services.Configure<RequestSignatureVerificationOptions>(options =>
         {
@@ -204,7 +204,7 @@ public sealed class WebhookReceiver : IDisposable
 
     public WebhookMessageRecorder WebhookMessageRecorder => Services.GetRequiredService<WebhookMessageRecorder>();
 
-    public WebhookSender GetWebhookSender() => Services.GetRequiredService<WebhookSender>();
+    public IWebhookSender GetWebhookSender() => Services.GetRequiredService<IWebhookSender>();
 
     public WebhookOptions GetWebhookOptions() => Services.GetRequiredService<IOptions<WebhookOptions>>().Value;
 

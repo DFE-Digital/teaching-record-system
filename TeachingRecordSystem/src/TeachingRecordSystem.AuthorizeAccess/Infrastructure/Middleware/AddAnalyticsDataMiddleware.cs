@@ -1,7 +1,7 @@
 using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.FormFlow;
-using TeachingRecordSystem.UiCommon.FormFlow.State;
+using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Infrastructure.Middleware;
 

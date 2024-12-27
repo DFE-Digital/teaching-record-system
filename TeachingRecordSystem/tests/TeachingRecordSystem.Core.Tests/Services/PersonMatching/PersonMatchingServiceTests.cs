@@ -21,7 +21,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             dbFixture.GetDataSource(),
             organizationService,
             referenceDataCache,
-            Clock);
+            Clock,
+            new TestableAuditRepository());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -198,7 +199,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             // Person who matches on last name & DOB
             var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName(lastName).WithDateOfBirth(dateOfBirth));
 
-            // Person who matches on NINO            
+            // Person who matches on NINO
             var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber(usePersonNino ? nationalInsuranceNumber : alternativeNationalInsuranceNumber));
             var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321", establishmentNumber: "4321", establishmentStatusCode: 1);
             var personEmployment = await TestData.CreateTpsEmploymentAsync(person2, establishment, new DateOnly(2023, 08, 03), new DateOnly(2024, 05, 25), EmploymentType.FullTime, new DateOnly(2024, 05, 25), usePersonNino ? alternativeNationalInsuranceNumber : nationalInsuranceNumber);
@@ -374,7 +375,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ true,
             _matchNameDobAndNinoAttributes
-        },        
+        },
 
         // Single name with alias, single DOB, person NINO and TRN all match
         {
@@ -454,7 +455,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ true,
             _matchNameDobAndNinoAttributes
-        },        
+        },
 
         // Multiple names with one match, single DOB, person NINO and TRN all match
         {
@@ -534,8 +535,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             TrnArgumentOption.SpecifiedButDifferent,
             /*expectMatch: */ true,
             _matchNameDobAndNinoAttributes
-        },        
-        
+        },
+
 
         // *** No match cases ***
 

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -17,8 +16,6 @@ public static class HostApplicationBuilderExtensions
                 options.IsGlobalModeEnabled = true;
             });
         }
-
-        builder.Services.AddApplicationInsightsTelemetryWorkerService();
 
         // We want all logging to go through Serilog so that our filters are always applied
         builder.Logging.ClearProviders();

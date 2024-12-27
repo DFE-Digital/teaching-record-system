@@ -82,6 +82,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddFakeXrm();
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
+            services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddSingleton<ITrnGenerationApiClient, FakeTrnGenerationApiClient>();
             services.Decorate<ICrmQueryDispatcher>(
                 inner => new CrmQueryDispatcherDecorator(

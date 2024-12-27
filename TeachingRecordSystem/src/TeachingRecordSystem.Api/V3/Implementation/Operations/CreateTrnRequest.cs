@@ -22,13 +22,13 @@ public record CreateTrnRequestCommand
     public required string? NationalInsuranceNumber { get; init; }
     public required bool? IdentityVerified { get; init; }
     public required string? OneLoginUserSubject { get; init; }
-    public required Contact_GenderCode? GenderCode { get; set; }
-    public required string? AddressLine1 { get; set; }
-    public required string? AddressLine2 { get; set; }
-    public required string? AddressLine3 { get; set; }
-    public required string? City { get; set; }
-    public required string? Postcode { get; set; }
-    public required string? Country { get; set; }
+    public required Gender? Gender { get; init; }
+    public required string? AddressLine1 { get; init; }
+    public required string? AddressLine2 { get; init; }
+    public required string? AddressLine3 { get; init; }
+    public required string? City { get; init; }
+    public required string? Postcode { get; init; }
+    public required string? Country { get; init; }
 }
 
 public class CreateTrnRequestHandler(
@@ -150,7 +150,7 @@ public class CreateTrnRequestHandler(
             StatedMiddleName = command.MiddleName ?? "",
             StatedLastName = command.LastName,
             DateOfBirth = command.DateOfBirth,
-            Gender = command.GenderCode ?? Contact_GenderCode.Notavailable,
+            Gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
             PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),

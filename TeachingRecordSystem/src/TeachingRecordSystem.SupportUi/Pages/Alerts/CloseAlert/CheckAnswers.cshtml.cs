@@ -51,8 +51,7 @@ public class CheckAnswersModel(
     {
         var now = clock.UtcNow;
 
-        var alert = await dbContext.Alerts
-            .SingleAsync(a => a.AlertId == AlertId);
+        var alert = HttpContext.GetCurrentAlertFeature().Alert;
 
         var oldAlertEventModel = EventModels.Alert.FromModel(alert);
         alert.EndDate = EndDate;
@@ -78,7 +77,7 @@ public class CheckAnswersModel(
             Changes = AlertUpdatedEventChanges.EndDate
         };
 
-        dbContext.AddEvent(updatedEvent);
+        await dbContext.AddEventAndBroadcastAsync(updatedEvent);
 
         await dbContext.SaveChangesAsync();
 

@@ -7,13 +7,12 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
-    <IsSourceGeneratorProject Condition="'$(IsSourceGeneratorProject)' == '' and $(MSBuildProjectName.EndsWith('Generator'))">true</IsSourceGeneratorProject>
 
     <UserSecretsId>TeachingRecordSystem</UserSecretsId>
     <UserSecretsId Condition="'$(IsTestProject)' == 'true'">TeachingRecordSystemTests</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(IsSourceGeneratorProject)' != 'true'">
+  <ItemGroup>
     <Using Include="Microsoft.EntityFrameworkCore" />
     <Using Include="TeachingRecordSystem.Core" />
     <Using Include="TeachingRecordSystem.Core.CoreConstants" Static="true" />
@@ -23,7 +22,7 @@
     <Using Include="TeachingRecordSystem.Core.Events.Models" Alias="EventModels" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(IsTestProject)' != 'true' and '$(IsSourceGeneratorProject)' != 'true'">
+  <ItemGroup Condition="'$(IsTestProject)' != 'true'">
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

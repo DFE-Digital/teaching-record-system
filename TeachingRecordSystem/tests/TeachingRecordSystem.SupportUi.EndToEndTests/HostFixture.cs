@@ -76,6 +76,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
                     services.AddSingleton<TrsDataSyncHelper>();
+                    services.AddSingleton<IAuditRepository, TestableAuditRepository>();
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton(GetMockAdUserService());
 

@@ -16,13 +16,17 @@ default:
 # Install local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
-  npm install -g sass
+  @npm install -g sass
 
 # Restore dependencies
 restore:
   @cd {{solution-root}} && dotnet restore --locked-mode
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet libman restore --verbosity quiet
   @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess" }} && dotnet libman restore --verbosity quiet
+
+# Install Playwright
+install-playwright:
+  @cd {{solution-root / "tests" / "TeachingRecordSystem.AuthorizeAccess.EndToEndTests"}} && pwsh bin/Debug/net8.0/playwright.ps1 install chromium
 
 # Run the trscli
 cli *ARGS:
@@ -38,7 +42,7 @@ test:
 
 # Format the .NET solution and Terraform code
 format:
-  @cd {{solution-root}} && dotnet format
+  @cd {{solution-root}} && dotnet dotnet-format
   @terraform fmt terraform/aks
 
 # Format any un-committed .tf or .cs files
@@ -60,7 +64,7 @@ format-changed:
 
   $changedCsFiles = (Get-ChangedFiles "{{solution-root}}/**/*.cs") | foreach { $_ -Replace "^{{solution-root}}/", "" }
   if ($changedCsFiles.Length -gt 0) {
-    $dotnetArgs = @("format", "--no-restore", "--include") + $changedCsFiles
+    $dotnetArgs = @("dotnet-format", "--no-restore", "--include") + $changedCsFiles
     cd {{solution-root}} && dotnet $dotnetArgs
   }
 

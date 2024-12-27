@@ -1,14 +1,15 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
 using Serilog.Formatting.Compact;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core;
 
@@ -55,8 +56,6 @@ public static class Extensions
     {
         if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
         {
-            var pgConnectionString = GetPostgresConnectionString(builder.Configuration);
-
             builder.Services.AddHangfire((sp, configuration) => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
@@ -72,6 +71,15 @@ public static class Extensions
         return builder;
     }
 
+    public static IHostApplicationBuilder AddWebhookMessageFactory(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<WebhookMessageFactory>();
+        builder.Services.AddSingleton<EventMapperRegistry>();
+        builder.Services.TryAddSingleton<PersonInfoCache>();
+
+        return builder;
+    }
+
     public static void ConfigureSerilog(
         this LoggerConfiguration config,
         IHostEnvironment environment,
@@ -80,7 +88,6 @@ public static class Extensions
     {
         config
             .ReadFrom.Configuration(configuration)
-            .WriteTo.ApplicationInsights(services.GetRequiredService<TelemetryConfiguration>(), TelemetryConverter.Traces)
             .WriteTo.Sentry(o => o.InitializeSdk = false);
 
         if (environment.IsProduction())

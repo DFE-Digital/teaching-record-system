@@ -23,7 +23,8 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
             dbFixture.GetDataSource(),
             organizationService,
             referenceDataCache,
-            Clock);
+            Clock,
+            new TestableAuditRepository());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

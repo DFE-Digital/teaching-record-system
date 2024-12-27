@@ -14,7 +14,9 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
             return;
         }
 
-        var currentSupportTask = await dbContext.SupportTasks.SingleOrDefaultAsync(t => t.SupportTaskReference == supportTaskReference);
+        var currentSupportTask = await dbContext.SupportTasks
+            .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update")  // https://github.com/dotnet/efcore/issues/26042
+            .SingleOrDefaultAsync();
 
         if (currentSupportTask is null ||
             (supportTaskType is SupportTaskType type && currentSupportTask.SupportTaskType != type) ||

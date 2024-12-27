@@ -6,7 +6,7 @@ using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
-using TeachingRecordSystem.UiCommon.FormFlow;
+using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Pages;
 
@@ -57,7 +57,7 @@ public class CheckAnswersModel(SignInJourneyHelper helper, TrsDbContext dbContex
         };
         dbContext.SupportTasks.Add(supportTask);
 
-        dbContext.AddEvent(new SupportTaskCreatedEvent()
+        await dbContext.AddEventAndBroadcastAsync(new SupportTaskCreatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,

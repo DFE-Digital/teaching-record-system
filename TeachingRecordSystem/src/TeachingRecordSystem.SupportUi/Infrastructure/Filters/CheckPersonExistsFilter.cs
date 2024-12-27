@@ -1,9 +1,10 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
@@ -22,7 +23,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 public class CheckPersonExistsFilter(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
-    IBackgroundJobScheduler backgroundJobScheduler) : IAsyncResourceFilter
+    TrsDataSyncHelper syncHelper) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -33,7 +34,7 @@ public class CheckPersonExistsFilter(
             return;
         }
 
-        var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == personId && p.DqtState == 0);
+        var person = await GetPersonAsync();
 
         if (person is not null)
         {
@@ -58,9 +59,16 @@ public class CheckPersonExistsFilter(
 
             if (dqtContact is not null)
             {
-                context.HttpContext.SetCurrentPersonFeature(dqtContact);
+                var synced = await syncHelper.SyncPersonAsync(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None);
+                if (!synced)
+                {
+                    throw new Exception($"Could not sync Person with contact ID: '{personId}'.");
+                }
 
-                await backgroundJobScheduler.EnqueueAsync<TrsDataSyncHelper>(helper => helper.SyncPersonAsync(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None));
+                person = await GetPersonAsync();
+                Debug.Assert(person is not null);
+
+                context.HttpContext.SetCurrentPersonFeature(person);
             }
             else
             {
@@ -70,6 +78,10 @@ public class CheckPersonExistsFilter(
         }
 
         await next();
+
+        Task<Person?> GetPersonAsync() => dbContext.Persons
+            .FromSql($"select * from persons where person_id = {personId} and dqt_state = 0 for update")  // https://github.com/dotnet/efcore/issues/26042
+            .SingleOrDefaultAsync();
     }
 }
 

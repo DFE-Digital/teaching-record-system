@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -31,9 +30,10 @@ using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
-using TeachingRecordSystem.ServiceDefaults;
-using TeachingRecordSystem.ServiceDefaults.Infrastructure.Logging;
+using TeachingRecordSystem.WebCommon;
+using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 
 [assembly: ApiController]
 namespace TeachingRecordSystem.Api;
@@ -70,41 +70,6 @@ public class Program
                 options.Authority = configuration.GetRequiredValue("AuthorizeAccessIssuer");
                 options.MapInboundClaims = false;
                 options.TokenValidationParameters.ValidateAudience = false;
-            })
-            .AddBasic(options =>
-            {
-                options.Realm = "TeachingRecordSystem.Api";
-                options.Events = new BasicAuthenticationEvents
-                {
-                    OnValidateCredentials = static context =>
-                    {
-                        var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-                        var username = configuration.GetRequiredValue("AdminCredentials:Username");
-                        var password = configuration.GetRequiredValue("AdminCredentials:Password");
-
-                        if (context.Username == username && context.Password == password)
-                        {
-                            var claims = new[]
-                            {
-                                new Claim(
-                                    ClaimTypes.NameIdentifier,
-                                    context.Username,
-                                    ClaimValueTypes.String,
-                                    context.Options.ClaimsIssuer),
-                                new Claim(
-                                    ClaimTypes.Name,
-                                    context.Username,
-                                    ClaimValueTypes.String,
-                                    context.Options.ClaimsIssuer)
-                            };
-
-                            context.Principal = new ClaimsPrincipal(new ClaimsIdentity(claims, context.Scheme.Name));
-                            context.Success();
-                        }
-
-                        return Task.CompletedTask;
-                    }
-                };
             });
 
         services.AddAuthorization(options =>
@@ -226,7 +191,8 @@ public class Program
             .AddIdentityApi()
             .AddNameSynonyms()
             .AddDqtOutboxMessageSerializer()
-            .AddWebhookOptions();
+            .AddWebhookOptions()
+            .AddTrsSyncHelper();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddCertificateGeneration();

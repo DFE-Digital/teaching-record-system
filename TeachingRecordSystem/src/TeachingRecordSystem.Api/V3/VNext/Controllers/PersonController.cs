@@ -5,7 +5,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Api.V3.V20240920.Requests;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Api.V3.VNext.Responses;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;

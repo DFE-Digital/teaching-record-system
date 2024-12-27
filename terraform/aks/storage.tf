@@ -48,3 +48,9 @@ resource "azurerm_storage_container" "dqt-integrations" {
   storage_account_name  = azurerm_storage_account.app_storage.name
   container_access_type = "private"
 }
+
+resource "azurerm_storage_container" "dqtaudits" {
+  name                  = "dqtaudits"
+  storage_account_name  = azurerm_storage_account.app_storage.name
+  container_access_type = "private"
+}

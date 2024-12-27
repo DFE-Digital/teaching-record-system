@@ -23,6 +23,7 @@ public record FindPersonsResultItem
     public required DqtInductionStatusInfo? DqtInductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
+    public required QtlsStatus QtlsStatus { get; init; }
 }
 
 public abstract class FindPersonsHandlerBase(
@@ -45,7 +46,20 @@ public abstract class FindPersonsHandlerBase(
         Contact.Fields.dfeta_StatedFirstName,
         Contact.Fields.dfeta_StatedMiddleName,
         Contact.Fields.dfeta_StatedLastName,
-        Contact.Fields.dfeta_InductionStatus);
+        Contact.Fields.dfeta_InductionStatus,
+        Contact.Fields.dfeta_qtlsdate,
+        Contact.Fields.dfeta_QtlsDateHasBeenSet);
+
+    private static QtlsStatus MapQtlsStatus(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
+    {
+        return (qtlsDate, qtlsDateHasBeenSet) switch
+        {
+            (not null, _) => QtlsStatus.Active,
+            (null, true) => QtlsStatus.Expired,
+            (null, false) => QtlsStatus.None,
+            (_, _) => QtlsStatus.None,
+        };
+    }
 
     protected async Task<FindPersonsResult> CreateResultAsync(IEnumerable<Contact> matched)
     {
@@ -131,8 +145,9 @@ public abstract class FindPersonsHandlerBase(
                         StatusDescription = inductionStatus.GetDescription()
                     } :
                     null,
-                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache),
+                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache, r.dfeta_qtlsdate),
                 Eyts = await EytsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_EYTSDate is not null), referenceDataCache),
+                QtlsStatus = MapQtlsStatus(r.dfeta_qtlsdate, r.dfeta_QtlsDateHasBeenSet),
             })
             .OrderBy(c => c.Trn)
             .ToArrayAsync();

@@ -71,7 +71,7 @@ public class CheckAnswersModel(
             out var createdEvent);
 
         dbContext.Alerts.Add(alert);
-        dbContext.AddEvent(createdEvent);
+        await dbContext.AddEventAndBroadcastAsync(createdEvent);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
