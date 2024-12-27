@@ -322,9 +322,9 @@ public class Person
         return true;
     }
 
-    public bool InductionStatusManagedByCpd(DateOnly? now)
+    public bool InductionStatusManagedByCpd(DateOnly now)
     {
-        var sevenYearsAgo = now?.AddYears(-7);
+        var sevenYearsAgo = now.AddYears(-7);
         return InductionCompletedDate is not null
             && InductionCompletedDate < sevenYearsAgo;
     }
