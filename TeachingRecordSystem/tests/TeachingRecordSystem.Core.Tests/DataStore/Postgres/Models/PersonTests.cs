@@ -238,7 +238,7 @@ public class PersonTests
         // CML TODO figure out the date-time types
         // Arrange
         var dateTimeCompleted = Clock.UtcNow.AddYears(yearsSinceCompleted).AddDays(-1);
-        var dateCompleted = dateTimeCompleted.ToDateOnlyWithDqtBstFix(true);
+        var dateCompleted = Clock.Today.AddYears(yearsSinceCompleted).AddDays(-1);
         var person = new Person
         {
             PersonId = Guid.NewGuid(),
@@ -253,7 +253,7 @@ public class PersonTests
         person.SetInductionStatus(InductionStatus.Passed, dateCompleted, dateCompleted, InductionExemptionReasons.None, SystemUser.SystemUserId, Clock.UtcNow, out _);
 
         // Act
-        var result = person.InductionStatusManagedByCpd(Clock.UtcNow.ToDateOnlyWithDqtBstFix(true));
+        var result = person.InductionStatusManagedByCpd(Clock.Today);
 
         // Assert
         Assert.Equal(expected, result);
