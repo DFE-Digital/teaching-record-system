@@ -234,7 +234,6 @@ public class PersonTests
     [InlineData(-7, true)]
     public void InductionManagedByCpd_ReturnsTrue(int yearsSinceCompleted, bool expected)
     {
-        // CML TODO figure out the date-time types
         // Arrange
         var dateTimeCompleted = Clock.UtcNow.AddYears(yearsSinceCompleted).AddDays(-1);
         var dateCompleted = Clock.Today.AddYears(yearsSinceCompleted).AddDays(-1);
