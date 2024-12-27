@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
-public class InductionTests : TestBase 
+public class InductionTests : TestBase
 {
     public InductionTests(HostFixture hostFixture)
         : base(hostFixture)
