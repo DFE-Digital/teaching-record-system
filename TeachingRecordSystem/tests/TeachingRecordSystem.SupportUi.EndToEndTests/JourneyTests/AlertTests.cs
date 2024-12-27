@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.Link;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 using TeachingRecordSystem.SupportUi.Pages.Alerts.ReopenAlert;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
