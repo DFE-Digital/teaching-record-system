@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
@@ -12,7 +13,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        FakeTrnGenerator trnGenerator,
+        ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -22,7 +24,8 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             organizationService,
             referenceDataCache,
             Clock,
-            new TestableAuditRepository());
+            new TestableAuditRepository(),
+            loggerFactory.CreateLogger<TrsDataSyncHelper>());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
