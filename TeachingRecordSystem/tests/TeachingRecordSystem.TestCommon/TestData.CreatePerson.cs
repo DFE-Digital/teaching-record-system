@@ -572,7 +572,7 @@ public partial class TestData
             contact = retrieveContactHandle.GetResponse().Entity.ToEntity<Contact>();
 
             var syncedPerson = await testData.SyncConfiguration.SyncIfEnabledAsync(
-                helper => helper.SyncPersonAsync(contact, ignoreInvalid: false),
+                helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
                 _syncEnabledOverride);
 
             var (mqs, alerts, person) = await testData.WithDbContextAsync(async dbContext =>

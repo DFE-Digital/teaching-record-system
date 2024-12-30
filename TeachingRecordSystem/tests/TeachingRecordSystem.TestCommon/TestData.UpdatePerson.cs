@@ -59,7 +59,7 @@ public partial class TestData
                     }
                 });
 
-                await testData.SyncConfiguration.SyncIfEnabledAsync(helper => helper.SyncPersonAsync(_personId.Value, ignoreInvalid: false));
+                await testData.SyncConfiguration.SyncIfEnabledAsync(helper => helper.SyncPersonAsync(_personId.Value, syncAudit: true, ignoreInvalid: false));
             }
         }
     }
