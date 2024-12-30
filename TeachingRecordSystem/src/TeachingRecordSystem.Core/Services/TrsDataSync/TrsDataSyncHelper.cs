@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
@@ -76,11 +75,7 @@ public class TrsDataSyncHelper(
         }
 
         var audits = await GetAuditRecordsAsync(entityLogicalName, idsToSync, cancellationToken);
-
-        foreach (var (id, audit) in audits)
-        {
-            await auditRepository.SetAuditDetailAsync(entityLogicalName, id, audit);
-        }
+        await Task.WhenAll(audits.Select(async kvp => await auditRepository.SetAuditDetailAsync(entityLogicalName, kvp.Key, kvp.Value)));
     }
 
     public static Alert? MapAlertFromDqtSanction(
@@ -894,17 +889,16 @@ public class TrsDataSyncHelper(
         IEnumerable<Guid> ids,
         CancellationToken cancellationToken)
     {
-        var auditRecords = new ConcurrentDictionary<Guid, AuditDetailCollection>();
-        await Parallel.ForEachAsync(
-            ids,
-            cancellationToken,
-            async (id, ct) =>
+        var auditRecords = await Task.WhenAll(
+            ids.Select(async id =>
             {
-                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, id) ?? throw new Exception($"No audit detail for '{id}'.");
-                auditRecords[id] = audit;
-            });
+                cancellationToken.ThrowIfCancellationRequested();
+                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, id) ??
+                    throw new Exception($"No audit detail for '{id}'.");
+                return (Id: id, Audit: audit);
+            }));
 
-        return auditRecords;
+        return auditRecords.ToDictionary(a => a.Id, a => a.Audit);
     }
 
     private async Task<TEntity[]> GetEntitiesAsync<TEntity>(
