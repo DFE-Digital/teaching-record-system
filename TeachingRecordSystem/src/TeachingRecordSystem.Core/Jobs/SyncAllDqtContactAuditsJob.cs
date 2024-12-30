@@ -23,6 +23,7 @@ public class SyncAllDqtContactAuditsJob(
             ColumnSet = new ColumnSet(),
             Orders =
             {
+                new OrderExpression(Contact.Fields.CreatedOn, OrderType.Ascending),
                 new OrderExpression(Contact.PrimaryIdAttribute, OrderType.Ascending)
             },
             PageInfo = new PagingInfo()
