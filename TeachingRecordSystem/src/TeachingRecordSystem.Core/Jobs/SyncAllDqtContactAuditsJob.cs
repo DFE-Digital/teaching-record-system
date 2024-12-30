@@ -1,6 +1,6 @@
 using System.ServiceModel;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -9,10 +9,10 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-[AutomaticRetry(Attempts = 0)]
 public class SyncAllDqtContactAuditsJob(
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
-    TrsDataSyncHelper trsDataSyncHelper)
+    TrsDataSyncHelper trsDataSyncHelper,
+    ILogger<SyncAllDqtContactAuditsJob> logger)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -32,6 +32,8 @@ public class SyncAllDqtContactAuditsJob(
             }
         };
 
+        var fetched = 0;
+
         while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -47,7 +49,18 @@ public class SyncAllDqtContactAuditsJob(
                 continue;
             }
 
-            await trsDataSyncHelper.SyncAuditAsync(Contact.EntityLogicalName, result.Entities.Select(e => e.Id), cancellationToken);
+            fetched += result.Entities.Count;
+
+            await trsDataSyncHelper.SyncAuditAsync(
+                Contact.EntityLogicalName,
+                result.Entities.Select(e => e.Id),
+                skipIfExists: true,
+                cancellationToken);
+
+            if (fetched > 0 && fetched % 50000 == 0)
+            {
+                logger.LogWarning("Synced {Count} contact audit records.", fetched);
+            }
 
             if (result.MoreRecords)
             {

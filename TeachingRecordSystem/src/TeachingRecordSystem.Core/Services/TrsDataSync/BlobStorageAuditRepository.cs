@@ -35,6 +35,13 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
         }
     }
 
+    public async Task<bool> HaveAuditDetailAsync(string entityLogicalName, Guid id)
+    {
+        var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
+        var blobClient = containerClient.GetBlobClient(GetBlobName(entityLogicalName, id));
+        return await blobClient.ExistsAsync();
+    }
+
     public async Task SetAuditDetailAsync(string entityLogicalName, Guid id, AuditDetailCollection auditDetailCollection)
     {
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);

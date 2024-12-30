@@ -51,9 +51,31 @@ public class TrsDataSyncHelper(
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
     }
 
-    public async Task SyncAuditAsync(string entityLogicalName, IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    public async Task SyncAuditAsync(
+        string entityLogicalName,
+        IEnumerable<Guid> ids,
+        bool skipIfExists,
+        CancellationToken cancellationToken = default)
     {
-        var audits = await GetAuditRecordsAsync(entityLogicalName, ids, cancellationToken);
+        var idsToSync = ids.ToList();
+
+        if (skipIfExists)
+        {
+            var existingAudits = await Task.WhenAll(
+                idsToSync.Select(async id => (Id: id, HaveAudit: await auditRepository.HaveAuditDetailAsync(entityLogicalName, id))));
+
+            foreach (var (id, _) in existingAudits.Where(t => t.HaveAudit))
+            {
+                idsToSync.Remove(id);
+            }
+        }
+
+        if (idsToSync.Count == 0)
+        {
+            return;
+        }
+
+        var audits = await GetAuditRecordsAsync(entityLogicalName, idsToSync, cancellationToken);
 
         foreach (var (id, audit) in audits)
         {
@@ -370,8 +392,8 @@ public class TrsDataSyncHelper(
     {
         if (syncAudit)
         {
-            await SyncAuditAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
-            await SyncAuditAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+            await SyncAuditAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), skipIfExists: false, cancellationToken);
+            await SyncAuditAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), skipIfExists: false, cancellationToken);
         }
 
         var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
