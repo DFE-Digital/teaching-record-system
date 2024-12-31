@@ -32,6 +32,12 @@ public class EditInductionStateBuilder
         return this;
     }
 
+    public EditInductionStateBuilder WithStartDate(DateOnly startDate)
+    {
+        StartDate = startDate;
+        return this;
+    }
+
     public EditInductionState Create()
     {
         return new EditInductionState()

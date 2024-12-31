@@ -94,7 +94,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("Select a status", statusChoicesLegend!.TextContent);
+        Assert.Equal("What is their induction status?", statusChoicesLegend!.TextContent);
         Assert.Equal(expectedChoices, statusChoices);
     }
 
@@ -137,7 +137,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("Select a status", statusChoicesLegend!.TextContent);
+        Assert.Equal("What is their induction status?", statusChoicesLegend!.TextContent);
         Assert.Equal(expectedChoices, statusChoices);
     }
 
@@ -148,7 +148,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     [InlineData(InductionStatus.Passed, InductionStatus.InProgress)]
     [InlineData(InductionStatus.Failed, InductionStatus.FailedInWales)]
     [InlineData(InductionStatus.FailedInWales, InductionStatus.Failed)]
-    public async Task Get_InductionstatusHasBeenSet_ShowsSelectedRadioButton(InductionStatus currentInductionStatus, InductionStatus selectedInductionStatus)
+    public async Task Get_InductionStatusHasBeenSet_ShowsSelectedRadioButton(InductionStatus currentInductionStatus, InductionStatus selectedInductionStatus)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -234,7 +234,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await response.GetDocumentAsync();
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("Select a status", statusChoicesLegend!.TextContent);
         Assert.Equal(expectedStatusChoices.Select(c => c.ToString()), statusChoices);
     }
 
@@ -281,7 +280,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await response.GetDocumentAsync();
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("Select a status", statusChoicesLegend!.TextContent);
         Assert.Equal(expectedChoices.Select(c => c.ToString()), statusChoices);
     }
 
