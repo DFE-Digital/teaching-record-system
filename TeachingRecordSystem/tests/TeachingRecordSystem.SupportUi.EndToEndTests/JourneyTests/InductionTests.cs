@@ -8,7 +8,7 @@ public class InductionTests : TestBase
     }
 
     [Fact]
-    public async Task EditInductionStatus()
+    public async Task EditInduction()
     {
         var setStartDate = new DateOnly(2021, 1, 1);
         var person = await TestData.CreatePersonAsync(
@@ -44,7 +44,7 @@ public class InductionTests : TestBase
     }
 
     [Fact]
-    public async Task EditInductionStatus_NavigateBack_ShowsPreviousSelection()
+    public async Task EditInduction_NavigateBack()
     {
         var inductionStatusToSelect = InductionStatus.Failed;
         var setStartDate = new DateOnly(2021, 1, 1);
