@@ -1,5 +1,4 @@
 using System.ServiceModel;
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
@@ -9,7 +8,6 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-[AutomaticRetry(Attempts = 0)]
 public class SyncAllDqtInductionAuditsJob(
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper)
@@ -47,7 +45,11 @@ public class SyncAllDqtInductionAuditsJob(
                 continue;
             }
 
-            await trsDataSyncHelper.SyncAuditAsync(dfeta_induction.EntityLogicalName, result.Entities.Select(e => e.Id), cancellationToken);
+            await trsDataSyncHelper.SyncAuditAsync(
+                dfeta_induction.EntityLogicalName,
+                result.Entities.Select(e => e.Id),
+                skipIfExists: true,
+                cancellationToken);
 
             if (result.MoreRecords)
             {

@@ -3,6 +3,7 @@ using System.Reactive.Subjects;
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
@@ -16,11 +17,12 @@ using TeachingRecordSystem.Core.Dqt;
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
 public class TrsDataSyncHelper(
-    NpgsqlDataSource trsDbDataSource,
-    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
-    ReferenceDataCache referenceDataCache,
-    IClock clock,
-    IAuditRepository auditRepository)
+        NpgsqlDataSource trsDbDataSource,
+        [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+        ReferenceDataCache referenceDataCache,
+        IClock clock,
+        IAuditRepository auditRepository,
+        ILogger<TrsDataSyncHelper> logger)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -48,14 +50,32 @@ public class TrsDataSyncHelper(
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
     }
 
-    public async Task SyncAuditAsync(string entityLogicalName, IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    public async Task SyncAuditAsync(
+        string entityLogicalName,
+        IEnumerable<Guid> ids,
+        bool skipIfExists,
+        CancellationToken cancellationToken = default)
     {
-        var audits = await GetAuditRecordsAsync(entityLogicalName, ids, cancellationToken);
+        var idsToSync = ids.ToList();
 
-        foreach (var (id, audit) in audits)
+        if (skipIfExists)
         {
-            await auditRepository.SetAuditDetailAsync(entityLogicalName, id, audit);
+            var existingAudits = await Task.WhenAll(
+                idsToSync.Select(async id => (Id: id, HaveAudit: await auditRepository.HaveAuditDetailAsync(entityLogicalName, id))));
+
+            foreach (var (id, _) in existingAudits.Where(t => t.HaveAudit))
+            {
+                idsToSync.Remove(id);
+            }
         }
+
+        if (idsToSync.Count == 0)
+        {
+            return;
+        }
+
+        var audits = await GetAuditRecordsAsync(entityLogicalName, idsToSync, cancellationToken);
+        await Task.WhenAll(audits.Select(async kvp => await auditRepository.SetAuditDetailAsync(entityLogicalName, kvp.Key, kvp.Value)));
     }
 
     public static Alert? MapAlertFromDqtSanction(
@@ -100,7 +120,7 @@ public class TrsDataSyncHelper(
         };
     }
 
-    private static InductionInfo? MapInductionInfoFromDqtInduction(
+    private InductionInfo? MapInductionInfoFromDqtInduction(
         dfeta_induction? induction,
         Contact contact,
         bool ignoreInvalid)
@@ -109,22 +129,26 @@ public class TrsDataSyncHelper(
         var hasQtls = contact.dfeta_qtlsdate is not null;
         if (induction is not null && induction.dfeta_InductionStatus != contact.dfeta_InductionStatus)
         {
+            var errorMessage = $"Induction status {contact.dfeta_InductionStatus} for contact {contact.ContactId} does not match induction status {induction.dfeta_InductionStatus} for induction {induction!.dfeta_inductionId}.";
             if (ignoreInvalid)
             {
+                logger.LogWarning(errorMessage);
                 return null;
             }
 
-            throw new InvalidOperationException($"Induction status {contact.dfeta_InductionStatus} for contact {contact.ContactId} does not match induction status {induction.dfeta_InductionStatus} for induction {induction!.dfeta_inductionId}.");
+            throw new InvalidOperationException(errorMessage);
         }
         // Person with QTLS should be exempt from induction
         else if (hasQtls && contact.dfeta_InductionStatus != dfeta_InductionStatus.Exempt)
         {
+            var errorMessage = $"Induction status for contact {contact.ContactId} with QTLS should be {dfeta_InductionStatus.Exempt} but is {contact.dfeta_InductionStatus}.";
             if (ignoreInvalid)
             {
+                logger.LogWarning(errorMessage);
                 return null;
             }
 
-            throw new InvalidOperationException($"Induction status for contact {contact.ContactId} with QTLS should be {dfeta_InductionStatus.Exempt} but is {contact.dfeta_InductionStatus}.");
+            throw new InvalidOperationException(errorMessage);
         }
 
         return new InductionInfo()
@@ -302,16 +326,12 @@ public class TrsDataSyncHelper(
 
     public async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<dfeta_induction> inductions,
+        bool syncAudit,
         bool ignoreInvalid,
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var contactAttributeNames = new[]
-        {
-            Contact.PrimaryIdAttribute,
-            Contact.Fields.dfeta_InductionStatus,
-            Contact.Fields.dfeta_QtlsDateHasBeenSet
-        };
+        var contactAttributeNames = GetModelTypeSyncInfo(ModelTypes.Induction).AttributeNames;
 
         var contacts = await GetEntitiesAsync<Contact>(
             Contact.EntityLogicalName,
@@ -321,11 +341,12 @@ public class TrsDataSyncHelper(
             activeOnly: false,
             cancellationToken);
 
-        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, createMigratedEvent: false, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, createMigratedEvent: false, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<Contact> contacts,
+        bool syncAudit,
         bool ignoreInvalid,
         bool createMigratedEvent,
         bool dryRun,
@@ -340,7 +361,8 @@ public class TrsDataSyncHelper(
             dfeta_induction.Fields.dfeta_InductionStatus,
             dfeta_induction.Fields.CreatedOn,
             dfeta_induction.Fields.CreatedBy,
-            dfeta_induction.Fields.ModifiedOn
+            dfeta_induction.Fields.ModifiedOn,
+            dfeta_induction.Fields.StateCode
         };
 
         var inductions = await GetEntitiesAsync<dfeta_induction>(
@@ -351,19 +373,26 @@ public class TrsDataSyncHelper(
             true,
             cancellationToken);
 
-        return await SyncInductionsAsync(contacts, inductions, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<Contact> contacts,
         IReadOnlyCollection<dfeta_induction> entities,
+        bool syncAudit,
         bool ignoreInvalid,
         bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var contactAuditDetails = await GetAuditRecordsAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
-        var inductionAuditDetails = await GetAuditRecordsAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+        if (syncAudit)
+        {
+            await SyncAuditAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), skipIfExists: false, cancellationToken);
+            await SyncAuditAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), skipIfExists: false, cancellationToken);
+        }
+
+        var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
+        var inductionAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
         var auditDetails = contactAuditDetails
             .Concat(inductionAuditDetails)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -445,8 +474,10 @@ public class TrsDataSyncHelper(
                 var unableToSyncContactIds = unsyncedContactIds.Where(id => !personsSynced.Contains(id)).ToArray();
                 if (unableToSyncContactIds.Length > 0)
                 {
+                    var errorMessage = $"Attempted to sync Induction for persons but the Contact records with IDs [{string.Join(", ", unableToSyncContactIds)}] do not meet the sync criteria.";
                     if (ignoreInvalid)
                     {
+                        logger.LogWarning(errorMessage);
                         toSync.RemoveAll(i => unableToSyncContactIds.Contains(i.PersonId));
                         if (toSync.Count == 0)
                         {
@@ -455,8 +486,7 @@ public class TrsDataSyncHelper(
                     }
                     else
                     {
-                        throw new InvalidOperationException(
-                            $"Attempted to sync Induction for persons but the Contact records with IDs [{string.Join(", ", unableToSyncContactIds)}] do not meet the sync criteria.");
+                        throw new InvalidOperationException(errorMessage);
                     }
                 }
 
@@ -647,13 +677,19 @@ public class TrsDataSyncHelper(
     private EntityVersionInfo<TEntity>[] GetEntityVersions<TEntity>(TEntity latest, IEnumerable<AuditDetail> auditDetails, string[] attributeNames)
         where TEntity : Entity
     {
-        var created = latest.GetAttributeValue<DateTime?>("createdon")!.Value;
+        if (!latest.TryGetAttributeValue<DateTime?>("createdon", out var createdOn) || !createdOn.HasValue)
+        {
+            throw new ArgumentException($"Expected {latest.LogicalName} entity with ID {latest.Id} to have a non-null 'createdon' attribute value.", nameof(latest));
+        }
+
+        var created = createdOn.Value;
         var createdBy = latest.GetAttributeValue<EntityReference>("createdby");
 
         var ordered = auditDetails
             .OfType<AttributeAuditDetail>()
             .Select(a => (AuditDetail: a, AuditRecord: a.AuditRecord.ToEntity<Audit>()))
             .OrderBy(a => a.AuditRecord.CreatedOn)
+            .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
             .ToArray();
 
         if (ordered.Length == 0)
@@ -812,6 +848,7 @@ public class TrsDataSyncHelper(
                     }
                     catch (FaultException fex) when (fex.IsCrmRateLimitException(out var retryAfter))
                     {
+                        logger.LogWarning("Hit CRM service limits getting {entityLogicalName} audit records; Fault exception. Retrying after {retryAfter} seconds.", entityLogicalName, retryAfter.TotalSeconds);
                         await Task.Delay(retryAfter, cancellationToken);
                         continue;
                     }
@@ -822,11 +859,13 @@ public class TrsDataSyncHelper(
 
                         if (firstFault.IsCrmRateLimitFault(out var retryAfter))
                         {
+                            logger.LogWarning("Hit CRM service limits getting {entityLogicalName} audit records; CRM rate limit fault. Retrying after {retryAfter} seconds.", entityLogicalName, retryAfter.TotalSeconds);
                             await Task.Delay(retryAfter, cancellationToken);
                             continue;
                         }
                         else if (firstFault.Message.Contains("The HTTP status code of the response was not expected (429)"))
                         {
+                            logger.LogWarning("Hit CRM service limits getting {entityLogicalName} audit records; 429 too many requests", entityLogicalName);
                             await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
                             continue;
                         }
@@ -843,6 +882,23 @@ public class TrsDataSyncHelper(
             })))
             .SelectMany(b => b)
             .ToDictionary(t => t.Id, t => t.AuditDetailCollection));
+    }
+
+    private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecordsFromAuditRepositoryAsync(
+        string entityLogicalName,
+        IEnumerable<Guid> ids,
+        CancellationToken cancellationToken)
+    {
+        var auditRecords = await Task.WhenAll(
+            ids.Select(async id =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, id) ??
+                    throw new Exception($"No audit detail for '{id}'.");
+                return (Id: id, Audit: audit);
+            }));
+
+        return auditRecords.ToDictionary(a => a.Id, a => a.Audit);
     }
 
     private async Task<TEntity[]> GetEntitiesAsync<TEntity>(
@@ -862,7 +918,25 @@ public class TrsDataSyncHelper(
             query.Criteria.AddCondition("statecode", ConditionOperator.Equal, 0);
         }
 
-        var response = await organizationService.RetrieveMultipleAsync(query, cancellationToken);
+        EntityCollection response;
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            try
+            {
+                response = await organizationService.RetrieveMultipleAsync(query, cancellationToken);
+            }
+            catch (FaultException<OrganizationServiceFault> fex) when (fex.IsCrmRateLimitException(out var retryAfter))
+            {
+                logger.LogWarning("Hit CRM service limits; error code: {ErrorCode}", fex.Detail.ErrorCode);
+                await Task.Delay(retryAfter, cancellationToken);
+                continue;
+            }
+
+            break;
+        }
+
         return response.Entities.Select(e => e.ToEntity<TEntity>()).ToArray();
     }
 
@@ -1022,7 +1096,21 @@ public class TrsDataSyncHelper(
         {
             Contact.PrimaryIdAttribute,
             Contact.Fields.dfeta_InductionStatus,
-            Contact.Fields.dfeta_qtlsdate
+            Contact.Fields.dfeta_qtlsdate,
+            Contact.Fields.CreatedOn,
+            Contact.Fields.CreatedBy,
+            Contact.Fields.StateCode,
+            Contact.Fields.ModifiedOn,
+            Contact.Fields.dfeta_TRN,
+            Contact.Fields.FirstName,
+            Contact.Fields.MiddleName,
+            Contact.Fields.LastName,
+            Contact.Fields.dfeta_StatedFirstName,
+            Contact.Fields.dfeta_StatedMiddleName,
+            Contact.Fields.dfeta_StatedLastName,
+            Contact.Fields.BirthDate,
+            Contact.Fields.dfeta_NINumber,
+            Contact.Fields.EMailAddress1,
         };
 
         Action<NpgsqlBinaryImporter, InductionInfo> writeRecord = (writer, induction) =>
@@ -1046,7 +1134,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = dfeta_induction.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncInductionsAsync(entities.Select(e => e.ToEntity<dfeta_induction>()).ToArray(), ignoreInvalid, dryRun, ct),
+                helper.SyncInductionsAsync(entities.Select(e => e.ToEntity<dfeta_induction>()).ToArray(), syncAudit: true, ignoreInvalid, dryRun, ct),
             WriteRecord = writeRecord
         };
     }
@@ -1215,9 +1303,17 @@ public class TrsDataSyncHelper(
                 // We shouldn't have multiple induction records for the same person in prod at all but we might in other environments
                 // so we'll just take the most recently modified one.
                 induction = personInductions.OrderByDescending(i => i.ModifiedOn).First();
-                if (personInductions.Length > 1 && !ignoreInvalid)
+                if (personInductions.Length > 1)
                 {
-                    throw new InvalidOperationException($"Contact '{contact.ContactId!.Value}' has multiple induction records.");
+                    var errorMessage = $"Contact '{contact.ContactId!.Value}' has multiple induction records.";
+                    if (ignoreInvalid)
+                    {
+                        logger.LogWarning(errorMessage);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(errorMessage);
+                    }
                 }
             }
 
@@ -1235,7 +1331,8 @@ public class TrsDataSyncHelper(
                     dfeta_induction.Fields.dfeta_InductionExemptionReason,
                     dfeta_induction.Fields.dfeta_StartDate,
                     dfeta_induction.Fields.dfeta_InductionStatus,
-                    dfeta_induction.Fields.ModifiedOn
+                    dfeta_induction.Fields.ModifiedOn,
+                    dfeta_induction.Fields.StateCode
                 };
 
                 if (auditDetails.TryGetValue(induction!.Id, out var inductionAudits))

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -11,7 +12,8 @@ public class EstablishmentRefresherTests
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        FakeTrnGenerator trnGenerator,
+        ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
         Clock = new();
@@ -21,7 +23,8 @@ public class EstablishmentRefresherTests
             organizationService,
             referenceDataCache,
             Clock,
-            new TestableAuditRepository());
+            new TestableAuditRepository(),
+            loggerFactory.CreateLogger<TrsDataSyncHelper>());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

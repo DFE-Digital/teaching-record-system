@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
@@ -12,17 +13,20 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
         ReferenceDataCache referenceDataCache,
-        FakeTrnGenerator trnGenerator)
+        FakeTrnGenerator trnGenerator,
+        ILoggerFactory loggerFactory)
     {
         DbFixture = dbFixture;
         Clock = new();
+        AuditRepository = new();
 
         Helper = new TrsDataSyncHelper(
             dbFixture.GetDataSource(),
             organizationService,
             referenceDataCache,
             Clock,
-            new TestableAuditRepository());
+            AuditRepository,
+            loggerFactory.CreateLogger<TrsDataSyncHelper>());
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -40,6 +44,8 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
     public TrsDataSyncHelper Helper { get; }
 
     public TestData TestData { get; }
+
+    public TestableAuditRepository AuditRepository { get; }
 
     public Task PublishChangedItemAndConsumeAsync(string modelType, IChangedItem changedItem)
     {
