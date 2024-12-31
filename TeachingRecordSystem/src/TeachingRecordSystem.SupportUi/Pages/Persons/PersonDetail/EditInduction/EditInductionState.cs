@@ -30,7 +30,8 @@ public class EditInductionState : IRegisterJourney
         var person = await dbContext.Persons
             .SingleAsync(q => q.PersonId == personId);
 
-        CurrentInductionStatus = person!.InductionStatus;
+        CurrentInductionStatus = person.InductionStatus;
+        StartDate = person.InductionStartDate;
         if (JourneyStartPage == null)
         {
             JourneyStartPage = startPage;
