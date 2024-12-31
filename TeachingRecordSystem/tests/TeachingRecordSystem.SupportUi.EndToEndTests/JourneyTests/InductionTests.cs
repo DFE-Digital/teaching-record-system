@@ -15,8 +15,7 @@ public class InductionTests : TestBase
                 personBuilder => personBuilder
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
-                    .WithStatus(InductionStatus.InProgress)
-                    .WithStartDate(setStartDate)
+                    .WithStatus(InductionStatus.RequiredToComplete)
                 ));
         var personId = person.ContactId;
 
@@ -32,6 +31,7 @@ public class InductionTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
@@ -52,8 +52,7 @@ public class InductionTests : TestBase
                 personBuilder => personBuilder
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
-                    .WithStatus(InductionStatus.InProgress)
-                    .WithStartDate(setStartDate)
+                    .WithStatus(InductionStatus.RequiredToComplete)
                 ));
         var personId = person.ContactId;
 
@@ -69,6 +68,7 @@ public class InductionTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
