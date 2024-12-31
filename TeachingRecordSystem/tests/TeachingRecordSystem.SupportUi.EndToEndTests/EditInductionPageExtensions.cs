@@ -39,6 +39,12 @@ public static class EditInductionPageExtensions
         return page.WaitForUrlPathAsync($"/persons/{personId}/edit-induction/check-answers");
     }
 
+    public static Task AssertInductionStatusSelected(this IPage page, InductionStatus status)
+    {
+        var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
+        return radioButton.Locator("xpath=following-sibling::label").IsCheckedAsync();
+    }
+
     public static Task SelectStatusAsync(this IPage page, InductionStatus status)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
