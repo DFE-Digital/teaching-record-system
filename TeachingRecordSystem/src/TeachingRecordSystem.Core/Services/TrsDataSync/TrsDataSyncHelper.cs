@@ -667,7 +667,27 @@ public class TrsDataSyncHelper(
         IEnumerable<Guid> ids,
         CancellationToken cancellationToken)
     {
-        return (IsFakeXrm ? new Dictionary<Guid, AuditDetailCollection>() : (await Task.WhenAll(ids
+        if (IsFakeXrm)
+        {
+            return new Dictionary<Guid, AuditDetailCollection>();
+        }
+
+        // Throttle the amount of concurrent requests
+        using var requestThrottle = new SemaphoreSlim(20, 20);
+
+        // Keep track of the last seen 'retry-after' value
+        var retryDelayUpdateLock = new object();
+        var retryDelay = Task.Delay(0, cancellationToken);
+
+        void UpdateRetryDelay(TimeSpan ts)
+        {
+            lock (retryDelayUpdateLock)
+            {
+                retryDelay = Task.Delay(ts, cancellationToken);
+            }
+        }
+
+        return (await Task.WhenAll(ids
             .Chunk(MaxAuditRequestsPerBatch)
             .Select(async chunk =>
             {
@@ -687,6 +707,8 @@ public class TrsDataSyncHelper(
                 ExecuteMultipleResponse response;
                 while (true)
                 {
+                    await retryDelay;
+                    await requestThrottle.WaitAsync(cancellationToken);
                     try
                     {
                         response = (ExecuteMultipleResponse)await organizationService.ExecuteAsync(request, cancellationToken);
@@ -694,8 +716,12 @@ public class TrsDataSyncHelper(
                     catch (FaultException fex) when (fex.IsCrmRateLimitException(out var retryAfter))
                     {
                         logger.LogWarning("Hit CRM service limits getting {entityLogicalName} audit records; Fault exception. Retrying after {retryAfter} seconds.", entityLogicalName, retryAfter.TotalSeconds);
-                        await Task.Delay(retryAfter, cancellationToken);
+                        UpdateRetryDelay(retryAfter);
                         continue;
+                    }
+                    finally
+                    {
+                        requestThrottle.Release();
                     }
 
                     if (response.IsFaulted)
@@ -705,13 +731,13 @@ public class TrsDataSyncHelper(
                         if (firstFault.IsCrmRateLimitFault(out var retryAfter))
                         {
                             logger.LogWarning("Hit CRM service limits getting {entityLogicalName} audit records; CRM rate limit fault. Retrying after {retryAfter} seconds.", entityLogicalName, retryAfter.TotalSeconds);
-                            await Task.Delay(retryAfter, cancellationToken);
+                            UpdateRetryDelay(retryAfter);
                             continue;
                         }
                         else if (firstFault.Message.Contains("The HTTP status code of the response was not expected (429)"))
                         {
                             logger.LogWarning("Hit CRM service limits getting {entityLogicalName} audit records; 429 too many requests", entityLogicalName);
-                            await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
+                            UpdateRetryDelay(TimeSpan.FromMinutes(2));
                             continue;
                         }
 
@@ -726,7 +752,7 @@ public class TrsDataSyncHelper(
                     (r, e) => (Id: e, ((RetrieveRecordChangeHistoryResponse)r.Response).AuditDetailCollection));
             })))
             .SelectMany(b => b)
-            .ToDictionary(t => t.Id, t => t.AuditDetailCollection));
+            .ToDictionary(t => t.Id, t => t.AuditDetailCollection);
     }
 
     private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecordsFromAuditRepositoryAsync(
