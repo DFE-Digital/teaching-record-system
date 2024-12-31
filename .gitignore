@@ -13,7 +13,3 @@ bin/konduit.sh
 
 .idea
 .vs/
-/TeachingRecordSystem/tests/TeachingRecordSystem.UiCommon.Tests/packages.lock.json
-/TeachingRecordSystem/src/TeachingRecordSystem.UiCommon/packages.lock.json
-/TeachingRecordSystem/gen/TeachingRecordSystem.Api.Generator/packages.lock.json
-/TeachingRecordSystem/src/TeachingRecordSystem.ServiceDefaults/packages.lock.json
