@@ -41,7 +41,6 @@ public class AddAlertState : IRegisterJourney
     [MemberNotNullWhen(true, nameof(AlertTypeId), nameof(Details), nameof(StartDate), nameof(UploadEvidence))]
     public bool IsComplete =>
         AlertTypeId.HasValue &&
-        !string.IsNullOrWhiteSpace(Details) &&
         AddLink.HasValue &&
         StartDate.HasValue &&
         AddReason.HasValue &&

@@ -21,7 +21,6 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? AlertTypeName { get; set; }
 
     [BindProperty]
-    [Required(ErrorMessage = "Enter details")]
     [Display(Description = "For example, include any restrictions it places on a teacher.")]
     [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Details must be 4000 characters or less")]
     public string? Details { get; set; }
