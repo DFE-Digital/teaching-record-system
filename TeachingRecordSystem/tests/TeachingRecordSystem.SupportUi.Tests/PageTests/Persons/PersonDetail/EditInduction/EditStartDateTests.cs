@@ -60,7 +60,6 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(dateValid, journeyInstance.State.StartDate);
     }
 
-
     [Fact]
     public async Task Post_NoStartDateIsEntered_ReturnsError()
     {
@@ -111,7 +110,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StartDateIsTooEarly_ReturnsError()
     {
         // Arrange
-        var dateTooEarly = new DateOnly(1999,5,6);
+        var dateTooEarly = new DateOnly(1999, 5, 6);
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -133,8 +132,8 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
-    CreateJourneyInstance(
-        JourneyNames.EditInduction,
-        state ?? new EditInductionState(),
-        new KeyValuePair<string, object>("personId", personId));
+        CreateJourneyInstance(
+            JourneyNames.EditInduction,
+            state ?? new EditInductionState(),
+            new KeyValuePair<string, object>("personId", personId));
 }
