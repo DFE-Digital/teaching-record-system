@@ -15,7 +15,7 @@ public partial class TrsDataSyncHelperTests
         var contact = await CreatePersonEntity(contactId);
 
         // Act
-        await Helper.SyncPersonAsync(contact, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(contact, syncAudit: false, ignoreInvalid: false);
 
         // Assert
         await AssertDatabasePersonMatchesEntity(contact);
@@ -28,14 +28,14 @@ public partial class TrsDataSyncHelperTests
         var contactId = Guid.NewGuid();
         var existingEntity = await CreatePersonEntity(contactId);
 
-        await Helper.SyncPersonAsync(existingEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(existingEntity, syncAudit: false, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
 
         Clock.Advance();
         var updatedEntity = await CreatePersonEntity(contactId, existingEntity);
 
         // Act
-        await Helper.SyncPersonAsync(updatedEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(updatedEntity, syncAudit: false, ignoreInvalid: false);
 
         // Assert
         await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync);
@@ -48,7 +48,7 @@ public partial class TrsDataSyncHelperTests
         var contactId = Guid.NewGuid();
         var existingEntity = await CreatePersonEntity(contactId);
 
-        await Helper.SyncPersonAsync(existingEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(existingEntity, syncAudit: false, ignoreInvalid: false);
 
         // Act
         await Helper.DeleteRecordsAsync(TrsDataSyncHelper.ModelTypes.Person, new[] { contactId });
@@ -71,12 +71,12 @@ public partial class TrsDataSyncHelperTests
         Clock.Advance();
         var updatedEntity = await CreatePersonEntity(contactId, initialEntity);
 
-        await Helper.SyncPersonAsync(updatedEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(updatedEntity, syncAudit: false, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
         var expectedLastSync = Clock.UtcNow;
 
         // Act
-        await Helper.SyncPersonAsync(initialEntity, ignoreInvalid: false);
+        await Helper.SyncPersonAsync(initialEntity, syncAudit: false, ignoreInvalid: false);
 
         // Assert
         await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
