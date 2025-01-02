@@ -209,6 +209,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<SyncDqtContactAuditsMopUpJob>(
+                    nameof(SyncDqtContactAuditsMopUpJob),
+                    job => job.ExecuteAsync(/*modifiedSince: */new DateTime(2024, 11, 24), CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

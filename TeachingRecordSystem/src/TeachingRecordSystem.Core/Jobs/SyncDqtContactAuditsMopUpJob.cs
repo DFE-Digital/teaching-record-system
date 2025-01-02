@@ -14,13 +14,12 @@ public class SyncDqtContactAuditsMopUpJob(
     TrsDataSyncHelper trsDataSyncHelper,
     ILogger<SyncDqtContactAuditsMopUpJob> logger)
 {
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(DateTime modifiedSince, CancellationToken cancellationToken)
     {
-        var changedSince = new DateTime(2024, 12, 24);
         const int pageSize = 1000;
 
         var filter = new FilterExpression();
-        filter.AddCondition(Contact.Fields.ModifiedOn, ConditionOperator.GreaterEqual, changedSince);
+        filter.AddCondition(Contact.Fields.ModifiedOn, ConditionOperator.GreaterEqual, modifiedSince);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
@@ -60,7 +59,7 @@ public class SyncDqtContactAuditsMopUpJob(
             await trsDataSyncHelper.SyncAuditAsync(
                 Contact.EntityLogicalName,
                 result.Entities.Select(e => e.Id),
-                skipIfExists: true,
+                skipIfExists: false,
                 cancellationToken);
 
             if (fetched > 0 && fetched % 50000 == 0)
