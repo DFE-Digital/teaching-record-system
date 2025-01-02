@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Specialism;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.StartDate;
 using TeachingRecordSystem.SupportUi.Pages.Mqs.EditMq.Status;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -107,7 +107,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Name = "evidence.jpg",
                 MimeType = "image/jpeg",
-                Buffer = TestCommon.TestData.JpegImage
+                Buffer = TestData.JpegImage
             });
 
         await page.ClickContinueButtonAsync();
@@ -163,7 +163,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Name = "evidence.jpg",
                 MimeType = "image/jpeg",
-                Buffer = TestCommon.TestData.JpegImage
+                Buffer = TestData.JpegImage
             });
 
         await page.ClickContinueButtonAsync();
@@ -217,7 +217,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Name = "evidence.jpg",
                 MimeType = "image/jpeg",
-                Buffer = TestCommon.TestData.JpegImage
+                Buffer = TestData.JpegImage
             });
 
         await page.ClickContinueButtonAsync();
@@ -317,7 +317,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
            {
                Name = "evidence.jpg",
                MimeType = "image/jpeg",
-               Buffer = TestCommon.TestData.JpegImage
+               Buffer = TestData.JpegImage
            });
 
         await page.ClickContinueButtonAsync();
@@ -363,7 +363,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
             {
                 Name = "evidence.jpg",
                 MimeType = "image/jpeg",
-                Buffer = TestCommon.TestData.JpegImage
+                Buffer = TestData.JpegImage
             });
 
         await page.ClickContinueButtonAsync();

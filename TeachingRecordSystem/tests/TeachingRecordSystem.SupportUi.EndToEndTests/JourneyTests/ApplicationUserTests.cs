@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -47,7 +47,7 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         var newPostLogoutRedirectUris = "https://localhost/logout-callback";
         var newAuthenticationSchemeName = Guid.NewGuid().ToString();
         var newOneLoginClientId = Guid.NewGuid().ToString();
-        var newOneLoginPrivateKeyPem = TestCommon.TestData.GeneratePrivateKeyPem();
+        var newOneLoginPrivateKeyPem = TestData.GeneratePrivateKeyPem();
         var newOneLoginRedirectUri = $"/_onelogin/{newAuthenticationSchemeName}/callback";
         var newOneLoginPostLogoutRedirectUri = $"/_onelogin/{newAuthenticationSchemeName}/logout-callback";
 
