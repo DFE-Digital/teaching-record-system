@@ -46,7 +46,7 @@ public class LinkTests : AddAlertTestBase
     }
 
     [Fact]
-    public async Task Get_MissingDataInJourneyState_Redirects()
+    public async Task Get_MissingDetailsInJourneyState_ReturnsOk()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -58,8 +58,7 @@ public class LinkTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/details?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
     }
 
     [Fact]
@@ -131,20 +130,26 @@ public class LinkTests : AddAlertTestBase
     }
 
     [Fact]
-    public async Task Post_WithMissingDataInJourneyState_Redirects()
+    public async Task Post_WithMissingDetailsDataInJourneyState_RedirectsToStartDatePage()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
+        var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, person.PersonId);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/alerts/add/link?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = CreatePostContent(false, null)
+        };
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.StartsWith($"/alerts/add/details?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+        Assert.StartsWith($"/alerts/add/start-date?personId={person.PersonId}", response.Headers.Location?.OriginalString);
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.False(journeyInstance.State.AddLink);
+        Assert.Null(journeyInstance.State.Link);
     }
 
     [Fact]

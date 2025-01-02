@@ -148,7 +148,7 @@ public class DetailsTests : AddAlertTestBase
     }
 
     [Fact]
-    public async Task Post_WhenDetailsIsBlank_ReturnsError()
+    public async Task Post_WhenDetailsIsBlank_Redirects()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -160,7 +160,8 @@ public class DetailsTests : AddAlertTestBase
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Details", "Enter details");
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/alerts/add/link?personId={person.PersonId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
