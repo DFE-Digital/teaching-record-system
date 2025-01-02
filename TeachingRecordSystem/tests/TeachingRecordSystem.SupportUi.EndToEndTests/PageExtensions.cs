@@ -457,6 +457,13 @@ public static class PageExtensions
         Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
     }
 
+    public static async Task AssertDateInputAsync(this IPage page, DateOnly date)
+    {
+        Assert.Equal(date.Day.ToString(), await page.InputValueAsync("label:text-is('Day')"));
+        Assert.Equal(date.Month.ToString(), await page.InputValueAsync("label:text-is('Month')"));
+        Assert.Equal(date.Year.ToString(), await page.InputValueAsync("label:text-is('Year')"));
+    }
+
     public static async Task FillDateInputAsync(this IPage page, DateOnly date)
     {
         await page.FillAsync("label:text-is('Day')", date.Day.ToString());

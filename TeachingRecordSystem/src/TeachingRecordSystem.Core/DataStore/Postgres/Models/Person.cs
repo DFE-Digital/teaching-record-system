@@ -6,6 +6,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Person
 {
+    public static DateOnly EarliestInductionStartDate => new(1999, 5, 7);
+
     public required Guid PersonId { get; init; }
     public required DateTime? CreatedOn { get; init; }
     public required DateTime? UpdatedOn { get; set; }
