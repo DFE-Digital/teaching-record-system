@@ -199,6 +199,16 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<SyncAllDqtIttAuditsJob>(
+                    nameof(SyncAllDqtIttAuditsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<SyncAllDqtQtsAuditsJob>(
+                    nameof(SyncAllDqtQtsAuditsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

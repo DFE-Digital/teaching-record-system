@@ -73,5 +73,7 @@ public class SyncAllDqtIttAuditsJob(
                 break;
             }
         }
+
+        logger.LogWarning("Synced {Count} dfeta_initialteachertraining audit records.", fetched);
     }
 }
