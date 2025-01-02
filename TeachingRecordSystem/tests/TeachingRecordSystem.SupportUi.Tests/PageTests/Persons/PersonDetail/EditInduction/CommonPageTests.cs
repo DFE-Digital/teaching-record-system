@@ -44,14 +44,14 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 InductionStatus = inductionStatus
             });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
-        if (fromPage == "edit-induction/status")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            request.Content = new FormUrlEncodedContent(new Dictionary<string, string?>
-            {
-                { "InductionStatus", inductionStatus.ToString() }
-            });
-        }
+            Content = new FormUrlEncodedContent(
+                new EditInductionPostRequestBuilder()
+                    .WithInductionStatus(inductionStatus)
+                    .WithStartDate(Clock.Today)
+                    .Build())
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -121,7 +121,13 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 InductionStatus = inductionStatus
             });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithStartDate(Clock.Today)
+                .Build())
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -164,7 +170,13 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 Initialized = true,
                 InductionStatus = inductionStatus
             });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithStartDate(Clock.Today)
+                .Build())
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);

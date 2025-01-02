@@ -49,12 +49,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["StartDate.Day"] = dateValid.Day.ToString(),
-                ["StartDate.Month"] = dateValid.Month.ToString(),
-                ["StartDate.Year"] = dateValid.Year.ToString()
-            })
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithStartDate(dateValid).Build())
         };
 
         // Act
@@ -64,6 +59,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(dateValid, journeyInstance.State.StartDate);
     }
+
 
     [Fact]
     public async Task Post_NoStartDateIsEntered_ReturnsError()
@@ -101,12 +97,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["StartDate.Day"] = dateTomorrow.Day.ToString(),
-                ["StartDate.Month"] = dateTomorrow.Month.ToString(),
-                ["StartDate.Year"] = dateTomorrow.Year.ToString()
-            })
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithStartDate(dateTomorrow).Build())
         };
 
         // Act
@@ -131,12 +122,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["StartDate.Day"] = dateTooEarly.Day.ToString(),
-                ["StartDate.Month"] = dateTooEarly.Month.ToString(),
-                ["StartDate.Year"] = dateTooEarly.Year.ToString()
-            })
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithStartDate(dateTooEarly).Build())
         };
 
         // Act
