@@ -15,7 +15,9 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
             knownTypes: [
                 typeof(Audit),
                 typeof(Contact),
-                typeof(dfeta_induction)
+                typeof(dfeta_induction),
+                typeof(dfeta_initialteachertraining),
+                typeof(dfeta_qtsregistration)
             ]);
 
     public async Task<AuditDetailCollection?> GetAuditDetailAsync(string entityLogicalName, Guid id)
