@@ -67,6 +67,7 @@ public class InductionTests : TestBase
         await page.ClickEditInductionStatusPageAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
+
         await page.SelectStatusAsync(inductionStatusToSelect);
         await page.ClickContinueButtonAsync();
 

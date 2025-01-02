@@ -213,7 +213,7 @@ public class TrsDataSyncHelper(
         return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(IReadOnlyCollection<Guid> contactIds, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(IReadOnlyCollection<Guid> contactIds, bool syncAudit, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default)
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Person);
 
@@ -225,17 +225,28 @@ public class TrsDataSyncHelper(
             activeOnly: false,
             cancellationToken);
 
-        return await SyncPersonsAsync(contacts, ignoreInvalid, dryRun, cancellationToken);
+        return await SyncPersonsAsync(contacts, syncAudit, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<bool> SyncPersonAsync(Guid contactId, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default) =>
-        (await SyncPersonsAsync([contactId], ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
+    public async Task<bool> SyncPersonAsync(Guid contactId, bool syncAudit, bool ignoreInvalid = false, bool dryRun = false, CancellationToken cancellationToken = default) =>
+        (await SyncPersonsAsync([contactId], syncAudit, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
 
-    public async Task<bool> SyncPersonAsync(Contact entity, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
-        (await SyncPersonsAsync(new[] { entity }, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
+    public async Task<bool> SyncPersonAsync(Contact entity, bool syncAudit, bool ignoreInvalid, bool dryRun = false, CancellationToken cancellationToken = default) =>
+        (await SyncPersonsAsync(new[] { entity }, syncAudit, ignoreInvalid, dryRun, cancellationToken)).Count() == 1;
 
-    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(IReadOnlyCollection<Contact> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
+        IReadOnlyCollection<Contact> entities,
+        bool syncAudit,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken = default)
     {
+        // For the moment we are just making sure we have the audit history in TRS - we will amend to generate events as part of the contact migration work
+        if (syncAudit)
+        {
+            await SyncAuditAsync(Contact.EntityLogicalName, entities.Select(q => q.ContactId!.Value), skipIfExists: false, cancellationToken);
+        }
+
         // We're syncing all contacts for now.
         // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
         IEnumerable<Contact> toSync = entities;
@@ -312,7 +323,7 @@ public class TrsDataSyncHelper(
             await txn.DisposeAsync();
             await connection.DisposeAsync();
 
-            return await SyncPersonsAsync(entitiesExceptFailedOne, ignoreInvalid, dryRun, cancellationToken);
+            return await SyncPersonsAsync(entitiesExceptFailedOne, syncAudit, ignoreInvalid, dryRun, cancellationToken);
         }
 
         if (!dryRun)
@@ -470,7 +481,7 @@ public class TrsDataSyncHelper(
 
             if (unsyncedContactIds.Length > 0)
             {
-                var personsSynced = await SyncPersonsAsync(unsyncedContactIds, ignoreInvalid, dryRun: false, cancellationToken);
+                var personsSynced = await SyncPersonsAsync(unsyncedContactIds, syncAudit: true, ignoreInvalid, dryRun: false, cancellationToken);
                 var unableToSyncContactIds = unsyncedContactIds.Where(id => !personsSynced.Contains(id)).ToArray();
                 if (unableToSyncContactIds.Length > 0)
                 {
@@ -621,7 +632,7 @@ public class TrsDataSyncHelper(
                 // ex.Detail will be something like "Key (person_id)=(6ac8dc26-c8ae-e311-b8ed-005056822391) is not present in table "persons"."
                 var personId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, Guid.Empty.ToString().Length));
 
-                var personSynced = await SyncPersonAsync(personId, ignoreInvalid, dryRun: false, cancellationToken);
+                var personSynced = await SyncPersonAsync(personId, syncAudit: true, ignoreInvalid, dryRun: false, cancellationToken);
                 if (!personSynced)
                 {
                     // The person sync may fail if the record doesn't meet the criteria (e.g. it doesn't have a TRN).
@@ -1040,7 +1051,7 @@ public class TrsDataSyncHelper(
             EntityLogicalName = Contact.EntityLogicalName,
             AttributeNames = attributeNames,
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncPersonsAsync(entities.Select(e => e.ToEntity<Contact>()).ToArray(), ignoreInvalid, dryRun, ct),
+                helper.SyncPersonsAsync(entities.Select(e => e.ToEntity<Contact>()).ToArray(), syncAudit: true, ignoreInvalid, dryRun, ct),
             WriteRecord = writeRecord
         };
     }

@@ -59,7 +59,7 @@ public class CheckPersonExistsFilter(
 
             if (dqtContact is not null)
             {
-                var synced = await syncHelper.SyncPersonAsync(personId, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None);
+                var synced = await syncHelper.SyncPersonAsync(personId, /* syncAudit: */ true, /*ignoreInvalid: */ false, /*dryRun:*/ false, CancellationToken.None);
                 if (!synced)
                 {
                     throw new Exception($"Could not sync Person with contact ID: '{personId}'.");

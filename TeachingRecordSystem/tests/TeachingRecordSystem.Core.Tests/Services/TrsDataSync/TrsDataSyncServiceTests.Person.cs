@@ -41,7 +41,7 @@ public partial class TrsDataSyncServiceTests
         contact.CreatedOn = Clock.UtcNow;
         contact.ModifiedOn = Clock.UtcNow;
 
-        await fixture.Helper.SyncPersonAsync(contact, ignoreInvalid: false);
+        await fixture.Helper.SyncPersonAsync(contact, syncAudit: false, ignoreInvalid: false);
         var expectedFirstSync = Clock.UtcNow;
 
         var modifiedOn = Clock.Advance();

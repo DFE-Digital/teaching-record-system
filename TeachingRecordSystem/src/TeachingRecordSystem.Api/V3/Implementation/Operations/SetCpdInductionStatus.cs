@@ -74,7 +74,7 @@ public class SetCpdInductionStatusHandler(
         if (person is null)
         {
             // The person record hasn't synced to TRS yet - force that to happen so we can assign induction status
-            var synced = await syncHelper.SyncPersonAsync(dqtContact.Id);
+            var synced = await syncHelper.SyncPersonAsync(dqtContact.Id, syncAudit: true);
             if (!synced)
             {
                 throw new Exception($"Could not sync Person with contact ID: '{dqtContact.Id}'.");
