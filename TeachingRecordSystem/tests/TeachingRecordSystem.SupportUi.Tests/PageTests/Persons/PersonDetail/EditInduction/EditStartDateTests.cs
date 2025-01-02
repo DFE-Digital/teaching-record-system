@@ -143,7 +143,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be before 7th May 1999");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be before 7 May 1999");
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>

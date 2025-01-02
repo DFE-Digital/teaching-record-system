@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -52,9 +53,9 @@ public class StartDateModel : CommonJourneyPage
         {
             ModelState.AddModelError(nameof(StartDate), "The induction start date cannot be in the future");
         }
-        if (StartDate < new DateOnly(1999, 5, 7)) // CML TODO - business logic - move
+        if (StartDate < Person.EarliestInductionStartDate)
         {
-            ModelState.AddModelError(nameof(StartDate), "The induction start date cannot be before 7th May 1999");
+            ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString("d MMMM yyyy")}");
         }
 
         if (!ModelState.IsValid)
