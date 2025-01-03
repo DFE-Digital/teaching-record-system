@@ -21,6 +21,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [DateInput(ErrorMessagePrefix = "End date")]
     [Display(Name = "Enter a new end date")]
     public DateOnly? EndDate { get; set; }
 
