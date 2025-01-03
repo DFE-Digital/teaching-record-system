@@ -20,7 +20,7 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
                 typeof(dfeta_qtsregistration)
             ]);
 
-    public async Task<AuditDetailCollection?> GetAuditDetailAsync(string entityLogicalName, Guid id)
+    public async Task<AuditDetailCollection?> GetAuditDetailAsync(string entityLogicalName, string primaryIdAttribute, Guid id)
     {
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         var blobClient = containerClient.GetBlobClient(GetBlobName(entityLogicalName, id));
@@ -29,7 +29,17 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
         {
             var response = await blobClient.DownloadContentAsync();
             await using var contentStream = response.Value.Content.ToStream();
-            return (AuditDetailCollection)_serializer.ReadObject(contentStream)!;
+
+            var auditDetail = (AuditDetailCollection)_serializer.ReadObject(contentStream)!;
+
+            // Deserialization wrongly sets the Primary Id attribute to be non null because it gets it from the non-null Id attribute - we need to unset this for NewValue and OldValue
+            foreach (var item in auditDetail.AuditDetails.OfType<AttributeAuditDetail>())
+            {
+                item.NewValue.Attributes.Remove(primaryIdAttribute);
+                item.OldValue.Attributes.Remove(primaryIdAttribute);
+            }
+
+            return auditDetail;
         }
         catch (RequestFailedException ex) when (ex.Status == 404)
         {

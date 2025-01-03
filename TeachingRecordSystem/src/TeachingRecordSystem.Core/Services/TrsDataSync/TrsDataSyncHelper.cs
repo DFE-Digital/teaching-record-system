@@ -403,8 +403,9 @@ public class TrsDataSyncHelper(
             await SyncAuditAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), skipIfExists: false, cancellationToken);
         }
 
-        var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
-        var inductionAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
+        var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, Contact.PrimaryIdAttribute, contacts.Select(q => q.ContactId!.Value), cancellationToken);
+        var inductionAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, dfeta_induction.PrimaryIdAttribute, entities.Select(q => q.Id), cancellationToken);
+
         var auditDetails = contactAuditDetails
             .Concat(inductionAuditDetails)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -509,7 +510,7 @@ public class TrsDataSyncHelper(
                 .Where(e => e is IEventWithPersonId && !unsyncedContactIds.Any(c => c == ((IEventWithPersonId)e).PersonId))
                 .ToArray();
 
-            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_import", clock, cancellationToken);
+            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_import", clock, cancellationToken, timeoutSeconds: 120);
 
             if (!dryRun)
             {
@@ -564,13 +565,13 @@ public class TrsDataSyncHelper(
 
         if (ordered.Length == 0)
         {
-            return [new EntityVersionInfo<TEntity>(latest.Id, latest, ChangedAttributes: Array.Empty<string>(), created, createdBy.Id, createdBy.Name)];
+            return [new EntityVersionInfo<TEntity>(latest.Id, latest, ChangedAttributes: [], created, createdBy.Id, createdBy.Name)];
         }
 
         var versions = new List<EntityVersionInfo<TEntity>>();
 
         var initialVersion = GetInitialVersion();
-        versions.Add(new EntityVersionInfo<TEntity>(initialVersion.Id, initialVersion, ChangedAttributes: Array.Empty<string>(), created, createdBy.Id, createdBy.Name));
+        versions.Add(new EntityVersionInfo<TEntity>(initialVersion.Id, initialVersion, ChangedAttributes: [], created, createdBy.Id, createdBy.Name));
 
         latest = initialVersion.ShallowClone();
         foreach (var audit in ordered)
@@ -590,19 +591,34 @@ public class TrsDataSyncHelper(
 
             foreach (var attr in audit.AuditDetail.DeletedAttributes)
             {
+                if (!attributeNames.Contains(attr.Value))
+                {
+                    continue;
+                }
+
                 thisVersion.Attributes.Remove(attr.Value);
                 changedAttributes.Add(attr.Value);
             }
 
             foreach (var attr in audit.AuditDetail.NewValue.Attributes)
             {
+                if (!attributeNames.Contains(attr.Key))
+                {
+                    continue;
+                }
+
                 thisVersion.Attributes[attr.Key] = attr.Value;
                 changedAttributes.Add(attr.Key);
             }
 
+            if (changedAttributes.Count == 0)
+            {
+                continue;
+            }
+
             versions.Add(new EntityVersionInfo<TEntity>(
                 audit.AuditRecord.Id,
-                thisVersion,
+                thisVersion.SparseClone(attributeNames),
                 changedAttributes.ToArray(),
                 audit.AuditRecord.CreatedOn!.Value,
                 audit.AuditRecord.UserId.Id,
@@ -615,45 +631,44 @@ public class TrsDataSyncHelper(
 
         TEntity GetInitialVersion()
         {
+            TEntity? initial;
             if (ordered[0] is { AuditRecord: { Action: Audit_Action.Create } } createAction)
             {
-                var entity = createAction.AuditDetail.NewValue.ToEntity<TEntity>();
-                entity.Id = latest.Id;
-                entity["createdon"] = created;
-                entity["createdby"] = createdBy;
-                entity["modifiedon"] = created;
-                return entity;
+                initial = createAction.AuditDetail.NewValue.ToEntity<TEntity>();
+                initial.Id = latest.Id;
             }
-
-            // Starting with `latest`, go through each event in reverse and undo the changes it applied.
-            // When we're done we end up with the initial version of the record.
-            var initial = latest.ShallowClone();
-
-            foreach (var a in ordered.Reverse())
+            else
             {
-                // Check that new attributes align with what we have in `initial`;
-                // if they don't, then we've got an incomplete history
-                foreach (var attr in a.AuditDetail.NewValue.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
+                // Starting with `latest`, go through each event in reverse and undo the changes it applied.
+                // When we're done we end up with the initial version of the record.
+                initial = latest.ShallowClone();
+
+                foreach (var a in ordered.Reverse())
                 {
-                    if (!AttributeValuesEqual(attr.Value, initial.Attributes.TryGetValue(attr.Key, out var initialAttr) ? initialAttr : null))
+                    // Check that new attributes align with what we have in `initial`;
+                    // if they don't, then we've got an incomplete history
+                    foreach (var attr in a.AuditDetail.NewValue.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
                     {
-                        throw new Exception($"Non-contiguous audit records for {initial.LogicalName} '{initial.Id}':\n" +
-                            $"Expected '{attr.Key}' to be '{attr.Value ?? "<null>"}' but was '{initialAttr ?? "<null>"}'.");
+                        if (!AttributeValuesEqual(attr.Value, initial.Attributes.TryGetValue(attr.Key, out var initialAttr) ? initialAttr : null))
+                        {
+                            throw new Exception($"Non-contiguous audit records for {initial.LogicalName} '{initial.Id}':\n" +
+                                $"Expected '{attr.Key}' to be '{attr.Value ?? "<null>"}' but was '{initialAttr ?? "<null>"}'.");
+                        }
+
+                        if (!a.AuditDetail.OldValue.Attributes.Contains(attr.Key))
+                        {
+                            initial.Attributes.Remove(attr.Key);
+                        }
                     }
 
-                    if (!a.AuditDetail.OldValue.Attributes.Contains(attr.Key))
+                    foreach (var attr in a.AuditDetail.OldValue.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
                     {
-                        initial.Attributes.Remove(attr.Key);
+                        initial.Attributes[attr.Key] = attr.Value;
                     }
-                }
-
-                foreach (var attr in a.AuditDetail.OldValue.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
-                {
-                    initial.Attributes[attr.Key] = attr.Value;
                 }
             }
 
-            return initial;
+            return initial.SparseClone(attributeNames);
         }
 
         static bool AttributeValuesEqual(object? first, object? second)
@@ -756,6 +771,7 @@ public class TrsDataSyncHelper(
 
     private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecordsFromAuditRepositoryAsync(
         string entityLogicalName,
+        string primaryIdAttribute,
         IEnumerable<Guid> ids,
         CancellationToken cancellationToken)
     {
@@ -763,7 +779,7 @@ public class TrsDataSyncHelper(
             ids.Select(async id =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, id) ??
+                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, primaryIdAttribute, id) ??
                     throw new Exception($"No audit detail for '{id}'.");
                 return (Id: id, Audit: audit);
             }));
@@ -1103,6 +1119,7 @@ public class TrsDataSyncHelper(
             {
                 var inductionAttributeNames = new[]
                 {
+                    dfeta_induction.Fields.dfeta_PersonId,
                     dfeta_induction.Fields.dfeta_CompletionDate,
                     dfeta_induction.Fields.dfeta_InductionExemptionReason,
                     dfeta_induction.Fields.dfeta_StartDate,
@@ -1139,8 +1156,13 @@ public class TrsDataSyncHelper(
 
             if (auditDetails.TryGetValue(contact.ContactId!.Value, out var contactAudits))
             {
+                var contactAttributeNames = new[]
+                {
+                    Contact.Fields.dfeta_InductionStatus
+                };
+
                 var contactAuditDetails = contactAudits.AuditDetails;
-                var contactVersions = GetEntityVersions(contact, contactAuditDetails, GetModelTypeSyncInfo(ModelTypes.Person).AttributeNames);
+                var contactVersions = GetEntityVersions(contact, contactAuditDetails, contactAttributeNames);
 
                 foreach (var (thisVersion, previousVersion) in contactVersions.Skip(1).Zip(contactVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
                 {
@@ -1364,6 +1386,19 @@ file static class Extensions
         var cloned = new Entity(entity.LogicalName, entity.Id);
 
         foreach (var attr in entity.Attributes)
+        {
+            cloned.Attributes.Add(attr.Key, attr.Value);
+        }
+
+        return cloned.ToEntity<TEntity>();
+    }
+
+    public static TEntity SparseClone<TEntity>(this TEntity entity, string[] attributeNames) where TEntity : Entity
+    {
+        // N.B. This only clones Attributes in the whitelist
+        var cloned = new Entity(entity.LogicalName, entity.Id);
+
+        foreach (var attr in entity.Attributes.Where(kvp => attributeNames.Contains(kvp.Key)))
         {
             cloned.Attributes.Add(attr.Key, attr.Value);
         }
