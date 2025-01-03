@@ -401,7 +401,7 @@ public class TrsDataSyncHelper(
             await SyncAuditAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), skipIfExists: false, cancellationToken);
             await SyncAuditAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), skipIfExists: false, cancellationToken);
         }
-        
+
         var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, Contact.PrimaryIdAttribute, contacts.Select(q => q.ContactId!.Value), cancellationToken);
         var inductionAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, dfeta_induction.PrimaryIdAttribute, entities.Select(q => q.Id), cancellationToken);
 
