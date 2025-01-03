@@ -262,6 +262,11 @@
           "Google.Apis.Bigquery.v2": "[1.57.0.2704, 2.0.0)"
         }
       },
+      "HtmlTags": {
+        "type": "Transitive",
+        "resolved": "9.0.0",
+        "contentHash": "Qb2TEiO3gvGTqcetPV1nYGeaTjsWv+hHdHJ0SuqJmznTjUr7eX6Q/7fQNrrhW7rFt2Dw5yGL3NRbBPdpt5jUrQ=="
+      },
       "IronCompress": {
         "type": "Transitive",
         "resolved": "1.5.2",
@@ -508,10 +513,10 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "9uQbDTqX1MidhoZFUSK1JItt74IapEadFDOIWAlBIKxr3O/ZEWLWkLYGlgUeP1Dkyog6/CB7h1EAU3xADYZ/lA==",
+        "resolved": "8.0.11",
+        "contentHash": "1tn+c7d628+dASqo0UezdeWdKrEpp2XA376MUkr4nFYDj295iPWeWOV8rOvgR0Gma1xfOEjNJur1QvS6AVnjng==",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "6.0.0"
+          "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0"
         }
       },
       "Microsoft.Extensions.FileProviders.Physical": {
@@ -2350,7 +2355,7 @@
         "type": "Project",
         "dependencies": {
           "Dfe.Analytics": "[0.2.5, )",
-          "GovUk.Frontend.AspNetCore": "[2.0.1, )",
+          "GovUk.Frontend.AspNetCore": "[2.3.0-alpha.0.25, )",
           "GovUk.OneLogin.AspNetCore": "[0.3.1, )",
           "Humanizer.Core": "[2.14.1, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[5.0.0, )",
@@ -2616,11 +2621,12 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[2.0.1, )",
-        "resolved": "2.0.1",
-        "contentHash": "rWaE6WaVMT3Y98luTi2cva6F9BZO21jdvVsqR+tCnmmoP4Xw+bsnHeroDbqlmVEPjhN6wJDk9za2mUxG2KQIQA==",
+        "requested": "[2.3.0-alpha.0.25, )",
+        "resolved": "2.3.0-alpha.0.25",
+        "contentHash": "KtlnovzbHhm081mvatPcCHpRhSVa3CbJG1zV5hGlAYNZcsgXWtT4xTP+w97aG5X8fOm8Ta0PA0QZc3FWxdYudg==",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "6.0.0"
+          "HtmlTags": "9.0.0",
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.11"
         }
       },
       "GovUk.OneLogin.AspNetCore": {
