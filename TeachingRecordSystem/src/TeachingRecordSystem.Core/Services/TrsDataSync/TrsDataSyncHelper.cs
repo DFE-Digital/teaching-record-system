@@ -401,9 +401,10 @@ public class TrsDataSyncHelper(
             await SyncAuditAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), skipIfExists: false, cancellationToken);
             await SyncAuditAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), skipIfExists: false, cancellationToken);
         }
+        
+        var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, Contact.PrimaryIdAttribute, contacts.Select(q => q.ContactId!.Value), cancellationToken);
+        var inductionAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, dfeta_induction.PrimaryIdAttribute, entities.Select(q => q.Id), cancellationToken);
 
-        var contactAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, contacts.Select(q => q.ContactId!.Value), cancellationToken);
-        var inductionAuditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
         var auditDetails = contactAuditDetails
             .Concat(inductionAuditDetails)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -897,6 +898,7 @@ public class TrsDataSyncHelper(
 
     private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecordsFromAuditRepositoryAsync(
         string entityLogicalName,
+        string primaryIdAttribute,
         IEnumerable<Guid> ids,
         CancellationToken cancellationToken)
     {
@@ -904,7 +906,7 @@ public class TrsDataSyncHelper(
             ids.Select(async id =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, id) ??
+                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, primaryIdAttribute, id) ??
                     throw new Exception($"No audit detail for '{id}'.");
                 return (Id: id, Audit: audit);
             }));

@@ -8,7 +8,7 @@ public class TestableAuditRepository : IAuditRepository
 {
     private readonly ConcurrentDictionary<(string EntityLogicalName, Guid Id), AuditDetailCollection> _audits = new();
 
-    public Task<AuditDetailCollection?> GetAuditDetailAsync(string entityLogicalName, Guid id) =>
+    public Task<AuditDetailCollection?> GetAuditDetailAsync(string entityLogicalName, string primaryIdAttribute, Guid id) =>
         Task.FromResult(_audits.TryGetValue((entityLogicalName, id), out var audit) ? audit : null);
 
     public Task<bool> HaveAuditDetailAsync(string entityLogicalName, Guid id) =>
