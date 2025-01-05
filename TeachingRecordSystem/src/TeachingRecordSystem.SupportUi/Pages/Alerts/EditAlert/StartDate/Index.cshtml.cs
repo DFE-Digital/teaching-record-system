@@ -21,7 +21,8 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IClock clock) : PageMode
     public string? PersonName { get; set; }
 
     [BindProperty]
-    [Display(Name = "Start date")]  // https://github.com/gunndabad/govuk-frontend-aspnetcore/issues/282
+    [DateInput(ErrorMessagePrefix = "Start date")]
+    [Display(Name = "Enter a new start date")]
     public DateOnly? StartDate { get; set; }
 
     public DateOnly? CurrentStartDate { get; set; }

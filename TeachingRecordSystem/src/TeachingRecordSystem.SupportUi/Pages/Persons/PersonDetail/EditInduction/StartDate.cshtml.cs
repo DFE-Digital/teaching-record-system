@@ -16,8 +16,9 @@ public class StartDateModel : CommonJourneyPage
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [DateInput(ErrorMessagePrefix = "Start date")]
     [Required(ErrorMessage = "Enter an induction start date")]
-    [Display(Name = "Start date")]  // https://github.com/gunndabad/govuk-frontend-aspnetcore/issues/282
+    [Display(Name = "When did they start induction?")]
     public DateOnly? StartDate { get; set; }
 
     public InductionJourneyPage NextPage

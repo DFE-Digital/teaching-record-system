@@ -87,7 +87,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(existingNationalInsuranceNumber ?? "", doc.GetElementById("NationalInsuranceNumber")?.GetAttribute("value"));
+        Assert.Equal(existingNationalInsuranceNumber, doc.GetElementById("NationalInsuranceNumber")?.GetAttribute("value"));
     }
 
     [Fact]
