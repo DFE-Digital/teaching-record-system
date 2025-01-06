@@ -45,7 +45,7 @@ public class CompletedDateModel : CommonJourneyPage
         {
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be in the future");
         }
-        if(CompletedDate < JourneyInstance!.State.StartDate)
+        if (CompletedDate < JourneyInstance!.State.StartDate)
         {
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be before the induction start date");
         }
