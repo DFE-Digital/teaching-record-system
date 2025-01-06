@@ -137,4 +137,10 @@ public partial class TrsDataSyncHelperTests : IAsyncLifetime
 
         return updatedEntity.ToEntity<T>();
     }
+
+    private class EventQueryResult
+    {
+        public required string EventName { get; set; }
+        public required string Payload { get; set; }
+    }
 }
