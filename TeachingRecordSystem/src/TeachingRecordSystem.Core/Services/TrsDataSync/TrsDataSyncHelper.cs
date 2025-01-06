@@ -158,7 +158,7 @@ public class TrsDataSyncHelper(
             InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            InductionExemptionReasons = InductionExemptionReasons.None, // this mapping will be done in a future PR
+            InductionExemptionReasonIds = [], // this mapping will be done in a future PR
             DqtModifiedOn = induction?.ModifiedOn
         };
     }
@@ -924,7 +924,7 @@ public class TrsDataSyncHelper(
         {
             "person_id",
             "induction_completed_date",
-            "induction_exemption_reasons",
+            "induction_exemption_reason_ids",
             "induction_start_date",
             "induction_status",
             "induction_modified_on",
@@ -941,7 +941,7 @@ public class TrsDataSyncHelper(
             (
                 person_id uuid NOT NULL,
                 induction_completed_date date,
-                induction_exemption_reasons integer,
+                induction_exemption_reason_ids uuid[],
                 induction_start_date date,
                 induction_status integer,
                 induction_modified_on timestamp with time zone,
@@ -987,7 +987,7 @@ public class TrsDataSyncHelper(
         {
             writer.WriteValueOrNull(induction.PersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(induction.InductionCompletedDate, NpgsqlDbType.Date);
-            writer.WriteValueOrNull((int?)induction.InductionExemptionReasons, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(induction.InductionExemptionReasonIds, NpgsqlDbType.Array | NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(induction.InductionStartDate, NpgsqlDbType.Date);
             writer.WriteValueOrNull((int?)induction.InductionStatus, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
@@ -1293,7 +1293,7 @@ public class TrsDataSyncHelper(
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
                 InductionStatus = mappedInduction.InductionStatus.ToString(),
-                InductionExemptionReason = mappedInduction.InductionExemptionReasons.ToString(),
+                InductionExemptionReason = "",  // TODO
                 DqtInduction = GetEventDqtInduction(snapshot.Entity)
             };
         }
@@ -1341,7 +1341,7 @@ public class TrsDataSyncHelper(
     {
         public required Guid PersonId { get; init; }
         public required DateOnly? InductionCompletedDate { get; init; }
-        public required InductionExemptionReasons InductionExemptionReasons { get; init; }
+        public required Guid[] InductionExemptionReasonIds { get; init; }
         public required DateOnly? InductionStartDate { get; init; }
         public required InductionStatus? InductionStatus { get; init; }
         public required DateTime? DqtModifiedOn { get; init; }

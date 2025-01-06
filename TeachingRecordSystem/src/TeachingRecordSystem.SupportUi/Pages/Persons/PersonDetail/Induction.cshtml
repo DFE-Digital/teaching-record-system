@@ -28,7 +28,7 @@
                 </govuk-summary-list-row-actions>
             </govuk-summary-list-row>
 
-            @if (Model.ExemptionReasons != InductionExemptionReasons.None) // how to enforce that InductionExemptionReasons.None means no other flags are set?
+            @if (Model.ExemptionReasonIds!.Length > 0) // how to enforce that InductionExemptionReasons.None means no other flags are set?
             {
                 <govuk-summary-list-row data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>

@@ -296,7 +296,7 @@ public partial class TestData
                 var qtsDate = GetQtsDate();
                 var startDate = CreatePersonInductionBuilder.GetDefaultStartDate(status, qtsDate);
                 var completedDate = CreatePersonInductionBuilder.GetDefaultCompletedDate(status, startDate);
-                var exemptionReasons = CreatePersonInductionBuilder.GetDefaultExemptionReasons(status);
+                var exemptionReasons = CreatePersonInductionBuilder.GetDefaultExemptionReasonIds(status);
 
                 if (!Person.ValidateInductionData(status, startDate, completedDate, exemptionReasons, out var error))
                 {
@@ -1066,7 +1066,7 @@ public partial class TestData
         private Option<InductionStatus> _status;
         private Option<DateOnly?> _startDate;
         private Option<DateOnly?> _completedDate;
-        private Option<InductionExemptionReasons> _exemptionReasons;
+        private Option<Guid[]> _exemptionReasonIds;
 
         public bool HasStatusRequiringQts => _status.HasValue && _status.ValueOrFailure() != InductionStatus.None;
 
@@ -1103,14 +1103,14 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonInductionBuilder WithExemptionReasons(InductionExemptionReasons exemptionReasons)
+        public CreatePersonInductionBuilder WithExemptionReasons(params Guid[] exemptionReasonIds)
         {
-            if (_exemptionReasons.HasValue)
+            if (_exemptionReasonIds.HasValue)
             {
                 throw new InvalidOperationException("Exemption reasons have already been set.");
             }
 
-            _exemptionReasons = Option.Some(exemptionReasons);
+            _exemptionReasonIds = Option.Some(exemptionReasonIds);
             return this;
         }
 
@@ -1125,7 +1125,7 @@ public partial class TestData
             var status = _status.ValueOr(qtsDate.HasValue ? InductionStatus.RequiredToComplete : InductionStatus.None);
             var startDate = _startDate.ValueOrDefault();
             var completedDate = _completedDate.ValueOrDefault();
-            var exemptionReasons = _exemptionReasons.ValueOr(InductionExemptionReasons.None);
+            var exemptionReasons = _exemptionReasonIds.ValueOr([]);
 
             person.SetInductionStatus(
                 status,
@@ -1151,8 +1151,8 @@ public partial class TestData
         internal static DateOnly? GetDefaultCompletedDate(InductionStatus status, DateOnly? startDate) =>
             status.RequiresCompletedDate() ? startDate!.Value.AddMonths(12) : null;
 
-        internal static InductionExemptionReasons GetDefaultExemptionReasons(InductionStatus status) =>
-            status is InductionStatus.Exempt ? (InductionExemptionReasons)1 : InductionExemptionReasons.None;
+        internal static Guid[] GetDefaultExemptionReasonIds(InductionStatus status) =>
+            status is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : Array.Empty<Guid>();
     }
 
     public record CreatePersonResult
