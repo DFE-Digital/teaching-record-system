@@ -141,6 +141,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0039_InductionFields.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0040_PersonInductionExemptionReasons.sql" />
   </ItemGroup>
 
   <ItemGroup>
