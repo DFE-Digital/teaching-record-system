@@ -1,4 +1,3 @@
-using GovUk.Frontend.AspNetCore;
 using Hangfire;
 using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Authentication.Cookies;
