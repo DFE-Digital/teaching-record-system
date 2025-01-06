@@ -44,11 +44,11 @@
                 </govuk-summary-list-row>
             }
 
-            @if (Model.ShowCompletionDate)
+            @if (Model.ShowCompletedDate)
             {
-                <govuk-summary-list-row data-testid="induction-completion-date">
-                    <govuk-summary-list-row-key>Induction completion date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.CompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row data-testid="induction-completed-date">
+                    <govuk-summary-list-row-key>Induction completed date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>

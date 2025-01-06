@@ -195,18 +195,18 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.Failed)]
     [InlineData(InductionStatus.FailedInWales)]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletionDate_DisplaysExpectedCompletionDate(InductionStatus setInductionStatus)
+    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletedDate_DisplaysExpectedCompletionDate(InductionStatus setInductionStatus)
     {
         // Arrange
         var setStartDate = Clock.Today.AddMonths(-1);
-        var setCompletionDate = Clock.Today;
+        var setCompletedDate = Clock.Today;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(setInductionStatus)
                     .WithStartDate(setStartDate)
-                    .WithCompletedDate(setCompletionDate)
+                    .WithCompletedDate(setCompletedDate)
                 ));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
@@ -219,7 +219,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
         var completionDate = doc.GetElementByTestId("induction-completion-date")!.Children[1].TextContent;
-        Assert.Contains(setCompletionDate.ToString("d MMMM yyyy"), completionDate);
+        Assert.Contains(setCompletedDate.ToString("d MMMM yyyy"), completionDate);
     }
 
     [Fact]
