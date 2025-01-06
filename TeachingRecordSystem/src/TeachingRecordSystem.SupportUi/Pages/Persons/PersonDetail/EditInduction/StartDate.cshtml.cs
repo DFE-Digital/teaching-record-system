@@ -55,7 +55,7 @@ public class StartDateModel : CommonJourneyPage
         }
         if (StartDate < Person.EarliestInductionStartDate)
         {
-            ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString("d MMMM yyyy")}");
+            ModelState.AddModelError(nameof(StartDate), $"The induction start date cannot be before {Person.EarliestInductionStartDate.ToString(UiDefaults.DateOnlyDisplayFormat)}");
         }
 
         if (!ModelState.IsValid)
