@@ -149,20 +149,9 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
-                recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
-                    nameof(SyncAllAlertsFromCrmJob),
-                    job => job.ExecuteAsync(/*createMigratedEvent: */false, /*dryRun: */false, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
-                    $"{nameof(SyncAllAlertsFromCrmJob)} (dry-run)",
-                    job => job.ExecuteAsync(/*createMigratedEvent: */true, /*dryRun: */true, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<SyncAllAlertsFromCrmJob>(
-                    $"{nameof(SyncAllAlertsFromCrmJob)} & migrate",
-                    job => job.ExecuteAsync(/*createMigratedEvent: */true, /*dryRun: */false, CancellationToken.None),
-                    Cron.Never);
+                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
+                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
+                recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
 
                 recurringJobManager.AddOrUpdate<SyncAllInductionsFromCrmJob>(
                     nameof(SyncAllInductionsFromCrmJob),

@@ -725,7 +725,7 @@ public partial class TrsDataSyncHelperTests
     private Task<EventBase[]> GetEventsForInduction(Guid inductionId) =>
         DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var results = await dbContext.Database.SqlQuery<AlertEventQueryResult>(
+            var results = await dbContext.Database.SqlQuery<EventQueryResult>(
                 $"""
                 SELECT e.event_name, e.payload
                 FROM events as e
