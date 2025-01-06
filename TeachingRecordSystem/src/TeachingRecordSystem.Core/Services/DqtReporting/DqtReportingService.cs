@@ -1,6 +1,7 @@
 using System.Data;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 using Medallion.Threading;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -569,8 +570,19 @@ public partial class DqtReportingService : BackgroundService
 
         foreach (var (columnName, columnValue) in columnValues)
         {
+            object? value = columnValue;
+
+            if (value is not null)
+            {
+                var columnValueType = value.GetType();
+                if (columnValueType.IsArray)
+                {
+                    value = JsonSerializer.Serialize(columnValue);
+                }
+            }
+
             var parameterName = $"@p{parameters.Count + 1}";
-            parameters.Add(new SqlParameter(parameterName, columnValue ?? DBNull.Value));
+            parameters.Add(new SqlParameter(parameterName, value ?? DBNull.Value));
             columnNames.Add(columnName);
         }
 
