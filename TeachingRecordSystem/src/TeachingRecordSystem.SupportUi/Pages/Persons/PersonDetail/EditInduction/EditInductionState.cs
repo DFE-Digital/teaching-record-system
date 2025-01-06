@@ -32,6 +32,7 @@ public class EditInductionState : IRegisterJourney
 
         CurrentInductionStatus = person.InductionStatus;
         StartDate = person.InductionStartDate;
+        CompletedDate = person.InductionCompletedDate;
         if (JourneyStartPage == null)
         {
             JourneyStartPage = startPage;
