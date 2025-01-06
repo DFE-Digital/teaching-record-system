@@ -60,6 +60,8 @@ public abstract class TestBase : IDisposable
 
     public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 
+    public ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
+
     public async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
             string journeyName,
             TState state,

@@ -108,19 +108,18 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
-    [Theory]
-    [InlineData(InductionStatus.Exempt)]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusExempt_DisplaysExpected(InductionStatus setInductionStatus)
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusExempt_DisplaysExpected()
     {
         // Arrange
+        var exemptionReasonId = InductionExemptionReason.PassedInWalesId;
+
         var person = await TestData.CreatePersonAsync(
             builder => builder
                 .WithQts()
                 .WithInductionStatus(builder => builder
-                    .WithStatus(setInductionStatus)
-                    .WithExemptionReasons(InductionExemptionReasons.QualifiedBefore07052000)
-                    )
-                );
+                    .WithStatus(InductionStatus.Exempt)
+                    .WithExemptionReasons(exemptionReasonId)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -128,11 +127,15 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        var allExemptionReasons = await ReferenceDataCache.GetInductionExemptionReasonsAsync();
+        var expectedExemptionReasonText =
+            allExemptionReasons.Single(r => r.InductionExemptionReasonId == exemptionReasonId).Name;
+
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
+        Assert.Contains(StatusStrings[InductionStatus.Exempt], inductionStatus!.TextContent);
         var exemptionReason = doc.GetElementByTestId("induction-exemption-reasons")!.Children[1].TextContent;
-        Assert.Contains("QualifiedBefore07052000", exemptionReason); // CML TODO - needs proper mapping to string
+        Assert.Contains(expectedExemptionReasonText, exemptionReason);
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
         Assert.Null(doc.GetElementByTestId("induction-end-date"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
