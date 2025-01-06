@@ -45,7 +45,7 @@ public static partial class ServiceCollectionExtensions
         public Task ExecuteAsync() => _action(_serviceProvider);
     }
 
-    private class RunStartupTasksHostedService : IHostedService
+    private class RunStartupTasksHostedService : IHostedLifecycleService
     {
         private readonly IEnumerable<IStartupTask> _startupTasks;
 
@@ -54,7 +54,11 @@ public static partial class ServiceCollectionExtensions
             _startupTasks = startupTasks;
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public async Task StartingAsync(CancellationToken cancellationToken)
         {
             foreach (var startupTask in _startupTasks)
             {
@@ -62,6 +66,10 @@ public static partial class ServiceCollectionExtensions
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StartedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        public Task StoppedAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }
