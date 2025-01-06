@@ -19,8 +19,9 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, IClock clock) : Page
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [DateInput(ErrorMessagePrefix = "Start date")]
     [Required(ErrorMessage = "Enter a start date")]
-    [Display(Name = "Start date")]  // https://github.com/gunndabad/govuk-frontend-aspnetcore/issues/282
+    [Display(Name = "Enter start date")]
     public DateOnly? StartDate { get; set; }
 
     public void OnGet()
