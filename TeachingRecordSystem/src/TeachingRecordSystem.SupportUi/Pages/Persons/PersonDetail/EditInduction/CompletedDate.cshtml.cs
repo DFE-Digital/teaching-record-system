@@ -15,8 +15,9 @@ public class CompletedDateModel : CommonJourneyPage
     public string? PersonName { get; set; }
 
     [BindProperty]
+    [DateInput(ErrorMessagePrefix = "Completed date")]
     [Required(ErrorMessage = "Enter an induction completed date")]
-    [Display(Name = "Completed date")]  // CML TODO - change after merge with main
+    [Display(Name = "When did they complete induction?")]
     public DateOnly? CompletedDate { get; set; }
 
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;

@@ -49,7 +49,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
                     .WithInductionStatus(inductionStatus)
-                    .WithStartDate(Clock.Today)
+                    .WithStartDate(Clock.Today.AddDays(-1))
+                    .WithCompletedDate(Clock.Today)
                     .Build())
         };
 
@@ -125,7 +126,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
                 .WithInductionStatus(inductionStatus)
-                .WithStartDate(Clock.Today)
+                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithCompletedDate(Clock.Today)
                 .Build())
         };
 
@@ -174,7 +176,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
                 .WithInductionStatus(inductionStatus)
-                .WithStartDate(Clock.Today)
+                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithCompletedDate(Clock.Today)
                 .Build())
         };
 
