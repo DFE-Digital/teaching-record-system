@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Eventing.Reader;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -48,6 +47,11 @@ public class CompletedDateModel : CommonJourneyPage
         if(CompletedDate < JourneyInstance!.State.StartDate)
         {
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be before the induction start date");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
         }
 
         await JourneyInstance!.UpdateStateAsync(state =>
