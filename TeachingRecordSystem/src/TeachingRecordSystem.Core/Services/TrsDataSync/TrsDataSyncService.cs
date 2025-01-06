@@ -64,7 +64,6 @@ public class TrsDataSyncService(
         await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Induction);
         await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Person);
         await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Event);
-        await SyncIfEnabledAsync(TrsDataSyncHelper.ModelTypes.Alert);
 
         async Task SyncIfEnabledAsync(string modelType)
         {
