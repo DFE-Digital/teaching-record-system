@@ -73,5 +73,7 @@ public class SyncAllDqtQtsAuditsJob(
                 break;
             }
         }
+
+        logger.LogWarning("Synced {Count} dfeta_qtsregistration audit records.", fetched);
     }
 }

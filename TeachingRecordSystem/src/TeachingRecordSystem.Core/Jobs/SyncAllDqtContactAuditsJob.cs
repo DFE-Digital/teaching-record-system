@@ -73,5 +73,7 @@ public class SyncAllDqtContactAuditsJob(
                 break;
             }
         }
+
+        logger.LogWarning("Synced {Count} contact audit records.", fetched);
     }
 }

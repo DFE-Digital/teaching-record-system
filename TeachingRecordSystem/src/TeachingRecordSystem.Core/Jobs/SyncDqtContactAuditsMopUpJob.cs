@@ -9,28 +9,32 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class SyncAllDqtIttAuditsJob(
+public class SyncDqtContactAuditsMopUpJob(
     [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
-    ILogger<SyncAllDqtIttAuditsJob> logger)
+    ILogger<SyncDqtContactAuditsMopUpJob> logger)
 {
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    public async Task ExecuteAsync(DateTime modifiedSince, CancellationToken cancellationToken)
     {
         const int pageSize = 1000;
 
-        var query = new QueryExpression(dfeta_initialteachertraining.EntityLogicalName)
+        var filter = new FilterExpression();
+        filter.AddCondition(Contact.Fields.ModifiedOn, ConditionOperator.GreaterEqual, modifiedSince);
+
+        var query = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(),
             Orders =
             {
-                new OrderExpression("createdon", OrderType.Ascending),
-                new OrderExpression(dfeta_initialteachertraining.PrimaryIdAttribute, OrderType.Ascending)
+                new OrderExpression(Contact.Fields.CreatedOn, OrderType.Ascending),
+                new OrderExpression(Contact.PrimaryIdAttribute, OrderType.Ascending)
             },
             PageInfo = new PagingInfo()
             {
                 Count = pageSize,
                 PageNumber = 1
-            }
+            },
+            Criteria = filter
         };
 
         var fetched = 0;
@@ -53,14 +57,14 @@ public class SyncAllDqtIttAuditsJob(
             fetched += result.Entities.Count;
 
             await trsDataSyncHelper.SyncAuditAsync(
-                dfeta_initialteachertraining.EntityLogicalName,
+                Contact.EntityLogicalName,
                 result.Entities.Select(e => e.Id),
-                skipIfExists: true,
+                skipIfExists: false,
                 cancellationToken);
 
             if (fetched > 0 && fetched % 50000 == 0)
             {
-                logger.LogWarning("Synced {Count} dfeta_initialteachertraining audit records.", fetched);
+                logger.LogWarning("Synced {Count} contact audit records.", fetched);
             }
 
             if (result.MoreRecords)
@@ -74,6 +78,6 @@ public class SyncAllDqtIttAuditsJob(
             }
         }
 
-        logger.LogWarning("Synced {Count} dfeta_initialteachertraining audit records.", fetched);
+        logger.LogWarning("Synced {Count} contact audit records.", fetched);
     }
 }
