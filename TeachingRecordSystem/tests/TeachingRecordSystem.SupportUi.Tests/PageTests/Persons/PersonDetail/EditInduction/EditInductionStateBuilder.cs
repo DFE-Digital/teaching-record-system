@@ -8,7 +8,7 @@ public class EditInductionStateBuilder
     private InductionStatus CurrentInductionStatus { get; set; }
     private DateOnly? StartDate { get; set; }
     private DateOnly? CompletedDate { get; set; }
-    private InductionExemptionReasons? ExemptionReasons { get; set; }
+    private Guid[]? ExemptionReasonIds { get; set; }
     private string? ChangeReason { get; set; }
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool RecordManagedInCpd { get; set; }
@@ -52,7 +52,7 @@ public class EditInductionStateBuilder
             CurrentInductionStatus = CurrentInductionStatus,
             StartDate = StartDate,
             CompletedDate = CompletedDate,
-            ExemptionReasons = ExemptionReasons,
+            ExemptionReasonIds = ExemptionReasonIds,
             ChangeReason = ChangeReason,
             JourneyStartPage = JourneyStartPage,
             RecordManagedInCpd = RecordManagedInCpd,

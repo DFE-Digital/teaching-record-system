@@ -69,7 +69,7 @@ public static class InductionStatusRegistry
                .GetCustomAttribute<InductionStatusInfoAttribute>() ??
            throw new Exception($"{nameof(InductionStatus)}.{status} is missing the {nameof(InductionStatusInfoAttribute)} attribute.");
 
-        return new InductionStatusInfo(status, attr.Name, attr.RequiresStartDate, attr.RequiresCompletedDate, attr.RequiresExemptionReason);
+        return new InductionStatusInfo(status, attr.Name, attr.RequiresStartDate, attr.RequiresCompletedDate, attr.RequiresExemptionReasons);
     }
 }
 
@@ -84,5 +84,5 @@ file sealed class InductionStatusInfoAttribute(string name, bool requiresStartDa
     public string Name => name;
     public bool RequiresStartDate => requiresStartDate;
     public bool RequiresCompletedDate => requiresCompletedDate;
-    public bool RequiresExemptionReason => requiresExemptionReasons;
+    public bool RequiresExemptionReasons => requiresExemptionReasons;
 }

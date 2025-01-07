@@ -17,12 +17,14 @@ using TeachingRecordSystem.Core.Dqt;
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
 public class TrsDataSyncHelper(
-        NpgsqlDataSource trsDbDataSource,
-        [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
-        ReferenceDataCache referenceDataCache,
-        IClock clock,
-        IAuditRepository auditRepository,
-        ILogger<TrsDataSyncHelper> logger)
+    NpgsqlDataSource trsDbDataSource,
+    [FromKeyedServices(TrsDataSyncService.CrmClientName)] IOrganizationServiceAsync2 organizationService,
+#pragma warning disable CS9113 // Parameter is unread.
+    ReferenceDataCache referenceDataCache,
+#pragma warning restore CS9113 // Parameter is unread.
+    IClock clock,
+    IAuditRepository auditRepository,
+    ILogger<TrsDataSyncHelper> logger)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -34,7 +36,6 @@ public class TrsDataSyncHelper(
     {
         { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
         { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
-        { ModelTypes.Alert, GetModelTypeSyncInfoForAlert() },
         { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() }
     };
 
@@ -157,7 +158,7 @@ public class TrsDataSyncHelper(
             InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            InductionExemptionReasons = InductionExemptionReasons.None, // this mapping will be done in a future PR
+            InductionExemptionReasonIds = [], // this mapping will be done in a future PR
             DqtModifiedOn = induction?.ModifiedOn
         };
     }
@@ -513,148 +514,6 @@ public class TrsDataSyncHelper(
             if (!dryRun)
             {
                 await txn.CommitAsync(cancellationToken);
-            }
-
-            break;
-        }
-        while (true);
-
-        _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
-        return toSync.Count;
-    }
-
-    public async Task<bool> SyncAlertAsync(
-        dfeta_sanction entity,
-        AuditDetailCollection auditDetails,
-        bool ignoreInvalid,
-        bool createMigratedEvent,
-        bool dryRun = false,
-        CancellationToken cancellationToken = default)
-    {
-        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
-        {
-            { entity.Id, auditDetails }
-        };
-
-        return await SyncAlertsAsync(new[] { entity }, auditDetailsDict, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken) == 1;
-    }
-
-    public async Task<int> SyncAlertsAsync(
-        IReadOnlyCollection<dfeta_sanction> entities,
-        bool ignoreInvalid,
-        bool createMigratedEvent,
-        bool dryRun,
-        CancellationToken cancellationToken)
-    {
-        var auditDetails = await GetAuditRecordsAsync(dfeta_sanction.EntityLogicalName, entities.Select(q => q.Id), cancellationToken);
-
-        return await SyncAlertsAsync(entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
-    }
-
-    public async Task<int> SyncAlertsAsync(
-        IReadOnlyCollection<dfeta_sanction> entities,
-        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
-        bool ignoreInvalid,
-        bool createMigratedEvent,
-        bool dryRun,
-        CancellationToken cancellationToken = default)
-    {
-        var (alerts, events) = await MapAlertsAndAuditsAsync(entities, auditDetails, ignoreInvalid, createMigratedEvent);
-
-        return await SyncAlertsAsync(alerts, events, ignoreInvalid, dryRun, cancellationToken);
-    }
-
-    private async Task<int> SyncAlertsAsync(
-        IReadOnlyCollection<Alert> alerts,
-        IReadOnlyCollection<EventBase> events,
-        bool ignoreInvalid,
-        bool dryRun,
-        CancellationToken cancellationToken)
-    {
-        if (alerts.Count == 0)
-        {
-            Debug.Assert(events.Count == 0);
-            return 0;
-        }
-
-        var modelTypeSyncInfo = GetModelTypeSyncInfo<Alert>(ModelTypes.Alert);
-
-        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-
-        var toSync = alerts.ToList();
-
-        do
-        {
-            try
-            {
-                using var txn = await connection.BeginTransactionAsync(cancellationToken);
-
-                using (var createTempTableCommand = connection.CreateCommand())
-                {
-                    createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
-                    createTempTableCommand.Transaction = txn;
-                    await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
-                }
-
-                using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
-
-                foreach (var a in toSync)
-                {
-                    writer.StartRow();
-                    modelTypeSyncInfo.WriteRecord!(writer, a);
-                }
-
-                await writer.CompleteAsync(cancellationToken);
-                await writer.CloseAsync(cancellationToken);
-
-                using (var mergeCommand = connection.CreateCommand())
-                {
-                    mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
-                    mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
-                    mergeCommand.Transaction = txn;
-                    await mergeCommand.ExecuteNonQueryAsync();
-                }
-
-                await txn.SaveEventsAsync(events, "events_import", clock, cancellationToken);
-
-                if (!dryRun)
-                {
-                    await txn.CommitAsync(cancellationToken);
-                }
-            }
-            catch (PostgresException ex) when (ex.SqlState == "23503" && ex.ConstraintName == Alert.PersonForeignKeyName)
-            {
-                // Person does not exist.
-                // This is unlikely to happen often so the handling of this doesn't need to be super optimal.
-                // In this case we just pull the contact record directly, sync it then go again.
-                // Since the person sync happens in its own transaction we need to ensure dryRun is false otherwise this will loop forever.
-
-                // ex.Detail will be something like "Key (person_id)=(6ac8dc26-c8ae-e311-b8ed-005056822391) is not present in table "persons"."
-                var personId = Guid.Parse(ex.Detail!.Substring("Key (person_id)=(".Length, Guid.Empty.ToString().Length));
-
-                var personSynced = await SyncPersonAsync(personId, syncAudit: true, ignoreInvalid, dryRun: false, cancellationToken);
-                if (!personSynced)
-                {
-                    // The person sync may fail if the record doesn't meet the criteria (e.g. it doesn't have a TRN).
-                    // If we're ignoring invalid records we can skip MQs that reference this person ID,
-                    // otherwise we blow up.
-
-                    if (ignoreInvalid)
-                    {
-                        toSync.RemoveAll(a => a.PersonId == personId);
-                        if (toSync.Count == 0)
-                        {
-                            return 0;
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(
-                            $"Attempted to sync Alert for person '{personId}' but the person record does not meet the sync criteria.");
-                    }
-                }
-
-                continue;
             }
 
             break;
@@ -1065,7 +924,7 @@ public class TrsDataSyncHelper(
         {
             "person_id",
             "induction_completed_date",
-            "induction_exemption_reasons",
+            "induction_exemption_reason_ids",
             "induction_start_date",
             "induction_status",
             "induction_modified_on",
@@ -1082,7 +941,7 @@ public class TrsDataSyncHelper(
             (
                 person_id uuid NOT NULL,
                 induction_completed_date date,
-                induction_exemption_reasons integer,
+                induction_exemption_reason_ids uuid[],
                 induction_start_date date,
                 induction_status integer,
                 induction_modified_on timestamp with time zone,
@@ -1128,7 +987,7 @@ public class TrsDataSyncHelper(
         {
             writer.WriteValueOrNull(induction.PersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(induction.InductionCompletedDate, NpgsqlDbType.Date);
-            writer.WriteValueOrNull((int?)induction.InductionExemptionReasons, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(induction.InductionExemptionReasonIds, NpgsqlDbType.Array | NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(induction.InductionStartDate, NpgsqlDbType.Date);
             writer.WriteValueOrNull((int?)induction.InductionStatus, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
@@ -1171,100 +1030,6 @@ public class TrsDataSyncHelper(
             GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
                 helper.SyncEventsAsync(entities.Select(e => e.ToEntity<dfeta_TRSEvent>()).ToArray(), dryRun, ct),
             WriteRecord = null
-        };
-    }
-
-    private static ModelTypeSyncInfo GetModelTypeSyncInfoForAlert()
-    {
-        var tempTableName = "temp_alerts_import";
-        var tableName = "alerts";
-
-        var columnNames = new[]
-        {
-            "alert_id",
-            "alert_type_id",
-            "person_id",
-            "details",
-            "external_link",
-            "start_date",
-            "end_date",
-            "created_on",
-            "updated_on",
-            "deleted_on",
-            "dqt_sanction_id",
-            "dqt_state",
-            "dqt_created_on",
-            "dqt_modified_on",
-        };
-
-        var columnsToUpdate = columnNames.Except(new[] { "alert_id", "dqt_sanction_id" }).ToArray();
-
-        var columnList = string.Join(", ", columnNames);
-
-        var createTempTableStatement = $"CREATE TEMP TABLE {tempTableName} (LIKE {tableName} INCLUDING DEFAULTS)";
-
-        var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
-
-        var insertStatement =
-            $"""
-            INSERT INTO {tableName} AS t ({columnList}, dqt_first_sync, dqt_last_sync)
-            SELECT {columnList}, {NowParameterName}, {NowParameterName} FROM {tempTableName}
-            ON CONFLICT (alert_id) DO UPDATE
-            SET dqt_last_sync = {NowParameterName}, {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
-            WHERE t.dqt_modified_on < EXCLUDED.dqt_modified_on
-            """;
-
-        var deleteStatement = $"DELETE FROM {tableName} WHERE dqt_sanction_id = ANY({IdsParameterName})";
-
-        var getLastModifiedOnStatement = $"SELECT MAX(dqt_modified_on) FROM {tableName}";
-
-        var attributeNames = new[]
-        {
-            dfeta_sanction.Fields.dfeta_sanctionId,
-            dfeta_sanction.Fields.dfeta_SanctionCodeId,
-            dfeta_sanction.Fields.CreatedOn,
-            dfeta_sanction.Fields.CreatedBy,
-            dfeta_sanction.Fields.ModifiedOn,
-            dfeta_sanction.Fields.dfeta_StartDate,
-            dfeta_sanction.Fields.dfeta_EndDate,
-            dfeta_sanction.Fields.dfeta_PersonId,
-            dfeta_sanction.Fields.dfeta_SanctionDetails,
-            dfeta_sanction.Fields.dfeta_DetailsLink,
-            dfeta_sanction.Fields.dfeta_Spent,
-            dfeta_sanction.Fields.StateCode,
-            dfeta_sanction.Fields.StatusCode
-        };
-
-        Action<NpgsqlBinaryImporter, Alert> writeRecord = (writer, alert) =>
-        {
-            writer.WriteValueOrNull(alert.AlertId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(alert.AlertTypeId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(alert.PersonId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(alert.Details, NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull(alert.ExternalLink, NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull(alert.StartDate, NpgsqlDbType.Date);
-            writer.WriteValueOrNull(alert.EndDate, NpgsqlDbType.Date);
-            writer.WriteValueOrNull(alert.CreatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(alert.UpdatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(alert.DeletedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(alert.DqtSanctionId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(alert.DqtState, NpgsqlDbType.Integer);
-            writer.WriteValueOrNull(alert.DqtCreatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(alert.DqtModifiedOn, NpgsqlDbType.TimestampTz);
-        };
-
-        return new ModelTypeSyncInfo<Alert>()
-        {
-            CreateTempTableStatement = createTempTableStatement,
-            CopyStatement = copyStatement,
-            UpsertStatement = insertStatement,
-            DeleteStatement = deleteStatement,
-            GetLastModifiedOnStatement = getLastModifiedOnStatement,
-            EntityLogicalName = dfeta_sanction.EntityLogicalName,
-            AttributeNames = attributeNames,
-            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
-                helper.SyncAlertsAsync(entities.Select(e => e.ToEntity<dfeta_sanction>()).ToArray(), ignoreInvalid, createMigratedEvent: false, dryRun, ct),
-            WriteRecord = writeRecord
         };
     }
 
@@ -1528,7 +1293,7 @@ public class TrsDataSyncHelper(
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
                 InductionStatus = mappedInduction.InductionStatus.ToString(),
-                InductionExemptionReason = mappedInduction.InductionExemptionReasons.ToString(),
+                InductionExemptionReason = "",  // TODO
                 DqtInduction = GetEventDqtInduction(snapshot.Entity)
             };
         }
@@ -1542,203 +1307,6 @@ public class TrsDataSyncHelper(
                 CompletionDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                 InductionStatus = induction.dfeta_InductionStatus.ToString(),
                 InductionExemptionReason = induction.dfeta_InductionExemptionReason.ToString()
-            };
-        }
-    }
-
-    private async Task<(List<Alert> Alerts, List<EventBase> Events)> MapAlertsAndAuditsAsync(
-        IEnumerable<dfeta_sanction> sanctions,
-        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
-        bool ignoreInvalid,
-        bool createMigratedEvent)
-    {
-        var sanctionCodes = await referenceDataCache.GetSanctionCodesAsync(activeOnly: false);
-        var alertTypes = await referenceDataCache.GetAlertTypesAsync();
-
-        var alerts = new List<Alert>();
-        var events = new List<EventBase>();
-
-        foreach (var s in sanctions)
-        {
-            var mapped = MapAlertFromDqtSanction(s, sanctionCodes, alertTypes, ignoreInvalid);
-
-            if (mapped is null)
-            {
-                continue;
-            }
-
-            var audits = auditDetails[s.Id].AuditDetails;
-            var versions = GetEntityVersions(s, audits, GetModelTypeSyncInfo(ModelTypes.Alert).AttributeNames);
-
-            events.Add(audits.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
-                MapCreatedEvent(versions.First()) :
-                MapImportedEvent(versions.First()));
-
-            foreach (var (thisVersion, previousVersion) in versions.Skip(1).Zip(versions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
-            {
-                var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
-
-                if (mappedEvent is not null)
-                {
-                    events.Add(mappedEvent);
-                }
-            }
-
-            // If the record is deactivated then it's migrated as deleted
-            if (s.StateCode == dfeta_sanctionState.Inactive)
-            {
-                mapped.DeletedOn = clock.UtcNow;
-            }
-            else if (createMigratedEvent)
-            {
-                events.Add(MapMigratedEvent(versions.Last()));
-            }
-
-            alerts.Add(mapped);
-        }
-
-        return (alerts, events);
-
-        EventBase MapCreatedEvent(EntityVersionInfo<dfeta_sanction> snapshot)
-        {
-            return new AlertCreatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Entity.Id}-Created",
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
-                AddReason = null,
-                AddReasonDetail = null,
-                EvidenceFile = null,
-            };
-        }
-
-        EventBase? MapUpdatedEvent(EntityVersionInfo<dfeta_sanction> snapshot, EntityVersionInfo<dfeta_sanction> previous)
-        {
-            if (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.StateCode))
-            {
-                var nonStateAttributes = snapshot.ChangedAttributes
-                    .Where(a => !(a is dfeta_sanction.Fields.StateCode or dfeta_sanction.Fields.StatusCode))
-                    .ToArray();
-
-                if (nonStateAttributes.Length > 0)
-                {
-                    throw new InvalidOperationException(
-                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
-                }
-
-                if (snapshot.Entity.StateCode == dfeta_sanctionState.Inactive)
-                {
-                    return new AlertDqtDeactivatedEvent()
-                    {
-                        EventId = Guid.NewGuid(),
-                        Key = $"{snapshot.Id}",  // The CRM Audit ID
-                        CreatedUtc = snapshot.Timestamp,
-                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                        Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false)
-                    };
-                }
-                else
-                {
-                    return new AlertDqtReactivatedEvent()
-                    {
-                        EventId = Guid.NewGuid(),
-                        Key = $"{snapshot.Id}",  // The CRM Audit ID
-                        CreatedUtc = snapshot.Timestamp,
-                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                        Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false)
-                    };
-                }
-            }
-
-            var changes = AlertUpdatedEventChanges.None |
-                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_SanctionDetails) ? AlertUpdatedEventChanges.Details : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_DetailsLink) ? AlertUpdatedEventChanges.ExternalLink : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_StartDate) ? AlertUpdatedEventChanges.StartDate : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_EndDate) ? AlertUpdatedEventChanges.EndDate : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_Spent) ? AlertUpdatedEventChanges.DqtSpent : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_sanction.Fields.dfeta_SanctionCodeId) ? AlertUpdatedEventChanges.DqtSanctionCode : 0);
-
-            if (changes == AlertUpdatedEventChanges.None)
-            {
-                return null;
-            }
-
-            return new AlertUpdatedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Id}",  // The CRM Audit ID
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
-                OldAlert = GetEventAlert(previous.Entity, applyMigrationMappings: false),
-                ChangeReason = null,
-                ChangeReasonDetail = null,
-                EvidenceFile = null,
-                Changes = changes
-            };
-        }
-
-        EventBase MapImportedEvent(EntityVersionInfo<dfeta_sanction> snapshot)
-        {
-            return new AlertDqtImportedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Entity.Id}-Imported",
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false),
-                DqtState = (int)snapshot.Entity.StateCode!
-            };
-        }
-
-        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_sanction> snapshot)
-        {
-            return new AlertMigratedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Entity.Id}-Migrated",
-                CreatedUtc = clock.UtcNow,
-                RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Alert = GetEventAlert(snapshot.Entity, applyMigrationMappings: true),
-                OldAlert = GetEventAlert(snapshot.Entity, applyMigrationMappings: false)
-            };
-        }
-
-        EventModels.Alert GetEventAlert(dfeta_sanction snapshot, bool applyMigrationMappings)
-        {
-            var dqtSanctionCode = snapshot.dfeta_SanctionCodeId is null ?
-                null :
-                sanctionCodes.Single(s => s.Id == snapshot.dfeta_SanctionCodeId.Id);
-
-            var alertType = applyMigrationMappings && dqtSanctionCode is not null ?
-                alertTypes.Single(t => t.DqtSanctionCode == dqtSanctionCode.dfeta_Value) :
-                null;
-
-            return new()
-            {
-                AlertId = snapshot.Id,
-                AlertTypeId = alertType?.AlertTypeId,
-                Details = snapshot.dfeta_SanctionDetails,
-                ExternalLink = snapshot.dfeta_DetailsLink,
-                StartDate = snapshot.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                EndDate = snapshot.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                DqtSpent = applyMigrationMappings ? null : snapshot.dfeta_Spent,
-                DqtSanctionCode = !applyMigrationMappings && dqtSanctionCode is not null ?
-                    new EventModels.AlertDqtSanctionCode()
-                    {
-                        SanctionCodeId = dqtSanctionCode.Id,
-                        Name = dqtSanctionCode.dfeta_name,
-                        Value = dqtSanctionCode.dfeta_Value
-                    } :
-                    null
             };
         }
     }
@@ -1773,7 +1341,7 @@ public class TrsDataSyncHelper(
     {
         public required Guid PersonId { get; init; }
         public required DateOnly? InductionCompletedDate { get; init; }
-        public required InductionExemptionReasons InductionExemptionReasons { get; init; }
+        public required Guid[] InductionExemptionReasonIds { get; init; }
         public required DateOnly? InductionStartDate { get; init; }
         public required InductionStatus? InductionStatus { get; init; }
         public required DateTime? DqtModifiedOn { get; init; }
@@ -1783,7 +1351,6 @@ public class TrsDataSyncHelper(
     {
         public const string Person = "Person";
         public const string Event = "Event";
-        public const string Alert = "Alert";
         public const string Induction = "Induction";
     }
 }

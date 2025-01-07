@@ -22,6 +22,7 @@ public class ReferenceDataCache(
     // TRS
     private Task<AlertCategory[]>? _alertCategoriesTask;
     private Task<AlertType[]>? _alertTypesTask;
+    private Task<InductionExemptionReason[]>? _inductionExemptionReasonsTask;
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
     {
@@ -184,6 +185,12 @@ public class ReferenceDataCache(
         return alertTypes.SingleOrDefault(at => at.DqtSanctionCode == dqtSanctionCode);
     }
 
+    public async Task<InductionExemptionReason[]> GetInductionExemptionReasonsAsync()
+    {
+        var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
+        return inductionExemptionReasons;
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -240,6 +247,15 @@ public class ReferenceDataCache(
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
                 return await dbContext.AlertTypes.AsNoTracking().Include(at => at.AlertCategory).ToArrayAsync();
+            });
+
+    private Task<InductionExemptionReason[]> EnsureInductionExemptionReasonsAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _inductionExemptionReasonsTask,
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.InductionExemptionReasons.AsNoTracking().ToArrayAsync();
             });
 
     async Task IStartupTask.ExecuteAsync()

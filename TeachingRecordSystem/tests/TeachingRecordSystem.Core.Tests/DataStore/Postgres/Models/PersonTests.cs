@@ -62,7 +62,7 @@ public class PersonTests
             InductionStatus.Exempt,
             startDate: null,
             completedDate: null,
-            (InductionExemptionReasons)1,
+            [InductionExemptionReason.PassedInWalesId],
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -108,7 +108,7 @@ public class PersonTests
             InductionStatus.Exempt,
             startDate: null,
             completedDate: null,
-            (InductionExemptionReasons)1,
+            [InductionExemptionReason.PassedInWalesId],
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -160,7 +160,7 @@ public class PersonTests
             currentStatus,
             startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
-            exemptionReasons: currentStatus is InductionStatus.Exempt ? InductionExemptionReasons.QualifiedBefore07052000 : InductionExemptionReasons.None,
+            exemptionReasonIds: currentStatus is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : Array.Empty<Guid>(),
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -181,14 +181,8 @@ public class PersonTests
         Assert.Equal(currentStatus, person.InductionStatus);
     }
 
-    [Theory]
-    [InlineData(true, InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionExemptionReasons.PassedInductionInWales)]
-    [InlineData(false, InductionStatus.RequiredToComplete, InductionStatus.FailedInWales, InductionExemptionReasons.None)]
-    public void TrySetWelshInductionStatus_StatusIsAtLowerPriorityStatus_UpdatesStatusAndReturnsTrue(
-        bool passed,
-        InductionStatus currentStatus,
-        InductionStatus expectedStatus,
-        InductionExemptionReasons expectedExemptionReasons)
+    [Fact]
+    public void TrySetWelshInductionStatus_PassedAndStatusIsAtLowerPriorityStatus_UpdatesStatusAndReturnsTrue()
     {
         // Arrange
         var person = new Person
@@ -203,11 +197,13 @@ public class PersonTests
             DateOfBirth = new(1990, 1, 1),
         };
 
+        var currentStatus = InductionStatus.RequiredToComplete;
+
         person.SetInductionStatus(
             currentStatus,
             startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
-            exemptionReasons: currentStatus is InductionStatus.Exempt ? InductionExemptionReasons.QualifiedBefore07052000 : InductionExemptionReasons.None,
+            exemptionReasonIds: [],
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -216,17 +212,61 @@ public class PersonTests
 
         // Act
         var result = person.TrySetWelshInductionStatus(
-            passed,
-            startDate: !passed ? new(2024, 1, 1) : null,
-            completedDate: !passed ? new(2024, 10, 1) : null,
+            passed: true,
+            startDate: null,
+            completedDate: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
 
         // Assert
         Assert.True(result);
-        Assert.Equal(expectedStatus, person.InductionStatus);
-        Assert.Equal(expectedExemptionReasons, person.InductionExemptionReasons);
+        Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
+        Assert.Collection(person.InductionExemptionReasonIds, id => Assert.Equal(InductionExemptionReason.PassedInWalesId, id));
+    }
+
+    [Fact]
+    public void TrySetWelshInductionStatus_FailedAndStatusIsAtLowerPriorityStatus_UpdatesStatusAndReturnsTrue()
+    {
+        // Arrange
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            CreatedOn = Clock.UtcNow,
+            UpdatedOn = Clock.UtcNow,
+            Trn = "1234567",
+            FirstName = "Joe",
+            MiddleName = "",
+            LastName = "Bloggs",
+            DateOfBirth = new(1990, 1, 1),
+        };
+
+        var currentStatus = InductionStatus.RequiredToComplete;
+
+        person.SetInductionStatus(
+            currentStatus,
+            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
+            exemptionReasonIds: [],
+            updatedBy: SystemUser.SystemUserId,
+            Clock.UtcNow,
+            out _);
+
+        Clock.Advance();
+
+        // Act
+        var result = person.TrySetWelshInductionStatus(
+            passed: false,
+            startDate: new(2024, 1, 1),
+            completedDate: new(2024, 10, 1),
+            updatedBy: SystemUser.SystemUserId,
+            Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(InductionStatus.FailedInWales, person.InductionStatus);
+        Assert.Empty(person.InductionExemptionReasonIds);
     }
 
     [Theory]
@@ -248,7 +288,7 @@ public class PersonTests
             LastName = "Bloggs",
             DateOfBirth = new(1990, 1, 1),
         };
-        person.SetInductionStatus(InductionStatus.Passed, dateCompleted, dateCompleted, InductionExemptionReasons.None, SystemUser.SystemUserId, Clock.UtcNow, out _);
+        person.SetInductionStatus(InductionStatus.Passed, dateCompleted, dateCompleted, [], SystemUser.SystemUserId, Clock.UtcNow, out _);
 
         // Act
         var result = person.InductionStatusManagedByCpd(Clock.Today);

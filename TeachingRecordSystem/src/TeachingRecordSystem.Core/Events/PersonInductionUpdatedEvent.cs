@@ -8,7 +8,7 @@ public record PersonInductionUpdatedEvent : EventBase, IEventWithPersonId
     public required InductionStatus InductionStatus { get; init; }
     public required DateOnly? InductionStartDate { get; init; }
     public required DateOnly? InductionCompletedDate { get; init; }
-    public required InductionExemptionReasons InductionExemptionReasons { get; init; }
+    public required Guid[] InductionExemptionReasonIds { get; init; }
     public required Option<InductionStatus> CpdInductionStatus { get; init; }
     public required Option<DateOnly?> CpdInductionStartDate { get; init; }
     public required Option<DateOnly?> CpdInductionCompletedDate { get; init; }

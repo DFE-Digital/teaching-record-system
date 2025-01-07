@@ -237,7 +237,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(initialVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
                 Assert.Equal(initialVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
                 Assert.Equal(initialVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
-                Assert.Equal(InductionExemptionReasons.None.ToString(), migratedEvent.InductionExemptionReason);
+                Assert.Equal("", migratedEvent.InductionExemptionReason);
                 return Task.CompletedTask;
             });
     }
@@ -285,7 +285,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(initialVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
                 Assert.Equal(initialVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
                 Assert.Equal(initialVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
-                Assert.Equal(InductionExemptionReasons.None.ToString(), migratedEvent.InductionExemptionReason);
+                Assert.Equal("", migratedEvent.InductionExemptionReason);
                 return Task.CompletedTask;
             });
     }
@@ -359,7 +359,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
                 Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
                 Assert.Equal(updatedVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
-                Assert.Equal(InductionExemptionReasons.None.ToString(), migratedEvent.InductionExemptionReason);
+                Assert.Equal("", migratedEvent.InductionExemptionReason);
                 return Task.CompletedTask;
             });
     }
@@ -725,7 +725,7 @@ public partial class TrsDataSyncHelperTests
     private Task<EventBase[]> GetEventsForInduction(Guid inductionId) =>
         DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var results = await dbContext.Database.SqlQuery<AlertEventQueryResult>(
+            var results = await dbContext.Database.SqlQuery<EventQueryResult>(
                 $"""
                 SELECT e.event_name, e.payload
                 FROM events as e

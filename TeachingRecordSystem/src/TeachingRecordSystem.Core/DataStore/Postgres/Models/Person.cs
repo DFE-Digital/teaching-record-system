@@ -20,7 +20,7 @@ public class Person
     public string? EmailAddress { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public InductionStatus InductionStatus { get; set; }
-    public InductionExemptionReasons InductionExemptionReasons { get; private set; }
+    public Guid[] InductionExemptionReasonIds { get; private set; } = [];
     public DateOnly? InductionStartDate { get; private set; }
     public DateOnly? InductionCompletedDate { get; private set; }
     public DateTime? InductionModifiedOn { get; private set; }
@@ -67,14 +67,14 @@ public class Person
         }
 
         // FUTURE When we have QTS in TRS - assert person has QTS
-        AssertInductionChangeIsValid(status, startDate, completedDate, exemptionReasons: InductionExemptionReasons.None);
+        AssertInductionChangeIsValid(status, startDate, completedDate, exemptionReasonIds: []);
 
         // If the CPD status is not Passed and we know the person is Exempt then the overall status is Exempt.
         // Otherwise, the overall status is set to match the CPD status.
         // It's important we never overwrite InductionExemptionReasons here since we're using it to remember
         // if somebody is exempt. In future we may be able to get this from the {route to} professional status instead.
 
-        var isExempt = InductionExemptionReasons != InductionExemptionReasons.None;
+        var isExempt = InductionExemptionReasonIds.Any();
         var (newOverallStatus, newOverallStartDate, newOverallCompletedDate) = isExempt && status != InductionStatus.Passed
             ? (InductionStatus.Exempt, null, null)
             : (status, startDate, completedDate);
@@ -121,7 +121,7 @@ public class Person
             InductionStatus = newOverallStatus,
             InductionStartDate = newOverallStartDate,
             InductionCompletedDate = newOverallCompletedDate,
-            InductionExemptionReasons = InductionExemptionReasons,
+            InductionExemptionReasonIds = InductionExemptionReasonIds,
             CpdInductionStatus = Option.Some(status),
             CpdInductionStartDate = Option.Some(startDate),
             CpdInductionCompletedDate = Option.Some(completedDate),
@@ -137,7 +137,7 @@ public class Person
         InductionStatus status,
         DateOnly? startDate,
         DateOnly? completedDate,
-        InductionExemptionReasons exemptionReasons,
+        Guid[] exemptionReasonIds,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
         out PersonInductionUpdatedEvent? @event)
@@ -149,7 +149,7 @@ public class Person
             (InductionStatus != status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
             (InductionStartDate != startDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
             (InductionCompletedDate != completedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-            (InductionExemptionReasons != exemptionReasons ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0);
+            (InductionExemptionReasonIds != exemptionReasonIds ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0);
 
         if (changes == PersonInductionUpdatedEventChanges.None)
         {
@@ -160,7 +160,7 @@ public class Person
         InductionStatus = status;
         InductionStartDate = startDate;
         InductionCompletedDate = completedDate;
-        InductionExemptionReasons = exemptionReasons;
+        InductionExemptionReasonIds = exemptionReasonIds;
         InductionModifiedOn = now;
 
         @event = new PersonInductionUpdatedEvent()
@@ -172,7 +172,7 @@ public class Person
             InductionStatus = status,
             InductionStartDate = startDate,
             InductionCompletedDate = completedDate,
-            InductionExemptionReasons = InductionExemptionReasons,
+            InductionExemptionReasonIds = InductionExemptionReasonIds,
             CpdInductionStatus = default,
             CpdInductionStartDate = default,
             CpdInductionCompletedDate = default,
@@ -192,17 +192,17 @@ public class Person
         DateTime now,
         [NotNullWhen(true)] out PersonInductionUpdatedEvent? @event)
     {
-        var newStatus = GetInductionStatusFromWelshOutcome(passed, out var exemptionReasons);
+        var newStatus = GetInductionStatusFromWelshOutcome(passed, out var exemptionReasonIds);
 
         // FUTURE When we have QTS in TRS - assert person has QTS
-        AssertInductionChangeIsValid(newStatus, startDate, completedDate, exemptionReasons);
+        AssertInductionChangeIsValid(newStatus, startDate, completedDate, exemptionReasonIds);
 
         if (InductionStatus is InductionStatus.RequiredToComplete)
         {
             if (newStatus == InductionStatus.Exempt)
             {
                 InductionStatus = newStatus;
-                InductionExemptionReasons = exemptionReasons;
+                InductionExemptionReasonIds = exemptionReasonIds;
                 InductionModifiedOn = now;
 
                 @event = new PersonInductionUpdatedEvent
@@ -211,7 +211,7 @@ public class Person
                     InductionStatus = newStatus,
                     InductionStartDate = startDate,
                     InductionCompletedDate = completedDate,
-                    InductionExemptionReasons = InductionExemptionReasons,
+                    InductionExemptionReasonIds = InductionExemptionReasonIds,
                     CpdInductionStatus = default,
                     CpdInductionStartDate = default,
                     CpdInductionCompletedDate = default,
@@ -240,7 +240,7 @@ public class Person
                     InductionStatus = newStatus,
                     InductionStartDate = null,
                     InductionCompletedDate = null,
-                    InductionExemptionReasons = exemptionReasons,
+                    InductionExemptionReasonIds = exemptionReasonIds,
                     CpdInductionStatus = default,
                     CpdInductionStartDate = default,
                     CpdInductionCompletedDate = default,
@@ -262,14 +262,10 @@ public class Person
         return false;
     }
 
-    public static InductionStatus GetInductionStatusFromWelshOutcome(bool passed, out InductionExemptionReasons exemptionReasons)
+    public static InductionStatus GetInductionStatusFromWelshOutcome(bool passed, out Guid[] exemptionReasonIds)
     {
         var status = passed ? InductionStatus.Exempt : InductionStatus.FailedInWales;
-
-        exemptionReasons = passed
-            ? InductionExemptionReasons.PassedInductionInWales
-            : InductionExemptionReasons.None;
-
+        exemptionReasonIds = passed ? [InductionExemptionReason.PassedInWalesId] : [];
         return status;
     }
 
@@ -277,7 +273,7 @@ public class Person
         InductionStatus status,
         DateOnly? startDate,
         DateOnly? completedDate,
-        InductionExemptionReasons exemptionReasons,
+        Guid[] exemptionReasonIds,
         [NotNullWhen(false)] out string? error)
     {
         var requiresStartDate = status.RequiresStartDate();
@@ -308,15 +304,15 @@ public class Person
             return false;
         }
 
-        if (requiresExemptionReason && exemptionReasons == InductionExemptionReasons.None)
+        if (requiresExemptionReason && !exemptionReasonIds.Any())
         {
-            error = $"Exemption reasons cannot be {nameof(InductionExemptionReasons.None)} when the status is: '{status}'.";
+            error = $"Exemption reasons cannot be empty when the status is: '{status}'.";
             return false;
         }
 
-        if (!requiresExemptionReason && exemptionReasons != InductionExemptionReasons.None)
+        if (!requiresExemptionReason && exemptionReasonIds.Any())
         {
-            error = $"Exemption reasons must be {nameof(InductionExemptionReasons.None)} when the status is: '{status}'.";
+            error = $"Exemption reasons must be empty when the status is: '{status}'.";
             return false;
         }
 
@@ -335,9 +331,9 @@ public class Person
         InductionStatus status,
         DateOnly? startDate,
         DateOnly? completedDate,
-        InductionExemptionReasons exemptionReasons)
+        Guid[] exemptionReasonIds)
     {
-        if (!ValidateInductionData(status, startDate, completedDate, exemptionReasons, out var error))
+        if (!ValidateInductionData(status, startDate, completedDate, exemptionReasonIds, out var error))
         {
             Debug.Fail(error);
         }
