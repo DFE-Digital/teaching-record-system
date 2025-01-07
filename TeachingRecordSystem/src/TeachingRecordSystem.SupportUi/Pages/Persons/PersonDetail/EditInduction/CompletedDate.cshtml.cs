@@ -22,7 +22,7 @@ public class CompletedDateModel : CommonJourneyPage
 
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
 
-     public string BackLink
+    public string BackLink
     {
         get
         {

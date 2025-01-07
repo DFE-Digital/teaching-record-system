@@ -145,7 +145,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/status")]
     [InlineData(InductionJourneyPage.Status, "edit-induction/start-date", InductionStatus.InProgress, "edit-induction/status")]
     [InlineData(InductionJourneyPage.StartDate, "edit-induction/start-date", InductionStatus.InProgress, "induction")]
-    [InlineData(InductionJourneyPage.CompletedDate,"edit-induction/date-completed", InductionStatus.Failed, "induction")]
+    [InlineData(InductionJourneyPage.CompletedDate, "edit-induction/date-completed", InductionStatus.Failed, "induction")]
     [InlineData(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Failed, "edit-induction/start-date")]
     [InlineData(InductionJourneyPage.StartDate, "edit-induction/date-completed", InductionStatus.Failed, "edit-induction/start-date")]
     [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
