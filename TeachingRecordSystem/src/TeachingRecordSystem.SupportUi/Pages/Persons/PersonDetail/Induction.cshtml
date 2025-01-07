@@ -28,7 +28,7 @@
                 </govuk-summary-list-row-actions>
             </govuk-summary-list-row>
 
-            @if (Model.ExemptionReasons != InductionExemptionReasons.None) // how to enforce that InductionExemptionReasons.None means no other flags are set?
+            @if (Model.ExemptionReasons != InductionExemptionReasons.None)
             {
                 <govuk-summary-list-row data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
@@ -41,6 +41,9 @@
                 <govuk-summary-list-row data-testid="induction-start-date">
                     <govuk-summary-list-row-key>Induction start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.InductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change status">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
 
@@ -49,6 +52,9 @@
                 <govuk-summary-list-row data-testid="induction-completed-date">
                     <govuk-summary-list-row-key>Induction completed date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.InductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change status">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>

@@ -8,7 +8,8 @@ public class ExemptionReasonModel : CommonJourneyPage
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
     public string BackLink
     {
-        // TODO - more logic needed when other routes to exemption reason are added
+        // TODO - check logic with BA - journey ticket suggestions two routes into this page which
+        // suggests exemption reason would be editable from the induction detail page
         get => PageLink(InductionJourneyPage.Status);
     }
 

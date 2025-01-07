@@ -14,6 +14,20 @@ public static class EditInductionPageExtensions
         return page.GetByTestId($"change-induction-status").ClickAsync();
     }
 
+    public static Task ClickEditInductionStartDatePageAsync(this IPage page)
+    {
+        return page.GetByTestId($"change-induction-start-date").ClickAsync();
+    }
+    public static Task ClickEditInductionCompletedDatePageAsync(this IPage page)
+    {
+        return page.GetByTestId($"change-induction-completed-date").ClickAsync();
+    }
+
+    public static Task AssertOnPersonInductionPageAsync(this IPage page, Guid personId)
+    {
+        return page.WaitForUrlPathAsync($"/persons/{personId}/induction");
+    }
+
     public static Task AssertOnEditInductionStatusPageAsync(this IPage page, Guid personId)
     {
         return page.WaitForUrlPathAsync($"/persons/{personId}/edit-induction/status");

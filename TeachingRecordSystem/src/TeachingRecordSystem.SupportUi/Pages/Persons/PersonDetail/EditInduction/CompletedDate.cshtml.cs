@@ -11,7 +11,7 @@ public class CompletedDateModel : CommonJourneyPage
     protected TrsDbContext _dbContext;
     protected IClock _clock;
 
-    public InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -22,10 +22,14 @@ public class CompletedDateModel : CommonJourneyPage
 
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
 
-    public string BackLink
+     public string BackLink
     {
-        // TODO - more logic needed when other routes to completed-date are added
-        get => PageLink(InductionJourneyPage.StartDate);
+        get
+        {
+            return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.CompletedDate
+                ? LinkGenerator.PersonInduction(PersonId)
+                : PageLink(InductionJourneyPage.StartDate);
+        }
     }
 
     public CompletedDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
@@ -34,9 +38,16 @@ public class CompletedDateModel : CommonJourneyPage
         _clock = clock;
     }
 
-    public void OnGet()
+    public Task OnGetAsync()
     {
         CompletedDate = JourneyInstance!.State.CompletedDate;
+        return JourneyInstance!.UpdateStateAsync(state =>
+        {
+            if (state.InductionStatus == InductionStatus.None)
+            {
+                state.InductionStatus = JourneyInstance!.State.CurrentInductionStatus;
+            }
+        });
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -69,7 +80,7 @@ public class CompletedDateModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
+        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.CompletedDate);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;

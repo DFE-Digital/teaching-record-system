@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
 public class InductionChangeReasonModel : CommonJourneyPage
 {
-    public InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public InductionJourneyPage NextPage => InductionJourneyPage.CheckAnswers;
     public string BackLink
     {
@@ -25,8 +25,15 @@ public class InductionChangeReasonModel : CommonJourneyPage
     {
     }
 
-    public void OnGet()
+    public Task OnGetAsync()
     {
+        return JourneyInstance!.UpdateStateAsync(state =>
+        {
+            if (state.InductionStatus == InductionStatus.None)
+            {
+                state.InductionStatus = JourneyInstance!.State.CurrentInductionStatus;
+            }
+        });
     }
 
     public async Task<IActionResult> OnPostAsync()

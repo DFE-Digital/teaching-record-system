@@ -12,7 +12,7 @@ public class StartDateModel : CommonJourneyPage
     protected TrsDbContext _dbContext;
     protected IClock _clock;
 
-    public InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public string? PersonName { get; set; }
 
     [BindProperty]
@@ -33,8 +33,12 @@ public class StartDateModel : CommonJourneyPage
 
     public string BackLink
     {
-        // TODO - more logic needed when other routes to start-date are added
-        get => PageLink(InductionJourneyPage.Status);
+        get
+        {
+            return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.StartDate
+            ? LinkGenerator.PersonInduction(PersonId)
+            : PageLink(InductionJourneyPage.Status);
+        }
     }
 
     public StartDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
@@ -43,9 +47,16 @@ public class StartDateModel : CommonJourneyPage
         _clock = clock;
     }
 
-    public void OnGet()
+    public Task OnGetAsync()
     {
         StartDate = JourneyInstance!.State.StartDate;
+        return JourneyInstance!.UpdateStateAsync(state =>
+        {
+            if (state.InductionStatus == InductionStatus.None)
+            {
+                state.InductionStatus = JourneyInstance!.State.CurrentInductionStatus;
+            }
+        });
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -78,7 +89,7 @@ public class StartDateModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
+        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.StartDate);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
