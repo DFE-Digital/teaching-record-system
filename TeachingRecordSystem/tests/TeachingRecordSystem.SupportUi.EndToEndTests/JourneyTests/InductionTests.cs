@@ -201,4 +201,40 @@ public class InductionTests : TestBase
 
         await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
+
+    [Fact]
+    public async Task EditInductionExemptionReason_NavigateBack()
+    {
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithQts()
+                .WithInductionStatus(inductionBuilder => inductionBuilder
+                    .WithStatus(InductionStatus.Exempt)
+                    .WithExemptionReasons(new Guid("5a80cee8-98a8-426b-8422-b0e81cb49b36"))
+                ));
+        var personId = person.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonInductionPageAsync(personId);
+        await page.ClickEditInductionExemptionReasonPageAsync();
+
+        await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnPersonInductionPageAsync(person.PersonId);
+    }
 }
