@@ -564,13 +564,13 @@ public class TrsDataSyncHelper(
 
         if (ordered.Length == 0)
         {
-            return [new EntityVersionInfo<TEntity>(latest.Id, latest, ChangedAttributes: Array.Empty<string>(), created, createdBy.Id, createdBy.Name)];
+            return [new EntityVersionInfo<TEntity>(latest.Id, latest, ChangedAttributes: [], created, createdBy.Id, createdBy.Name)];
         }
 
         var versions = new List<EntityVersionInfo<TEntity>>();
 
         var initialVersion = GetInitialVersion();
-        versions.Add(new EntityVersionInfo<TEntity>(initialVersion.Id, initialVersion, ChangedAttributes: Array.Empty<string>(), created, createdBy.Id, createdBy.Name));
+        versions.Add(new EntityVersionInfo<TEntity>(initialVersion.Id, initialVersion, ChangedAttributes: [], created, createdBy.Id, createdBy.Name));
 
         latest = initialVersion.ShallowClone();
         foreach (var audit in ordered)
@@ -590,14 +590,29 @@ public class TrsDataSyncHelper(
 
             foreach (var attr in audit.AuditDetail.DeletedAttributes)
             {
+                if (!attributeNames.Contains(attr.Value))
+                {
+                    continue;
+                }
+
                 thisVersion.Attributes.Remove(attr.Value);
                 changedAttributes.Add(attr.Value);
             }
 
             foreach (var attr in audit.AuditDetail.NewValue.Attributes)
             {
+                if (!attributeNames.Contains(attr.Value))
+                {
+                    continue;
+                }
+
                 thisVersion.Attributes[attr.Key] = attr.Value;
                 changedAttributes.Add(attr.Key);
+            }
+
+            if (changedAttributes.Count == 0)
+            {
+                continue;
             }
 
             versions.Add(new EntityVersionInfo<TEntity>(
