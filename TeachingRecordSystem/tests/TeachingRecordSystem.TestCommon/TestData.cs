@@ -265,7 +265,7 @@ public partial class TestData
 
     public T GenerateEnumValue<T>() where T : Enum => Faker.Enum.Random<T>();
 
-    public T GenerateChangedEnumValue<T>(T? currentValue) where T : struct, Enum
+    public T GenerateChangedEnumValue<T>(T? currentValue, T[]? excluding = null) where T : struct, Enum
     {
         T newValue;
 
@@ -273,7 +273,7 @@ public partial class TestData
         {
             newValue = GenerateEnumValue<T>();
         }
-        while (newValue.Equals(currentValue));
+        while (newValue.Equals(currentValue) || (excluding is not null && excluding.Contains(newValue)));
 
         return newValue;
     }

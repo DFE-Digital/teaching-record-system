@@ -106,7 +106,8 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "establishment_sources",
                     "tps_establishment_types",
                     "alert_types",
-                    "alert_categories"
+                    "alert_categories",
+                    "induction_exemption_reasons"
                 ]
             });
 }

@@ -52,6 +52,28 @@ public class TrsDataSyncHelper(
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
     }
 
+    public Guid MapDqtInductionExemptionReason(dfeta_InductionExemptionReason dqtInductionExemptionReason) => dqtInductionExemptionReason switch
+    {
+        dfeta_InductionExemptionReason.Exempt => new("a5faff9f-29ce-4a6b-a7b8-0c1f57f15920"),
+        dfeta_InductionExemptionReason.ExemptDataLossErrorCriteria => new("204f86eb-0383-40eb-b793-6fccb76ecee2"),
+        dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland => new("a112e691-1694-46a7-8f33-5ec5b845c181"),
+        dfeta_InductionExemptionReason.OverseasTrainedTeacher => new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
+        dfeta_InductionExemptionReason.Qualifiedbefore07May1999 => new("5a80cee8-98a8-426b-8422-b0e81cb49b36"),
+        dfeta_InductionExemptionReason.Qualifiedbetween07May1999and01April2003FirstpostwasinWalesandlastedaminimumoftwoterms => new("15014084-2d8d-4f51-9198-b0e1881f8896"),
+        dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute => new("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85"),
+        dfeta_InductionExemptionReason.QualifiedthroughFEroutebetween01Sep2001and01Sep2004 => new("0997ab13-7412-4560-8191-e51ed4d58d2a"),
+        dfeta_InductionExemptionReason.RegisteredTeacher_havingatleasttwoyearsfulltimeteachingexperience => new("42bb7bbc-a92c-4886-b319-3c1a5eac319a"),
+        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninGuernsey => new("fea2db23-93e0-49af-96fd-83c815c17c0b"),
+        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninIsleOfMan => new("e5c3847d-8fb6-4b31-8726-812392da8c5c"),
+        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninJersey => new("243b21a8-0be4-4af5-8874-85944357e7f8"),
+        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland => new("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
+        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninServiceChildrensEducationschoolsinGermanyorCyprus => new("7d17d904-c1c6-451b-9e09-031314bd35f7"),
+        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninWales => InductionExemptionReason.PassedInWalesId,
+        dfeta_InductionExemptionReason.SuccessfullycompletedprobationaryperiodinGibraltar => new("a751494a-7e7a-4836-96cb-00b9ed6e1b5f"),
+        dfeta_InductionExemptionReason.TeacherhasbeenawardedQTLSandisexemptprovidedtheymaintaintheirmembershipwiththeSocietyforEducationandTraining => new("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
+        _ => throw new ArgumentException($"Failed mapping '{dqtInductionExemptionReason}' to TRS Induction Exemption Reason.", nameof(dqtInductionExemptionReason))
+    };
+
     public async Task SyncAuditAsync(
         string entityLogicalName,
         IEnumerable<Guid> ids,
@@ -111,6 +133,12 @@ public class TrsDataSyncHelper(
             throw new InvalidOperationException(errorMessage);
         }
 
+        Guid[] exemptionReasonIds = [];
+        if (induction?.dfeta_InductionExemptionReason is not null)
+        {
+            exemptionReasonIds = [MapDqtInductionExemptionReason(induction.dfeta_InductionExemptionReason!.Value)];
+        }
+
         return new InductionInfo()
         {
             PersonId = contact.ContactId!.Value,
@@ -118,7 +146,7 @@ public class TrsDataSyncHelper(
             InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            InductionExemptionReasonIds = [], // this mapping will be done in a future PR
+            InductionExemptionReasonIds = exemptionReasonIds,
             DqtModifiedOn = induction?.ModifiedOn
         };
     }
@@ -382,7 +410,7 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var (inductions, events) = MapInductionsAndAudits(contacts, entities, auditDetails, ignoreInvalid, createMigratedEvent);
+        var (inductions, events) = await MapInductionsAndAuditsAsync(contacts, entities, auditDetails, ignoreInvalid, createMigratedEvent);
         return await SyncInductionsAsync(inductions, events, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
     }
 
@@ -1077,7 +1105,7 @@ public class TrsDataSyncHelper(
         })
         .ToList();
 
-    private (List<InductionInfo> Inductions, List<EventBase> Events) MapInductionsAndAudits(
+    private async Task<(List<InductionInfo> Inductions, List<EventBase> Events)> MapInductionsAndAuditsAsync(
         IReadOnlyCollection<Contact> contacts,
         IEnumerable<dfeta_induction> inductionEntities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
@@ -1189,7 +1217,7 @@ public class TrsDataSyncHelper(
 
                     if (createMigratedEvent)
                     {
-                        events.Add(MapMigratedEvent(contact.ContactId!.Value, induction, mapped));
+                        events.Add(await MapMigratedEventAsync(contact.ContactId!.Value, induction, mapped));
                     }
                 }
             }
@@ -1219,9 +1247,9 @@ public class TrsDataSyncHelper(
                     .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
                     .ToArray();
 
-                foreach (var item in orderedContactAuditDetails.Skip(1))
+                foreach (var item in orderedContactAuditDetails)
                 {
-                    if (item.AllChangedAttributes.Contains(Contact.Fields.StateCode))
+                    if (item.AllChangedAttributes.Contains(Contact.Fields.StateCode) && item.AuditRecord.Action != Audit_Action.Create)
                     {
                         var nonStateAttributes = item.AllChangedAttributes
                             .Where(a => !(a is Contact.Fields.StateCode or Contact.Fields.StatusCode))
@@ -1348,8 +1376,15 @@ public class TrsDataSyncHelper(
             };
         }
 
-        EventBase MapMigratedEvent(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
+        async Task<EventBase> MapMigratedEventAsync(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
         {
+            var inductionExemptionReason = "";
+            if (mappedInduction.InductionExemptionReasonIds.Length > 0)
+            {
+                var reason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(mappedInduction.InductionExemptionReasonIds.Single());
+                inductionExemptionReason = reason.Name;
+            }
+
             return new InductionMigratedEvent()
             {
                 EventId = Guid.NewGuid(),
@@ -1360,7 +1395,7 @@ public class TrsDataSyncHelper(
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
                 InductionStatus = mappedInduction.InductionStatus.ToString(),
-                InductionExemptionReason = "",  // TODO
+                InductionExemptionReason = inductionExemptionReason,
                 DqtInduction = GetEventDqtInduction(dqtInduction)
             };
         }
