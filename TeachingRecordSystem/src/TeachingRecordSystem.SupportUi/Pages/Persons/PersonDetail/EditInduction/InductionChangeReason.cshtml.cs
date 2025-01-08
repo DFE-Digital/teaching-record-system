@@ -25,15 +25,8 @@ public class InductionChangeReasonModel : CommonJourneyPage
     {
     }
 
-    public Task OnGetAsync()
+    public void OnGet()
     {
-        return JourneyInstance!.UpdateStateAsync(state =>
-        {
-            if (state.InductionStatus == InductionStatus.None)
-            {
-                state.InductionStatus = JourneyInstance!.State.CurrentInductionStatus;
-            }
-        });
     }
 
     public async Task<IActionResult> OnPostAsync()
