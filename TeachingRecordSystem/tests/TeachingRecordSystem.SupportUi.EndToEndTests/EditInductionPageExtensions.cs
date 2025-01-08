@@ -24,11 +24,8 @@ public static class EditInductionPageExtensions
     }
     public static Task ClickEditInductionExemptionReasonPageAsync(this IPage page)
     {
-        var temp = page.GetByTestId($"change-induction-exemption-reason");
-        return temp.ClickAsync();
-        //return page.GetByTestId($"change-induction-exemption-reason").ClickAsync();
+        return page.GetByTestId($"change-induction-exemption-reason").ClickAsync();
     }
-
 
     public static Task AssertOnPersonInductionPageAsync(this IPage page, Guid personId)
     {
