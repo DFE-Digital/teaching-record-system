@@ -38,16 +38,9 @@ public class CompletedDateModel : CommonJourneyPage
         _clock = clock;
     }
 
-    public Task OnGetAsync()
+    public void OnGet()
     {
         CompletedDate = JourneyInstance!.State.CompletedDate;
-        return JourneyInstance!.UpdateStateAsync(state =>
-        {
-            if (state.InductionStatus == InductionStatus.None)
-            {
-                state.InductionStatus = JourneyInstance!.State.CurrentInductionStatus;
-            }
-        });
     }
 
     public async Task<IActionResult> OnPostAsync()

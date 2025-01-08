@@ -37,6 +37,10 @@ public class EditInductionState : IRegisterJourney
         {
             JourneyStartPage = startPage;
         }
+        if (InductionStatus == InductionStatus.None)
+        {
+            InductionStatus = CurrentInductionStatus;
+        }
 
         Initialized = true;
     }
