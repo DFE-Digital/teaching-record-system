@@ -28,11 +28,14 @@
                 </govuk-summary-list-row-actions>
             </govuk-summary-list-row>
 
-            @if (Model.ExemptionReasonIds!.Length > 0) // how to enforce that InductionExemptionReasons.None means no other flags are set?
+            @if (Model.ExemptionReasonIds!.Length > 0)
             {
                 <govuk-summary-list-row data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ExemptionReasonsText</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.InductionEditExemptionReason(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change exemption reason">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
 
@@ -41,14 +44,20 @@
                 <govuk-summary-list-row data-testid="induction-start-date">
                     <govuk-summary-list-row-key>Induction start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.InductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change start date">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
 
-            @if (Model.ShowCompletionDate)
+            @if (Model.ShowCompletedDate)
             {
-                <govuk-summary-list-row data-testid="induction-completion-date">
-                    <govuk-summary-list-row-key>Induction completion date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.CompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                <govuk-summary-list-row data-testid="induction-completed-date">
+                    <govuk-summary-list-row-key>Induction completed date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.InductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change completed date">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             }
         </govuk-summary-list>

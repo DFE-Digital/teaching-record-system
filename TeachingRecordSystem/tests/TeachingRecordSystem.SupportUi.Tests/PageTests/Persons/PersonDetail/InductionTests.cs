@@ -167,7 +167,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
-        Assert.Contains(setStartDate.ToString("d MMMM yyyy"), startDate);
+        Assert.Contains(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), startDate);
         Assert.Null(doc.GetElementByTestId("induction-exemption-reasons"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
@@ -198,18 +198,18 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.Failed)]
     [InlineData(InductionStatus.FailedInWales)]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletionDate_DisplaysExpectedCompletionDate(InductionStatus setInductionStatus)
+    public async Task Get_WithPersonIdForPersonWithInductionStatusRequiringCompletedDate_DisplaysExpectedCompletedDate(InductionStatus setInductionStatus)
     {
         // Arrange
         var setStartDate = Clock.Today.AddMonths(-1);
-        var setCompletionDate = Clock.Today;
+        var setCompletedDate = Clock.Today;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(setInductionStatus)
                     .WithStartDate(setStartDate)
-                    .WithCompletedDate(setCompletionDate)
+                    .WithCompletedDate(setCompletedDate)
                 ));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
@@ -221,8 +221,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
-        var completionDate = doc.GetElementByTestId("induction-completion-date")!.Children[1].TextContent;
-        Assert.Contains(setCompletionDate.ToString("d MMMM yyyy"), completionDate);
+        var completedDate = doc.GetElementByTestId("induction-completed-date")!.Children[1].TextContent;
+        Assert.Contains(setCompletedDate.ToString(UiDefaults.DateOnlyDisplayFormat), completedDate);
     }
 
     [Fact]

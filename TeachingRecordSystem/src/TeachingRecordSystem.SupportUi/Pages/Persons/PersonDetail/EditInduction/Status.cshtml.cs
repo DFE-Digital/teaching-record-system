@@ -66,28 +66,15 @@ public class StatusModel : CommonJourneyPage
         _clock = clock;
     }
 
-    public async Task OnGetAsync()
+    public void OnGet()
     {
-        var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
-        InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
         InductionStatus = JourneyInstance!.State.InductionStatus;
-        CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            if (state.CurrentInductionStatus == InductionStatus.None)
-            {
-                state.CurrentInductionStatus = CurrentInductionStatus;
-            }
-        });
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
-            var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
-            InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
-            CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
             return this.PageWithErrors();
         }
         await JourneyInstance!.UpdateStateAsync(state =>
@@ -109,6 +96,9 @@ public class StatusModel : CommonJourneyPage
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+        var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
+        CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
         await next();
     }
 }

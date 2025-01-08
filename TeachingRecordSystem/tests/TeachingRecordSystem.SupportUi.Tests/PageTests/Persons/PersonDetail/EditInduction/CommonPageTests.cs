@@ -49,7 +49,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
                     .WithInductionStatus(inductionStatus)
-                    .WithStartDate(Clock.Today)
+                    .WithStartDate(Clock.Today.AddDays(-1))
+                    .WithCompletedDate(Clock.Today)
                     .Build())
         };
 
@@ -125,7 +126,8 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
                 .WithInductionStatus(inductionStatus)
-                .WithStartDate(Clock.Today)
+                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithCompletedDate(Clock.Today)
                 .Build())
         };
 
@@ -138,27 +140,21 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("edit-induction/status", InductionStatus.Exempt)]
-    [InlineData("edit-induction/status", InductionStatus.InProgress)]
-    [InlineData("edit-induction/status", InductionStatus.Failed)]
-    [InlineData("edit-induction/status", InductionStatus.FailedInWales)]
-    [InlineData("edit-induction/status", InductionStatus.Passed)]
-    [InlineData("edit-induction/status", InductionStatus.RequiredToComplete)]
-    [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt)]
-    [InlineData("edit-induction/start-date", InductionStatus.InProgress)]
-    [InlineData("edit-induction/start-date", InductionStatus.Failed)]
-    [InlineData("edit-induction/start-date", InductionStatus.FailedInWales)]
-    [InlineData("edit-induction/start-date", InductionStatus.Passed)]
-    [InlineData("edit-induction/date-completed", InductionStatus.Failed)]
-    [InlineData("edit-induction/date-completed", InductionStatus.FailedInWales)]
-    [InlineData("edit-induction/date-completed", InductionStatus.Passed)]
-    [InlineData("edit-induction/change-reason", InductionStatus.Exempt)]
-    [InlineData("edit-induction/change-reason", InductionStatus.InProgress)]
-    [InlineData("edit-induction/change-reason", InductionStatus.Failed)]
-    [InlineData("edit-induction/change-reason", InductionStatus.FailedInWales)]
-    [InlineData("edit-induction/change-reason", InductionStatus.Passed)]
-    [InlineData("edit-induction/change-reason", InductionStatus.RequiredToComplete)]
-    public async Task FollowingRedirect_BacklinkContainsExpected(string fromPage, InductionStatus inductionStatus)
+    [InlineData(InductionJourneyPage.Status, "edit-induction/status", InductionStatus.Exempt, "induction")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/status", InductionStatus.RequiredToComplete, "induction")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/status")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/start-date", InductionStatus.InProgress, "edit-induction/status")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/start-date", InductionStatus.InProgress, "induction")]
+    [InlineData(InductionJourneyPage.CompletedDate, "edit-induction/date-completed", InductionStatus.Failed, "induction")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Failed, "edit-induction/start-date")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/date-completed", InductionStatus.Failed, "edit-induction/start-date")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.InProgress, "edit-induction/start-date")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Failed, "edit-induction/date-completed")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.FailedInWales, "edit-induction/date-completed")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.Passed, "edit-induction/date-completed")]
+    [InlineData(InductionJourneyPage.StartDate, "edit-induction/change-reason", InductionStatus.RequiredToComplete, "edit-induction/status")]
+    public async Task SubjectToStartPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -168,25 +164,18 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             new EditInductionState()
             {
                 Initialized = true,
-                InductionStatus = inductionStatus
+                InductionStatus = inductionStatus,
+                JourneyStartPage = startPage
             });
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
-                .WithInductionStatus(inductionStatus)
-                .WithStartDate(Clock.Today)
-                .Build())
-        };
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
-        var redirectDoc = await redirectResponse.GetDocumentAsync();
-        var backlink = redirectDoc.GetElementByTestId("back-link") as IHtmlAnchorElement;
-        Assert.Contains(fromPage, backlink!.Href);
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/persons/{person.PersonId}/{expectedBackPage}", backlink!.Href);
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>

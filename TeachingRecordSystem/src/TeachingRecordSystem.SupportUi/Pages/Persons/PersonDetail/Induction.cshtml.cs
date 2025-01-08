@@ -21,13 +21,13 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 
     public DateOnly? StartDate { get; set; }
 
-    public DateOnly? CompletionDate { get; set; }
+    public DateOnly? CompletedDate { get; set; }
 
     public Guid[]? ExemptionReasonIds { get; set; }
 
     public bool ShowStartDate => Status.RequiresStartDate();
 
-    public bool ShowCompletionDate => Status.RequiresCompletedDate();
+    public bool ShowCompletedDate => Status.RequiresCompletedDate();
 
     public string? ExemptionReasonsText { get; set; }
 
@@ -63,7 +63,7 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
 
         Status = person.InductionStatus;
         StartDate = person.InductionStartDate;
-        CompletionDate = person.InductionCompletedDate;
+        CompletedDate = person.InductionCompletedDate;
         ExemptionReasonIds = person.InductionExemptionReasonIds;
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
