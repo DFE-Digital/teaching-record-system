@@ -23,13 +23,6 @@ public class Alert
     public DateTime? DeletedOn { get; set; }
     [Projectable] public bool IsOpen => EndDate == null;
 
-    public Guid? DqtSanctionId { get; set; }
-    public DateTime? DqtFirstSync { get; set; }
-    public DateTime? DqtLastSync { get; set; }
-    public int? DqtState { get; set; }
-    public DateTime? DqtCreatedOn { get; set; }
-    public DateTime? DqtModifiedOn { get; set; }
-
     public static Alert Create(
         Guid alertTypeId,
         Guid personId,
