@@ -18,7 +18,7 @@ public class SyncAllInductionsFromCrmJob(
 {
     public async Task ExecuteAsync(bool createMigratedEvent, bool dryRun, CancellationToken cancellationToken)
     {
-        const int pageSize = 500;
+        const int pageSize = 1000;
 
         var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
         var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Induction).AttributeNames);

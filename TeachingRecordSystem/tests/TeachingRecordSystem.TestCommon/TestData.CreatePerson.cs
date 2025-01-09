@@ -681,7 +681,7 @@ public partial class TestData
                     Operation = Audit_Operation.Create,
                     UserId = currentDqtUser
                 },
-                OldValue = new Entity(),
+                OldValue = new Entity(Contact.EntityLogicalName),
                 NewValue = contact.Clone()
             };
 

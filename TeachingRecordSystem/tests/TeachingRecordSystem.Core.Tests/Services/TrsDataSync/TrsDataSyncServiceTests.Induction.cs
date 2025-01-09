@@ -88,24 +88,6 @@ public partial class TrsDataSyncServiceTests
         var induction = ctx.dfeta_inductionSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(dfeta_induction.PrimaryIdAttribute) == inductionId);
         var inductionAuditDetails = new AuditDetailCollection();
 
-        ////var existingInduction = person.DqtInductions.Single();
-
-        ////var updatedInductionStatus = dfeta_InductionStatus.Pass;
-        ////var updatedInductionStartDate = Clock.Today.AddYears(-2);
-        ////var updatedInductionEndDate = Clock.Today.AddDays(-20);
-        ////var createdOn = Clock.UtcNow;
-        ////var modifiedOn = Clock.Advance();
-        ////var updatedInduction = new dfeta_induction()
-        ////{
-        ////    Id = existingInduction.InductionId,
-        ////    dfeta_PersonId = new EntityReference(Contact.EntityLogicalName, contactId),
-        ////    dfeta_InductionStatus = updatedInductionStatus,
-        ////    dfeta_StartDate = updatedInductionStartDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
-        ////    dfeta_CompletionDate = updatedInductionEndDate.ToDateTimeWithDqtBstFix(isLocalTime: true),
-        ////    CreatedOn = Clock.UtcNow,
-        ////    ModifiedOn = modifiedOn
-        ////};
-
         var updatedInduction = await CreateUpdatedInductionEntityVersion(
             induction!,
             inductionAuditDetails,
@@ -185,7 +167,7 @@ public partial class TrsDataSyncServiceTests
                     Operation = Audit_Operation.Create,
                     UserId = currentDqtUser
                 },
-                OldValue = new Entity(),
+                OldValue = new Entity(dfeta_induction.EntityLogicalName),
                 NewValue = newInduction.Clone()
             });
         }

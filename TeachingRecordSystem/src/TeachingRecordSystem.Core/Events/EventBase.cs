@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using TeachingRecordSystem.Core.Events.Models;
+using TeachingRecordSystem.Core.Infrastructure.Json;
 
 namespace TeachingRecordSystem.Core.Events;
 
@@ -26,7 +27,8 @@ public abstract record EventBase
                     {
                         propertyInfo.IsRequired = false;
                     }
-                }
+                },
+                Modifiers.OptionProperties
             }
         }
     };
