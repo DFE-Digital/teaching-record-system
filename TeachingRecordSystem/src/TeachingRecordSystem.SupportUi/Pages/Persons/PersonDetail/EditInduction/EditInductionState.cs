@@ -15,7 +15,7 @@ public class EditInductionState : IRegisterJourney
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
     public Guid[]? ExemptionReasonIds { get; set; }
-    public string? ChangeReason { get; set; }
+    public InductionChangeReasonOption? ChangeReason { get; set; }
     public InductionJourneyPage? JourneyStartPage { get; set; }
     public bool RecordManagedInCpd { get; set; }
 

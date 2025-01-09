@@ -26,6 +26,11 @@ public class InductionChangeReasonModel : CommonJourneyPage
     [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Do you want to upload evidence?")]
+    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
+    public bool? UploadEvidence { get; set; }
+
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public InductionJourneyPage NextPage => InductionJourneyPage.CheckAnswers;
     public string BackLink
@@ -53,9 +58,21 @@ public class InductionChangeReasonModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
+        {
+            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
+        }
+        //if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
+        //{
+        //    ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
+        //}
+        if (ModelState.IsValid == false)
+        {
+            return this.PageWithErrors();
+        }
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            // TODO - store the change reason
+            state.ChangeReason = ChangeReason;
         });
 
         return Redirect(PageLink(NextPage));

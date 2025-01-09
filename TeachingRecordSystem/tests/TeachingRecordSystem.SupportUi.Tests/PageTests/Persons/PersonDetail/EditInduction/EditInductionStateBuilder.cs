@@ -9,7 +9,7 @@ public class EditInductionStateBuilder
     private DateOnly? StartDate { get; set; }
     private DateOnly? CompletedDate { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
-    private string? ChangeReason { get; set; }
+    private InductionChangeReasonOption? ChangeReason { get; set; }
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool RecordManagedInCpd { get; set; }
     private bool Initialized { get; set; }
