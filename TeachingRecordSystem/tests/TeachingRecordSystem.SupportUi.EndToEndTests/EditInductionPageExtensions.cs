@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -72,5 +73,25 @@ public static class EditInductionPageExtensions
     {
         var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+    }
+
+    public static Task SelectChangeReasonAsync(this IPage page, InductionChangeReasonOption reason)
+    {
+        var radioButton = page.Locator($"input[type='radio'][value='{reason.ToString()}']");
+        return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+    }
+
+    public static Task SelectReasonMoreDetails(this IPage page, bool yesOrNo)
+    {
+        var section = page.GetByTestId("has-additional-reason_detail-options");
+        var radioButton = section.Locator($"input[type='radio'][value='{yesOrNo}']");
+        return radioButton.ClickAsync();
+    }
+
+    public static Task SelectReasonFileUpload(this IPage page, bool yesOrNo)
+    {
+        var section = page.GetByTestId("upload-evidence-options");
+        var radioButton = section.Locator($"input[type='radio'][value='{yesOrNo}']");
+        return radioButton.ClickAsync();
     }
 }

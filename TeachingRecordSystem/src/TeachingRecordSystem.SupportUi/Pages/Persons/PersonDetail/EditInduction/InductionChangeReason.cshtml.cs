@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
-using TeachingRecordSystem.SupportUi.Pages.Alerts;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -29,7 +28,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
-    [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
+    [MaxLength(InductionDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -39,7 +38,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(AlertDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(InductionDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }

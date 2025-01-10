@@ -17,13 +17,12 @@ public class EditInductionState : IRegisterJourney
     public DateOnly? CompletedDate { get; set; }
     public Guid[]? ExemptionReasonIds { get; set; }
     public InductionChangeReasonOption? ChangeReason { get; set; }
-    public bool HasAdditionalReasonDetail { get; set; }
+    public bool? HasAdditionalReasonDetail { get; set; }
     public string? ChangeReasonDetail { get; set; }
     public bool? UploadEvidence { get; set; }
     public Guid? EvidenceFileId { get; set; }
     public string? EvidenceFileName { get; set; }
     public string? EvidenceFileSizeDescription { get; set; }
-    //public bool RecordManagedInCpd { get; set; }
 
     public bool Initialized { get; set; }
 

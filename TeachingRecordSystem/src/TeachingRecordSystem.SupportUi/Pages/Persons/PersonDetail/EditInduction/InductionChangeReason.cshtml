@@ -15,16 +15,16 @@
             <govuk-radios asp-for="ChangeReason" data-testid="status-choices">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--m" />
-                    <govuk-radios-item value="@InductionChangeReasonOption.IncompleteDetails" checked="false">
+                    <govuk-radios-item value="@InductionChangeReasonOption.IncompleteDetails">
                         @InductionChangeReasonOption.IncompleteDetails.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@InductionChangeReasonOption.NewInformation" checked="false">
+                    <govuk-radios-item value="@InductionChangeReasonOption.NewInformation">
                         @InductionChangeReasonOption.NewInformation.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@InductionChangeReasonOption.NoLongerExempt" checked="false">
+                    <govuk-radios-item value="@InductionChangeReasonOption.NoLongerExempt">
                         @InductionChangeReasonOption.NoLongerExempt.GetDisplayName()
                     </govuk-radios-item>
-                    <govuk-radios-item value="@InductionChangeReasonOption.AnotherReason" checked="false">
+                    <govuk-radios-item value="@InductionChangeReasonOption.AnotherReason">
                         @InductionChangeReasonOption.AnotherReason.GetDisplayName()
                     </govuk-radios-item>
                 </govuk-radios-fieldset>

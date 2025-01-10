@@ -66,14 +66,6 @@ public class EditInductionPostRequestBuilder
         var properties = GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
             .Where(f => f.GetValue(this) != null);
 
-        if (UploadEvidence == true)
-        {
-            foreach (var property in properties)
-            {
-
-            }
-        }
-
         var dictionary = new Dictionary<string, string>();
 
         foreach (var property in properties)
