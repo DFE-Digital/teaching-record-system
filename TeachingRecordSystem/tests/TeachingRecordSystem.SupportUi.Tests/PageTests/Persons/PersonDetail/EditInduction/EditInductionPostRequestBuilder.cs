@@ -5,53 +5,76 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditInductionPostRequestBuilder
 {
-    private DateOnly? startDate;
-    private DateOnly? completedDate;
-    private InductionStatus? inductionStatus;
-    private InductionChangeReasonOption? changeReason;
-    private bool? hasAdditionalReasonDetail;
-    private string? changeReasonDetail;
-    private bool? uploadEvidence;
+    private DateOnly? StartDate { get; set; }
+    private DateOnly? CompletedDate { get; set; }
+    private InductionStatus? InductionStatus { get; set; }
+    private InductionChangeReasonOption? ChangeReason { get; set; }
+    private bool? HasAdditionalReasonDetail { get; set; }
+    private string? ChangeReasonDetail { get; set; }
+    private bool? UploadEvidence { get; set; }
+
+    private string? _evidenceFileName;
+    private HttpContent? _evidenceFileContent;
 
     public EditInductionPostRequestBuilder WithStartDate(DateOnly date)
     {
-        startDate = date;
+        StartDate = date;
         return this;
     }
 
     public EditInductionPostRequestBuilder WithCompletedDate(DateOnly date)
     {
-        completedDate = date;
+        CompletedDate = date;
         return this;
     }
 
     public EditInductionPostRequestBuilder WithInductionStatus(InductionStatus status)
     {
-        inductionStatus = status;
+        InductionStatus = status;
         return this;
     }
 
     public EditInductionPostRequestBuilder WithChangeReason(InductionChangeReasonOption changeReason)
     {
-        this.changeReason = changeReason;
+        this.ChangeReason = changeReason;
         return this;
     }
 
-    public EditInductionPostRequestBuilder WithChangeReasonSelections(InductionChangeReasonOption? changeReason, bool? hasAdditionalDetail, string? detail, bool uploadEvidence = false)
+    public EditInductionPostRequestBuilder WithChangeReasonDetailSelections(bool? hasAdditionalDetail, string? detail)
     {
-        this.changeReason = changeReason;
-        this.hasAdditionalReasonDetail = hasAdditionalDetail;
-        this.changeReasonDetail = detail;
-        this.uploadEvidence = uploadEvidence;
+        HasAdditionalReasonDetail = hasAdditionalDetail;
+        ChangeReasonDetail = detail;
+        return this;
+    }
+
+    public EditInductionPostRequestBuilder WithNoFileUploadSelection()
+    {
+        UploadEvidence = false;
+        return this;
+    }
+
+    public EditInductionPostRequestBuilder WithFileUploadSelection(HttpContent binaryFileContent, string filename)
+    {
+        UploadEvidence = true;
+        _evidenceFileName = filename;
+        _evidenceFileContent = binaryFileContent;
         return this;
     }
 
     public Dictionary<string, string> Build()
     {
-        var dictionary = new Dictionary<string, string>();
-
-        var properties = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+        var properties = GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
             .Where(f => f.GetValue(this) != null);
+
+        if (UploadEvidence == true)
+        {
+            foreach (var property in properties)
+            {
+
+            }
+        }
+
+        var dictionary = new Dictionary<string, string>();
 
         foreach (var property in properties)
         {

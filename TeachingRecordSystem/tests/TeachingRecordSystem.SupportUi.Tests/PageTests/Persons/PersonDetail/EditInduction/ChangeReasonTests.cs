@@ -1,5 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Microsoft.AspNetCore.WebUtilities;
+using TeachingRecordSystem.SupportUi.Pages.Alerts.EditAlert.StartDate;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -50,10 +52,11 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_SetValidChangeReason_PersistsReason()
+    public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
         var changeReason = InductionChangeReasonOption.NewInformation;
+        var changeReasonDetails = "A description about why the change typed into the box";
         var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -67,7 +70,10 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
-                    .WithChangeReasonSelections(changeReason, false, null).Build())
+                    .WithChangeReason(changeReason)
+                    .WithChangeReasonDetailSelections(true, changeReasonDetails)
+                    .WithNoFileUploadSelection()
+                    .Build())
         };
 
         // Act
@@ -76,6 +82,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
+        Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail);
     }
 
     [Fact]
@@ -117,7 +124,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
-                    .WithChangeReasonSelections(InductionChangeReasonOption.AnotherReason, true, null).Build())
+                    .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                    .WithChangeReasonDetailSelections(true, null)
+                    .Build())
         };
 
         // Act
@@ -127,6 +136,72 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter additional detail");
     }
 
+    [Fact]
+    public async Task Post_FileUploadYes_NoFileUploadedAdded_ReturnsError()
+    {
+        // Arrange
+        var changeReason = InductionChangeReasonOption.NoLongerExempt;
+        var inductionStatus = InductionStatus.InProgress;
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .Create());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", changeReason)
+                .Add("HasAdditionalReasonDetail", false)
+                .Add("UploadEvidence", true)
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+    }
+
+    [Fact]
+    public async Task Post_SetValidFileUpload_PersistsDetails()
+    {
+        // Arrange
+        var changeReason = InductionChangeReasonOption.NewInformation;
+        var changeReasonDetails = "A description about why the change typed into the box";
+        var evidenceFileName = "evidence.pdf";
+        var inductionStatus = InductionStatus.InProgress;
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .Create());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", changeReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("ChangeReasonDetail", changeReasonDetails)
+                .Add("UploadEvidence", true)
+                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName)
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
+        Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail);
+        Assert.True(journeyInstance.State.UploadEvidence);
+        Assert.Equal(evidenceFileName, journeyInstance.State.EvidenceFileName);
+    }
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
     CreateJourneyInstance(
         JourneyNames.EditInduction,

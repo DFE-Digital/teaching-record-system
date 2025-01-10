@@ -11,7 +11,7 @@ public class EditInductionStateBuilder
     private Guid[]? ExemptionReasonIds { get; set; }
     private InductionChangeReasonOption? ChangeReason { get; set; }
     private InductionJourneyPage? JourneyStartPage { get; set; }
-    private bool RecordManagedInCpd { get; set; }
+    //private bool RecordManagedInCpd { get; set; }
     private bool Initialized { get; set; }
 
     public EditInductionStateBuilder WithInitialisedState(InductionStatus? currentInductionStatus, InductionJourneyPage startPage)
@@ -55,7 +55,7 @@ public class EditInductionStateBuilder
             ExemptionReasonIds = ExemptionReasonIds,
             ChangeReason = ChangeReason,
             JourneyStartPage = JourneyStartPage,
-            RecordManagedInCpd = RecordManagedInCpd,
+            //RecordManagedInCpd = RecordManagedInCpd,
             Initialized = Initialized
         };
     }
