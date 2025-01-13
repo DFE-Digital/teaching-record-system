@@ -80,7 +80,7 @@ public class WebhookSender(HttpClient httpClient, IOptions<WebhookOptions> optio
                 .SetParameters = signingOptions => signingOptions
                     .WithTag(TagName)
                     .WithCreatedNow()
-                    .WithExpires(DateTimeOffset.UtcNow.AddMinutes(5))
+                    .WithExpires(DateTimeOffset.UtcNow.AddDays(90))
                     .WithAlgorithm(SignatureAlgorithm.EcdsaP384Sha384)
                     .WithKeyId(keyId)
                     .WithNonce(Guid.NewGuid().ToString("N"));
