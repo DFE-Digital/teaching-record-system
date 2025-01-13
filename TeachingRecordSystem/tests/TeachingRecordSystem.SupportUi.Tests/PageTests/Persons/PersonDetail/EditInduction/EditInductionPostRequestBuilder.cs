@@ -40,7 +40,7 @@ public class EditInductionPostRequestBuilder
         return this;
     }
 
-    public EditInductionPostRequestBuilder WithChangeReasonDetailSelections(bool? hasAdditionalDetail, string? detail)
+    public EditInductionPostRequestBuilder WithChangeReasonDetailSelections(bool? hasAdditionalDetail, string? detail = null)
     {
         HasAdditionalReasonDetail = hasAdditionalDetail;
         ChangeReasonDetail = detail;

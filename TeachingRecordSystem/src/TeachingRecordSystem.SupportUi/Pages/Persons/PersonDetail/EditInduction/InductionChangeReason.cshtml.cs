@@ -131,7 +131,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
-            state.ChangeReasonDetail = ChangeReasonDetail;
+            state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail = ChangeReasonDetail;
             state.UploadEvidence = UploadEvidence;
         });

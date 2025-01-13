@@ -12,9 +12,9 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
-            <govuk-radios asp-for="ChangeReason" data-testid="status-choices">
+            <govuk-radios asp-for="ChangeReason" data-testid="reason-choices">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend data-testid="reason-choices-legend" class="govuk-fieldset__legend--m" />
                     <govuk-radios-item value="@InductionChangeReasonOption.IncompleteDetails">
                         @InductionChangeReasonOption.IncompleteDetails.GetDisplayName()
                     </govuk-radios-item>
@@ -35,7 +35,7 @@
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
                     <govuk-radios-item value="@true">
                         Yes
-                        <govuk-radios-item-conditional>
+                        <govuk-radios-item-conditional data-testid="additional-detail">
                             <govuk-character-count asp-for="ChangeReasonDetail" label-class="govuk-label--m" max-length="InductionDefaults.DetailMaxCharacterCount" rows="InductionDefaults.DetailTextAreaMinimumRows" />
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>

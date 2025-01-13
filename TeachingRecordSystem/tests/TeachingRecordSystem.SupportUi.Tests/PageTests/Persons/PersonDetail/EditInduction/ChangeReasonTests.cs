@@ -8,6 +8,50 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.InProgress;
+        var reasonChoice = InductionChangeReasonOption.NewInformation;
+        var reasonDetail = "A description about why the change typed into the box";
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithReasonChoice(reasonChoice)
+                .WithReasonDetailsChoice(true, reasonDetail)
+                .WithFileUploadChoice(false)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var reasonChoiceSelection = doc.GetElementByTestId("reason-choices")!
+            .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
+            .Single(i => i.IsChecked == true).Value;
+        Assert.Equal(reasonChoice.ToString(), reasonChoiceSelection);
+
+        var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
+            .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
+            .Single(i => i.IsChecked == true).Value;
+        Assert.Equal(true.ToString(), additionalDetailChoices);
+
+        var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
+            .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
+            .Single(i => i.IsChecked == true).Value;
+        Assert.Equal(false.ToString(), uploadEvidenceChoices);
+
+        var additionalDetailTextArea = doc.GetElementByTestId("additional-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
+        Assert.Equal(reasonDetail, additionalDetailTextArea!.Value);
+    }
+
+    [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
@@ -29,13 +73,13 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("Why are you changing the induction details?", statusChoicesLegend!.TextContent);
-        var statusChoices = doc.GetElementByTestId("status-choices")!
+        var reasonChoicesLegend = doc.GetElementByTestId("reason-choices-legend");
+        Assert.Equal("Why are you changing the induction details?", reasonChoicesLegend!.TextContent);
+        var reasonChoices = doc.GetElementByTestId("reason-choices")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
             .Select(i => i.Value);
-        Assert.Equal(expectedChoices, statusChoices);
+        Assert.Equal(expectedChoices, reasonChoices);
 
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")

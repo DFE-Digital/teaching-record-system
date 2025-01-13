@@ -62,6 +62,6 @@ public class ConfirmModel : PageModel
         CurrentValue = person!.Contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)!.Value.ToString(UiDefaults.DateOnlyDisplayFormat);
         NewValue = state.DateOfBirth!.Value.ToString(UiDefaults.DateOnlyDisplayFormat);
 
-        await next();
+        //await next();
     }
 }

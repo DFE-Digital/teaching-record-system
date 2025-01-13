@@ -51,6 +51,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                     .WithInductionStatus(inductionStatus)
                     .WithStartDate(Clock.Today.AddDays(-1))
                     .WithCompletedDate(Clock.Today)
+                    .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                    .WithChangeReasonDetailSelections(false)
+                    .WithNoFileUploadSelection()
                     .Build())
         };
 

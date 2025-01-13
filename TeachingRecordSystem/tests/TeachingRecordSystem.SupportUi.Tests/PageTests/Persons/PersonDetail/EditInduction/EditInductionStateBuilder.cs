@@ -10,8 +10,10 @@ public class EditInductionStateBuilder
     private DateOnly? CompletedDate { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
     private InductionChangeReasonOption? ChangeReason { get; set; }
+    private bool? HasAdditionalReasonDetail { get; set; }
+    private string? AdditionalReasonDetail { get; set; }
+    private bool? FileUpload { get; set; }
     private InductionJourneyPage? JourneyStartPage { get; set; }
-    //private bool RecordManagedInCpd { get; set; }
     private bool Initialized { get; set; }
 
     public EditInductionStateBuilder WithInitialisedState(InductionStatus? currentInductionStatus, InductionJourneyPage startPage)
@@ -43,6 +45,22 @@ public class EditInductionStateBuilder
         CompletedDate = date;
         return this;
     }
+    public EditInductionStateBuilder WithReasonChoice(InductionChangeReasonOption option)
+    {
+        ChangeReason = option;
+        return this;
+    }
+    public EditInductionStateBuilder WithReasonDetailsChoice(bool yesOrNo, string detailText)
+    {
+        HasAdditionalReasonDetail = yesOrNo;
+        AdditionalReasonDetail = detailText;
+        return this;
+    }
+    public EditInductionStateBuilder WithFileUploadChoice(bool yesOrNo)
+    {
+        FileUpload = yesOrNo;
+        return this;
+    }
 
     public EditInductionState Create()
     {
@@ -54,8 +72,10 @@ public class EditInductionStateBuilder
             CompletedDate = CompletedDate,
             ExemptionReasonIds = ExemptionReasonIds,
             ChangeReason = ChangeReason,
+            HasAdditionalReasonDetail = HasAdditionalReasonDetail,
+            ChangeReasonDetail = AdditionalReasonDetail,
+            UploadEvidence = FileUpload,
             JourneyStartPage = JourneyStartPage,
-            //RecordManagedInCpd = RecordManagedInCpd,
             Initialized = Initialized
         };
     }
