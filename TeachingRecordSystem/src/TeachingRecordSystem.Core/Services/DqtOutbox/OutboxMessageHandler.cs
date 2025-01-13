@@ -24,7 +24,7 @@ public partial class OutboxMessageHandler(MessageSerializer messageSerializer, I
         {
             var serviceScopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
             using var scope = serviceScopeFactory.CreateScope();
-            var handler = ActivatorUtilities.CreateInstance<THandler>(serviceProvider);
+            var handler = ActivatorUtilities.CreateInstance<THandler>(scope.ServiceProvider);
             await handler.HandleMessageAsync(message);
         }
     }
