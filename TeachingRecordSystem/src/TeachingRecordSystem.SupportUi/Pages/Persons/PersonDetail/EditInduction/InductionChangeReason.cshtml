@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post" enctype="multipart/form-data">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
             <govuk-radios asp-for="ChangeReason" data-testid="reason-choices">
                 <govuk-radios-fieldset>
