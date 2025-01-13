@@ -10,6 +10,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using Npgsql;
 using NpgsqlTypes;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -113,6 +114,7 @@ public class TrsDataSyncHelper(
         return new InductionInfo()
         {
             PersonId = contact.ContactId!.Value,
+            InductionId = induction?.dfeta_inductionId,
             InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
@@ -737,8 +739,26 @@ public class TrsDataSyncHelper(
             ids.Select(async id =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, primaryIdAttribute, id) ??
-                    throw new Exception($"No audit detail for '{id}'.");
+                int retryCount = 0;
+                AuditDetailCollection? audit = null;
+                while (true)
+                {
+                    audit = await auditRepository.GetAuditDetailAsync(entityLogicalName, primaryIdAttribute, id);
+                    if (audit is not null || retryCount > 0)
+                    {
+                        break;
+                    }
+
+                    // Try and sync the audit record from CRM if it doesn't exist in the audit repository
+                    await SyncAuditAsync(entityLogicalName, new[] { id }, skipIfExists: false, cancellationToken);
+                    retryCount++;
+                }
+
+                if (audit is null)
+                {
+                    throw new Exception($"No audit detail for {entityLogicalName} with id '{id}'.");
+                }
+
                 return (Id: id, Audit: audit);
             }));
 
@@ -1077,28 +1097,64 @@ public class TrsDataSyncHelper(
             {
                 var inductionAttributeNames = new[]
                 {
-                    dfeta_induction.Fields.dfeta_PersonId,
                     dfeta_induction.Fields.dfeta_CompletionDate,
                     dfeta_induction.Fields.dfeta_InductionExemptionReason,
                     dfeta_induction.Fields.dfeta_StartDate,
                     dfeta_induction.Fields.dfeta_InductionStatus,
-                    dfeta_induction.Fields.ModifiedOn,
                     dfeta_induction.Fields.StateCode
                 };
 
                 if (auditDetails.TryGetValue(induction!.Id, out var inductionAudits))
                 {
-                    var inductionAuditDetails = inductionAudits.AuditDetails;
-                    var inductionVersions = GetEntityVersions(induction, inductionAuditDetails, inductionAttributeNames);
+                    var orderedInductionAuditDetails = inductionAudits.AuditDetails
+                        .OfType<AttributeAuditDetail>()
+                        .Where(a => a.AuditRecord.ToEntity<Audit>().Action != Audit_Action.Merge)
+                        .Select(a =>
+                        {
+                            var allChangedAttributes = a.NewValue.Attributes.Keys.Union(a.OldValue.Attributes.Keys).ToArray();
+                            var relevantChangedAttributes = allChangedAttributes.Where(k => inductionAttributeNames.Contains(k)).ToArray();
+                            var newValue = a.NewValue.ToEntity<dfeta_induction>().SparseClone(inductionAttributeNames);
+                            newValue.Id = induction.Id;
+                            var oldValue = a.OldValue.ToEntity<dfeta_induction>().SparseClone(inductionAttributeNames);
+                            oldValue.Id = induction.Id;
 
-                    events.Add(inductionAuditDetails.Any(a => a.AuditRecord.ToEntity<Audit>().Action == Audit_Action.Create) ?
-                        MapCreatedEvent(inductionVersions.First()) :
-                        MapImportedEvent(inductionVersions.First()));
+                            return (AllChangedAttributes: allChangedAttributes, RelevantChangedAttributes: relevantChangedAttributes, NewValue: newValue, OldValue: oldValue, AuditRecord: a.AuditRecord.ToEntity<Audit>());
+                        })
+                        .OrderBy(a => a.AuditRecord.CreatedOn)
+                        .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
+                        .ToArray();
 
-                    foreach (var (thisVersion, previousVersion) in inductionVersions.Skip(1).Zip(inductionVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                    var auditRecordsToMap = orderedInductionAuditDetails.Skip(1).ToArray();
+                    if (orderedInductionAuditDetails.FirstOrDefault() is { AuditRecord: { Action: Audit_Action.Create } } createAction)
                     {
-                        var mappedEvent = MapUpdatedEvent(thisVersion, previousVersion);
+                        events.Add(MapCreatedEvent(contact.ContactId!.Value, createAction.NewValue, createAction.AuditRecord));
+                    }
+                    else
+                    {
+                        auditRecordsToMap = orderedInductionAuditDetails;
+                        // we may have gaps in the audit history so we can't be sure that we can rewind from the latest back to the imported version
+                        var minimalInduction = new Entity(dfeta_induction.EntityLogicalName, induction.Id).ToEntity<dfeta_induction>();
+                        minimalInduction.CreatedOn = induction.CreatedOn;
+                        minimalInduction.CreatedBy = induction.CreatedBy;
+                        events.Add(MapImportedEvent(contact.ContactId!.Value, minimalInduction));
+                    }
 
+                    foreach (var item in auditRecordsToMap)
+                    {
+                        if (item.AllChangedAttributes.Contains(dfeta_induction.Fields.StateCode))
+                        {
+                            var nonStateAttributes = item.AllChangedAttributes
+                                .Where(a => !(a is dfeta_induction.Fields.StateCode or dfeta_induction.Fields.StatusCode))
+                                .ToArray();
+
+                            if (nonStateAttributes.Length > 0)
+                            {
+                                throw new InvalidOperationException(
+                                    $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                            }
+                        }
+
+                        var mappedEvent = MapUpdatedEvent(contact.ContactId!.Value, item.RelevantChangedAttributes, item.NewValue, item.OldValue, item.AuditRecord);
                         if (mappedEvent is not null)
                         {
                             events.Add(mappedEvent);
@@ -1107,7 +1163,7 @@ public class TrsDataSyncHelper(
 
                     if (createMigratedEvent)
                     {
-                        events.Add(MapMigratedEvent(inductionVersions.Last(), mapped));
+                        events.Add(MapMigratedEvent(contact.ContactId!.Value, induction, mapped));
                     }
                 }
             }
@@ -1119,13 +1175,40 @@ public class TrsDataSyncHelper(
                     Contact.Fields.dfeta_InductionStatus
                 };
 
-                var contactAuditDetails = contactAudits.AuditDetails;
-                var contactVersions = GetEntityVersions(contact, contactAuditDetails, contactAttributeNames);
+                var orderedContactAuditDetails = contactAudits.AuditDetails
+                    .OfType<AttributeAuditDetail>()
+                    .Where(a => a.AuditRecord.ToEntity<Audit>().Action != Audit_Action.Merge)
+                    .Select(a =>
+                    {
+                        var allChangedAttributes = a.NewValue.Attributes.Keys.Union(a.OldValue.Attributes.Keys).ToArray();
+                        var relevantChangedAttributes = allChangedAttributes.Where(k => contactAttributeNames.Contains(k)).ToArray();
+                        var newValue = a.NewValue.ToEntity<Contact>().SparseClone(contactAttributeNames);
+                        newValue.Id = contact.ContactId!.Value;
+                        var oldValue = a.OldValue.ToEntity<Contact>().SparseClone(contactAttributeNames);
+                        oldValue.Id = contact.ContactId!.Value;
 
-                foreach (var (thisVersion, previousVersion) in contactVersions.Skip(1).Zip(contactVersions, (thisVersion, previousVersion) => (thisVersion, previousVersion)))
+                        return (AllChangedAttributes: allChangedAttributes, RelevantChangedAttributes: relevantChangedAttributes, NewValue: newValue, OldValue: oldValue, AuditRecord: a.AuditRecord.ToEntity<Audit>());
+                    })
+                    .OrderBy(a => a.AuditRecord.CreatedOn)
+                    .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
+                    .ToArray();
+
+                foreach (var item in orderedContactAuditDetails.Skip(1))
                 {
-                    var mappedEvent = MapContactInductionStatusChangedEvent(thisVersion, previousVersion);
+                    if (item.AllChangedAttributes.Contains(Contact.Fields.StateCode))
+                    {
+                        var nonStateAttributes = item.AllChangedAttributes
+                            .Where(a => !(a is Contact.Fields.StateCode or Contact.Fields.StatusCode))
+                            .ToArray();
 
+                        if (nonStateAttributes.Length > 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                        }
+                    }
+
+                    var mappedEvent = MapContactInductionStatusChangedEvent(contact.ContactId!.Value, item.RelevantChangedAttributes, item.NewValue, item.OldValue, item.AuditRecord);
                     if (mappedEvent is not null)
                     {
                         events.Add(mappedEvent);
@@ -1138,43 +1221,48 @@ public class TrsDataSyncHelper(
 
         return (inductions, events);
 
-        EventBase MapCreatedEvent(EntityVersionInfo<dfeta_induction> snapshot)
+        EventBase MapCreatedEvent(Guid contactId, dfeta_induction induction, Audit audit)
         {
             return new DqtInductionCreatedEvent()
             {
                 EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Entity.Id}-Imported",
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Induction = GetEventDqtInduction(snapshot.Entity)
+                Key = $"{induction.Id}-Created",
+                CreatedUtc = audit.CreatedOn!.Value,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
+                PersonId = contactId,
+                Induction = GetEventDqtInduction(induction)
             };
         }
 
-        EventBase? MapUpdatedEvent(EntityVersionInfo<dfeta_induction> snapshot, EntityVersionInfo<dfeta_induction> previous)
+        EventBase MapImportedEvent(Guid contactId, dfeta_induction induction)
         {
-            if (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.StateCode))
+            var createdBy = induction.GetAttributeValue<EntityReference>("createdby");
+            return new DqtInductionImportedEvent()
             {
-                var nonStateAttributes = snapshot.ChangedAttributes
-                    .Where(a => !(a is dfeta_induction.Fields.StateCode or dfeta_induction.Fields.StatusCode))
-                    .ToArray();
+                EventId = Guid.NewGuid(),
+                Key = $"{induction.Id}-Imported",
+                CreatedUtc = induction.CreatedOn!.Value,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(createdBy.Id, createdBy.Name),
+                PersonId = contactId,
+                Induction = GetEventDqtInduction(induction),
+                DqtState = (int)dfeta_inductionState.Active
+            };
+        }
 
-                if (nonStateAttributes.Length > 0)
-                {
-                    throw new InvalidOperationException(
-                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
-                }
-
-                if (snapshot.Entity.StateCode == dfeta_inductionState.Inactive)
+        EventBase? MapUpdatedEvent(Guid contactId, string[] changedAttributes, dfeta_induction newValue, dfeta_induction oldValue, Audit audit)
+        {
+            if (changedAttributes.Contains(dfeta_induction.Fields.StateCode))
+            {
+                if (newValue.StateCode == dfeta_inductionState.Inactive)
                 {
                     return new DqtInductionDeactivatedEvent()
                     {
                         EventId = Guid.NewGuid(),
-                        Key = $"{snapshot.Id}",  // The CRM Audit ID
-                        CreatedUtc = snapshot.Timestamp,
-                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                        Induction = GetEventDqtInduction(snapshot.Entity)
+                        Key = $"{audit.Id}",  // The CRM Audit ID
+                        CreatedUtc = audit.CreatedOn!.Value,
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
+                        PersonId = contactId,
+                        Induction = GetEventDqtInduction(newValue)
                     };
                 }
                 else
@@ -1182,20 +1270,20 @@ public class TrsDataSyncHelper(
                     return new DqtInductionReactivatedEvent()
                     {
                         EventId = Guid.NewGuid(),
-                        Key = $"{snapshot.Id}",  // The CRM Audit ID
-                        CreatedUtc = snapshot.Timestamp,
-                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                        PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                        Induction = GetEventDqtInduction(snapshot.Entity)
+                        Key = $"{audit.Id}",  // The CRM Audit ID
+                        CreatedUtc = audit.CreatedOn!.Value,
+                        RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
+                        PersonId = contactId,
+                        Induction = GetEventDqtInduction(newValue)
                     };
                 }
             }
 
             var changes = DqtInductionUpdatedEventChanges.None |
-                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_StartDate) ? DqtInductionUpdatedEventChanges.StartDate : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_CompletionDate) ? DqtInductionUpdatedEventChanges.CompletionDate : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_InductionStatus) ? DqtInductionUpdatedEventChanges.Status : 0) |
-                (snapshot.ChangedAttributes.Contains(dfeta_induction.Fields.dfeta_InductionExemptionReason) ? DqtInductionUpdatedEventChanges.ExemptionReason : 0);
+                (changedAttributes.Contains(dfeta_induction.Fields.dfeta_StartDate) ? DqtInductionUpdatedEventChanges.StartDate : 0) |
+                (changedAttributes.Contains(dfeta_induction.Fields.dfeta_CompletionDate) ? DqtInductionUpdatedEventChanges.CompletionDate : 0) |
+                (changedAttributes.Contains(dfeta_induction.Fields.dfeta_InductionStatus) ? DqtInductionUpdatedEventChanges.Status : 0) |
+                (changedAttributes.Contains(dfeta_induction.Fields.dfeta_InductionExemptionReason) ? DqtInductionUpdatedEventChanges.ExemptionReason : 0);
 
             if (changes == DqtInductionUpdatedEventChanges.None)
             {
@@ -1205,32 +1293,19 @@ public class TrsDataSyncHelper(
             return new DqtInductionUpdatedEvent()
             {
                 EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Id}",  // The CRM Audit ID
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Induction = GetEventDqtInduction(snapshot.Entity),
-                OldInduction = GetEventDqtInduction(previous.Entity),
+                Key = $"{audit.Id}",  // The CRM Audit ID
+                CreatedUtc = audit.CreatedOn!.Value,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
+                PersonId = contactId,
+                Induction = GetEventDqtInduction(newValue),
+                OldInduction = GetEventDqtInduction(oldValue),
                 Changes = changes
             };
         }
 
-        EventBase? MapContactInductionStatusChangedEvent(EntityVersionInfo<Contact> snapshot, EntityVersionInfo<Contact> previous)
+        EventBase? MapContactInductionStatusChangedEvent(Guid contactId, string[] changedAttributes, Contact newValue, Contact oldValue, Audit audit)
         {
-            if (snapshot.ChangedAttributes.Contains(Contact.Fields.StateCode))
-            {
-                var nonStateAttributes = snapshot.ChangedAttributes
-                    .Where(a => !(a is Contact.Fields.StateCode or Contact.Fields.StatusCode))
-                    .ToArray();
-
-                if (nonStateAttributes.Length > 0)
-                {
-                    throw new InvalidOperationException(
-                        $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
-                }
-            }
-
-            if (!snapshot.ChangedAttributes.Contains(Contact.Fields.dfeta_InductionStatus))
+            if (!changedAttributes.Contains(Contact.Fields.dfeta_InductionStatus))
             {
                 return null;
             }
@@ -1238,55 +1313,57 @@ public class TrsDataSyncHelper(
             return new DqtContactInductionStatusChangedEvent()
             {
                 EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Id}",  // The CRM Audit ID
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.Id,
-                InductionStatus = snapshot.Entity.dfeta_InductionStatus.ToString(),
-                OldInductionStatus = previous.Entity.dfeta_InductionStatus.ToString()
+                Key = $"{audit.Id}",  // The CRM Audit ID
+                CreatedUtc = audit.CreatedOn!.Value,
+                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
+                PersonId = contactId,
+                InductionStatus = newValue.dfeta_InductionStatus.ToString(),
+                OldInductionStatus = oldValue.dfeta_InductionStatus.ToString()
             };
         }
 
-        EventBase MapImportedEvent(EntityVersionInfo<dfeta_induction> snapshot)
-        {
-            return new DqtInductionImportedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Entity.Id}-Imported",
-                CreatedUtc = snapshot.Timestamp,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(snapshot.UserId, snapshot.UserName),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
-                Induction = GetEventDqtInduction(snapshot.Entity),
-                DqtState = (int)snapshot.Entity.StateCode!
-            };
-        }
-
-        EventBase MapMigratedEvent(EntityVersionInfo<dfeta_induction> snapshot, InductionInfo mappedInduction)
+        EventBase MapMigratedEvent(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
         {
             return new InductionMigratedEvent()
             {
                 EventId = Guid.NewGuid(),
-                Key = $"{snapshot.Entity.Id}-Migrated",
+                Key = $"{dqtInduction.Id}-Migrated",
                 CreatedUtc = clock.UtcNow,
                 RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
-                PersonId = snapshot.Entity.dfeta_PersonId.Id,
+                PersonId = contactId,
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
                 InductionStatus = mappedInduction.InductionStatus.ToString(),
                 InductionExemptionReason = "",  // TODO
-                DqtInduction = GetEventDqtInduction(snapshot.Entity)
+                DqtInduction = GetEventDqtInduction(dqtInduction)
             };
         }
 
         EventModels.DqtInduction GetEventDqtInduction(dfeta_induction induction)
         {
+            Option<DateOnly?> startDateOption = induction.TryGetAttributeValue<DateTime?>(dfeta_induction.Fields.dfeta_StartDate, out var startDate)
+                ? Option.Some(startDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+                : Option.None<DateOnly?>();
+
+            Option<DateOnly?> completionDateOption = induction.TryGetAttributeValue<DateTime?>(dfeta_induction.Fields.dfeta_CompletionDate, out var completionDate)
+                ? Option.Some(completionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+                : Option.None<DateOnly?>();
+
+            Option<string?> inductionStatusOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionStatus, out var inductionStatus)
+                ? Option.Some(((dfeta_InductionStatus?)inductionStatus!.Value).ToString())
+                : Option.None<string?>();
+
+            Option<string?> inductionExemptionReasonOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionExemptionReason, out var inductionExemptionReason)
+                ? Option.Some(((dfeta_InductionExemptionReason?)inductionExemptionReason!.Value).ToString())
+                : Option.None<string?>();
+
             return new EventModels.DqtInduction()
             {
                 InductionId = induction.Id,
-                StartDate = induction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                CompletionDate = induction.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                InductionStatus = induction.dfeta_InductionStatus.ToString(),
-                InductionExemptionReason = induction.dfeta_InductionExemptionReason.ToString()
+                StartDate = startDateOption,
+                CompletionDate = completionDateOption,
+                InductionStatus = inductionStatusOption,
+                InductionExemptionReason = inductionExemptionReasonOption
             };
         }
     }
@@ -1320,6 +1397,7 @@ public class TrsDataSyncHelper(
     private record InductionInfo
     {
         public required Guid PersonId { get; init; }
+        public required Guid? InductionId { get; init; }
         public required DateOnly? InductionCompletedDate { get; init; }
         public required Guid[] InductionExemptionReasonIds { get; init; }
         public required DateOnly? InductionStartDate { get; init; }

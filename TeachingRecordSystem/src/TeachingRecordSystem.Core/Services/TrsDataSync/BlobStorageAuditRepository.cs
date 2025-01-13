@@ -2,10 +2,11 @@ using System.Runtime.Serialization;
 using Azure;
 using Azure.Storage.Blobs;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
-public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : IAuditRepository
+public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient, ILogger<BlobStorageAuditRepository> logger) : IAuditRepository
 {
     private const string ContainerName = "dqtaudits";
 
@@ -33,7 +34,7 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
             var auditDetail = (AuditDetailCollection)_serializer.ReadObject(contentStream)!;
 
             // Deserialization wrongly sets the Primary Id attribute to be non null because it gets it from the non-null Id attribute - we need to unset this for NewValue and OldValue
-            foreach (var item in auditDetail.AuditDetails.OfType<AttributeAuditDetail>())
+            foreach (var item in auditDetail.AuditDetails.OfType<AttributeAuditDetail>().Where(a => a.AuditRecord.ToEntity<Audit>().Action != Audit_Action.Merge))
             {
                 item.NewValue.Attributes.Remove(primaryIdAttribute);
                 item.OldValue.Attributes.Remove(primaryIdAttribute);
@@ -44,6 +45,11 @@ public class BlobStorageAuditRepository(BlobServiceClient blobServiceClient) : I
         catch (RequestFailedException ex) when (ex.Status == 404)
         {
             return null;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error reading audit detail for {entityLogicalName} with id {id}");
+            throw;
         }
     }
 
