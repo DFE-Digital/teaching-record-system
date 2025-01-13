@@ -2,6 +2,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class MandatoryQualification : Qualification
 {
+    public MandatoryQualification()
+    {
+        QualificationType = QualificationType.MandatoryQualification;
+    }
+
     public MandatoryQualificationProvider? Provider { get; }
     public required Guid? ProviderId { get; set; }
     public required MandatoryQualificationSpecialism? Specialism { get; set; }

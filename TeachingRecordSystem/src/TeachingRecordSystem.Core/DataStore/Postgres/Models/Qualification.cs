@@ -8,7 +8,7 @@ public abstract class Qualification
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
-    public QualificationType QualificationType { get; }
+    public QualificationType QualificationType { get; protected init; }
     public required Guid PersonId { get; init; }
     public Person Person { get; } = null!;
 

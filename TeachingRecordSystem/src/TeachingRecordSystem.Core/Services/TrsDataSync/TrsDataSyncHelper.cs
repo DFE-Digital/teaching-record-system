@@ -79,48 +79,6 @@ public class TrsDataSyncHelper(
         await Task.WhenAll(audits.Select(async kvp => await auditRepository.SetAuditDetailAsync(entityLogicalName, kvp.Key, kvp.Value)));
     }
 
-    public static Alert? MapAlertFromDqtSanction(
-        dfeta_sanction sanction,
-        IEnumerable<dfeta_sanctioncode> sanctionCodes,
-        IEnumerable<AlertType> alertTypes,
-        bool ignoreInvalid)
-    {
-        if (sanction.dfeta_SanctionCodeId is null)
-        {
-            if (ignoreInvalid)
-            {
-                return null;
-            }
-
-            throw new InvalidOperationException($"Sanction {sanction.Id} does not have a {nameof(dfeta_sanction.Fields.dfeta_SanctionCodeId)}.");
-        }
-
-        var sanctionCode = sanctionCodes.Single(c => c.Id == sanction.dfeta_SanctionCodeId.Id).dfeta_Value;
-        var alertType = alertTypes.SingleOrDefault(t => t.DqtSanctionCode == sanctionCode);
-
-        if (alertType is null)
-        {
-            return null;
-        }
-
-        return new Alert()
-        {
-            AlertId = sanction.Id,
-            AlertTypeId = alertType.AlertTypeId,
-            PersonId = sanction.dfeta_PersonId.Id,
-            Details = sanction.dfeta_SanctionDetails,
-            ExternalLink = sanction.dfeta_DetailsLink,
-            StartDate = sanction.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            EndDate = sanction.dfeta_EndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            CreatedOn = sanction.CreatedOn!.Value,
-            UpdatedOn = sanction.ModifiedOn!.Value,
-            DqtSanctionId = sanction.Id,
-            DqtState = (int)sanction.StateCode!,
-            DqtCreatedOn = sanction.CreatedOn!.Value,
-            DqtModifiedOn = sanction.ModifiedOn!.Value,
-        };
-    }
-
     private InductionInfo? MapInductionInfoFromDqtInduction(
         dfeta_induction? induction,
         Contact contact,
