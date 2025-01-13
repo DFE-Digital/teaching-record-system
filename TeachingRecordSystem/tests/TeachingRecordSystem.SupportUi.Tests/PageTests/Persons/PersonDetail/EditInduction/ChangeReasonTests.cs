@@ -32,7 +32,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var reasonChoiceSelection = doc.GetElementByTestId("reason-choices")!
+        var reasonChoiceSelection = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Single(i => i.IsChecked == true).Value;
         Assert.Equal(reasonChoice.ToString(), reasonChoiceSelection);
@@ -73,9 +73,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var reasonChoicesLegend = doc.GetElementByTestId("reason-choices-legend");
+        var reasonChoicesLegend = doc.GetElementByTestId("reason-options-legend");
         Assert.Equal("Why are you changing the induction details?", reasonChoicesLegend!.TextContent);
-        var reasonChoices = doc.GetElementByTestId("reason-choices")!
+        var reasonChoices = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
             .Select(i => i.Value);
