@@ -5,7 +5,8 @@
     "dfeta_ukprn",
     "name",
     "statecode",
-    "accountnumber"
+    "accountnumber",
+    "dfeta_laschoolcode"
   ],
   "annotation": [
     "annotationid",

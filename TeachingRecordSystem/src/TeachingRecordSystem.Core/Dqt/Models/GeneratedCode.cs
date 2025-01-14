@@ -45,6 +45,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string AccountId = "accountid";
 			public const string Id = "accountid";
 			public const string AccountNumber = "accountnumber";
+			public const string dfeta_LASchoolCode = "dfeta_laschoolcode";
 			public const string dfeta_TrainingProvider = "dfeta_trainingprovider";
 			public const string dfeta_UKPRN = "dfeta_ukprn";
 			public const string Name = "name";
@@ -180,6 +181,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("AccountNumber");
 				this.SetAttributeValue("accountnumber", value);
 				this.OnPropertyChanged("AccountNumber");
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_laschoolcode")]
+		public string dfeta_LASchoolCode
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<string>("dfeta_laschoolcode");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_LASchoolCode");
+				this.SetAttributeValue("dfeta_laschoolcode", value);
+				this.OnPropertyChanged("dfeta_LASchoolCode");
 			}
 		}
 		
@@ -7458,6 +7479,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_dfeta_ittsubject1_dfeta_initialteachertra = "dfeta_dfeta_ittsubject1_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject2_dfeta_initialteachertra = "dfeta_dfeta_ittsubject2_dfeta_initialteachertra";
 			public const string dfeta_dfeta_ittsubject3_dfeta_initialteachertra = "dfeta_dfeta_ittsubject3_dfeta_initialteachertra";
+			public const string dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration = "dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration";
 			public const string lk_dfeta_initialteachertraining_createdby = "lk_dfeta_initialteachertraining_createdby";
 			public const string lk_dfeta_initialteachertraining_createdonbehalfby = "lk_dfeta_initialteachertraining_createdonbehalfby";
 			public const string lk_dfeta_initialteachertraining_modifiedby = "lk_dfeta_initialteachertraining_modifiedby";
@@ -8089,6 +8111,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.dfeta_ittsubject>("dfeta_dfeta_ittsubject3_dfeta_initialteachertra", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_ittsubject3_dfeta_initialteachertra");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_qtsregistration")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration")]
+		public TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.dfeta_qtsregistration>("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration");
 			}
 		}
 		
@@ -10873,6 +10916,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_TeacherStatusId = "dfeta_teacherstatusid";
 			public const string StateCode = "statecode";
 			public const string dfeta_dfeta_qtsregistration_contact = "dfeta_dfeta_qtsregistration_contact";
+			public const string dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration = "dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration";
 			public const string business_unit_dfeta_qtsregistration = "business_unit_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_qtsregistration = "dfeta_contact_dfeta_qtsregistration";
 			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
@@ -11141,6 +11185,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_dfeta_qtsregistration_contact");
 				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_dfeta_qtsregistration_contact", null, value);
 				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_contact");
+			}
+		}
+		
+		/// <summary>
+		/// 1:N dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration")]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining> dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration", null);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.dfeta_initialteachertraining>("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration", null, value);
+				this.OnPropertyChanged("dfeta_dfeta_qtsregistration_dfeta_initialteachertraining_qtsregistration");
 			}
 		}
 		

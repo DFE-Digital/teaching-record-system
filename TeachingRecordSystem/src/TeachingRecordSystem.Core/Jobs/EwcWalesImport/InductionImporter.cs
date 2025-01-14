@@ -400,7 +400,7 @@ public class InductionImporter
     }
     public async Task<(OrganisationLookupResult, Guid? OrganisationId)> FindMatchingOrganisationsRecordAsync(string OrgNumber)
     {
-        var query = new FindActiveOrganisationsByAccountNumberQuery(OrgNumber);
+        var query = new FindActiveOrganisationsByLaSchoolCodeQuery(OrgNumber);
         var results = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         if (results.Length == 0)

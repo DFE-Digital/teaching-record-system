@@ -3880,6 +3880,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DesktopScript", 1, null, "authorize this credential in power automate for desktop script", "DesktopScript")]
 		DesktopScript = 280920001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Network", 2, null, "authorize this credential in power automate for network", "Network")]
+		Network = 280920002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3964,6 +3968,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Sat", 6, "#0000ff", "Saturday")]
 		Sat = 192350006,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum aiinsightcard_Surface
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Table", 0, "#0000ff")]
+		Table = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Record", 1, "#0000ff")]
+		Record = 1,
 	}
 }
 

@@ -564,17 +564,19 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 0;
-        var accountNumber = "54321";
+        var accountNumber = "9999";
+        var lascoolcode = "54321";
         var startDate = DateTime.ParseExact("17/09/2014", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         var passDate = DateTime.ParseExact("28/09/2017", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         var account = await TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
+            x.WithLaSchoolCode(lascoolcode);
         });
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn = person.Trn;
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{startDate.ToString("dd/MM/yyyy")},{passDate.ToString("dd/MM/yyyy")},,{account.Name},{accountNumber},Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{startDate.ToString("dd/MM/yyyy")},{passDate.ToString("dd/MM/yyyy")},,{account.Name},{lascoolcode},Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -787,10 +789,12 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
     {
         // Arrange
         var accountNumber = "678910";
+        var laschoolcode = "555";
         var account = await TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
+            x.WithLaSchoolCode(laschoolcode);
         });
         var expectedTotalRowCount = 1;
         var expectedSuccessCount = 1;
@@ -811,7 +815,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var trn = person.Trn;
         var updatedStartDate = DateTime.ParseExact("17/09/2019", "dd/MM/yyyy", CultureInfo.InvariantCulture);
         var updatedPassDate = DateTime.ParseExact("28/09/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture);
-        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{updatedStartDate.ToString("dd/MM/yyyy")},{updatedPassDate.ToString("dd/MM/yyyy")},,,{account.AccountNumber},Pass\r\n";
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,START_DATE,PASS_DATE,FAIL_DATE,EMPLOYER_NAME,EMPLOYER_CODE,IND_STATUS_NAME\r\n{trn},{person.FirstName},{person.LastName},{person.DateOfBirth.ToString("dd/MM/yyyy")},{updatedStartDate.ToString("dd/MM/yyyy")},{updatedPassDate.ToString("dd/MM/yyyy")},,,{account.dfeta_LASchoolCode},Pass\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);

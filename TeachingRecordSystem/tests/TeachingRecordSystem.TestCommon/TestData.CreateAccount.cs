@@ -16,6 +16,7 @@ public partial class TestData
     {
         private string? _name = null;
         private string? _accountnumber = null;
+        private string? _laschoolcode = null;
 
         public CreateAccountBuilder WithName(string name)
         {
@@ -39,6 +40,17 @@ public partial class TestData
             return this;
         }
 
+        public CreateAccountBuilder WithLaSchoolCode(string laschoolcode)
+        {
+            if (_laschoolcode is not null && _laschoolcode != laschoolcode)
+            {
+                throw new InvalidOperationException("WithLaSchoolCode cannot be changed after it's set.");
+            }
+
+            _laschoolcode = laschoolcode;
+            return this;
+        }
+
         public async Task<Account> ExecuteAsync(TestData testData)
         {
             var name = _name ?? Faker.Company.Name();
@@ -47,7 +59,8 @@ public partial class TestData
             {
                 Id = accountId,
                 Name = name,
-                AccountNumber = _accountnumber
+                AccountNumber = _accountnumber,
+                dfeta_LASchoolCode = _laschoolcode
             };
             await testData.OrganizationService.ExecuteAsync(new CreateRequest()
             {
