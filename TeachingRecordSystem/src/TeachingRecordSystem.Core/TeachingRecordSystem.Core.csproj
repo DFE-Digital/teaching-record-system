@@ -71,6 +71,7 @@
     <None Remove="Services\DqtReporting\Migrations\0036_TrsPersonsInduction.sql" />
     <None Remove="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
     <None Remove="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0041_QTSRegistrationITTLink.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -140,8 +141,9 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0036_TrsPersonsInduction.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
-    <EmbeddedResource Include="Services\DqtReporting\Migrations\0039_InductionFields.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0039_InductionFields.sql" /> 
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0040_PersonInductionExemptionReasons.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0041_QTSRegistrationITTLink.sql" />
   </ItemGroup>
 
   <ItemGroup>

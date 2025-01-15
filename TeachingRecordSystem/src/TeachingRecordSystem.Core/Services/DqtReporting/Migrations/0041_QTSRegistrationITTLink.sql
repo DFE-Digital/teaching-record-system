@@ -1,0 +1,3 @@
+alter table dfeta_initialteachertraining add dfeta_qtsregistration uniqueidentifier;
+alter table dfeta_initialteachertraining add dfeta_qtsregistration_entitytype nvarchar(128);
+alter table dfeta_initialteachertraining  add dfeta_qtsregistrationname nvarchar(250);
