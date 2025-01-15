@@ -81,6 +81,7 @@ public class WebhookDeliveryService(
                 limit {BatchSize + 1}
                 for update skip locked
             """)
+            .Where(m => m.WebhookEndpoint.Enabled)
             .Include(m => m.WebhookEndpoint)
             .ToArrayAsync();
 
