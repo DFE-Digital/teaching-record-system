@@ -1,18 +1,10 @@
-using Optional;
-
 namespace TeachingRecordSystem.Core.Events;
 
 public record PersonInductionUpdatedEvent : EventBase, IEventWithPersonId
 {
     public required Guid PersonId { get; init; }
-    public required InductionStatus InductionStatus { get; init; }
-    public required DateOnly? InductionStartDate { get; init; }
-    public required DateOnly? InductionCompletedDate { get; init; }
-    public required Guid[] InductionExemptionReasonIds { get; init; }
-    public required Option<InductionStatus> CpdInductionStatus { get; init; }
-    public required Option<DateOnly?> CpdInductionStartDate { get; init; }
-    public required Option<DateOnly?> CpdInductionCompletedDate { get; init; }
-    public required Option<DateTime> CpdInductionCpdModifiedOn { get; init; }
+    public required EventModels.Induction Induction { get; init; }
+    public required EventModels.Induction OldInduction { get; init; }
     public required string? ChangeReason { get; init; }
     public required string? ChangeReasonDetail { get; init; }
     public required EventModels.File? EvidenceFile { get; init; }

@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Optional;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -93,6 +92,8 @@ public class Person
             return;
         }
 
+        var oldEventInduction = EventModels.Induction.FromModel(this);
+
         InductionStatus = newOverallStatus;
         InductionStartDate = newOverallStartDate;
         InductionCompletedDate = newOverallCompletedDate;
@@ -118,14 +119,8 @@ public class Person
             CreatedUtc = now,
             RaisedBy = updatedBy,
             PersonId = PersonId,
-            InductionStatus = newOverallStatus,
-            InductionStartDate = newOverallStartDate,
-            InductionCompletedDate = newOverallCompletedDate,
-            InductionExemptionReasonIds = InductionExemptionReasonIds,
-            CpdInductionStatus = Option.Some(status),
-            CpdInductionStartDate = Option.Some(startDate),
-            CpdInductionCompletedDate = Option.Some(completedDate),
-            CpdInductionCpdModifiedOn = Option.Some(cpdModifiedOn),
+            Induction = EventModels.Induction.FromModel(this),
+            OldInduction = oldEventInduction,
             ChangeReason = null,
             ChangeReasonDetail = null,
             EvidenceFile = null,
@@ -157,6 +152,8 @@ public class Person
             return;
         }
 
+        var oldEventInduction = EventModels.Induction.FromModel(this);
+
         InductionStatus = status;
         InductionStartDate = startDate;
         InductionCompletedDate = completedDate;
@@ -169,14 +166,8 @@ public class Person
             CreatedUtc = now,
             RaisedBy = updatedBy,
             PersonId = PersonId,
-            InductionStatus = status,
-            InductionStartDate = startDate,
-            InductionCompletedDate = completedDate,
-            InductionExemptionReasonIds = InductionExemptionReasonIds,
-            CpdInductionStatus = default,
-            CpdInductionStartDate = default,
-            CpdInductionCompletedDate = default,
-            CpdInductionCpdModifiedOn = default,
+            Induction = EventModels.Induction.FromModel(this),
+            OldInduction = oldEventInduction,
             ChangeReason = null,
             ChangeReasonDetail = null,
             EvidenceFile = null,
@@ -201,6 +192,8 @@ public class Person
         {
             if (newStatus == InductionStatus.Exempt)
             {
+                var oldEventInduction = EventModels.Induction.FromModel(this);
+
                 InductionStatus = newStatus;
                 InductionExemptionReasonIds = exemptionReasonIds;
                 InductionModifiedOn = now;
@@ -208,14 +201,8 @@ public class Person
                 @event = new PersonInductionUpdatedEvent
                 {
                     PersonId = PersonId,
-                    InductionStatus = newStatus,
-                    InductionStartDate = startDate,
-                    InductionCompletedDate = completedDate,
-                    InductionExemptionReasonIds = InductionExemptionReasonIds,
-                    CpdInductionStatus = default,
-                    CpdInductionStartDate = default,
-                    CpdInductionCompletedDate = default,
-                    CpdInductionCpdModifiedOn = default,
+                    Induction = EventModels.Induction.FromModel(this),
+                    OldInduction = oldEventInduction,
                     ChangeReason = null,
                     ChangeReasonDetail = null,
                     EvidenceFile = null,
@@ -231,20 +218,16 @@ public class Person
             }
             else if (newStatus == InductionStatus.FailedInWales)
             {
+                var oldEventInduction = EventModels.Induction.FromModel(this);
+
                 InductionStatus = newStatus;
                 InductionModifiedOn = now;
 
                 @event = new PersonInductionUpdatedEvent
                 {
                     PersonId = PersonId,
-                    InductionStatus = newStatus,
-                    InductionStartDate = null,
-                    InductionCompletedDate = null,
-                    InductionExemptionReasonIds = exemptionReasonIds,
-                    CpdInductionStatus = default,
-                    CpdInductionStartDate = default,
-                    CpdInductionCompletedDate = default,
-                    CpdInductionCpdModifiedOn = default,
+                    Induction = EventModels.Induction.FromModel(this),
+                    OldInduction = oldEventInduction,
                     ChangeReason = null,
                     ChangeReasonDetail = null,
                     EvidenceFile = null,
