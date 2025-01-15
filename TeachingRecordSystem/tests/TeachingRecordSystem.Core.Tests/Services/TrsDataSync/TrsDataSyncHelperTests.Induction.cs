@@ -64,6 +64,54 @@ public partial class TrsDataSyncHelperTests
     }
 
     [Theory]
+    [InlineData(dfeta_InductionExemptionReason.Exempt, "a5faff9f-29ce-4a6b-a7b8-0c1f57f15920")]
+    [InlineData(dfeta_InductionExemptionReason.ExemptDataLossErrorCriteria, "204f86eb-0383-40eb-b793-6fccb76ecee2")]
+    [InlineData(dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland, "a112e691-1694-46a7-8f33-5ec5b845c181")]
+    [InlineData(dfeta_InductionExemptionReason.OverseasTrainedTeacher, "4c97e211-10d2-4c63-8da9-b0fcebe7f2f9")]
+    [InlineData(dfeta_InductionExemptionReason.Qualifiedbefore07May1999, "5a80cee8-98a8-426b-8422-b0e81cb49b36")]
+    [InlineData(dfeta_InductionExemptionReason.Qualifiedbetween07May1999and01April2003FirstpostwasinWalesandlastedaminimumoftwoterms, "15014084-2d8d-4f51-9198-b0e1881f8896")]
+    [InlineData(dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute, "e7118bab-c2b1-4fe8-ad3f-4095d73f5b85")]
+    [InlineData(dfeta_InductionExemptionReason.QualifiedthroughFEroutebetween01Sep2001and01Sep2004, "0997ab13-7412-4560-8191-e51ed4d58d2a")]
+    [InlineData(dfeta_InductionExemptionReason.RegisteredTeacher_havingatleasttwoyearsfulltimeteachingexperience, "42bb7bbc-a92c-4886-b319-3c1a5eac319a")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedinductioninGuernsey, "fea2db23-93e0-49af-96fd-83c815c17c0b")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedinductioninIsleOfMan, "e5c3847d-8fb6-4b31-8726-812392da8c5c")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedinductioninJersey, "243b21a8-0be4-4af5-8874-85944357e7f8")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland, "3471ab35-e6e4-4fa9-a72b-b8bd113df591")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedinductioninServiceChildrensEducationschoolsinGermanyorCyprus, "7d17d904-c1c6-451b-9e09-031314bd35f7")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedinductioninWales, "39550fa9-3147-489d-b808-4feea7f7f979")]
+    [InlineData(dfeta_InductionExemptionReason.SuccessfullycompletedprobationaryperiodinGibraltar, "a751494a-7e7a-4836-96cb-00b9ed6e1b5f")]
+    [InlineData(dfeta_InductionExemptionReason.TeacherhasbeenawardedQTLSandisexemptprovidedtheymaintaintheirmembershipwiththeSocietyforEducationandTraining, "35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db")]
+    public async Task SyncInductionsAsync_WithInductionExemptionReason_MapsToTrsAsExpected(dfeta_InductionExemptionReason dqtInductionExemptionReason, string expectedTrsInductionExemptionReason)
+    {
+        // Arrange
+        var expectedTrsInductionExemptionReasonId = new Guid(expectedTrsInductionExemptionReason);
+        var inductionId = Guid.NewGuid();
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn()
+                .WithSyncOverride(false)
+                .WithDqtInduction(dfeta_InductionStatus.Exempt, dqtInductionExemptionReason, null, null));
+        var inductionAuditDetails = new AuditDetailCollection();
+        var entity = await CreateNewInductionEntityVersion(inductionId, person.Contact, inductionAuditDetails, status: dfeta_InductionStatus.Exempt, exemptionReason: dqtInductionExemptionReason);
+        var contactAuditDetails = new AuditDetailCollection();
+        contactAuditDetails.Add(person.DqtContactAuditDetail);
+        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
+        {
+            { entity.Id, inductionAuditDetails },
+            { person.ContactId, contactAuditDetails }
+        };
+
+        // Act
+        await Helper.SyncInductionsAsync([person.Contact], [entity], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+
+        // Assert
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleAsync(p => p.DqtContactId == person.ContactId);
+            Assert.Equal(expectedTrsInductionExemptionReasonId, updatedPerson!.InductionExemptionReasonIds[0]);
+        });
+    }
+
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task SyncInductionsAsync_WithContactOnlyInductionStatus_UpdatesPersonRecord(bool personAlreadySynced)
@@ -657,7 +705,7 @@ public partial class TrsDataSyncHelperTests
 
         var existingExemptionReason = existingInduction.dfeta_InductionExemptionReason;
         var exemptionReason = ChangeRequested(DqtInductionUpdatedEventChanges.ExemptionReason) ?
-            TestData.GenerateChangedEnumValue(existingExemptionReason) :
+            TestData.GenerateChangedEnumValue(existingExemptionReason, excluding: [dfeta_InductionExemptionReason.Extendedonappeal, dfeta_InductionExemptionReason.QualifiedthroughIndependentroutebetween01Oct2000and01Sep2004]) :
             existingExemptionReason;
 
         var updatedInduction = existingInduction.Clone<dfeta_induction>();

@@ -212,6 +212,12 @@ public class ReferenceDataCache(
         return inductionExemptionReasons;
     }
 
+    public async Task<InductionExemptionReason> GetInductionExemptionReasonByIdAsync(Guid inductionExemptionReasonId)
+    {
+        var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
+        return inductionExemptionReasons.Single(er => er.InductionExemptionReasonId == inductionExemptionReasonId, $"Could not find induction exemption reason with ID: '{inductionExemptionReasonId}'.");
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -312,5 +318,6 @@ public class ReferenceDataCache(
         // TRS
         await EnsureAlertCategoriesAsync();
         await EnsureAlertTypesAsync();
+        await EnsureInductionExemptionReasonsAsync();
     }
 }
