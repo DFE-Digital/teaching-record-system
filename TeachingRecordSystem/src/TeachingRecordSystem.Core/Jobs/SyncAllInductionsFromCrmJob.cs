@@ -21,7 +21,7 @@ public class SyncAllInductionsFromCrmJob(
         const int pageSize = 1000;
 
         var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
-        var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Induction).AttributeNames);
+        var columns = new ColumnSet(TrsDataSyncHelper.GetEntityInfoForModelType(TrsDataSyncHelper.ModelTypes.Person).AttributeNames);
 
         var query = new QueryExpression(Contact.EntityLogicalName)
         {
