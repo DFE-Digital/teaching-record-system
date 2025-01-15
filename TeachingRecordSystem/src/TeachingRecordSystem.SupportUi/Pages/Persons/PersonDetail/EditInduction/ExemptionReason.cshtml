@@ -8,11 +8,24 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
-<h1 data-testid="page-title" class="govuk-heading-l">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Induction - @Model.PersonName</span>
+            <govuk-checkboxes asp-for="ExemptionReasonIds">
+                <govuk-checkboxes-fieldset>
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" is-page-heading="true"/>
+                    <govuk-checkboxes-hint>Select all that apply</govuk-checkboxes-hint>
+                    @foreach (var category in ExemptionReasonCategories.All)
+                    {
+                        <govuk-checkboxes-divider class="trs-radios__divider--heading-s">@category.GetDisplayName()</govuk-checkboxes-divider>
+                        @foreach (var exemptionReasonId in ExemptionReasonCategories.GetExemptionReasonIdsForCategory(category))
+                        {
+                            <govuk-checkboxes-item value="@exemptionReasonId">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
+                        }
+                    }
+                </govuk-checkboxes-fieldset>
+            </govuk-checkboxes>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
                 <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.InductionEditExemptionReasonCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
