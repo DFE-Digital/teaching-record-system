@@ -23,6 +23,6 @@ public record Induction
         CpdStatus = person.CpdInductionStatus.ToOption(),
         CpdStartDate = Option.Some(person.CpdInductionStartDate),
         CpdCompletedDate = Option.Some(person.CpdInductionCompletedDate),
-        CpdCpdModifiedOn = person.CpdInductionModifiedOn.ToOption()
+        CpdCpdModifiedOn = person.CpdInductionCpdModifiedOn.ToOption()
     };
 }
