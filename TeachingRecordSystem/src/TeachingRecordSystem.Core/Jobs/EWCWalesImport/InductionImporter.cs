@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Globalization;
 using System.Text;
 using CsvHelper;
@@ -134,26 +135,26 @@ public class InductionImporter
                             };
                             rowTransaction.AppendQuery(queryInductionPeriod);
                         }
-                        else
-                        {
-                            inductionPeriodId = lookupData.InductionPeriod.dfeta_inductionperiodId;
-                            var updateInduction = new UpdateInductionTransactionalQuery()
-                            {
-                                InductionId = inductionId!.Value,
-                                CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
-                                InductionStatus = lookupData.Induction!.dfeta_InductionStatus!.Value
-                            };
-                            rowTransaction.AppendQuery(updateInduction);
+                        //else
+                        //{
+                        //    inductionPeriodId = lookupData.InductionPeriod.dfeta_inductionperiodId;
+                        //    var updateInduction = new UpdateInductionTransactionalQuery()
+                        //    {
+                        //        InductionId = inductionId!.Value,
+                        //        CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                        //        InductionStatus = lookupData.Induction!.dfeta_InductionStatus!.Value
+                        //    };
+                        //    rowTransaction.AppendQuery(updateInduction);
 
-                            var updateInductionPeriodQuery = new UpdateInductionPeriodTransactionalQuery()
-                            {
-                                InductionPeriodId = inductionPeriodId!.Value,
-                                AppropriateBodyId = lookupData.OrganisationId,
-                                InductionStartDate = lookupData.InductionPeriod.dfeta_StartDate,
-                                InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
-                            };
-                            rowTransaction.AppendQuery(updateInductionPeriodQuery);
-                        }
+                        //    var updateInductionPeriodQuery = new UpdateInductionPeriodTransactionalQuery()
+                        //    {
+                        //        InductionPeriodId = inductionPeriodId!.Value,
+                        //        AppropriateBodyId = lookupData.OrganisationId,
+                        //        InductionStartDate = lookupData.InductionPeriod.dfeta_StartDate,
+                        //        InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                        //    };
+                        //    rowTransaction.AppendQuery(updateInductionPeriodQuery);
+                        //}
 
                         //soft validation errors can be appended to the IntegrationTransactionRecord Failure message
                         foreach (var validationMessage in validationFailures.ValidationFailures)
@@ -259,15 +260,19 @@ public class InductionImporter
             inductionMatchStatus = indStatus;
             induction = ind?.Induction;
 
-            if (ind?.InductionPeriods?.Length == 1)
+            if (ind?.InductionPeriods?.Length > 0)
             {
-                inductionPeriodMatchStatus = InductionPeriodLookupResult.OneMatch;
-                inductionPeriod = ind.InductionPeriods.First();
-            }
-            else if (ind?.InductionPeriods?.Length > 1)
-            {
-                inductionPeriodMatchStatus = InductionPeriodLookupResult.MultipleMatchesFound;
-                inductionPeriod = null;
+                var periods = ind?.InductionPeriods.Where(x => !x.dfeta_EndDate.HasValue).ToList();
+                if (periods?.Count() == 1)
+                { 
+                    inductionPeriodMatchStatus = InductionPeriodLookupResult.OneMatch;
+                    inductionPeriod = periods.First();
+                }
+                else if(periods?.Count() > 1)
+                {
+                    inductionPeriodMatchStatus = InductionPeriodLookupResult.MultipleMatchesFound;
+                    inductionPeriod = null;
+                }
             }
 
             hasActiveAlerts = _dbContext.Alerts.Where(x => x.PersonId == contact.Id && x.IsOpen).Count() > 0;
