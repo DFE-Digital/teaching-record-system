@@ -331,7 +331,7 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var contactAttributeNames = GetModelTypeSyncInfo(ModelTypes.Induction).AttributeNames;
+        var contactAttributeNames = GetModelTypeSyncInfo(ModelTypes.Person).AttributeNames;
 
         var contacts = await GetEntitiesAsync<Contact>(
             Contact.EntityLogicalName,
@@ -352,24 +352,13 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken = default)
     {
-        var inductionAttributeNames = new[]
-        {
-            dfeta_induction.Fields.dfeta_PersonId,
-            dfeta_induction.Fields.dfeta_CompletionDate,
-            dfeta_induction.Fields.dfeta_InductionExemptionReason,
-            dfeta_induction.Fields.dfeta_StartDate,
-            dfeta_induction.Fields.dfeta_InductionStatus,
-            dfeta_induction.Fields.CreatedOn,
-            dfeta_induction.Fields.CreatedBy,
-            dfeta_induction.Fields.ModifiedOn,
-            dfeta_induction.Fields.StateCode
-        };
+        var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Induction);
 
         var inductions = await GetEntitiesAsync<dfeta_induction>(
             dfeta_induction.EntityLogicalName,
             dfeta_induction.Fields.dfeta_PersonId,
             contacts.Select(c => c.ContactId!.Value),
-            inductionAttributeNames,
+            modelTypeSyncInfo.AttributeNames,
             true,
             cancellationToken);
 
@@ -908,7 +897,7 @@ public class TrsDataSyncHelper(
 
         var attributeNames = new[]
         {
-            Contact.Fields.ContactId,
+            Contact.PrimaryIdAttribute,
             Contact.Fields.StateCode,
             Contact.Fields.CreatedOn,
             Contact.Fields.CreatedBy,
@@ -923,7 +912,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.BirthDate,
             Contact.Fields.dfeta_NINumber,
             Contact.Fields.EMailAddress1,
-            Contact.Fields.dfeta_InductionStatus
+            Contact.Fields.dfeta_InductionStatus,
+            Contact.Fields.dfeta_qtlsdate,
         };
 
         Action<NpgsqlBinaryImporter, Person> writeRecord = (writer, person) =>
@@ -1012,23 +1002,16 @@ public class TrsDataSyncHelper(
 
         var attributeNames = new[]
         {
-            Contact.PrimaryIdAttribute,
-            Contact.Fields.dfeta_InductionStatus,
-            Contact.Fields.dfeta_qtlsdate,
-            Contact.Fields.CreatedOn,
-            Contact.Fields.CreatedBy,
-            Contact.Fields.StateCode,
-            Contact.Fields.ModifiedOn,
-            Contact.Fields.dfeta_TRN,
-            Contact.Fields.FirstName,
-            Contact.Fields.MiddleName,
-            Contact.Fields.LastName,
-            Contact.Fields.dfeta_StatedFirstName,
-            Contact.Fields.dfeta_StatedMiddleName,
-            Contact.Fields.dfeta_StatedLastName,
-            Contact.Fields.BirthDate,
-            Contact.Fields.dfeta_NINumber,
-            Contact.Fields.EMailAddress1,
+            dfeta_induction.PrimaryIdAttribute,
+            dfeta_induction.Fields.dfeta_PersonId,
+            dfeta_induction.Fields.dfeta_CompletionDate,
+            dfeta_induction.Fields.dfeta_InductionExemptionReason,
+            dfeta_induction.Fields.dfeta_StartDate,
+            dfeta_induction.Fields.dfeta_InductionStatus,
+            dfeta_induction.Fields.CreatedOn,
+            dfeta_induction.Fields.CreatedBy,
+            dfeta_induction.Fields.ModifiedOn,
+            dfeta_induction.Fields.StateCode
         };
 
         Action<NpgsqlBinaryImporter, InductionInfo> writeRecord = (writer, induction) =>
