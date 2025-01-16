@@ -45,7 +45,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
             .Select(e => e.InductionExemptionReasonId)
             .RandomSelection(2)
             .ToArray();
-           var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()

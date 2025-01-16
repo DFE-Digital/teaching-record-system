@@ -78,20 +78,20 @@ public class EditInductionPostRequestBuilder
             var value = property.GetValue(this);
             if (value is DateOnly date)
             {
-                yield return new ($"{property.Name}.Day", date.Day.ToString());
-                yield return new ($"{property.Name}.Month", date.Month.ToString());
-                yield return new ($"{property.Name}.Year", date.Year.ToString());
+                yield return new($"{property.Name}.Day", date.Day.ToString());
+                yield return new($"{property.Name}.Month", date.Month.ToString());
+                yield return new($"{property.Name}.Year", date.Year.ToString());
             }
             else if (value is Array array)
             {
                 for (var i = 0; i < array.Length; i++)
                 {
-                    yield return new ($"{property.Name}[{i}]", array.GetValue(i)?.ToString());
+                    yield return new($"{property.Name}[{i}]", array.GetValue(i)?.ToString());
                 }
             }
             else
             {
-                yield return new (property.Name, value?.ToString());
+                yield return new(property.Name, value?.ToString());
             }
         }
     }
