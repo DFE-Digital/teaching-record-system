@@ -37,6 +37,10 @@ public static class HostApplicationBuilderExtensions
                     .Bind(builder.Configuration.GetSection("RecurringJobs:BatchSendInductionCompletedEmails"))
                     .ValidateDataAnnotations()
                     .ValidateOnStart();
+                builder.Services.AddOptions<InductionStatusUpdatedSupportJobOptions>()
+                    .Bind(builder.Configuration.GetSection("RecurringJobs:InductionStatusUpdatedSupportJob"))
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
                 builder.Services.AddTransient<SendQtsAwardedEmailJob>();
                 builder.Services.AddTransient<QtsAwardedEmailJobDispatcher>();
@@ -47,6 +51,7 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<SendInductionCompletedEmailJob>();
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
+                builder.Services.AddTransient<InductionStatusUpdatedSupportJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
@@ -153,6 +158,11 @@ public static class HostApplicationBuilderExtensions
                     nameof(ExportWorkforceDataJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
+
+                recurringJobManager.AddOrUpdate<InductionStatusUpdatedSupportJob>(
+                    nameof(InductionStatusUpdatedSupportJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    InductionStatusUpdatedSupportJob.JobSchedule);
 
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
