@@ -8,13 +8,87 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
-<h1 data-testid="page-title" class="govuk-heading-l">@ViewBag.Title</h1>
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.InductionCheckYourAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-summary-list data-testid="change-summary">
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.InductionStatus</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                @if (Model.ShowStartDate)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (Model.ShowCompletedDate)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if(Model.ShowExemptionReasons)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>ExemptionReasons</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.ExemptionReasonsDisplayString</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.ChangeReasonDetail is not null)
+                        {
+                            <multi-line-text text="@Model.ChangeReasonDetail" />
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>
+                        @if (Model.UploadedEvidenceFileUrl is not null)
+                        {
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{Model.EvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+
             <div class="govuk-button-group">
-                <govuk-button type="submit" data-testid="continue-button">Confirm induction details</govuk-button>
+                <govuk-button type="submit" data-testid="confirm-button">Confirm change</govuk-button>
                 <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.InductionCheckYourAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
