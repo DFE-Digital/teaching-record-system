@@ -20,6 +20,15 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
                 EmailAddress = message.EmailAddress,
                 Name = message.Name,
                 DateOfBirth = message.DateOfBirth,
+                PotentialDuplicate = message.PotentialDuplicate,
+                NationalInsuranceNumber = message.NationalInsuranceNumber,
+                Gender = message.Gender,
+                AddressLine1 = message.AddressLine1,
+                AddressLine2 = message.AddressLine2,
+                AddressLine3 = message.AddressLine3,
+                City = message.City,
+                Postcode = message.Postcode,
+                Country = message.Country
             });
             await dbContext.SaveChangesAsync();
         }
