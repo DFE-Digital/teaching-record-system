@@ -10,7 +10,6 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ShowsExemptionReasonsList()
     {
         // note - not testing that inactive reasons are not shown as there aren't any in the reference data cache
-        //      - is there any value in the cache returning non-active reasons?
         // Arrange
         var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());

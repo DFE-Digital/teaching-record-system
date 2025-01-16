@@ -30,6 +30,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
+        var exemptionReasonIds = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Select(e => e.InductionExemptionReasonId)
+            .RandomSelection(1)
+            .ToArray();
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
@@ -49,6 +53,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
                     .WithInductionStatus(inductionStatus)
+                    .WithExemptionReasonIds(exemptionReasonIds)
                     .WithStartDate(Clock.Today.AddDays(-1))
                     .WithCompletedDate(Clock.Today)
                     .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
@@ -116,6 +121,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         InductionStatus inductionStatus = InductionStatus.Passed;
+        var exemptionReasonIds = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Select(e => e.InductionExemptionReasonId)
+            .RandomSelection(1)
+            .ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -131,6 +140,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInductionStatus(inductionStatus)
                 .WithStartDate(Clock.Today.AddDays(-1))
                 .WithCompletedDate(Clock.Today)
+                .WithExemptionReasonIds(exemptionReasonIds)
                 .Build())
         };
 

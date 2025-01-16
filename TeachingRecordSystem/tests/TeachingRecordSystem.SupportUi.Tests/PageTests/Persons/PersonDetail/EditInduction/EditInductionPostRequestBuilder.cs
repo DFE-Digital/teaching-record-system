@@ -82,11 +82,11 @@ public class EditInductionPostRequestBuilder
                 yield return new ($"{property.Name}.Month", date.Month.ToString());
                 yield return new ($"{property.Name}.Year", date.Year.ToString());
             }
-            else if (value is Guid[] guids)
+            else if (value is Array array)
             {
-                for (var i = 0; i < guids.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
-                    yield return new ($"{property.Name}[{i}]", guids[i].ToString());
+                    yield return new ($"{property.Name}[{i}]", array.GetValue(i)?.ToString());
                 }
             }
             else
