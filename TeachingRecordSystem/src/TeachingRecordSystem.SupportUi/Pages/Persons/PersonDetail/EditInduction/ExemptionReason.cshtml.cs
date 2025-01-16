@@ -65,7 +65,7 @@ public class ExemptionReasonModel : CommonJourneyPage
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.ExemptionReasonIds = ExemptionReasonIds?.ToArray();
+            state.ExemptionReasonIds = ExemptionReasonIds;
             if (state.JourneyStartPage == null)
             {
                 state.JourneyStartPage = InductionJourneyPage.ExemptionReason;
@@ -79,7 +79,7 @@ public class ExemptionReasonModel : CommonJourneyPage
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.ExemptionReason);
 
-        ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync();
+        ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
         if (JourneyInstance!.State.ExemptionReasonIds != null)
         {
             ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;

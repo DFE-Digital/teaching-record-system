@@ -21,6 +21,7 @@ public class EditInductionStateBuilder
         this.Initialized = true;
         JourneyStartPage = startPage;
         CurrentInductionStatus = currentInductionStatus ?? InductionStatus.None;
+        InductionStatus = CurrentInductionStatus;
         return this;
     }
 

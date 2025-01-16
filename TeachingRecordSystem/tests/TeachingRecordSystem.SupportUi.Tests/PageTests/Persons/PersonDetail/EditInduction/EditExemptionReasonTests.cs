@@ -9,9 +9,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     [Fact]
     public async Task Get_InvalidInductionStatusForPage_PageNotFound()
     {
-        // note - not testing that inactive reasons are not shown as there aren't any in the reference data cache
         // Arrange
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -31,10 +29,12 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     [Fact]
     public async Task Get_ShowsExemptionReasonsList()
     {
-        // note - not testing that inactive reasons are not shown as there aren't any in the reference data cache
         // Arrange
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).ToArray();
-        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true)).ToArray();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(i => i.
+                WithStatus(InductionStatus.Exempt)));
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
@@ -60,9 +60,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     [Fact]
     public async Task Get_WithExemptionReasonsSelected_ShowsExpected()
     {
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
-            .Where(e => e.IsActive)
-            .ToArray();
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true)).ToArray();
         var selectedExemptionReasonIds = exemptionReasons
             .Select(e => e.InductionExemptionReasonId)
             .RandomSelection(2)
@@ -114,8 +112,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
-            .Where(e => e.IsActive)
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .Select(e => e.InductionExemptionReasonId);
         var randomExemptionReasonIds = exemptionReasons
             .RandomSelection(2)

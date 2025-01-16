@@ -58,8 +58,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionStatus_InductionStatusExempt()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
-            .Where(e => e.IsActive)
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .Select(e => e.InductionExemptionReasonId)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(
@@ -95,8 +94,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionStatusExempt_NavigateBack()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
-            .Where(e => e.IsActive)
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .Select(e => e.InductionExemptionReasonId)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(
@@ -303,8 +301,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionExemptionReason_NavigateBack()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
-            .Where(e => e.IsActive)
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .Select(e => e.InductionExemptionReasonId)
             .RandomOne();
 
