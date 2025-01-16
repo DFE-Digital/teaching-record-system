@@ -111,7 +111,8 @@ public class CreateTrnRequestHandler(
         }
 
         string? trn = null;
-        if (potentialDuplicates.Count == 0)
+        var potentialDuplicate = potentialDuplicates.Count > 0;
+        if (!potentialDuplicate)
         {
             trn = await trnGenerationApiClient.GenerateTrnAsync();
         }
@@ -123,25 +124,32 @@ public class CreateTrnRequestHandler(
             .Distinct()
             .ToArrayAsync();
 
-        var emailAddress = command.EmailAddresses?.FirstOrDefault();
+        var emailAddress = command.EmailAddresses.FirstOrDefault();
 
-        var outboxMessages = new List<dfeta_TrsOutboxMessage>();
-        if (command.OneLoginUserSubject is string oneLoginUserId)
+        var outboxMessages = new List<dfeta_TrsOutboxMessage>
         {
-            outboxMessages.Add(messageSerializer.CreateCrmOutboxMessage(new TrnRequestMetadataMessage()
+            messageSerializer.CreateCrmOutboxMessage(new TrnRequestMetadataMessage
             {
                 ApplicationUserId = currentApplicationUserId,
                 RequestId = command.RequestId,
                 CreatedOn = clock.UtcNow,
                 IdentityVerified = command.IdentityVerified,
-                OneLoginUserSubject = oneLoginUserId,
+                OneLoginUserSubject = command.OneLoginUserSubject,
                 Name = GetNonEmptyValues(command.FirstName, command.MiddleName, command.LastName),
                 DateOfBirth = command.DateOfBirth,
-                EmailAddress = emailAddress
-            }));
-        }
+                EmailAddress = emailAddress,
+                NationalInsuranceNumber = command.NationalInsuranceNumber,
+                Gender = (int?)command.Gender,
+                AddressLine1 = command.AddressLine1,
+                AddressLine2 = command.AddressLine2,
+                AddressLine3 = command.AddressLine3,
+                City = command.City,
+                Postcode = command.Postcode,
+                Country = command.Country
+            })
+        };
 
-        var contactId = await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
+        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
             FirstName = firstName,
             MiddleName = middleName,
