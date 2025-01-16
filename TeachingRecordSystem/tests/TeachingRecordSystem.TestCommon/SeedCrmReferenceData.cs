@@ -22,6 +22,9 @@ public class SeedCrmReferenceData : IStartupTask
         AddSpecialisms();
         AddHeQualifications();
         AddHeSubjects();
+        AddCountries();
+        AddITTSubjects();
+        AddITTQualifications();
 
         return Task.CompletedTask;
     }
@@ -406,6 +409,76 @@ public class SeedCrmReferenceData : IStartupTask
         {
             dfeta_name = "History",
             dfeta_Value = "007"
+        });
+    }
+
+    private void AddCountries()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "United Kingdom",
+            dfeta_Value = "XK"
+        });
+
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "Wales",
+            dfeta_Value = "WA"
+        });
+    }
+
+    private void AddITTSubjects()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_ittsubject()
+        {
+            dfeta_name = "business and management",
+            dfeta_Value = "100078"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_ittsubject()
+        {
+            dfeta_name = "business studies",
+            dfeta_Value = "100079"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_ittsubject()
+        {
+            dfeta_name = "applied biology",
+            dfeta_Value = "100343"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_ittsubject()
+        {
+            dfeta_name = "classical studies",
+            dfeta_Value = "100300"
+        });
+    }
+
+    private void AddITTQualifications()
+    {
+        _xrmFakedContext.CreateEntity(new dfeta_ittqualification()
+        {
+            dfeta_name = "BA (Hons)",
+            dfeta_Value = "008"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_ittqualification()
+        {
+            dfeta_name = "BSc",
+            dfeta_Value = "003"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_ittqualification()
+        {
+            dfeta_name = "BTech/Education",
+            dfeta_Value = "005"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_ittqualification()
+        {
+            dfeta_name = "Degree",
+            dfeta_Value = "400"
         });
     }
 }
