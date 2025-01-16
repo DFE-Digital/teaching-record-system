@@ -22,9 +22,10 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
 
         return new TrnRequestInfo()
         {
-            RequestId = command.RequestId.ToString(),
+            RequestId = command.RequestId,
             Person = new TrnRequestInfoPerson()
             {
+                // FUTURE - these values should be what was submitted in the original request
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
                 MiddleName = contact.MiddleName,
@@ -33,7 +34,7 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
                 DateOfBirth = contact.BirthDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false)
             },
             Trn = contact.dfeta_TRN,
-            Status = trnRequest.IsCompleted ? TrnRequestStatus.Completed : TrnRequestStatus.Pending,
+            Status = trnRequest.IsCompleted ? TrnRequestStatus.Completed : TrnRequestStatus.Pending
         };
     }
 }
