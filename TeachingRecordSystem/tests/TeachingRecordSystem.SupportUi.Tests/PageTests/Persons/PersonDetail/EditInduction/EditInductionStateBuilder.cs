@@ -34,6 +34,12 @@ public class EditInductionStateBuilder
         return this;
     }
 
+    public EditInductionStateBuilder WithExemptionReasonIds(Guid[] exemptionReasonIds)
+    {
+        ExemptionReasonIds = exemptionReasonIds;
+        return this;
+    }
+
     public EditInductionStateBuilder WithStartDate(DateOnly date)
     {
         StartDate = date;

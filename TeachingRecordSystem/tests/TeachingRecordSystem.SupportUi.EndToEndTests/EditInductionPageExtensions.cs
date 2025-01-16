@@ -81,6 +81,12 @@ public static class EditInductionPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
+    public static Task SelectExemptionReasonAsync(this IPage page, Guid exemptionReasonId)
+    {
+        var checkbox = page.Locator($"input[type='checkbox'][value='{exemptionReasonId}']");
+        return checkbox.Locator("xpath=following-sibling::label").ClickAsync();
+    }
+
     public static async Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null)
     {
         var section = page.GetByTestId("has-additional-reason_detail-options");

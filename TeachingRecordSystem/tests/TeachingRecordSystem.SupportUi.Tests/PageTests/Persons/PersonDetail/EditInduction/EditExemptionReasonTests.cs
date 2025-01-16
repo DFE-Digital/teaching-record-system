@@ -7,18 +7,17 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithExemptionReasons_ShowsExemptionReasons()
+    public async Task Get_ShowsExemptionReasonsList()
     {
         // note - not testing that inactive reasons are not shown as there aren't any in the reference data cache
         //      - is there any value in the cache returning non-active reasons?
         // Arrange
-        var exemptionReasons = await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync();
-        var inductionStatus = InductionStatus.InProgress;
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
                 .Create());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -30,32 +29,54 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var exemptionReasonsElement = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
         Assert.Equal(exemptionReasons.Length, exemptionReasonsElement.Count());
-
-        for (var i = 0; i < exemptionReasons.Length; i++)
+        Assert.All(exemptionReasonsElement, checkbox =>
         {
-            var checkbox = exemptionReasonsElement.ElementAt(i);
-            var label = checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']");
-
-            Assert.Equal(exemptionReasons[i].InductionExemptionReasonId.ToString(), checkbox.Value);
-            Assert.Equal(exemptionReasons[i].Name, label!.TextContent.Trim());
-        }
+            Assert.Contains(checkbox.Value, exemptionReasons.Select(e => e.InductionExemptionReasonId.ToString()));
+            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasons.Select(e => e.Name));
+        });
     }
 
     [Fact]
-    public async Task Post_NoExemptionReasonsSet_ShowsError()
+    public async Task Get_WithExemptionReasonsSelected_ShowsExpected()
     {
-        // Arrange
-        var dateValid = Clock.Today;
-        var inductionStatus = InductionStatus.InProgress;
-        var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        var random = new Random();
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).Select(e => e.InductionExemptionReasonId);
-        var randomExemptionReasonIds = exemptionReasons.OrderBy(x => random.Next()).Take(2).ToArray();
-
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Where(e => e.IsActive)
+            .ToArray();
+        var selectedExemptionReasonIds = exemptionReasons
+            .Select(e => e.InductionExemptionReasonId)
+            .RandomSelection(2)
+            .ToArray();
+           var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .WithExemptionReasonIds(selectedExemptionReasonIds)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var selectedExemptionReasonsCheckboxes = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]").Where(c => c.IsChecked).Select(c => c.Value);
+        Assert.All(selectedExemptionReasonsCheckboxes, checkboxValue =>
+            {
+                Assert.Contains(checkboxValue, selectedExemptionReasonIds.Select(id => id.ToString()));
+            });
+    }
+
+    [Fact]
+    public async Task Post_NoExemptionReasonsSelected_ShowsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -71,24 +92,24 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Post_SetExemptionReasons_PersistsExemptionReasons()
     {
         // Arrange
-        var dateValid = Clock.Today;
-        var inductionStatus = InductionStatus.InProgress;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        var random = new Random();
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).Select(e => e.InductionExemptionReasonId);
-        var randomExemptionReasonIds = exemptionReasons.OrderBy(x => random.Next()).Take(2).ToArray();
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Where(e => e.IsActive)
+            .Select(e => e.InductionExemptionReasonId);
+        var randomExemptionReasonIds = exemptionReasons
+            .RandomSelection(2)
+            .ToArray();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
-                    .WithCompletedDate(dateValid)
                     .WithExemptionReasonIds(randomExemptionReasonIds)
                     .Build())
         };

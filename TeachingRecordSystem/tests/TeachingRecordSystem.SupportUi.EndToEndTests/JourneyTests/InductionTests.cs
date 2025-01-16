@@ -58,17 +58,52 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionStatus_InductionStatusExempt()
     {
-        var startDate = new DateOnly(2021, 1, 1);
-        var completedDate = startDate.AddDays(1);
-        var setStartDate = startDate.AddDays(1).AddMonths(1).AddYears(1);
-        var setCompletedDate = setStartDate.AddDays(1);
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Where(e => e.IsActive)
+            .Select(e => e.InductionExemptionReasonId)
+            .RandomOne();
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
-                    .WithStatus(InductionStatus.RequiredToComplete)
-                    .WithStartDate(startDate)
-                    .WithCompletedDate(completedDate)));
+                    .WithStatus(InductionStatus.RequiredToComplete)));
+        var personId = person.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonInductionPageAsync(personId);
+        await page.ClickEditInductionStatusPageAsync();
+
+        await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
+        await page.SelectStatusAsync(InductionStatus.Exempt);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
+        await page.SelectExemptionReasonAsync(exemptionReasonId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+    }
+
+    [Fact]
+    public async Task EditInductionStatusExempt_NavigateBack()
+    {
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Where(e => e.IsActive)
+            .Select(e => e.InductionExemptionReasonId)
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithQts()
+                .WithInductionStatus(inductionBuilder => inductionBuilder
+                    .WithStatus(InductionStatus.RequiredToComplete)));
         var personId = person.ContactId;
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -79,17 +114,11 @@ public class InductionTests : TestBase
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
 
-        await page.SelectStatusAsync(InductionStatus.Passed);
+        await page.SelectStatusAsync(InductionStatus.Exempt);
         await page.ClickContinueButtonAsync();
 
-        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
-        await page.AssertDateInputAsync(startDate);
-        await page.FillDateInputAsync(setStartDate);
-        await page.ClickContinueButtonAsync();
-
-        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
-        await page.AssertDateInputAsync(completedDate);
-        await page.FillDateInputAsync(setCompletedDate);
+        await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
+        await page.SelectExemptionReasonAsync(exemptionReasonId);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
@@ -99,6 +128,15 @@ public class InductionTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
     }
 
     [Fact]
@@ -265,13 +303,18 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionExemptionReason_NavigateBack()
     {
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync())
+            .Where(e => e.IsActive)
+            .Select(e => e.InductionExemptionReasonId)
+            .RandomOne();
+
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.Exempt)
-                    .WithExemptionReasons(new Guid("5a80cee8-98a8-426b-8422-b0e81cb49b36"))
-                ));
+                    .WithExemptionReasons(exemptionReasonId))
+                );
         var personId = person.ContactId;
 
         await using var context = await HostFixture.CreateBrowserContext();
@@ -281,6 +324,7 @@ public class InductionTests : TestBase
         await page.ClickEditInductionExemptionReasonPageAsync();
 
         await page.AssertOnEditInductionExemptionReasonPageAsync(person.PersonId);
+        await page.SelectExemptionReasonAsync(exemptionReasonId);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
