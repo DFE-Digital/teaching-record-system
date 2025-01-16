@@ -10,5 +10,8 @@ public class CountryMapping : IEntityTypeConfiguration<Country>
         builder.HasKey(c => c.CountryId);
         builder.Property(c => c.CountryId).HasMaxLength(4);
         builder.Property(c => c.Name).HasMaxLength(200);
+
+        builder.HasData(
+            new Country { CountryId = "UK", Name = "United Kingdom" });
     }
 }
