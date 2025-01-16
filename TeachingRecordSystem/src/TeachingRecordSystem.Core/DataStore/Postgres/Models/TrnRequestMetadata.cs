@@ -10,13 +10,13 @@ public class TrnRequestMetadata
     public required string? OneLoginUserSubject { get; init; }
     public required string[] Name { get; init; }
     public required DateOnly DateOfBirth { get; init; }
-    public bool? PotentialDuplicate { get; init; }
-    public string? NationalInsuranceNumber { get; init; }
-    public int? Gender { get; init; }
-    public string? AddressLine1 { get; init; }
-    public string? AddressLine2 { get; init; }
-    public string? AddressLine3 { get; init; }
-    public string? City { get; init; }
-    public string? Postcode { get; init; }
-    public string? Country { get; init; }
+    public bool? PotentialDuplicate { get; set; }
+    public string? NationalInsuranceNumber { get; set; }
+    public int? Gender { get; set; }
+    public string? AddressLine1 { get; set; }
+    public string? AddressLine2 { get; set; }
+    public string? AddressLine3 { get; set; }
+    public string? City { get; set; }
+    public string? Postcode { get; set; }
+    public string? Country { get; set; }
 }

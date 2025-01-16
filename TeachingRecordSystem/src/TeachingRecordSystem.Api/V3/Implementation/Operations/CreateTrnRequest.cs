@@ -137,6 +137,7 @@ public class CreateTrnRequestHandler(
                 OneLoginUserSubject = command.OneLoginUserSubject,
                 Name = GetNonEmptyValues(command.FirstName, command.MiddleName, command.LastName),
                 DateOfBirth = command.DateOfBirth,
+                PotentialDuplicate = potentialDuplicate,
                 EmailAddress = emailAddress,
                 NationalInsuranceNumber = command.NationalInsuranceNumber,
                 Gender = (int?)command.Gender,

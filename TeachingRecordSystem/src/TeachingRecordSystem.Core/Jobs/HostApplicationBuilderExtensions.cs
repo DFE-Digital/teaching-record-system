@@ -223,6 +223,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     EwcWalesImportJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<BackfillTrnRequestMetadataJob>(
+                    nameof(BackfillTrnRequestMetadataJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
