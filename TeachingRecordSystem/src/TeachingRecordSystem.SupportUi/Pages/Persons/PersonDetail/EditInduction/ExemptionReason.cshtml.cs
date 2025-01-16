@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -41,8 +42,14 @@ public class ExemptionReasonModel : CommonJourneyPage
         _referenceDataCache = referenceDataCache;
     }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        if (InductionStatus != InductionStatus.Exempt)
+        {
+            return NotFound();
+        }
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()

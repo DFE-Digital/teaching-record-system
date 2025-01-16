@@ -7,6 +7,28 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
+    public async Task Get_InvalidInductionStatusForPage_PageNotFound()
+    {
+        // note - not testing that inactive reasons are not shown as there aren't any in the reference data cache
+        // Arrange
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.IsActive).ToArray();
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseAsync(response, 404);
+    }
+
+    [Fact]
     public async Task Get_ShowsExemptionReasonsList()
     {
         // note - not testing that inactive reasons are not shown as there aren't any in the reference data cache
