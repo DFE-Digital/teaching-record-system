@@ -13,8 +13,8 @@ public class StartDateModel : CommonJourneyPage
     protected IClock _clock;
 
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    public DateOnly? CompletedDate => JourneyInstance!.State.CompletedDate;
     public string? PersonName { get; set; }
-    public DateOnly? CompletedDate { get; set; }
 
     [FromQuery]
     public JourneyFromCyaPage? FromCheckAnswers { get; set; }
@@ -66,7 +66,6 @@ public class StartDateModel : CommonJourneyPage
     public void OnGet()
     {
         StartDate = JourneyInstance!.State.StartDate;
-        CompletedDate = JourneyInstance!.State.CompletedDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -100,7 +99,6 @@ public class StartDateModel : CommonJourneyPage
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.StartDate);
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;

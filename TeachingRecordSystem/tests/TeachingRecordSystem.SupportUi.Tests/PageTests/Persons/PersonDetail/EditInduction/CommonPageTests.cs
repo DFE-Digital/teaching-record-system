@@ -239,6 +239,101 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/persons/{person.PersonId}/{expectedBackPage}", backlink!.Href);
     }
 
+    [Theory]
+    [InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
+    [InlineData("edit-induction/start-date", InductionStatus.Passed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/exemption-reason", InductionStatus.Exempt, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
+    public async Task FromCya_ToPage_Post_RedirectsToExpectedPage(string page, InductionStatus inductionStatus, string expectedNextPageUrl)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+               .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+               .WithStartDate(new DateOnly(2000, 2, 2))
+               .WithCompletedDate(new DateOnly(2002, 2, 2))
+               .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+               .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?FromCheckAnswers={JourneyFromCyaPage.Cya.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(
+                new EditInductionPostRequestBuilder()
+                    .WithInductionStatus(inductionStatus)
+                    .WithStartDate(Clock.Today.AddDays(-1))
+                    .WithCompletedDate(Clock.Today)
+                    .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                    .WithChangeReasonDetailSelections(false)
+                    .WithNoFileUploadSelection()
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+        var expectedUrl = $"/persons/{person.PersonId}/{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}";
+        Assert.Equal(expectedUrl, location);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Passed, "2000-02-02", "2002-02-02", "check-answers")]
+    [InlineData(InductionStatus.Passed, "2003-02-02", "2002-02-02", "date-completed")]
+    public async Task FromCya_ToStartDate_Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string startDateString, string completedDateString, string expectedNextPageUrl)
+    {
+        // Arrange
+        var startDate = DateOnly.Parse(startDateString);
+        var completedDate = DateOnly.Parse(completedDateString);
+        var fromPage = "edit-induction/start-date";
+        var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCyaPage.Cya.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(
+                new EditInductionPostRequestBuilder()
+                    .WithInductionStatus(inductionStatus)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)
+                    .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                    .WithChangeReasonDetailSelections(false)
+                    .WithNoFileUploadSelection()
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+        //var expectedUrl = $"/persons/{person.PersonId}/edit-induction/{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}"; // TODO - querystring for CYA_start
+        var expectedUrl = $"/persons/{person.PersonId}/edit-induction/{expectedNextPageUrl}";
+        Assert.Contains(expectedUrl, location);
+    }
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,
