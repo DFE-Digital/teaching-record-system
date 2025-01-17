@@ -8,6 +8,7 @@ public class EditInductionPostRequestBuilder
     private DateOnly? StartDate { get; set; }
     private DateOnly? CompletedDate { get; set; }
     private InductionStatus? InductionStatus { get; set; }
+    private Guid[]? ExemptionReasonIds { get; set; }
     private InductionChangeReasonOption? ChangeReason { get; set; }
     private bool? HasAdditionalReasonDetail { get; set; }
     private string? ChangeReasonDetail { get; set; }
@@ -31,6 +32,12 @@ public class EditInductionPostRequestBuilder
     public EditInductionPostRequestBuilder WithInductionStatus(InductionStatus status)
     {
         InductionStatus = status;
+        return this;
+    }
+
+    public EditInductionPostRequestBuilder WithExemptionReasonIds(Guid[] exemptionReasons)
+    {
+        ExemptionReasonIds = exemptionReasons;
         return this;
     }
 
@@ -61,28 +68,31 @@ public class EditInductionPostRequestBuilder
         return this;
     }
 
-    public Dictionary<string, string> Build()
+    public IEnumerable<KeyValuePair<string, string?>> Build()
     {
         var properties = GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance)
             .Where(f => f.GetValue(this) != null);
-
-        var dictionary = new Dictionary<string, string>();
 
         foreach (var property in properties)
         {
             var value = property.GetValue(this);
             if (value is DateOnly date)
             {
-                dictionary[$"{property.Name}.Day"] = date.Day.ToString();
-                dictionary[$"{property.Name}.Month"] = date.Month.ToString();
-                dictionary[$"{property.Name}.Year"] = date.Year.ToString();
+                yield return new($"{property.Name}.Day", date.Day.ToString());
+                yield return new($"{property.Name}.Month", date.Month.ToString());
+                yield return new($"{property.Name}.Year", date.Year.ToString());
+            }
+            else if (value is Array array)
+            {
+                for (var i = 0; i < array.Length; i++)
+                {
+                    yield return new($"{property.Name}[{i}]", array.GetValue(i)?.ToString());
+                }
             }
             else
             {
-                dictionary[property.Name] = value!.ToString()!; // CML TODO !
+                yield return new(property.Name, value?.ToString());
             }
         }
-
-        return dictionary;
     }
 }

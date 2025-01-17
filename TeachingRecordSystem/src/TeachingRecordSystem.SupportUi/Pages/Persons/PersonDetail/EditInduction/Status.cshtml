@@ -8,7 +8,6 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
-<h1 data-testid="page-title" class="govuk-heading-l">@ViewBag.Title</h1>
 @if (!String.IsNullOrEmpty(Model.StatusWarningMessage))
 {
     <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>

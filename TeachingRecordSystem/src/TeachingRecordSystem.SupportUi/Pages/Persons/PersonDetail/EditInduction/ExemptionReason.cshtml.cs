@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -8,8 +10,19 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class ExemptionReasonModel : CommonJourneyPage
 {
     protected TrsDbContext _dbContext;
+    protected ReferenceDataCache _referenceDataCache;
+
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Why are they exempt from induction?")]
+    public Guid[] ExemptionReasonIds { get; set; } = Array.Empty<Guid>();
+
     public string? PersonName { get; set; }
+    public InductionExemptionReason[] ExemptionReasons { get; set; } = Array.Empty<InductionExemptionReason>();
     public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
 
     public string BackLink
@@ -22,20 +35,36 @@ public class ExemptionReasonModel : CommonJourneyPage
         }
     }
 
-    public ExemptionReasonModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
+    public ExemptionReasonModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, ReferenceDataCache referenceDataCache) : base(linkGenerator)
     {
         _dbContext = dbContext;
+        _referenceDataCache = referenceDataCache;
     }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        if (InductionStatus != InductionStatus.Exempt)
+        {
+            return NotFound();
+        }
+
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (ExemptionReasonIds.Length == 0)
+        {
+            ModelState.AddModelError(nameof(ExemptionReasonIds), "Select the reason for a teacher’s exemption to induction");
+        }
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            // TODO - store the exemption reason
+            state.ExemptionReasonIds = ExemptionReasonIds;
             if (state.JourneyStartPage == null)
             {
                 state.JourneyStartPage = InductionJourneyPage.ExemptionReason;
@@ -48,6 +77,12 @@ public class ExemptionReasonModel : CommonJourneyPage
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.ExemptionReason);
+
+        ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
+        if (JourneyInstance!.State.ExemptionReasonIds != null)
+        {
+            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
