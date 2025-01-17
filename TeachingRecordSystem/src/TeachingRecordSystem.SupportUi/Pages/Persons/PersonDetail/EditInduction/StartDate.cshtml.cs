@@ -47,6 +47,10 @@ public class StartDateModel : CommonJourneyPage
     {
         get
         {
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.StartDate
             ? LinkGenerator.PersonInduction(PersonId)
             : PageLink(InductionJourneyPage.Status);

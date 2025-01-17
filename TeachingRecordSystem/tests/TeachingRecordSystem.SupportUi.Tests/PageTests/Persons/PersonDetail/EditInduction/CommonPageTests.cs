@@ -181,6 +181,64 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains($"/persons/{person.PersonId}/{expectedBackPage}", backlink!.Href);
     }
 
+    [Theory]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/status", InductionStatus.Exempt, "check-answers")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/start-date", InductionStatus.Passed, "check-answers")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Passed, "check-answers")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/change-reason", InductionStatus.Passed, "check-answers")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Passed, "check-answers")]
+    public async Task FromCheckYourAnswersPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, startPage)
+                .WithStartDate(new DateOnly(2000, 2, 2))
+                .WithCompletedDate(new DateOnly(2002, 2, 2))
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .Create());
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCyaPage.Cya.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/persons/{person.PersonId}/edit-induction/{expectedBackPage}", backlink!.Href);
+    }
+
+    [Fact]
+    public async Task CompletedDate_FromStartDate_FromCya_BacklinkContainsExpected()
+    {
+        // Arrange
+        var fromPage = "edit-induction/date-completed";
+        var inductionStatus = InductionStatus.Passed;
+        var expectedBackPage = "edit-induction/start-date";
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.StartDate)
+                .WithStartDate(new DateOnly(2000, 2, 2))
+                .WithCompletedDate(new DateOnly(2002, 2, 2))
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .Create());
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCyaPage.CyaToStartDate.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await response.GetDocumentAsync();
+        var backlink = document.GetElementByTestId("back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/persons/{person.PersonId}/{expectedBackPage}", backlink!.Href);
+    }
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,

@@ -15,6 +15,9 @@ public class StatusModel : CommonJourneyPage
     protected IClock _clock;
     protected bool InductionStatusManagedByCpd;
 
+    [FromQuery]
+    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Display(Name = "What is their induction status?")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
@@ -58,7 +61,17 @@ public class StatusModel : CommonJourneyPage
         }
     }
 
-    public string BackLink => LinkGenerator.PersonInduction(PersonId);
+    public string BackLink
+    {
+        get
+        {
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
+            return LinkGenerator.PersonInduction(PersonId);
+        }
+    }
 
     public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
     {
