@@ -31,7 +31,8 @@ public class StartDateModel : CommonJourneyPage
         {
             if(FromCheckAnswers == JourneyFromCyaPage.Cya)
             {
-                if (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate)
+                if ((InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate) ||
+                    (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate?.AddYears(-2)))
                 {
                     return PageLink(InductionJourneyPage.CompletedDate, JourneyFromCyaPage.CyaToStartDate);
                 }

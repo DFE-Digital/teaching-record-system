@@ -15,7 +15,7 @@ public class ExemptionReasonModel : CommonJourneyPage
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public JourneyFromCyaPage FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Display(Name = "Why are they exempt from induction?")]
@@ -23,12 +23,26 @@ public class ExemptionReasonModel : CommonJourneyPage
 
     public string? PersonName { get; set; }
     public InductionExemptionReason[] ExemptionReasons { get; set; } = Array.Empty<InductionExemptionReason>();
-    public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
+    public InductionJourneyPage NextPage
+    {
+        get
+        {
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                return InductionJourneyPage.CheckAnswers;
+            }
+            return InductionJourneyPage.ChangeReasons;
+        }
+    }
 
     public string BackLink
     {
         get
         {
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.ExemptionReason
                 ? LinkGenerator.PersonInduction(PersonId)
                 : PageLink(InductionJourneyPage.Status);

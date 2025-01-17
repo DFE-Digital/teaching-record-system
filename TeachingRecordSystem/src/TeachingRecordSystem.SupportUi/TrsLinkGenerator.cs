@@ -176,7 +176,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string InductionEditStatusCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/Status", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string InductionEditExemptionReason(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string InductionEditExemptionReason(Guid personId, JourneyInstanceId? journeyInstanceId, JourneyFromCyaPage? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/ExemptionReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string InductionEditExemptionReasonCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>

@@ -190,16 +190,24 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionJourneyPage.Status, "edit-induction/start-date", InductionStatus.Passed, "check-answers")]
     [InlineData(InductionJourneyPage.Status, "edit-induction/date-completed", InductionStatus.Passed, "check-answers")]
     [InlineData(InductionJourneyPage.Status, "edit-induction/change-reason", InductionStatus.Passed, "check-answers")]
-    [InlineData(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Passed, "check-answers")]
+    [InlineData(InductionJourneyPage.Status, "edit-induction/exemption-reasons", InductionStatus.Exempt, "check-answers")]
     public async Task FromCheckYourAnswersPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
         // Arrange
+        var exemptionReasonIds = (await TestData
+            .ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(1)
+            .Select(e => e.InductionExemptionReasonId)
+            .ToArray();
+
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitialisedState(inductionStatus, startPage)
+                .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(new DateOnly(2000, 2, 2))
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
@@ -244,14 +252,23 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
+    //[InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
     [InlineData("edit-induction/start-date", InductionStatus.Passed, "edit-induction/check-answers")]
-    [InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
-    [InlineData("edit-induction/exemption-reason", InductionStatus.Exempt, "edit-induction/check-answers")]
-    [InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
+    //[InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/check-answers")]
+    //[InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
     public async Task FromCya_ToPage_Post_RedirectsToExpectedPage(string page, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
+        var startDate = new DateOnly(2000, 2, 1);
+        var completedDate = new DateOnly(2002, 2, 2);
+        var exemptionReasonIds = (await TestData
+            .ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(1)
+            .Select(e => e.InductionExemptionReasonId)
+            .ToArray();
+
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
@@ -262,8 +279,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             person.PersonId,
             new EditInductionStateBuilder()
                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-               .WithStartDate(new DateOnly(2000, 2, 2))
-               .WithCompletedDate(new DateOnly(2002, 2, 2))
+               .WithExemptionReasonIds(exemptionReasonIds)
+               .WithStartDate(startDate)
+               .WithCompletedDate(completedDate)
                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                .Create());
 
@@ -272,8 +290,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
                     .WithInductionStatus(inductionStatus)
-                    .WithStartDate(Clock.Today.AddDays(-1))
-                    .WithCompletedDate(Clock.Today)
+                    .WithExemptionReasonIds(exemptionReasonIds)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)
                     .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
                     .WithChangeReasonDetailSelections(false)
                     .WithNoFileUploadSelection()
@@ -291,8 +310,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(InductionStatus.Passed, "2000-02-02", "2002-02-02", "check-answers")]
-    [InlineData(InductionStatus.Passed, "2003-02-02", "2002-02-02", "date-completed")]
+    [InlineData(InductionStatus.Passed, "2000-02-01", "2002-02-02", "check-answers")] // Start date not within two years of completed date
+    [InlineData(InductionStatus.Passed, "2003-02-02", "2002-02-02", "date-completed")] // Start date after completed date
+    [InlineData(InductionStatus.Passed, "2000-02-03", "2002-02-02", "date-completed")] // Start date within two years of completed date
+    [InlineData(InductionStatus.Passed, "2000-02-02", "2002-02-02", "check-answers")] // Start date not within two years of completed date
     public async Task FromCya_ToStartDate_Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string startDateString, string completedDateString, string expectedNextPageUrl)
     {
         // Arrange

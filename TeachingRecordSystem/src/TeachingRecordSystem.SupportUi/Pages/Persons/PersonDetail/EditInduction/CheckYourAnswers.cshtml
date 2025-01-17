@@ -48,7 +48,7 @@
                         <govuk-summary-list-row-key>ExemptionReasons</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.ExemptionReasonsDisplayString</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action href="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action href="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
