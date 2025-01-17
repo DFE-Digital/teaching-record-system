@@ -22,14 +22,14 @@ public abstract class CommonJourneyPage : PageModel
         return Redirect(LinkGenerator.PersonInduction(PersonId));
     }
 
-    protected string PageLink(InductionJourneyPage? pageName)
+    protected string PageLink(InductionJourneyPage? pageName, JourneyFromCyaPage? fromCyaPage = null)
     {
         return pageName switch
         {
             InductionJourneyPage.Status => LinkGenerator.InductionEditStatus(PersonId, JourneyInstance!.InstanceId),
             InductionJourneyPage.CompletedDate => LinkGenerator.InductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId),
             InductionJourneyPage.ExemptionReason => LinkGenerator.InductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId),
-            InductionJourneyPage.StartDate => LinkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId),
+            InductionJourneyPage.StartDate => LinkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId, fromCyaPage),
             InductionJourneyPage.ChangeReasons => LinkGenerator.InductionChangeReason(PersonId, JourneyInstance!.InstanceId),
             InductionJourneyPage.CheckAnswers => LinkGenerator.InductionCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonInduction(PersonId)

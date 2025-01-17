@@ -131,6 +131,13 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "StartDate", "The induction start date cannot be before 7 May 1999");
     }
 
+    [Fact]
+    public async Task Get_FromCYA_BackLink()
+    {
+
+    }
+
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,

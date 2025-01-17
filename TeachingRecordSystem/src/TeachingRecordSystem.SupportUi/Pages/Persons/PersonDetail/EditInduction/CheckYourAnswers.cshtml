@@ -27,6 +27,9 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.InductionEditStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
                 @if (Model.ShowCompletedDate)
@@ -34,6 +37,9 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.InductionEditCompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
                     </govuk-summary-list-row>
                 }
                 @if(Model.ShowExemptionReasons)
@@ -50,7 +56,7 @@
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -66,7 +72,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
@@ -82,7 +88,7 @@
                         }
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.AlertEditStartDateReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
             </govuk-summary-list>

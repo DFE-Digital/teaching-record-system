@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.WebUtilities;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -181,19 +182,19 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string InductionEditExemptionReasonCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/ExemptionReason", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string InductionEditStartDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string InductionEditStartDate(Guid personId, JourneyInstanceId? journeyInstanceId, JourneyFromCyaPage? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/StartDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string InductionEditStartDateCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/StartDate", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string InductionEditCompletedDate(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string InductionEditCompletedDate(Guid personId, JourneyInstanceId? journeyInstanceId, JourneyFromCyaPage? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CompletedDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string InductionEditCompletedDateCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CompletedDate", "cancel", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string InductionChangeReason(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string InductionChangeReason(Guid personId, JourneyInstanceId? journeyInstanceId, JourneyFromCyaPage? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/InductionChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string InductionChangeReasonCancel(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>

@@ -29,6 +29,9 @@ public class CheckYourAnswersModel : CommonJourneyPage
     public bool ShowExemptionReasons =>
         InductionStatus == InductionStatus.Exempt;
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public CheckYourAnswersModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext) : base(linkGenerator)
     {
         _dbContext = dbContext;

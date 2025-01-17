@@ -14,18 +14,39 @@ public class CompletedDateModel : CommonJourneyPage
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public string? PersonName { get; set; }
 
+    [FromQuery]
+    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Completed date")]
     [Required(ErrorMessage = "Enter an induction completed date")]
     [Display(Name = "When did they complete induction?")]
     public DateOnly? CompletedDate { get; set; }
 
-    public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
+    public InductionJourneyPage NextPage
+    {
+        get
+        {
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya || FromCheckAnswers == JourneyFromCyaPage.CyaToStartDate)
+            {
+                return InductionJourneyPage.CheckAnswers;
+            }
+            return InductionJourneyPage.ChangeReasons;
+        }
+    }
 
     public string BackLink
     {
         get
         {
+            if(FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
+            if(FromCheckAnswers == JourneyFromCyaPage.CyaToStartDate)
+            {
+                return PageLink(InductionJourneyPage.StartDate, JourneyFromCyaPage.Cya);
+            }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.CompletedDate
                 ? LinkGenerator.PersonInduction(PersonId)
                 : PageLink(InductionJourneyPage.StartDate);

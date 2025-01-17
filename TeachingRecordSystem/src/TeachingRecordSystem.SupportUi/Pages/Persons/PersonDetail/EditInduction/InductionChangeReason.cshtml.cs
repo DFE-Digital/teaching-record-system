@@ -16,6 +16,9 @@ public class InductionChangeReasonModel : CommonJourneyPage
 
     public string? PersonName { get; set; }
 
+    [FromQuery]
+    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
     [Display(Name = "Why are you changing the induction details?")]
@@ -57,6 +60,10 @@ public class InductionChangeReasonModel : CommonJourneyPage
     {
         get
         {
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return InductionStatus switch
             {
                 _ when InductionStatus.RequiresCompletedDate() => PageLink(InductionJourneyPage.CompletedDate),

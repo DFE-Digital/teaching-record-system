@@ -14,6 +14,10 @@ public class StartDateModel : CommonJourneyPage
 
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public string? PersonName { get; set; }
+    public DateOnly? CompletedDate { get; set; }
+
+    [FromQuery]
+    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -21,13 +25,21 @@ public class StartDateModel : CommonJourneyPage
     [Display(Name = "When did they start induction?")]
     public DateOnly? StartDate { get; set; }
 
-    public InductionJourneyPage NextPage
+    public string NextPage
     {
         get
         {
+            if(FromCheckAnswers == JourneyFromCyaPage.Cya)
+            {
+                if (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate)
+                {
+                    return PageLink(InductionJourneyPage.CompletedDate, JourneyFromCyaPage.CyaToStartDate);
+                }
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return InductionStatus.RequiresCompletedDate()
-                ? InductionJourneyPage.CompletedDate
-                : InductionJourneyPage.ChangeReasons;
+                ? PageLink(InductionJourneyPage.CompletedDate)
+                : PageLink(InductionJourneyPage.ChangeReasons);
         }
     }
 
@@ -50,6 +62,7 @@ public class StartDateModel : CommonJourneyPage
     public void OnGet()
     {
         StartDate = JourneyInstance!.State.StartDate;
+        CompletedDate = JourneyInstance!.State.CompletedDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -77,7 +90,7 @@ public class StartDateModel : CommonJourneyPage
             }
         });
 
-        return Redirect(PageLink(NextPage));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
