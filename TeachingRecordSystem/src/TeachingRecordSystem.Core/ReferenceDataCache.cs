@@ -206,10 +206,10 @@ public class ReferenceDataCache(
         return ittQualifications.ToArray();
     }
 
-    public async Task<InductionExemptionReason[]> GetInductionExemptionReasonsAsync()
+    public async Task<InductionExemptionReason[]> GetInductionExemptionReasonsAsync(bool activeOnly = false)
     {
         var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
-        return inductionExemptionReasons;
+        return inductionExemptionReasons.Where(e => !activeOnly || e.IsActive).ToArray();
     }
 
     public async Task<InductionExemptionReason> GetInductionExemptionReasonByIdAsync(Guid inductionExemptionReasonId)

@@ -185,10 +185,10 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["InductionStatus"] = "Exempt"
-            })
+            Content = new FormUrlEncodedContent(
+                new EditInductionPostRequestBuilder()
+                    .WithInductionStatus(InductionStatus.Exempt)
+                    .Build())
         };
 
         // Act
@@ -220,10 +220,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["InductionStatus"] = InductionStatus.None.ToString()
-            })
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
+                    .WithInductionStatus(InductionStatus.None)
+                    .Build())
         };
 
         // Act
@@ -266,10 +265,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["InductionStatus"] = InductionStatus.None.ToString()
-            })
+            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
+                    .WithInductionStatus(InductionStatus.None)
+                    .Build())
         };
 
         // Act

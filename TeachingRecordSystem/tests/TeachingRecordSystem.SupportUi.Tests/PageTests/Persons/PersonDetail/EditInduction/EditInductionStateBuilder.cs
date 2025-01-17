@@ -21,6 +21,7 @@ public class EditInductionStateBuilder
         this.Initialized = true;
         JourneyStartPage = startPage;
         CurrentInductionStatus = currentInductionStatus ?? InductionStatus.None;
+        InductionStatus = CurrentInductionStatus;
         return this;
     }
 
@@ -31,6 +32,12 @@ public class EditInductionStateBuilder
             throw new NotSupportedException("Initialised state must be set using WithInitialisedState");
         }
         InductionStatus = inductionStatus;
+        return this;
+    }
+
+    public EditInductionStateBuilder WithExemptionReasonIds(Guid[] exemptionReasonIds)
+    {
+        ExemptionReasonIds = exemptionReasonIds;
         return this;
     }
 
