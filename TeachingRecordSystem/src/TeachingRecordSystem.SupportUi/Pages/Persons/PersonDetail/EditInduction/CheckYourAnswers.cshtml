@@ -15,17 +15,20 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list data-testid="change-summary">
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.InductionStatus</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                @if (Model.ShowStatus)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.InductionStatus</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
                 @if (Model.ShowStartDate)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Induction start date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.InductionEditStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
@@ -35,7 +38,7 @@
                 @if (Model.ShowCompletedDate)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Induction completion date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.InductionEditCompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
@@ -45,7 +48,7 @@
                 @if(Model.ShowExemptionReasons)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>ExemptionReasons</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.ExemptionReasonsDisplayString</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
@@ -53,7 +56,7 @@
                     </govuk-summary-list-row>
                 }
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Reason for changing induction details</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
@@ -76,7 +79,7 @@
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Do you have evidence to upload</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
                         @if (Model.UploadedEvidenceFileUrl is not null)
                         {

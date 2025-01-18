@@ -137,7 +137,6 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     }
 
-
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,

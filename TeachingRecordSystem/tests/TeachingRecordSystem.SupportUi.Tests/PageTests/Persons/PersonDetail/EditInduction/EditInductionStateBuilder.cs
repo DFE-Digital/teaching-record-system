@@ -57,15 +57,15 @@ public class EditInductionStateBuilder
         ChangeReason = option;
         return this;
     }
-    public EditInductionStateBuilder WithReasonDetailsChoice(bool yesOrNo, string detailText)
+    public EditInductionStateBuilder WithReasonDetailsChoice(bool addDetails, string detailText)
     {
-        HasAdditionalReasonDetail = yesOrNo;
+        HasAdditionalReasonDetail = addDetails;
         AdditionalReasonDetail = detailText;
         return this;
     }
-    public EditInductionStateBuilder WithFileUploadChoice(bool yesOrNo)
+    public EditInductionStateBuilder WithFileUploadChoice(bool uploadFile)
     {
-        FileUpload = yesOrNo;
+        FileUpload = uploadFile;
         return this;
     }
 
