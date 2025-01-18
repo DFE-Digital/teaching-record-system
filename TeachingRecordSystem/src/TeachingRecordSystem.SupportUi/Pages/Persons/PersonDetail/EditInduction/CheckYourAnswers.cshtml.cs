@@ -11,6 +11,9 @@ public class CheckYourAnswersModel : CommonJourneyPage
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _referenceDataCache;
     private InductionJourneyPage? StartPage => JourneyInstance!.State.JourneyStartPage;
+
+    protected IClock _clock;
+
     public string? PersonName { get; set; }
     public InductionStatus InductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
@@ -39,6 +42,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public bool ShowStatus =>
             StartPage == InductionJourneyPage.Status;
+
     public bool ShowStartDate =>
             StartPage != InductionJourneyPage.CompletedDate &&
                 (InductionStatus == InductionStatus.InProgress ||
@@ -57,10 +61,11 @@ public class CheckYourAnswersModel : CommonJourneyPage
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
-    public CheckYourAnswersModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, ReferenceDataCache referenceDataCache) : base(linkGenerator)
+    public CheckYourAnswersModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, ReferenceDataCache referenceDataCache, IClock clock) : base(linkGenerator)
     {
         _dbContext = dbContext;
         _referenceDataCache = referenceDataCache;
+        _clock = clock;
     }
 
     public string BackLink => PageLink(InductionJourneyPage.ChangeReasons);
@@ -69,9 +74,38 @@ public class CheckYourAnswersModel : CommonJourneyPage
     {
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        // TODO - end of journey logic
+        // TODO validate the induction state model
+
+        var person = await _dbContext.Persons
+            .SingleAsync(q => q.PersonId == PersonId);
+
+        person.SetInductionStatus(
+            InductionStatus,
+            StartDate,
+            CompletedDate,
+            JourneyInstance!.State.ExemptionReasonIds,
+            User.GetUserId(),
+            _clock.UtcNow,
+            out var updatedEvent);
+
+        if (updatedEvent is not null)
+        {
+            await _dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await _dbContext.SaveChangesAsync();
+        }
+
+            //ChangeReason,
+            //ChangeReasonDetail,
+            //JourneyInstance!.State.EvidenceFileName,
+            //UploadedEvidenceFileUrl
+
+        await _dbContext.SaveChangesAsync();
+
+        await JourneyInstance!.CompleteAsync();
+
+        TempData.SetFlashSuccess("Induction details have been updated");
 
         return Redirect(NextPage()(PersonId, JourneyInstance!.InstanceId));
     }
