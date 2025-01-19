@@ -185,7 +185,6 @@
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />
     <PackageReference Include="Optional" />
     <PackageReference Include="Parquet.Net" />
-    <PackageReference Include="PdfSharpCore" />
     <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="Serilog.Expressions" />

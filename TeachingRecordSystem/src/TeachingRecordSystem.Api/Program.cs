@@ -25,7 +25,6 @@ using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Json;
-using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
@@ -195,7 +194,6 @@ public class Program
             .AddTrsSyncHelper();
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
-        services.AddCertificateGeneration();
         services.AddTrsBaseServices();
 
         if (!env.IsUnitTests())

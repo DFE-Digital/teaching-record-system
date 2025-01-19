@@ -444,17 +444,6 @@
           "Microsoft.IO.RecyclableMemoryStream": "3.0.0"
         }
       },
-      "PdfSharpCore": {
-        "type": "Direct",
-        "requested": "[1.3.62, )",
-        "resolved": "1.3.62",
-        "contentHash": "O5oxuQsjBy/IHYU0pksUBWbqrZ5QNXWJGfvIxJJoMkrH3iH2qYHwWmSBqPWiyzTgeumN7H8co/kiS4wXNjScFw==",
-        "dependencies": {
-          "SharpZipLib": "1.3.3",
-          "SixLabors.Fonts": "1.0.0-beta17",
-          "SixLabors.ImageSharp": "1.0.4"
-        }
-      },
       "Polly.Core": {
         "type": "Direct",
         "requested": "[8.2.1, )",
@@ -1421,21 +1410,6 @@
         "type": "Transitive",
         "resolved": "4.12.1",
         "contentHash": "OLf7885OKHWLaTLTyw884mwOT4XKCWj2Hz5Wuz/TJemJqXwCIdIljkJBIoeHviRUPvtB7ulDgeYXf/Z7ScToSA=="
-      },
-      "SharpZipLib": {
-        "type": "Transitive",
-        "resolved": "1.3.3",
-        "contentHash": "N8+hwhsKZm25tDJfWpBSW7EGhH/R7EMuiX+KJ4C4u+fCWVc1lJ5zg1u3S1RPPVYgTqhx/C3hxrqUpi6RwK5+Tg=="
-      },
-      "SixLabors.Fonts": {
-        "type": "Transitive",
-        "resolved": "1.0.0-beta17",
-        "contentHash": "qubgVovAoSR7vyv9tJ68gSzRIPWz7HBjTM9rwAaLjpcJ6T50arnX+GHAZcC0r2mVagyRMknCNda3DGoe8StUUQ=="
-      },
-      "SixLabors.ImageSharp": {
-        "type": "Transitive",
-        "resolved": "1.0.4",
-        "contentHash": "H2rPiEr2ddBOltOuqRYhpLBAsQXDAhbzMMhhuksnBG2oefup1MXMchALe7yYkKJksNbtxbZHKeM6dn/68I75qw=="
       },
       "Snappier": {
         "type": "Transitive",
