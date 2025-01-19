@@ -53,6 +53,8 @@ public class InductionTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickContinueButtonAsync();
+        await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
 
     [Fact]

@@ -302,6 +302,51 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("Not provided", valueFileUpload!.TextContent.Trim());
     }
 
+    [Fact]
+    public async Task Post_RedirectsToExpectedPage()
+    {
+        // Arrange
+        var fromPage = "edit-induction/check-answers";
+        var inductionStatus = InductionStatus.RequiredToComplete;
+
+        var startDate = Clock.Today.AddYears(-2);
+        var completedDate = Clock.Today;
+        var exemptionReasonIds = (await TestData.ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(1)
+            .Select(r => r.InductionExemptionReasonId)
+            .ToArray();
+        var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithFileUploadChoice(uploadFile: false)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+
+        Assert.Equal($"/persons/{person.PersonId}/induction", location);
+    }
+
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,

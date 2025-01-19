@@ -26,7 +26,6 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("edit-induction/change-reason", InductionStatus.FailedInWales, "edit-induction/check-answers")]
     [InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
     [InlineData("edit-induction/change-reason", InductionStatus.RequiredToComplete, "edit-induction/check-answers")]
-    [InlineData("edit-induction/check-answers", InductionStatus.RequiredToComplete, "induction")]
     public async Task Post_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
