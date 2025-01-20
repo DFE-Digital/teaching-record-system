@@ -15,7 +15,7 @@ public class EditInductionState : IRegisterJourney
     public InductionStatus CurrentInductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
-    public Guid[] ExemptionReasonIds { get; set; } = Array.Empty<Guid>();
+    public Guid[]? ExemptionReasonIds { get; set; } = Array.Empty<Guid>();
     public InductionChangeReasonOption? ChangeReason { get; set; }
     public bool? HasAdditionalReasonDetail { get; set; }
     public string? ChangeReasonDetail { get; set; }

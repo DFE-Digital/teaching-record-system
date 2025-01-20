@@ -97,6 +97,18 @@ public class StatusModel : CommonJourneyPage
             {
                 state.JourneyStartPage = InductionJourneyPage.Status;
             }
+            // Editing status is considered a 'start again' action - clear all other fields currently set
+            // CML - TODO - delete any previously-uploaded file evidence?
+            state.StartDate = null;
+            state.CompletedDate = null;
+            state.ExemptionReasonIds = null;
+            state.HasAdditionalReasonDetail = null;
+            state.ChangeReason = null;
+            state.ChangeReasonDetail = null;
+            state.EvidenceFileId = null;
+            state.EvidenceFileName = null;
+            state.EvidenceFileSizeDescription = null;
+            state.UploadEvidence = null;
         });
 
         return Redirect(PageLink(NextPage));

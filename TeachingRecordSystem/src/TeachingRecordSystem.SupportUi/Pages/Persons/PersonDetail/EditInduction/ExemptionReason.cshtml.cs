@@ -61,6 +61,10 @@ public class ExemptionReasonModel : CommonJourneyPage
         {
             return NotFound();
         }
+        if (JourneyInstance!.State.ExemptionReasonIds != null)
+        {
+            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
+        }
 
         return Page();
     }
@@ -93,10 +97,6 @@ public class ExemptionReasonModel : CommonJourneyPage
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.ExemptionReason);
 
         ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
-        if (JourneyInstance!.State.ExemptionReasonIds != null)
-        {
-            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
-        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;

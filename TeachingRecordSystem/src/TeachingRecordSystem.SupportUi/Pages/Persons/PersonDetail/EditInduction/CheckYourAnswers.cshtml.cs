@@ -85,7 +85,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
             InductionStatus,
             StartDate,
             CompletedDate,
-            JourneyInstance!.State.ExemptionReasonIds,
+            JourneyInstance!.State.ExemptionReasonIds ?? Array.Empty<Guid>(),
             User.GetUserId(),
             _clock.UtcNow,
             out var updatedEvent);
