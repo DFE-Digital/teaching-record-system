@@ -14,6 +14,7 @@ public class MandatoryQualification : Qualification
     public required DateOnly? StartDate { get; set; }
     public required DateOnly? EndDate { get; set; }
 
+    public Guid? DqtQualificationId { get; set; }
     public Guid? DqtMqEstablishmentId { get; set; }
     public Guid? DqtSpecialismId { get; set; }
 

@@ -109,6 +109,10 @@ public class TrsDbContext : DbContext
 
     public DbSet<JobMetadata> JobMetadata => Set<JobMetadata>();
 
+    public DbSet<TrainingProvider> TrainingProviders => Set<TrainingProvider>();
+
+    public DbSet<TrainingSubject> TrainingSubjects => Set<TrainingSubject>();
+
     public DbSet<RouteToProfessionalStatus> RoutesToProfessionalStatus => Set<RouteToProfessionalStatus>();
 
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
