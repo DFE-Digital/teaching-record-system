@@ -1,3 +1,4 @@
+using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -258,6 +259,41 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
+    public async Task Cancel_RedirectsToExpectedPage()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(s => s.
+                WithStatus(InductionStatus.RequiredToComplete)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/induction", location);
+    }
+
+    [Fact]
     public async Task Get_ShowsChangeReason_AsExpected()
     {
         // Arrange
@@ -315,9 +351,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
-        var fromPage = "edit-induction/check-answers";
         var inductionStatus = InductionStatus.RequiredToComplete;
-
         var startDate = Clock.Today.AddYears(-2);
         var completedDate = Clock.Today;
         var exemptionReasonIds = (await TestData.ReferenceDataCache
@@ -343,7 +377,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithFileUploadChoice(uploadFile: false)
                 .Create());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -353,6 +387,79 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var location = response.Headers.Location?.OriginalString;
 
         Assert.Equal($"/persons/{person.PersonId}/induction", location);
+    }
+
+    [Fact]
+    public async Task Post_Confirm_UpdatesPersonInductionCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.RequiredToComplete;
+        var startDate = Clock.Today.AddYears(-2);
+        var completedDate = Clock.Today;
+        var exemptionReasonIds = (await TestData.ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(1)
+            .Select(r => r.InductionExemptionReasonId)
+            .ToArray(); var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(InductionStatus.RequiredToComplete)));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithFileUploadChoice(uploadFile: true)
+                .Create());
+
+        EventPublisher.Clear();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Induction details have been updated");
+
+        await WithDbContext(async dbContext =>
+        {
+            var updatedPersonRecord = await dbContext.Persons.FirstOrDefaultAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(journeyInstance.State.InductionStatus, updatedPersonRecord!.InductionStatus);
+            Assert.Equal(journeyInstance.State.StartDate, updatedPersonRecord!.InductionStartDate);
+            Assert.Equal(journeyInstance.State.CompletedDate, updatedPersonRecord!.InductionCompletedDate);
+            Assert.Equal(journeyInstance.State.ExemptionReasonIds, updatedPersonRecord!.InductionExemptionReasonIds);
+        });
+
+        var RaisedBy = GetCurrentUserId();
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var actualInductionUpdatedEvent = Assert.IsType<PersonInductionUpdatedEvent>(e);
+
+            Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, Clock.UtcNow);
+            Assert.Equal(actualInductionUpdatedEvent.PersonId, person.PersonId);
+            Assert.Equal(actualInductionUpdatedEvent.Induction.Status, journeyInstance.State.InductionStatus);
+            Assert.Equal(actualInductionUpdatedEvent.Induction.StartDate, journeyInstance.State.StartDate!.Value);
+            Assert.Equal(actualInductionUpdatedEvent.Induction.CompletedDate, journeyInstance.State.CompletedDate!.Value);
+            Assert.Equal(actualInductionUpdatedEvent.Induction.ExemptionReasonIds, journeyInstance.State.ExemptionReasonIds!);
+            Assert.Equal(actualInductionUpdatedEvent.ChangeReason, journeyInstance.State.ChangeReason!.GetDisplayName());
+            Assert.Equal(actualInductionUpdatedEvent.ChangeReasonDetail, journeyInstance.State.ChangeReasonDetail);
+            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile!.FileId, journeyInstance.State.EvidenceFileId!.Value);
+            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile.Name, journeyInstance.State.EvidenceFileName);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
     }
 
 

@@ -77,7 +77,6 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("edit-induction/start-date", InductionStatus.Passed)]
     [InlineData("edit-induction/date-completed", InductionStatus.Passed)]
     [InlineData("edit-induction/change-reason", InductionStatus.InProgress)]
-    [InlineData("edit-induction/check-answers", InductionStatus.InProgress)]
     public async Task Cancel_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus)
     {
         // Arrange
@@ -251,11 +250,11 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    //[InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
+    [InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
     [InlineData("edit-induction/start-date", InductionStatus.Passed, "edit-induction/check-answers")]
-    //[InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/date-completed", InductionStatus.Passed, "edit-induction/check-answers")]
     [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt, "edit-induction/check-answers")]
-    //[InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
+    [InlineData("edit-induction/change-reason", InductionStatus.Passed, "edit-induction/check-answers")]
     public async Task FromCya_ToPage_Post_RedirectsToExpectedPage(string page, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
