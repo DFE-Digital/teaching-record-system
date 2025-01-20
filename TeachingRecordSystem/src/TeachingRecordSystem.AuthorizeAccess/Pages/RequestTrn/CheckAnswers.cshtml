@@ -14,13 +14,53 @@
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-summary-list>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.Email</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="email">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                @if (!string.IsNullOrEmpty(Model.NpqApplicationId))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ application ID</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.NpqApplicationId</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNpqApplication(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ application id">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
+                else
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.NpqName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNpqName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>NPQ provider</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.NpqProvider</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnNpqTrainingProvider(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="NPQ provider">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
+                @if (!string.IsNullOrEmpty(Model.WorkEmail))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Work email</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.WorkEmail</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnWorkEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="work email">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
+                @if (!string.IsNullOrEmpty(Model.PersonalEmail))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Personal email</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.PersonalEmail</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnPersonalEmail(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="personal email">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
@@ -28,13 +68,16 @@
                         <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="name">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Previous name</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.PreviousName</govuk-summary-list-row-value>
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="previous name">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                </govuk-summary-list-row>
+                @if (!string.IsNullOrEmpty(Model.PreviousName))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Previous name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.PreviousName</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RequestTrnPreviousName(Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)" visually-hidden-text="previous name">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.DateOfBirth!.Value.ToString("d MMMM yyyy")</govuk-summary-list-row-value>
@@ -64,7 +107,9 @@
                             @Model.AddressLine1<br />
                             @if (!string.IsNullOrWhiteSpace(Model.AddressLine2))
                             {
-                                @Model.AddressLine2<br />
+                                @Model.AddressLine2
+
+                                <br />
                             }
                             @Model.TownOrCity<br />
                             @Model.PostalCode<br />

@@ -35,17 +35,32 @@ public abstract class AuthorizeAccessLinkGenerator
     public string SignOut(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SignOut", journeyInstanceId: journeyInstanceId);
 
-    public string RequestTrn(JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RequestTrn/Index", journeyInstanceId: journeyInstanceId);
+    public string RequestTrn(JourneyInstanceId journeyInstanceId, string? AccessToken = null) =>
+        GetRequiredPathByPage("/RequestTrn/Index", routeValues: new { AccessToken }, journeyInstanceId: journeyInstanceId);
+
+    public string TakingNpqRequireTrn(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/TakingNpq", journeyInstanceId: journeyInstanceId);
 
     public string RequestTrnNpqCheck(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/NpqCheck", journeyInstanceId: journeyInstanceId);
 
+    public string RequestTrnWorkingInSchoolOrEducationalSetting(JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RequestTrn/SchoolOrEducationalSetting", journeyInstanceId: journeyInstanceId);
+
+    public string RequestTrnNpqApplication(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RequestTrn/NpqApplication", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string RequestTrnNpqName(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RequestTrn/NpqName", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
     public string RequestTrnNotEligible(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/NotEligible", journeyInstanceId: journeyInstanceId);
 
-    public string RequestTrnEmail(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RequestTrn/Email", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RequestTrnWorkEmail(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RequestTrn/WorkEmail", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string RequestTrnPersonalEmail(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RequestTrn/PersonalEmail", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string RequestTrnName(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RequestTrn/Name", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
@@ -67,6 +82,9 @@ public abstract class AuthorizeAccessLinkGenerator
 
     public string RequestTrnCheckAnswers(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/CheckAnswers", journeyInstanceId: journeyInstanceId);
+
+    public string RequestTrnNpqTrainingProvider(JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RequestTrn/NpqTrainingProvider", routeValues: new { fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string RequestTrnEmailInUse(JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RequestTrn/EmailInUse", journeyInstanceId: journeyInstanceId);

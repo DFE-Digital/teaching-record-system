@@ -1,0 +1,35 @@
+@page "/request-trn/npq-application"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.NpqApplicationModel
+@{
+    ViewBag.Title = Html.DisplayNameFor(m => m.NpqApplicationId);
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RequestTrnCheckAnswers(Model.JourneyInstance!.InstanceId) : LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId))" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RequestTrnNpqApplication(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <govuk-input asp-for="NpqApplicationId" spellcheck="false">
+                <govuk-input-label is-page-heading="true" class="govuk-label--l" />
+            </govuk-input>
+
+            <govuk-details open="false">
+                <govuk-details-summary>Where to find this</govuk-details-summary>
+                <govuk-details-text>
+                    <p>You can find your NPQ application ID:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>by signing in to your NPQ online account</li>
+                        <li>on your NPQ registration confirmation email</li>
+                    </ul>
+
+                </govuk-details-text>
+            </govuk-details>
+            <p class="govuk-body">
+                <a href="@LinkGenerator.RequestTrnNpqName(Model.JourneyInstance!.InstanceId)" class="govuk-link" rel="noreferrer noopener" target="_blank">I cannot find my NPQ application ID</a>
+            </p>
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>

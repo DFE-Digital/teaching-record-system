@@ -65,7 +65,7 @@ public abstract class TestBase : IDisposable
         return (JourneyInstance<RequestTrnJourneyState>)reloadedInstance!;
     }
 
-    public RequestTrnJourneyState CreateNewState(string? email = null) => new RequestTrnJourneyState() { Email = email };
+    public RequestTrnJourneyState CreateNewState(string? email = null) => new RequestTrnJourneyState() { PersonalEmail = email };
 
     public virtual void Dispose()
     {

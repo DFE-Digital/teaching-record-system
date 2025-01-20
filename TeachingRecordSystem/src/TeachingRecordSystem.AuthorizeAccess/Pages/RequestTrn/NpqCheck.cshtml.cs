@@ -12,13 +12,13 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you plan on taking a national professional qualification (NPQ)?")]
-    [Required(ErrorMessage = "Tell us whether you plan on taking a national professional qualification (NPQ)")]
-    public bool? IsPlanningToTakeAnNpq { get; set; }
+    [Display(Name = "Have you already registered for an NPQ?")]
+    [Required(ErrorMessage = "Select yes if you’ve already registered for an NPQ")]
+    public bool? HaveRegisteredForAnNpq { get; set; }
 
     public void OnGet()
     {
-        IsPlanningToTakeAnNpq = JourneyInstance!.State.IsPlanningToTakeAnNpq;
+        HaveRegisteredForAnNpq = JourneyInstance!.State.HaveRegisteredForAnNpq;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -28,11 +28,11 @@ public class NpqCheckModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMod
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.IsPlanningToTakeAnNpq = IsPlanningToTakeAnNpq);
+        await JourneyInstance!.UpdateStateAsync(state => state.HaveRegisteredForAnNpq = HaveRegisteredForAnNpq);
 
-        return IsPlanningToTakeAnNpq == true ?
-            Redirect(linkGenerator.RequestTrnEmail(JourneyInstance!.InstanceId)) :
-            Redirect(linkGenerator.RequestTrnNotEligible(JourneyInstance.InstanceId));
+        return HaveRegisteredForAnNpq == true ?
+            Redirect(linkGenerator.RequestTrnNpqApplication(JourneyInstance!.InstanceId)) :
+            Redirect(linkGenerator.RequestTrnNpqName(JourneyInstance.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

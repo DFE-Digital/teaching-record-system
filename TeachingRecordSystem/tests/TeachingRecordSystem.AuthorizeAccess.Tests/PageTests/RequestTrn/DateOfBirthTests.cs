@@ -42,7 +42,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -84,7 +84,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoDateOfBirthIsEntered_ReturnsError()
     {
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -106,7 +106,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenDateOfBirthIsInTheFuture_ReturnsError()
     {
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -161,7 +161,7 @@ public class DateOfBirthTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;

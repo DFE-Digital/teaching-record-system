@@ -12,9 +12,9 @@ public class EmailInUseModel(AuthorizeAccessLinkGenerator linkGenerator) : PageM
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var state = JourneyInstance!.State;
-        if (state.Email is null)
+        if (state.PersonalEmail is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnEmail(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
         }
     }
 }

@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.AuthorizeAccess.Tests.PageTests.RequestTrn;
 public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithoutEmailAddress_RedirectsToEmail()
+    public async Task Get_WithoutPersonalEmailAddress_RedirectsToEmail()
     {
         // Arrange
         var state = CreateNewState();
@@ -17,11 +17,11 @@ public class EmailInUseTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/personal-email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
-    public async Task Get_WithEmailAddress_RendersExpectedContent()
+    public async Task Get_WithPersonalEmailAddress_RendersExpectedContent()
     {
         // Arrange
         var email = Faker.Internet.Email();

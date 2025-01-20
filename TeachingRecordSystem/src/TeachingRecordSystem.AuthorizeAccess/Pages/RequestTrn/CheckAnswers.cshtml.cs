@@ -18,7 +18,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
 
     public RequestTrnJourneyState? JourneyState { get; set; }
 
-    public string? Email { get; set; }
+    public string? WorkEmail { get; set; }
 
     public string? Name { get; set; }
 
@@ -46,9 +46,17 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
 
     public string? Country { get; set; }
 
+    public string? NpqApplicationId { get; set; }
+
+    public string? PersonalEmail { get; set; }
+
+    public string? NpqName { get; set; }
+
+    public string? NpqProvider { get; set; }
+
     public async Task OnGetAsync()
     {
-        Email = JourneyInstance!.State.Email;
+        WorkEmail = JourneyInstance!.State.WorkEmail;
         Name = JourneyInstance!.State.Name;
         PreviousName = JourneyInstance!.State.PreviousName;
         DateOfBirth = JourneyInstance!.State.DateOfBirth;
@@ -64,6 +72,10 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
         TownOrCity = JourneyInstance!.State.TownOrCity;
         PostalCode = JourneyInstance!.State.PostalCode;
         Country = JourneyInstance!.State.Country;
+        NpqApplicationId = JourneyInstance!.State.NpqApplicationId;
+        PersonalEmail = JourneyInstance!.State.PersonalEmail;
+        NpqName = JourneyInstance!.State.NpqName;
+        NpqProvider = JourneyInstance!.State.NpqTrainingProvider;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -71,11 +83,17 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
         var state = JourneyInstance!.State;
 
         var description = $"""
-            Email: {state.Email}
+            Working In School or Educational Setting: {(state.WorkingInSchoolOrEducationalSetting == true ? "Yes" : "No")}
+            Personal Email: {state.PersonalEmail}
+            Work Email: {state.WorkEmail}
             Name: {state.Name}
             Previous name: {state.PreviousName}
             Date of birth: {state.DateOfBirth:dd/MM/yyyy}                
             National Insurance number: {NationalInsuranceNumberHelper.Normalize(state.NationalInsuranceNumber)}
+            Registered For NPQ: {(state.HaveRegisteredForAnNpq == true ? "Yes" : "No")}
+            NPQ application ID: {state.NpqApplicationId}
+            NPQ name: {state.NpqName}
+            NPQ training provider: {state.NpqTrainingProvider}
             """;
         if (state.HasNationalInsuranceNumber == false)
         {
@@ -104,7 +122,7 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
                 EvidenceFileName = JourneyInstance!.State.EvidenceFileName!,
                 EvidenceFileContent = stream,
                 EvidenceFileMimeType = evidenceFileMimeType,
-                EmailAddress = JourneyInstance!.State.Email!
+                EmailAddress = JourneyInstance!.State.PersonalEmail!
             });
 
         await JourneyInstance!.UpdateStateAsync(state => state.HasPendingTrnRequest = true);
@@ -119,9 +137,18 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
         {
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
         }
-        else if (state.Email is null)
+        else if (state.HaveRegisteredForAnNpq is null && state.NpqApplicationId is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnEmail(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RequestTrnNpqApplication(JourneyInstance.InstanceId));
+        }
+        else if (state.WorkEmail is null && state.WorkingInSchoolOrEducationalSetting == true)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnWorkEmail(JourneyInstance.InstanceId));
+        }
+        else if (state.PersonalEmail is null)
+        {
+            // personal email is required for either WorkingInSchoolOrEducationalSetting being true or false
+            context.Result = Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
         }
         else if (state.Name is null)
         {

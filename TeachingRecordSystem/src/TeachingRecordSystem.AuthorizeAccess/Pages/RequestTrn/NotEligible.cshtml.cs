@@ -16,9 +16,9 @@ public class NotEligibleModel(AuthorizeAccessLinkGenerator linkGenerator) : Page
         {
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
         }
-        else if (state.IsPlanningToTakeAnNpq is null)
+        else if (state.IsTakingNpq is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnNpqCheck(JourneyInstance!.InstanceId));
+            context.Result = Redirect(linkGenerator.TakingNpqRequireTrn(JourneyInstance!.InstanceId));
         }
     }
 }

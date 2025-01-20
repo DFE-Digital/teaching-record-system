@@ -16,7 +16,7 @@ public class AddressModel(AuthorizeAccessLinkGenerator linkGenerator) : PageMode
 
     [BindProperty]
     [Display(Name = "Address line 1")]
-    [Required(ErrorMessage = "Enter address line 1")]
+    [Required(ErrorMessage = "Enter address line 1, typically the building and street")]
     [MaxLength(200, ErrorMessage = "Address line 1 must be 200 characters or less")]
     public string? AddressLine1 { get; set; }
 

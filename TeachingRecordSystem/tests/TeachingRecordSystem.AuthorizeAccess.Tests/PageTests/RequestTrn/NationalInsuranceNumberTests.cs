@@ -42,7 +42,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
@@ -103,7 +103,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
@@ -132,7 +132,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
@@ -161,7 +161,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
@@ -193,7 +193,7 @@ public class NationalInsuranceNumberTests(HostFixture hostFixture) : TestBase(ho
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.HasPreviousName = false;
         state.DateOfBirth = new DateOnly(1980, 3, 1);
