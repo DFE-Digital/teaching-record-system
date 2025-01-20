@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -27,7 +28,11 @@ public class QtsImporter
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
-        using var csv = new CsvReader(csvReaderStream, CultureInfo.InvariantCulture);
+        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            TrimOptions = TrimOptions.Trim
+        };
+        using var csv = new CsvReader(csvReaderStream, csvConfig);
         var records = csv.GetRecords<EwcWalesQtsFileImportData>().ToList();
         var totalRowCount = 0;
         var successCount = 0;

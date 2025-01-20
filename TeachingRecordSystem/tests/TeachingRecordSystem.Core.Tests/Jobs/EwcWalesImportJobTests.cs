@@ -444,9 +444,9 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
     {
         // Arrange
         var expectedTotalRowCount = 1;
-        var expectedSuccessCount = 0;
+        var expectedSuccessCount = 1;
         var expectedDuplicateRowCount = 0;
-        var expectedFailureRowCount = 1;
+        var expectedFailureRowCount = 0;
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn1 = person.Trn;
         var inductionStartDate = new DateTime(2024, 05, 01);
@@ -470,7 +470,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
             item1 =>
             {
                 Assert.Contains($"Organisation with Induction Body Code {invalidEmployeCode} was not found.", item1.dfeta_FailureMessage);
-                Assert.Equal(dfeta_integrationtransactionrecord_StatusCode.Fail, item1.StatusCode);
+                Assert.Equal(dfeta_integrationtransactionrecord_StatusCode.Success, item1.StatusCode);
             });
         Assert.NotNull(induction);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);

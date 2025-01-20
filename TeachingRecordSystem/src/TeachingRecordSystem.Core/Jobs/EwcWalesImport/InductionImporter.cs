@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -26,7 +27,11 @@ public class InductionImporter
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
-        using (var csv = new CsvReader(csvReaderStream, CultureInfo.InvariantCulture))
+        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            TrimOptions = TrimOptions.Trim
+        };
+        using (var csv = new CsvReader(csvReaderStream, csvConfig))
         {
             var integrationJob = new CreateIntegrationTransactionQuery()
             {
@@ -164,7 +169,7 @@ public class InductionImporter
 
                         //increase failurecount if row is processable or if there are validation failures
                         //else increase success counter
-                        if (validationFailures.ValidationFailures.Any() || validationFailures.Errors.Any())
+                        if (validationFailures.Errors.Any())
                         {
                             failureRowCount++;
                         }
@@ -186,7 +191,7 @@ public class InductionImporter
                         InductionPeriodId = inductionPeriodId,
                         DuplicateStatus = null,
                         FailureMessage = itrFailureMessage.ToString(),
-                        StatusCode = string.IsNullOrEmpty(itrFailureMessage.ToString()) ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
+                        StatusCode = validationFailures.Errors.Count == 0 ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
                         RowData = ConvertToCSVString(row),
                         FileName = fileName
                     };
