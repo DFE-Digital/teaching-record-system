@@ -17,7 +17,7 @@ public class StartDateModel : CommonJourneyPage
     public string? PersonName { get; set; }
 
     [FromQuery]
-    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -29,12 +29,12 @@ public class StartDateModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
                 if ((InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate) ||
                     (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate?.AddYears(-2)))
                 {
-                    return PageLink(InductionJourneyPage.CompletedDate, JourneyFromCyaPage.CyaToStartDate);
+                    return PageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate);
                 }
                 return PageLink(InductionJourneyPage.CheckAnswers);
             }
@@ -48,7 +48,7 @@ public class StartDateModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
                 return PageLink(InductionJourneyPage.CheckAnswers);
             }

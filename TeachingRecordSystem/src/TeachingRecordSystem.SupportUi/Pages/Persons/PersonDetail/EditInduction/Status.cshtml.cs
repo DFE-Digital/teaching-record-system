@@ -16,7 +16,7 @@ public class StatusModel : CommonJourneyPage
     protected bool InductionStatusManagedByCpd;
 
     [FromQuery]
-    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Display(Name = "What is their induction status?")]
@@ -65,7 +65,7 @@ public class StatusModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
                 return PageLink(InductionJourneyPage.CheckAnswers);
             }

@@ -17,7 +17,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
     public string? PersonName { get; set; }
 
     [FromQuery]
-    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
@@ -60,7 +60,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
                 return PageLink(InductionJourneyPage.CheckAnswers);
             }

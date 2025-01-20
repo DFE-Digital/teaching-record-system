@@ -15,7 +15,7 @@ public class CompletedDateModel : CommonJourneyPage
     public string? PersonName { get; set; }
 
     [FromQuery]
-    public JourneyFromCyaPage? FromCheckAnswers { get; set; }
+    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Completed date")]
@@ -27,7 +27,7 @@ public class CompletedDateModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCyaPage.Cya || FromCheckAnswers == JourneyFromCyaPage.CyaToStartDate)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers || FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
             {
                 return InductionJourneyPage.CheckAnswers;
             }
@@ -39,13 +39,13 @@ public class CompletedDateModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
                 return PageLink(InductionJourneyPage.CheckAnswers);
             }
-            if (FromCheckAnswers == JourneyFromCyaPage.CyaToStartDate)
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
             {
-                return PageLink(InductionJourneyPage.StartDate, JourneyFromCyaPage.Cya);
+                return PageLink(InductionJourneyPage.StartDate, JourneyFromCheckYourAnswersPage.CheckYourAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.CompletedDate
                 ? LinkGenerator.PersonInduction(PersonId)

@@ -22,7 +22,7 @@ public abstract class CommonJourneyPage : PageModel
         return Redirect(LinkGenerator.PersonInduction(PersonId));
     }
 
-    protected string PageLink(InductionJourneyPage? pageName, JourneyFromCyaPage? fromCyaPage = null)
+    protected string PageLink(InductionJourneyPage? pageName, JourneyFromCheckYourAnswersPage? fromCyaPage = null)
     {
         return pageName switch
         {
