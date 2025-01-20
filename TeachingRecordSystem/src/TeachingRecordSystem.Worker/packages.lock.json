@@ -865,21 +865,6 @@
           "Serilog": "3.1.1"
         }
       },
-      "SharpZipLib": {
-        "type": "Transitive",
-        "resolved": "1.3.3",
-        "contentHash": "N8+hwhsKZm25tDJfWpBSW7EGhH/R7EMuiX+KJ4C4u+fCWVc1lJ5zg1u3S1RPPVYgTqhx/C3hxrqUpi6RwK5+Tg=="
-      },
-      "SixLabors.Fonts": {
-        "type": "Transitive",
-        "resolved": "1.0.0-beta17",
-        "contentHash": "qubgVovAoSR7vyv9tJ68gSzRIPWz7HBjTM9rwAaLjpcJ6T50arnX+GHAZcC0r2mVagyRMknCNda3DGoe8StUUQ=="
-      },
-      "SixLabors.ImageSharp": {
-        "type": "Transitive",
-        "resolved": "1.0.4",
-        "contentHash": "H2rPiEr2ddBOltOuqRYhpLBAsQXDAhbzMMhhuksnBG2oefup1MXMchALe7yYkKJksNbtxbZHKeM6dn/68I75qw=="
-      },
       "Snappier": {
         "type": "Transitive",
         "resolved": "1.1.6",
@@ -2127,7 +2112,6 @@
           "OpenIddict.EntityFrameworkCore": "[5.2.0, )",
           "Optional": "[4.0.0, )",
           "Parquet.Net": "[4.24.0, )",
-          "PdfSharpCore": "[1.3.62, )",
           "Polly.Core": "[8.2.1, )",
           "Scrutor": "[5.0.1, )",
           "Sentry.Serilog": "[4.12.1, )",
@@ -2563,17 +2547,6 @@
           "IronCompress": "1.5.2",
           "Microsoft.Data.Analysis": "0.21.1",
           "Microsoft.IO.RecyclableMemoryStream": "3.0.0"
-        }
-      },
-      "PdfSharpCore": {
-        "type": "CentralTransitive",
-        "requested": "[1.3.62, )",
-        "resolved": "1.3.62",
-        "contentHash": "O5oxuQsjBy/IHYU0pksUBWbqrZ5QNXWJGfvIxJJoMkrH3iH2qYHwWmSBqPWiyzTgeumN7H8co/kiS4wXNjScFw==",
-        "dependencies": {
-          "SharpZipLib": "1.3.3",
-          "SixLabors.Fonts": "1.0.0-beta17",
-          "SixLabors.ImageSharp": "1.0.4"
         }
       },
       "Polly.Core": {

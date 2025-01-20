@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Tests;
@@ -12,7 +11,6 @@ public class TestScopedServices
 
     public TestScopedServices()
     {
-        CertificateGeneratorMock = new();
         Clock = new();
         DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
@@ -48,8 +46,6 @@ public class TestScopedServices
         current = default;
         return false;
     }
-
-    public Mock<ICertificateGenerator> CertificateGeneratorMock { get; }
 
     public TestableClock Clock { get; }
 

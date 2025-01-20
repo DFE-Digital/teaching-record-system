@@ -9,7 +9,6 @@ using TeachingRecordSystem.Api.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure.Json;
-using TeachingRecordSystem.Core.Services.Certificates;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.Tests;
@@ -41,8 +40,6 @@ public abstract class TestBase
     }
 
     public HostFixture HostFixture { get; }
-
-    public Mock<ICertificateGenerator> CertificateGeneratorMock => _testServices.CertificateGeneratorMock;
 
     public Guid DefaultApplicationUserId => HostFixture.DefaultApplicationUserId;
 

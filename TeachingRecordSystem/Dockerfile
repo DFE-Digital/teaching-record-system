@@ -29,11 +29,6 @@ RUN apk --no-cache add postgresql14-client
 # Fix for invoking trscli
 RUN apk --no-cache add libc6-compat
 
-# Install fonts for PDF generation
-RUN apk --no-cache add msttcorefonts-installer fontconfig && \
-    update-ms-fonts && \
-    fc-cache -f
-
 # Install SQL Server tools needed to be able to query the reporting DB to help debugging
 RUN apk add curl
 
