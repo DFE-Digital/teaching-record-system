@@ -1,0 +1,35 @@
+@using Optional.Unsafe
+@using TeachingRecordSystem.Core.Events
+@model TimelineItem<TimelineEvent<DqtContactInductionStatusChangedEvent>>
+@{
+    var changedEvent = Model.ItemModel.Event;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-dqt-contact-induction-status-changed-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Person induction status updated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="induction-status" use-empty-fallback>@changedEvent.InductionStatus</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="old-induction-status" use-empty-fallback="">@changedEvent.OldInductionStatus</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>
