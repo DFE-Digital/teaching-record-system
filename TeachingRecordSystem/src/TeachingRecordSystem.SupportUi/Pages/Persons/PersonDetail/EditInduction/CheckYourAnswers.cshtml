@@ -49,7 +49,12 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.ExemptionReasonsDisplayString</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>
+                            @foreach (var exemptionReason in Model.SelectedExemptionReasonsValues!)
+                            {
+                                <div>@exemptionReason</div>
+                            }
+                        </govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCyaPage.Cya)" visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
@@ -97,7 +102,7 @@
             </govuk-summary-list>
 
             <div class="govuk-button-group">
-                <govuk-button type="submit" data-testid="confirm-button">Confirm induction deta</govuk-button>
+                <govuk-button type="submit" data-testid="confirm-button">Confirm induction details</govuk-button>
                 <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.InductionCheckYourAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>

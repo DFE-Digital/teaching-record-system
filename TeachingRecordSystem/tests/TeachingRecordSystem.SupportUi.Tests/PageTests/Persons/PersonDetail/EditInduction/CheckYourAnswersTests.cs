@@ -206,13 +206,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, true)]
     public async Task Get_ShowsExemptionReason_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsExemptionReason)
     {
-        // CML TODO  - change - it's supposed to be shown as a list (no bullets)
         // Arrange
         var labelContent = "Exemption reason";
         var startDate = Clock.Today.AddYears(-2);
         var completedDate = Clock.Today;
-        var exemptionReasonIds = new Guid[] { new Guid("a5faff9f-29ce-4a6b-a7b8-0c1f57f15920"), new Guid("a112e691-1694-46a7-8f33-5ec5b845c181") };
-        var expectedExemptionReasonsDisplayString = "Exempt, Has, or is eligible for, full registration in Scotland";
+        var exemptionReasonIds = (await TestData.ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(2)
+            .Select(r => r.InductionExemptionReasonId)
+            .ToArray();
+        var expectedReasons = (await TestData.ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .Where(r => exemptionReasonIds.Contains(r.InductionExemptionReasonId))
+            .Select(r => r.Name)
+            .OrderByDescending(r => r)
+            .ToArray();
         var editInductionState = new EditInductionStateBuilder()
                 .WithInitialisedState(inductionStatus, startPage)
                 .WithExemptionReasonIds(exemptionReasonIds)
@@ -239,8 +247,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
             Assert.NotNull(label);
-            var value = label.NextElementSibling;
-            Assert.Equal(expectedExemptionReasonsDisplayString, value!.TextContent);
+            var reasons = label.NextElementSibling!.QuerySelectorAll("div").Select(d => d.TextContent.Trim());
+            Assert.NotEmpty(reasons);
+            Assert.Equal(expectedReasons, reasons);
         }
         else
         {

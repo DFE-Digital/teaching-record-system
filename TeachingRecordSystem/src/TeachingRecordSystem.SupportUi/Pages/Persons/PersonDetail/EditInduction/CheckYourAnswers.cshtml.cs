@@ -18,7 +18,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
     public InductionStatus InductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
-    public string? ExemptionReasonsDisplayString
+    public IEnumerable<string>? SelectedExemptionReasonsValues
     {
         get
         {
@@ -26,12 +26,10 @@ public class CheckYourAnswersModel : CommonJourneyPage
             {
                 return null;
             }
-            var exemptionReasonNames = from id in JourneyInstance.State.ExemptionReasonIds
-                                       join reason in ExemptionReasons on id equals reason.InductionExemptionReasonId
-                                       orderby reason.Name
-                                       select reason.Name;
 
-            return string.Join(", ", exemptionReasonNames);
+            return JourneyInstance.State.ExemptionReasonIds
+                .Join(ExemptionReasons, id => id, reason => reason.InductionExemptionReasonId, (id, reason) => reason.Name)
+                .OrderByDescending(name => name);
         }
     }
     public InductionExemptionReason[] ExemptionReasons { get; set; } = Array.Empty<InductionExemptionReason>();
