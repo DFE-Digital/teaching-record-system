@@ -1,4 +1,3 @@
-using System.ComponentModel.Design;
 using System.Globalization;
 using System.Text;
 using CsvHelper;
@@ -135,26 +134,26 @@ public class InductionImporter
                             };
                             rowTransaction.AppendQuery(queryInductionPeriod);
                         }
-                        //else
-                        //{
-                        //    inductionPeriodId = lookupData.InductionPeriod.dfeta_inductionperiodId;
-                        //    var updateInduction = new UpdateInductionTransactionalQuery()
-                        //    {
-                        //        InductionId = inductionId!.Value,
-                        //        CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
-                        //        InductionStatus = lookupData.Induction!.dfeta_InductionStatus!.Value
-                        //    };
-                        //    rowTransaction.AppendQuery(updateInduction);
+                        else
+                        {
+                            inductionPeriodId = lookupData.InductionPeriod.dfeta_inductionperiodId;
+                            var updateInduction = new UpdateInductionTransactionalQuery()
+                            {
+                                InductionId = inductionId!.Value,
+                                CompletionDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                                InductionStatus = lookupData.Induction!.dfeta_InductionStatus!.Value
+                            };
+                            rowTransaction.AppendQuery(updateInduction);
 
-                        //    var updateInductionPeriodQuery = new UpdateInductionPeriodTransactionalQuery()
-                        //    {
-                        //        InductionPeriodId = inductionPeriodId!.Value,
-                        //        AppropriateBodyId = lookupData.OrganisationId,
-                        //        InductionStartDate = lookupData.InductionPeriod.dfeta_StartDate,
-                        //        InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
-                        //    };
-                        //    rowTransaction.AppendQuery(updateInductionPeriodQuery);
-                        //}
+                            var updateInductionPeriodQuery = new UpdateInductionPeriodTransactionalQuery()
+                            {
+                                InductionPeriodId = inductionPeriodId!.Value,
+                                AppropriateBodyId = lookupData.OrganisationId,
+                                InductionStartDate = lookupData.InductionPeriod.dfeta_StartDate,
+                                InductionEndDate = DateTime.ParseExact(row.PassedDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None),
+                            };
+                            rowTransaction.AppendQuery(updateInductionPeriodQuery);
+                        }
 
                         //soft validation errors can be appended to the IntegrationTransactionRecord Failure message
                         foreach (var validationMessage in validationFailures.ValidationFailures)
@@ -262,15 +261,20 @@ public class InductionImporter
 
             if (ind?.InductionPeriods?.Length > 0)
             {
-                var periods = ind?.InductionPeriods.Where(x => !x.dfeta_EndDate.HasValue).ToList();
+                var periods = ind?.InductionPeriods.ToList();
                 if (periods?.Count() == 1)
-                { 
+                {
                     inductionPeriodMatchStatus = InductionPeriodLookupResult.OneMatch;
                     inductionPeriod = periods.First();
                 }
-                else if(periods?.Count() > 1)
+                else if (periods?.Count() > 1)
                 {
                     inductionPeriodMatchStatus = InductionPeriodLookupResult.MultipleMatchesFound;
+                    inductionPeriod = null;
+                }
+                else
+                {
+                    inductionPeriodMatchStatus = InductionPeriodLookupResult.NoMatch;
                     inductionPeriod = null;
                 }
             }
@@ -401,11 +405,26 @@ public class InductionImporter
             }
         }
 
+        // Error If:
+        // Matched InductionPeriod already has an end date
+        // Matched InductionPeriod is associated with a different AB
+        if (lookups.InductionPeriod != null)
+        {
+            if (lookups.InductionPeriod.dfeta_EndDate.HasValue)
+            {
+                errors.Add($"Unable to update induction period that has an end date.");
+            }
+            else if (lookups.InductionPeriod.dfeta_AppropriateBodyId?.Id != lookups.OrganisationId)
+            {
+                errors.Add($"Teacher is claimed by another Appropriate Body.");
+            }
+        }
+
         return (validationFailures, errors);
     }
     public async Task<(OrganisationLookupResult, Guid? OrganisationId)> FindMatchingOrganisationsRecordAsync(string OrgNumber)
     {
-        var query = new FindActiveOrganisationsByLaSchoolCodeQuery(OrgNumber);
+        var query = new FindActiveOrganisationsByAccountNumberQuery(OrgNumber);
         var results = await _crmQueryDispatcher.ExecuteQueryAsync(query);
 
         if (results.Length == 0)

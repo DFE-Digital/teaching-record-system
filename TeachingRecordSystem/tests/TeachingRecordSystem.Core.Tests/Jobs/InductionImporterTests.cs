@@ -228,6 +228,7 @@ public class InductionImporterTests : IAsyncLifetime
     [InlineData(dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.Exempt)]
     [InlineData(dfeta_InductionStatus.FailedinWales, null)]
     [InlineData(dfeta_InductionStatus.Fail, null)]
+    [InlineData(dfeta_InductionStatus.InProgress, null)]
     public async Task Validate_WithCompletedInduction_ReturnsError(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason)
     {
         // Arrange
@@ -254,6 +255,129 @@ public class InductionImporterTests : IAsyncLifetime
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.ReferenceNumber} completed induction already or is progress."));
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.RequiredtoComplete, null, "12345")]
+    [InlineData(dfeta_InductionStatus.NotYetCompleted, null, "212324")]
+    public async Task Validate_WithoutEndDate_ReturnsNoErrors(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, string accountNumber)
+    {
+        // Arrange
+        var inductionPeriodStartDate = new DateOnly(2019, 01, 01);
+        var inductionStartDate = new DateOnly(2019, 01, 01);
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x =>
+        {
+            x.WithDqtInduction(inductionStatus: inductionStatus,
+                inductionExemptionReason: inductionExemptionReason,
+                inductionStartDate: inductionStartDate,
+                completedDate: null,
+                inductionPeriodStartDate: inductionPeriodStartDate,
+                inductionPeriodEndDate: null,
+                appropriateBodyOrgId: account.Id,
+                numberOfTerms: 1);
+        });
+        var row = GetDefaultRow(x =>
+        {
+            x.ReferenceNumber = person.Trn!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            x.EmployerCode = accountNumber;
+            return x;
+        });
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Act
+        var (failures, errors) = Importer.Validate(row, lookups);
+
+        // Assert
+        Assert.Empty(errors);
+        Assert.Empty(failures);
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.RequiredtoComplete, null)]
+    [InlineData(dfeta_InductionStatus.NotYetCompleted, null)]
+    public async Task Validate_UpdateInductionPeriodForAnotherAppropriateBody_ReturnsError(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason)
+    {
+        // Arrange
+        var accountNumber = "1357";
+        var inductionPeriodStartDate = new DateOnly(2019, 01, 01);
+        var inductionPeriodEndDate = new DateOnly(2019, 01, 01);
+        var inductionStartDate = new DateOnly(2019, 01, 01);
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x =>
+        {
+            x.WithDqtInduction(inductionStatus: inductionStatus,
+                inductionExemptionReason: inductionExemptionReason,
+                inductionStartDate: inductionStartDate,
+                completedDate: null,
+                inductionPeriodStartDate: inductionPeriodStartDate,
+                inductionPeriodEndDate: null,
+                appropriateBodyOrgId: account.Id,
+                numberOfTerms: 1);
+        });
+        var row = GetDefaultRow(x =>
+        {
+            x.ReferenceNumber = person.Trn!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            return x;
+        });
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Act
+        var (failures, errors) = Importer.Validate(row, lookups);
+
+        // Assert
+        Assert.Contains(errors, item => item.Contains("Teacher is claimed by another Appropriate Body."));
+    }
+
+    [Theory]
+    [InlineData(dfeta_InductionStatus.RequiredtoComplete, null)]
+    [InlineData(dfeta_InductionStatus.NotYetCompleted, null)]
+    public async Task Validate_UpdateInductionPeriodWithEndDate_ReturnsError(dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason)
+    {
+        // Arrange
+        var accountNumber = "1357";
+        var inductionPeriodStartDate = new DateOnly(2019, 01, 01);
+        var inductionPeriodEndDate = new DateOnly(2019, 01, 01);
+        var inductionStartDate = new DateOnly(2019, 01, 01);
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x =>
+        {
+            x.WithDqtInduction(inductionStatus: inductionStatus,
+                inductionExemptionReason: inductionExemptionReason,
+                inductionStartDate: inductionStartDate,
+                completedDate: null,
+                inductionPeriodStartDate: inductionPeriodStartDate,
+                inductionPeriodEndDate: inductionPeriodEndDate,
+                appropriateBodyOrgId: account.Id,
+                numberOfTerms: 1);
+        });
+        var row = GetDefaultRow(x =>
+        {
+            x.ReferenceNumber = person.Trn!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy");
+            return x;
+        });
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Act
+        var (failures, errors) = Importer.Validate(row, lookups);
+
+        // Assert
+        Assert.Contains(errors, item => item.Contains("Unable to update induction period that has an end date."));
     }
 
     [Fact]
