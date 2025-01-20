@@ -95,6 +95,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             startDate: null,
             completedDate: null,
             exemptionReasonIds: new[] { InductionExemptionReason.PassedInWalesId },
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out var event1);
@@ -104,6 +107,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             startDate: null,
             completedDate: null,
             exemptionReasonIds: Array.Empty<Guid>(),
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(1),
             out var event2);
@@ -141,6 +147,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             startDate: null,
             completedDate: null,
             exemptionReasonIds: Array.Empty<Guid>(),
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out var event1);
@@ -151,6 +160,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             startDate: null,
             completedDate: null,
             exemptionReasonIds: new[] { InductionExemptionReason.PassedInWalesId },
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(1),
             out var event2);
@@ -188,6 +200,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             startDate: null,
             completedDate: null,
             exemptionReasonIds: Array.Empty<Guid>(),
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(-2),
             out var event1);
@@ -198,6 +213,9 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             startDate: null,
             completedDate: null,
             exemptionReasonIds: new[] { InductionExemptionReason.PassedInWalesId },
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow.AddDays(-2),
             out var event2);

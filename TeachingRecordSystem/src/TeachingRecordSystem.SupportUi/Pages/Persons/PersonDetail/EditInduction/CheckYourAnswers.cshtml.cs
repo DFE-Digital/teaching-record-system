@@ -35,10 +35,14 @@ public class CheckYourAnswersModel : CommonJourneyPage
         }
     }
     public InductionExemptionReason[] ExemptionReasons { get; set; } = Array.Empty<InductionExemptionReason>();
-    public InductionChangeReasonOption? ChangeReason { get; set; }
+    public InductionChangeReasonOption ChangeReason { get; set; }
     public string? ChangeReasonDetail { get; set; }
-    public string? UploadedEvidenceFileUrl { get; set; }
+
     public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public bool ShowStatus =>
             StartPage == InductionJourneyPage.Status;
@@ -86,6 +90,15 @@ public class CheckYourAnswersModel : CommonJourneyPage
             StartDate,
             CompletedDate,
             JourneyInstance!.State.ExemptionReasonIds ?? Array.Empty<Guid>(),
+            ChangeReason.GetDisplayName(),
+            ChangeReasonDetail,
+            JourneyInstance!.State.EvidenceFileId is Guid fileId
+                ? new EventModels.File()
+                {
+                    FileId = fileId,
+                    Name = JourneyInstance.State.EvidenceFileName!
+                }
+                : null,
             User.GetUserId(),
             _clock.UtcNow,
             out var updatedEvent);
@@ -95,11 +108,6 @@ public class CheckYourAnswersModel : CommonJourneyPage
             await _dbContext.AddEventAndBroadcastAsync(updatedEvent);
             await _dbContext.SaveChangesAsync();
         }
-
-            //ChangeReason,
-            //ChangeReasonDetail,
-            //JourneyInstance!.State.EvidenceFileName,
-            //UploadedEvidenceFileUrl
 
         await _dbContext.SaveChangesAsync();
 
@@ -124,16 +132,12 @@ public class CheckYourAnswersModel : CommonJourneyPage
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        //EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        //UploadedEvidenceFileUrl = JourneyInstance!.State.UploadedEvidenceFileUrl;
-        ChangeReason = JourneyInstance!.State.ChangeReason;
+        ChangeReason = JourneyInstance!.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
         InductionStatus = JourneyInstance!.State.InductionStatus;
         StartDate = JourneyInstance!.State.StartDate;
         CompletedDate = JourneyInstance!.State.CompletedDate;
-
-        //EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
         await next();
     }
 }

@@ -1133,6 +1133,9 @@ public partial class TestData
                 startDate,
                 completedDate,
                 exemptionReasons,
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 testData.Clock.UtcNow,
                 out var @event);
