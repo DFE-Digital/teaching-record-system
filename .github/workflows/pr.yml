@@ -14,7 +14,7 @@ permissions:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
 
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +84,7 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Important - later versions of ubuntu have a different .NET SDK which breaks trscli. Review on .NET 9 upgrade
     strategy:
       fail-fast: false
       matrix:
