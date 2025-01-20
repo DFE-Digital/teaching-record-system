@@ -18,11 +18,6 @@ public class BackfillDqtReportingQualifications(IOptions<DqtReportingOptions> dq
         dataTable.Columns.Add("qualification_type", typeof(int));
         dataTable.Columns.Add("person_id", typeof(Guid));
         dataTable.Columns.Add("dqt_qualification_id", typeof(Guid));
-        dataTable.Columns.Add("dqt_first_sync", typeof(DateTime));
-        dataTable.Columns.Add("dqt_last_sync", typeof(DateTime));
-        dataTable.Columns.Add("dqt_state", typeof(int));
-        dataTable.Columns.Add("dqt_created_on", typeof(DateTime));
-        dataTable.Columns.Add("dqt_modified_on", typeof(DateTime));
         dataTable.Columns.Add("mq_specialism", typeof(int));
         dataTable.Columns.Add("mq_status", typeof(int));
         dataTable.Columns.Add("start_date", typeof(DateOnly));
@@ -45,11 +40,6 @@ public class BackfillDqtReportingQualifications(IOptions<DqtReportingOptions> dq
                 mq.QualificationType,
                 mq.PersonId,
                 mq.DqtQualificationId,
-                mq.DqtFirstSync,
-                mq.DqtLastSync,
-                mq.DqtState,
-                mq.DqtCreatedOn,
-                mq.DqtModifiedOn,
                 mq.Specialism,
                 mq.Status,
                 mq.StartDate,
