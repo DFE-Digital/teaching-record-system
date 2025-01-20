@@ -46,16 +46,9 @@ public class CheckYourAnswersModel : CommonJourneyPage
             StartPage == InductionJourneyPage.Status;
 
     public bool ShowStartDate =>
-            StartPage != InductionJourneyPage.CompletedDate &&
-                (InductionStatus == InductionStatus.InProgress ||
-                InductionStatus == InductionStatus.Passed ||
-                InductionStatus == InductionStatus.Failed ||
-                InductionStatus == InductionStatus.FailedInWales);
+            StartPage != InductionJourneyPage.CompletedDate && InductionStatus.RequiresStartDate();
 
-    public bool ShowCompletedDate =>
-        InductionStatus == InductionStatus.Failed ||
-        InductionStatus == InductionStatus.FailedInWales ||
-        InductionStatus == InductionStatus.Passed;
+    public bool ShowCompletedDate => InductionStatus.RequiresCompletedDate();
 
     public bool ShowExemptionReasons =>
         InductionStatus == InductionStatus.Exempt;
