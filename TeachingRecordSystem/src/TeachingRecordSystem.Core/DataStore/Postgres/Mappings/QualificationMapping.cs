@@ -11,9 +11,12 @@ public class QualificationMapping : IEntityTypeConfiguration<Qualification>
         builder.HasKey(q => q.QualificationId);
         builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Qualification.DeletedOn)) == null);
         builder.HasDiscriminator(q => q.QualificationType)
-            .HasValue<MandatoryQualification>(QualificationType.MandatoryQualification);
+            .HasValue<MandatoryQualification>(QualificationType.MandatoryQualification)
+            .HasValue<ProfessionalStatus>(QualificationType.QualifiedTeacherStatus)
+            .HasValue<ProfessionalStatus>(QualificationType.EarlyYearsTeacherStatus)
+            .HasValue<ProfessionalStatus>(QualificationType.PartialQualifiedTeacherStatus)
+            .HasValue<ProfessionalStatus>(QualificationType.EarlyYearsProfessionalStatus);
         builder.HasOne<Person>(q => q.Person).WithMany(p => p.Qualifications).HasForeignKey(q => q.PersonId).HasConstraintName(Qualification.PersonForeignKeyName);
         builder.HasIndex(q => q.PersonId);
-        builder.HasIndex(q => q.DqtQualificationId).HasFilter("dqt_qualification_id is not null").IsUnique();
     }
 }

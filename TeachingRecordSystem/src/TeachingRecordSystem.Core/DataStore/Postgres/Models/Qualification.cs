@@ -8,14 +8,7 @@ public abstract class Qualification
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
-    public QualificationType QualificationType { get; protected init; }
+    public QualificationType QualificationType { get; protected set; }
     public required Guid PersonId { get; init; }
     public Person Person { get; } = null!;
-
-    public Guid? DqtQualificationId { get; set; }
-    public DateTime? DqtFirstSync { get; set; }
-    public DateTime? DqtLastSync { get; set; }
-    public int? DqtState { get; set; }
-    public DateTime? DqtCreatedOn { get; set; }
-    public DateTime? DqtModifiedOn { get; set; }
 }
