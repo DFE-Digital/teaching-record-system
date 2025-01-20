@@ -39,11 +39,11 @@ public class CompletedDateModel : CommonJourneyPage
     {
         get
         {
-            if(FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
             {
                 return PageLink(InductionJourneyPage.CheckAnswers);
             }
-            if(FromCheckAnswers == JourneyFromCyaPage.CyaToStartDate)
+            if (FromCheckAnswers == JourneyFromCyaPage.CyaToStartDate)
             {
                 return PageLink(InductionJourneyPage.StartDate, JourneyFromCyaPage.Cya);
             }

@@ -53,7 +53,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
                 InductionStatus == InductionStatus.Passed ||
                 InductionStatus == InductionStatus.Failed ||
                 InductionStatus == InductionStatus.FailedInWales);
- 
+
     public bool ShowCompletedDate =>
         InductionStatus == InductionStatus.Failed ||
         InductionStatus == InductionStatus.FailedInWales ||

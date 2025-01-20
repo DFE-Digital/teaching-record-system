@@ -29,7 +29,7 @@ public class StartDateModel : CommonJourneyPage
     {
         get
         {
-            if(FromCheckAnswers == JourneyFromCyaPage.Cya)
+            if (FromCheckAnswers == JourneyFromCyaPage.Cya)
             {
                 if ((InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate) ||
                     (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate?.AddYears(-2)))
