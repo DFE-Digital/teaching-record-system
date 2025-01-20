@@ -352,7 +352,6 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var location = response.Headers.Location?.OriginalString;
-        //var expectedUrl = $"/persons/{person.PersonId}/edit-induction/{expectedNextPageUrl}?{journeyInstance.GetUniqueIdQueryParameter()}"; // TODO - querystring for CYA_start
         var expectedUrl = $"/persons/{person.PersonId}/edit-induction/{expectedNextPageUrl}";
         Assert.Contains(expectedUrl, location);
     }

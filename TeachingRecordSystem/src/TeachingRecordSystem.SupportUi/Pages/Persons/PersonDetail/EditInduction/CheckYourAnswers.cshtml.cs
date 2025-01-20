@@ -78,8 +78,6 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // TODO validate the induction state model
-
         var person = await _dbContext.Persons
             .SingleAsync(q => q.PersonId == PersonId);
 

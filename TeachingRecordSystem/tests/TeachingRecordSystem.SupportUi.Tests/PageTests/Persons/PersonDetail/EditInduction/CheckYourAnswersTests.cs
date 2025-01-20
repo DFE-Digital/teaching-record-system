@@ -340,7 +340,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var valueDetails = labelDetails.NextElementSibling;
         Assert.Equal(_changeReasonDetails, valueDetails!.TextContent.Trim());
 
-        // CML TODO - add file upload test
         var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Do you have evidence to upload");
         Assert.NotNull(labelFileUpload);
         var valueFileUpload = labelFileUpload.NextElementSibling;
