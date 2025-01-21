@@ -162,7 +162,15 @@ public class TrsDataSyncHelper(
 
         if (modelTypeSyncInfo.DeleteStatement is null)
         {
-            throw new NotSupportedException($"Cannot delete a {modelType}.");
+            if (!modelTypeSyncInfo.IgnoreDeletions)
+            {
+                throw new NotSupportedException($"Cannot delete a {modelType}.");
+            }
+            else
+            {
+                logger.LogWarning($"Ignoring deletion of {ids.Count} {modelType} records.");
+                return;
+            }
         }
 
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
@@ -198,6 +206,11 @@ public class TrsDataSyncHelper(
 
     public Task SyncRecordsAsync(string modelType, IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken = default)
     {
+        if (entities.Count == 0)
+        {
+            return Task.CompletedTask;
+        }
+
         var modelTypeSyncInfo = GetModelTypeSyncInfo(modelType);
         return modelTypeSyncInfo.GetSyncHandler(this)(entities, ignoreInvalid, dryRun, cancellationToken);
     }
@@ -944,6 +957,7 @@ public class TrsDataSyncHelper(
             CopyStatement = copyStatement,
             UpsertStatement = insertStatement,
             DeleteStatement = deleteStatement,
+            IgnoreDeletions = false,
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = Contact.EntityLogicalName,
             AttributeNames = attributeNames,
@@ -1031,6 +1045,7 @@ public class TrsDataSyncHelper(
             CopyStatement = copyStatement,
             UpsertStatement = updateStatement,
             DeleteStatement = null,
+            IgnoreDeletions = true,
             GetLastModifiedOnStatement = getLastModifiedOnStatement,
             EntityLogicalName = dfeta_induction.EntityLogicalName,
             AttributeNames = attributeNames,
@@ -1055,6 +1070,7 @@ public class TrsDataSyncHelper(
             CopyStatement = null,
             UpsertStatement = null,
             DeleteStatement = null,
+            IgnoreDeletions = false,
             GetLastModifiedOnStatement = null,
             EntityLogicalName = dfeta_TRSEvent.EntityLogicalName,
             AttributeNames = attributeNames,
@@ -1418,6 +1434,7 @@ public class TrsDataSyncHelper(
         public required string? CopyStatement { get; init; }
         public required string? UpsertStatement { get; init; }
         public required string? DeleteStatement { get; init; }
+        public required bool IgnoreDeletions { get; init; }
         public required string? GetLastModifiedOnStatement { get; init; }
         public required string EntityLogicalName { get; init; }
         public required string[] AttributeNames { get; init; }
