@@ -28,7 +28,7 @@
                 @if (Model.ShowStartDate)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Induction start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.InductionEditStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>
@@ -38,7 +38,7 @@
                 @if (Model.ShowCompletedDate)
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Induction completion date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.InductionEditCompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)" visually-hidden-text="new start date">Change</govuk-summary-list-row-action>

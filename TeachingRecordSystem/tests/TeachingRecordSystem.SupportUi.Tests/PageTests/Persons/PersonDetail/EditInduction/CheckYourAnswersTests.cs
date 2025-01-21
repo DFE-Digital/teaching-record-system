@@ -121,7 +121,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsStartDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsStartDate)
     {
         // Arrange
-        var labelContent = "Induction start date";
+        var labelContent = "Induction started on";
         var startDate = Clock.Today.AddYears(-2);
         var completedDate = Clock.Today;
         var exemptionReasonIds = (await TestData.ReferenceDataCache
@@ -184,7 +184,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsCompletedDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsCompletedDate)
     {
         // Arrange
-        var labelContent = "Induction completion date";
+        var labelContent = "Induction completed on";
         var startDate = Clock.Today.AddYears(-2);
         var completedDate = Clock.Today;
         var exemptionReasonIds = (await TestData.ReferenceDataCache
