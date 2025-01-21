@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -25,6 +26,17 @@ public class EditInductionState : IRegisterJourney
     public string? EvidenceFileSizeDescription { get; set; }
 
     public bool Initialized { get; set; }
+
+    [JsonIgnore]
+    public bool IsComplete =>
+        InductionStatus != InductionStatus.None &&
+        (InductionStatus.RequiresStartDate() == StartDate.HasValue) &&
+        (InductionStatus.RequiresCompletedDate() == CompletedDate.HasValue) &&
+        (InductionStatus.RequiresExemptionReasons() == ExemptionReasonIds?.Any()) &&
+        ChangeReason.HasValue &&
+        HasAdditionalReasonDetail.HasValue &&
+        UploadEvidence.HasValue &&
+        (!UploadEvidence.Value || (UploadEvidence.Value && EvidenceFileId.HasValue));
 
     public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId, InductionJourneyPage startPage)
     {

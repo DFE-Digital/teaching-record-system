@@ -114,6 +114,12 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        if (!JourneyInstance!.State.IsComplete)
+        {
+            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            return;
+        }
+
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
 
         ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);

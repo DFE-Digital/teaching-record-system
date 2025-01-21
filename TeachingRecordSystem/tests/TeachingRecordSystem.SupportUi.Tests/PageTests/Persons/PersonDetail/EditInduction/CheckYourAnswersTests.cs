@@ -15,7 +15,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             new EditInductionStateBuilder().WithInitialisedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
         yield return new object[] {
             new EditInductionStateBuilder().WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+        yield return new object[] {
+            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).Create() };
     }
+    [Theory]
+    [MemberData(nameof(GetInductionStatusData))]
     public async Task Get_WithInvalidJourneyState_RedirectToStart(EditInductionState editInductionState)
     {
         // Arrange
