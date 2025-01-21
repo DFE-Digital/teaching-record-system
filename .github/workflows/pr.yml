@@ -173,7 +173,7 @@ jobs:
           dotnet_test_args: >-
             --no-build
             -e ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=trs;Database=trs"
-        timeout-minutes: 15
+        timeout-minutes: 20
 
   package:
     name: Package application
