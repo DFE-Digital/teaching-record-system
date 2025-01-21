@@ -60,7 +60,7 @@ public class EditInductionStateBuilder
         ChangeReason = option;
         return this;
     }
-    public EditInductionStateBuilder WithReasonDetailsChoice(bool addDetails, string detailText)
+    public EditInductionStateBuilder WithReasonDetailsChoice(bool addDetails, string? detailText = null)
     {
         HasAdditionalReasonDetail = addDetails;
         AdditionalReasonDetail = detailText;

@@ -57,12 +57,13 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     {
         // Arrange
         var dateValid = Clock.Today;
-        var inductionStatus = InductionStatus.InProgress;
+        var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(dateValid.AddYears(-2))
                 .WithCompletedDate(dateValid)
                 .Create());
 
@@ -84,13 +85,14 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     {
         // Arrange
         var dateValid = Clock.Today;
-        var inductionStatus = InductionStatus.InProgress;
+        var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(Clock.Today.AddDays(-1))
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -110,12 +112,13 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     public async Task Post_NoCompletedDateIsEntered_ReturnsError()
     {
         // Arrange
-        var inductionStatus = InductionStatus.InProgress;
+        var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(Clock.Today.AddDays(-1))
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -132,7 +135,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
     {
         // Arrange
         var dateTomorrow = Clock.Today.AddDays(1);
-        var inductionStatus = InductionStatus.InProgress;
+        var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -159,7 +162,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
         // Arrange
         var completedDate = Clock.Today.AddDays(-1);
         var startDate = completedDate.AddDays(1);
-        var inductionStatus = InductionStatus.InProgress;
+        var inductionStatus = InductionStatus.Passed;
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

@@ -26,13 +26,12 @@ public class EditInductionState : IRegisterJourney
     public string? EvidenceFileSizeDescription { get; set; }
 
     public bool Initialized { get; set; }
-
     [JsonIgnore]
     public bool IsComplete =>
         InductionStatus != InductionStatus.None &&
-        (InductionStatus.RequiresStartDate() == StartDate.HasValue) &&
-        (InductionStatus.RequiresCompletedDate() == CompletedDate.HasValue) &&
-        (InductionStatus.RequiresExemptionReasons() == (ExemptionReasonIds?.Any() ?? false)) &&
+        (!InductionStatus.RequiresStartDate() || StartDate.HasValue) &&
+        (!InductionStatus.RequiresCompletedDate() || CompletedDate.HasValue) &&
+        (!InductionStatus.RequiresExemptionReasons() || (ExemptionReasonIds != null && ExemptionReasonIds.Any())) &&
         ChangeReason.HasValue &&
         HasAdditionalReasonDetail.HasValue &&
         UploadEvidence.HasValue &&

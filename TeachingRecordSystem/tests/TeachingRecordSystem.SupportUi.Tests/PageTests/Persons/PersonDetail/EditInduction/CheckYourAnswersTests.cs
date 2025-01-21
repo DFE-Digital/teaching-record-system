@@ -72,6 +72,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(false)
+                .WithFileUploadChoice(false)
                 .Create();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -133,6 +135,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(false)
+                .WithFileUploadChoice(false)
                 .Create();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -194,6 +198,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(false)
+                .WithFileUploadChoice(false)
                 .Create();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -261,6 +267,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(false)
+                .WithFileUploadChoice(false)
                 .Create();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -303,8 +311,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status)
+                .WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(false)
+                .WithFileUploadChoice(false)
                 .Create());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
