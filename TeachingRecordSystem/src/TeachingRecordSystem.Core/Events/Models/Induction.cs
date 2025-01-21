@@ -21,8 +21,8 @@ public record Induction
         CompletedDate = person.InductionCompletedDate,
         ExemptionReasonIds = person.InductionExemptionReasonIds,
         CpdStatus = person.CpdInductionStatus.ToOption(),
-        CpdStartDate = Option.Some(person.CpdInductionStartDate),
-        CpdCompletedDate = Option.Some(person.CpdInductionCompletedDate),
+        CpdStartDate = person.CpdInductionStatus is not null ? Option.Some(person.CpdInductionStartDate) : default,
+        CpdCompletedDate = person.CpdInductionStatus is not null ? Option.Some(person.CpdInductionCompletedDate) : default,
         CpdCpdModifiedOn = person.CpdInductionCpdModifiedOn.ToOption()
     };
 }
