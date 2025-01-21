@@ -99,6 +99,11 @@ public class StartDateModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        if (!JourneyInstance!.State.InductionStatus.RequiresStartDate())
+        {
+            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            return;
+        }
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.StartDate);
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;

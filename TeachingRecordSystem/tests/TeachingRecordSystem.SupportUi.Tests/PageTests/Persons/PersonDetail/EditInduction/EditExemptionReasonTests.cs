@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_InvalidInductionStatusForPage_PageNotFound()
+    public async Task Get_InvalidInductionStatusForPage_RedirectToStart()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -23,7 +23,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseAsync(response, 404);
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]

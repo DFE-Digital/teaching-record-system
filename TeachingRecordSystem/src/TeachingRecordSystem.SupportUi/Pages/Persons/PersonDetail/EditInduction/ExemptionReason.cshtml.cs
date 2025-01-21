@@ -57,10 +57,6 @@ public class ExemptionReasonModel : CommonJourneyPage
 
     public IActionResult OnGet()
     {
-        if (InductionStatus != InductionStatus.Exempt)
-        {
-            return NotFound();
-        }
         if (JourneyInstance!.State.ExemptionReasonIds != null)
         {
             ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
@@ -94,6 +90,12 @@ public class ExemptionReasonModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        if (JourneyInstance!.State.InductionStatus != InductionStatus.Exempt)
+        {
+            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            return;
+        }
+
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.ExemptionReason);
 
         ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
