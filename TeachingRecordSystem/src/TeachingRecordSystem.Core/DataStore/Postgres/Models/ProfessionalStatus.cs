@@ -2,8 +2,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class ProfessionalStatus : Qualification
 {
+    public const int SourceApplicationReferenceMaxLength = 200;
+
     public new required QualificationType QualificationType { get; set; }
     public required Guid RouteToProfessionalStatusId { get; init; }
+    public Guid? SourceApplicationUserId { get; init; }
+    public string? SourceApplicationReference { get; init; }
     public RouteToProfessionalStatus Route { get; } = null!;
     public required ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardDate { get; set; }
