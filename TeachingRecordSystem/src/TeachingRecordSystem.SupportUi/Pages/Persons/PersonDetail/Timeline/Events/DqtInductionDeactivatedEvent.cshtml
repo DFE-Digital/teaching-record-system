@@ -1,0 +1,12 @@
+@using TeachingRecordSystem.Core.Events
+@model TimelineItem<TimelineEvent<DqtInductionDeactivatedEvent>>
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-dqt-induction-deactivated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Induction deactivated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>    
+</div>
