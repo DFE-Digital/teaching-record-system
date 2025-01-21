@@ -32,7 +32,7 @@ public class EditInductionState : IRegisterJourney
         InductionStatus != InductionStatus.None &&
         (InductionStatus.RequiresStartDate() == StartDate.HasValue) &&
         (InductionStatus.RequiresCompletedDate() == CompletedDate.HasValue) &&
-        (InductionStatus.RequiresExemptionReasons() == ExemptionReasonIds?.Any()) &&
+        (InductionStatus.RequiresExemptionReasons() == (ExemptionReasonIds?.Any() ?? false)) &&
         ChangeReason.HasValue &&
         HasAdditionalReasonDetail.HasValue &&
         UploadEvidence.HasValue &&
