@@ -7,6 +7,35 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 {
     private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
+    public static IEnumerable<object[]> GetInductionStatusData()
+    {
+        yield return new object[] {
+            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+        yield return new object[] {
+            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+        yield return new object[] {
+            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+    }
+    public async Task Get_WithInvalidJourneyState_RedirectToStart(EditInductionState editInductionState)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            editInductionState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
     [Theory]
     [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, true)]
     [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, true)]
