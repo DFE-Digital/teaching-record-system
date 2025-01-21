@@ -13,6 +13,9 @@ public class EditInductionStateBuilder
     private bool? HasAdditionalReasonDetail { get; set; }
     private string? AdditionalReasonDetail { get; set; }
     private bool? FileUpload { get; set; }
+    private string? EvidenceFileSizeDescription { get; set; }
+    private Guid? EvidenceFileId { get; set; }
+    private string? EvidenceFileName { get; set; }
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool Initialized { get; set; }
 
@@ -57,15 +60,21 @@ public class EditInductionStateBuilder
         ChangeReason = option;
         return this;
     }
-    public EditInductionStateBuilder WithReasonDetailsChoice(bool yesOrNo, string detailText)
+    public EditInductionStateBuilder WithReasonDetailsChoice(bool addDetails, string? detailText = null)
     {
-        HasAdditionalReasonDetail = yesOrNo;
+        HasAdditionalReasonDetail = addDetails;
         AdditionalReasonDetail = detailText;
         return this;
     }
-    public EditInductionStateBuilder WithFileUploadChoice(bool yesOrNo)
+    public EditInductionStateBuilder WithFileUploadChoice(bool uploadFile)
     {
-        FileUpload = yesOrNo;
+        FileUpload = uploadFile;
+        if (uploadFile)
+        {
+            EvidenceFileId = Guid.NewGuid();
+            EvidenceFileName = "evidence.jpeg";
+            EvidenceFileSizeDescription = "5MB";
+        }
         return this;
     }
 
@@ -83,6 +92,9 @@ public class EditInductionStateBuilder
             ChangeReasonDetail = AdditionalReasonDetail,
             UploadEvidence = FileUpload,
             JourneyStartPage = JourneyStartPage,
+            EvidenceFileId = EvidenceFileId,
+            EvidenceFileName = EvidenceFileName,
+            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
             Initialized = Initialized
         };
     }

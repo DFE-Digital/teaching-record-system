@@ -37,12 +37,11 @@ public class InductionTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
-        await page.AssertDateInputAsync(startDate);
         await page.FillDateInputAsync(setStartDate);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
-        await page.AssertDateInputAsync(completedDate);
+        await page.AssertDateInputEmptyAsync();
         await page.FillDateInputAsync(setCompletedDate);
         await page.ClickContinueButtonAsync();
 
@@ -53,6 +52,8 @@ public class InductionTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickButtonAsync("Confirm induction details");
+        await page.AssertOnPersonInductionPageAsync(person.PersonId);
     }
 
     [Fact]

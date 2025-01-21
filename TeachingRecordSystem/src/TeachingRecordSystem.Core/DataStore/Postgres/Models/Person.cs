@@ -133,6 +133,9 @@ public class Person
         DateOnly? startDate,
         DateOnly? completedDate,
         Guid[] exemptionReasonIds,
+        string? changeReason,
+        string? changeReasonDetail,
+        EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
         out PersonInductionUpdatedEvent? @event)
@@ -168,9 +171,9 @@ public class Person
             PersonId = PersonId,
             Induction = EventModels.Induction.FromModel(this),
             OldInduction = oldEventInduction,
-            ChangeReason = null,
-            ChangeReasonDetail = null,
-            EvidenceFile = null,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            EvidenceFile = evidenceFile,
             Changes = changes
         };
     }

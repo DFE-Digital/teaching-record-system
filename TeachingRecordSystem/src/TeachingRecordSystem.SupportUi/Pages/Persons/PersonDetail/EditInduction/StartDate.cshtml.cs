@@ -13,7 +13,11 @@ public class StartDateModel : CommonJourneyPage
     protected IClock _clock;
 
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
+    public DateOnly? CompletedDate => JourneyInstance!.State.CompletedDate;
     public string? PersonName { get; set; }
+
+    [FromQuery]
+    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -21,13 +25,22 @@ public class StartDateModel : CommonJourneyPage
     [Display(Name = "When did they start induction?")]
     public DateOnly? StartDate { get; set; }
 
-    public InductionJourneyPage NextPage
+    public string NextPage
     {
         get
         {
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            {
+                if ((InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate) ||
+                    (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate?.AddYears(-2)))
+                {
+                    return PageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate);
+                }
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return InductionStatus.RequiresCompletedDate()
-                ? InductionJourneyPage.CompletedDate
-                : InductionJourneyPage.ChangeReasons;
+                ? PageLink(InductionJourneyPage.CompletedDate)
+                : PageLink(InductionJourneyPage.ChangeReasons);
         }
     }
 
@@ -35,6 +48,10 @@ public class StartDateModel : CommonJourneyPage
     {
         get
         {
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.StartDate
             ? LinkGenerator.PersonInduction(PersonId)
             : PageLink(InductionJourneyPage.Status);
@@ -77,13 +94,17 @@ public class StartDateModel : CommonJourneyPage
             }
         });
 
-        return Redirect(PageLink(NextPage));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.StartDate);
-
+        if (!JourneyInstance!.State.InductionStatus.RequiresStartDate())
+        {
+            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            return;
+        }
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;

@@ -463,6 +463,12 @@ public static class PageExtensions
         Assert.Equal(date.Month.ToString(), await page.InputValueAsync("label:text-is('Month')"));
         Assert.Equal(date.Year.ToString(), await page.InputValueAsync("label:text-is('Year')"));
     }
+    public static async Task AssertDateInputEmptyAsync(this IPage page)
+    {
+        Assert.Empty(await page.InputValueAsync("label:text-is('Day')"));
+        Assert.Empty(await page.InputValueAsync("label:text-is('Month')"));
+        Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
+    }
 
     public static async Task FillDateInputAsync(this IPage page, DateOnly date)
     {

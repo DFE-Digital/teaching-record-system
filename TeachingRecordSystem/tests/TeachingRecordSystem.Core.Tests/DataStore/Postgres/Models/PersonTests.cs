@@ -63,6 +63,9 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             [InductionExemptionReason.PassedInWalesId],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -109,6 +112,9 @@ public class PersonTests
             startDate: null,
             completedDate: null,
             [InductionExemptionReason.PassedInWalesId],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -161,6 +167,9 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
             exemptionReasonIds: currentStatus is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : Array.Empty<Guid>(),
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -204,6 +213,9 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
             exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -248,6 +260,9 @@ public class PersonTests
             startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
             exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -288,7 +303,15 @@ public class PersonTests
             LastName = "Bloggs",
             DateOfBirth = new(1990, 1, 1),
         };
-        person.SetInductionStatus(InductionStatus.Passed, dateCompleted, dateCompleted, [], SystemUser.SystemUserId, Clock.UtcNow, out _);
+        person.SetInductionStatus(
+            InductionStatus.Passed,
+            dateCompleted, dateCompleted,
+            [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            SystemUser.SystemUserId,
+            Clock.UtcNow, out _);
 
         // Act
         var result = person.InductionStatusManagedByCpd(Clock.Today);

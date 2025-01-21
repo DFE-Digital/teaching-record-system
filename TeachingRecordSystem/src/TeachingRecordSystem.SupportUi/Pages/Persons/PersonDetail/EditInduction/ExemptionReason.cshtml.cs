@@ -15,7 +15,7 @@ public class ExemptionReasonModel : CommonJourneyPage
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public JourneyFromCheckYourAnswersPage FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Display(Name = "Why are they exempt from induction?")]
@@ -23,12 +23,26 @@ public class ExemptionReasonModel : CommonJourneyPage
 
     public string? PersonName { get; set; }
     public InductionExemptionReason[] ExemptionReasons { get; set; } = Array.Empty<InductionExemptionReason>();
-    public InductionJourneyPage NextPage => InductionJourneyPage.ChangeReasons;
+    public InductionJourneyPage NextPage
+    {
+        get
+        {
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            {
+                return InductionJourneyPage.CheckAnswers;
+            }
+            return InductionJourneyPage.ChangeReasons;
+        }
+    }
 
     public string BackLink
     {
         get
         {
+            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
+            {
+                return PageLink(InductionJourneyPage.CheckAnswers);
+            }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.ExemptionReason
                 ? LinkGenerator.PersonInduction(PersonId)
                 : PageLink(InductionJourneyPage.Status);
@@ -43,9 +57,9 @@ public class ExemptionReasonModel : CommonJourneyPage
 
     public IActionResult OnGet()
     {
-        if (InductionStatus != InductionStatus.Exempt)
+        if (JourneyInstance!.State.ExemptionReasonIds != null)
         {
-            return NotFound();
+            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
         }
 
         return Page();
@@ -77,12 +91,13 @@ public class ExemptionReasonModel : CommonJourneyPage
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.ExemptionReason);
+        if (JourneyInstance!.State.InductionStatus != InductionStatus.Exempt)
+        {
+            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            return;
+        }
 
         ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
-        if (JourneyInstance!.State.ExemptionReasonIds != null)
-        {
-            ExemptionReasonIds = JourneyInstance!.State.ExemptionReasonIds;
-        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
