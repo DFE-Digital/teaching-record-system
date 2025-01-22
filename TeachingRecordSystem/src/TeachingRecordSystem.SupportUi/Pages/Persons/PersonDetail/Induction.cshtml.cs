@@ -1,12 +1,19 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
-public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher, IClock clock, ReferenceDataCache referenceDataCache) : PageModel
+public class InductionModel(
+    TrsDbContext dbContext,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IClock clock,
+    ReferenceDataCache referenceDataCache,
+    IAuthorizationService authorizationService) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
     private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
@@ -50,6 +57,8 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         }
     }
 
+    public bool CanWrite { get; set; }
+
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons
@@ -72,6 +81,9 @@ public class InductionModel(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         var exemptionReasons = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId))
             .ToArray();
         ExemptionReasonsText = string.Join(", ", exemptionReasons.Select(r => r.Name));
+
+        CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
+            .Succeeded;
     }
 
     private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)

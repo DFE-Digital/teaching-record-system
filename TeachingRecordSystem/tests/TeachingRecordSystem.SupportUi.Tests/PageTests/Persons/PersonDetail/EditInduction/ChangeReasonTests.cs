@@ -281,8 +281,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
-    CreateJourneyInstance(
-        JourneyNames.EditInduction,
-        state ?? new EditInductionState(),
-        new KeyValuePair<string, object>("personId", personId));
+        CreateJourneyInstance(
+            JourneyNames.EditInduction,
+            state ?? new EditInductionState(),
+            new KeyValuePair<string, object>("personId", personId));
 }
