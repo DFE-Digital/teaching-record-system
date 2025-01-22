@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -10,6 +11,7 @@ public class CheckYourAnswersModel : CommonJourneyPage
 {
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _referenceDataCache;
+    private readonly IFileService _fileService;
     private InductionJourneyPage? StartPage => JourneyInstance!.State.JourneyStartPage;
 
     protected IClock _clock;
@@ -56,11 +58,16 @@ public class CheckYourAnswersModel : CommonJourneyPage
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
 
-    public CheckYourAnswersModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, ReferenceDataCache referenceDataCache, IClock clock) : base(linkGenerator)
+    public CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
+        TrsDbContext dbContext,
+        ReferenceDataCache referenceDataCache,
+        IClock clock,
+        IFileService fileService) : base(linkGenerator)
     {
         _dbContext = dbContext;
         _referenceDataCache = referenceDataCache;
         _clock = clock;
+        _fileService = fileService;
     }
 
     public string BackLink => PageLink(InductionJourneyPage.ChangeReasons);
@@ -133,6 +140,9 @@ public class CheckYourAnswersModel : CommonJourneyPage
         InductionStatus = JourneyInstance!.State.InductionStatus;
         StartDate = JourneyInstance!.State.StartDate;
         CompletedDate = JourneyInstance!.State.CompletedDate;
+        UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
+            await _fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, InductionDefaults.FileUrlExpiry) :
+            null;
         await next();
     }
 }
