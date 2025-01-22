@@ -4,15 +4,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private static Dictionary<InductionStatus, string> StatusStrings = new() {
-        {InductionStatus.RequiredToComplete, "Required to complete" },
-        {InductionStatus.Exempt, "Exempt" },
-        {InductionStatus.InProgress, "In progress" },
-        {InductionStatus.Passed, "Passed" },
-        {InductionStatus.Failed, "Failed" },
-        {InductionStatus.FailedInWales, "Failed in Wales"}
-    };
-
     [Fact]
     public async Task Get_FeatureFlagOff_NoInductionTabShown()
     {
@@ -90,9 +81,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             builder => builder
                 .WithQts()
                 .WithInductionStatus(builder => builder
-                    .WithStatus(setInductionStatus)
-                    )
-                );
+                    .WithStatus(setInductionStatus)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -102,7 +91,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
+        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TextContent);
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
         Assert.Null(doc.GetElementByTestId("induction-end-date"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
@@ -133,7 +122,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(StatusStrings[InductionStatus.Exempt], inductionStatus!.TextContent);
+        Assert.Contains(InductionStatus.Exempt.GetTitle(), inductionStatus!.TextContent);
         var exemptionReason = doc.GetElementByTestId("induction-exemption-reasons")!.Children[1].TextContent;
         Assert.Contains(expectedExemptionReasonText, exemptionReason);
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
@@ -154,8 +143,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithQts()
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(setInductionStatus)
-                    .WithStartDate(setStartDate)
-                ));
+                    .WithStartDate(setStartDate)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -165,7 +153,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
+        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TextContent);
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
         Assert.Contains(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), startDate);
         Assert.Null(doc.GetElementByTestId("induction-exemption-reasons"));
@@ -180,8 +168,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 personBuilder => personBuilder
                     .WithQts()
                     .WithInductionStatus(inductionBuilder =>
-                        inductionBuilder.WithStatus(InductionStatus.InProgress))
-                );
+                        inductionBuilder.WithStatus(InductionStatus.InProgress)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -191,7 +178,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
-        Assert.True(String.IsNullOrWhiteSpace(startDate.Trim()));
+        Assert.True(string.IsNullOrWhiteSpace(startDate.Trim()));
     }
 
     [Theory]
@@ -209,8 +196,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(setInductionStatus)
                     .WithStartDate(setStartDate)
-                    .WithCompletedDate(setCompletedDate)
-                ));
+                    .WithCompletedDate(setCompletedDate)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -220,7 +206,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(StatusStrings[setInductionStatus], inductionStatus!.TextContent);
+        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TextContent);
         var completedDate = doc.GetElementByTestId("induction-completed-date")!.Children[1].TextContent;
         Assert.Contains(setCompletedDate.ToString(UiDefaults.DateOnlyDisplayFormat), completedDate);
     }
@@ -267,18 +253,18 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             builder => builder.WithQtlsDate(Clock.Today));
 
         await WithDbContext(async dbContext =>
-            {
-                dbContext.Attach(person.Person);
-                person.Person.SetCpdInductionStatus(
-                    InductionStatus.Passed,
-                    startDate: underSevenYearsAgo.AddYears(-1),
-                    completedDate: underSevenYearsAgo,
-                    cpdModifiedOn: Clock.UtcNow,
-                    updatedBy: SystemUser.SystemUserId,
-                    now: Clock.UtcNow,
-                    out _);
-                await dbContext.SaveChangesAsync();
-            });
+        {
+            dbContext.Attach(person.Person);
+            person.Person.SetCpdInductionStatus(
+                InductionStatus.Passed,
+                startDate: underSevenYearsAgo.AddYears(-1),
+                completedDate: underSevenYearsAgo,
+                cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -299,9 +285,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             builder => builder
                 .WithQts()
                 .WithInductionStatus(builder => builder
-                    .WithStatus(setInductionStatus)
-                    )
-                );
+                    .WithStatus(setInductionStatus)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
@@ -312,5 +296,51 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
         Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TextContent);
+    }
+
+    [Fact]
+    public async Task Get_UserHasInductionReadWritePermission_ShowsActions()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(UserRoles.InductionReadWrite));
+
+        var person = await TestData.CreatePersonAsync(
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(b => b.WithStatus(InductionStatus.Passed)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetElementByTestId("change-induction-completed-date"));
+        Assert.NotNull(doc.GetElementByTestId("change-induction-start-date"));
+        Assert.NotNull(doc.GetElementByTestId("change-induction-status"));
+    }
+
+    [Fact]
+    public async Task Get_UserDoesNotHaveInductionReadWritePermission_DeosNotShowActions()
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(roles: []));
+
+        var person = await TestData.CreatePersonAsync(
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(b => b.WithStatus(InductionStatus.Passed)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("change-induction-completed-date"));
+        Assert.Null(doc.GetElementByTestId("change-induction-start-date"));
+        Assert.Null(doc.GetElementByTestId("change-induction-status"));
     }
 }

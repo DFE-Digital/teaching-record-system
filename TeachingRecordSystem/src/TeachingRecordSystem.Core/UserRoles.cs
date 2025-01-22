@@ -20,6 +20,9 @@ public static class UserRoles
     [Display(Name = "DBS alerts - read & write")]
     public const string DbsAlertsReadWrite = "DbsAlertsReadWrite";
 
+    [Display(Name = "Induction - read & write")]
+    public const string InductionReadWrite = "InductionReadWrite";
+
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
         Administrator,
@@ -27,6 +30,7 @@ public static class UserRoles
         AlertsReadWrite,
         DbsAlertsReadOnly,
         DbsAlertsReadWrite,
+        InductionReadWrite
     };
 
     public static string GetDisplayNameForRole(string role)

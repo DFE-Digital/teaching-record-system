@@ -94,7 +94,8 @@ builder.Services.AddAuthorizationBuilder()
         policy => policy
             .RequireAuthenticatedUser()
             .RequireRole(UserRoles.Administrator))
-    .AddAlertPolicies();
+    .AddAlertPolicies()
+    .AddInductionPolicies();
 
 builder.Services
     .AddRazorPages()

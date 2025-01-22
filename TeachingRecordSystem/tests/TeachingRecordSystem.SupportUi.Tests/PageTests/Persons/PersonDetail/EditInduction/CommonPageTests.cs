@@ -369,6 +369,80 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(expectedUrl, location);
     }
 
+    [Theory]
+    [MemberData(nameof(GetPagesForUserWithoutInductionWriteRoleData))]
+    public async Task Get_UserDoesNotHavePermission_ReturnsForbidden(string page, string? role, InductionStatus inductionStatus)
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(role));
+
+        var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(Clock.Today.AddYears(-2))
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Post,
+            $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    public static TheoryData<string, string?, InductionStatus> GetPagesForUserWithoutInductionWriteRoleData()
+    {
+        var pagesAndValidStatuses = new[]
+        {
+            ("edit-induction/status", InductionStatus.Exempt),
+            ("edit-induction/status", InductionStatus.InProgress),
+            ("edit-induction/status", InductionStatus.Failed),
+            ("edit-induction/status", InductionStatus.FailedInWales),
+            ("edit-induction/status", InductionStatus.Passed),
+            ("edit-induction/status", InductionStatus.RequiredToComplete),
+            ("edit-induction/exemption-reasons", InductionStatus.Exempt),
+            ("edit-induction/start-date", InductionStatus.InProgress),
+            ("edit-induction/start-date", InductionStatus.Failed),
+            ("edit-induction/start-date", InductionStatus.FailedInWales),
+            ("edit-induction/start-date", InductionStatus.Passed),
+            ("edit-induction/date-completed", InductionStatus.Failed),
+            ("edit-induction/date-completed", InductionStatus.FailedInWales),
+            ("edit-induction/date-completed", InductionStatus.Passed),
+            ("edit-induction/change-reason", InductionStatus.Exempt),
+            ("edit-induction/change-reason", InductionStatus.InProgress),
+            ("edit-induction/change-reason", InductionStatus.Failed),
+            ("edit-induction/change-reason", InductionStatus.FailedInWales),
+            ("edit-induction/change-reason", InductionStatus.Passed),
+            ("edit-induction/change-reason", InductionStatus.RequiredToComplete)
+        };
+
+        var rolesWithoutWritePermission = UserRoles.All
+            .Except([UserRoles.InductionReadWrite, UserRoles.Administrator])
+            .Append(null)
+            .ToArray();
+
+        var data = new TheoryData<string, string?, InductionStatus>();
+
+        foreach (var (page, status) in pagesAndValidStatuses)
+        {
+            foreach (var role in rolesWithoutWritePermission)
+            {
+                data.Add(page, role, status);
+            }
+        }
+
+        return data;
+    }
+
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditInduction,
