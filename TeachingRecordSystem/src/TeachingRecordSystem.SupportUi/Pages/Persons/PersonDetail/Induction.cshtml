@@ -48,7 +48,7 @@
             @if (Model.ShowStartDate)
             {
                 <govuk-summary-list-row data-testid="induction-start-date">
-                    <govuk-summary-list-row-key>Induction start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     @if (Model.CanWrite)
                     {
@@ -62,7 +62,7 @@
             @if (Model.ShowCompletedDate)
             {
                 <govuk-summary-list-row data-testid="induction-completed-date">
-                    <govuk-summary-list-row-key>Induction completed date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     @if (Model.CanWrite)
                     {
