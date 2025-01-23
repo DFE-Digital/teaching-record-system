@@ -300,6 +300,34 @@ public class InductionTests : TestBase
     }
 
     [Fact]
+    public async Task EditStartDate_CYA_ChangeStartDateThatInvalidatesCompletedDate_ContinueToCompletedDate()
+    {
+        var startDate = new DateOnly(2021, 1, 1);
+        var completedDate = startDate.AddYears(1);
+        var setStartDate = completedDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithQts()
+                .WithInductionStatus(inductionBuilder => inductionBuilder
+                    .WithStatus(InductionStatus.Passed)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)));
+        var personId = person.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonInductionPageAsync(personId);
+        await page.ClickEditInductionStartDatePageAsync();
+
+        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
+    }
+
+    [Fact]
     public async Task EditInductionStatus_CYA_ChangeAnythingOtherThanStatus_ContinueToCYA()
     {
         var startDate = new DateOnly(2021, 1, 1);
