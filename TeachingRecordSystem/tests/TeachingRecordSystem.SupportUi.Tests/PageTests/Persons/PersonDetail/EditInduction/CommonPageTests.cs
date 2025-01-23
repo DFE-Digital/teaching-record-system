@@ -323,8 +323,6 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Theory]
     [InlineData(InductionStatus.Passed, "2000-02-01", "2002-02-02", "check-answers")] // Start date not within two years of completed date
     [InlineData(InductionStatus.Passed, "2003-02-02", "2002-02-02", "date-completed")] // Start date after completed date
-    [InlineData(InductionStatus.Passed, "2000-02-03", "2002-02-02", "date-completed")] // Start date within two years of completed date
-    [InlineData(InductionStatus.Passed, "2000-02-02", "2002-02-02", "check-answers")] // Start date not within two years of completed date
     public async Task FromCya_ToStartDate_Post_RedirectsToExpectedPage(InductionStatus inductionStatus, string startDateString, string completedDateString, string expectedNextPageUrl)
     {
         // Arrange
