@@ -82,13 +82,17 @@ As well as NuGet packages, there are some client-side libraries required. A `jus
 just restore
 ```
 
+### Blob storage emulator
+
+The Support UI uses Azure Blob Storage for storing files. For local development, you can use the Azure Storage Emulator - Azurite. If you
+use Visual Studio 2022 you probably have it installed already otherwise you can install it from [here](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite). Run it before starting the Support UI.
+
 ### Install Playwright
 
 Playwright is used for end-to-end testing. Install it with a `just` recipe:
 ```shell
 just install-playwright
 ```
-
 
 ### Database setup
 
