@@ -15,7 +15,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <span data-testid="induction-status-caption" class="govuk-caption-l">Induction - @Model.PersonName</span>
-        <form data-testid="submit-form" action="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form data-testid="submit-form" action="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <govuk-radios asp-for="InductionStatus">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--m" />
