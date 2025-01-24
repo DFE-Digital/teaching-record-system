@@ -22,17 +22,5 @@ public record CreateTrnRequestRequestPerson
     public required DateOnly DateOfBirth { get; init; }
     public IReadOnlyCollection<string>? EmailAddresses { get; init; }
     public string? NationalInsuranceNumber { get; init; }
-    public CreateTrnRequestAddress? Address { get; init; }
     public Gender? Gender { get; init; }
 }
-
-public class CreateTrnRequestAddress
-{
-    public string? AddressLine1 { get; init; }
-    public string? AddressLine2 { get; init; }
-    public string? AddressLine3 { get; init; }
-    public string? City { get; init; }
-    public string? Postcode { get; init; }
-    public string? Country { get; init; }
-}
-

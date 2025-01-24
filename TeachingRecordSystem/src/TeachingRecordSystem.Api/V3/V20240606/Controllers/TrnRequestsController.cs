@@ -39,13 +39,7 @@ public class TrnRequestsController(IMapper mapper) : ControllerBase
             NationalInsuranceNumber = request.Person.NationalInsuranceNumber,
             IdentityVerified = null,
             OneLoginUserSubject = null,
-            AddressLine1 = null,
-            AddressLine2 = null,
-            AddressLine3 = null,
-            City = null,
-            Postcode = null,
-            Gender = null,
-            Country = null
+            Gender = null
         };
         var result = await handler.HandleAsync(command);
 
