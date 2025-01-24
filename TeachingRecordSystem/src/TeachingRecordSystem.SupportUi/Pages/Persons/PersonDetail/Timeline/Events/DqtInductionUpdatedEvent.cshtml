@@ -9,7 +9,7 @@
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-dqt-induction-updated-event">
     <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title">Induction updated</h2>
+        <h2 class="moj-timeline__title">DQT induction updated</h2>
     </div>
     <p class="moj-timeline__date">
         <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
@@ -36,7 +36,7 @@
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
@@ -44,7 +44,7 @@
             @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Completion date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="completion-date" use-empty-fallback>@induction.CompletionDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
@@ -72,7 +72,7 @@
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
@@ -80,7 +80,7 @@
                     @if (dqtUpdatedEvent.Changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Completion date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-completion-date" use-empty-fallback>@oldInduction.CompletionDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
