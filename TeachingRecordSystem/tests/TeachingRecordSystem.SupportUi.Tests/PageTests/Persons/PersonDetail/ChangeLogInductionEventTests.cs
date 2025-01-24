@@ -579,7 +579,7 @@ public class ChangeLogInductionEventTests : TestBase
     public async Task Person_WithPersonInductionUpdatedEvent_RendersExpectedContent(PersonInductionUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
-        var createdByDqtUser = EventModels.RaisedByUserInfo.FromDqtUser(dqtUserId: Guid.NewGuid(), dqtUserName: "DQT User");
+        var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
 
         DateOnly? oldStartDate = Clock.Today.AddYears(-1);
@@ -632,7 +632,7 @@ public class ChangeLogInductionEventTests : TestBase
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = Clock.UtcNow,
-            RaisedBy = createdByDqtUser,
+            RaisedBy = createdByUser.UserId,
             PersonId = person.PersonId,
             Induction = induction,
             OldInduction = oldInduction,
@@ -660,7 +660,7 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-person-induction-updated-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
+                Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
                 Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
                 if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
                 {
