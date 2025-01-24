@@ -289,7 +289,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
             Assert.NotNull(label);
-            var reasons = label.NextElementSibling!.QuerySelectorAll("div").Select(d => d.TextContent.Trim());
+            var reasons = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TextContent.Trim());
             Assert.NotEmpty(reasons);
             Assert.Equal(expectedReasons, reasons);
         }
