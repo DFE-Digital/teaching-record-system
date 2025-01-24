@@ -216,7 +216,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         //Arrange
         var expectedWarning = "To change this teacher’s induction status ";
-        var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
         var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>
@@ -224,8 +224,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
                 InductionStatus.Passed,
-                startDate: Clock.Today.AddYears(-7).AddMonths(-6),
-                completedDate: overSevenYearsAgo,
+                startDate: Clock.Today.AddYears(-2),
+                completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
