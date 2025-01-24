@@ -17,10 +17,4 @@ public class CreateContactQuery : ICrmQuery<Guid>
     public required string? Trn { get; init; }
     public required string? TrnRequestId { get; init; }
     public required IEnumerable<dfeta_TrsOutboxMessage> OutboxMessages { get; init; }
-    public required string? Address1Line1 { get; init; }
-    public required string? Address1Line2 { get; init; }
-    public required string? Address1Line3 { get; init; }
-    public required string? Address1City { get; init; }
-    public required string? Address1PostalCode { get; init; }
-    public required string? Address1Country { get; init; }
 }

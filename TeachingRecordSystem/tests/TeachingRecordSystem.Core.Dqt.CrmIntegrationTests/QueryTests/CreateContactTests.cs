@@ -26,12 +26,6 @@ public class CreateContactTests : IAsyncLifetime
         var lastName = _dataScope.TestData.GenerateLastName();
         var email = _dataScope.TestData.GenerateUniqueEmail();
         var nino = _dataScope.TestData.GenerateNationalInsuranceNumber();
-        var address1 = Faker.Address.StreetName();
-        var address2 = Faker.Address.StreetName();
-        var address3 = Faker.Address.StreetName();
-        var city = Faker.Address.City().ToUpper();
-        var country = "England";
-        var postCode = Faker.Address.UkPostCode();
         var gender = Contact_GenderCode.Notavailable;
         var dateOfBirth = _dataScope.TestData.GenerateDateOfBirth();
         var trn = await _dataScope.TestData.GenerateTrnAsync();
@@ -52,13 +46,7 @@ public class CreateContactTests : IAsyncLifetime
             Trn = trn,
             PotentialDuplicates = [],
             ApplicationUserName = "Tests",
-            OutboxMessages = [],
-            Address1Line1 = address1,
-            Address1Line2 = address2,
-            Address1Line3 = address3,
-            Address1City = city,
-            Address1Country = country,
-            Address1PostalCode = postCode
+            OutboxMessages = []
         };
 
         // Act
@@ -76,12 +64,6 @@ public class CreateContactTests : IAsyncLifetime
         Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
         Assert.Equal(nino, contact.dfeta_NINumber);
         Assert.Equal(dateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(true));
-        Assert.Equal(address1, contact.Address1_Line1);
-        Assert.Equal(address2, contact.Address1_Line2);
-        Assert.Equal(address3, contact.Address1_Line3);
-        Assert.Equal(city, contact.Address1_City);
-        Assert.Equal(postCode, contact.Address1_PostalCode);
-        Assert.Equal(country, contact.Address1_Country);
         Assert.Equal(gender, contact.GenderCode);
     }
 
@@ -146,13 +128,7 @@ public class CreateContactTests : IAsyncLifetime
                 HasActiveAlert: false)
             ],
             ApplicationUserName = "Tests",
-            OutboxMessages = [],
-            Address1Line1 = null,
-            Address1Line2 = null,
-            Address1Line3 = null,
-            Address1City = null,
-            Address1Country = null,
-            Address1PostalCode = null
+            OutboxMessages = []
         };
         var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQueryAsync(query);
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
