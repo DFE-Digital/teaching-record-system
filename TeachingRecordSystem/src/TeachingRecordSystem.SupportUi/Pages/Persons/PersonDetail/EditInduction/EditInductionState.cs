@@ -46,22 +46,20 @@ public class EditInductionState : IRegisterJourney
             .SingleAsync(q => q.PersonId == personId);
 
         InductionStatus = person.InductionStatus;
-        if (JourneyStartPage == null)
+        JourneyStartPage ??= startPage;
+
+        switch (startPage)
         {
-            JourneyStartPage = startPage;
-        }
-        if (startPage == InductionJourneyPage.StartDate)
-        {
-            StartDate = person.InductionStartDate;
-        }
-        if (startPage == InductionJourneyPage.CompletedDate)
-        {
-            StartDate = person.InductionStartDate;
-            CompletedDate = person.InductionCompletedDate;
-        }
-        if (startPage == InductionJourneyPage.ExemptionReason)
-        {
-            ExemptionReasonIds = person.InductionExemptionReasonIds;
+            case InductionJourneyPage.StartDate:
+                StartDate = person.InductionStartDate;
+                break;
+            case InductionJourneyPage.CompletedDate:
+                StartDate = person.InductionStartDate;
+                CompletedDate = person.InductionCompletedDate;
+                break;
+            case InductionJourneyPage.ExemptionReason:
+                ExemptionReasonIds = person.InductionExemptionReasonIds;
+                break;
         }
 
         Initialized = true;
