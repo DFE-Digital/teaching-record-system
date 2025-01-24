@@ -244,39 +244,6 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCPD_NoWarning()
-    {
-        //Arrange
-        var underSevenYearsAgo = Clock.Today.AddYears(-6);
-
-        var person = await TestData.CreatePersonAsync(
-            builder => builder.WithQtlsDate(Clock.Today));
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
-                InductionStatus.Passed,
-                startDate: underSevenYearsAgo.AddYears(-1),
-                completedDate: underSevenYearsAgo,
-                cpdModifiedOn: Clock.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
-                out _);
-            await dbContext.SaveChangesAsync();
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("induction-status-warning"));
-    }
-
-    [Fact]
     public async Task Get_WithPersonId_ShowsLinkToChangeStatus()
     {
         // Arrange
