@@ -78,6 +78,11 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (JourneyInstance!.State.StartDate > JourneyInstance!.State.CompletedDate)
+        {
+            return Redirect(LinkGenerator.InductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers));
+        }
+
         var person = await _dbContext.Persons
             .SingleAsync(q => q.PersonId == PersonId);
 

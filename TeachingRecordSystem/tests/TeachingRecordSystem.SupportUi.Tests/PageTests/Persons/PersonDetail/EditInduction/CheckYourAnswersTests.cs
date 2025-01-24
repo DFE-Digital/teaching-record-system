@@ -390,6 +390,48 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
+    public async Task Post_InvalidCompletedDate_RedirectToCompletedDatePage()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.RequiredToComplete;
+        var startDate = Clock.Today;
+        var completedDate = startDate.AddYears(-2);
+        var exemptionReasonIds = (await TestData.ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(1)
+            .Select(r => r.InductionExemptionReasonId)
+            .ToArray();
+        var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithFileUploadChoice(uploadFile: false)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+
+        Assert.Equal($"/persons/{person.PersonId}/edit-induction/date-completed?fromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}", location);
+    }
+
+    [Fact]
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
