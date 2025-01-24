@@ -300,6 +300,167 @@ public class InductionTests : TestBase
     }
 
     [Fact]
+    public async Task EditStartDate_CYA_ChangeStartDateThatInvalidatesCompletedDate_ContinueToCompletedDate()
+    {
+        var startDate = new DateOnly(2021, 1, 1);
+        var completedDate = startDate.AddYears(1);
+        var setStartDate = completedDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithQts()
+                .WithInductionStatus(inductionBuilder => inductionBuilder
+                    .WithStatus(InductionStatus.Passed)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)));
+        var personId = person.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonInductionPageAsync(personId);
+        await page.ClickEditInductionStartDatePageAsync();
+
+        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
+    }
+
+    [Fact]
+    public async Task EditInductionStatus_CYA_ChangeAnythingOtherThanStatus_ContinueToCYA()
+    {
+        var startDate = new DateOnly(2021, 1, 1);
+        var completedDate = startDate.AddYears(1);
+        var setStartDate = startDate.AddDays(1);
+        var setCompletedDate = completedDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithQts()
+                .WithInductionStatus(inductionBuilder => inductionBuilder
+                    .WithStatus(InductionStatus.RequiredToComplete)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)));
+        var personId = person.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonInductionPageAsync(personId);
+        await page.ClickEditInductionStatusPageAsync();
+
+        await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
+
+        await page.SelectStatusAsync(InductionStatus.Passed);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
+        await page.AssertDateInputEmptyAsync();
+        await page.FillDateInputAsync(setCompletedDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction started on");
+        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction completed on");
+        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setCompletedDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Reason details");
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+    }
+
+    [Fact]
+    public async Task EditInductionStatus_CYA_ChangeSomething_NavigatesBackToCYA()
+    {
+        var startDate = new DateOnly(2021, 1, 1);
+        var completedDate = startDate.AddYears(1);
+        var setStartDate = startDate.AddDays(1);
+        var setCompletedDate = completedDate.AddDays(1);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithQts()
+                .WithInductionStatus(inductionBuilder => inductionBuilder
+                    .WithStatus(InductionStatus.RequiredToComplete)
+                    .WithStartDate(startDate)
+                    .WithCompletedDate(completedDate)));
+        var personId = person.ContactId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonInductionPageAsync(personId);
+        await page.ClickEditInductionStatusPageAsync();
+
+        await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
+
+        await page.SelectStatusAsync(InductionStatus.Passed);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
+        await page.AssertDateInputEmptyAsync();
+        await page.FillDateInputAsync(setCompletedDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction status");
+        await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction started on");
+        await page.AssertOnEditInductionStartDatePageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Induction completed on");
+        await page.AssertOnEditInductionCompletedDatePageAsync(person.PersonId);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+        await page.ClickChangeLinkForSummaryListRowWithKeyAsync("Reason details");
+        await page.AssertOnEditInductionChangeReasonPageAsync(person.PersonId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickBackLink();
+
+        await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
+    }
+
+    [Fact]
     public async Task EditInductionExemptionReason_NavigateBack()
     {
         var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
