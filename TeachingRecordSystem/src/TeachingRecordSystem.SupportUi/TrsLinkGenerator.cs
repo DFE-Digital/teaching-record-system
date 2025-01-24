@@ -200,8 +200,8 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string InductionChangeReasonCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/InductionChangeReason", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string InductionCheckYourAnswers(Guid personId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string InductionCheckYourAnswers(Guid personId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string InductionCheckYourAnswersCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
     GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
