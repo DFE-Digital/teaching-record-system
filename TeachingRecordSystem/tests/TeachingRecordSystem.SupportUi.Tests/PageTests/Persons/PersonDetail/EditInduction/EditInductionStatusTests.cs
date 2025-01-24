@@ -65,16 +65,12 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TextContent);
     }
 
-    [Theory]
-    [InlineData(InductionStatus.RequiredToComplete, new InductionStatus[] { InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Exempt, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.InProgress, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
-    public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus, InductionStatus[] expectedStatuses)
+    [Fact]
+    public async Task Get_InductionNotManagedByCpd_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
+        InductionStatus currentInductionStatus = InductionStatus.InProgress;
+        var expectedStatuses = new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales };
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -99,12 +95,14 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Theory]
-    [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt })]
-    public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus, InductionStatus[] expectedStatuses)
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.FailedInWales)]
+    // CML - TODO just test 1 when page changes are complete
+    public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus)
     {
         // Arrange
+        InductionStatus[] expectedStatuses = { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales };
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -142,13 +140,14 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Theory]
-    [InlineData(InductionStatus.RequiredToComplete, InductionStatus.Exempt)]
-    [InlineData(InductionStatus.Exempt, InductionStatus.RequiredToComplete)]
-    [InlineData(InductionStatus.InProgress, InductionStatus.Passed)]
-    [InlineData(InductionStatus.Passed, InductionStatus.InProgress)]
-    [InlineData(InductionStatus.Failed, InductionStatus.FailedInWales)]
-    [InlineData(InductionStatus.FailedInWales, InductionStatus.Failed)]
-    public async Task Get_InductionStatusHasBeenSet_ShowsSelectedRadioButton(InductionStatus currentInductionStatus, InductionStatus selectedInductionStatus)
+    [InlineData(InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.Exempt)]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.Passed)]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.FailedInWales)]
+    //CML TODO just test 1 when page changes are complete
+    public async Task Get_InductionStatusHasBeenSet_ShowsSelectedRadioButton(InductionStatus currentInductionStatus)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -157,7 +156,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
             person.PersonId,
             new EditInductionStateBuilder()
                 .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
-                .WithUpdatedState(selectedInductionStatus)
                 .Create());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -168,7 +166,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var selectedStatus = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Single(r => r.IsChecked == true);
-        Assert.Equal(selectedInductionStatus.ToString(), selectedStatus.Value);
+        Assert.Equal(currentInductionStatus.ToString(), selectedStatus.Value);
     }
 
     [Fact]

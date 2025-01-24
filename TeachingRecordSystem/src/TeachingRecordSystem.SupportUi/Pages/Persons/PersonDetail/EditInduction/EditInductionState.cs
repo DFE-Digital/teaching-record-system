@@ -46,16 +46,12 @@ public class EditInductionState : IRegisterJourney
         var person = await dbContext.Persons
             .SingleAsync(q => q.PersonId == personId);
 
-        CurrentInductionStatus = person.InductionStatus;
-        StartDate = person.InductionStartDate;
-        CompletedDate = person.InductionCompletedDate;
+        InductionStatus = person.InductionStatus;
+        //StartDate = person.InductionStartDate;
+        //CompletedDate = person.InductionCompletedDate;
         if (JourneyStartPage == null)
         {
             JourneyStartPage = startPage;
-        }
-        if (InductionStatus == InductionStatus.None)
-        {
-            InductionStatus = CurrentInductionStatus;
         }
 
         Initialized = true;

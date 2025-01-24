@@ -22,15 +22,14 @@ public class StatusModel : CommonJourneyPage
     [Display(Name = "What is their induction status?")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
-    public InductionStatus CurrentInductionStatus { get; set; }
     public string? PersonName { get; set; }
     public IEnumerable<InductionStatusInfo> StatusChoices
     {
         get
         {
             return InductionStatusManagedByCpd ?
-                 InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd.Where(i => i.Value != CurrentInductionStatus)
-                : InductionStatusRegistry.All.ToArray()[1..].Where(i => i.Value != CurrentInductionStatus);
+                 InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
+                : InductionStatusRegistry.All.ToArray()[1..];
         }
     }
     public string? StatusWarningMessage
@@ -97,17 +96,6 @@ public class StatusModel : CommonJourneyPage
             {
                 state.JourneyStartPage = InductionJourneyPage.Status;
             }
-            // Editing status is considered a 'start again' action - clear all other fields currently set
-            state.StartDate = null;
-            state.CompletedDate = null;
-            state.ExemptionReasonIds = null;
-            state.HasAdditionalReasonDetail = null;
-            state.ChangeReason = null;
-            state.ChangeReasonDetail = null;
-            state.EvidenceFileId = null;
-            state.EvidenceFileName = null;
-            state.EvidenceFileSizeDescription = null;
-            state.UploadEvidence = null;
         });
 
         return Redirect(PageLink(NextPage));
@@ -122,7 +110,6 @@ public class StatusModel : CommonJourneyPage
         PersonName = personInfo.Name;
         var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
         InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
-        CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
         await next();
     }
 }

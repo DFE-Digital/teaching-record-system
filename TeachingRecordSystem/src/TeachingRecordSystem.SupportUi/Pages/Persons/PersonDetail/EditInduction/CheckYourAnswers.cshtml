@@ -19,7 +19,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@Model.InductionStatus</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>@Model.InductionStatus.GetDisplayName()</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action
                                 href="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"

@@ -250,21 +250,10 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var underSevenYearsAgo = Clock.Today.AddYears(-6);
 
         var person = await TestData.CreatePersonAsync(
-            builder => builder.WithQtlsDate(Clock.Today));
-
-        await WithDbContext(async dbContext =>
-        {
-            dbContext.Attach(person.Person);
-            person.Person.SetCpdInductionStatus(
-                InductionStatus.Passed,
-                startDate: underSevenYearsAgo.AddYears(-1),
-                completedDate: underSevenYearsAgo,
-                cpdModifiedOn: Clock.UtcNow,
-                updatedBy: SystemUser.SystemUserId,
-                now: Clock.UtcNow,
-                out _);
-            await dbContext.SaveChangesAsync();
-        });
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(builder => builder
+                    .WithStatus(InductionStatus.InProgress)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
