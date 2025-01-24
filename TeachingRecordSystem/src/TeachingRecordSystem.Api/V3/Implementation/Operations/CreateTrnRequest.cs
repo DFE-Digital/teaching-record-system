@@ -23,12 +23,6 @@ public record CreateTrnRequestCommand
     public required bool? IdentityVerified { get; init; }
     public required string? OneLoginUserSubject { get; init; }
     public required Gender? Gender { get; init; }
-    public required string? AddressLine1 { get; init; }
-    public required string? AddressLine2 { get; init; }
-    public required string? AddressLine3 { get; init; }
-    public required string? City { get; init; }
-    public required string? Postcode { get; init; }
-    public required string? Country { get; init; }
 }
 
 public class CreateTrnRequestHandler(
@@ -139,13 +133,7 @@ public class CreateTrnRequestHandler(
                 DateOfBirth = command.DateOfBirth,
                 EmailAddress = emailAddress,
                 NationalInsuranceNumber = command.NationalInsuranceNumber,
-                Gender = (int?)command.Gender,
-                AddressLine1 = command.AddressLine1,
-                AddressLine2 = command.AddressLine2,
-                AddressLine3 = command.AddressLine3,
-                City = command.City,
-                Postcode = command.Postcode,
-                Country = command.Country
+                Gender = (int?)command.Gender
             })
         };
 
@@ -165,13 +153,7 @@ public class CreateTrnRequestHandler(
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
-            OutboxMessages = outboxMessages,
-            Address1Line1 = command.AddressLine1,
-            Address1Line2 = command.AddressLine2,
-            Address1Line3 = command.AddressLine3,
-            Address1City = command.City,
-            Address1PostalCode = command.Postcode,
-            Address1Country = command.Country
+            OutboxMessages = outboxMessages
         });
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;

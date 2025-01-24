@@ -31,25 +31,13 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             EMailAddress1 = query.EmailAddress,
             dfeta_AllowPiiUpdatesFromRegister = false,
             dfeta_TrnRequestID = query.TrnRequestId,
-            dfeta_TRN = query.Trn,
-            Address1_Line1 = query.Address1Line1,
-            Address1_Line2 = query.Address1Line2,
-            Address1_Line3 = query.Address1Line3,
-            Address1_City = query.Address1City,
-            Address1_PostalCode = query.Address1PostalCode,
-            Address1_Country = query.Address1Country
+            dfeta_TRN = query.Trn
         };
 
         if (query.Trn is null)
         {
             // CRM plug-in explodes if TRN is specified but is null
             contact.Attributes.Remove(Contact.Fields.dfeta_TRN);
-        }
-
-        if (query.Address1City is null)
-        {
-            // CRM plug-in explodes if AddressCity is specified but is null
-            contact.Attributes.Remove(Contact.Fields.Address1_City);
         }
 
         requestBuilder.AddRequest(new CreateRequest() { Target = contact });

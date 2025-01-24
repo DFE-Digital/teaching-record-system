@@ -70,7 +70,8 @@ public class ChangeHistoryModel(
             nameof(InductionMigratedEvent),
             nameof(DqtInductionDeactivatedEvent),
             nameof(DqtInductionReactivatedEvent),
-            nameof(DqtContactInductionStatusChangedEvent)
+            nameof(DqtContactInductionStatusChangedEvent),
+            nameof(PersonInductionUpdatedEvent),
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();

@@ -36,14 +36,14 @@
             @if (@induction.StartDate.HasValue)
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Started on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="start-date">@induction.StartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (@induction.CompletionDate.HasValue)
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Completion date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Completed on</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="completion-date">@induction.CompletionDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
