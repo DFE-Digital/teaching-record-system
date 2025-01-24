@@ -17,7 +17,7 @@
 
 @if (Model.Status != InductionStatus.None)
 {
-    <govuk-summary-card data-testid="induction-card">
+    <govuk-summary-card class="govuk-grid-column-full-from-desktop" data-testid="induction-card">
         <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
         <govuk-summary-list>
             <govuk-summary-list-row data-testid="induction-status">
@@ -33,9 +33,16 @@
 
             @if (Model.ExemptionReasonIds!.Length > 0)
             {
-                <govuk-summary-list-row data-testid="induction-exemption-reasons">
+                <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.ExemptionReasonsText</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>
+                            <ul class="govuk-list">
+                            @foreach (var exemptionReason in Model.ExemptionReasonValues!)
+                            {
+                                <li>@exemptionReason</li>
+                            }
+                            </ul>
+                    </govuk-summary-list-row-value>
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>

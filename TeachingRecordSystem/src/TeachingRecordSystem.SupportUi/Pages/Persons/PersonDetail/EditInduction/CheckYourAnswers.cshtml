@@ -9,7 +9,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
+    <div class="govuk-grid-column-full-from-desktop">
         <form action="@LinkGenerator.InductionCheckYourAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Change an alert - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
@@ -53,13 +53,15 @@
                 }
                 @if(Model.ShowExemptionReasons)
                 {
-                    <govuk-summary-list-row>
+                    <govuk-summary-list-row class="govuk-list--spaced">
                         <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
-                            @foreach (var exemptionReason in Model.SelectedExemptionReasonsValues!)
-                            {
-                                <div>@exemptionReason</div>
-                            }
+                            <ul class="govuk-list">
+                                @foreach (var exemptionReason in Model.SelectedExemptionReasonsValues!)
+                                {
+                                    <li>@exemptionReason</li>
+                                }
+                            </ul>
                         </govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action

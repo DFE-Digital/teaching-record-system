@@ -36,7 +36,7 @@ public class InductionModel(
 
     public bool ShowCompletedDate => Status.RequiresCompletedDate();
 
-    public string? ExemptionReasonsText { get; set; }
+    public IEnumerable<string>? ExemptionReasonValues { get; set; }
 
     public string? StatusWarningMessage
     {
@@ -78,9 +78,7 @@ public class InductionModel(
         _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
 
         var allExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync();
-        var exemptionReasons = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId))
-            .ToArray();
-        ExemptionReasonsText = string.Join(", ", exemptionReasons.Select(r => r.Name));
+        ExemptionReasonValues = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId)).Select(r => r.Name);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;
