@@ -309,8 +309,7 @@ public class Person
     public bool InductionStatusManagedByCpd(DateOnly now)
     {
         var sevenYearsAgo = now.AddYears(-7);
-        return InductionCompletedDate is not null
-            && InductionCompletedDate < sevenYearsAgo;
+        return (CpdInductionStatus is not null && (CpdInductionCompletedDate is null || CpdInductionCompletedDate > sevenYearsAgo));
     }
 
     private static void AssertInductionChangeIsValid(

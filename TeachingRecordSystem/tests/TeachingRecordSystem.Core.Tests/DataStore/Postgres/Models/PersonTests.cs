@@ -285,9 +285,9 @@ public class PersonTests
     }
 
     [Theory]
-    [InlineData(-3, false)]
-    [InlineData(-7, true)]
-    public void InductionManagedByCpd_ReturnsTrue(int yearsSinceCompleted, bool expected)
+    [InlineData(-3, true)]
+    [InlineData(-7, false)]
+    public void InductionManagedByCpd_ReturnsExpected(int yearsSinceCompleted, bool expected)
     {
         // Arrange
         var dateTimeCompleted = Clock.UtcNow.AddYears(yearsSinceCompleted).AddDays(-1);
@@ -301,15 +301,13 @@ public class PersonTests
             FirstName = "Joe",
             MiddleName = "",
             LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
+            DateOfBirth = new(1990, 1, 1)
         };
-        person.SetInductionStatus(
-            InductionStatus.Passed,
-            dateCompleted, dateCompleted,
-            [],
-            changeReason: null,
-            changeReasonDetail: null,
-            evidenceFile: null,
+        person.SetCpdInductionStatus(
+            status: InductionStatus.Passed,
+            startDate: dateCompleted,
+            completedDate: dateCompleted,
+            cpdModifiedOn: dateTimeCompleted,
             SystemUser.SystemUserId,
             Clock.UtcNow, out _);
 
