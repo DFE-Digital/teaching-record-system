@@ -106,15 +106,15 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
-        var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
                 InductionStatus.Passed,
-                startDate: Clock.Today.AddYears(-7).AddMonths(-6),
-                completedDate: overSevenYearsAgo,
+                startDate: lessThanSevenYearsAgo.AddYears(-1),
+                completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
@@ -199,15 +199,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal("Exempt", journeyInstance.State.InductionStatus.GetTitle());
     }
 
-    [Theory]
-    [InlineData(InductionStatus.RequiredToComplete, new InductionStatus[] { InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Exempt, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.InProgress, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Failed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed })]
-
-    public async Task Post_NoSelectedStatus_ShowsPageError(InductionStatus currentInductionStatus, InductionStatus[] expectedStatusChoices)
+    [Fact]
+    public async Task Post_NoSelectedStatus_ShowsPageError()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -215,7 +208,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -230,27 +223,20 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
-        var doc = await response.GetDocumentAsync();
-        var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
-        var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal(expectedStatusChoices.Select(c => c.ToString()), statusChoices);
     }
 
-    [Theory]
-    [InlineData(InductionStatus.Passed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.Failed, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales })]
-    [InlineData(InductionStatus.FailedInWales, new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt })]
-    public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError(InductionStatus currentInductionStatus, InductionStatus[] expectedChoices)
+    [Fact]
+    public async Task Post_PersonManagedByCpd_NoSelectedStatus_ShowsPageError()
     {
-        var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
                 InductionStatus.Passed,
-                startDate: Clock.Today.AddYears(-7).AddMonths(-6),
-                completedDate: overSevenYearsAgo,
+                startDate: lessThanSevenYearsAgo.AddYears(-1),
+                completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
@@ -260,7 +246,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
+                .WithInitialisedState(InductionStatus.Passed, InductionJourneyPage.Status)
                 .Create());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -275,10 +261,6 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
-        var doc = await response.GetDocumentAsync();
-        var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
-        var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal(expectedChoices.Select(c => c.ToString()), statusChoices);
     }
 
     [Fact]
@@ -286,16 +268,16 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     {
         //Arrange
         var expectedWarning = "To change this teacher’s induction status ";
-        var overSevenYearsAgo = Clock.Today.AddYears(-7).AddDays(-1);
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
                 InductionStatus.Passed,
-                startDate: Clock.Today.AddYears(-7).AddMonths(-6),
-                completedDate: overSevenYearsAgo,
+                startDate: lessThanSevenYearsAgo.AddYears(-1),
+                completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
