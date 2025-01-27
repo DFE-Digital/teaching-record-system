@@ -105,7 +105,7 @@ public class EwcWalesImportJob(BlobServiceClient blobServiceClient, InductionImp
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(StorageContainer);
         var sourceBlobClient = blobContainerClient.GetBlobClient(fileName);
         var fileNameParts = fileName.Split("/");
-        var fileNameWithoutFolder = fileNameParts.Last();
+        var fileNameWithoutFolder = $"{DateTime.Now.ToString("ddMMyyyyHHmm")}-{fileNameParts.Last()}";
         var targetFileName = $"{ProcessedFolder}/{fileNameWithoutFolder}";
 
         // Acquire a lease to prevent another client modifying the source blob

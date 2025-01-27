@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
@@ -26,7 +27,11 @@ public class InductionImporter
 
     public async Task<InductionImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
-        using (var csv = new CsvReader(csvReaderStream, CultureInfo.InvariantCulture))
+        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            TrimOptions = TrimOptions.Trim
+        };
+        using (var csv = new CsvReader(csvReaderStream, csvConfig))
         {
             var integrationJob = new CreateIntegrationTransactionQuery()
             {
@@ -164,7 +169,7 @@ public class InductionImporter
 
                         //increase failurecount if row is processable or if there are validation failures
                         //else increase success counter
-                        if (validationFailures.ValidationFailures.Any() || validationFailures.Errors.Any())
+                        if (validationFailures.Errors.Any())
                         {
                             failureRowCount++;
                         }
@@ -186,7 +191,7 @@ public class InductionImporter
                         InductionPeriodId = inductionPeriodId,
                         DuplicateStatus = null,
                         FailureMessage = itrFailureMessage.ToString(),
-                        StatusCode = string.IsNullOrEmpty(itrFailureMessage.ToString()) ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
+                        StatusCode = validationFailures.Errors.Count == 0 ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
                         RowData = ConvertToCSVString(row),
                         FileName = fileName
                     };
@@ -259,15 +264,24 @@ public class InductionImporter
             inductionMatchStatus = indStatus;
             induction = ind?.Induction;
 
-            if (ind?.InductionPeriods?.Length == 1)
+            if (ind?.InductionPeriods?.Length > 0)
             {
-                inductionPeriodMatchStatus = InductionPeriodLookupResult.OneMatch;
-                inductionPeriod = ind.InductionPeriods.First();
-            }
-            else if (ind?.InductionPeriods?.Length > 1)
-            {
-                inductionPeriodMatchStatus = InductionPeriodLookupResult.MultipleMatchesFound;
-                inductionPeriod = null;
+                var periods = ind?.InductionPeriods.ToList();
+                if (periods?.Count() == 1)
+                {
+                    inductionPeriodMatchStatus = InductionPeriodLookupResult.OneMatch;
+                    inductionPeriod = periods.First();
+                }
+                else if (periods?.Count() > 1)
+                {
+                    inductionPeriodMatchStatus = InductionPeriodLookupResult.MultipleMatchesFound;
+                    inductionPeriod = null;
+                }
+                else
+                {
+                    inductionPeriodMatchStatus = InductionPeriodLookupResult.NoMatch;
+                    inductionPeriod = null;
+                }
             }
 
             hasActiveAlerts = _dbContext.Alerts.Where(x => x.PersonId == contact.Id && x.IsOpen).Count() > 0;
@@ -393,6 +407,21 @@ public class InductionImporter
                 case (int)dfeta_InductionStatus.InProgress:
                     errors.Add($"Teacher with TRN {row.ReferenceNumber} completed induction already or is progress.");
                     break;
+            }
+        }
+
+        // Error If:
+        // Matched InductionPeriod already has an end date
+        // Matched InductionPeriod is associated with a different AB
+        if (lookups.InductionPeriod != null)
+        {
+            if (lookups.InductionPeriod.dfeta_EndDate.HasValue)
+            {
+                errors.Add($"Unable to update induction period that has an end date.");
+            }
+            else if (lookups.InductionPeriod.dfeta_AppropriateBodyId?.Id != lookups.OrganisationId)
+            {
+                errors.Add($"Teacher is claimed by another Appropriate Body.");
             }
         }
 

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -27,7 +28,11 @@ public class QtsImporter
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
-        using var csv = new CsvReader(csvReaderStream, CultureInfo.InvariantCulture);
+        var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            TrimOptions = TrimOptions.Trim
+        };
+        using var csv = new CsvReader(csvReaderStream, csvConfig);
         var records = csv.GetRecords<EwcWalesQtsFileImportData>().ToList();
         var totalRowCount = 0;
         var successCount = 0;
@@ -46,9 +51,9 @@ public class QtsImporter
         foreach (var row in records)
         {
             totalRowCount++;
-            var qualificationId = Guid.NewGuid();
+            var qualificationId = default(Guid?);
             Guid? ittId = null;
-            var qtsRegistrationId = Guid.NewGuid();
+            var qtsRegistrationId = default(Guid?);
             Guid? inductionId = null;
             var itrFailureMessage = new StringBuilder();
             using var rowTransaction = _crmQueryDispatcher.CreateTransactionRequestBuilder();
@@ -71,6 +76,9 @@ public class QtsImporter
                 else
                 {
                     ittId = Guid.NewGuid();
+                    qualificationId = Guid.NewGuid();
+                    qtsRegistrationId = Guid.NewGuid();
+
                     //Create ITT
                     var ittQuery = new CreateInitialTeacherTrainingTransactionalQuery()
                     {
@@ -85,7 +93,7 @@ public class QtsImporter
                     //Create Qualification
                     var qualificationQuery = new CreateHeQualificationTransactionalQuery()
                     {
-                        Id = qualificationId,
+                        Id = qualificationId.Value,
                         ContactId = lookupData.PersonId.Value,
                         HECountryId = lookupData.PQCountryId,
                         HECourseLength = row.PqCourseLength,
@@ -102,7 +110,7 @@ public class QtsImporter
                     //Qts
                     var qtsQuery = new CreateQtsRegistrationTransactionalQuery()
                     {
-                        Id = qtsRegistrationId,
+                        Id = qtsRegistrationId.Value,
                         ContactId = lookupData.PersonId.Value,
                         TeacherStatusId = lookupData.TeacherStatusId!.Value,
                         QtsDate = DateTime.ParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)
@@ -156,7 +164,7 @@ public class QtsImporter
                     InductionPeriodId = null,
                     DuplicateStatus = null,
                     FailureMessage = itrFailureMessage.ToString(),
-                    StatusCode = string.IsNullOrEmpty(itrFailureMessage.ToString()) ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
+                    StatusCode = validationFailures.Errors.Count == 0 ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
                     RowData = ConvertToCsvString(row),
                     FileName = fileName
                 };
@@ -181,7 +189,7 @@ public class QtsImporter
 
                 //increase failurecount if row is processable or if there are validation failures
                 //else increase success counter
-                if (validationFailures.ValidationFailures.Any() || validationFailures.Errors.Any())
+                if (validationFailures.Errors.Any())
                 {
                     failureRowCount++;
                 }
