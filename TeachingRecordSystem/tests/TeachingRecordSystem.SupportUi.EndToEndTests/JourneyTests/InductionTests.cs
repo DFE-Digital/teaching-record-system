@@ -30,7 +30,6 @@ public class InductionTests : TestBase
         await page.ClickEditInductionStatusPageAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
-
         await page.SelectStatusAsync(InductionStatus.Passed);
         await page.ClickContinueButtonAsync();
 
@@ -109,7 +108,6 @@ public class InductionTests : TestBase
         await page.ClickEditInductionStatusPageAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
-
         await page.SelectStatusAsync(InductionStatus.Exempt);
         await page.ClickContinueButtonAsync();
 
@@ -160,7 +158,6 @@ public class InductionTests : TestBase
         await page.ClickEditInductionStatusPageAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
-
         await page.SelectStatusAsync(inductionStatusToSelect);
         await page.ClickContinueButtonAsync();
 
@@ -344,7 +341,6 @@ public class InductionTests : TestBase
         await page.ClickEditInductionStatusPageAsync();
 
         await page.AssertOnEditInductionStatusPageAsync(person.PersonId);
-
         await page.SelectStatusAsync(InductionStatus.Passed);
         await page.ClickContinueButtonAsync();
 

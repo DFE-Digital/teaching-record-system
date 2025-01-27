@@ -47,21 +47,9 @@ public class EditInductionState : IRegisterJourney
 
         InductionStatus = person.InductionStatus;
         JourneyStartPage ??= startPage;
-
-        switch (startPage)
-        {
-            case InductionJourneyPage.StartDate:
-                StartDate = person.InductionStartDate;
-                break;
-            case InductionJourneyPage.CompletedDate:
-                StartDate = person.InductionStartDate;
-                CompletedDate = person.InductionCompletedDate;
-                break;
-            case InductionJourneyPage.ExemptionReason:
-                ExemptionReasonIds = person.InductionExemptionReasonIds;
-                break;
-        }
-
+        StartDate = person.InductionStartDate;
+        CompletedDate = person.InductionCompletedDate;
+        ExemptionReasonIds = person.InductionExemptionReasonIds;
         Initialized = true;
     }
 }

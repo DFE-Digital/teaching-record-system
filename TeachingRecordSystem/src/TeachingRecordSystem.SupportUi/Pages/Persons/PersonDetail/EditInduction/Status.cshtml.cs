@@ -96,6 +96,18 @@ public class StatusModel : CommonJourneyPage
             {
                 state.JourneyStartPage = InductionJourneyPage.Status;
             }
+            if (!InductionStatus.RequiresStartDate())
+            {
+                state.StartDate = null;
+            }
+            if (!InductionStatus.RequiresCompletedDate())
+            {
+                state.CompletedDate = null;
+            }
+            if (!InductionStatus.RequiresExemptionReasons())
+            {
+                state.ExemptionReasonIds = Array.Empty<Guid>();
+            }
         });
 
         return Redirect(PageLink(NextPage));

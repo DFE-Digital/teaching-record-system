@@ -137,7 +137,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Fact]
-    public async Task Get_InductionStatusHasBeenSet_ShowsSelectedRadioButton()
+    public async Task Get_InductionStatus_ShowsAllRadioButtonsNotSelected()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -149,6 +149,29 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 .Create());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var selectedStatus = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Where(r => r.IsChecked == true);
+        Assert.Empty(selectedStatus);
+    }
+
+    [Fact]
+    public async Task Get_InductionStatusFromCya_ShowsSelectedRadioButton()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var currentInductionStatus = InductionStatus.RequiredToComplete;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?fromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
