@@ -3,7 +3,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Logging;
 
-namespace TeachingRecordSystem.Core.Jobs.EWCWalesImport;
+namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class EwcWalesImportJob(BlobServiceClient blobServiceClient, InductionImporter inductionImporter, QtsImporter qtsImporter, ILogger<EwcWalesImportJob> logger)
 {

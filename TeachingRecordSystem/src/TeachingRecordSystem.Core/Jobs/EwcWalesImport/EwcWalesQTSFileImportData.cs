@@ -1,6 +1,6 @@
 using CsvHelper.Configuration.Attributes;
 
-namespace TeachingRecordSystem.Core.Jobs.EWCWalesImport;
+namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class EwcWalesQtsFileImportData
 {
