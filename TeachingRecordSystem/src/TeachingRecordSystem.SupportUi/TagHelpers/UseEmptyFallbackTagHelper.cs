@@ -1,5 +1,3 @@
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace TeachingRecordSystem.SupportUi.TagHelpers;
@@ -16,7 +14,6 @@ public class UseEmptyFallbackTagHelper : TagHelper
 
         if (content.IsEmptyOrWhiteSpace)
         {
-            output.AddClass("trs-subtle-emphasis", HtmlEncoder.Default);
             output.Content.SetContent(UiDefaults.EmptyDisplayContent);
         }
     }

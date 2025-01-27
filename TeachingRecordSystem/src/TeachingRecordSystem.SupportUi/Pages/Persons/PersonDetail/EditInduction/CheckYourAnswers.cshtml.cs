@@ -44,15 +44,15 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public bool ShowStatus =>
+    public bool ShowStatusChangeLink =>
             StartPage == InductionJourneyPage.Status;
 
-    public bool ShowStartDate =>
-            StartPage != InductionJourneyPage.CompletedDate && InductionStatus.RequiresStartDate();
+    public bool ShowStartDateChangeLink =>
+            (StartPage == InductionJourneyPage.Status || StartPage == InductionJourneyPage.StartDate) && InductionStatus.RequiresStartDate();
 
-    public bool ShowCompletedDate => InductionStatus.RequiresCompletedDate();
+    public bool ShowCompletedDateChangeLink => InductionStatus.RequiresCompletedDate();
 
-    public bool ShowExemptionReasons =>
+    public bool ShowExemptionReasonsChangeLink =>
         InductionStatus == InductionStatus.Exempt;
 
     [FromQuery]
@@ -78,6 +78,11 @@ public class CheckYourAnswersModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (JourneyInstance!.State.StartDate > JourneyInstance!.State.CompletedDate)
+        {
+            return Redirect(LinkGenerator.InductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers));
+        }
+
         var person = await _dbContext.Persons
             .SingleAsync(q => q.PersonId == PersonId);
 

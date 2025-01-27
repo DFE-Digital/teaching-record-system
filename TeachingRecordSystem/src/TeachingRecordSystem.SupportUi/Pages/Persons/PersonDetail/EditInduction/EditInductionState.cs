@@ -13,7 +13,6 @@ public class EditInductionState : IRegisterJourney
 
     public InductionJourneyPage? JourneyStartPage { get; set; }
     public InductionStatus InductionStatus { get; set; }
-    public InductionStatus CurrentInductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
     public Guid[]? ExemptionReasonIds { get; set; } = Array.Empty<Guid>();
@@ -46,18 +45,11 @@ public class EditInductionState : IRegisterJourney
         var person = await dbContext.Persons
             .SingleAsync(q => q.PersonId == personId);
 
-        CurrentInductionStatus = person.InductionStatus;
+        InductionStatus = person.InductionStatus;
+        JourneyStartPage ??= startPage;
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
-        if (JourneyStartPage == null)
-        {
-            JourneyStartPage = startPage;
-        }
-        if (InductionStatus == InductionStatus.None)
-        {
-            InductionStatus = CurrentInductionStatus;
-        }
-
+        ExemptionReasonIds = person.InductionExemptionReasonIds;
         Initialized = true;
     }
 }

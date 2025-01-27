@@ -216,7 +216,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         //Arrange
         var expectedWarning = "To change this teacher’s induction status ";
-        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1).AddDays(-1);
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
         var person = await TestData.CreatePersonAsync();
         await WithDbContext(async dbContext =>
@@ -224,7 +224,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
                 InductionStatus.Passed,
-                startDate: lessThanSevenYearsAgo.AddYears(-1),
+                startDate: Clock.Today.AddYears(-2),
                 completedDate: lessThanSevenYearsAgo,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
@@ -241,6 +241,28 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+    }
+
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCPD_NoWarning()
+    {
+        //Arrange
+        var underSevenYearsAgo = Clock.Today.AddYears(-6);
+
+        var person = await TestData.CreatePersonAsync(
+            builder => builder
+                .WithQts()
+                .WithInductionStatus(builder => builder
+                    .WithStatus(InductionStatus.InProgress)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetElementByTestId("induction-status-warning"));
     }
 
     [Fact]

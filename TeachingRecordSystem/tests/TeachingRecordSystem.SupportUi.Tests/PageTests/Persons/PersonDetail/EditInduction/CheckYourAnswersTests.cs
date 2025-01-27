@@ -55,7 +55,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, false)]
     [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, false)]
     [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false)]
-    public async Task Get_ShowsInductionStatus_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showStatus)
+    public async Task Get_ShowsInductionStatus_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showChangeLink)
     {
         // Arrange
         var labelContent = "Induction status";
@@ -90,35 +90,36 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        if (showStatus)
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
+        Assert.NotNull(label);
+        var value = label.NextElementSibling;
+        Assert.Equal(inductionStatus.GetTitle(), value!.TextContent);
+        if (showChangeLink)
         {
-            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
-            Assert.NotNull(label);
-            var value = label.NextElementSibling;
-            Assert.Equal(inductionStatus.GetDisplayName(), value!.TextContent);
+            Assert.NotNull(value.NextElementSibling!.GetElementsByTagName("a").First());
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TextContent == labelContent));
+            Assert.Null(value.NextElementSibling);
         }
     }
 
     [Theory]
-    [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, true)]
-    [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, true)]
-    [InlineData(InductionJourneyPage.Status, InductionStatus.Failed, true)]
-    [InlineData(InductionJourneyPage.Status, InductionStatus.FailedInWales, true)]
-    [InlineData(InductionJourneyPage.Status, InductionStatus.Exempt, false)]
-    [InlineData(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false)]
-    [InlineData(InductionJourneyPage.StartDate, InductionStatus.InProgress, true)]
-    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Passed, true)]
-    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Failed, true)]
-    [InlineData(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, true)]
-    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Passed, false)]
-    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, false)]
-    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, false)]
-    [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false)]
-    public async Task Get_ShowsStartDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool ShowsStartDate)
+    [InlineData(InductionJourneyPage.Status, InductionStatus.InProgress, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Passed, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Failed, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.FailedInWales, true, true)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.Exempt, false, false)]
+    [InlineData(InductionJourneyPage.Status, InductionStatus.RequiredToComplete, false, false)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.InProgress, true, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Passed, true, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.Failed, true, true)]
+    [InlineData(InductionJourneyPage.StartDate, InductionStatus.FailedInWales, true, true)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Passed, true, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.Failed, true, false)]
+    [InlineData(InductionJourneyPage.CompletedDate, InductionStatus.FailedInWales, true, false)]
+    [InlineData(InductionJourneyPage.ExemptionReason, InductionStatus.Exempt, false, false)]
+    public async Task Get_ShowsStartDate_AsExpected(InductionJourneyPage startPage, InductionStatus inductionStatus, bool showStartDateRow, bool showChangeLink)
     {
         // Arrange
         var labelContent = "Induction started on";
@@ -153,12 +154,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        if (ShowsStartDate)
+
+        if (showStartDateRow)
         {
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
             Assert.NotNull(label);
             var value = label.NextElementSibling;
             Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
+            if (showChangeLink)
+            {
+                Assert.NotNull(value.NextElementSibling!.GetElementsByTagName("a").First());
+            }
+            else
+            {
+                Assert.Null(value.NextElementSibling);
+            }
         }
         else
         {
@@ -289,7 +299,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
             Assert.NotNull(label);
-            var reasons = label.NextElementSibling!.QuerySelectorAll("div").Select(d => d.TextContent.Trim());
+            var reasons = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TextContent.Trim());
             Assert.NotEmpty(reasons);
             Assert.Equal(expectedReasons, reasons);
         }
@@ -387,6 +397,48 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.NotNull(labelFileUpload);
         var valueFileUpload = labelFileUpload.NextElementSibling;
         Assert.Equal("Not provided", valueFileUpload!.TextContent.Trim());
+    }
+
+    [Fact]
+    public async Task Post_InvalidCompletedDate_RedirectToCompletedDatePage()
+    {
+        // Arrange
+        var inductionStatus = InductionStatus.RequiredToComplete;
+        var startDate = Clock.Today;
+        var completedDate = startDate.AddYears(-2);
+        var exemptionReasonIds = (await TestData.ReferenceDataCache
+            .GetInductionExemptionReasonsAsync(activeOnly: true))
+            .RandomSelection(1)
+            .Select(r => r.InductionExemptionReasonId)
+            .ToArray();
+        var person = await TestData.CreatePersonAsync(
+            p => p
+                .WithQts()
+                .WithInductionStatus(i => i
+                    .WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+                .WithFileUploadChoice(uploadFile: false)
+                .Create());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+
+        Assert.Equal($"/persons/{person.PersonId}/edit-induction/date-completed?fromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}", location);
     }
 
     [Fact]

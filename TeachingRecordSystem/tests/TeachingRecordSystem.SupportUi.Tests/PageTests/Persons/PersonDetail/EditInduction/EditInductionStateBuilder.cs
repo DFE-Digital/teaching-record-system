@@ -5,7 +5,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class EditInductionStateBuilder
 {
     private InductionStatus InductionStatus { get; set; }
-    private InductionStatus CurrentInductionStatus { get; set; }
     private DateOnly? StartDate { get; set; }
     private DateOnly? CompletedDate { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
@@ -19,18 +18,17 @@ public class EditInductionStateBuilder
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool Initialized { get; set; }
 
-    public EditInductionStateBuilder WithInitialisedState(InductionStatus? currentInductionStatus, InductionJourneyPage startPage)
+    public EditInductionStateBuilder WithInitialisedState(InductionStatus currentInductionStatus, InductionJourneyPage startPage)
     {
         this.Initialized = true;
         JourneyStartPage = startPage;
-        CurrentInductionStatus = currentInductionStatus ?? InductionStatus.None;
-        InductionStatus = CurrentInductionStatus;
+        InductionStatus = currentInductionStatus;
         return this;
     }
 
     public EditInductionStateBuilder WithUpdatedState(InductionStatus inductionStatus)
     {
-        if (CurrentInductionStatus == InductionStatus.None)
+        if (InductionStatus == InductionStatus.None)
         {
             throw new NotSupportedException("Initialised state must be set using WithInitialisedState");
         }
@@ -83,7 +81,6 @@ public class EditInductionStateBuilder
         return new EditInductionState()
         {
             InductionStatus = InductionStatus,
-            CurrentInductionStatus = CurrentInductionStatus,
             StartDate = StartDate,
             CompletedDate = CompletedDate,
             ExemptionReasonIds = ExemptionReasonIds,

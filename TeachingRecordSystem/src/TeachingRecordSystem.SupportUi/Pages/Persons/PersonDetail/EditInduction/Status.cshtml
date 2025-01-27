@@ -21,7 +21,7 @@
                     <govuk-radios-fieldset-legend data-testid="status-choices-legend" class="govuk-fieldset__legend--m" />
                     @foreach (var inductionStatus in Model.StatusChoices)
                     {
-                        <govuk-radios-item value="@inductionStatus.Value" checked="@Model.InductionStatus==inductionStatus.Value">@inductionStatus.Title</govuk-radios-item>
+                        <govuk-radios-item value="@inductionStatus.Value" checked="@(Model.InductionStatus == inductionStatus.Value && Model.FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)">@inductionStatus.Title</govuk-radios-item>
                     }
                 </govuk-radios-fieldset>
             </govuk-radios>
