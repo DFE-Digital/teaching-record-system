@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Jobs.EWCWalesImport;
+using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
