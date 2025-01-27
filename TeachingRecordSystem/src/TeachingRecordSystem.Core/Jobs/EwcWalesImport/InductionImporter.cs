@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
-namespace TeachingRecordSystem.Core.Jobs.EWCWalesImport;
+namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class InductionImporter
 {
