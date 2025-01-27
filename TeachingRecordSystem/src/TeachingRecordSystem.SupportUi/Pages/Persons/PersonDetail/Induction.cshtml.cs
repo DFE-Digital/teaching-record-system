@@ -16,7 +16,6 @@ public class InductionModel(
     IAuthorizationService authorizationService) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
-    private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
     private bool _statusIsManagedByCpd;
     private bool _teacherHoldsQualifiedTeacherStatus;
 
@@ -37,6 +36,15 @@ public class InductionModel(
     public bool ShowCompletedDate => Status.RequiresCompletedDate();
 
     public IEnumerable<string>? ExemptionReasonValues { get; set; }
+
+    public string InductionIsManagedByCpdWarning => Status switch
+    {
+        InductionStatus.RequiredToComplete => InductionWarnings.InductionIsManagedByCpdWarningRequiredToComplete,
+        InductionStatus.InProgress => InductionWarnings.InductionIsManagedByCpdWarningInProgress,
+        InductionStatus.Passed => InductionWarnings.InductionIsManagedByCpdWarningPassed,
+        InductionStatus.Failed => InductionWarnings.InductionIsManagedByCpdWarningFailed,
+        _ => InductionWarnings.InductionIsManagedByCpdWarningOther
+    };
 
     public string? StatusWarningMessage
     {

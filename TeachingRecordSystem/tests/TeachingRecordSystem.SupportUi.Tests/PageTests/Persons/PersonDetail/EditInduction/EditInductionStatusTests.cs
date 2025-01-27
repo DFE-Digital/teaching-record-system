@@ -274,11 +274,15 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         await AssertEx.HtmlResponseHasErrorAsync(response, nameof(StatusModel.InductionStatus), "Select a status");
     }
 
-    [Fact]
-    public async Task Get_ForPersonWithInductionStatusManagedByCPD_ShowsWarning()
+
+    [Theory]
+    [InlineData(InductionStatus.RequiredToComplete, "passed, failed, or in progress")]
+    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed")]
+    [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress")]
+    [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress")]
+    public async Task Get_ForPersonWithInductionStatusManagedByCPD_ShowsWarning(InductionStatus status, string statusSpecificText)
     {
         //Arrange
-        var expectedWarning = "To change this teacher’s induction status ";
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -286,9 +290,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
-                InductionStatus.Passed,
-                startDate: lessThanSevenYearsAgo.AddYears(-1),
-                completedDate: lessThanSevenYearsAgo,
+                status,
+                startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
+                completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
@@ -303,7 +307,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Contains(expectedWarning, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+        Assert.Contains(statusSpecificText, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
