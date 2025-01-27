@@ -1,4 +1,5 @@
 using FakeXrmEasy.Extensions;
+using Microsoft.Crm.Sdk.Messages;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -82,6 +83,50 @@ public partial class TrsDataSyncHelperTests
         await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
     }
 
+    [Fact]
+    public async Task SyncPersonAsync_WithContactOnlyInductionStatus_UpdatesPersonRecordAndCreatesExpectedEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn()
+                .WithSyncOverride(false));
+
+        var auditDetails = new AuditDetailCollection();
+        auditDetails.Add(person.DqtContactAuditDetail);
+
+        var qtlsDate = new DateOnly(2024, 11, 2);
+        var inductionStatus = dfeta_InductionStatus.Exempt;
+        var updatedContactQtlsDate = await CreateUpdatedContactEntityVersion(
+            person.Contact,
+            auditDetails,
+            updatedQtlsDate: qtlsDate);
+
+        Clock.Advance(TimeSpan.FromSeconds(5));
+        var updatedContact = await CreateUpdatedContactEntityVersion(
+            updatedContactQtlsDate,
+            auditDetails,
+            updatedInductionStatus: inductionStatus);
+
+        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
+        {
+            { person.ContactId, auditDetails }
+        };
+
+        // Act
+        await Helper.SyncPersonsAsync([updatedContact], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
+
+        // Assert
+        var events = await GetEventsForPerson(person.PersonId);
+        Assert.Single(events);
+        Assert.IsType<DqtContactInductionStatusChangedEvent>(events[0]);
+
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == person.ContactId);
+            Assert.Equal(inductionStatus.ToInductionStatus(), updatedPerson!.InductionStatus);
+        });
+    }
+
     private async Task AssertDatabasePersonMatchesEntity(
         Contact entity,
         DateTime? expectedFirstSync = null,
@@ -144,4 +189,17 @@ public partial class TrsDataSyncHelperTests
 
         return newContact;
     }
+
+    private Task<EventBase[]> GetEventsForPerson(Guid personId) =>
+        DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var results = await dbContext.Database.SqlQuery<EventQueryResult>(
+                $"""
+                SELECT e.event_name, e.payload
+                FROM events as e
+                WHERE e.person_id = {personId}
+                """).ToArrayAsync();
+
+            return results.Select(r => EventBase.Deserialize(r.Payload, r.EventName)).ToArray();
+        });
 }
