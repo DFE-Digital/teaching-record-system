@@ -754,37 +754,71 @@ public partial class TrsDataSyncHelperTests
     private async Task<Contact> CreateUpdatedContactEntityVersion(
         Contact existingContact,
         AuditDetailCollection auditDetailCollection,
-        dfeta_InductionStatus updatedInductionStatus)
+        dfeta_InductionStatus? updatedInductionStatus = null,
+        DateOnly? updatedQtlsDate = null)
     {
         var currentDqtUser = await TestData.GetCurrentCrmUserAsync();
 
         var updatedContact = existingContact.Clone<Contact>();
         updatedContact.ModifiedOn = Clock.UtcNow;
-        updatedContact.dfeta_InductionStatus = updatedInductionStatus;
 
-        var oldValue = new Entity(Contact.EntityLogicalName, existingContact.Id);
-        oldValue.Attributes[Contact.Fields.ModifiedOn] = existingContact.Attributes[Contact.Fields.ModifiedOn];
-        oldValue.Attributes[Contact.Fields.dfeta_InductionStatus] = existingContact.GetAttributeValue<dfeta_InductionStatus?>(Contact.Fields.dfeta_InductionStatus);
-
-        var newValue = new Entity(Contact.EntityLogicalName, existingContact.Id);
-        newValue.Attributes[Contact.Fields.ModifiedOn] = updatedContact.Attributes[Contact.Fields.ModifiedOn];
-        newValue.Attributes[Contact.Fields.dfeta_InductionStatus] = updatedContact.Attributes[Contact.Fields.dfeta_InductionStatus];
-
-        var auditId = Guid.NewGuid();
-        auditDetailCollection.Add(new AttributeAuditDetail()
+        if (updatedQtlsDate is not null)
         {
-            AuditRecord = new Audit()
+            updatedContact.dfeta_qtlsdate = updatedQtlsDate.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
+
+            var oldValueQtlsDate = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            oldValueQtlsDate.Attributes[Contact.Fields.ModifiedOn] = existingContact.Attributes[Contact.Fields.ModifiedOn];
+            oldValueQtlsDate.Attributes[Contact.Fields.dfeta_qtlsdate] = existingContact.GetAttributeValue<DateTime?>(Contact.Fields.dfeta_qtlsdate);
+
+            var newValueQtlsDate = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            newValueQtlsDate.Attributes[Contact.Fields.ModifiedOn] = updatedContact.Attributes[Contact.Fields.ModifiedOn];
+            newValueQtlsDate.Attributes[Contact.Fields.dfeta_qtlsdate] = updatedContact.Attributes[Contact.Fields.dfeta_qtlsdate];
+
+            var auditId = Guid.NewGuid();
+            auditDetailCollection.Add(new AttributeAuditDetail()
             {
-                Action = Audit_Action.Update,
-                AuditId = auditId,
-                CreatedOn = Clock.UtcNow,
-                Id = auditId,
-                Operation = Audit_Operation.Update,
-                UserId = currentDqtUser
-            },
-            OldValue = oldValue,
-            NewValue = newValue
-        });
+                AuditRecord = new Audit()
+                {
+                    Action = Audit_Action.Update,
+                    AuditId = auditId,
+                    CreatedOn = Clock.UtcNow,
+                    Id = auditId,
+                    Operation = Audit_Operation.Update,
+                    UserId = currentDqtUser
+                },
+                OldValue = oldValueQtlsDate,
+                NewValue = newValueQtlsDate
+            });
+        }
+
+        if (updatedInductionStatus is not null)
+        {
+            updatedContact.dfeta_InductionStatus = updatedInductionStatus;
+
+            var oldValueStatus = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            oldValueStatus.Attributes[Contact.Fields.ModifiedOn] = existingContact.Attributes[Contact.Fields.ModifiedOn];
+            oldValueStatus.Attributes[Contact.Fields.dfeta_InductionStatus] = existingContact.GetAttributeValue<dfeta_InductionStatus?>(Contact.Fields.dfeta_InductionStatus);
+
+            var newValueStatus = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            newValueStatus.Attributes[Contact.Fields.ModifiedOn] = updatedContact.Attributes[Contact.Fields.ModifiedOn];
+            newValueStatus.Attributes[Contact.Fields.dfeta_InductionStatus] = updatedContact.Attributes[Contact.Fields.dfeta_InductionStatus];
+
+            var auditId = Guid.NewGuid();
+            auditDetailCollection.Add(new AttributeAuditDetail()
+            {
+                AuditRecord = new Audit()
+                {
+                    Action = Audit_Action.Update,
+                    AuditId = auditId,
+                    CreatedOn = Clock.UtcNow,
+                    Id = auditId,
+                    Operation = Audit_Operation.Update,
+                    UserId = currentDqtUser
+                },
+                OldValue = oldValueStatus,
+                NewValue = newValueStatus
+            });
+        }
 
         return updatedContact;
     }

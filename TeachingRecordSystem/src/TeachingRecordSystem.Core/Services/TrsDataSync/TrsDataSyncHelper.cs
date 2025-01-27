@@ -243,25 +243,42 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken = default)
     {
-        // For the moment we are just making sure we have the audit history in TRS - we will amend to generate events as part of the contact migration work
         if (syncAudit)
         {
             await SyncAuditAsync(Contact.EntityLogicalName, entities.Select(q => q.ContactId!.Value), skipIfExists: false, cancellationToken);
         }
 
-        // We're syncing all contacts for now.
-        // Keep this in sync with the filter in the SyncAllContactsFromCrmJob job.
-        IEnumerable<Contact> toSync = entities;
+        var auditDetails = await GetAuditRecordsFromAuditRepositoryAsync(Contact.EntityLogicalName, Contact.PrimaryIdAttribute, entities.Select(q => q.ContactId!.Value), cancellationToken);
+        return await SyncPersonsAsync(entities, auditDetails, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
+        IReadOnlyCollection<Contact> entities,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken = default)
+    {
+        var (persons, events) = MapPersonsAndAudits(entities, auditDetails, ignoreInvalid);
+        return await SyncPersonsAsync(persons, events, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
+        IReadOnlyCollection<Person> persons,
+        IReadOnlyCollection<EventBase> events,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken = default)
+    {
+        var toSync = persons.ToList();
 
         if (ignoreInvalid)
         {
             // Some bad data in the build environment has a TRN that's longer than 7 digits
-            toSync = toSync.Where(e => string.IsNullOrEmpty(e.dfeta_TRN) || e.dfeta_TRN.Length == 7);
+            toSync = toSync.Where(p => string.IsNullOrEmpty(p.Trn) || p.Trn.Length == 7).ToList();
         }
 
-        var people = MapPersons(toSync);
-
-        if (people.Count == 0)
+        if (!toSync.Any())
         {
             return [];
         }
@@ -280,7 +297,7 @@ public class TrsDataSyncHelper(
 
         using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
 
-        foreach (var person in people)
+        foreach (var person in toSync)
         {
             writer.StartRow();
             modelTypeSyncInfo.WriteRecord!(writer, person);
@@ -313,28 +330,31 @@ public class TrsDataSyncHelper(
                 throw;
             }
 
-            var entitiesExceptFailedOne = entities.Where(e => e.dfeta_TRN != trn).ToArray();
+            var personsExceptFailedOne = persons.Where(e => e.Trn != trn).ToArray();
+            var eventsExceptFailedOne = events.Where(e => e is not IEventWithPersonId || ((IEventWithPersonId)e).PersonId != personsExceptFailedOne[0].PersonId).ToArray();
 
             // Be extra sure we've actually removed a record (otherwise we'll go in an endless loop and stack overflow)
-            if (!(entitiesExceptFailedOne.Length < entities.Count))
+            if (!(personsExceptFailedOne.Length < persons.Count))
             {
-                Debug.Fail("No entities removed from collection.");
+                Debug.Fail("No persons removed from collection.");
                 throw;
             }
 
             await txn.DisposeAsync();
             await connection.DisposeAsync();
 
-            return await SyncPersonsAsync(entitiesExceptFailedOne, syncAudit, ignoreInvalid, dryRun, cancellationToken);
+            return await SyncPersonsAsync(personsExceptFailedOne, eventsExceptFailedOne, ignoreInvalid, dryRun, cancellationToken);
         }
+
+        await txn.SaveEventsAsync(events, "events_person_import", clock, cancellationToken, timeoutSeconds: 120);
 
         if (!dryRun)
         {
             await txn.CommitAsync(cancellationToken);
         }
 
-        _syncedEntitiesSubject.OnNext(people.ToArray());
-        return people.Select(p => p.PersonId).ToArray();
+        _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
+        return toSync.Select(p => p.PersonId).ToArray();
     }
 
     public async Task<int> SyncInductionsAsync(
@@ -500,7 +520,7 @@ public class TrsDataSyncHelper(
                 .Where(e => e is IEventWithPersonId && !unsyncedContactIds.Any(c => c == ((IEventWithPersonId)e).PersonId))
                 .ToArray();
 
-            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_import", clock, cancellationToken, timeoutSeconds: 120);
+            await txn.SaveEventsAsync(eventsForSyncedContacts, "events_induction_import", clock, cancellationToken, timeoutSeconds: 120);
 
             if (!dryRun)
             {
@@ -1080,6 +1100,105 @@ public class TrsDataSyncHelper(
         };
     }
 
+    private (List<Person> Inductions, List<EventBase> Events) MapPersonsAndAudits(
+        IReadOnlyCollection<Contact> contacts,
+        IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool ignoreInvalid)
+    {
+        var events = new List<EventBase>();
+        var persons = MapPersons(contacts);
+
+        foreach (var contact in contacts)
+        {
+            if (auditDetails.TryGetValue(contact.ContactId!.Value, out var contactAudits))
+            {
+                // At the moment we are only interested in induction related changes
+                var contactAttributeNames = new[]
+                {
+                    Contact.Fields.dfeta_qtlsdate,
+                    Contact.Fields.dfeta_InductionStatus
+                };
+
+                var orderedContactAuditDetails = contactAudits.AuditDetails
+                    .OfType<AttributeAuditDetail>()
+                    .Where(a => a.AuditRecord.ToEntity<Audit>().Action != Audit_Action.Merge)
+                    .Select(a =>
+                    {
+                        var allChangedAttributes = a.NewValue.Attributes.Keys.Union(a.OldValue.Attributes.Keys).ToArray();
+                        var relevantChangedAttributes = allChangedAttributes.Where(k => contactAttributeNames.Contains(k)).ToArray();
+                        var newValue = a.NewValue.ToEntity<Contact>().SparseClone(contactAttributeNames);
+                        newValue.Id = contact.ContactId!.Value;
+                        var oldValue = a.OldValue.ToEntity<Contact>().SparseClone(contactAttributeNames);
+                        oldValue.Id = contact.ContactId!.Value;
+
+                        return new AuditInfo<Contact>
+                        {
+                            AllChangedAttributes = allChangedAttributes,
+                            RelevantChangedAttributes = relevantChangedAttributes,
+                            NewValue = newValue,
+                            OldValue = oldValue,
+                            AuditRecord = a.AuditRecord.ToEntity<Audit>()
+                        };
+                    })
+                    .OrderBy(a => a.AuditRecord.CreatedOn)
+                    .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
+                    .ToArray();
+
+                foreach (var item in orderedContactAuditDetails)
+                {
+                    // For the moment (until we migrate contacts) we are not interested in the created event
+                    if (item.AuditRecord.Action == Audit_Action.Create)
+                    {
+                        continue;
+                    }
+
+                    if (item.AllChangedAttributes.Contains(Contact.Fields.StateCode) && item.AuditRecord.Action != Audit_Action.Create)
+                    {
+                        var nonStateAttributes = item.AllChangedAttributes
+                            .Where(a => !(a is Contact.Fields.StateCode or Contact.Fields.StatusCode))
+                            .ToArray();
+
+                        if (nonStateAttributes.Length > 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
+                        }
+                    }
+
+                    var mappedEvent = MapContactInductionStatusChangedEvent(contact.ContactId!.Value, item.RelevantChangedAttributes, item.NewValue, item.OldValue, item.AuditRecord, orderedContactAuditDetails);
+                    if (mappedEvent is not null)
+                    {
+                        events.Add(mappedEvent);
+                    }
+                }
+            }
+        }
+
+        return (persons, events);
+    }
+
+    private static EventBase? MapContactInductionStatusChangedEvent(Guid contactId, string[] changedAttributes, Contact newValue, Contact oldValue, Audit audit, AuditInfo<Contact>[] allAuditDetails)
+    {
+        // Needs to have changed because of a QTLS date change which would be in a separate audit record shortly before the induction status change one (allow 10 seconds)
+        if (!changedAttributes.Contains(Contact.Fields.dfeta_InductionStatus) ||
+            (changedAttributes.Contains(Contact.Fields.dfeta_InductionStatus) &&
+                !allAuditDetails.Any(a => a.RelevantChangedAttributes.Contains(Contact.Fields.dfeta_qtlsdate) && audit.CreatedOn!.Value.Subtract(a.AuditRecord.CreatedOn!.Value).TotalSeconds < 10)))
+        {
+            return null;
+        }
+
+        return new DqtContactInductionStatusChangedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            Key = $"{audit.Id}",  // The CRM Audit ID
+            CreatedUtc = audit.CreatedOn!.Value,
+            RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
+            PersonId = contactId,
+            InductionStatus = newValue.dfeta_InductionStatus.ToString(),
+            OldInductionStatus = oldValue.dfeta_InductionStatus.ToString()
+        };
+    }
+
     private static List<Person> MapPersons(IEnumerable<Contact> contacts) => contacts
         .Select(c => new Person()
         {
@@ -1171,7 +1290,14 @@ public class TrsDataSyncHelper(
                             var oldValue = a.OldValue.ToEntity<dfeta_induction>().SparseClone(inductionAttributeNames);
                             oldValue.Id = induction.Id;
 
-                            return (AllChangedAttributes: allChangedAttributes, RelevantChangedAttributes: relevantChangedAttributes, NewValue: newValue, OldValue: oldValue, AuditRecord: a.AuditRecord.ToEntity<Audit>());
+                            return new AuditInfo<dfeta_induction>
+                            {
+                                AllChangedAttributes = allChangedAttributes,
+                                RelevantChangedAttributes = relevantChangedAttributes,
+                                NewValue = newValue,
+                                OldValue = oldValue,
+                                AuditRecord = a.AuditRecord.ToEntity<Audit>()
+                            };
                         })
                         .OrderBy(a => a.AuditRecord.CreatedOn)
                         .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
@@ -1217,54 +1343,6 @@ public class TrsDataSyncHelper(
                     if (createMigratedEvent)
                     {
                         events.Add(await MapMigratedEventAsync(contact.ContactId!.Value, induction, mapped));
-                    }
-                }
-            }
-
-            if (auditDetails.TryGetValue(contact.ContactId!.Value, out var contactAudits))
-            {
-                var contactAttributeNames = new[]
-                {
-                    Contact.Fields.dfeta_InductionStatus
-                };
-
-                var orderedContactAuditDetails = contactAudits.AuditDetails
-                    .OfType<AttributeAuditDetail>()
-                    .Where(a => a.AuditRecord.ToEntity<Audit>().Action != Audit_Action.Merge)
-                    .Select(a =>
-                    {
-                        var allChangedAttributes = a.NewValue.Attributes.Keys.Union(a.OldValue.Attributes.Keys).ToArray();
-                        var relevantChangedAttributes = allChangedAttributes.Where(k => contactAttributeNames.Contains(k)).ToArray();
-                        var newValue = a.NewValue.ToEntity<Contact>().SparseClone(contactAttributeNames);
-                        newValue.Id = contact.ContactId!.Value;
-                        var oldValue = a.OldValue.ToEntity<Contact>().SparseClone(contactAttributeNames);
-                        oldValue.Id = contact.ContactId!.Value;
-
-                        return (AllChangedAttributes: allChangedAttributes, RelevantChangedAttributes: relevantChangedAttributes, NewValue: newValue, OldValue: oldValue, AuditRecord: a.AuditRecord.ToEntity<Audit>());
-                    })
-                    .OrderBy(a => a.AuditRecord.CreatedOn)
-                    .ThenBy(a => a.AuditRecord.Action == Audit_Action.Create ? 0 : 1)
-                    .ToArray();
-
-                foreach (var item in orderedContactAuditDetails)
-                {
-                    if (item.AllChangedAttributes.Contains(Contact.Fields.StateCode) && item.AuditRecord.Action != Audit_Action.Create)
-                    {
-                        var nonStateAttributes = item.AllChangedAttributes
-                            .Where(a => !(a is Contact.Fields.StateCode or Contact.Fields.StatusCode))
-                            .ToArray();
-
-                        if (nonStateAttributes.Length > 0)
-                        {
-                            throw new InvalidOperationException(
-                                $"Expected state and status attributes to change in isolation but also received: {string.Join(", ", nonStateAttributes)}.");
-                        }
-                    }
-
-                    var mappedEvent = MapContactInductionStatusChangedEvent(contact.ContactId!.Value, item.RelevantChangedAttributes, item.NewValue, item.OldValue, item.AuditRecord);
-                    if (mappedEvent is not null)
-                    {
-                        events.Add(mappedEvent);
                     }
                 }
             }
@@ -1353,25 +1431,6 @@ public class TrsDataSyncHelper(
                 Induction = GetEventDqtInduction(newValue),
                 OldInduction = GetEventDqtInduction(oldValue),
                 Changes = changes
-            };
-        }
-
-        EventBase? MapContactInductionStatusChangedEvent(Guid contactId, string[] changedAttributes, Contact newValue, Contact oldValue, Audit audit)
-        {
-            if (!changedAttributes.Contains(Contact.Fields.dfeta_InductionStatus))
-            {
-                return null;
-            }
-
-            return new DqtContactInductionStatusChangedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{audit.Id}",  // The CRM Audit ID
-                CreatedUtc = audit.CreatedOn!.Value,
-                RaisedBy = EventModels.RaisedByUserInfo.FromDqtUser(audit.UserId.Id, audit.UserId.Name),
-                PersonId = contactId,
-                InductionStatus = newValue.dfeta_InductionStatus.ToString(),
-                OldInductionStatus = oldValue.dfeta_InductionStatus.ToString()
             };
         }
 
@@ -1464,6 +1523,15 @@ public class TrsDataSyncHelper(
         public required DateOnly? InductionStartDate { get; init; }
         public required InductionStatus? InductionStatus { get; init; }
         public required DateTime? DqtModifiedOn { get; init; }
+    }
+
+    private record AuditInfo<TEntity>
+    {
+        public required string[] AllChangedAttributes { get; init; }
+        public required string[] RelevantChangedAttributes { get; init; }
+        public required TEntity NewValue { get; init; }
+        public required TEntity OldValue { get; init; }
+        public required Audit AuditRecord { get; init; }
     }
 
     public static class ModelTypes
