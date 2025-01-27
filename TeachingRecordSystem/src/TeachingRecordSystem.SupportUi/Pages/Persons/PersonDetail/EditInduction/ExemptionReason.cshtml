@@ -14,7 +14,7 @@
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
             <govuk-checkboxes asp-for="ExemptionReasonIds">
                 <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" is-page-heading="true"/>
+                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true"/>
                     <govuk-checkboxes-hint>Select all that apply</govuk-checkboxes-hint>
                     @foreach (var category in ExemptionReasonCategories.All)
                     {

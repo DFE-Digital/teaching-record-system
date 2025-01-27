@@ -14,7 +14,7 @@
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
             <govuk-radios asp-for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--m" />
+                    <govuk-radios-fieldset-legend data-testid="reason-options-legend" class="govuk-fieldset__legend--l" is-page-heading="true"/>
                     <govuk-radios-item value="@InductionChangeReasonOption.IncompleteDetails">
                         @InductionChangeReasonOption.IncompleteDetails.GetDisplayName()
                     </govuk-radios-item>
