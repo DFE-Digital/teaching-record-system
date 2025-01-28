@@ -43,7 +43,7 @@ public class SyncAllInductionsFromCrmJobTests : SyncFromCrmJobTestBase, IAsyncLi
             options,
             LoggerFactory.CreateLogger<SyncAllInductionsFromCrmJob>());
 
-        await job.ExecuteAsync(createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await job.ExecuteAsync(dryRun: false, CancellationToken.None);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>

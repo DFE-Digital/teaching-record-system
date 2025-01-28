@@ -51,7 +51,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([person.Contact], [entity], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([person.Contact], [entity], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
@@ -101,7 +101,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([person.Contact], [entity], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([person.Contact], [entity], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
@@ -135,7 +135,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([updatedContact], [], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([updatedContact], [], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
@@ -174,7 +174,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([person.Contact], [induction!], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([person.Contact], [induction!], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
@@ -208,7 +208,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        var exception = await Record.ExceptionAsync(() => Helper.SyncInductionsAsync([person.Contact], [induction], auditDetailsDict, ignoreInvalid: false, createMigratedEvent: false, dryRun: false, CancellationToken.None));
+        var exception = await Record.ExceptionAsync(() => Helper.SyncInductionsAsync([person.Contact], [induction], auditDetailsDict, ignoreInvalid: false, dryRun: false, CancellationToken.None));
 
         // Assert
         Assert.IsType<InvalidOperationException>(exception);
@@ -232,7 +232,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([person.Contact], [], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([person.Contact], [], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
@@ -267,39 +267,19 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([contact], [initialVersion], auditDetailsDict, ignoreInvalid: false, createMigratedEvent: true, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([contact], [initialVersion], auditDetailsDict, ignoreInvalid: false, dryRun: false, CancellationToken.None);
 
         // Assert
         var events = await GetEventsForInduction(inductionId);
-
-        await Assert.CollectionAsync(
-            events,
-            async e =>
-            {
-                var createdEvent = Assert.IsType<DqtInductionCreatedEvent>(e);
-                Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), createdEvent.RaisedBy.DqtUserId);
-                Assert.Equal(person.PersonId, createdEvent.PersonId);
-                Assert.Equal(inductionId, createdEvent.Induction.InductionId);
-                Assert.Equal(inductionStatus.ToString(), createdEvent.Induction.InductionStatus.ValueOrFailure());
-                Assert.Equal(startDate, createdEvent.Induction.StartDate.ValueOrFailure());
-                Assert.Equal(completionDate, createdEvent.Induction.CompletionDate.ValueOrFailure());
-            },
-            e =>
-            {
-                var migratedEvent = Assert.IsType<InductionMigratedEvent>(e);
-                Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
-                Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
-                Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                Assert.Equal(inductionId, migratedEvent.DqtInduction.InductionId);
-                Assert.Equal(inductionStatus.ToString(), migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
-                Assert.Equal(startDate, migratedEvent.DqtInduction.StartDate.ValueOrFailure());
-                Assert.Equal(completionDate, migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
-                Assert.Equal(initialVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
-                Assert.Equal(initialVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(initialVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
-                return Task.CompletedTask;
-            });
+        Assert.Single(events);
+        var createdEvent = Assert.IsType<DqtInductionCreatedEvent>(events[0]);
+        Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
+        Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), createdEvent.RaisedBy.DqtUserId);
+        Assert.Equal(person.PersonId, createdEvent.PersonId);
+        Assert.Equal(inductionId, createdEvent.Induction.InductionId);
+        Assert.Equal(inductionStatus.ToString(), createdEvent.Induction.InductionStatus.ValueOrFailure());
+        Assert.Equal(startDate, createdEvent.Induction.StartDate.ValueOrFailure());
+        Assert.Equal(completionDate, createdEvent.Induction.CompletionDate.ValueOrFailure());
     }
 
     [Fact]
@@ -326,36 +306,16 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([contact], [initialVersion], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: true, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([contact], [initialVersion], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         var events = await GetEventsForInduction(inductionId);
-
-        await Assert.CollectionAsync(
-            events,
-            async e =>
-            {
-                var importedEvent = Assert.IsType<DqtInductionImportedEvent>(e);
-                Assert.Equal(Clock.UtcNow, importedEvent.CreatedUtc);
-                Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), importedEvent.RaisedBy.DqtUserId);
-                Assert.Equal(person.PersonId, importedEvent.PersonId);
-                Assert.Equal(inductionId, importedEvent.Induction.InductionId);
-            },
-            e =>
-            {
-                var migratedEvent = Assert.IsType<InductionMigratedEvent>(e);
-                Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
-                Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
-                Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                Assert.Equal(inductionId, migratedEvent.DqtInduction.InductionId);
-                Assert.Equal(inductionStatus.ToString(), migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
-                Assert.Equal(startDate, migratedEvent.DqtInduction.StartDate.ValueOrFailure());
-                Assert.Equal(completionDate, migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
-                Assert.Equal(initialVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
-                Assert.Equal(initialVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(initialVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
-                return Task.CompletedTask;
-            });
+        Assert.Single(events);
+        var importedEvent = Assert.IsType<DqtInductionImportedEvent>(events[0]);
+        Assert.Equal(Clock.UtcNow, importedEvent.CreatedUtc);
+        Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), importedEvent.RaisedBy.DqtUserId);
+        Assert.Equal(person.PersonId, importedEvent.PersonId);
+        Assert.Equal(inductionId, importedEvent.Induction.InductionId);
     }
 
     [Fact]
@@ -396,7 +356,7 @@ public partial class TrsDataSyncHelperTests
         var updatedVersion = await CreateUpdatedInductionEntityVersion(intermediateVersion, inductionAuditDetails, DqtInductionUpdatedEventChanges.CompletionDate);
 
         // Act
-        await Helper.SyncInductionsAsync([contact], [updatedVersion], auditDetailsDict, ignoreInvalid: false, createMigratedEvent: true, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([contact], [updatedVersion], auditDetailsDict, ignoreInvalid: false, dryRun: false, CancellationToken.None);
 
         // Assert
         var events = await GetEventsForInduction(inductionId);
@@ -421,21 +381,6 @@ public partial class TrsDataSyncHelperTests
             {
                 // Checking UpdatedEvent details is covered elsewhere
                 Assert.IsType<DqtInductionUpdatedEvent>(e);
-                return Task.CompletedTask;
-            },
-            e =>
-            {
-                var migratedEvent = Assert.IsType<InductionMigratedEvent>(e);
-                Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
-                Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
-                Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                Assert.Equal(inductionId, migratedEvent.DqtInduction.InductionId);
-                Assert.Equal(updatedVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.DqtInduction.StartDate.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
-                Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(updatedVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
                 return Task.CompletedTask;
             });
     }
@@ -464,7 +409,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([updatedContact], [updatedVersion], auditDetailsDict, ignoreInvalid: false, createMigratedEvent: true, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([updatedContact], [updatedVersion], auditDetailsDict, ignoreInvalid: false, dryRun: false, CancellationToken.None);
 
         // Assert
         var events = await GetEventsForInduction(inductionId);
@@ -487,21 +432,6 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), updatedEvent.Induction.CompletionDate.ValueOrFailure());
                 Assert.Equal(updatedVersion.dfeta_InductionStatus.ToString(), updatedEvent.Induction.InductionStatus.ValueOrFailure());
                 Assert.Equal(GetChanges(initialVersion, updatedVersion), updatedEvent.Changes);
-            },
-            e =>
-            {
-                var migratedEvent = Assert.IsType<InductionMigratedEvent>(e);
-                Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
-                Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
-                Assert.Equal(person.PersonId, migratedEvent.PersonId);
-                Assert.Equal(inductionId, migratedEvent.DqtInduction.InductionId);
-                Assert.Equal(updatedVersion.dfeta_InductionStatus.ToString(), migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.DqtInduction.StartDate.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionStartDate);
-                Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), migratedEvent.InductionCompletedDate);
-                Assert.Equal(updatedVersion.dfeta_InductionStatus.ToInductionStatus().ToString(), migratedEvent.InductionStatus);
-                return Task.CompletedTask;
             });
     }
 
@@ -527,7 +457,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([person.Contact], [deactivatedVersion], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([person.Contact], [deactivatedVersion], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         var events = await GetEventsForInduction(inductionId);
@@ -574,7 +504,7 @@ public partial class TrsDataSyncHelperTests
         };
 
         // Act
-        await Helper.SyncInductionsAsync([person.Contact], [deactivatedVersion], auditDetailsDict, ignoreInvalid: true, createMigratedEvent: false, dryRun: false, CancellationToken.None);
+        await Helper.SyncInductionsAsync([person.Contact], [deactivatedVersion], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
 
         // Assert
         var events = await GetEventsForInduction(inductionId);
@@ -599,6 +529,40 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(person.PersonId, reactivatedEvent.PersonId);
                 Assert.Equal(inductionId, reactivatedEvent.Induction.InductionId);
             });
+    }
+
+    [Fact]
+    public async Task MigrateInductionsAsync_WithDqtInductions_CreatesExpectedEvents()
+    {
+        // Arrange
+        var inductionStatus = dfeta_InductionStatus.InProgress;
+        var inductionStartDate = Clock.Today.AddYears(-1);
+        var inductionCompletionDate = Clock.Today.AddDays(-10);
+
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn()
+                .WithQts()
+                .WithDqtInduction(inductionStatus, null, inductionStartDate, inductionCompletionDate)
+                .WithSyncOverride(false));
+        var inductionId = person.DqtInductions.Single().InductionId;
+
+        // Act
+        await Helper.MigrateInductionsAsync([person.Contact], ignoreInvalid: true, dryRun: false, CancellationToken.None);
+
+        // Assert
+        var events = await GetEventsForInduction(inductionId);
+        Assert.Single(events);
+        var migratedEvent = Assert.IsType<InductionMigratedEvent>(events[0]);
+        Assert.Equal(Clock.UtcNow, migratedEvent.CreatedUtc);
+        Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
+        Assert.Equal(person.PersonId, migratedEvent.PersonId);
+        Assert.Equal(inductionId, migratedEvent.DqtInduction.InductionId);
+        Assert.Equal(inductionStatus.ToString(), migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
+        Assert.Equal(inductionStartDate, migratedEvent.DqtInduction.StartDate.ValueOrFailure());
+        Assert.Equal(inductionCompletionDate, migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
+        Assert.Equal(inductionStartDate, migratedEvent.InductionStartDate);
+        Assert.Equal(inductionCompletionDate, migratedEvent.InductionCompletedDate);
+        Assert.Equal(inductionStatus.ToInductionStatus().GetTitle(), migratedEvent.InductionStatus);
     }
 
     private async Task<dfeta_induction> CreateNewInductionEntityVersion(
