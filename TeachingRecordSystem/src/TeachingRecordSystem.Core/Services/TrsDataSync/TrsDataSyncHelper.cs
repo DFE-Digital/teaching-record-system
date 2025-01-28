@@ -446,7 +446,7 @@ public class TrsDataSyncHelper(
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var (inductions, events) = await MapInductionsAndAuditsAsync(contacts, entities, auditDetails, ignoreInvalid);
+        var (inductions, events) = MapInductionsAndAudits(contacts, entities, auditDetails, ignoreInvalid);
         return await SyncInductionsAsync(inductions, events, ignoreInvalid, dryRun, cancellationToken);
     }
 
@@ -1336,7 +1336,7 @@ public class TrsDataSyncHelper(
         })
         .ToList();
 
-    private async Task<(List<InductionInfo> Inductions, List<EventBase> Events)> MapInductionsAndAuditsAsync(
+    private (List<InductionInfo> Inductions, List<EventBase> Events) MapInductionsAndAudits(
         IReadOnlyCollection<Contact> contacts,
         IEnumerable<dfeta_induction> inductionEntities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
