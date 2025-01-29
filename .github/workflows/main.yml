@@ -64,7 +64,9 @@ jobs:
         with:
           environment_name: test
           docker_image: ${{ needs.package.outputs.docker_image }}
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
   deploy_preprod:
     name: Deploy pre-production environment
@@ -81,7 +83,9 @@ jobs:
         with:
           environment_name: pre-production
           docker_image: ${{ needs.package.outputs.docker_image }}
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
   deploy_prod:
     name: Deploy production environment
@@ -98,4 +102,6 @@ jobs:
         with:
           environment_name: production
           docker_image: ${{ needs.package.outputs.docker_image }}
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
