@@ -9,10 +9,10 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 namespace TeachingRecordSystem.Core.Jobs;
 
 public class MigrateInductionsFromCrmJob(
-        ICrmServiceClientProvider crmServiceClientProvider,
-        TrsDataSyncHelper trsDataSyncHelper,
-        IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
-        ILogger<SyncAllInductionsFromCrmJob> logger)
+    ICrmServiceClientProvider crmServiceClientProvider,
+    TrsDataSyncHelper trsDataSyncHelper,
+    IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
+    ILogger<SyncAllInductionsFromCrmJob> logger)
 {
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -35,9 +35,6 @@ public class MigrateInductionsFromCrmJob(
             }
         };
 
-        int contactsProcessed = 0;
-        int eventsGenerated = 0;
-
         while (true)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -54,16 +51,11 @@ public class MigrateInductionsFromCrmJob(
                 continue;
             }
 
-            eventsGenerated += await trsDataSyncHelper.MigrateInductionsAsync(
+            await trsDataSyncHelper.MigrateInductionsAsync(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
                 ignoreInvalid: syncOptionsAccessor.Value.IgnoreInvalidData,
                 dryRun,
                 cancellationToken);
-
-            contactsProcessed += result.Entities.Count;
-
-            logger.LogWarning("Processed {contactsProcessed} contacts", contactsProcessed);
-            logger.LogWarning("Generated {eventsGenerated} migrated events", eventsGenerated);
 
             if (result.MoreRecords)
             {
