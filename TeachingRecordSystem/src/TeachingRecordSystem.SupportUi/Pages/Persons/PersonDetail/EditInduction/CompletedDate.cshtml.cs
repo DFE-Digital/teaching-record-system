@@ -6,12 +6,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class CompletedDateModel : CommonJourneyPage
+public class CompletedDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock)
+    : CommonJourneyPage(linkGenerator)
 {
-    protected TrsDbContext _dbContext;
-    protected IClock _clock;
-
-    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public string? PersonName { get; set; }
 
     [FromQuery]
@@ -27,7 +24,7 @@ public class CompletedDateModel : CommonJourneyPage
     {
         get
         {
-            if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers || FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
+            if (FromCheckAnswers is JourneyFromCheckYourAnswersPage.CheckYourAnswers or JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
             {
                 return InductionJourneyPage.CheckAnswers;
             }
@@ -41,22 +38,16 @@ public class CompletedDateModel : CommonJourneyPage
         {
             if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
-                return PageLink(InductionJourneyPage.CheckAnswers);
+                return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate)
             {
-                return PageLink(InductionJourneyPage.StartDate, JourneyFromCheckYourAnswersPage.CheckYourAnswers);
+                return GetPageLink(InductionJourneyPage.StartDate, JourneyFromCheckYourAnswersPage.CheckYourAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.CompletedDate
                 ? LinkGenerator.PersonInduction(PersonId)
-                : PageLink(InductionJourneyPage.StartDate);
+                : GetPageLink(InductionJourneyPage.StartDate);
         }
-    }
-
-    public CompletedDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
-    {
-        _dbContext = dbContext;
-        _clock = clock;
     }
 
     public void OnGet()
@@ -66,7 +57,7 @@ public class CompletedDateModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (CompletedDate > _clock.Today)
+        if (CompletedDate > clock.Today)
         {
             ModelState.AddModelError(nameof(CompletedDate), "The induction completed date cannot be in the future");
         }
@@ -83,27 +74,25 @@ public class CompletedDateModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.CompletedDate = CompletedDate;
-            if (state.JourneyStartPage == null)
-            {
-                state.JourneyStartPage = InductionJourneyPage.CompletedDate;
-            }
         });
 
-        return Redirect(PageLink(NextPage));
+        return Redirect(GetPageLink(NextPage));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.CompletedDate);
+        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.CompletedDate);
+
         if (!JourneyInstance!.State.InductionStatus.RequiresCompletedDate() || !JourneyInstance!.State.StartDate.HasValue)
         {
-            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
             return;
         }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+
         await next();
     }
 }

@@ -7,13 +7,12 @@ using TeachingRecordSystem.SupportUi.ValidationAttributes;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StatusModel : CommonJourneyPage
+public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock)
+    : CommonJourneyPage(linkGenerator)
 {
     private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
 
-    protected TrsDbContext _dbContext;
-    protected IClock _clock;
-    protected bool InductionStatusManagedByCpd;
+    private bool _inductionStatusManagedByCpd;
 
     [FromQuery]
     public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
@@ -27,7 +26,7 @@ public class StatusModel : CommonJourneyPage
     {
         get
         {
-            return InductionStatusManagedByCpd ?
+            return _inductionStatusManagedByCpd ?
                  InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
                 : InductionStatusRegistry.All.ToArray()[1..];
         }
@@ -36,7 +35,7 @@ public class StatusModel : CommonJourneyPage
     {
         get
         {
-            if (InductionStatusManagedByCpd)
+            if (_inductionStatusManagedByCpd)
             {
                 return InductionIsManagedByCpdWarning;
             }
@@ -66,16 +65,10 @@ public class StatusModel : CommonJourneyPage
         {
             if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
-                return PageLink(InductionJourneyPage.CheckAnswers);
+                return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return LinkGenerator.PersonInduction(PersonId);
         }
-    }
-
-    public StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
-    {
-        _dbContext = dbContext;
-        _clock = clock;
     }
 
     public void OnGet()
@@ -89,13 +82,10 @@ public class StatusModel : CommonJourneyPage
         {
             return this.PageWithErrors();
         }
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.InductionStatus = InductionStatus;
-            if (state.JourneyStartPage == null)
-            {
-                state.JourneyStartPage = InductionJourneyPage.Status;
-            }
             if (!InductionStatus.RequiresStartDate())
             {
                 state.StartDate = null;
@@ -110,18 +100,20 @@ public class StatusModel : CommonJourneyPage
             }
         });
 
-        return Redirect(PageLink(NextPage));
+        return Redirect(GetPageLink(NextPage));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
+        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.Status);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        var person = await _dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
-        InductionStatusManagedByCpd = person.InductionStatusManagedByCpd(_clock.Today);
+
+        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
+
         await next();
     }
 }

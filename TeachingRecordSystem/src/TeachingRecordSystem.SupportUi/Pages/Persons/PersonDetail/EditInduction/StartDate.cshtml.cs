@@ -7,13 +7,13 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StartDateModel : CommonJourneyPage
+public class StartDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock)
+    : CommonJourneyPage(linkGenerator)
 {
-    protected TrsDbContext _dbContext;
-    protected IClock _clock;
+    private InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
 
-    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
     public DateOnly? CompletedDate => JourneyInstance!.State.CompletedDate;
+
     public string? PersonName { get; set; }
 
     [FromQuery]
@@ -33,13 +33,13 @@ public class StartDateModel : CommonJourneyPage
             {
                 if (InductionStatus.RequiresCompletedDate() && StartDate > CompletedDate)
                 {
-                    return PageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate);
+                    return GetPageLink(InductionJourneyPage.CompletedDate, JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate);
                 }
-                return PageLink(InductionJourneyPage.CheckAnswers);
+                return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return InductionStatus.RequiresCompletedDate()
-                ? PageLink(InductionJourneyPage.CompletedDate)
-                : PageLink(InductionJourneyPage.ChangeReasons);
+                ? GetPageLink(InductionJourneyPage.CompletedDate)
+                : GetPageLink(InductionJourneyPage.ChangeReasons);
         }
     }
 
@@ -49,18 +49,12 @@ public class StartDateModel : CommonJourneyPage
         {
             if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
-                return PageLink(InductionJourneyPage.CheckAnswers);
+                return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.StartDate
             ? LinkGenerator.PersonInduction(PersonId)
-            : PageLink(InductionJourneyPage.Status);
+            : GetPageLink(InductionJourneyPage.Status);
         }
-    }
-
-    public StartDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock) : base(linkGenerator)
-    {
-        _dbContext = dbContext;
-        _clock = clock;
     }
 
     public void OnGet()
@@ -70,7 +64,7 @@ public class StartDateModel : CommonJourneyPage
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (StartDate > _clock.Today)
+        if (StartDate > clock.Today)
         {
             ModelState.AddModelError(nameof(StartDate), "The induction start date cannot be in the future");
         }
@@ -87,10 +81,6 @@ public class StartDateModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.StartDate = StartDate!.Value;
-            if (state.JourneyStartPage == null)
-            {
-                state.JourneyStartPage = InductionJourneyPage.StartDate;
-            }
         });
 
         return Redirect(NextPage);
@@ -98,15 +88,18 @@ public class StartDateModel : CommonJourneyPage
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.StartDate);
+        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.StartDate);
+
         if (!JourneyInstance!.State.InductionStatus.RequiresStartDate())
         {
-            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
             return;
         }
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+
         await next();
     }
 }

@@ -15,7 +15,7 @@ public class EditInductionState : IRegisterJourney
     public InductionStatus InductionStatus { get; set; }
     public DateOnly? StartDate { get; set; }
     public DateOnly? CompletedDate { get; set; }
-    public Guid[]? ExemptionReasonIds { get; set; } = Array.Empty<Guid>();
+    public Guid[]? ExemptionReasonIds { get; set; } = [];
     public InductionChangeReasonOption? ChangeReason { get; set; }
     public bool? HasAdditionalReasonDetail { get; set; }
     public string? ChangeReasonDetail { get; set; }
@@ -25,6 +25,7 @@ public class EditInductionState : IRegisterJourney
     public string? EvidenceFileSizeDescription { get; set; }
 
     public bool Initialized { get; set; }
+
     [JsonIgnore]
     public bool IsComplete =>
         InductionStatus != InductionStatus.None &&
@@ -42,11 +43,11 @@ public class EditInductionState : IRegisterJourney
         {
             return;
         }
-        var person = await dbContext.Persons
-            .SingleAsync(q => q.PersonId == personId);
+
+        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == personId);
 
         InductionStatus = person.InductionStatus;
-        JourneyStartPage ??= startPage;
+        JourneyStartPage = startPage;
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
         ExemptionReasonIds = person.InductionExemptionReasonIds;

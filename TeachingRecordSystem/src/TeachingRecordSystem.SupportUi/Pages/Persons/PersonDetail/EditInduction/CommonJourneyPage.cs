@@ -3,18 +3,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
-public abstract class CommonJourneyPage : PageModel
+public abstract class CommonJourneyPage(TrsLinkGenerator linkGenerator) : PageModel
 {
-    protected TrsLinkGenerator LinkGenerator { get; set; }
     public JourneyInstance<EditInductionState>? JourneyInstance { get; set; }
+
+    protected TrsLinkGenerator LinkGenerator { get; } = linkGenerator;
 
     [FromRoute]
     public Guid PersonId { get; set; }
-
-    protected CommonJourneyPage(TrsLinkGenerator linkGenerator)
-    {
-        LinkGenerator = linkGenerator;
-    }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
@@ -22,7 +18,7 @@ public abstract class CommonJourneyPage : PageModel
         return Redirect(LinkGenerator.PersonInduction(PersonId));
     }
 
-    protected string PageLink(InductionJourneyPage? pageName, JourneyFromCheckYourAnswersPage? fromCheckYourAnswersPage = null)
+    protected string GetPageLink(InductionJourneyPage? pageName, JourneyFromCheckYourAnswersPage? fromCheckYourAnswersPage = null)
     {
         return pageName switch
         {
