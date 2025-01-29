@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace TeachingRecordSystem.Core.Models;
 
-public enum TrainingAge
+public enum TrainingAgeSpecialismType
 {
     [Description("Age range")]
     Range = 0,

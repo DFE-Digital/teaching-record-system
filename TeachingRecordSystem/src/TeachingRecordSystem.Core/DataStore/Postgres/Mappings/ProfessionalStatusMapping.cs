@@ -8,7 +8,7 @@ public class ProfessionalStatusMapping : IEntityTypeConfiguration<ProfessionalSt
     public void Configure(EntityTypeBuilder<ProfessionalStatus> builder)
     {
         builder.HasOne(q => q.Route).WithMany().HasForeignKey(q => q.RouteToProfessionalStatusId);
-        builder.HasOne(q => q.Country).WithMany().HasForeignKey(q => q.CountryId);
+        builder.HasOne(q => q.TrainingCountry).WithMany().HasForeignKey(q => q.TrainingCountryId);
         builder.HasOne(q => q.TrainingProvider).WithMany().HasForeignKey(q => q.TrainingProviderId);
         builder.HasOne(q => q.InductionExemptionReason).WithMany().HasForeignKey(q => q.InductionExemptionReasonId);
         builder.HasOne<ApplicationUser>().WithMany().HasForeignKey(q => q.SourceApplicationUserId);
