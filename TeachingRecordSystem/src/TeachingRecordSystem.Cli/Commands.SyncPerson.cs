@@ -53,7 +53,7 @@ public partial class Commands
 
                 await syncHelper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false, dryRun: false);
 
-                await syncHelper.SyncInductionsAsync([contact], syncAudit: true, ignoreInvalid: false, createMigratedEvent: false, dryRun: false);
+                await syncHelper.SyncInductionsAsync([contact], syncAudit: true, ignoreInvalid: false, dryRun: false);
                 //return 0;
             },
             connectionStringOption,

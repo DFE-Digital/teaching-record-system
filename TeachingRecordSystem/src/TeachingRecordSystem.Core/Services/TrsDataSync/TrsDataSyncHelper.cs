@@ -52,27 +52,39 @@ public class TrsDataSyncHelper(
         return (modelTypeSyncInfo.EntityLogicalName, modelTypeSyncInfo.AttributeNames);
     }
 
-    public Guid MapDqtInductionExemptionReason(dfeta_InductionExemptionReason dqtInductionExemptionReason) => dqtInductionExemptionReason switch
+    public bool TryMapDqtInductionExemptionReason(dfeta_InductionExemptionReason dqtInductionExemptionReason, out Guid inductionExemptionReasonId)
     {
-        dfeta_InductionExemptionReason.Exempt => new("a5faff9f-29ce-4a6b-a7b8-0c1f57f15920"),
-        dfeta_InductionExemptionReason.ExemptDataLossErrorCriteria => new("204f86eb-0383-40eb-b793-6fccb76ecee2"),
-        dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland => new("a112e691-1694-46a7-8f33-5ec5b845c181"),
-        dfeta_InductionExemptionReason.OverseasTrainedTeacher => new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
-        dfeta_InductionExemptionReason.Qualifiedbefore07May1999 => new("5a80cee8-98a8-426b-8422-b0e81cb49b36"),
-        dfeta_InductionExemptionReason.Qualifiedbetween07May1999and01April2003FirstpostwasinWalesandlastedaminimumoftwoterms => new("15014084-2d8d-4f51-9198-b0e1881f8896"),
-        dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute => new("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85"),
-        dfeta_InductionExemptionReason.QualifiedthroughFEroutebetween01Sep2001and01Sep2004 => new("0997ab13-7412-4560-8191-e51ed4d58d2a"),
-        dfeta_InductionExemptionReason.RegisteredTeacher_havingatleasttwoyearsfulltimeteachingexperience => new("42bb7bbc-a92c-4886-b319-3c1a5eac319a"),
-        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninGuernsey => new("fea2db23-93e0-49af-96fd-83c815c17c0b"),
-        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninIsleOfMan => new("e5c3847d-8fb6-4b31-8726-812392da8c5c"),
-        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninJersey => new("243b21a8-0be4-4af5-8874-85944357e7f8"),
-        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland => new("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
-        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninServiceChildrensEducationschoolsinGermanyorCyprus => new("7d17d904-c1c6-451b-9e09-031314bd35f7"),
-        dfeta_InductionExemptionReason.SuccessfullycompletedinductioninWales => InductionExemptionReason.PassedInWalesId,
-        dfeta_InductionExemptionReason.SuccessfullycompletedprobationaryperiodinGibraltar => new("a751494a-7e7a-4836-96cb-00b9ed6e1b5f"),
-        dfeta_InductionExemptionReason.TeacherhasbeenawardedQTLSandisexemptprovidedtheymaintaintheirmembershipwiththeSocietyforEducationandTraining => new("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
-        _ => throw new ArgumentException($"Failed mapping '{dqtInductionExemptionReason}' to TRS Induction Exemption Reason.", nameof(dqtInductionExemptionReason))
-    };
+        Guid? id = dqtInductionExemptionReason switch
+        {
+            dfeta_InductionExemptionReason.Exempt => new("a5faff9f-29ce-4a6b-a7b8-0c1f57f15920"),
+            dfeta_InductionExemptionReason.ExemptDataLossErrorCriteria => new("204f86eb-0383-40eb-b793-6fccb76ecee2"),
+            dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland => new("a112e691-1694-46a7-8f33-5ec5b845c181"),
+            dfeta_InductionExemptionReason.OverseasTrainedTeacher => new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
+            dfeta_InductionExemptionReason.Qualifiedbefore07May1999 => new("5a80cee8-98a8-426b-8422-b0e81cb49b36"),
+            dfeta_InductionExemptionReason.Qualifiedbetween07May1999and01April2003FirstpostwasinWalesandlastedaminimumoftwoterms => new("15014084-2d8d-4f51-9198-b0e1881f8896"),
+            dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute => new("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85"),
+            dfeta_InductionExemptionReason.QualifiedthroughFEroutebetween01Sep2001and01Sep2004 => new("0997ab13-7412-4560-8191-e51ed4d58d2a"),
+            dfeta_InductionExemptionReason.RegisteredTeacher_havingatleasttwoyearsfulltimeteachingexperience => new("42bb7bbc-a92c-4886-b319-3c1a5eac319a"),
+            dfeta_InductionExemptionReason.SuccessfullycompletedinductioninGuernsey => new("fea2db23-93e0-49af-96fd-83c815c17c0b"),
+            dfeta_InductionExemptionReason.SuccessfullycompletedinductioninIsleOfMan => new("e5c3847d-8fb6-4b31-8726-812392da8c5c"),
+            dfeta_InductionExemptionReason.SuccessfullycompletedinductioninJersey => new("243b21a8-0be4-4af5-8874-85944357e7f8"),
+            dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland => new("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
+            dfeta_InductionExemptionReason.SuccessfullycompletedinductioninServiceChildrensEducationschoolsinGermanyorCyprus => new("7d17d904-c1c6-451b-9e09-031314bd35f7"),
+            dfeta_InductionExemptionReason.SuccessfullycompletedinductioninWales => InductionExemptionReason.PassedInWalesId,
+            dfeta_InductionExemptionReason.SuccessfullycompletedprobationaryperiodinGibraltar => new("a751494a-7e7a-4836-96cb-00b9ed6e1b5f"),
+            dfeta_InductionExemptionReason.TeacherhasbeenawardedQTLSandisexemptprovidedtheymaintaintheirmembershipwiththeSocietyforEducationandTraining => new("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
+            _ => null
+        };
+
+        if (id is null)
+        {
+            inductionExemptionReasonId = default;
+            return false;
+        }
+
+        inductionExemptionReasonId = id.Value;
+        return true;
+    }
 
     public async Task SyncAuditAsync(
         string entityLogicalName,
@@ -136,7 +148,19 @@ public class TrsDataSyncHelper(
         Guid[] exemptionReasonIds = [];
         if (induction?.dfeta_InductionExemptionReason is not null)
         {
-            exemptionReasonIds = [MapDqtInductionExemptionReason(induction.dfeta_InductionExemptionReason!.Value)];
+            if (!TryMapDqtInductionExemptionReason(induction.dfeta_InductionExemptionReason!.Value, out var exemptionReasonId))
+            {
+                var errorMessage = $"Failed mapping DQT Induction Exemption Reason '{induction.dfeta_InductionExemptionReason}' for contact {contact.ContactId}.";
+                if (ignoreInvalid)
+                {
+                    logger.LogWarning(errorMessage);
+                    return null;
+                }
+
+                throw new InvalidOperationException(errorMessage);
+            }
+
+            exemptionReasonIds = [exemptionReasonId];
         }
 
         return new InductionInfo()
@@ -374,14 +398,13 @@ public class TrsDataSyncHelper(
             activeOnly: false,
             cancellationToken);
 
-        return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, createMigratedEvent: false, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<Contact> contacts,
         bool syncAudit,
         bool ignoreInvalid,
-        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken = default)
     {
@@ -395,7 +418,7 @@ public class TrsDataSyncHelper(
             true,
             cancellationToken);
 
-        return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
@@ -403,7 +426,6 @@ public class TrsDataSyncHelper(
         IReadOnlyCollection<dfeta_induction> entities,
         bool syncAudit,
         bool ignoreInvalid,
-        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
@@ -413,7 +435,7 @@ public class TrsDataSyncHelper(
         }
 
         var auditDetails = await GetAuditRecordsFromAuditRepositoryAsync(dfeta_induction.EntityLogicalName, dfeta_induction.PrimaryIdAttribute, entities.Select(q => q.Id), cancellationToken);
-        return await SyncInductionsAsync(contacts, entities, auditDetails, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+        return await SyncInductionsAsync(contacts, entities, auditDetails, ignoreInvalid, dryRun, cancellationToken);
     }
 
     public async Task<int> SyncInductionsAsync(
@@ -421,19 +443,17 @@ public class TrsDataSyncHelper(
         IReadOnlyCollection<dfeta_induction> entities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid,
-        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
-        var (inductions, events) = await MapInductionsAndAuditsAsync(contacts, entities, auditDetails, ignoreInvalid, createMigratedEvent);
-        return await SyncInductionsAsync(inductions, events, ignoreInvalid, createMigratedEvent, dryRun, cancellationToken);
+        var (inductions, events) = MapInductionsAndAudits(contacts, entities, auditDetails, ignoreInvalid);
+        return await SyncInductionsAsync(inductions, events, ignoreInvalid, dryRun, cancellationToken);
     }
 
     private async Task<int> SyncInductionsAsync(
         IReadOnlyCollection<InductionInfo> inductions,
         IReadOnlyCollection<EventBase> events,
         bool ignoreInvalid,
-        bool createMigratedEvent,
         bool dryRun,
         CancellationToken cancellationToken)
     {
@@ -526,6 +546,106 @@ public class TrsDataSyncHelper(
 
         _syncedEntitiesSubject.OnNext([.. toSync, .. events]);
         return toSync.Count;
+    }
+
+    public async Task<int> MigrateInductionsAsync(
+        IReadOnlyCollection<Contact> contacts,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var modelTypeSyncInfo = GetModelTypeSyncInfo(ModelTypes.Induction);
+
+        var inductions = await GetEntitiesAsync<dfeta_induction>(
+            dfeta_induction.EntityLogicalName,
+            dfeta_induction.Fields.dfeta_PersonId,
+            contacts.Select(c => c.ContactId!.Value),
+            modelTypeSyncInfo.AttributeNames,
+            true,
+            cancellationToken);
+
+        var inductionLookup = inductions
+            .GroupBy(i => i.dfeta_PersonId.Id)
+            .ToDictionary(g => g.Key, g => g.ToArray());
+
+        var events = new List<EventBase>();
+
+        foreach (var contact in contacts)
+        {
+            dfeta_induction? induction = null;
+            if (inductionLookup.TryGetValue(contact.ContactId!.Value, out var personInductions))
+            {
+                // We shouldn't have multiple induction records for the same person in prod at all but we might in other environments
+                // so we'll just take the most recently modified one.
+                induction = personInductions.OrderByDescending(i => i.ModifiedOn).First();
+                if (personInductions.Length > 1)
+                {
+                    var errorMessage = $"Contact '{contact.ContactId!.Value}' has multiple induction records.";
+                    if (ignoreInvalid)
+                    {
+                        logger.LogWarning(errorMessage);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(errorMessage);
+                    }
+                }
+            }
+
+            if (induction is null)
+            {
+                continue;
+            }
+
+            var mapped = MapInductionInfoFromDqtInduction(induction, contact, ignoreInvalid);
+            if (mapped is null)
+            {
+                continue;
+            }
+
+            var migratedEvent = await MapMigratedEventAsync(contact.ContactId!.Value, induction!, mapped);
+            events.Add(migratedEvent);
+        }
+
+        if (events.Count == 0)
+        {
+            return 0;
+        }
+
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+        await txn.SaveEventsAsync(events, "events_induction_migration", clock, cancellationToken);
+
+        if (!dryRun)
+        {
+            await txn.CommitAsync();
+        }
+
+        return events.Count;
+
+        async Task<EventBase> MapMigratedEventAsync(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
+        {
+            var inductionExemptionReason = "";
+            if (mappedInduction.InductionExemptionReasonIds.Length > 0)
+            {
+                var reason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(mappedInduction.InductionExemptionReasonIds.Single());
+                inductionExemptionReason = reason.Name;
+            }
+
+            return new InductionMigratedEvent()
+            {
+                EventId = Guid.NewGuid(),
+                Key = $"{dqtInduction.Id}-Migrated",
+                CreatedUtc = clock.UtcNow,
+                RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                PersonId = contactId,
+                InductionStartDate = mappedInduction.InductionStartDate,
+                InductionCompletedDate = mappedInduction.InductionCompletedDate,
+                InductionStatus = mappedInduction.InductionStatus.HasValue ? mappedInduction.InductionStatus!.Value.GetTitle() : null,
+                InductionExemptionReason = inductionExemptionReason,
+                DqtInduction = GetEventDqtInduction(dqtInduction)
+            };
+        }
     }
 
     public async Task<int> SyncEventsAsync(IReadOnlyCollection<dfeta_TRSEvent> events, bool dryRun, CancellationToken cancellationToken = default)
@@ -1216,12 +1336,11 @@ public class TrsDataSyncHelper(
         })
         .ToList();
 
-    private async Task<(List<InductionInfo> Inductions, List<EventBase> Events)> MapInductionsAndAuditsAsync(
+    private (List<InductionInfo> Inductions, List<EventBase> Events) MapInductionsAndAudits(
         IReadOnlyCollection<Contact> contacts,
         IEnumerable<dfeta_induction> inductionEntities,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
-        bool ignoreInvalid,
-        bool createMigratedEvent)
+        bool ignoreInvalid)
     {
         var inductionLookup = inductionEntities
             .GroupBy(i => i.dfeta_PersonId.Id)
@@ -1332,11 +1451,6 @@ public class TrsDataSyncHelper(
                             events.Add(mappedEvent);
                         }
                     }
-
-                    if (createMigratedEvent)
-                    {
-                        events.Add(await MapMigratedEventAsync(contact.ContactId!.Value, induction, mapped));
-                    }
                 }
             }
 
@@ -1426,58 +1540,34 @@ public class TrsDataSyncHelper(
                 Changes = changes
             };
         }
+    }
 
-        async Task<EventBase> MapMigratedEventAsync(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
+    EventModels.DqtInduction GetEventDqtInduction(dfeta_induction induction)
+    {
+        Option<DateOnly?> startDateOption = induction.TryGetAttributeValue<DateTime?>(dfeta_induction.Fields.dfeta_StartDate, out var startDate)
+            ? Option.Some(startDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+            : Option.None<DateOnly?>();
+
+        Option<DateOnly?> completionDateOption = induction.TryGetAttributeValue<DateTime?>(dfeta_induction.Fields.dfeta_CompletionDate, out var completionDate)
+            ? Option.Some(completionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
+            : Option.None<DateOnly?>();
+
+        Option<string?> inductionStatusOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionStatus, out var inductionStatus)
+            ? Option.Some(((dfeta_InductionStatus?)inductionStatus!.Value).ToString())
+            : Option.None<string?>();
+
+        Option<string?> inductionExemptionReasonOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionExemptionReason, out var inductionExemptionReason)
+            ? Option.Some(((dfeta_InductionExemptionReason?)inductionExemptionReason!.Value).ToString())
+            : Option.None<string?>();
+
+        return new EventModels.DqtInduction()
         {
-            var inductionExemptionReason = "";
-            if (mappedInduction.InductionExemptionReasonIds.Length > 0)
-            {
-                var reason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(mappedInduction.InductionExemptionReasonIds.Single());
-                inductionExemptionReason = reason.Name;
-            }
-
-            return new InductionMigratedEvent()
-            {
-                EventId = Guid.NewGuid(),
-                Key = $"{dqtInduction.Id}-Migrated",
-                CreatedUtc = clock.UtcNow,
-                RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
-                PersonId = contactId,
-                InductionStartDate = mappedInduction.InductionStartDate,
-                InductionCompletedDate = mappedInduction.InductionCompletedDate,
-                InductionStatus = mappedInduction.InductionStatus.ToString(),
-                InductionExemptionReason = inductionExemptionReason,
-                DqtInduction = GetEventDqtInduction(dqtInduction)
-            };
-        }
-
-        EventModels.DqtInduction GetEventDqtInduction(dfeta_induction induction)
-        {
-            Option<DateOnly?> startDateOption = induction.TryGetAttributeValue<DateTime?>(dfeta_induction.Fields.dfeta_StartDate, out var startDate)
-                ? Option.Some(startDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
-                : Option.None<DateOnly?>();
-
-            Option<DateOnly?> completionDateOption = induction.TryGetAttributeValue<DateTime?>(dfeta_induction.Fields.dfeta_CompletionDate, out var completionDate)
-                ? Option.Some(completionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true))
-                : Option.None<DateOnly?>();
-
-            Option<string?> inductionStatusOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionStatus, out var inductionStatus)
-                ? Option.Some(((dfeta_InductionStatus?)inductionStatus!.Value).ToString())
-                : Option.None<string?>();
-
-            Option<string?> inductionExemptionReasonOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionExemptionReason, out var inductionExemptionReason)
-                ? Option.Some(((dfeta_InductionExemptionReason?)inductionExemptionReason!.Value).ToString())
-                : Option.None<string?>();
-
-            return new EventModels.DqtInduction()
-            {
-                InductionId = induction.Id,
-                StartDate = startDateOption,
-                CompletionDate = completionDateOption,
-                InductionStatus = inductionStatusOption,
-                InductionExemptionReason = inductionExemptionReasonOption
-            };
-        }
+            InductionId = induction.Id,
+            StartDate = startDateOption,
+            CompletionDate = completionDateOption,
+            InductionStatus = inductionStatusOption,
+            InductionExemptionReason = inductionExemptionReasonOption
+        };
     }
 
     private record ModelTypeSyncInfo

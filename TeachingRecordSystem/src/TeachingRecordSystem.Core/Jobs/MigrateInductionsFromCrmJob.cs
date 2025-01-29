@@ -1,5 +1,4 @@
 using System.ServiceModel;
-using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk;
@@ -9,12 +8,11 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-[AutomaticRetry(Attempts = 0)]
-public class SyncAllInductionsFromCrmJob(
-        ICrmServiceClientProvider crmServiceClientProvider,
-        TrsDataSyncHelper trsDataSyncHelper,
-        IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
-        ILogger<SyncAllInductionsFromCrmJob> logger)
+public class MigrateInductionsFromCrmJob(
+    ICrmServiceClientProvider crmServiceClientProvider,
+    TrsDataSyncHelper trsDataSyncHelper,
+    IOptions<TrsDataSyncServiceOptions> syncOptionsAccessor,
+    ILogger<SyncAllInductionsFromCrmJob> logger)
 {
     public async Task ExecuteAsync(bool dryRun, CancellationToken cancellationToken)
     {
@@ -53,9 +51,8 @@ public class SyncAllInductionsFromCrmJob(
                 continue;
             }
 
-            await trsDataSyncHelper.SyncInductionsAsync(
+            await trsDataSyncHelper.MigrateInductionsAsync(
                 result.Entities.Select(e => e.ToEntity<Contact>()).ToArray(),
-                syncAudit: false,
                 ignoreInvalid: syncOptionsAccessor.Value.IgnoreInvalidData,
                 dryRun,
                 cancellationToken);
