@@ -9,11 +9,12 @@ using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), RequireJourneyInstance]
-public class InductionChangeReasonModel : CommonJourneyPage
+public class InductionChangeReasonModel(
+    TrsLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    IFileService fileService)
+    : CommonJourneyPage(linkGenerator)
 {
-    protected TrsDbContext _dbContext;
-    protected IFileService _fileService;
-
     public string? PersonName { get; set; }
 
     [FromQuery]
@@ -62,22 +63,16 @@ public class InductionChangeReasonModel : CommonJourneyPage
         {
             if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
-                return PageLink(InductionJourneyPage.CheckAnswers);
+                return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return InductionStatus switch
             {
-                _ when InductionStatus.RequiresCompletedDate() => PageLink(InductionJourneyPage.CompletedDate),
-                _ when InductionStatus.RequiresStartDate() => PageLink(InductionJourneyPage.StartDate),
-                _ when InductionStatus.RequiresExemptionReasons() => PageLink(InductionJourneyPage.ExemptionReason),
-                _ => PageLink(InductionJourneyPage.Status),
+                _ when InductionStatus.RequiresCompletedDate() => GetPageLink(InductionJourneyPage.CompletedDate),
+                _ when InductionStatus.RequiresStartDate() => GetPageLink(InductionJourneyPage.StartDate),
+                _ when InductionStatus.RequiresExemptionReasons() => GetPageLink(InductionJourneyPage.ExemptionReason),
+                _ => GetPageLink(InductionJourneyPage.Status),
             };
         }
-    }
-
-    public InductionChangeReasonModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IFileService fileService) : base(linkGenerator)
-    {
-        _dbContext = dbContext;
-        _fileService = fileService;
     }
 
     public async Task OnGetAsync()
@@ -87,7 +82,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await _fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, InductionDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, InductionDefaults.FileUrlExpiry) :
             null;
     }
 
@@ -111,11 +106,11 @@ public class InductionChangeReasonModel : CommonJourneyPage
             {
                 if (EvidenceFileId is not null)
                 {
-                    await _fileService.DeleteFileAsync(EvidenceFileId.Value);
+                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
                 }
 
                 using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await _fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
+                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
                 await JourneyInstance!.UpdateStateAsync(state =>
                 {
                     state.EvidenceFileId = evidenceFileId;
@@ -126,7 +121,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
         }
         else if (EvidenceFileId is not null)
         {
-            await _fileService.DeleteFileAsync(EvidenceFileId.Value);
+            await fileService.DeleteFileAsync(EvidenceFileId.Value);
             await JourneyInstance!.UpdateStateAsync(state =>
             {
                 state.EvidenceFileId = null;
@@ -143,12 +138,12 @@ public class InductionChangeReasonModel : CommonJourneyPage
             state.UploadEvidence = UploadEvidence;
         });
 
-        return Redirect(PageLink(NextPage));
+        return Redirect(GetPageLink(NextPage));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.Status);
+        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.Status);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
@@ -156,6 +151,7 @@ public class InductionChangeReasonModel : CommonJourneyPage
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
+
         await next();
     }
 }

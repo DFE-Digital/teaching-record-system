@@ -7,22 +7,23 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class ExemptionReasonModel : CommonJourneyPage
+public class ExemptionReasonModel(
+    TrsLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    ReferenceDataCache referenceDataCache)
+    : CommonJourneyPage(linkGenerator)
 {
-    protected TrsDbContext _dbContext;
-    protected ReferenceDataCache _referenceDataCache;
-
-    protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
-
     [FromQuery]
     public JourneyFromCheckYourAnswersPage FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Display(Name = "Why are they exempt from induction?")]
-    public Guid[] ExemptionReasonIds { get; set; } = Array.Empty<Guid>();
+    public Guid[] ExemptionReasonIds { get; set; } = [];
 
     public string? PersonName { get; set; }
-    public InductionExemptionReason[] ExemptionReasons { get; set; } = Array.Empty<InductionExemptionReason>();
+
+    public InductionExemptionReason[] ExemptionReasons { get; set; } = [];
+
     public InductionJourneyPage NextPage
     {
         get
@@ -41,18 +42,12 @@ public class ExemptionReasonModel : CommonJourneyPage
         {
             if (FromCheckAnswers == JourneyFromCheckYourAnswersPage.CheckYourAnswers)
             {
-                return PageLink(InductionJourneyPage.CheckAnswers);
+                return GetPageLink(InductionJourneyPage.CheckAnswers);
             }
             return JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.ExemptionReason
                 ? LinkGenerator.PersonInduction(PersonId)
-                : PageLink(InductionJourneyPage.Status);
+                : GetPageLink(InductionJourneyPage.Status);
         }
-    }
-
-    public ExemptionReasonModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, ReferenceDataCache referenceDataCache) : base(linkGenerator)
-    {
-        _dbContext = dbContext;
-        _referenceDataCache = referenceDataCache;
     }
 
     public IActionResult OnGet()
@@ -79,29 +74,27 @@ public class ExemptionReasonModel : CommonJourneyPage
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ExemptionReasonIds = ExemptionReasonIds;
-            if (state.JourneyStartPage == null)
-            {
-                state.JourneyStartPage = InductionJourneyPage.ExemptionReason;
-            }
         });
 
-        return Redirect(PageLink(NextPage));
+        return Redirect(GetPageLink(NextPage));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(_dbContext, PersonId, InductionJourneyPage.ExemptionReason);
+        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.ExemptionReason);
+
         if (JourneyInstance!.State.InductionStatus != InductionStatus.Exempt)
         {
-            context.Result = Redirect(PageLink(JourneyInstance!.State.JourneyStartPage));
+            context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
             return;
         }
 
-        ExemptionReasons = await _referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
+        ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
+
         await next();
     }
 }
