@@ -10,8 +10,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock)
     : CommonJourneyPage(linkGenerator)
 {
-    private const string InductionIsManagedByCpdWarning = "To change this teacher’s induction status to passed, failed, or in progress, use the Record inductions as an appropriate body service.";
-
     private bool _inductionStatusManagedByCpd;
 
     [FromQuery]
@@ -31,20 +29,17 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
                 : InductionStatusRegistry.All.ToArray()[1..];
         }
     }
-    public string? StatusWarningMessage
+
+    public string InductionIsManagedByCpdWarning => InductionStatus switch
     {
-        get
-        {
-            if (_inductionStatusManagedByCpd)
-            {
-                return InductionIsManagedByCpdWarning;
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
+        InductionStatus.RequiredToComplete => InductionWarnings.InductionIsManagedByCpdWarningRequiredToComplete,
+        InductionStatus.InProgress => InductionWarnings.InductionIsManagedByCpdWarningInProgress,
+        InductionStatus.Passed => InductionWarnings.InductionIsManagedByCpdWarningPassed,
+        InductionStatus.Failed => InductionWarnings.InductionIsManagedByCpdWarningFailed,
+        _ => InductionWarnings.InductionIsManagedByCpdWarningOther
+    };
+
+    public string? StatusWarningMessage => _inductionStatusManagedByCpd ? InductionIsManagedByCpdWarning : null;
 
     public InductionJourneyPage NextPage
     {

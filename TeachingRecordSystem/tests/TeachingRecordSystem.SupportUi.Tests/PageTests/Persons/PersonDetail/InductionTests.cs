@@ -211,21 +211,27 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Contains(setCompletedDate.ToString(UiDefaults.DateOnlyDisplayFormat), completedDate);
     }
 
-    [Fact]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCPD_ShowsWarning()
+    [Theory]
+    [InlineData(InductionStatus.RequiredToComplete, "passed, failed, or in progress")]
+    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed")]
+    [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress")]
+    [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress")]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsExpectedWarning(
+        InductionStatus status,
+        string expectedWarningMessage)
     {
-        //Arrange
-        var expectedWarning = "To change this teacher’s induction status ";
+        // Arrange
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts());
+
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
-                InductionStatus.Passed,
-                startDate: Clock.Today.AddYears(-2),
-                completedDate: lessThanSevenYearsAgo,
+                status,
+                startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
+                completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
@@ -240,11 +246,12 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+        var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent;
+        Assert.Contains(expectedWarningMessage, warningMessage);
     }
 
     [Fact]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCPD_NoWarning()
+    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCpd_DoesNotShowWarning()
     {
         //Arrange
         var underSevenYearsAgo = Clock.Today.AddYears(-6);
