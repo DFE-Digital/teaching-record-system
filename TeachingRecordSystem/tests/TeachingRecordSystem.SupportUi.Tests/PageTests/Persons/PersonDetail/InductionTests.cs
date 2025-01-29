@@ -216,18 +216,21 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed")]
     [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress")]
     [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress")]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCPD_ShowsWarning(InductionStatus status, string statusSpecificText)
+    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsExpectedWarning(
+        InductionStatus status,
+        string expectedWarningMessage)
     {
-        //Arrange
+        // Arrange
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts());
+
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
                 status,
-                startDate: lessThanSevenYearsAgo.AddYears(-1),
+                startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
                 completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
                 cpdModifiedOn: Clock.UtcNow,
                 updatedBy: SystemUser.SystemUserId,
@@ -244,10 +247,11 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent;
+        Assert.Contains(expectedWarningMessage, warningMessage);
     }
 
     [Fact]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCPD_NoWarning()
+    public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCpd_DoesNotShowWarning()
     {
         //Arrange
         var underSevenYearsAgo = Clock.Today.AddYears(-6);

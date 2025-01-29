@@ -29,6 +29,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
                 : InductionStatusRegistry.All.ToArray()[1..];
         }
     }
+
     public string InductionIsManagedByCpdWarning => InductionStatus switch
     {
         InductionStatus.RequiredToComplete => InductionWarnings.InductionIsManagedByCpdWarningRequiredToComplete,
@@ -38,20 +39,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
         _ => InductionWarnings.InductionIsManagedByCpdWarningOther
     };
 
-    public string? StatusWarningMessage
-    {
-        get
-        {
-            if (_inductionStatusManagedByCpd)
-            {
-                return InductionIsManagedByCpdWarning;
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
+    public string? StatusWarningMessage => _inductionStatusManagedByCpd ? InductionIsManagedByCpdWarning : null;
 
     public InductionJourneyPage NextPage
     {
