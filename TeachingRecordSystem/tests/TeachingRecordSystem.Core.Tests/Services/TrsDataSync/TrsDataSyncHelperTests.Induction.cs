@@ -277,7 +277,7 @@ public partial class TrsDataSyncHelperTests
         Assert.Equal(await TestData.GetCurrentCrmUserIdAsync(), createdEvent.RaisedBy.DqtUserId);
         Assert.Equal(person.PersonId, createdEvent.PersonId);
         Assert.Equal(inductionId, createdEvent.Induction.InductionId);
-        Assert.Equal(inductionStatus.ToString(), createdEvent.Induction.InductionStatus.ValueOrFailure());
+        Assert.Equal(inductionStatus.GetMetadata().Name, createdEvent.Induction.InductionStatus.ValueOrFailure());
         Assert.Equal(startDate, createdEvent.Induction.StartDate.ValueOrFailure());
         Assert.Equal(completionDate, createdEvent.Induction.CompletionDate.ValueOrFailure());
     }
@@ -557,7 +557,7 @@ public partial class TrsDataSyncHelperTests
         Assert.Equal(Core.DataStore.Postgres.Models.SystemUser.SystemUserId, migratedEvent.RaisedBy.UserId);
         Assert.Equal(person.PersonId, migratedEvent.PersonId);
         Assert.Equal(inductionId, migratedEvent.DqtInduction.InductionId);
-        Assert.Equal(inductionStatus.ToString(), migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
+        Assert.Equal(inductionStatus.GetMetadata().Name, migratedEvent.DqtInduction.InductionStatus.ValueOrFailure());
         Assert.Equal(inductionStartDate, migratedEvent.DqtInduction.StartDate.ValueOrFailure());
         Assert.Equal(inductionCompletionDate, migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
         Assert.Equal(inductionStartDate, migratedEvent.InductionStartDate);
