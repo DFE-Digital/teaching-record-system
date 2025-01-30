@@ -430,7 +430,7 @@ public partial class TrsDataSyncHelperTests
                 Assert.Equal(inductionId, updatedEvent.Induction.InductionId);
                 Assert.Equal(updatedVersion.dfeta_StartDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), updatedEvent.Induction.StartDate.ValueOrFailure());
                 Assert.Equal(updatedVersion.dfeta_CompletionDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true), updatedEvent.Induction.CompletionDate.ValueOrFailure());
-                Assert.Equal(updatedVersion.dfeta_InductionStatus.ToString(), updatedEvent.Induction.InductionStatus.ValueOrFailure());
+                Assert.Equal(updatedVersion.dfeta_InductionStatus!.Value.GetMetadata().Name, updatedEvent.Induction.InductionStatus.ValueOrFailure());
                 Assert.Equal(GetChanges(initialVersion, updatedVersion), updatedEvent.Changes);
             });
     }
