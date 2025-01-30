@@ -1553,11 +1553,11 @@ public class TrsDataSyncHelper(
             : Option.None<DateOnly?>();
 
         Option<string?> inductionStatusOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionStatus, out var inductionStatus)
-            ? Option.Some(((dfeta_InductionStatus?)inductionStatus!.Value).ToString())
+            ? Option.Some(inductionStatus is not null ? (string?)((dfeta_InductionStatus?)inductionStatus!.Value)!.Value.GetMetadata().Name : null)
             : Option.None<string?>();
 
         Option<string?> inductionExemptionReasonOption = induction.TryGetAttributeValue<OptionSetValue>(dfeta_induction.Fields.dfeta_InductionExemptionReason, out var inductionExemptionReason)
-            ? Option.Some(((dfeta_InductionExemptionReason?)inductionExemptionReason!.Value).ToString())
+            ? Option.Some(inductionExemptionReason is not null ? (string?)((dfeta_InductionExemptionReason?)inductionExemptionReason!.Value)!.Value.GetMetadata().Name : null)
             : Option.None<string?>();
 
         return new EventModels.DqtInduction()
