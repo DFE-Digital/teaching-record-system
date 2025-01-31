@@ -146,4 +146,16 @@ public class PersonsController(IMapper mapper) : ControllerBase
                 Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
             }));
     }
+
+    [HttpPut("{trn}/professional-statuses/{id}")]
+    [SwaggerOperation(
+        OperationId = "SetProfessionalStatus",
+        Summary = "Sets a professional status")]
+    [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetProfessionalStatus)]
+    public IActionResult SetProfessionalStatus(
+        [FromRoute] string id,
+        [FromBody] SetProfessionalStatusRequest request) =>
+        NoContent();
 }

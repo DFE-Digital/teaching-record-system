@@ -10,15 +10,15 @@ public class ProfessionalStatus : Qualification
     public string? SourceApplicationReference { get; init; }
     public RouteToProfessionalStatus Route { get; } = null!;
     public required ProfessionalStatusStatus Status { get; set; }
-    public DateOnly? AwardDate { get; set; }
-    public required DateOnly? StartDate { get; set; }
-    public required DateOnly? EndDate { get; set; }
+    public DateOnly? AwardedDate { get; set; }
+    public required DateOnly? TrainingStartDate { get; set; }
+    public required DateOnly? TrainingEndDate { get; set; }
     public required Guid[] TrainingSubjectIds { get; set; } = [];
-    public required TrainingAge? TrainingAge { get; set; }
-    public required int? AgeRangeFrom { get; set; }
-    public required int? AgeRangeTo { get; set; }
-    public required string? CountryId { get; init; }
-    public Country? Country { get; }
+    public required TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
+    public required int? TrainingAgeRangeFrom { get; set; }
+    public required int? TrainingAgeRangeTo { get; set; }
+    public required string? TrainingCountryId { get; init; }
+    public Country? TrainingCountry { get; }
     public required Guid? TrainingProviderId { get; set; }
     public TrainingProvider? TrainingProvider { get; }
     public required Guid? InductionExemptionReasonId { get; set; }

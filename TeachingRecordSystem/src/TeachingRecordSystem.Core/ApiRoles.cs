@@ -12,6 +12,7 @@ public static class ApiRoles
     public const string UpdateRole = "UpdateRole";
     public const string SetCpdInduction = "SetCpdInduction";
     public const string SetWelshInduction = "SetWelshInduction";
+    public const string SetProfessionalStatus = "SetProfessionalStatus";
 
     public static IReadOnlyCollection<string> All { get; } =
     [
@@ -24,6 +25,7 @@ public static class ApiRoles
         AppropriateBody,
         UpdateRole,
         SetCpdInduction,
-        SetWelshInduction
+        SetWelshInduction,
+        SetProfessionalStatus
     ];
 }
