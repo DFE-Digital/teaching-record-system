@@ -15,8 +15,8 @@ public class ProfessionalStatus : Qualification
     public required DateOnly? TrainingEndDate { get; set; }
     public required Guid[] TrainingSubjectIds { get; set; } = [];
     public required TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
-    public required int? TrainingAgeRangeFrom { get; set; }
-    public required int? TrainingAgeRangeTo { get; set; }
+    public required int? TrainingAgeSpecialismRangeFrom { get; set; }
+    public required int? TrainingAgeSpecialismRangeTo { get; set; }
     public required string? TrainingCountryId { get; init; }
     public Country? TrainingCountry { get; }
     public required Guid? TrainingProviderId { get; set; }
