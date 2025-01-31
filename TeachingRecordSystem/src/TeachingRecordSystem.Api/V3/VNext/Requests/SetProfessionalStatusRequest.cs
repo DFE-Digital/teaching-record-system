@@ -12,14 +12,14 @@ public record SetProfessionalStatusRequest
     public DateOnly? TrainingStartDate { get; init; }
     public DateOnly? TrainingEndDate { get; init; }
     public Option<string[]> TrainingSubjectReferences { get; init; }
-    public SetProfessionalStatusRequestAgeRangeSpecialism? AgeRangeSpecialism { get; init; }
+    public SetProfessionalStatusRequestTrainingAgeSpecialism? TrainingAgeSpecialism { get; init; }
     public string? TrainingCountryReference { get; init; }
     public string? TrainingProviderUkprn { get; init; }
     public Guid? DegreeTypeId { get; init; }
     public Guid? InductionExemptionReasonId { get; init; }
 }
 
-public record SetProfessionalStatusRequestAgeRangeSpecialism
+public record SetProfessionalStatusRequestTrainingAgeSpecialism
 {
     public TrainingAgeSpecialismType Type { get; init; }
     public int? From { get; init; }
