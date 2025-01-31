@@ -180,6 +180,11 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.RemoveIfExists($"{nameof(SyncAllInductionsFromCrmJob)} & migrate");
 
+                recurringJobManager.AddOrUpdate<BackfillDqtInductionEventEnumDescriptionsJob>(
+                    nameof(BackfillDqtInductionEventEnumDescriptionsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 recurringJobManager.AddOrUpdate<ClearAlertsJob>(
                     nameof(ClearAlertsJob),
                     job => job.ExecuteAsync(),
