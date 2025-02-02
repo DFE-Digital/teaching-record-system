@@ -335,6 +335,7 @@ public class TrsDataSyncHelper(
             using (var mergeCommand = connection.CreateCommand())
             {
                 mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
+                mergeCommand.CommandTimeout = 120;
                 mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
                 mergeCommand.Transaction = txn;
                 await mergeCommand.ExecuteNonQueryAsync();
@@ -368,6 +369,11 @@ public class TrsDataSyncHelper(
             await connection.DisposeAsync();
 
             return await SyncPersonsAsync(personsExceptFailedOne, eventsExceptFailedOne, ignoreInvalid, dryRun, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"Exception {ex.Message} attempting to sync persons with IDs [{string.Join(", ", toSync.Select(p => p.DqtContactId))}].");
+            throw;
         }
 
         await txn.SaveEventsAsync(events, "events_person_import", clock, cancellationToken, timeoutSeconds: 120);
@@ -490,6 +496,7 @@ public class TrsDataSyncHelper(
             using (var mergeCommand = connection.CreateCommand())
             {
                 mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
+                mergeCommand.CommandTimeout = 120;
                 mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
                 mergeCommand.Transaction = txn;
                 using var reader = await mergeCommand.ExecuteReaderAsync();
