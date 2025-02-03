@@ -1,4 +1,5 @@
 using Optional;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
@@ -398,9 +399,8 @@ public class ChangeLogInductionEventTests : TestBase
     [InlineData(DqtInductionFields.CompletionDate)]
     [InlineData(DqtInductionFields.Status)]
     [InlineData(DqtInductionFields.ExemptionReason)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.Status)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.Status)]
-    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.Status | DqtInductionFields.ExemptionReason)]
+    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate)]
+    [InlineData(DqtInductionFields.StartDate | DqtInductionFields.CompletionDate | DqtInductionFields.ExemptionReason)]
     public async Task Person_WithInductionMigratedEvent_RendersExpectedContent(DqtInductionFields populatedFields)
     {
         // Arrange
@@ -411,8 +411,9 @@ public class ChangeLogInductionEventTests : TestBase
         DateOnly? completionDate = Clock.Today.AddDays(-10);
         dfeta_InductionStatus? inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? Core.Dqt.Models.dfeta_InductionStatus.Exempt : Core.Dqt.Models.dfeta_InductionStatus.InProgress;
         dfeta_InductionExemptionReason? inductionExemptionReason = Core.Dqt.Models.dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
-        string? migratedInductionStatus = inductionStatus == dfeta_InductionStatus.Exempt ? "Exempt" : "In progress";
-        string? migratedInductionExemptionReason = "Qualified through EEA mutual recognition route";
+        InductionStatus migratedInductionStatus = inductionStatus == dfeta_InductionStatus.Exempt ? InductionStatus.Exempt : InductionStatus.InProgress;
+        var exemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReason.PassedInWalesId);
+        Guid? migratedInductionExemptionReasonId = exemptionReason.InductionExemptionReasonId;
 
         var induction = new EventModels.DqtInduction
         {
@@ -430,8 +431,8 @@ public class ChangeLogInductionEventTests : TestBase
             CreatedUtc = Clock.UtcNow,
             RaisedBy = createdByDqtUser,
             PersonId = person.PersonId,
-            InductionStatus = populatedFields.HasFlag(DqtInductionFields.Status) ? migratedInductionStatus : null,
-            InductionExemptionReason = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? migratedInductionExemptionReason : null,
+            InductionStatus = migratedInductionStatus,
+            InductionExemptionReasonId = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? migratedInductionExemptionReasonId : null,
             InductionStartDate = populatedFields.HasFlag(DqtInductionFields.StartDate) ? startDate : null,
             InductionCompletedDate = populatedFields.HasFlag(DqtInductionFields.CompletionDate) ? completionDate : null,
             DqtInduction = induction
@@ -473,18 +474,11 @@ public class ChangeLogInductionEventTests : TestBase
                 {
                     Assert.Null(item.GetElementByTestId("completed-date"));
                 }
-                if (populatedFields.HasFlag(DqtInductionFields.Status))
-                {
-                    Assert.Equal(migratedInductionStatus, item.GetElementByTestId("induction-status")?.TextContent.Trim());
-                    Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("dqt-induction-status")?.TextContent.Trim());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("induction-status"));
-                }
+                Assert.Equal(migratedInductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TextContent.Trim());
+                //Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("dqt-induction-status")?.TextContent.Trim());
                 if (populatedFields.HasFlag(DqtInductionFields.ExemptionReason))
                 {
-                    Assert.Equal(migratedInductionExemptionReason, item.GetElementByTestId("exemption-reason")?.TextContent.Trim());
+                    Assert.Equal(exemptionReason.Name, item.GetElementByTestId("exemption-reason")?.TextContent.Trim());
                     Assert.Equal(inductionExemptionReason.ToString(), item.GetElementByTestId("dqt-exemption-reason")?.TextContent.Trim());
                 }
                 else

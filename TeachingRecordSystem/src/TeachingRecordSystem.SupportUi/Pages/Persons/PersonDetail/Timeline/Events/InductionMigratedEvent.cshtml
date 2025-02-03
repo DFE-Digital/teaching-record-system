@@ -1,6 +1,7 @@
 @using Optional.Unsafe
 @using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
+@inject ReferenceDataCache ReferenceDataCache
 @model TimelineItem<TimelineEvent<InductionMigratedEvent>>
 @{
     var migratedEvent = Model.ItemModel.Event;
@@ -17,18 +18,16 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            @if (!string.IsNullOrEmpty(migratedEvent.InductionStatus))
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="induction-status">@migratedEvent.InductionStatus.GetTitle()</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            @if (migratedEvent.InductionExemptionReasonId is Guid exemptionReasonId)
             {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="induction-status">@migratedEvent.InductionStatus</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-            @if (!string.IsNullOrEmpty(migratedEvent.InductionExemptionReason))
-            {
+                var exemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(exemptionReasonId);
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Induction exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="exemption-reason">@migratedEvent.InductionExemptionReason</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value data-testid="exemption-reason">@exemptionReason.Name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
             @if (migratedEvent.InductionStartDate.HasValue)

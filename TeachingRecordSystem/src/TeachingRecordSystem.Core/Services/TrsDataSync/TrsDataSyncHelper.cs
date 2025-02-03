@@ -603,7 +603,7 @@ public class TrsDataSyncHelper(
                 continue;
             }
 
-            var migratedEvent = await MapMigratedEventAsync(contact.ContactId!.Value, induction!, mapped);
+            var migratedEvent = MapMigratedEvent(contact.ContactId!.Value, induction, mapped);
             events.Add(migratedEvent);
         }
 
@@ -623,15 +623,8 @@ public class TrsDataSyncHelper(
 
         return events.Count;
 
-        async Task<EventBase> MapMigratedEventAsync(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
+        EventBase MapMigratedEvent(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
         {
-            var inductionExemptionReason = "";
-            if (mappedInduction.InductionExemptionReasonIds.Length > 0)
-            {
-                var reason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(mappedInduction.InductionExemptionReasonIds.Single());
-                inductionExemptionReason = reason.Name;
-            }
-
             return new InductionMigratedEvent()
             {
                 EventId = Guid.NewGuid(),
@@ -641,8 +634,8 @@ public class TrsDataSyncHelper(
                 PersonId = contactId,
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
-                InductionStatus = mappedInduction.InductionStatus.HasValue ? mappedInduction.InductionStatus!.Value.GetTitle() : null,
-                InductionExemptionReason = inductionExemptionReason,
+                InductionStatus = mappedInduction.InductionStatus,
+                InductionExemptionReasonId = mappedInduction.InductionExemptionReasonIds.SingleOrDefault(),
                 DqtInduction = GetEventDqtInduction(dqtInduction)
             };
         }
@@ -1604,7 +1597,7 @@ public class TrsDataSyncHelper(
         public required DateOnly? InductionCompletedDate { get; init; }
         public required Guid[] InductionExemptionReasonIds { get; init; }
         public required DateOnly? InductionStartDate { get; init; }
-        public required InductionStatus? InductionStatus { get; init; }
+        public required InductionStatus InductionStatus { get; init; }
         public required DateTime? DqtModifiedOn { get; init; }
     }
 
