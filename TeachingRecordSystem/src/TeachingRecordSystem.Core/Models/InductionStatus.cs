@@ -4,26 +4,26 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum InductionStatus
 {
-    [InductionStatusInfo("none", requiresStartDate: false, requiresCompletedDate: false)]
+    [InductionStatusInfo("none", 6, requiresStartDate: false, requiresCompletedDate: false)]
     None = 0,
-    [InductionStatusInfo("required to complete", requiresStartDate: false, requiresCompletedDate: false)]
+    [InductionStatusInfo("required to complete", 5, requiresStartDate: false, requiresCompletedDate: false)]
     RequiredToComplete = 1,
-    [InductionStatusInfo("exempt", requiresStartDate: false, requiresCompletedDate: false, requiresExemptionReasons: true)]
+    [InductionStatusInfo("exempt", 2, requiresStartDate: false, requiresCompletedDate: false, requiresExemptionReasons: true)]
     Exempt = 2,
-    [InductionStatusInfo("in progress", requiresStartDate: true, requiresCompletedDate: false)]
+    [InductionStatusInfo("in progress", 3, requiresStartDate: true, requiresCompletedDate: false)]
     InProgress = 3,
-    [InductionStatusInfo("passed", requiresStartDate: true, requiresCompletedDate: true)]
+    [InductionStatusInfo("passed", 1, requiresStartDate: true, requiresCompletedDate: true)]
     Passed = 4,
-    [InductionStatusInfo("failed", requiresStartDate: true, requiresCompletedDate: true)]
+    [InductionStatusInfo("failed", 0, requiresStartDate: true, requiresCompletedDate: true)]
     Failed = 5,
-    [InductionStatusInfo("failed in Wales", requiresStartDate: true, requiresCompletedDate: true)]
+    [InductionStatusInfo("failed in Wales", 4, requiresStartDate: true, requiresCompletedDate: true)]
     FailedInWales = 6,
 }
 
 public static class InductionStatusRegistry
 {
     private static readonly IReadOnlyDictionary<InductionStatus, InductionStatusInfo> _info =
-        Enum.GetValues<InductionStatus>().ToDictionary(s => s, s => GetInfo(s));
+        Enum.GetValues<InductionStatus>().ToDictionary(s => s, GetInfo);
 
     public static IReadOnlyCollection<InductionStatusInfo> All => _info.Values.ToArray();
 
@@ -43,6 +43,9 @@ public static class InductionStatusRegistry
 
     public static bool RequiresExemptionReasons(this InductionStatus status) => _info[status].RequiresExemptionReasons;
 
+    public static bool IsHigherPriorityThan(this InductionStatus status, InductionStatus otherStatus) =>
+        status.GetPriority() < otherStatus.GetPriority();
+
     public static InductionStatus ToInductionStatus(this dfeta_InductionStatus status) =>
         ToInductionStatus((dfeta_InductionStatus?)status);
 
@@ -61,6 +64,8 @@ public static class InductionStatusRegistry
         _ => throw new ArgumentException($"Failed mapping '{status}' to {nameof(InductionStatus)}.", nameof(status))
     };
 
+    private static int GetPriority(this InductionStatus status) => _info[status].Priority;
+
     private static InductionStatusInfo GetInfo(InductionStatus status)
     {
         var attr = status.GetType()
@@ -69,19 +74,31 @@ public static class InductionStatusRegistry
                .GetCustomAttribute<InductionStatusInfoAttribute>() ??
            throw new Exception($"{nameof(InductionStatus)}.{status} is missing the {nameof(InductionStatusInfoAttribute)} attribute.");
 
-        return new InductionStatusInfo(status, attr.Name, attr.RequiresStartDate, attr.RequiresCompletedDate, attr.RequiresExemptionReasons);
+        return new InductionStatusInfo(status, attr.Priority, attr.Name, attr.RequiresStartDate, attr.RequiresCompletedDate, attr.RequiresExemptionReasons);
     }
 }
 
-public sealed record InductionStatusInfo(InductionStatus Value, string Name, bool RequiresStartDate, bool RequiresCompletedDate, bool RequiresExemptionReasons = false)
+public sealed record InductionStatusInfo(
+    InductionStatus Value,
+    int Priority,
+    string Name,
+    bool RequiresStartDate,
+    bool RequiresCompletedDate,
+    bool RequiresExemptionReasons = false)
 {
-    public string Title => Name[0..1].ToUpper() + Name[1..];
+    public string Title => Name[..1].ToUpper() + Name[1..];
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-file sealed class InductionStatusInfoAttribute(string name, bool requiresStartDate, bool requiresCompletedDate, bool requiresExemptionReasons = false) : Attribute
+file sealed class InductionStatusInfoAttribute(
+    string name,
+    int priority,
+    bool requiresStartDate,
+    bool requiresCompletedDate,
+    bool requiresExemptionReasons = false) : Attribute
 {
     public string Name => name;
+    public int Priority => priority;
     public bool RequiresStartDate => requiresStartDate;
     public bool RequiresCompletedDate => requiresCompletedDate;
     public bool RequiresExemptionReasons => requiresExemptionReasons;
