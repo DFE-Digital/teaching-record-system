@@ -562,7 +562,7 @@ public partial class TrsDataSyncHelperTests
         Assert.Equal(inductionCompletionDate, migratedEvent.DqtInduction.CompletionDate.ValueOrFailure());
         Assert.Equal(inductionStartDate, migratedEvent.InductionStartDate);
         Assert.Equal(inductionCompletionDate, migratedEvent.InductionCompletedDate);
-        Assert.Equal(inductionStatus.ToInductionStatus().GetTitle(), migratedEvent.InductionStatus);
+        Assert.Equal(inductionStatus.ToInductionStatus(), migratedEvent.InductionStatus);
     }
 
     private async Task<dfeta_induction> CreateNewInductionEntityVersion(
