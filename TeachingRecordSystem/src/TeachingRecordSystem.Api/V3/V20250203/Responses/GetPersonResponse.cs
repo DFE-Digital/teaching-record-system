@@ -2,9 +2,9 @@ using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos;
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Responses;
+namespace TeachingRecordSystem.Api.V3.V20250203.Responses;
 
 [AutoMap(typeof(GetPersonResult))]
 public record GetPersonResponse
@@ -20,7 +20,7 @@ public record GetPersonResponse
     public required string? EmailAddress { get; init; }
     public required GetPersonResponseQts? Qts { get; init; }
     public required GetPersonResponseEyts? Eyts { get; init; }
-    public required Option<GetPersonResponseInduction> Induction { get; init; }
+    public required Option<InductionInfo> Induction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseMandatoryQualification>> MandatoryQualifications { get; init; }
@@ -35,7 +35,6 @@ public record GetPersonResponse
 public record GetPersonResponseQts
 {
     public required DateOnly? Awarded { get; init; }
-    public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
@@ -43,7 +42,6 @@ public record GetPersonResponseQts
 public record GetPersonResponseEyts
 {
     public required DateOnly? Awarded { get; init; }
-    public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
 }
 
@@ -92,7 +90,6 @@ public record GetPersonResponseNpqQualification
 {
     public required DateOnly Awarded { get; init; }
     public required GetPersonResponseNpqQualificationType Type { get; init; }
-    public required string CertificateUrl { get; init; }
 }
 
 [AutoMap(typeof(GetPersonResultNpqQualificationType))]
@@ -107,10 +104,4 @@ public record GetPersonResponseMandatoryQualification
 {
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
-}
-
-[AutoMap(typeof(GetPersonResultInduction))]
-public record GetPersonResponseInduction : InductionInfo
-{
-    public required string? CertificateUrl { get; init; }
 }
