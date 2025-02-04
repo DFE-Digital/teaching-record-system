@@ -72,9 +72,21 @@
   max-width: none;
 }
 
+.trs-checkboxes_hint {
+  padding-top: 1rem;
+}
+
 .trs-radios__divider--heading-s {
   @include govuk-text-colour;
   @include govuk-font($size: 19, $weight: bold);
   width: 400px;
   text-align: left;
+}
+
+.trs-checkboxes__divider--heading-s {
+  @include govuk-text-colour;
+  @include govuk-font($size: 19, $weight: bold);
+  width: 400px;
+  text-align: left;
+  margin-top: 2.5rem;
 }
