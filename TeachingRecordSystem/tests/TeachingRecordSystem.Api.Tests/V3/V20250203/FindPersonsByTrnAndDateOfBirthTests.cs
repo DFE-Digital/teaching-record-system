@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20250203;
 
 [Collection(nameof(DisableParallelization))]
 public class FindPersonsByTrnAndDateOfBirthTests : TestBase

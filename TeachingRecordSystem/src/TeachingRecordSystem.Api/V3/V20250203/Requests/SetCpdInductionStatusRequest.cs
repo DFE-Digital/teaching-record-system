@@ -1,6 +1,6 @@
-using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionStatus;
+using InductionStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.InductionStatus;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20250203.Requests;
 
 public record SetCpdInductionStatusRequest
 {

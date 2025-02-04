@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20250203;
 
 public class GetPersonByTrnTests : TestBase
 {
@@ -141,8 +141,7 @@ public class GetPersonByTrnTests : TestBase
             {
                 status = status.ToString(),
                 startDate = startDate.ToString("yyyy-MM-dd"),
-                completedDate = completedDate.ToString("yyyy-MM-dd"),
-                certificateUrl = "/v3/certificates/induction"
+                completedDate = completedDate.ToString("yyyy-MM-dd")
             },
             responseInduction);
     }
@@ -260,8 +259,7 @@ public class GetPersonByTrnTests : TestBase
             {
                 status = InductionStatus.None.ToString(),
                 startDate = (DateOnly?)null,
-                completedDate = (DateOnly?)null,
-                certificateUrl = (string?)null
+                completedDate = (DateOnly?)null
             },
             responseInduction);
     }

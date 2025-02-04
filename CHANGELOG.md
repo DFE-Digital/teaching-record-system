@@ -1,5 +1,47 @@
 # API Changelog
 
+## 20250203
+
+The `PUT /v3/persons/<trn>/cpd-induction` endpoint has been added.
+
+The `GET /v3/persons/<trn>` endpoint now supports passing a `nationalInsuranceNumber` query parameter.
+If specified, it must match the National Insurance number on the teaching record with TRN `<trn>`.
+
+The TRN request endpoint `PUT /v3/trn-requests` has the following additional properties:
+- `oneLoginUserSubject` (if the TRN request is for a One Login user);
+- `identityVerified` (if the One Login user's identity has been verified).
+- `gender`.
+
+The ability to return higher education qualifications has been removed from `GET /v3/person` and `GET /v3/persons/<trn>`.
+
+The `induction` object in responses to the following endpoints has the `statusDescription` property removed and
+the `endDate` property replaced by `completedDate`:
+- `GET /v3/persons/<trn>`
+- `GET /v3/person`
+- `GET /v3/persons?findBy=LastNameAndDateOfBirth`
+- `GET /v3/persons/find`.
+In addition, the status field will now only contain the following values:
+- `None`
+- `RequiredToComplete`
+- `Exempt`
+- `InProgress`
+- `Passed`
+- `Failed`
+- `FailedInWales`.
+Note that `null` will no longer be returned.
+
+The responses for the following endpoints now contain a `qtlsStatus` property:
+- `GET /v3/persons/<trn>`
+- `GET /v3/person`
+- `GET /v3/persons?findBy=LastNameAndDateOfBirth`
+- `GET /v3/persons/find`.
+
+The following certificate endpoints have been removed:
+- `GET /v3/certificates/qts`
+- `GET /v3/certificates/eyts`
+- `GET /v3/certificates/induction`
+- `GET /v3/certificates/npq/{qualificationId}`
+
 ## 20240920
 
 All references to `sanctions` have been removed and replaced with `alerts`; the following endpoints are affected:

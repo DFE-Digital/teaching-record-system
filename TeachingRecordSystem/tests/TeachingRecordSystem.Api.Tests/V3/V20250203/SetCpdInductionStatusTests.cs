@@ -1,6 +1,6 @@
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20250203;
 
 public class SetCpdInductionStatusTests : TestBase
 {

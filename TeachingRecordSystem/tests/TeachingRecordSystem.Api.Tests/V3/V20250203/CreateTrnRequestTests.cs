@@ -3,7 +3,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
-namespace TeachingRecordSystem.Api.Tests.V3.VNext;
+namespace TeachingRecordSystem.Api.Tests.V3.V20250203;
 
 [Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase
