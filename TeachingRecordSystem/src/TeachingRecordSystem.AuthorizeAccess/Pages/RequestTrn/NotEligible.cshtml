@@ -5,14 +5,14 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.TakingNpqRequireTrn(Model.JourneyInstance!.InstanceId)" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-        <p class="govuk-body">You can only use this service if you need a TRN to register for an NPQ.</p>
+        <p class="govuk-body">You can only use this service if you need a TRN because you’re taking an NPQ.</p>
         <p class="govuk-body">
             Find out how to <a class="govuk-link" href="https://www.gov.uk/guidance/teacher-reference-number-trn#if-youre-a-mentor-for-a-trainee-or-early-career-teacher">get a TRN if you’re a mentor for a trainee or early career teacher</a>.
         </p>

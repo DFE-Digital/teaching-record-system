@@ -1,0 +1,25 @@
+@page "/request-trn/school-or-educational-setting"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.SchoolOrEducationalSettingModel
+@{
+    ViewBag.Title = Html.DisplayNameFor(m => m.IsWorkingInSchoolOrEducationalSetting);
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.RequestTrnNpqApplication(Model.JourneyInstance!.InstanceId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RequestTrnWorkingInSchoolOrEducationalSetting(Model.JourneyInstance!.InstanceId)" asp-for="IsWorkingInSchoolOrEducationalSetting" method="post">
+            <govuk-radios asp-for="IsWorkingInSchoolOrEducationalSetting">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-item value="@true">Yes</govuk-radios-item>
+                    <govuk-radios-item value="@false">No</govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            <govuk-button type="submit">Continue</govuk-button>
+        </form>
+    </div>
+</div>
+

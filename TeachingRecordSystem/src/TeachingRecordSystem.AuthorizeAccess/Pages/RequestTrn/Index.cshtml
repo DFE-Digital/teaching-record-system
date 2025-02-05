@@ -1,20 +1,37 @@
 @page "/request-trn"
 @model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.IndexModel
 @{
-    ViewBag.Title = "Get a teacher reference number (TRN)";
+    ViewBag.Title = "Request a teacher reference number for a national professional qualification";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-        <p class="govuk-body">Use this service to get a teacher reference number (TRN) if you’re registering for a national professional qualification (NPQ).</p>
+        <p class="govuk-body">Use this service to get a teacher reference number (TRN) if you plan on taking a national professional qualification (NPQ).</p>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <p class="govuk-body">Do not use this service if:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>you’ve forgotten your TRN or you’re not sure if you have one - use the <a class="govuk-link" href="https://find-a-lost-trn.education.gov.uk/start">Find a lost TRN</a> service instead</li>
+            <li>you need a TRN because you’re a mentor for a trainee or early career teacher - <a href="https://manage-training-for-early-career-teachers.education.gov.uk/participants/start-registration/get-a-trn" class="govuk-link">request one via Galaxkey</a> instead</li>
+            <li>you need a TRN for a different reason - <a class="govuk-link" href="https://www.gov.uk/guidance/teacher-reference-number-trn#what-youll-need-a-trn-for">find out what you need a TRN for</a></li>
+        </ul>
     </div>
 </div>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <h2 class="govuk-heading-m">Before you start</h2>
-        <p class="govuk-body">You’ll need your National Insurance number (if you have one) and proof of your identity, for example a:</p>
+        <p class="govuk-body">You’ll need your:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>NPQ application ID - you can find this in your NPQ online account or registration confirmation email</li>
+            <li>National Insurance number (if you have one)</li>
+        </ul>
+
+        <p class="govuk-body">You’ll also need proof of your identity, for example a:</p>
         <ul class="govuk-list govuk-list--bullet">
             <li>passport</li>
             <li>driving licence</li>
@@ -24,4 +41,4 @@
     </div>
 </div>
 
-<govuk-button-link href="@LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId)" is-start-button="true">Start now</govuk-button-link>
+<govuk-button-link href="@LinkGenerator.TakingNpqRequireTrn(Model.JourneyInstance!.InstanceId)" is-start-button="true">Start now</govuk-button-link>

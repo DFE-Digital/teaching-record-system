@@ -21,10 +21,13 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_EmailMissingFromState_RedirectsToEmail()
+    public async Task Get_PersonalEmailMissingFromState_RedirectsToPersonalEmail()
     {
         // Arrange
         var state = CreateNewState();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.PersonalEmail = null;
+        state.WorkEmail = Faker.Internet.Email();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -34,7 +37,7 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/personal-email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -42,7 +45,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.PersonalEmail = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -79,7 +84,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.PersonalEmail = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -88,24 +95,58 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter your full name");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter your name");
     }
 
     [Fact]
-    public async Task Post_EmailMissingFromState_RedirectsToEmail()
+    public async Task Post_PersonalEmailMissingFromState_RedirectsToPersonalEmail()
     {
         // Arrange
         var state = CreateNewState();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.PersonalEmail = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["Name"] = Faker.Name.FullName()
+            }),
+        };
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/personal-email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_WorkEmailMissingFromState_RedirectsToWorkEmail()
+    {
+        // Arrange
+        var state = CreateNewState();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.PersonalEmail = Faker.Internet.Email();
+        state.WorkEmail = null;
+        var journeyInstance = await CreateJourneyInstance(state);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/name?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["Name"] = Faker.Name.FullName()
+            }),
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/request-trn/work-email?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -113,7 +154,9 @@ public class NameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkingInSchoolOrEducationalSetting = true;
+        state.PersonalEmail = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         var journeyInstance = await CreateJourneyInstance(state);
 
         var name = Faker.Name.FullName();

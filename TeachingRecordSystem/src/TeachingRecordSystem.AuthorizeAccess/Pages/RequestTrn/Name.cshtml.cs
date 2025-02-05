@@ -16,7 +16,7 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Display(Name = "What is your name?", Description = "Full name")]
-    [Required(ErrorMessage = "Enter your full name")]
+    [Required(ErrorMessage = "Enter your name")]
     [MaxLength(200, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
@@ -49,9 +49,13 @@ public class NameModel(AuthorizeAccessLinkGenerator linkGenerator) : PageModel
         {
             context.Result = Redirect(linkGenerator.RequestTrnSubmitted(JourneyInstance!.InstanceId));
         }
-        else if (state.Email is null)
+        else if (state.PersonalEmail is null)
         {
-            context.Result = Redirect(linkGenerator.RequestTrnEmail(JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RequestTrnPersonalEmail(JourneyInstance.InstanceId));
+        }
+        else if (state.WorkEmail is null && state.WorkingInSchoolOrEducationalSetting == true)
+        {
+            context.Result = Redirect(linkGenerator.RequestTrnWorkEmail(JourneyInstance.InstanceId));
         }
     }
 }
