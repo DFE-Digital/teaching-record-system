@@ -76,17 +76,14 @@
   padding-top: 1rem;
 }
 
-.trs-radios__divider--heading-s {
+.trs-radios__divider--heading-s,
+.trs-checkboxes__divider--heading-s {
   @include govuk-text-colour;
   @include govuk-font($size: 19, $weight: bold);
   width: 400px;
   text-align: left;
 }
 
-.trs-checkboxes__divider--heading-s {
-  @include govuk-text-colour;
-  @include govuk-font($size: 19, $weight: bold);
-  width: 400px;
-  text-align: left;
-  margin-top: 2.5rem;
+.govuk-checkboxes__divider.trs-checkboxes__divider--spaced:not(:first-of-type) {
+    margin-top: 2.5rem;
 }

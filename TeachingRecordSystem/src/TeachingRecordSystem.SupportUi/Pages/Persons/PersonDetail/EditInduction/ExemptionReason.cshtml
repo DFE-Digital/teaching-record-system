@@ -16,16 +16,9 @@
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true"/>
                     <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
-                    @{
-                        <govuk-checkboxes-divider class="trs-radios__divider--heading-s">@ExemptionReasonCategories.All.First().GetDisplayName()</govuk-checkboxes-divider>
-                        @foreach (var exemptionReasonId in ExemptionReasonCategories.GetExemptionReasonIdsForCategory(ExemptionReasonCategories.All.First()))
-                        {
-                            <govuk-checkboxes-item value="@exemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReasonId)">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
-                        }
-                    }
-                    @foreach (var category in ExemptionReasonCategories.All.Skip(1))
+                    @foreach (var category in ExemptionReasonCategories.All)
                     {
-                        <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@category.GetDisplayName()</govuk-checkboxes-divider>
+                        <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s trs-checkboxes__divider--spaced">@category.GetDisplayName()</govuk-checkboxes-divider>
                         @foreach (var exemptionReasonId in ExemptionReasonCategories.GetExemptionReasonIdsForCategory(category))
                         {
                             <govuk-checkboxes-item value="@exemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReasonId)">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
