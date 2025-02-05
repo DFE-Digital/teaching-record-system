@@ -252,7 +252,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        
+
         if (hasReadWriteAccess)
         {
             var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent;
