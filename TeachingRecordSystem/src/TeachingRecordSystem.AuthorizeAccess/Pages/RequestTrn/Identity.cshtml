@@ -13,9 +13,12 @@
         <form action="@LinkGenerator.RequestTrnIdentity(Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-details open="true">
+            <govuk-details open="false">
                 <govuk-details-summary>Documents we accept</govuk-details-summary>
                 <govuk-details-text>
+                    <p>
+                        You can upload a scan or photo of your:
+                    </p>
                     <ul class="govuk-list govuk-list--bullet">
                         <li>passport</li>
                         <li>driving licence</li>
@@ -34,7 +37,14 @@
             }
 
             <govuk-file-upload asp-for="EvidenceFile" input-accept=".jpeg, .jpg, .pdf, .png">
-                <govuk-file-upload-label>Upload file</govuk-file-upload-label>
+                <govuk-file-upload-label>
+                    <div>
+                        Upload File
+                        <p class="govuk-hint">
+                            File must be a JPEG, JPG, PDF or PNG and smaller than 3MB.
+                        </p>
+                    </div>
+                </govuk-file-upload-label>
             </govuk-file-upload>
 
             <govuk-button type="submit">Continue</govuk-button>

@@ -9,8 +9,7 @@ public class RequestTrnJourneyState()
     public static JourneyDescriptor JourneyDescriptor { get; } =
         new JourneyDescriptor(JourneyName, typeof(RequestTrnJourneyState), requestDataKeys: [], appendUniqueKey: true);
 
-    public bool? IsPlanningToTakeAnNpq { get; set; }
-    public string? Email { get; set; }
+    public string? WorkEmail { get; set; }
     public string? Name { get; set; }
     public bool? HasPreviousName { get; set; }
     public string? PreviousName { get; set; }
@@ -26,4 +25,11 @@ public class RequestTrnJourneyState()
     public string? Country { get; set; }
     public string? PostalCode { get; set; }
     public bool HasPendingTrnRequest { get; set; }
+    public bool? IsTakingNpq { get; set; }
+    public string? NpqApplicationId { get; set; }
+    public string? NpqTrainingProvider { get; set; }
+    public string? PersonalEmail { get; set; }
+    public bool? WorkingInSchoolOrEducationalSetting { get; set; }
+    public bool? HaveRegisteredForAnNpq { get; set; }
+    public string? NpqName { get; set; }
 }

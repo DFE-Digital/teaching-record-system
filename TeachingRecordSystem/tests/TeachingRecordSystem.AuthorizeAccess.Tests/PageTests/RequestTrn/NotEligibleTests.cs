@@ -21,7 +21,7 @@ public class NotEligibleTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_HasIsPlanningToTakeAnNpqMissingFromState_RedirectsToNpqCheck()
+    public async Task Get_IsTakingAnNpqMissingFromState_RedirectsToNpqCheck()
     {
         // Arrange
         var state = CreateNewState();
@@ -34,7 +34,7 @@ public class NotEligibleTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/npq-check?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/taking-npq?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class NotEligibleTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.IsPlanningToTakeAnNpq = false;
+        state.IsTakingNpq = false;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/request-trn/not-eligible?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -73,10 +73,11 @@ public class NotEligibleTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_HasIsPlanningToTakeAnNpqMissingFromState_RedirectsToNpqCheck()
+    public async Task Post_IsTakingAnNpqMissingFromState_RedirectsToNpqCheck()
     {
         // Arrange
         var state = CreateNewState();
+        state.IsTakingNpq = null;
         var journeyInstance = await CreateJourneyInstance(state);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/request-trn/not-eligible?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -86,6 +87,6 @@ public class NotEligibleTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/request-trn/npq-check?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/request-trn/taking-npq?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 }

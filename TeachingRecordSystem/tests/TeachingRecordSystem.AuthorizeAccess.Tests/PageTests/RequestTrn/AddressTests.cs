@@ -42,7 +42,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -105,7 +105,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(AddressLineType.AddressLine1, "Enter address line 1")]
+    [InlineData(AddressLineType.AddressLine1, "Enter address line 1, typically the building and street")]
     [InlineData(AddressLineType.TownOrCity, "Enter town or city")]
     [InlineData(AddressLineType.PostalCode, "Enter postal code")]
     [InlineData(AddressLineType.Country, "Enter country")]
@@ -113,7 +113,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -169,7 +169,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -208,7 +208,7 @@ public class AddressTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;

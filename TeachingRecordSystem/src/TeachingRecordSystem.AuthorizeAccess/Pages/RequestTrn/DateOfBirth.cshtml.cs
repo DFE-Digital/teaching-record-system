@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,6 +17,7 @@ public class DateOfBirthModel(AuthorizeAccessLinkGenerator linkGenerator, IClock
 
     [BindProperty]
     [Display(Name = "What is your date of birth?")]
+    [DateInput(ErrorMessagePrefix = "Date of birth")]
     [Required(ErrorMessage = "Enter your date of birth")]
     public DateOnly? DateOfBirth { get; set; }
 

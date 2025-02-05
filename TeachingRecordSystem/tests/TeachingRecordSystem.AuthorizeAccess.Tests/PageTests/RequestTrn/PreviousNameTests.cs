@@ -42,7 +42,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         state.PreviousName = Faker.Name.FullName();
         state.HasPreviousName = true;
@@ -101,7 +101,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -125,7 +125,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         var journeyInstance = await CreateJourneyInstance(state);
 
@@ -148,7 +148,7 @@ public class PreviousNameTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ValidRequest_UpdatesStateAndRedirectsToNextPage()
     {
         var state = CreateNewState();
-        state.Email = Faker.Internet.Email();
+        state.WorkEmail = Faker.Internet.Email();
         state.Name = Faker.Name.FullName();
         var journeyInstance = await CreateJourneyInstance(state);
 

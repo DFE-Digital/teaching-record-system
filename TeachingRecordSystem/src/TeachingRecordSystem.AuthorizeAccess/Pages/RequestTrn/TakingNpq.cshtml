@@ -1,25 +1,26 @@
-@page "/request-trn/npq-check"
-@model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.NpqCheckModel
+@page "/request-trn/taking-npq"
+@model TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn.TakingNpqModel
 @{
-    ViewBag.Title = Html.DisplayNameFor(m => m.HaveRegisteredForAnNpq);
+    ViewBag.Title = Html.DisplayNameFor(m => m.IsTakingAnNpq);
 }
+@inject IConfiguration config;
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.TakingNpqRequireTrn(Model.JourneyInstance!.InstanceId)" />
+    <govuk-back-link href="@LinkGenerator.RequestTrn(Model.JourneyInstance!.InstanceId, config.GetRequiredValue("RequestTrnAccessToken"))" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RequestTrnNpqCheck(Model.JourneyInstance!.InstanceId)" method="post">
-            <govuk-radios asp-for="HaveRegisteredForAnNpq">
+        <form action="@LinkGenerator.TakingNpqRequireTrn(Model.JourneyInstance!.InstanceId)" asp-for="IsTakingAnNpq" method="post">
+            <govuk-radios asp-for="IsTakingAnNpq">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
                     <govuk-radios-item value="@true">Yes</govuk-radios-item>
                     <govuk-radios-item value="@false">No</govuk-radios-item>
                 </govuk-radios-fieldset>
             </govuk-radios>
-
             <govuk-button type="submit">Continue</govuk-button>
         </form>
     </div>
 </div>
+

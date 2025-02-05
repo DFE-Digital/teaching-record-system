@@ -10,7 +10,7 @@ using EmailAddress = TeachingRecordSystem.AuthorizeAccess.DataAnnotations.EmailA
 namespace TeachingRecordSystem.AuthorizeAccess.Pages.RequestTrn;
 
 [Journey(RequestTrnJourneyState.JourneyName), RequireJourneyInstance]
-public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher) : PageModel
+public class PersonalEmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDispatcher crmQueryDispatcher) : PageModel
 {
     public JourneyInstance<RequestTrnJourneyState>? JourneyInstance { get; set; }
 
@@ -18,14 +18,14 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDis
     public bool? FromCheckAnswers { get; set; }
 
     [BindProperty]
-    [Display(Name = "What is your email address?", Description = "We’ll only use this to send you your TRN if you’re eligible for one.")]
-    [Required(ErrorMessage = "Enter your email address")]
+    [Display(Name = "What is your personal email address?", Description = "We need this to send you your TRN if you’re eligible for one. Do not use your work email address.")]
+    [Required(ErrorMessage = "Enter your personal email address")]
     [@EmailAddress(ErrorMessage = "Enter an email address in the correct format, like name@example.com")]
-    public string? Email { get; set; }
+    public string? PersonalEmail { get; set; }
 
     public void OnGet()
     {
-        Email = JourneyInstance!.State.Email;
+        PersonalEmail = JourneyInstance!.State.PersonalEmail;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -35,10 +35,10 @@ public class EmailModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQueryDis
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.Email = Email);
+        await JourneyInstance!.UpdateStateAsync(state => state.PersonalEmail = PersonalEmail);
 
         var openTasks = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetOpenTasksForEmailAddressQuery(EmailAddress: JourneyInstance!.State.Email!));
+            new GetOpenTasksForEmailAddressQuery(EmailAddress: JourneyInstance!.State.PersonalEmail!));
 
         if (openTasks.Any())
         {
