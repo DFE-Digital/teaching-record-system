@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
 
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 
 public record TrnRequestInfo
 {

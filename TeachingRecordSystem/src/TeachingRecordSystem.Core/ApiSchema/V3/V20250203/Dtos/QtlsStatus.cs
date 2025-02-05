@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+namespace TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 
 public enum QtlsStatus
 {
