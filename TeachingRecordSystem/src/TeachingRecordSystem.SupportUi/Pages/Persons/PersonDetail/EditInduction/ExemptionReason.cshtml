@@ -18,7 +18,7 @@
                     <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
                     @foreach (var category in ExemptionReasonCategories.All)
                     {
-                        <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s trs-checkboxes__divider--spaced">@category.GetDisplayName()</govuk-checkboxes-divider>
+                        <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@category.GetDisplayName()</govuk-checkboxes-divider>
                         @foreach (var exemptionReasonId in ExemptionReasonCategories.GetExemptionReasonIdsForCategory(category))
                         {
                             <govuk-checkboxes-item value="@exemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReasonId)">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
