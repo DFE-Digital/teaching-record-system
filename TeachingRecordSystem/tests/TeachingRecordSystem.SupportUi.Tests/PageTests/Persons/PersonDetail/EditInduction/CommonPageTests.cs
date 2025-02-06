@@ -36,8 +36,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
-                .WithInductionStatus(i => i
-                    .WithStatus(inductionStatus)));
+                .WithInductionStatus(inductionStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -83,8 +82,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithInductionStatus(s => s.
-                WithStatus(inductionStatus)));
+            .WithInductionStatus(inductionStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -273,18 +271,17 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2000, 2, 1);
         var completedDate = new DateOnly(2002, 2, 2);
-        var exemptionReasonIds = (await TestData
-            .ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(e => e.InductionExemptionReasonId)
-            .ToArray();
+         var exemptionReasonIds = (await TestData
+             .ReferenceDataCache
+             .GetInductionExemptionReasonsAsync(activeOnly: true))
+             .RandomSelection(1)
+             .Select(e => e.InductionExemptionReasonId)
+             .ToArray();
 
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
-                .WithInductionStatus(i => i
-                    .WithStatus(inductionStatus)));
+                .WithInductionStatus(inductionStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -377,8 +374,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
-                .WithInductionStatus(i => i
-                    .WithStatus(inductionStatus)));
+                .WithInductionStatus(inductionStatus));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

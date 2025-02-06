@@ -16,13 +16,13 @@ public class InductionModel(
     IAuthorizationService authorizationService) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
+
     private bool _statusIsManagedByCpd;
     private bool _teacherHoldsQualifiedTeacherStatus;
 
     [FromRoute]
     public Guid PersonId { get; set; }
 
-    [BindProperty]
     public InductionStatus Status { get; set; }
 
     public DateOnly? StartDate { get; set; }
@@ -55,31 +55,25 @@ public class InductionModel(
 
     public async Task OnGetAsync()
     {
-        var person = await dbContext.Persons
-            .SingleAsync(q => q.PersonId == PersonId);
+        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        var induction = person.GetInduction();
 
-        GetActiveContactDetailByIdQuery query = new(
-            person.PersonId,
-            ColumnSet: new ColumnSet(Contact.Fields.dfeta_QTSDate));
+        var qtsResult = await crmQueryDispatcher.ExecuteQueryAsync(
+            new GetActiveContactDetailByIdQuery(
+                person.PersonId,
+                ColumnSet: new ColumnSet(Contact.Fields.dfeta_QTSDate)));
 
-        var result = await crmQueryDispatcher.ExecuteQueryAsync(query);
-
-        Status = person.InductionStatus;
-        StartDate = person.InductionStartDate;
-        CompletedDate = person.InductionCompletedDate;
+        Status = induction.Status;
+        StartDate = induction.StartDate;
+        CompletedDate = induction.CompletedDate;
         ExemptionReasonIds = person.InductionExemptionReasonIds;
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
-        _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
+        _teacherHoldsQualifiedTeacherStatus = qtsResult?.Contact.dfeta_QTSDate is not null;
 
         var allExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync();
         ExemptionReasonValues = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId)).Select(r => r.Name);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;
-    }
-
-    private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)
-    {
-        return qtsDate is null;
     }
 }

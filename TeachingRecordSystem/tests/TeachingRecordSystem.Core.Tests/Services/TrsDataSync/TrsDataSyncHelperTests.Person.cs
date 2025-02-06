@@ -119,12 +119,6 @@ public partial class TrsDataSyncHelperTests
         var events = await GetEventsForPerson(person.PersonId);
         Assert.Single(events);
         Assert.IsType<DqtContactInductionStatusChangedEvent>(events[0]);
-
-        await DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            var updatedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == person.ContactId);
-            Assert.Equal(inductionStatus.ToInductionStatus(), updatedPerson!.InductionStatus);
-        });
     }
 
     private async Task AssertDatabasePersonMatchesEntity(

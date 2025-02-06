@@ -55,7 +55,7 @@ public class SetWelshInductionStatusHandler(
 
         var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        person.TrySetWelshInductionStatus(
+        person.SetWelshInductionStatus(
             command.Passed,
             !command.Passed ? command.StartDate : null,
             !command.Passed ? command.CompletedDate : null,

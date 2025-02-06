@@ -34,16 +34,27 @@ public partial class TrsDataSyncHelperTests
         // Arrange
         var inductionId = Guid.NewGuid();
         var inductionExemptionReason = dqtInductionStatus == dfeta_InductionStatus.Exempt ? dfeta_InductionExemptionReason.Exempt : (dfeta_InductionExemptionReason?)null;
-        var inductionStartDate = Clock.Today.AddYears(-1);
-        var inductionEndDate = Clock.Today.AddDays(-10);
-        var person = await TestData.CreatePersonAsync(
-            p => p.WithTrn()
-                .WithSyncOverride(personAlreadySynced)
-                .WithDqtInduction(dqtInductionStatus, inductionExemptionReason, inductionStartDate, inductionEndDate));
+        DateOnly? inductionStartDate = expectedTrsInductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-1) : null;
+        DateOnly? inductionEndDate = expectedTrsInductionStatus.RequiresCompletedDate() ? Clock.Today.AddDays(-10) : null;
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithSyncOverride(personAlreadySynced)
+            .WithDqtInduction(dqtInductionStatus, inductionExemptionReason, inductionStartDate, inductionEndDate));
+
         var inductionAuditDetails = new AuditDetailCollection();
-        var entity = await CreateNewInductionEntityVersion(inductionId, person.Contact, inductionAuditDetails, inductionStartDate, inductionEndDate, dqtInductionStatus, inductionExemptionReason);
+        var entity = await CreateNewInductionEntityVersion(
+            inductionId,
+            person.Contact,
+            inductionAuditDetails,
+            inductionStartDate,
+            inductionEndDate,
+            dqtInductionStatus,
+            inductionExemptionReason);
+
         var contactAuditDetails = new AuditDetailCollection();
         contactAuditDetails.Add(person.DqtContactAuditDetail);
+
         var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
         {
             { entity.Id, inductionAuditDetails },
@@ -57,9 +68,9 @@ public partial class TrsDataSyncHelperTests
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
             var updatedPerson = await dbContext.Persons.SingleAsync(p => p.DqtContactId == person.ContactId);
-            Assert.Equal(expectedTrsInductionStatus, updatedPerson!.InductionStatus);
-            Assert.Equal(inductionStartDate, updatedPerson.InductionStartDate);
-            Assert.Equal(inductionEndDate, updatedPerson.InductionCompletedDate);
+            Assert.Equal(expectedTrsInductionStatus, updatedPerson.InductionStatus);
+            Assert.Equal(inductionStartDate, updatedPerson.GetInduction().StartDate);
+            Assert.Equal(inductionEndDate, updatedPerson.GetInduction().CompletedDate);
         });
     }
 
@@ -212,34 +223,6 @@ public partial class TrsDataSyncHelperTests
 
         // Assert
         Assert.IsType<InvalidOperationException>(exception);
-    }
-
-    [Fact]
-    public async Task SyncInductionsAsync_WithQtls_UpdatesPersonRecord()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(
-            p => p.WithTrn()
-                .WithQtlsDate(Clock.Today)
-                .WithSyncOverride(true));
-
-        var auditDetails = new AuditDetailCollection();
-        auditDetails.Add(person.DqtContactAuditDetail);
-
-        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
-        {
-            { person.ContactId, auditDetails }
-        };
-
-        // Act
-        await Helper.SyncInductionsAsync([person.Contact], [], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
-
-        // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            var updatedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == person.ContactId);
-            Assert.Equal(InductionStatus.Exempt, updatedPerson!.InductionStatus);
-        });
     }
 
     [Fact]

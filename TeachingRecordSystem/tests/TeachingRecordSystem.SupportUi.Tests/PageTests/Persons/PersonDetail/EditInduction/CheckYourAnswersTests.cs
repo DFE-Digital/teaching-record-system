@@ -527,14 +527,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         await WithDbContext(async dbContext =>
         {
-            var updatedPersonRecord = await dbContext.Persons.FirstOrDefaultAsync(p => p.PersonId == person.PersonId);
-            Assert.Equal(journeyInstance.State.InductionStatus, updatedPersonRecord!.InductionStatus);
-            Assert.Equal(journeyInstance.State.StartDate, updatedPersonRecord!.InductionStartDate);
-            Assert.Equal(journeyInstance.State.CompletedDate, updatedPersonRecord!.InductionCompletedDate);
-            Assert.Equal(journeyInstance.State.ExemptionReasonIds, updatedPersonRecord!.InductionExemptionReasonIds);
+            var updatedPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            var updatedInduction = updatedPersonRecord.GetInduction();
+            Assert.Equal(journeyInstance.State.InductionStatus, updatedInduction.Status);
+            Assert.Equal(journeyInstance.State.StartDate, updatedInduction.StartDate);
+            Assert.Equal(journeyInstance.State.CompletedDate, updatedInduction.CompletedDate);
+            Assert.Equal(journeyInstance.State.ExemptionReasonIds, updatedInduction.ExemptionReasonIds);
         });
 
-        var RaisedBy = GetCurrentUserId();
+        var raisedBy = GetCurrentUserId();
 
         EventPublisher.AssertEventsSaved(e =>
         {

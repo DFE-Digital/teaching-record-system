@@ -10,75 +10,78 @@
 @section BeforeContent {
     <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)" data-testid="induction-backlink">Back to record</govuk-back-link>
 }
-@if (!String.IsNullOrEmpty(Model.StatusWarningMessage))
+
+@if (Model.StatusWarningMessage is not null)
 {
     <govuk-warning-text icon-fallback-text="Warning" data-testid="induction-status-warning">@Model.StatusWarningMessage</govuk-warning-text>
 }
 
 @if (Model.Status != InductionStatus.None)
 {
-    <govuk-summary-card class="govuk-grid-column-full-from-desktop" data-testid="induction-card">
-        <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
-        <govuk-summary-list>
-            <govuk-summary-list-row data-testid="induction-status">
-                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
-                @if (Model.CanWrite)
+    <div class="govuk-grid-column-full-from-desktop">
+        <govuk-summary-card data-testid="induction-card">
+            <govuk-summary-card-title data-testid="induction-title">Induction details</govuk-summary-card-title>
+            <govuk-summary-list>
+                <govuk-summary-list-row data-testid="induction-status">
+                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
+                    @if (Model.CanWrite)
+                    {
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.InductionEditStatus(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change status">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    }
+                </govuk-summary-list-row>
+
+                @if (Model.ExemptionReasonIds!.Length > 0)
                 {
-                    <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.InductionEditStatus(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change status">Change</govuk-summary-list-row-action>
-                    </govuk-summary-list-row-actions>
-                }
-            </govuk-summary-list-row>
-
-            @if (Model.ExemptionReasonIds!.Length > 0)
-            {
-                <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
-                    <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>
+                    <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
+                        <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
                             <ul class="govuk-list">
-                            @foreach (var exemptionReason in Model.ExemptionReasonValues!)
-                            {
-                                <li>@exemptionReason</li>
-                            }
+                                @foreach (var exemptionReason in Model.ExemptionReasonValues!)
+                                {
+                                    <li>@exemptionReason</li>
+                                }
                             </ul>
-                    </govuk-summary-list-row-value>
-                    @if (Model.CanWrite)
-                    {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.InductionEditExemptionReason(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change exemption reason">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    }
-                </govuk-summary-list-row>
-            }
+                        </govuk-summary-list-row-value>
+                        @if (Model.CanWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.InductionEditExemptionReason(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change exemption reason">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }
+                    </govuk-summary-list-row>
+                }
 
-            @if (Model.ShowStartDate)
-            {
-                <govuk-summary-list-row data-testid="induction-start-date">
-                    <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    @if (Model.CanWrite)
-                    {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.InductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change start date">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    }
-                </govuk-summary-list-row>
-            }
+                @if (Model.ShowStartDate)
+                {
+                    <govuk-summary-list-row data-testid="induction-start-date">
+                        <govuk-summary-list-row-key>Induction started on</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        @if (Model.CanWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.InductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change start date">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }
+                    </govuk-summary-list-row>
+                }
 
-            @if (Model.ShowCompletedDate)
-            {
-                <govuk-summary-list-row data-testid="induction-completed-date">
-                    <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                    @if (Model.CanWrite)
-                    {
-                        <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.InductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change completed date">Change</govuk-summary-list-row-action>
-                        </govuk-summary-list-row-actions>
-                    }
-                </govuk-summary-list-row>
-            }
-        </govuk-summary-list>
-    </govuk-summary-card>
+                @if (Model.ShowCompletedDate)
+                {
+                    <govuk-summary-list-row data-testid="induction-completed-date">
+                        <govuk-summary-list-row-key>Induction completed on</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@Model.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        @if (Model.CanWrite)
+                        {
+                            <govuk-summary-list-row-actions>
+                                <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.InductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change completed date">Change</govuk-summary-list-row-action>
+                            </govuk-summary-list-row-actions>
+                        }
+                    </govuk-summary-list-row>
+                }
+            </govuk-summary-list>
+        </govuk-summary-card>
+    </div>
 }

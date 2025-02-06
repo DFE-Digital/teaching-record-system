@@ -15,11 +15,15 @@ public record PersonInductionUpdatedEvent : EventBase, IEventWithPersonId
 public enum PersonInductionUpdatedEventChanges
 {
     None = 0,
-    InductionStatus = 1 << 0,
-    InductionStartDate = 1 << 1,
-    InductionCompletedDate = 1 << 2,
-    InductionExemptionReasons = 1 << 3,
-    CpdInductionStatus = 1 << 4,
-    CpdInductionStartDate = 1 << 5,
-    CpdInductionCompletedDate = 1 << 6
+    Status = 1 << 0,
+    StartDate = 1 << 1,
+    CompletedDate = 1 << 2,
+    ExemptionReasons = 1 << 3,
+    InductionStatus = 1 << 4,
+    FailedInWalesStartDate = 1 << 7,
+    FailedInWalesCompletedDate = 1 << 8,
+    RequiredToComplete = 1 << 9,
+    Passed = 1 << 10,
+    Failed = 1 << 11,
+    CpdStatus = 1 << 12
 }

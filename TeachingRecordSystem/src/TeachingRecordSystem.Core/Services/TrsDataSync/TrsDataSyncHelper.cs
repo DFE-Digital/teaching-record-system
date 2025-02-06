@@ -163,15 +163,28 @@ public class TrsDataSyncHelper(
             exemptionReasonIds = [exemptionReasonId];
         }
 
-        return new InductionInfo()
+        var status = contact.dfeta_InductionStatus.ToInductionStatus();
+
+        if (contact.dfeta_InductionStatus == dfeta_InductionStatus.PassedinWales)
+        {
+            Debug.Assert(status == InductionStatus.Exempt);
+            exemptionReasonIds = [InductionExemptionReason.PassedInWalesId];
+        }
+
+        return new InductionInfo
         {
             PersonId = contact.ContactId!.Value,
             InductionId = induction?.dfeta_inductionId,
-            InductionStatus = contact.dfeta_InductionStatus.ToInductionStatus(),
-            InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-            InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            InductionStatus = status,
+            InductionStartDate = status != InductionStatus.FailedInWales ? induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) : null,
+            InductionCompletedDate = status != InductionStatus.FailedInWales ? induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) : null,
             InductionExemptionReasonIds = exemptionReasonIds,
-            DqtModifiedOn = induction?.ModifiedOn
+            DqtModifiedOn = induction?.ModifiedOn,
+            RequiredToComplete = status != InductionStatus.None,
+            Passed = status == InductionStatus.Passed,
+            Failed = status == InductionStatus.Failed,
+            FailedInWalesStartDate = status == InductionStatus.FailedInWales ? induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) : null,
+            FailedInWalesCompletedDate = status == InductionStatus.FailedInWales ? induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true) : null
         };
     }
 
@@ -1013,7 +1026,7 @@ public class TrsDataSyncHelper(
             "induction_status",
         };
 
-        var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
+        var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id", "induction_status" }).ToArray();
 
         var columnList = string.Join(", ", columnNames);
 
@@ -1051,8 +1064,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.BirthDate,
             Contact.Fields.dfeta_NINumber,
             Contact.Fields.EMailAddress1,
-            Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
+            Contact.Fields.dfeta_InductionStatus
         };
 
         Action<NpgsqlBinaryImporter, Person> writeRecord = (writer, person) =>
@@ -1074,7 +1087,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull((int?)person.InductionStatus, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(0, NpgsqlDbType.Integer);
         };
 
         return new ModelTypeSyncInfo<Person>()
@@ -1106,7 +1119,12 @@ public class TrsDataSyncHelper(
             "induction_start_date",
             "induction_status",
             "induction_modified_on",
-            "dqt_induction_modified_on"
+            "dqt_induction_modified_on",
+            "induction_required_to_complete",
+            "induction_passed",
+            "induction_failed",
+            "induction_failed_in_wales_start_date",
+            "induction_failed_in_wales_completed_date"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id" }).ToArray();
@@ -1123,7 +1141,12 @@ public class TrsDataSyncHelper(
                 induction_start_date date,
                 induction_status integer,
                 induction_modified_on timestamp with time zone,
-                dqt_induction_modified_on timestamp with time zone
+                dqt_induction_modified_on timestamp with time zone,
+                induction_required_to_complete boolean,
+                induction_passed boolean,
+                induction_failed boolean,
+                induction_failed_in_wales_start_date date,
+                induction_failed_in_wales_completed_date date
             )
             """;
 
@@ -1163,6 +1186,11 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull((int?)induction.InductionStatus, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(induction.RequiredToComplete, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(induction.Passed, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(induction.Failed, NpgsqlDbType.Boolean);
+            writer.WriteValueOrNull(induction.FailedInWalesStartDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(induction.FailedInWalesCompletedDate, NpgsqlDbType.Date);
         };
 
         return new ModelTypeSyncInfo<InductionInfo>()
@@ -1324,8 +1352,7 @@ public class TrsDataSyncHelper(
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty,
-            InductionStatus = c.dfeta_InductionStatus.ToInductionStatus()
+            DqtLastName = c.LastName ?? string.Empty
         })
         .ToList();
 
@@ -1599,6 +1626,11 @@ public class TrsDataSyncHelper(
         public required DateOnly? InductionStartDate { get; init; }
         public required InductionStatus InductionStatus { get; init; }
         public required DateTime? DqtModifiedOn { get; init; }
+        public required bool RequiredToComplete { get; init; }
+        public required bool Passed { get; init; }
+        public required bool Failed { get; init; }
+        public required DateOnly? FailedInWalesStartDate  { get; init; }
+        public required DateOnly? FailedInWalesCompletedDate  { get; init; }
     }
 
     private record AuditInfo<TEntity>

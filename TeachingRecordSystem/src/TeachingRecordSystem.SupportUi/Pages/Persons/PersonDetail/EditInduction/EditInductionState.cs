@@ -45,11 +45,12 @@ public class EditInductionState : IRegisterJourney
         }
 
         var person = await dbContext.Persons.SingleAsync(q => q.PersonId == personId);
+        var induction = person.GetInduction();
 
-        InductionStatus = person.InductionStatus;
         JourneyStartPage = startPage;
-        StartDate = person.InductionStartDate;
-        CompletedDate = person.InductionCompletedDate;
+        InductionStatus = induction.Status;
+        StartDate = induction.StartDate;
+        CompletedDate = induction.CompletedDate;
         ExemptionReasonIds = person.InductionExemptionReasonIds;
         Initialized = true;
     }
