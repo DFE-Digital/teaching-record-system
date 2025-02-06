@@ -30,18 +30,6 @@
         {
             heading = "Induction exemption reason changed";
         }
-        else if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus))
-        {
-            heading = "CPD induction status changed";
-        }
-        else if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate))
-        {
-            heading = "CPD induction start date changed";
-        }
-        else if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate))
-        {
-            heading = "CPD induction completed date changed";
-        }
     }
 }
 
@@ -74,7 +62,7 @@
                                 @foreach (var id in induction.ExemptionReasonIds)
                                 {
                                     <li>@exemptionReasons[id].Name</li>
-                                }                            
+                                }
                             </ul>
                         }
                         else
@@ -98,30 +86,6 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>CPD induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="cpd-induction-status" use-empty-fallback>@(induction.CpdStatus.HasValue ? @induction.CpdStatus.ValueOrDefault().GetTitle() : null)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>CPD start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="cpd-start-date" use-empty-fallback>@induction.CpdStartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>CPD completed date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="cpd-completed-date" use-empty-fallback>@induction.CpdCompletedDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
 
@@ -219,30 +183,6 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
-
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus))
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>CPD induction status</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-cpd-induction-status" use-empty-fallback>@(oldInduction.CpdStatus.HasValue ? @oldInduction.CpdStatus.ValueOrDefault().GetTitle() : null)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
-
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate))
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>CPD start date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-cpd-start-date" use-empty-fallback>@oldInduction.CpdStartDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
-
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate))
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>CPD completed date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-cpd-completed-date" use-empty-fallback>@oldInduction.CpdCompletedDate.ValueOrDefault()?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
 

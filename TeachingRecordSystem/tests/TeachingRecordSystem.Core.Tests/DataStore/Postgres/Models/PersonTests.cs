@@ -7,6 +7,167 @@ public class PersonTests
 {
     public TestableClock Clock { get; } = new();
 
+    [Fact]
+    public void SetInductionStatus_None_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.None,
+            startDate: null,
+            completedDate: null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.None, person.InductionStatus);
+    }
+
+    [Fact]
+    public void SetInductionStatus_RequiredToComplete_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.RequiredToComplete,
+            startDate: null,
+            completedDate: null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.RequiredToComplete, person.InductionStatus);
+    }
+
+    [Fact]
+    public void SetInductionStatus_InProgress_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.InProgress,
+            startDate: new(2024, 1, 1),
+            completedDate: null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.InProgress, person.InductionStatus);
+    }
+
+    [Fact]
+    public void SetInductionStatus_Passed_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.Passed,
+            startDate: new(2024, 1, 1),
+            completedDate: new(2025, 1, 1),
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.Passed, person.InductionStatus);
+    }
+
+    [Fact]
+    public void SetInductionStatus_Failed_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.Failed,
+            startDate: new(2024, 1, 1),
+            completedDate: new(2025, 1, 1),
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.Failed, person.InductionStatus);
+    }
+
+    [Fact]
+    public void SetInductionStatus_Exempt_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.Exempt,
+            startDate: null,
+            completedDate: null,
+            exemptionReasonIds: [InductionExemptionReason.QtlsId],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
+    }
+
+    [Fact]
+    public void SetInductionStatus_FailedInWales_UpdatesStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        // Act
+        person.SetInductionStatus(
+            InductionStatus.FailedInWales,
+            startDate: new(2024, 1, 1),
+            completedDate: new(2025, 1, 1),
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.FailedInWales, person.InductionStatus);
+    }
+
     [Theory]
     [InlineData(InductionStatus.Passed)]
     [InlineData(InductionStatus.InProgress)]
@@ -14,17 +175,7 @@ public class PersonTests
     public void SetCpdInductionStatus_SetsOverallStatusAndOutsEvent(InductionStatus status)
     {
         // Arrange
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
-        };
+        var person = CreatePerson();
 
         // Act
         person.SetCpdInductionStatus(
@@ -38,6 +189,7 @@ public class PersonTests
 
         // Assert
         Assert.Equal(status, person.InductionStatus);
+        Assert.Equal(status, person.InductionStatusWithoutExemption);
         Assert.Equal(Clock.UtcNow, person.InductionModifiedOn);
         Assert.Equal(Clock.UtcNow, person.CpdInductionModifiedOn);
     }
@@ -46,17 +198,7 @@ public class PersonTests
     public void SetCpdInductionStatus_PersonIsExemptAndNewStatusIsPassed_SetsOverallStatusToPassed()
     {
         // Arrange
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
-        };
+        var person = CreatePerson();
 
         person.SetInductionStatus(
             InductionStatus.Exempt,
@@ -85,6 +227,7 @@ public class PersonTests
 
         // Assert
         Assert.Equal(InductionStatus.Passed, person.InductionStatus);
+        Assert.Equal(InductionStatus.Passed, person.InductionStatusWithoutExemption);
         Assert.Equal(Clock.UtcNow, person.InductionModifiedOn);
         Assert.Equal(Clock.UtcNow, person.CpdInductionModifiedOn);
     }
@@ -95,17 +238,7 @@ public class PersonTests
     public void SetCpdInductionStatus_PersonIsExemptAndNewStatusIsNotPassed_KeepsOverallStatusAsExempt(InductionStatus status)
     {
         // Arrange
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
-        };
+        var person = CreatePerson();
 
         person.SetInductionStatus(
             InductionStatus.Exempt,
@@ -134,39 +267,28 @@ public class PersonTests
 
         // Assert
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
-        Assert.NotEqual(Clock.UtcNow, person.InductionModifiedOn);
+        Assert.Equal(status, person.InductionStatusWithoutExemption);
+        Assert.Equal(Clock.UtcNow, person.InductionModifiedOn);
         Assert.Equal(Clock.UtcNow, person.CpdInductionModifiedOn);
     }
 
     [Theory]
     [InlineData(true, InductionStatus.Exempt)]
-    [InlineData(true, InductionStatus.InProgress)]
     [InlineData(true, InductionStatus.Passed)]
     [InlineData(true, InductionStatus.Failed)]
-    [InlineData(false, InductionStatus.Exempt)]
     [InlineData(false, InductionStatus.InProgress)]
     [InlineData(false, InductionStatus.Passed)]
     [InlineData(false, InductionStatus.Failed)]
-    public void TrySetWelshInductionStatus_StatusIsAlreadySetToHigherPriorityStatus_ReturnsFalse(bool passed, InductionStatus currentStatus)
+    public void TrySetWelshInductionStatus_StatusIsAlreadySetToHigherPriorityStatus_DoesNotChangeStatus(bool passed, InductionStatus currentStatus)
     {
         // Arrange
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
-        };
+        var person = CreatePerson();
 
         person.SetInductionStatus(
             currentStatus,
             startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
             completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
-            exemptionReasonIds: currentStatus is InductionStatus.Exempt ? new[] { InductionExemptionReason.PassedInWalesId } : Array.Empty<Guid>(),
+            exemptionReasonIds: currentStatus is InductionStatus.Exempt ? new[] { InductionExemptionReason.QtlsId } : Array.Empty<Guid>(),
             changeReason: null,
             changeReasonDetail: null,
             evidenceFile: null,
@@ -177,7 +299,7 @@ public class PersonTests
         Clock.Advance();
 
         // Act
-        var result = person.TrySetWelshInductionStatus(
+        person.TrySetWelshInductionStatus(
             passed,
             startDate: !passed ? new(2024, 1, 1) : null,
             completedDate: !passed ? new(2024, 10, 1) : null,
@@ -186,27 +308,16 @@ public class PersonTests
             out _);
 
         // Assert
-        Assert.False(result);
         Assert.Equal(currentStatus, person.InductionStatus);
     }
 
-    [Fact]
-    public void TrySetWelshInductionStatus_PassedAndStatusIsAtLowerPriorityStatus_UpdatesStatusAndReturnsTrue()
+    [Theory]
+    [InlineData(InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.InProgress)]
+    public void TrySetWelshInductionStatus_PassedAndStatusIsAtLowerPriorityStatus_UpdatesStatusAndReturnsTrue(InductionStatus currentStatus)
     {
         // Arrange
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
-        };
-
-        var currentStatus = InductionStatus.RequiredToComplete;
+        var person = CreatePerson();
 
         person.SetInductionStatus(
             currentStatus,
@@ -223,7 +334,7 @@ public class PersonTests
         Clock.Advance();
 
         // Act
-        var result = person.TrySetWelshInductionStatus(
+        person.TrySetWelshInductionStatus(
             passed: true,
             startDate: null,
             completedDate: null,
@@ -232,7 +343,6 @@ public class PersonTests
             out _);
 
         // Assert
-        Assert.True(result);
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
         Assert.Collection(person.InductionExemptionReasonIds, id => Assert.Equal(InductionExemptionReason.PassedInWalesId, id));
     }
@@ -241,18 +351,7 @@ public class PersonTests
     public void TrySetWelshInductionStatus_FailedAndStatusIsAtLowerPriorityStatus_UpdatesStatusAndReturnsTrue()
     {
         // Arrange
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = Clock.UtcNow,
-            UpdatedOn = Clock.UtcNow,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1),
-        };
-
+        var person = CreatePerson();
         var currentStatus = InductionStatus.RequiredToComplete;
 
         person.SetInductionStatus(
@@ -270,7 +369,7 @@ public class PersonTests
         Clock.Advance();
 
         // Act
-        var result = person.TrySetWelshInductionStatus(
+        person.TrySetWelshInductionStatus(
             passed: false,
             startDate: new(2024, 1, 1),
             completedDate: new(2024, 10, 1),
@@ -279,42 +378,254 @@ public class PersonTests
             out _);
 
         // Assert
-        Assert.True(result);
         Assert.Equal(InductionStatus.FailedInWales, person.InductionStatus);
         Assert.Empty(person.InductionExemptionReasonIds);
     }
 
-    [Theory]
-    [InlineData(-3, true)]
-    [InlineData(-7, false)]
-    public void InductionManagedByCpd_ReturnsExpected(int yearsSinceCompleted, bool expected)
+    [Fact]
+    public void InductionManagedByCpd_CpdStatusIsNotNullWithNoCompletedDate_ReturnsTrue()
     {
         // Arrange
-        var dateTimeCompleted = Clock.UtcNow.AddYears(yearsSinceCompleted).AddDays(-1);
-        var dateCompleted = Clock.Today.AddYears(yearsSinceCompleted).AddDays(-1);
-        var person = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            CreatedOn = dateTimeCompleted,
-            UpdatedOn = dateTimeCompleted,
-            Trn = "1234567",
-            FirstName = "Joe",
-            MiddleName = "",
-            LastName = "Bloggs",
-            DateOfBirth = new(1990, 1, 1)
-        };
+        var person = CreatePerson();
+
         person.SetCpdInductionStatus(
-            status: InductionStatus.Passed,
-            startDate: dateCompleted,
-            completedDate: dateCompleted,
-            cpdModifiedOn: dateTimeCompleted,
+            status: InductionStatus.InProgress,
+            startDate: new(2024, 1, 1),
+            completedDate: null,
+            cpdModifiedOn: Clock.UtcNow,
             SystemUser.SystemUserId,
-            Clock.UtcNow, out _);
+            Clock.UtcNow,
+            out _);
 
         // Act
         var result = person.InductionStatusManagedByCpd(Clock.Today);
 
         // Assert
-        Assert.Equal(expected, result);
+        Assert.True(result);
     }
+
+    [Fact]
+    public void InductionManagedByCpd_CpdStatusIsNotNullCompletedDateWithin7Years_ReturnsTrue()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetCpdInductionStatus(
+            status: InductionStatus.Passed,
+            startDate: Clock.Today.AddYears(-1),
+            completedDate: Clock.Today,
+            cpdModifiedOn: Clock.UtcNow,
+            SystemUser.SystemUserId,
+            Clock.UtcNow,
+            out _);
+
+        // Act
+        var result = person.InductionStatusManagedByCpd(Clock.Today);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void InductionManagedByCpd_CpdStatusIsNotNullCompletedDateMoreThan7YearsAgo_ReturnsFalse()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetCpdInductionStatus(
+            status: InductionStatus.Passed,
+            startDate: Clock.Today.AddYears(-9),
+            completedDate: Clock.Today.AddYears(-7),
+            cpdModifiedOn: Clock.UtcNow,
+            SystemUser.SystemUserId,
+            Clock.UtcNow,
+            out _);
+
+        // Act
+        var result = person.InductionStatusManagedByCpd(Clock.Today);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void InductionManagedByCpd_CpdStatusIsNull_ReturnsFalse()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetInductionStatus(
+            status: InductionStatus.InProgress,
+            startDate: Clock.Today,
+            completedDate: null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            SystemUser.SystemUserId,
+            Clock.UtcNow,
+            out _);
+
+        // Act
+        var result = person.InductionStatusManagedByCpd(Clock.Today);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.None)]
+    [InlineData(InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.FailedInWales)]
+    public void AddInductionExemptionReason_CurrentStatusIsLowerPriorityThanExempt_UpdatesStatus(InductionStatus currentStatus)
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetInductionStatus(
+            currentStatus,
+            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new(2025, 1, 1) : null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Act
+        person.AddInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.Passed)]
+    public void AddInductionExemptionReason_CurrentStatusIsHigherPriorityThanExempt_DoesNotChangeStatus(InductionStatus currentStatus)
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetInductionStatus(
+            currentStatus,
+            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new(2025, 1, 1) : null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Act
+        person.AddInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(currentStatus, person.InductionStatus);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.None)]
+    [InlineData(InductionStatus.RequiredToComplete)]
+    [InlineData(InductionStatus.InProgress)]
+    [InlineData(InductionStatus.FailedInWales)]
+    public void RemoveInductionExemptionReason_StatusIsExemptWithNoOtherReasons_RollsBackStatus(InductionStatus initialStatus)
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetInductionStatus(
+            initialStatus,
+            startDate: initialStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
+            completedDate: initialStatus.RequiresCompletedDate() ? new(2025, 1, 1) : null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        person.AddInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        Debug.Assert(person.InductionStatus == InductionStatus.Exempt);
+
+        // Act
+        person.RemoveInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(initialStatus, person.InductionStatus);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.Failed)]
+    [InlineData(InductionStatus.Passed)]
+    public void RemoveInductionExemptionReason_StatusIsHigherPriorityToExempt_DoesNotChangeStatus(InductionStatus currentStatus)
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetInductionStatus(
+            currentStatus,
+            startDate: new(2024, 1, 1),
+            completedDate: null,
+            exemptionReasonIds: [],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        person.AddInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        Debug.Assert(person.InductionStatus == currentStatus);
+
+        // Act
+        person.RemoveInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(currentStatus, person.InductionStatus);
+    }
+
+    private Person CreatePerson() => new Person
+    {
+        PersonId = Guid.NewGuid(),
+        CreatedOn = Clock.UtcNow,
+        UpdatedOn = Clock.UtcNow,
+        Trn = "1234567",
+        FirstName = "Joe",
+        MiddleName = "",
+        LastName = "Bloggs",
+        DateOfBirth = new(1990, 1, 1),
+    };
 }

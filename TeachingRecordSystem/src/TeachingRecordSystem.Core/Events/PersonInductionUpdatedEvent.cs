@@ -19,7 +19,5 @@ public enum PersonInductionUpdatedEventChanges
     InductionStartDate = 1 << 1,
     InductionCompletedDate = 1 << 2,
     InductionExemptionReasons = 1 << 3,
-    CpdInductionStatus = 1 << 4,
-    CpdInductionStartDate = 1 << 5,
-    CpdInductionCompletedDate = 1 << 6
+    InductionStatusWithoutExemption = 1 << 7,
 }

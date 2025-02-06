@@ -555,21 +555,6 @@ public class ChangeLogInductionEventTests : TestBase
     [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
     [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus, false, true)]
     [InlineData(PersonInductionUpdatedEventChanges.InductionStartDate | PersonInductionUpdatedEventChanges.InductionCompletedDate | PersonInductionUpdatedEventChanges.InductionStatus | PersonInductionUpdatedEventChanges.InductionExemptionReasons, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStatus, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStatus, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStatus, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate | PersonInductionUpdatedEventChanges.CpdInductionStatus, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate | PersonInductionUpdatedEventChanges.CpdInductionCompletedDate | PersonInductionUpdatedEventChanges.CpdInductionStatus, false, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate | PersonInductionUpdatedEventChanges.CpdInductionStatus, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate | PersonInductionUpdatedEventChanges.CpdInductionCompletedDate | PersonInductionUpdatedEventChanges.CpdInductionStatus, true, false)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate | PersonInductionUpdatedEventChanges.CpdInductionStatus, false, true)]
-    [InlineData(PersonInductionUpdatedEventChanges.CpdInductionStartDate | PersonInductionUpdatedEventChanges.CpdInductionCompletedDate | PersonInductionUpdatedEventChanges.CpdInductionStatus, false, true)]
     public async Task Person_WithPersonInductionUpdatedEvent_RendersExpectedContent(PersonInductionUpdatedEventChanges changes, bool previousValueIsDefault, bool newValueIsDefault)
     {
         // Arrange
@@ -603,11 +588,9 @@ public class ChangeLogInductionEventTests : TestBase
             StartDate = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate) && !newValueIsDefault ? startDate : null,
             CompletedDate = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate) && !newValueIsDefault ? completedDate : null,
             Status = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus) && !newValueIsDefault ? inductionStatus : InductionStatus.None,
+            StatusWithoutExemption = InductionStatus.RequiredToComplete,
             ExemptionReasonIds = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) && !newValueIsDefault ? exemptionReasons : [],
-            CpdStatus = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus) && !newValueIsDefault ? Option.Some(inductionStatus) : Option.None<InductionStatus>(),
-            CpdStartDate = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate) && !newValueIsDefault ? Option.Some(startDate) : Option.None<DateOnly?>(),
-            CpdCompletedDate = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate) && !newValueIsDefault ? Option.Some(completedDate) : Option.None<DateOnly?>(),
-            CpdCpdModifiedOn = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus) || changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate) || changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate) && !newValueIsDefault ? Option.Some(cpdModifiedOn) : Option.None<DateTime>()
+            CpdCpdModifiedOn = Option.None<DateTime>()
         };
 
         var oldInduction = new EventModels.Induction
@@ -615,11 +598,9 @@ public class ChangeLogInductionEventTests : TestBase
             StartDate = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate) && !previousValueIsDefault ? oldStartDate : null,
             CompletedDate = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate) && !previousValueIsDefault ? oldCompletedDate : null,
             Status = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus) && !previousValueIsDefault ? oldInductionStatus : InductionStatus.None,
+            StatusWithoutExemption = InductionStatus.RequiredToComplete,
             ExemptionReasonIds = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) && !previousValueIsDefault ? oldExemptionReasons : [],
-            CpdStatus = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus) && !previousValueIsDefault ? Option.Some(oldInductionStatus) : Option.None<InductionStatus>(),
-            CpdStartDate = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate) && !previousValueIsDefault ? Option.Some(oldStartDate) : Option.None<DateOnly?>(),
-            CpdCompletedDate = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate) && !previousValueIsDefault ? Option.Some(oldCompletedDate) : Option.None<DateOnly?>(),
-            CpdCpdModifiedOn = changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus) || changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate) || changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate) && !previousValueIsDefault ? Option.Some(oldCpdModifiedOn) : Option.None<DateTime>()
+            CpdCpdModifiedOn = Option.None<DateTime>()
         };
 
         var updatedEvent = new PersonInductionUpdatedEvent
@@ -716,36 +697,6 @@ public class ChangeLogInductionEventTests : TestBase
                 {
                     Assert.Null(item.GetElementByTestId("exemption-reason"));
                     Assert.Null(item.GetElementByTestId("old-exemption-reason"));
-                }
-                if (changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStatus))
-                {
-                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : inductionStatus.GetTitle(), item.GetElementByTestId("cpd-induction-status")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldInductionStatus.GetTitle(), item.GetElementByTestId("old-cpd-induction-status")?.TextContent.Trim());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("cpd-induction-status"));
-                    Assert.Null(item.GetElementByTestId("old-cpd-induction-status"));
-                }
-                if (changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionStartDate))
-                {
-                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("cpd-start-date")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-cpd-start-date")?.TextContent.Trim());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("cpd-start-date"));
-                    Assert.Null(item.GetElementByTestId("old-cpd-start-date"));
-                }
-                if (changes.HasFlag(PersonInductionUpdatedEventChanges.CpdInductionCompletedDate))
-                {
-                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : completedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("cpd-completed-date")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldCompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-cpd-completed-date")?.TextContent.Trim());
-                }
-                else
-                {
-                    Assert.Null(item.GetElementByTestId("cpd-completed-date"));
-                    Assert.Null(item.GetElementByTestId("old-cpd-completed-date"));
                 }
                 if (induction.CpdCpdModifiedOn.HasValue)
                 {

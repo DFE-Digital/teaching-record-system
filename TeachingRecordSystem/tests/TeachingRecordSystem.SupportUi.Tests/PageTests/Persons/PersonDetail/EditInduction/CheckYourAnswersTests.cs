@@ -10,14 +10,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public static IEnumerable<object[]> GetInductionStatusData()
     {
         yield return new object[] {
-            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithCompletedDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build() };
         yield return new object[] {
-            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build() };
         yield return new object[] {
-            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Create() };
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).WithReasonChoice(InductionChangeReasonOption.AnotherReason).Build() };
         yield return new object[] {
-            new EditInductionStateBuilder().WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).Create() };
+            new EditInductionStateBuilder().WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status).WithStartDate(DateOnly.Parse("2024-12-31")).Build() };
     }
+
     [Theory]
     [MemberData(nameof(GetInductionStatusData))]
     public async Task Get_WithInvalidJourneyState_RedirectToStart(EditInductionState editInductionState)
@@ -27,8 +28,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editInductionState
-            );
+            editInductionState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -59,22 +59,26 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var labelContent = "Induction status";
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(r => r.InductionExemptionReasonId)
-            .ToArray();
+
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+
+        var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
+            ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+                .RandomSelection(1)
+                .Select(r => r.InductionExemptionReasonId)
+                .ToArray()
+            : [];
+
         var editInductionState = new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, startPage)
-                .WithExemptionReasonIds(exemptionReasonIds)
-                .WithStartDate(startDate)
-                .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(false)
-                .WithFileUploadChoice(false)
-                .Create();
+            .WithInitializedState(inductionStatus, startPage)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonDetailsChoice(false)
+            .WithFileUploadChoice(false)
+            .Build();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -123,29 +127,32 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var labelContent = "Induction started on";
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
+
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+
+        var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
+            ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .RandomSelection(1)
             .Select(r => r.InductionExemptionReasonId)
-            .ToArray();
+            .ToArray()
+            : [];
+
         var editInductionState = new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, startPage)
-                .WithExemptionReasonIds(exemptionReasonIds)
-                .WithStartDate(startDate)
-                .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(false)
-                .WithFileUploadChoice(false)
-                .Create();
+            .WithInitializedState(inductionStatus, startPage)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonDetailsChoice(false)
+            .WithFileUploadChoice(false)
+            .Build();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editInductionState
-            );
+            editInductionState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -160,7 +167,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
             Assert.NotNull(label);
             var value = label.NextElementSibling;
-            Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
+            Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
             if (showChangeLink)
             {
                 Assert.NotNull(value.NextElementSibling!.GetElementsByTagName("a").First());
@@ -195,29 +202,32 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var labelContent = "Induction completed on";
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
+
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+
+        var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
+            ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .RandomSelection(1)
             .Select(r => r.InductionExemptionReasonId)
-            .ToArray();
+            .ToArray()
+            : [];
+
         var editInductionState = new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, startPage)
-                .WithExemptionReasonIds(exemptionReasonIds)
-                .WithStartDate(startDate)
-                .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(false)
-                .WithFileUploadChoice(false)
-                .Create();
+            .WithInitializedState(inductionStatus, startPage)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonDetailsChoice(false)
+            .WithFileUploadChoice(false)
+            .Build();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editInductionState
-            );
+            editInductionState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -231,7 +241,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
             Assert.NotNull(label);
             var value = label.NextElementSibling;
-            Assert.Equal(completedDate.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
+            Assert.Equal(completedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
         }
         else
         {
@@ -258,35 +268,39 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var labelContent = "Exemption reason";
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
+
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+
+        var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
+            ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
             .RandomSelection(2)
             .Select(r => r.InductionExemptionReasonId)
-            .ToArray();
+            .ToArray()
+            : [];
+
         var expectedReasons = (await TestData.ReferenceDataCache
             .GetInductionExemptionReasonsAsync(activeOnly: true))
             .Where(r => exemptionReasonIds.Contains(r.InductionExemptionReasonId))
             .Select(r => r.Name)
             .OrderByDescending(r => r)
             .ToArray();
+
         var editInductionState = new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, startPage)
-                .WithExemptionReasonIds(exemptionReasonIds)
-                .WithStartDate(startDate)
-                .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(false)
-                .WithFileUploadChoice(false)
-                .Create();
+            .WithInitializedState(inductionStatus, startPage)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonDetailsChoice(false)
+            .WithFileUploadChoice(false)
+            .Build();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editInductionState
-            );
+            editInductionState);
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -321,11 +335,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
+                .WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .WithReasonDetailsChoice(false)
                 .WithFileUploadChoice(false)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -353,20 +367,17 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var inductionStatus = InductionStatus.InProgress;
         var startDate = Clock.Today.AddYears(-2);
         var completedDate = Clock.Today;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(r => r.InductionExemptionReasonId)
-            .ToArray();
+        var exemptionReasonIds = Array.Empty<Guid>();
+
         var editInductionState = new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .WithExemptionReasonIds(exemptionReasonIds)
-                .WithStartDate(startDate)
-                .WithCompletedDate(completedDate)
-                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
-                .WithFileUploadChoice(uploadFile: false)
-                .Create();
+            .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+            .WithExemptionReasonIds(exemptionReasonIds)
+            .WithStartDate(startDate)
+            .WithCompletedDate(completedDate)
+            .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+            .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
+            .WithFileUploadChoice(uploadFile: false)
+            .Build();
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -406,11 +417,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var inductionStatus = InductionStatus.RequiredToComplete;
         var startDate = Clock.Today;
         var completedDate = startDate.AddYears(-2);
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(r => r.InductionExemptionReasonId)
-            .ToArray();
+        var exemptionReasonIds = Array.Empty<Guid>();
+
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
@@ -420,14 +428,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
                 .WithFileUploadChoice(uploadFile: false)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -462,14 +470,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
                 .WithFileUploadChoice(uploadFile: false)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -487,29 +495,30 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_Confirm_UpdatesPersonInductionCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var inductionStatus = InductionStatus.RequiredToComplete;
-        var startDate = Clock.Today.AddYears(-2);
-        var completedDate = Clock.Today;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(r => r.InductionExemptionReasonId)
-            .ToArray(); var person = await TestData.CreatePersonAsync(
+        var inductionStatus = InductionStatus.InProgress;
+
+        DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
+        DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
+
+        var exemptionReasonIds = Array.Empty<Guid>();
+
+        var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
                 .WithInductionStatus(i => i
                     .WithStatus(InductionStatus.RequiredToComplete)));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .WithReasonDetailsChoice(addDetails: true, _changeReasonDetails)
                 .WithFileUploadChoice(uploadFile: true)
-                .Create());
+                .Build());
 
         EventPublisher.Clear();
 
@@ -543,8 +552,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, Clock.UtcNow);
             Assert.Equal(actualInductionUpdatedEvent.PersonId, person.PersonId);
             Assert.Equal(actualInductionUpdatedEvent.Induction.Status, journeyInstance.State.InductionStatus);
-            Assert.Equal(actualInductionUpdatedEvent.Induction.StartDate, journeyInstance.State.StartDate!.Value);
-            Assert.Equal(actualInductionUpdatedEvent.Induction.CompletedDate, journeyInstance.State.CompletedDate!.Value);
+            Assert.Equal(actualInductionUpdatedEvent.Induction.StartDate, journeyInstance.State.StartDate);
+            Assert.Equal(actualInductionUpdatedEvent.Induction.CompletedDate, journeyInstance.State.CompletedDate);
             Assert.Equal(actualInductionUpdatedEvent.Induction.ExemptionReasonIds, journeyInstance.State.ExemptionReasonIds!);
             Assert.Equal(actualInductionUpdatedEvent.ChangeReason, journeyInstance.State.ChangeReason!.GetDisplayName());
             Assert.Equal(actualInductionUpdatedEvent.ChangeReasonDetail, journeyInstance.State.ChangeReasonDetail);
