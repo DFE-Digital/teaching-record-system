@@ -212,15 +212,21 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(InductionStatus.RequiredToComplete, "passed, failed, or in progress")]
-    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed")]
-    [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress")]
-    [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress")]
+    [InlineData(InductionStatus.RequiredToComplete, "passed, failed, or in progress", true)]
+    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed", true)]
+    [InlineData(InductionStatus.Passed, "required to complete, failed, or in progress", true)]
+    [InlineData(InductionStatus.Failed, "required to complete, passed, or in progress", true)]
+    [InlineData(InductionStatus.InProgress, "required to complete, passed, or failed", false)]
     public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsExpectedWarning(
         InductionStatus status,
-        string expectedWarningMessage)
+        string expectedWarningMessage,
+        bool hasReadWriteAccess)
     {
         // Arrange
+        SetCurrentUser(hasReadWriteAccess
+            ? TestUsers.GetUser(UserRoles.InductionReadWrite)
+            : TestUsers.GetUser(roles: []));
+
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
         var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts());
@@ -246,8 +252,16 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent;
-        Assert.Contains(expectedWarningMessage, warningMessage);
+
+        if (hasReadWriteAccess)
+        {
+            var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent;
+            Assert.Contains(expectedWarningMessage, warningMessage);
+        }
+        else
+        {
+            Assert.Null(doc.GetElementByTestId("induction-status-warning"));
+        }
     }
 
     [Fact]
@@ -318,7 +332,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_UserDoesNotHaveInductionReadWritePermission_DeosNotShowActions()
+    public async Task Get_UserDoesNotHaveInductionReadWritePermission_DoesNotShowActions()
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(roles: []));

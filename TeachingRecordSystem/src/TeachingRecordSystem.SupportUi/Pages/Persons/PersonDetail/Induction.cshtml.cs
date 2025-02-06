@@ -47,8 +47,8 @@ public class InductionModel(
     };
 
     public string? StatusWarningMessage =>
-        _statusIsManagedByCpd ? InductionIsManagedByCpdWarning :
-        _teacherHoldsQualifiedTeacherStatus ? NoQualifiedTeacherStatusWarning :
+         _teacherHoldsQualifiedTeacherStatus ? NoQualifiedTeacherStatusWarning :
+         _statusIsManagedByCpd && CanWrite ? InductionIsManagedByCpdWarning :
         null;
 
     public bool CanWrite { get; set; }
