@@ -14,8 +14,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -39,8 +39,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -70,9 +70,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
                 .WithExemptionReasonIds(selectedExemptionReasonIds)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -96,8 +96,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -122,8 +122,8 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.Exempt, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

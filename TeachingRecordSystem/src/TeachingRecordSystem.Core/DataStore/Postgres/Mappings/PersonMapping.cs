@@ -22,5 +22,6 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.Property(p => p.DqtLastName).HasMaxLength(100).UseCollation("case_insensitive");
         builder.Property(p => p.InductionStatus).IsRequired().HasDefaultValue(InductionStatus.None);
         builder.Property(p => p.InductionExemptionReasonIds).IsRequired();
+        builder.Property(p => p.InductionStatusWithoutExemption).IsRequired();
     }
 }

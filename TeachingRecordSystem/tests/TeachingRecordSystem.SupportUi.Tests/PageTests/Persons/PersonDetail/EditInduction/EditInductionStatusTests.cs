@@ -22,8 +22,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -46,8 +46,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -78,8 +78,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(currentInductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -120,8 +120,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(currentInductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -145,8 +145,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(currentInductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -168,8 +168,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(currentInductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(currentInductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?fromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -191,8 +191,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.Passed, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -219,8 +219,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.RequiredToComplete, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -257,8 +257,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.Passed, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.Passed, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

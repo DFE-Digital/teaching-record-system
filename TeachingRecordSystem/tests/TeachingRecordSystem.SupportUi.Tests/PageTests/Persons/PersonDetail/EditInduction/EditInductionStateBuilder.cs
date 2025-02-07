@@ -18,7 +18,7 @@ public class EditInductionStateBuilder
     private InductionJourneyPage? JourneyStartPage { get; set; }
     private bool Initialized { get; set; }
 
-    public EditInductionStateBuilder WithInitialisedState(InductionStatus currentInductionStatus, InductionJourneyPage startPage)
+    public EditInductionStateBuilder WithInitializedState(InductionStatus currentInductionStatus, InductionJourneyPage startPage)
     {
         this.Initialized = true;
         JourneyStartPage = startPage;
@@ -42,28 +42,31 @@ public class EditInductionStateBuilder
         return this;
     }
 
-    public EditInductionStateBuilder WithStartDate(DateOnly date)
+    public EditInductionStateBuilder WithStartDate(DateOnly? date)
     {
         StartDate = date;
         return this;
     }
 
-    public EditInductionStateBuilder WithCompletedDate(DateOnly date)
+    public EditInductionStateBuilder WithCompletedDate(DateOnly? date)
     {
         CompletedDate = date;
         return this;
     }
+
     public EditInductionStateBuilder WithReasonChoice(InductionChangeReasonOption option)
     {
         ChangeReason = option;
         return this;
     }
+
     public EditInductionStateBuilder WithReasonDetailsChoice(bool addDetails, string? detailText = null)
     {
         HasAdditionalReasonDetail = addDetails;
         AdditionalReasonDetail = detailText;
         return this;
     }
+
     public EditInductionStateBuilder WithFileUploadChoice(bool uploadFile)
     {
         FileUpload = uploadFile;
@@ -76,7 +79,7 @@ public class EditInductionStateBuilder
         return this;
     }
 
-    public EditInductionState Create()
+    public EditInductionState Build()
     {
         return new EditInductionState()
         {

@@ -287,8 +287,8 @@ public class TrsDataSyncHelper(
         return await SyncPersonsAsync(persons, events, ignoreInvalid, dryRun, cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
-        IReadOnlyCollection<Person> persons,
+    private async Task<IReadOnlyCollection<Guid>> SyncPersonsAsync(
+        IReadOnlyCollection<PersonInfo> persons,
         IReadOnlyCollection<EventBase> events,
         bool ignoreInvalid,
         bool dryRun,
@@ -307,7 +307,7 @@ public class TrsDataSyncHelper(
             return [];
         }
 
-        var modelTypeSyncInfo = GetModelTypeSyncInfo<Person>(ModelTypes.Person);
+        var modelTypeSyncInfo = GetModelTypeSyncInfo<PersonInfo>(ModelTypes.Person);
 
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
         using var txn = await connection.BeginTransactionAsync(cancellationToken);
@@ -1011,6 +1011,7 @@ public class TrsDataSyncHelper(
             "dqt_middle_name",
             "dqt_last_name",
             "induction_status",
+            "induction_status_without_exemption"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -1053,9 +1054,10 @@ public class TrsDataSyncHelper(
             Contact.Fields.EMailAddress1,
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
+            Contact.Fields.dfeta_QTSDate,
         };
 
-        Action<NpgsqlBinaryImporter, Person> writeRecord = (writer, person) =>
+        Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
         {
             writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
@@ -1075,9 +1077,10 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull((int?)person.InductionStatus, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull((int?)person.InductionStatus, NpgsqlDbType.Integer);
         };
 
-        return new ModelTypeSyncInfo<Person>()
+        return new ModelTypeSyncInfo<PersonInfo>()
         {
             CreateTempTableStatement = createTempTableStatement,
             CopyStatement = copyStatement,
@@ -1206,7 +1209,7 @@ public class TrsDataSyncHelper(
         };
     }
 
-    private (List<Person> Inductions, List<EventBase> Events) MapPersonsAndAudits(
+    private (List<PersonInfo> Persons, List<EventBase> Events) MapPersonsAndAudits(
         IReadOnlyCollection<Contact> contacts,
         IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool ignoreInvalid)
@@ -1305,8 +1308,8 @@ public class TrsDataSyncHelper(
         };
     }
 
-    private static List<Person> MapPersons(IEnumerable<Contact> contacts) => contacts
-        .Select(c => new Person()
+    private static List<PersonInfo> MapPersons(IEnumerable<Contact> contacts) => contacts
+        .Select(c => new PersonInfo()
         {
             PersonId = c.ContactId!.Value,
             CreatedOn = c.CreatedOn!.Value,
@@ -1325,7 +1328,9 @@ public class TrsDataSyncHelper(
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
             DqtLastName = c.LastName ?? string.Empty,
-            InductionStatus = c.dfeta_InductionStatus.ToInductionStatus()
+            InductionStatus = c.dfeta_InductionStatus.ToInductionStatus(),
+            InductionStatusWithoutExemption = c.dfeta_InductionStatus.ToInductionStatus() is InductionStatus i and not InductionStatus.Exempt ?
+                i : c.dfeta_QTSDate is not null ? InductionStatus.RequiredToComplete : InductionStatus.None
         })
         .ToList();
 
@@ -1589,6 +1594,29 @@ public class TrsDataSyncHelper(
         Guid UserId,
         string UserName)
         where TEntity : Entity;
+
+    private record PersonInfo
+    {
+        public required Guid PersonId { get; init; }
+        public required DateTime? CreatedOn { get; init; }
+        public required DateTime? UpdatedOn { get; init; }
+        public required string? Trn { get; init; }
+        public required string FirstName { get; init; }
+        public required string MiddleName { get; init; }
+        public required string LastName { get; init; }
+        public required DateOnly? DateOfBirth { get; init; }
+        public required string? EmailAddress { get; init; }
+        public required string? NationalInsuranceNumber { get; init; }
+        public required InductionStatus InductionStatus { get; init; }
+        public required InductionStatus InductionStatusWithoutExemption { get; init; }
+        public required Guid? DqtContactId { get; init; }
+        public required int? DqtState { get; init; }
+        public required DateTime? DqtCreatedOn { get; init; }
+        public required DateTime? DqtModifiedOn { get; init; }
+        public required string? DqtFirstName { get; init; }
+        public required string? DqtMiddleName { get; init; }
+        public required string? DqtLastName { get; init; }
+    }
 
     private record InductionInfo
     {

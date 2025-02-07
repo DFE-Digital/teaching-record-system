@@ -18,11 +18,11 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithReasonChoice(reasonChoice)
                 .WithReasonDetailsChoice(true, reasonDetail)
                 .WithFileUploadChoice(false)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -62,8 +62,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(InductionStatus.InProgress, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -106,8 +106,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -137,8 +137,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -160,8 +160,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -189,8 +189,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -220,8 +220,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -258,8 +258,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
-                .Create());
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {

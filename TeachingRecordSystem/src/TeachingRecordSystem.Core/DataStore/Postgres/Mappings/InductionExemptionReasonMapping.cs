@@ -27,6 +27,6 @@ public class InductionExemptionReasonMapping : IEntityTypeConfiguration<Inductio
             new InductionExemptionReason { InductionExemptionReasonId = new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"), Name = "Overseas Trained Teacher", IsActive = true },
             new InductionExemptionReason { InductionExemptionReasonId = new("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85"), Name = "Qualified through EEA mutual recognition route", IsActive = true },
             new InductionExemptionReason { InductionExemptionReasonId = new("42bb7bbc-a92c-4886-b319-3c1a5eac319a"), Name = "Registered teacher with at least 2 years full-time teaching experience", IsActive = true },
-            new InductionExemptionReason { InductionExemptionReasonId = new("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"), Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training", IsActive = true });
+            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QtlsId, Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training", IsActive = true });
     }
 }

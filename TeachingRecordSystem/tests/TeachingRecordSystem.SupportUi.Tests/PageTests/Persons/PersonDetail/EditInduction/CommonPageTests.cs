@@ -42,9 +42,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(Clock.Today.AddYears(-2))
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -89,13 +89,13 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(Clock.Today.AddYears(-2))
                 .WithCompletedDate(Clock.Today)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
                 .WithReasonDetailsChoice(true, "Details")
                 .WithFileUploadChoice(false)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -136,10 +136,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, pageName)
+                .WithInitializedState(inductionStatus, pageName)
                 .WithStartDate(Clock.Today.AddYears(-2))
                 .WithCompletedDate(Clock.Today)
-                .Create());
+                .Build());
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
@@ -181,10 +181,10 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, startPage)
+                .WithInitializedState(inductionStatus, startPage)
                 .WithStartDate(Clock.Today.AddYears(-2))
                 .WithCompletedDate(Clock.Today)
-                .Create());
+                .Build());
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -217,12 +217,12 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, startPage)
+                .WithInitializedState(inductionStatus, startPage)
                 .WithExemptionReasonIds(exemptionReasonIds)
                 .WithStartDate(new DateOnly(2000, 2, 2))
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .Create());
+                .Build());
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -246,11 +246,11 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.StartDate)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.StartDate)
                 .WithStartDate(new DateOnly(2000, 2, 2))
                 .WithCompletedDate(new DateOnly(2002, 2, 2))
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .Create());
+                .Build());
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswersToStartDate.ToString()}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
@@ -289,12 +289,12 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-               .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+               .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                .WithExemptionReasonIds(exemptionReasonIds)
                .WithStartDate(startDate)
                .WithCompletedDate(completedDate)
                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-               .Create());
+               .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -338,11 +338,11 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(startDate)
                 .WithCompletedDate(completedDate)
                 .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
@@ -383,9 +383,9 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()
-                .WithInitialisedState(inductionStatus, InductionJourneyPage.Status)
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .WithStartDate(Clock.Today.AddYears(-2))
-                .Create());
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post,
             $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}");
