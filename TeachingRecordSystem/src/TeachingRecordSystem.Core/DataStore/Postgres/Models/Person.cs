@@ -21,6 +21,7 @@ public class Person
     public InductionStatus InductionStatus { get; private set; }
     public InductionStatus InductionStatusWithoutExemption { get; private set; }
     public Guid[] InductionExemptionReasonIds { get; private set; } = [];
+    public bool InductionExemptWithoutReason { get; internal set; }  // internally set-able for testing
     public DateOnly? InductionStartDate { get; private set; }
     public DateOnly? InductionCompletedDate { get; private set; }
     public DateTime? InductionModifiedOn { get; private set; }
@@ -158,12 +159,15 @@ public class Person
             InductionExemptionReasonIds = [];
         }
 
+        InductionExemptWithoutReason = false;
+
         var changes = PersonInductionUpdatedEventChanges.None |
             (InductionStatus != oldEventInduction.Status ? PersonInductionUpdatedEventChanges.InductionStatus : 0) |
             (InductionStatusWithoutExemption != oldEventInduction.StatusWithoutExemption ? PersonInductionUpdatedEventChanges.InductionStatusWithoutExemption : 0) |
             (InductionStartDate != oldEventInduction.StartDate ? PersonInductionUpdatedEventChanges.InductionStartDate : 0) |
             (InductionCompletedDate != oldEventInduction.CompletedDate ? PersonInductionUpdatedEventChanges.InductionCompletedDate : 0) |
-            (!InductionExemptionReasonIds.ToHashSet().SetEquals(oldEventInduction.ExemptionReasonIds) ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0);
+            (!InductionExemptionReasonIds.ToHashSet().SetEquals(oldEventInduction.ExemptionReasonIds) ? PersonInductionUpdatedEventChanges.InductionExemptionReasons : 0) |
+            (InductionExemptWithoutReason != oldEventInduction.InductionExemptWithoutReason ? PersonInductionUpdatedEventChanges.InductionExemptWithoutReason : 0);
 
         if (changes == PersonInductionUpdatedEventChanges.None)
         {
@@ -249,7 +253,7 @@ public class Person
         InductionExemptionReasonIds = InductionExemptionReasonIds.Except([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
 
-        if (InductionStatus is InductionStatus.Exempt && InductionExemptionReasonIds.Length == 0)
+        if (InductionStatus is InductionStatus.Exempt && (InductionExemptionReasonIds.Length == 0 && !InductionExemptWithoutReason))
         {
             InductionStatus = InductionStatusWithoutExemption;
             changes |= PersonInductionUpdatedEventChanges.InductionStatus;

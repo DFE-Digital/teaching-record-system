@@ -617,6 +617,37 @@ public class PersonTests
         Assert.Equal(currentStatus, person.InductionStatus);
     }
 
+    [Fact]
+    public void RemoveInductionExemptionReason_PersonIsAlsoExemptWithoutReason_DoesNotChangeStatus()
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        person.SetInductionStatus(
+            InductionStatus.Exempt,
+            startDate: null,
+            completedDate: null,
+            exemptionReasonIds: [InductionExemptionReason.QtlsId],
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        person.InductionExemptWithoutReason = true;
+
+        // Act
+        person.RemoveInductionExemptionReason(
+            InductionExemptionReason.QtlsId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
+    }
+
     private Person CreatePerson() => new Person
     {
         PersonId = Guid.NewGuid(),

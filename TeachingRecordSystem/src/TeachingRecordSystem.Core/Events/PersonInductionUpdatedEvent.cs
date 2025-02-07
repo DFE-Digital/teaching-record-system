@@ -20,4 +20,5 @@ public enum PersonInductionUpdatedEventChanges
     InductionCompletedDate = 1 << 2,
     InductionExemptionReasons = 1 << 3,
     InductionStatusWithoutExemption = 1 << 7,
+    InductionExemptWithoutReason = 1 << 8
 }

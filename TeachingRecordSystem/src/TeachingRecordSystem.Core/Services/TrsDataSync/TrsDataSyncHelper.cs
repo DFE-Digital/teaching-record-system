@@ -171,7 +171,8 @@ public class TrsDataSyncHelper(
             InductionStartDate = induction?.dfeta_StartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionCompletedDate = induction?.dfeta_CompletionDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             InductionExemptionReasonIds = exemptionReasonIds,
-            DqtModifiedOn = induction?.ModifiedOn
+            DqtModifiedOn = induction?.ModifiedOn,
+            InductionExemptWithoutReason = contact.dfeta_InductionStatus.ToInductionStatus() is InductionStatus.Exempt && exemptionReasonIds.Length == 0
         };
     }
 
@@ -1109,7 +1110,8 @@ public class TrsDataSyncHelper(
             "induction_start_date",
             "induction_status",
             "induction_modified_on",
-            "dqt_induction_modified_on"
+            "dqt_induction_modified_on",
+            "induction_exempt_without_reason"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id" }).ToArray();
@@ -1126,7 +1128,8 @@ public class TrsDataSyncHelper(
                 induction_start_date date,
                 induction_status integer,
                 induction_modified_on timestamp with time zone,
-                dqt_induction_modified_on timestamp with time zone
+                dqt_induction_modified_on timestamp with time zone,
+                induction_exempt_without_reason boolean
             )
             """;
 
@@ -1166,6 +1169,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull((int?)induction.InductionStatus, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(induction.DqtModifiedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(induction.InductionExemptWithoutReason, NpgsqlDbType.Boolean);
         };
 
         return new ModelTypeSyncInfo<InductionInfo>()
@@ -1627,6 +1631,7 @@ public class TrsDataSyncHelper(
         public required DateOnly? InductionStartDate { get; init; }
         public required InductionStatus InductionStatus { get; init; }
         public required DateTime? DqtModifiedOn { get; init; }
+        public required bool InductionExemptWithoutReason { get; init; }
     }
 
     private record AuditInfo<TEntity>

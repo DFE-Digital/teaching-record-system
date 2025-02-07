@@ -590,7 +590,8 @@ public class ChangeLogInductionEventTests : TestBase
             Status = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus) && !newValueIsDefault ? inductionStatus : InductionStatus.None,
             StatusWithoutExemption = InductionStatus.RequiredToComplete,
             ExemptionReasonIds = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) && !newValueIsDefault ? exemptionReasons : [],
-            CpdCpdModifiedOn = Option.None<DateTime>()
+            CpdCpdModifiedOn = Option.None<DateTime>(),
+            InductionExemptWithoutReason = false
         };
 
         var oldInduction = new EventModels.Induction
@@ -600,7 +601,8 @@ public class ChangeLogInductionEventTests : TestBase
             Status = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus) && !previousValueIsDefault ? oldInductionStatus : InductionStatus.None,
             StatusWithoutExemption = InductionStatus.RequiredToComplete,
             ExemptionReasonIds = changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons) && !previousValueIsDefault ? oldExemptionReasons : [],
-            CpdCpdModifiedOn = Option.None<DateTime>()
+            CpdCpdModifiedOn = Option.None<DateTime>(),
+            InductionExemptWithoutReason = false
         };
 
         var updatedEvent = new PersonInductionUpdatedEvent
