@@ -36,7 +36,6 @@ public class RefreshTrainingProvidersJobTests(DbFixture dbFixture)
             }
         };
 
-
         publishApiClient
             .Setup(x => x.GetAccreditedProvidersAsync())
             .ReturnsAsync(providersExpected);

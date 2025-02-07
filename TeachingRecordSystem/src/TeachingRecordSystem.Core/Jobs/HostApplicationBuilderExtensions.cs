@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
+using TeachingRecordSystem.Core.Services.PublishApi;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
@@ -235,10 +236,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
                     Cron.Never);
 
+                var publishApiOptions = sp.GetRequiredService<IOptions<PublishApiOptions>>().Value;
                 recurringJobManager.AddOrUpdate<RefreshTrainingProvidersJob>(
                     nameof(RefreshTrainingProvidersJob),
                     job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never);
+                    publishApiOptions.RefreshTrainingProvidersJobSchedule);
 
                 return Task.CompletedTask;
             });

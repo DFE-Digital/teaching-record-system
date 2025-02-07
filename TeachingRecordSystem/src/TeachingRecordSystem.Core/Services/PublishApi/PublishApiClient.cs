@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Services.PublishApi;
 
 public class PublishApiClient : IPublishApiClient
 {
-    private readonly string[] noLongerAccreditedTrainingProviders = ["10034865", "10005413", "10002327", "10046628", "10055126", "10064183", "10007938"];
+    private readonly string[] _noLongerAccreditedTrainingProviders = ["10034865", "10005413", "10002327", "10046628", "10055126", "10064183", "10007938"];
     private readonly HttpClient _httpClient;
     private readonly ResiliencePipeline _resiliencePipeline;
 
@@ -34,6 +34,6 @@ public class PublishApiClient : IPublishApiClient
 
         var providerList = await response.Content.ReadFromJsonAsync<ProviderListResponse>();
         // Unfortunately the Publish API still includes some training providers that are no longer accredited, so we need to filter these out
-        return providerList!.Data.Where(p => p.Attributes.Ukprn is not null && !noLongerAccreditedTrainingProviders.Contains(p.Attributes.Ukprn)).AsReadOnly();
+        return providerList!.Data.Where(p => p.Attributes.Ukprn is not null && !_noLongerAccreditedTrainingProviders.Contains(p.Attributes.Ukprn)).AsReadOnly();
     }
 }
