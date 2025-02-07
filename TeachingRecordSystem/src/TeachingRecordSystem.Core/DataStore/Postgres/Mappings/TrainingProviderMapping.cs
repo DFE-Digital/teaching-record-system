@@ -9,15 +9,9 @@ public class TrainingProviderMapping : IEntityTypeConfiguration<TrainingProvider
     {
         builder.ToTable("training_providers");
         builder.HasKey(x => x.TrainingProviderId);
+        builder.HasIndex(x => x.Ukprn).HasDatabaseName(TrainingProvider.UkprnIndexName).IsUnique();
         builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
+        builder.Property(x => x.Ukprn).IsRequired().HasMaxLength(8).IsFixedLength();
         builder.Property(x => x.IsActive).IsRequired();
-
-        builder.HasData(
-            new TrainingProvider
-            {
-                TrainingProviderId = new("98BCF32F-9F84-4142-89A5-ACCB616153A2"),
-                Name = "Test provider",
-                IsActive = true
-            });
     }
 }
