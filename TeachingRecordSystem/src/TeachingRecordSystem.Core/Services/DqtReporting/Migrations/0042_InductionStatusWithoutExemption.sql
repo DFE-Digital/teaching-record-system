@@ -1,0 +1,1 @@
+alter table trs_persons add induction_status_without_exemption int
