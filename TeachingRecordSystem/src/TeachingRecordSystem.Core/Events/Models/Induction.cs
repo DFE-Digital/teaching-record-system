@@ -11,6 +11,7 @@ public record Induction
     public required DateOnly? CompletedDate { get; init; }
     public required Guid[] ExemptionReasonIds { get; init; }
     public required Option<DateTime> CpdCpdModifiedOn { get; init; }
+    public required bool InductionExemptWithoutReason { get; init; }
 
     public static Induction FromModel(Person person) => new()
     {
@@ -19,6 +20,7 @@ public record Induction
         StartDate = person.InductionStartDate,
         CompletedDate = person.InductionCompletedDate,
         ExemptionReasonIds = person.InductionExemptionReasonIds,
-        CpdCpdModifiedOn = person.CpdInductionCpdModifiedOn.ToOption()
+        CpdCpdModifiedOn = person.CpdInductionCpdModifiedOn.ToOption(),
+        InductionExemptWithoutReason = person.InductionExemptWithoutReason
     };
 }
