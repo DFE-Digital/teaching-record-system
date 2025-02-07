@@ -65,12 +65,13 @@ public abstract class FindPersonsHandlerBase(
     {
         var contactsById = matched.ToDictionary(r => r.Id, r => r);
 
-        var getAlertsTask = dbContext.Alerts
-            .Include(a => a.AlertType)
+        var getPersonsTask = dbContext.Persons
+            .Include(p => p.Alerts)
+            .ThenInclude(a => a.AlertType)
             .ThenInclude(at => at.AlertCategory)
-            .Where(a => contactsById.Keys.Contains(a.PersonId))
-            .GroupBy(a => a.PersonId)
-            .ToDictionaryAsync(a => a.Key, a => a.ToArray());
+            .AsSplitQuery()
+            .Where(p => contactsById.Keys.Contains(p.PersonId))
+            .ToDictionaryAsync(p => p.PersonId, p => p);
 
         var getPreviousNamesTask = crmQueryDispatcher.ExecuteQueryAsync(new GetPreviousNamesByContactIdsQuery(contactsById.Keys));
 
@@ -85,9 +86,9 @@ public abstract class FindPersonsHandlerBase(
                     dfeta_qtsregistration.Fields.dfeta_PersonId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId)));
 
-        await Task.WhenAll(getAlertsTask, getPreviousNamesTask, getQtsRegistrationsTask);
+        await Task.WhenAll(getPersonsTask, getPreviousNamesTask, getQtsRegistrationsTask);
 
-        var alerts = getAlertsTask.Result;
+        var persons = getPersonsTask.Result;
         var previousNames = getPreviousNamesTask.Result;
         var qtsRegistrations = getQtsRegistrationsTask.Result;
 
@@ -100,7 +101,7 @@ public abstract class FindPersonsHandlerBase(
                 FirstName = r.ResolveFirstName(),
                 MiddleName = r.ResolveMiddleName(),
                 LastName = r.ResolveLastName(),
-                Sanctions = alerts.GetValueOrDefault(r.Id, [])
+                Sanctions = persons[r.Id].Alerts
                     .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType.DqtSanctionCode) && a.IsOpen)
                     .Select(a => new SanctionInfo()
                     {
@@ -108,7 +109,7 @@ public abstract class FindPersonsHandlerBase(
                         StartDate = a.StartDate
                     })
                     .AsReadOnly(),
-                Alerts = alerts.GetValueOrDefault(r.Id, [])
+                Alerts = persons[r.Id].Alerts
                     .Where(a => !a.AlertType.InternalOnly)
                     .Select(a => new Alert()
                     {
@@ -137,12 +138,12 @@ public abstract class FindPersonsHandlerBase(
                         LastName = name.LastName
                     })
                     .AsReadOnly(),
-                InductionStatus = r.dfeta_InductionStatus.ToInductionStatus(),
-                DqtInductionStatus = r.dfeta_InductionStatus?.ConvertToDqtInductionStatus() is Dtos.DqtInductionStatus inductionStatus ?
+                InductionStatus = persons[r.Id].InductionStatus,
+                DqtInductionStatus = persons[r.Id].InductionStatus.ToDqtInductionStatus(out var statusDescription) is string inductionStatus ?
                     new DqtInductionStatusInfo()
                     {
-                        Status = inductionStatus,
-                        StatusDescription = inductionStatus.GetDescription()
+                        Status = Enum.Parse<DqtInductionStatus>(inductionStatus, ignoreCase: true),
+                        StatusDescription = statusDescription!
                     } :
                     null,
                 Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache, r.dfeta_qtlsdate),

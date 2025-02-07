@@ -113,18 +113,16 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_WithNonNullDqtInductionStatus_ReturnsExpectedInduction()
     {
         // Arrange
-        var dqtStatus = dfeta_InductionStatus.Pass;
-        var status = dqtStatus.ToInductionStatus();
+        var status = InductionStatus.Passed;
         var startDate = new DateOnly(1996, 2, 3);
         var completedDate = new DateOnly(1996, 6, 7);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithDqtInduction(
-                dqtStatus,
-                inductionExemptionReason: null,
-                startDate,
-                completedDate));
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)));
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
@@ -150,19 +148,11 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_WithQtlsDate_ReturnsActiveQtlsStatus()
     {
         // Arrange
-        var dqtStatus = dfeta_InductionStatus.Pass;
-        var status = dqtStatus.ToInductionStatus();
-        var startDate = new DateOnly(1996, 2, 3);
-        var completedDate = new DateOnly(1996, 6, 7);
         var qtlsDate = new DateOnly(2020, 01, 01);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate)
-            .WithDqtInduction(
-                dqtStatus,
-                inductionExemptionReason: null,
-                startDate,
-                completedDate));
+            .WithQtlsDate(qtlsDate));
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
@@ -180,19 +170,11 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_WithExpiredQtlsDate_ReturnsExpiredQtlsStatus()
     {
         // Arrange
-        var dqtStatus = dfeta_InductionStatus.Pass;
-        var status = dqtStatus.ToInductionStatus();
-        var startDate = new DateOnly(1996, 2, 3);
-        var completedDate = new DateOnly(1996, 6, 7);
         var qtlsDate = new DateOnly(2020, 01, 01);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate)
-            .WithDqtInduction(
-                dqtStatus,
-                inductionExemptionReason: null,
-                startDate,
-                completedDate));
+            .WithQtlsDate(qtlsDate));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
         entity[Contact.Fields.dfeta_qtlsdate] = null;
@@ -214,17 +196,7 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_WithoutQtlsDate_ReturnsNoneQtlsStatus()
     {
         // Arrange
-        var dqtStatus = dfeta_InductionStatus.Pass;
-        var status = dqtStatus.ToInductionStatus();
-        var startDate = new DateOnly(1996, 2, 3);
-        var completedDate = new DateOnly(1996, 6, 7);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithDqtInduction(
-                dqtStatus,
-                inductionExemptionReason: null,
-                startDate,
-                completedDate));
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");

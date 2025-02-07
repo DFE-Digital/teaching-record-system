@@ -80,24 +80,14 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
     public async Task Get_ValidRequestWithInduction_ReturnsExpectedInductionContent()
     {
         // Arrange
+        var inductionStatus = InductionStatus.Passed;
         var dqtStatus = dfeta_InductionStatus.Pass;
         var startDate = new DateOnly(1996, 2, 3);
         var completedDate = new DateOnly(1996, 6, 7);
-        var abName = "Test AB";
-        var appropriateBody = await TestData.CreateAccountAsync(a => a.WithName(abName));
-        var numberOfTerms = 3;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithDqtInduction(
-                dqtStatus,
-                inductionExemptionReason: null,
-                startDate,
-                completedDate,
-                inductionPeriodStartDate: startDate,
-                inductionPeriodEndDate: completedDate,
-                appropriateBodyOrgId: appropriateBody.Id,
-                numberOfTerms: numberOfTerms));
+            .WithInductionStatus(i => i.WithStatus(inductionStatus).WithStartDate(startDate).WithCompletedDate(completedDate)));
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/teachers/{person.Trn}?include=Induction");
@@ -117,19 +107,7 @@ public class GetTeacherByTrnTests : GetTeacherTestBase
                 status = dqtStatus.ToString(),
                 statusDescription = dqtStatus.GetDescription(),
                 certificateUrl = "/v3/certificates/induction",
-                periods = new[]
-                {
-                    new
-                    {
-                        startDate = startDate.ToString("yyyy-MM-dd"),
-                        endDate = completedDate.ToString("yyyy-MM-dd"),
-                        terms = numberOfTerms,
-                        appropriateBody = new
-                        {
-                            name = abName
-                        }
-                    }
-                }
+                periods = Array.Empty<object>()
             },
             responseInduction);
     }

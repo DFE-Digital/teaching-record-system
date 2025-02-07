@@ -80,22 +80,10 @@ public partial class DataverseAdapter
         var qtsEntity = helper.CreateQtsRegistrationEntity(referenceData);
         txnRequest.Requests.Add(new CreateRequest() { Target = qtsEntity });
 
-        Guid? inductionId = null;
         if (command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher)
         {
-            var inductionEntity = helper.CreateInductionEntity();
-            inductionId = inductionEntity.Id;
-            txnRequest.Requests.Add(new CreateRequest() { Target = inductionEntity });
-
-            // Update the QTS record with the induction ID; we can't set it in the Create above as Induction can't be created before QTS
-            txnRequest.Requests.Add(new UpdateRequest()
-            {
-                Target = new dfeta_qtsregistration()
-                {
-                    Id = qtsEntity.Id,
-                    dfeta_InductionId = inductionId.Value.ToEntityReference(dfeta_induction.EntityLogicalName)
-                }
-            });
+            var setInductionMessage = helper.CreateSetInductionOutboxMessage();
+            txnRequest.Requests.Add(new CreateRequest() { Target = setInductionMessage });
         }
 
         var txnResponse = (ExecuteTransactionResponse)await _service.ExecuteAsync(txnRequest);
@@ -269,28 +257,46 @@ public partial class DataverseAdapter
             return contact;
         }
 
-        public dfeta_induction CreateInductionEntity()
+        public dfeta_TrsOutboxMessage CreateSetInductionOutboxMessage()
         {
             Debug.Assert(_command.TeacherType == CreateTeacherType.OverseasQualifiedTeacher);
 
-            var exemptionReason = _command.InductionRequired.Value ?
-                (dfeta_InductionExemptionReason?)null :
+            var status = _command.InductionRequired == true
+                ? InductionStatus.RequiredToComplete
+                : InductionStatus.Exempt;
+
+            var exemptionReasonId = status == InductionStatus.Exempt ?
                 _command.RecognitionRoute switch
                 {
-                    CreateTeacherRecognitionRoute.Scotland => dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland,
-                    CreateTeacherRecognitionRoute.NorthernIreland => dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland,
-                    CreateTeacherRecognitionRoute.OverseasTrainedTeachers => dfeta_InductionExemptionReason.OverseasTrainedTeacher,
-                    CreateTeacherRecognitionRoute.EuropeanEconomicArea => dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute,
+                    CreateTeacherRecognitionRoute.Scotland => new Guid("a112e691-1694-46a7-8f33-5ec5b845c181"),
+                    CreateTeacherRecognitionRoute.NorthernIreland => new Guid("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
+                    CreateTeacherRecognitionRoute.OverseasTrainedTeachers => new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
+                    CreateTeacherRecognitionRoute.EuropeanEconomicArea => new Guid("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85"),
                     _ => throw new NotImplementedException($"Unknown {nameof(CreateTeacherRecognitionRoute)}: '{_command.RecognitionRoute}'.")
-                };
+                } :
+                (Guid?)null;
 
-            return new dfeta_induction()
+            var serializer = new MessageSerializer();
+
+            if (status is InductionStatus.Exempt)
             {
-                Id = Guid.NewGuid(),
-                dfeta_PersonId = TeacherId.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_InductionStatus = _command.InductionRequired.Value ? dfeta_InductionStatus.RequiredtoComplete : dfeta_InductionStatus.Exempt,
-                dfeta_InductionExemptionReason = exemptionReason
-            };
+                return serializer.CreateCrmOutboxMessage(new AddInductionExemptionMessage()
+                {
+                    PersonId = TeacherId,
+                    ExemptionReasonId = exemptionReasonId!.Value,
+                    TrsUserId = _command.TrsUserId
+                });
+            }
+            else
+            {
+                Debug.Assert(status is InductionStatus.RequiredToComplete);
+
+                return serializer.CreateCrmOutboxMessage(new SetInductionRequiredToCompleteMessage()
+                {
+                    PersonId = TeacherId,
+                    TrsUserId = _command.TrsUserId
+                });
+            }
         }
 
         public dfeta_initialteachertraining CreateInitialTeacherTrainingEntity(CreateTeacherReferenceLookupResult referenceData)
@@ -857,13 +863,8 @@ public partial class DataverseAdapter
                 DateOfBirth = _command.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)
             };
 
-            var payload = new MessageSerializer().SerializeMessage(message, out var messageName);
-
-            return new dfeta_TrsOutboxMessage()
-            {
-                dfeta_MessageName = messageName,
-                dfeta_Payload = payload
-            };
+            var serializer = new MessageSerializer();
+            return serializer.CreateCrmOutboxMessage(message);
         }
     }
 

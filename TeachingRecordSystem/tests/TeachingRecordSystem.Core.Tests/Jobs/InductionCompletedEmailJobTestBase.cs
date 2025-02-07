@@ -1,17 +1,16 @@
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
-[Collection("InductionCompletedEmailJob")]
-public abstract class InductionCompletedEmailJobTestBase : IAsyncLifetime
+[Collection("NightEmailJobCollection")]
+public abstract class InductionCompletedEmailJobTestBase(NightlyEmailJobFixture fixture) : IAsyncLifetime
 {
-    public InductionCompletedEmailJobTestBase(DbFixture dbFixture)
-    {
-        DbFixture = dbFixture;
-    }
+    public NightlyEmailJobFixture Fixture { get; } = fixture;
 
-    public DbFixture DbFixture { get; }
+    public TestData TestData => Fixture.TestData;
+
+    public TestableClock Clock => Fixture.Clock;
 
     public Task DisposeAsync() => Task.CompletedTask;
 
     public Task InitializeAsync() =>
-        DbFixture.WithDbContextAsync(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from induction_completed_emails_jobs"));
+        Fixture.DbFixture.WithDbContextAsync(dbContext => dbContext.Database.ExecuteSqlAsync($"delete from induction_completed_emails_jobs"));
 }

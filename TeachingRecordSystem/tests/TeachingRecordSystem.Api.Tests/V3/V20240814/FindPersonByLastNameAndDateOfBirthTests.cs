@@ -91,7 +91,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithAlert(a => a.WithAlertTypeId(alertType.AlertTypeId).WithEndDate(null))
-            .WithDqtInduction(dfeta_InductionStatus.Pass, inductionExemptionReason: null, inductionStartDate: new(2022, 1, 1), completedDate: new DateOnly(2023, 1, 1))
+            .WithInductionStatus(i => i.WithStatus(InductionStatus.Passed).WithStartDate(new(2022, 1, 1)).WithCompletedDate(new DateOnly(2023, 1, 1)))
             .WithQts(qtsDate: new(2021, 7, 1))
             .WithEyts(eytsDate: new(2021, 8, 1), eytsStatusValue: "222"));
 

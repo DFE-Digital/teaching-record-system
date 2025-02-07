@@ -27,6 +27,7 @@ public class CreateTeacherCommand
     public Guid ApplicationUserId { get; set; }
     public bool IdentityVerified { get; set; }
     public string OneLoginUserSubject { get; set; }
+    public Guid? TrsUserId { get; set; }
 }
 
 public class CreateTeacherCommandAddress

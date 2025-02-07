@@ -44,8 +44,6 @@ public partial class TestData
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private DateOnly? _qtlsDate;
-        private readonly List<DqtInduction> _dqtInductions = [];
-        private readonly List<DqtInductionPeriod> _dqtInductionPeriods = [];
         private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject)? _trnRequest;
         private string? _trnToken;
         private string? _slugId;
@@ -87,38 +85,6 @@ public partial class TestData
         public CreatePersonBuilder WithEmail(string? email)
         {
             _email = email;
-            return this;
-        }
-
-        public CreatePersonBuilder WithDqtInduction(
-            dfeta_InductionStatus inductionStatus,
-            dfeta_InductionExemptionReason? inductionExemptionReason,
-            DateOnly? inductionStartDate,
-            DateOnly? completedDate,
-            DateOnly? inductionPeriodStartDate = null,
-            DateOnly? inductionPeriodEndDate = null,
-            Guid? appropriateBodyOrgId = null,
-            int? numberOfTerms = null)
-        {
-            EnsureTrn();
-
-            var inductionId = Guid.NewGuid();
-            var inductionPeriodId = Guid.NewGuid();
-            if (inductionStatus == dfeta_InductionStatus.Exempt && inductionExemptionReason == null)
-            {
-                throw new InvalidOperationException("WithInduction must provide InductionExemptionReason if InductionStatus is Exempt");
-            }
-            _dqtInductions.Add(new DqtInduction(inductionId, inductionStatus, inductionExemptionReason, inductionStartDate, completedDate));
-
-            //inductionPeriod is optional
-            if (!appropriateBodyOrgId.HasValue && inductionPeriodStartDate.HasValue || !appropriateBodyOrgId.HasValue && inductionPeriodEndDate.HasValue)
-            {
-                throw new InvalidOperationException("WithInductionPeriod must be associated with an appropriate body");
-            }
-            if (appropriateBodyOrgId.HasValue)
-            {
-                _dqtInductionPeriods.Add(new DqtInductionPeriod(inductionPeriodId, inductionId, inductionPeriodStartDate, inductionPeriodEndDate, appropriateBodyOrgId!.Value, numberOfTerms));
-            }
             return this;
         }
 
@@ -170,7 +136,6 @@ public partial class TestData
         public CreatePersonBuilder WithoutTrn()
         {
             if (_alertBuilders.Any() ||
-                _dqtInductions.Any() ||
                 _mqBuilders.Any() ||
                 _qtlsDate.HasValue ||
                 _qtsRegistrations.Any() ||
@@ -528,39 +493,6 @@ public partial class TestData
                 }
             }
 
-            foreach (var induction in _dqtInductions)
-            {
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new dfeta_induction()
-                    {
-                        Id = induction.InductionId,
-                        dfeta_PersonId = PersonId.ToEntityReference(Contact.EntityLogicalName),
-                        dfeta_InductionStatus = induction.inductionStatus,
-                        dfeta_InductionExemptionReason = induction.inductionExemptionReason,
-                        dfeta_StartDate = induction.StartDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                        dfeta_CompletionDate = induction.CompletetionDate.ToDateTimeWithDqtBstFix(isLocalTime: false)
-                    }
-                });
-            }
-
-            foreach (var inductionperiod in _dqtInductionPeriods)
-            {
-                var induction = _dqtInductions.First();
-                txnRequestBuilder.AddRequest(new CreateRequest()
-                {
-                    Target = new dfeta_inductionperiod()
-                    {
-                        Id = inductionperiod!.InductionPeriodId,
-                        dfeta_InductionId = inductionperiod!.InductionId.ToEntityReference(dfeta_induction.EntityLogicalName),
-                        dfeta_StartDate = inductionperiod.startDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                        dfeta_EndDate = inductionperiod.endDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                        dfeta_AppropriateBodyId = inductionperiod.AppropriateBodyOrgId.ToEntityReference(Core.Dqt.Models.Account.EntityLogicalName),
-                        dfeta_Numberofterms = inductionperiod.NumberOfTerms
-                    }
-                });
-            }
-
             var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()
             {
                 ColumnSet = new(allColumns: true),
@@ -707,8 +639,6 @@ public partial class TestData
                 QtsDate = getQtsRegistationTask != null ? getQtsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_QTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 EytsDate = getEytsRegistationTask != null ? getEytsRegistationTask.GetResponse().Entity.ToEntity<dfeta_qtsregistration>().dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(true) : null,
                 MandatoryQualifications = mqs,
-                DqtInductions = [.. _dqtInductions],
-                DqtInductionPeriods = [.. _dqtInductionPeriods],
                 Alerts = alerts,
                 DqtContactAuditDetail = auditDetail
             };
@@ -1181,15 +1111,9 @@ public partial class TestData
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
-        public required IReadOnlyCollection<DqtInduction> DqtInductions { get; init; }
-        public required IReadOnlyCollection<DqtInductionPeriod> DqtInductionPeriods { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
         public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
-
-    public record DqtInduction(Guid InductionId, dfeta_InductionStatus inductionStatus, dfeta_InductionExemptionReason? inductionExemptionReason, DateOnly? StartDate, DateOnly? CompletetionDate);
-
-    public record DqtInductionPeriod(Guid InductionPeriodId, Guid InductionId, DateOnly? startDate, DateOnly? endDate, Guid AppropriateBodyOrgId, int? NumberOfTerms);
 
     public record QtsRegistration(DateOnly? QtsDate, string? TeacherStatusValue, DateTime? CreatedOn, DateOnly? EytsDate, string? EytsStatusValue);
 

@@ -46,6 +46,7 @@ public class SetIttOutcomeHandler : IRequestHandler<SetIttOutcomeRequest, SetItt
             request.IttProviderUkprn,
             ittResult,
             request.AssessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
             request.SlugId);
 
         if (!result.Succeeded)

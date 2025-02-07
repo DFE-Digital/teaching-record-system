@@ -8,18 +8,16 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithNonNullDqtInductionStatus_ReturnsExpectedInduction()
     {
         // Arrange
-        var dqtStatus = dfeta_InductionStatus.Pass;
-        var status = dqtStatus.ToInductionStatus();
+        var status = InductionStatus.Passed;
         var startDate = new DateOnly(1996, 2, 3);
         var completedDate = new DateOnly(1996, 6, 7);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithDqtInduction(
-                dqtStatus,
-                inductionExemptionReason: null,
-                startDate,
-                completedDate));
+            .WithInductionStatus(i => i
+                .WithStatus(status)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)));
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person?include=Induction");

@@ -419,13 +419,11 @@ public partial class DataverseAdapter : IDataverseAdapter
                 Contact.Fields.StateCode,
                 Contact.Fields.dfeta_TRN,
                 Contact.Fields.dfeta_NINumber,
-                Contact.Fields.BirthDate,
-                Contact.Fields.dfeta_InductionStatus
+                Contact.Fields.BirthDate
             ),
             Criteria = filter
         };
 
-        AddInductionLink(query);
         AddInitialTeacherTrainingLink(query);
         AddQualifiedTeacherStatusLink(query);
 
@@ -485,29 +483,6 @@ public partial class DataverseAdapter : IDataverseAdapter
                 dfeta_ittsubject.Fields.dfeta_Value);
 
             subjectLink.EntityAlias = alias;
-        }
-
-        static void AddInductionLink(QueryExpression query)
-        {
-            var inductionLink = query.AddLink(
-                dfeta_induction.EntityLogicalName,
-                Contact.PrimaryIdAttribute,
-                dfeta_induction.Fields.dfeta_PersonId,
-                JoinOperator.LeftOuter);
-
-            inductionLink.Columns = new ColumnSet(
-                dfeta_induction.PrimaryIdAttribute,
-                dfeta_induction.Fields.dfeta_InductionStatus,
-                dfeta_induction.Fields.StateCode,
-                dfeta_induction.Fields.dfeta_StartDate,
-                dfeta_induction.Fields.dfeta_CompletionDate
-            );
-
-            inductionLink.EntityAlias = nameof(dfeta_induction);
-
-            var filter = new FilterExpression();
-            filter.AddCondition(dfeta_induction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_inductionState.Active);
-            inductionLink.LinkCriteria = filter;
         }
 
         static void AddQualifiedTeacherStatusLink(QueryExpression query)
@@ -751,73 +726,6 @@ public partial class DataverseAdapter : IDataverseAdapter
             contactLink.Columns = new ColumnSet(columnNames);
             contactLink.EntityAlias = Contact.EntityLogicalName;
         }
-    }
-
-    public async Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacherAsync(
-        Guid teacherId,
-        string[] columnNames,
-        string[] inductionPeriodColumnNames = null,
-        string[] appropriateBodyColumnNames = null,
-        string[] contactColumnNames = null)
-    {
-        var filter = new FilterExpression();
-        filter.AddCondition(dfeta_induction.Fields.dfeta_PersonId, ConditionOperator.Equal, teacherId);
-        filter.AddCondition(dfeta_induction.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_inductionState.Active);
-
-        var query = new QueryExpression(dfeta_induction.EntityLogicalName)
-        {
-            ColumnSet = new ColumnSet(columnNames),
-            Criteria = filter
-        };
-
-        if (inductionPeriodColumnNames?.Length > 0)
-        {
-            var inductionPeriodLink = query.AddLink(
-                dfeta_inductionperiod.EntityLogicalName,
-                dfeta_induction.PrimaryIdAttribute,
-                dfeta_inductionperiod.Fields.dfeta_InductionId,
-                JoinOperator.LeftOuter);
-
-            inductionPeriodLink.Columns = new ColumnSet(inductionPeriodColumnNames);
-            inductionPeriodLink.EntityAlias = dfeta_inductionperiod.EntityLogicalName;
-
-            if (appropriateBodyColumnNames?.Length > 0)
-            {
-                var appropriateBodyLink = inductionPeriodLink.AddLink(
-                Account.EntityLogicalName,
-                dfeta_inductionperiod.Fields.dfeta_AppropriateBodyId,
-                Account.PrimaryIdAttribute,
-                JoinOperator.LeftOuter);
-
-                appropriateBodyLink.Columns = new ColumnSet(appropriateBodyColumnNames);
-                appropriateBodyLink.EntityAlias = $"{dfeta_inductionperiod.EntityLogicalName}.appropriatebody";
-            }
-        }
-
-        if (contactColumnNames?.Length > 0)
-        {
-            var contactLink = query.AddLink(
-                Contact.EntityLogicalName,
-                dfeta_induction.Fields.dfeta_PersonId,
-                Contact.PrimaryIdAttribute,
-                JoinOperator.Inner);
-
-            contactLink.Columns = new ColumnSet(contactColumnNames);
-            contactLink.EntityAlias = Contact.EntityLogicalName;
-        }
-
-        var result = await _service.RetrieveMultipleAsync(query);
-
-        var inductionAndPeriods = result.Entities.Select(entity => entity.ToEntity<dfeta_induction>())
-            .Select(i => (Induction: i, InductionPeriod: i.Extract<dfeta_inductionperiod>(dfeta_inductionperiod.EntityLogicalName, dfeta_induction.PrimaryIdAttribute)));
-
-        var returnValue = inductionAndPeriods
-            .GroupBy(t => t.Induction.Id)
-            .Select(g => (g.First().Induction, g.Where(i => i.InductionPeriod != null).Select(i => i.InductionPeriod).OrderBy(p => p.dfeta_StartDate).ToArray()))
-            .OrderBy(i => i.Induction.CreatedOn ?? DateTime.MinValue)
-            .FirstOrDefault();
-
-        return returnValue;
     }
 
     public async Task<Contact> GetTeacherAsync(Guid teacherId, string[] columnNames, bool resolveMerges = true)

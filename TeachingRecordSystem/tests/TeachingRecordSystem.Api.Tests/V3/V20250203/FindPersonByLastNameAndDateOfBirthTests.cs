@@ -42,8 +42,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var dqtInductionStatus = dfeta_InductionStatus.Pass;
-        var inductionStatus = dqtInductionStatus.ToInductionStatus();
+        var inductionStatus = InductionStatus.Passed;
         var inductionStartDate = new DateOnly(1996, 2, 3);
         var inductionCompletedDate = new DateOnly(1996, 6, 7);
 
@@ -51,11 +50,10 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithDqtInduction(
-                dqtInductionStatus,
-                inductionExemptionReason: null,
-                inductionStartDate,
-                inductionCompletedDate));
+            .WithInductionStatus(i => i
+                .WithStatus(inductionStatus)
+                .WithStartDate(inductionStartDate)
+                .WithCompletedDate(inductionCompletedDate)));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

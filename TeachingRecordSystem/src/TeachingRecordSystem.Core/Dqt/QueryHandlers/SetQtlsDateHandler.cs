@@ -9,7 +9,8 @@ public class SetQtlsDateHandler : ICrmQueryHandler<SetQtlsDateQuery, bool>
     public async Task<bool> ExecuteAsync(SetQtlsDateQuery query, IOrganizationServiceAsync organizationService)
     {
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
-        if (query.HasActiveSanctions == true)
+
+        if (query.HasActiveSanctions)
         {
             requestBuilder.AddRequest(new CreateRequest()
             {
@@ -32,6 +33,7 @@ public class SetQtlsDateHandler : ICrmQueryHandler<SetQtlsDateQuery, bool>
                 dfeta_qtlsdate = query.QtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false)
             }
         });
+
         await requestBuilder.ExecuteAsync();
 
         return true;

@@ -2,6 +2,7 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.DataverseAdapterTests;
 
@@ -38,13 +39,15 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(setPassResult.Succeeded);
@@ -66,13 +69,15 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            amendedAssessmentDate);
+            amendedAssessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(setPassResult.Succeeded);
@@ -93,13 +98,15 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(setPassResult.Succeeded);
@@ -124,7 +131,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         //Assert
         Assert.True(result.Succeeded);
@@ -149,7 +157,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         //Assert
         Assert.True(result.Succeeded);
@@ -176,7 +185,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         //Assert
         Assert.True(result.Succeeded);
@@ -198,13 +208,15 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var (result, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            amendedAssessmentDate);
+            amendedAssessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(setPassResult.Succeeded);
@@ -225,13 +237,15 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var (result, failedReasons) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(setPassResult.Succeeded);
@@ -253,7 +267,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -269,7 +284,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         Assert.Null(qtsUpdate.dfeta_QTSDate);
         Assert.Null(qtsUpdate.dfeta_TeacherStatusId);
 
-        transactionRequest.AssertDoesNotContainUpdateRequest<dfeta_induction>();
+        transactionRequest.AssertDoesNotContainCreateRequest<dfeta_TrsOutboxMessage>();
 
         var teacher = await _dataverseAdapter.GetTeacherAsync(createPersonResult.TeacherId, columnNames: new[] { Contact.Fields.dfeta_EYTSDate });
         Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_EYTSDate);
@@ -296,7 +311,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -312,9 +328,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
         Assert.Equal(assessmentDate.ToDateTime(), qtsUpdate.dfeta_QTSDate);
         Assert.Equal(teacherStatusId, qtsUpdate.dfeta_TeacherStatusId?.Id);
 
-        var induction = transactionRequest.AssertSingleCreateRequest<dfeta_induction>();
-        Assert.Equal(createPersonResult.TeacherId, induction.dfeta_PersonId?.Id);
-        Assert.Equal(dfeta_InductionStatus.RequiredtoComplete, induction.dfeta_InductionStatus);
+        var inductionOutboxMessage = transactionRequest.AssertSingleCreateRequest<dfeta_TrsOutboxMessage>();
+        Assert.Equal(nameof(SetInductionRequiredToCompleteMessage), inductionOutboxMessage.dfeta_MessageName);
 
         var teacher = await _dataverseAdapter.GetTeacherAsync(createPersonResult.TeacherId, columnNames: new[] { Contact.Fields.dfeta_QTSDate });
         Assert.Equal(assessmentDate.ToDateTime(), teacher.dfeta_QTSDate);
@@ -334,7 +349,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate: null);
+            assessmentDate: null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(createPersonResult.TeacherId,
             columnNames: new[]
@@ -363,7 +379,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate: null);
+            assessmentDate: null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(createPersonResult.TeacherId,
             columnNames: new[]
@@ -447,14 +464,16 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result2, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             newResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -474,14 +493,16 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result2, _) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             newResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -500,14 +521,16 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result2, trxRequest2) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             newResult,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -527,7 +550,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -548,7 +572,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -570,7 +595,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         var crmTask = transactionRequest.AssertSingleCreateRequest<CrmTask>();
@@ -607,7 +633,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         transactionRequest.AssertDoesNotContainCreateRequest<CrmTask>();
@@ -637,7 +664,8 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.False(result.Succeeded);
@@ -660,6 +688,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.IttProviderUkprn,
             ittResult,
             assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
             slugId);
 
         // Assert
@@ -691,6 +720,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.IttProviderUkprn,
             ittResult,
             assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
             slugId);
 
         // Assert
@@ -726,6 +756,7 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.IttProviderUkprn,
             ittResult,
             assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
             slugId);
 
         // Assert
@@ -748,13 +779,15 @@ public class SetIttOutcomeForTeacherTests : IAsyncLifetime
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var (result2, transactionRequest2) = await _dataverseAdapter.SetIttResultForTeacherImplAsync(
             createPersonResult.TeacherId,
             createPersonResult.IttProviderUkprn,
             ittResult,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Assert
         Assert.True(result.Succeeded);

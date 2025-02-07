@@ -1,5 +1,8 @@
 #nullable disable
+using System.Diagnostics;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.DataverseAdapterTests;
 
@@ -473,7 +476,8 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
                 IttQualificationAim = dfeta_ITTQualificationAim.Professionalstatusandacademicaward
 
             },
-            SlugId = slugId
+            SlugId = slugId,
+            TrnRequestId = Guid.NewGuid().ToString()
         };
         var (result1, transactionRequest1) = await _dataverseAdapter.CreateTeacherImplAsync(teachercommand1);
 
@@ -873,19 +877,22 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
     }
 
     [Theory]
-    [InlineData(true, CreateTeacherRecognitionRoute.Scotland, dfeta_InductionStatus.RequiredtoComplete, null)]
-    [InlineData(true, CreateTeacherRecognitionRoute.NorthernIreland, dfeta_InductionStatus.RequiredtoComplete, null)]
-    [InlineData(true, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, dfeta_InductionStatus.RequiredtoComplete, null)]
-    [InlineData(false, CreateTeacherRecognitionRoute.Scotland, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.HasoriseligibleforfullregistrationinScotland)]
-    [InlineData(false, CreateTeacherRecognitionRoute.NorthernIreland, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.SuccessfullycompletedinductioninNorthernIreland)]
-    [InlineData(false, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, dfeta_InductionStatus.Exempt, dfeta_InductionExemptionReason.OverseasTrainedTeacher)]
-    public void CreateInductionEntity(
+    [InlineData(true, CreateTeacherRecognitionRoute.Scotland, InductionStatus.RequiredToComplete, null)]
+    [InlineData(true, CreateTeacherRecognitionRoute.NorthernIreland, InductionStatus.RequiredToComplete, null)]
+    [InlineData(true, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, InductionStatus.RequiredToComplete, null)]
+    [InlineData(false, CreateTeacherRecognitionRoute.Scotland, InductionStatus.Exempt, "a112e691-1694-46a7-8f33-5ec5b845c181")]
+    [InlineData(false, CreateTeacherRecognitionRoute.NorthernIreland, InductionStatus.Exempt, "3471ab35-e6e4-4fa9-a72b-b8bd113df591")]
+    [InlineData(false, CreateTeacherRecognitionRoute.OverseasTrainedTeachers, InductionStatus.Exempt, "4c97e211-10d2-4c63-8da9-b0fcebe7f2f9")]
+    public void CreateSetInductionOutboxMessage(
         bool inductionRequired,
         CreateTeacherRecognitionRoute recognitionRoute,
-        dfeta_InductionStatus expectedInductionStatus,
-        dfeta_InductionExemptionReason? expectedInductionExemptionReason)
+        InductionStatus expectedInductionStatus,
+        string expectedInductionExemptionReasonIdStr)
     {
         // Arrange
+        Guid? expectedInductionExemptionReasonId =
+            expectedInductionExemptionReasonIdStr is string id ? Guid.Parse(id) : null;
+
         var command = CreateCommand(
             CreateTeacherType.OverseasQualifiedTeacher,
             c =>
@@ -897,12 +904,26 @@ public class CreateTeacherTests : IClassFixture<CreateTeacherFixture>, IAsyncLif
         var helper = new DataverseAdapter.CreateTeacherHelper(_dataverseAdapter, command);
 
         // Act
-        var result = helper.CreateInductionEntity();
+        var result = helper.CreateSetInductionOutboxMessage();
 
         // Assert
-        Assert.Equal(helper.TeacherId, result.dfeta_PersonId?.Id);
-        Assert.Equal(expectedInductionStatus, result.dfeta_InductionStatus);
-        Assert.Equal(expectedInductionExemptionReason, result.dfeta_InductionExemptionReason);
+        var messageSerializer = new MessageSerializer();
+
+        if (expectedInductionStatus is InductionStatus.Exempt)
+        {
+            Assert.Equal(nameof(AddInductionExemptionMessage), result.dfeta_MessageName);
+            var message = Assert.IsType<AddInductionExemptionMessage>(messageSerializer.DeserializeMessage(result.dfeta_Payload, result.dfeta_MessageName));
+            Assert.Equal(helper.TeacherId, message.PersonId);
+            Assert.Equal(expectedInductionExemptionReasonId, message.ExemptionReasonId);
+        }
+        else
+        {
+            Debug.Assert(expectedInductionStatus is InductionStatus.RequiredToComplete);
+
+            Assert.Equal(nameof(SetInductionRequiredToCompleteMessage), result.dfeta_MessageName);
+            var message = Assert.IsType<SetInductionRequiredToCompleteMessage>(messageSerializer.DeserializeMessage(result.dfeta_Payload, result.dfeta_MessageName));
+            Assert.Equal(helper.TeacherId, message.PersonId);
+        }
     }
 
     private static CreateTeacherCommand CreateCommand(
