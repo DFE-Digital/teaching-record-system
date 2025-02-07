@@ -71,6 +71,7 @@
     <None Remove="Services\DqtReporting\Migrations\0036_TrsPersonsInduction.sql" />
     <None Remove="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
     <None Remove="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -131,6 +132,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0027_TrsWorkforceData.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0028_TrsEstablishments.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0029_TrsPersons.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0030_TrsAlerts.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0031_TrsAlertsSyncMetadata.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0032_AddMissingProgrammeTypes.sql" />
