@@ -147,6 +147,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0041_ProfessionalStatus.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0042_InductionStatusWithoutExemption.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0043_InductionExemptWithoutReason.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0045_InductionExemptWithoutReason.sql" />
   </ItemGroup>
 
   <ItemGroup>
