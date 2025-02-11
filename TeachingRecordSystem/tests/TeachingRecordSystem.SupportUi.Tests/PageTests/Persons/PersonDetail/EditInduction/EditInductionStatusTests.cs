@@ -99,7 +99,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var currentInductionStatus = InductionStatus.Passed;
-        InductionStatus[] expectedStatuses = { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.FailedInWales };
+        InductionStatus[] expectedStatuses = { InductionStatus.Exempt, InductionStatus.FailedInWales };
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());

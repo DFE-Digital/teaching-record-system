@@ -29,7 +29,7 @@ public static class InductionStatusRegistry
 
     public static IReadOnlyCollection<InductionStatusInfo> ValidStatusChangesWhenManagedByCpd =>
         _info
-            .Where(s => s.Key is InductionStatus.RequiredToComplete or InductionStatus.Exempt or InductionStatus.FailedInWales)
+            .Where(s => s.Key is InductionStatus.Exempt or InductionStatus.FailedInWales)
             .Select(s => s.Value)
             .ToArray();
 

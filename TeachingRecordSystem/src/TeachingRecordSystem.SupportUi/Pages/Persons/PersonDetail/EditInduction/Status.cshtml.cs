@@ -43,11 +43,11 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
 
     public InductionJourneyPage NextPage =>
      InductionStatus switch
-            {
-                _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
-                _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
-                _ => InductionJourneyPage.ChangeReasons
-            };
+     {
+         _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
+         _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
+         _ => InductionJourneyPage.ChangeReasons
+     };
 
     public string BackLink
     {
