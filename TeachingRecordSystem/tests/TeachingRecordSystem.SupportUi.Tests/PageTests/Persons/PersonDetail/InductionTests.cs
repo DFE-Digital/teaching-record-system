@@ -276,7 +276,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // test setup here is convoluted because I need to set up a person,
         // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
-        // then set the induction status to the one we want to test
+        // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
             p => p.WithTrn().WithQts());
         await WithDbContext(async dbContext =>
