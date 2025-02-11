@@ -52,7 +52,7 @@ public class CpdInductionImporterJob(BlobServiceClient blobServiceClient, IDbCon
             using (var command = new NpgsqlCommand(
                 """
                 UPDATE persons
-                SET cpd_induction_cpd_modified_on = @now
+                SET cpd_induction_modified_on = @now
                 FROM temp_cpd_induction
                 WHERE persons.Trn = temp_cpd_induction.trn;
                 """, connection, transaction))
