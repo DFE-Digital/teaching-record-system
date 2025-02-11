@@ -102,7 +102,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_InductionManagedByCpd_ExpectedRadioButtonsExistOnPage(InductionStatus currentInductionStatus)
     {
         // Arrange
-        InductionStatus[] expectedStatuses = new List<InductionStatus>(){ InductionStatus.Exempt, InductionStatus.FailedInWales, currentInductionStatus }.OrderBy(i => i).ToArray();
+        InductionStatus[] expectedStatuses = new List<InductionStatus>() { InductionStatus.Exempt, InductionStatus.FailedInWales, currentInductionStatus }.OrderBy(i => i).ToArray();
         var expectedChoices = expectedStatuses.Select(s => s.ToString());
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
