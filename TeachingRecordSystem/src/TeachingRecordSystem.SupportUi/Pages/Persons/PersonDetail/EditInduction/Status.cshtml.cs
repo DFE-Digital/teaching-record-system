@@ -24,7 +24,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
     {
         get
         {
-            return _inductionStatusManagedByCpd ?
+            return _inductionStatusManagedByCpd && (InductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ?
                  InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
                 : InductionStatusRegistry.All.ToArray()[1..];
         }
@@ -39,20 +39,15 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
         _ => InductionWarnings.InductionIsManagedByCpdWarningOther
     };
 
-    public string? StatusWarningMessage => _inductionStatusManagedByCpd ? InductionIsManagedByCpdWarning : null;
+    public string? StatusWarningMessage => _inductionStatusManagedByCpd && (InductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ? InductionIsManagedByCpdWarning : null;
 
-    public InductionJourneyPage NextPage
-    {
-        get
-        {
-            return InductionStatus switch
+    public InductionJourneyPage NextPage =>
+     InductionStatus switch
             {
                 _ when InductionStatus.RequiresExemptionReasons() => InductionJourneyPage.ExemptionReason,
                 _ when InductionStatus.RequiresStartDate() => InductionJourneyPage.StartDate,
                 _ => InductionJourneyPage.ChangeReasons
             };
-        }
-    }
 
     public string BackLink
     {

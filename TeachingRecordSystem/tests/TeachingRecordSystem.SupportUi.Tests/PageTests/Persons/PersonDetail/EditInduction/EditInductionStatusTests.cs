@@ -136,6 +136,64 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(expectedChoices, statusChoices);
     }
 
+    [Theory]
+    [InlineData(InductionStatus.Exempt)]
+    [InlineData(InductionStatus.FailedInWales)]
+    public async Task Get_InductionManagedByCpd_StatusExemptOrFailedInWales_ExpectedRadioButtonsExistOnPage(InductionStatus status)
+    {
+        // Arrange
+        var expectedStatuses = new InductionStatus[] { InductionStatus.RequiredToComplete, InductionStatus.Exempt, InductionStatus.InProgress, InductionStatus.Passed, InductionStatus.Failed, InductionStatus.FailedInWales };
+        var expectedChoices = expectedStatuses.Select(s => s.ToString());
+
+        // test setup here is convoluted because I need to set up a person,
+        // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
+        // then set the induction status to the one we want to test
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn().WithQts());
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.SetCpdInductionStatus(
+                InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
+                startDate: null,
+                completedDate: null,
+                cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            person.Person.SetInductionStatus(
+                status,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: [],
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(status, InductionJourneyPage.Status)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
+        var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
+        Assert.Equal("What is their induction status?", statusChoicesLegend!.TextContent);
+        Assert.Equal(expectedChoices, statusChoices);
+    }
+
     [Fact]
     public async Task Get_InductionStatus_ShowsAllRadioButtonsNotSelected()
     {
@@ -285,22 +343,42 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         //Arrange
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
-        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        // test setup here is convoluted because I need to set up a person,
+        // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
+        // then set the induction status to the one we want to test
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn().WithQts());
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
             person.Person.SetCpdInductionStatus(
-                status,
-                startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,
-                completedDate: status.RequiresCompletedDate() ? lessThanSevenYearsAgo : null,
+                InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
+                startDate: null,
+                completedDate: null,
                 cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            person.Person.SetInductionStatus(
+                status,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: [],
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
                 out _);
             await dbContext.SaveChangesAsync();
         });
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(status, InductionJourneyPage.Status)
+                .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -308,6 +386,59 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Contains(statusSpecificText, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+    }
+
+    [Theory]
+    [InlineData(InductionStatus.FailedInWales)]
+    [InlineData(InductionStatus.Exempt)]
+    public async Task Get_ForPersonWithInductionStatusManagedByCPD_StatusExemptOrFailedInWales_NoWarning(InductionStatus status)
+    {
+        //Arrange
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+
+        // test setup here is convoluted because I need to set up a person,
+        // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
+        // then set the induction status to the one we want to test
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn().WithQts());
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.SetCpdInductionStatus(
+                InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
+                startDate: null,
+                completedDate: null,
+                cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            person.Person.SetInductionStatus(
+                status,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: [],
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            await dbContext.SaveChangesAsync();
+        });
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(status, InductionJourneyPage.Status)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc!.GetElementByTestId("induction-status-warning"));
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
