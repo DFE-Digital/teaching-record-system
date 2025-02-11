@@ -19,18 +19,22 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
     [Display(Name = "What is their induction status?")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
+    public InductionStatus CurrentInductionStatus { get; set; }
     public string? PersonName { get; set; }
     public IEnumerable<InductionStatusInfo> StatusChoices
     {
         get
         {
-            return _inductionStatusManagedByCpd && (InductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ?
-                 InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
+            return _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ?
+                InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
+                    .Concat(new[] { InductionStatusRegistry.All.Single(i => i.Value == CurrentInductionStatus) })
+                    .OrderBy(i => i.Value)
+                    .ToArray()
                 : InductionStatusRegistry.All.ToArray()[1..];
         }
     }
 
-    public string InductionIsManagedByCpdWarning => InductionStatus switch
+    public string InductionIsManagedByCpdWarning => CurrentInductionStatus switch
     {
         InductionStatus.RequiredToComplete => InductionWarnings.InductionIsManagedByCpdWarningRequiredToComplete,
         InductionStatus.InProgress => InductionWarnings.InductionIsManagedByCpdWarningInProgress,
@@ -39,7 +43,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
         _ => InductionWarnings.InductionIsManagedByCpdWarningOther
     };
 
-    public string? StatusWarningMessage => _inductionStatusManagedByCpd && (InductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ? InductionIsManagedByCpdWarning : null;
+    public string? StatusWarningMessage => _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ? InductionIsManagedByCpdWarning : null;
 
     public InductionJourneyPage NextPage =>
      InductionStatus switch
@@ -103,6 +107,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
 
         var person = await dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
         _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
+        CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
 
         await next();
     }

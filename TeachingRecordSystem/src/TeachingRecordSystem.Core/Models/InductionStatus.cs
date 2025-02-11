@@ -27,7 +27,7 @@ public static class InductionStatusRegistry
 
     public static IReadOnlyCollection<InductionStatusInfo> All => _info.Values.ToArray();
 
-    public static IReadOnlyCollection<InductionStatusInfo> ValidStatusChangesWhenManagedByCpd =>
+    public static ICollection<InductionStatusInfo> ValidStatusChangesWhenManagedByCpd =>
         _info
             .Where(s => s.Key is InductionStatus.Exempt or InductionStatus.FailedInWales)
             .Select(s => s.Value)
