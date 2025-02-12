@@ -5,6 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 public class EditInductionStateBuilder
 {
     private InductionStatus InductionStatus { get; set; }
+    private InductionStatus CurrentInductionStatus { get; set; }
     private DateOnly? StartDate { get; set; }
     private DateOnly? CompletedDate { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
@@ -23,6 +24,7 @@ public class EditInductionStateBuilder
         this.Initialized = true;
         JourneyStartPage = startPage;
         InductionStatus = currentInductionStatus;
+        CurrentInductionStatus = currentInductionStatus;
         return this;
     }
 
@@ -84,6 +86,7 @@ public class EditInductionStateBuilder
         return new EditInductionState()
         {
             InductionStatus = InductionStatus,
+            CurrentInductionStatus = CurrentInductionStatus,
             StartDate = StartDate,
             CompletedDate = CompletedDate,
             ExemptionReasonIds = ExemptionReasonIds,

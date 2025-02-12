@@ -264,6 +264,57 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         }
     }
 
+    [Theory]
+    [InlineData(InductionStatus.Exempt)]
+    [InlineData(InductionStatus.FailedInWales)]
+    public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsNoWarning(InductionStatus trsInductionStatus)
+    {
+        // Arrange
+        SetCurrentUser(TestUsers.GetUser(UserRoles.InductionReadWrite));
+
+        var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
+
+        // test setup here is convoluted because I need to set up a person,
+        // then call SetCpdInductionstatus to set the CpdInductionModifiedOn date,
+        // then set the induction status to the one being tested
+        var person = await TestData.CreatePersonAsync(
+            p => p.WithTrn().WithQts());
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+            person.Person.SetCpdInductionStatus(
+                InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
+                startDate: null,
+                completedDate: null,
+                cpdModifiedOn: Clock.UtcNow,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            person.Person.SetInductionStatus(
+                trsInductionStatus,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: [],
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetElementByTestId("induction-status-warning"));
+    }
+
     [Fact]
     public async Task Get_WithPersonIdForPersonWithInductionStatusNotManagedByCpd_DoesNotShowWarning()
     {
