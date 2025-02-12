@@ -49,3 +49,5 @@ public record CurrentMandatoryQualificationFeature(MandatoryQualification Mandat
 public record CurrentSupportTaskFeature(SupportTask SupportTask);
 
 public record CurrentAlertFeature(Alert Alert);
+
+public record CurrentProfessionalStatusFeature(ProfessionalStatus ProfessionalStatus);

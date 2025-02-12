@@ -1,0 +1,61 @@
+@page "/route/{qualificationId}/edit/check-answers"
+@model TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute.CheckYourAnswersModel
+@{
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@Model.BackLink" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.RouteToProfessionalStatusId</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.Status</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Award date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Training Provider ID</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.TrainingProviderId</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.QualificationType</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.TrainingCountryId</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>From @Model.TrainingAgeSpecialismRangeFrom to @Model.TrainingAgeSpecialismRangeTo</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Training Subject IDs</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@string.Join(", ", Model.TrainingSubjectIds)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="confirm-button">Confirm and commit changes</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteCheckYourAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
