@@ -14,6 +14,18 @@ public partial class OutboxMessageHandler(MessageSerializer messageSerializer, I
         {
             await HandleMessageAsync<TrnRequestMetadataMessage, TrnRequestMetadataMessageHandler>(trnRequestMetadataMessage);
         }
+        else if (message is AddInductionExemptionMessage addInductionExemptionMessage)
+        {
+            await HandleMessageAsync<AddInductionExemptionMessage, AddInductionExemptionMessageHandler>(addInductionExemptionMessage);
+        }
+        else if (message is RemoveInductionExemptionMessage removeInductionExemptionMessage)
+        {
+            await HandleMessageAsync<RemoveInductionExemptionMessage, RemoveInductionExemptionMessageHandler>(removeInductionExemptionMessage);
+        }
+        else if (message is SetInductionRequiredToCompleteMessage setInductionRequiredToCompleteMessage)
+        {
+            await HandleMessageAsync<SetInductionRequiredToCompleteMessage, SetInductionRequiredToCompleteMessageHandler>(setInductionRequiredToCompleteMessage);
+        }
         else
         {
             throw new ArgumentException($"Unknown message type: '{outboxMessage.dfeta_MessageName}'.", nameof(outboxMessage.dfeta_MessageName));

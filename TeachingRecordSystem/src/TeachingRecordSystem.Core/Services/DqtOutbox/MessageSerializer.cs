@@ -42,6 +42,6 @@ public class MessageSerializer
         var messageTypeName = $"{_messagesNamespace}{messageName}";
         var messageType = typeof(MessageSerializer).Assembly.GetType(messageTypeName) ??
             throw new ArgumentException("Could not find message type.", nameof(messageName));
-        return JsonSerializer.Deserialize(payload, messageType)!;
+        return JsonSerializer.Deserialize(payload, messageType, _serializerOptions)!;
     }
 }

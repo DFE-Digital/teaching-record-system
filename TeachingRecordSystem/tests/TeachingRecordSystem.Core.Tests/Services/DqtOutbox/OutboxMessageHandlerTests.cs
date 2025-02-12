@@ -1,12 +1,16 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.Core.Services.Webhooks;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Tests.Services.DqtOutbox;
 
@@ -79,6 +83,123 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
             Assert.Equal(message.DateOfBirth, trnRequestMetadata.DateOfBirth);
         });
     }
+
+    [Fact]
+    public async Task HandleOutboxMessage_ForAddInductionExemptionMessage_AddsExemptionReason()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts());
+
+        var exemptionReasonId = InductionExemptionReason.PassedInWalesId;
+
+        var message = new AddInductionExemptionMessage()
+        {
+            PersonId = person.PersonId,
+            ExemptionReasonId = exemptionReasonId,
+            TrsUserId = Core.DataStore.Postgres.Models.SystemUser.SystemUserId
+        };
+
+        var outboxMessage = new dfeta_TrsOutboxMessage()
+        {
+            dfeta_Payload = MessageSerializer.SerializeMessage(message, out var messageName),
+            dfeta_MessageName = messageName
+        };
+
+        // Act
+        await Handler.HandleOutboxMessageAsync(outboxMessage);
+
+        // Assert
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(InductionStatus.Exempt, updatedPerson.InductionStatus);
+            Assert.Collection(updatedPerson.InductionExemptionReasonIds, id => Assert.Equal(exemptionReasonId, id));
+        });
+    }
+
+    [Fact]
+    public async Task HandleOutboxMessage_ForRemoveInductionExemptionMessage_AddsExemptionReason()
+    {
+        // Arrange
+        var exemptionReasonId = InductionExemptionReason.PassedInWalesId;
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithQts()
+            .WithInductionStatus(i => i.WithStatus(InductionStatus.RequiredToComplete)));
+
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            dbContext.Attach(person.Person);
+
+            person.Person.SetInductionStatus(
+                InductionStatus.Exempt,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: [exemptionReasonId],
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
+                updatedBy: SystemUser.SystemUserId,
+                now: Clock.UtcNow,
+                out _);
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var message = new RemoveInductionExemptionMessage()
+        {
+            PersonId = person.PersonId,
+            ExemptionReasonId = exemptionReasonId,
+            TrsUserId = SystemUser.SystemUserId
+        };
+
+        var outboxMessage = new dfeta_TrsOutboxMessage()
+        {
+            dfeta_Payload = MessageSerializer.SerializeMessage(message, out var messageName),
+            dfeta_MessageName = messageName
+        };
+
+        // Act
+        await Handler.HandleOutboxMessageAsync(outboxMessage);
+
+        // Assert
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(InductionStatus.RequiredToComplete, updatedPerson.InductionStatus);
+            Assert.Empty(updatedPerson.InductionExemptionReasonIds);
+        });
+    }
+
+    [Fact]
+    public async Task HandleOutboxMessage_ForSetInductionRequiredToCompleteMessage_UpdatesInductionStatus()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+
+        var message = new SetInductionRequiredToCompleteMessage()
+        {
+            PersonId = person.PersonId,
+            TrsUserId = Core.DataStore.Postgres.Models.SystemUser.SystemUserId
+        };
+
+        var outboxMessage = new dfeta_TrsOutboxMessage()
+        {
+            dfeta_Payload = MessageSerializer.SerializeMessage(message, out var messageName),
+            dfeta_MessageName = messageName
+        };
+
+        // Act
+        await Handler.HandleOutboxMessageAsync(outboxMessage);
+
+        // Assert
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(InductionStatus.RequiredToComplete, updatedPerson.InductionStatus);
+        });
+    }
 }
 
 public class OutboxMessageHandlerFixture
@@ -86,7 +207,7 @@ public class OutboxMessageHandlerFixture
     public OutboxMessageHandlerFixture(
         DbFixture dbFixture,
         IOrganizationServiceAsync2 organizationService,
-        IDbContextFactory<TrsDbContext> dbContextFactory,
+        IConfiguration configuration,
         ReferenceDataCache referenceDataCache,
         FakeTrnGenerator trnGenerator,
         ILoggerFactory loggerFactory)
@@ -116,12 +237,16 @@ public class OutboxMessageHandlerFixture
             .AddSingleton(MessageSerializer)
             .AddSingleton<TestData>()
             .AddSingleton<OutboxMessageHandler>()
-            .AddSingleton(dbContextFactory)
+            .AddDatabase(configuration.GetPostgresConnectionString())
             .AddTransient<TrsDbContext>(sp => sp.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContext())
             .AddSingleton(TestData)
             .AddTransient<TrnRequestHelper>()
             .AddCrmQueries()
-            .AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService);
+            .AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService)
+            .AddSingleton<WebhookMessageFactory>()
+            .AddSingleton<EventMapperRegistry>()
+            .AddSingleton<PersonInfoCache>()
+            .AddMemoryCache();
 
         ServiceProvider = services.BuildServiceProvider();
     }
