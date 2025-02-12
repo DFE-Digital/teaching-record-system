@@ -20,5 +20,6 @@ public class EventMapping : IEntityTypeConfiguration<Event>
         builder.HasIndex(e => new { e.PersonId, e.EventName }).HasFilter("person_id is not null");
         builder.HasIndex(e => new { e.QualificationId, e.EventName }).HasFilter("qualification_id is not null");
         builder.HasIndex(e => new { e.AlertId, e.EventName }).HasFilter("alert_id is not null");
+        builder.HasIndex(e => new { e.EventName, e.Created }).IsCreatedConcurrently();
     }
 }

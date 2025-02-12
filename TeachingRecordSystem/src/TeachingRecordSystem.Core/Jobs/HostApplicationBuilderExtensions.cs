@@ -53,6 +53,7 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddTransient<InductionCompletedEmailJobDispatcher>();
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
                 builder.Services.AddTransient<InductionStatusUpdatedSupportJob>();
+                builder.Services.AddTransient<CpdInductionImporterJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
@@ -183,6 +184,11 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<BackfillDqtInductionEventEnumDescriptionsJob>(
                     nameof(BackfillDqtInductionEventEnumDescriptionsJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
+                    nameof(CpdInductionImporterJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
