@@ -27,7 +27,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
         {
             return _inductionStatusManagedByCpd && (CurrentInductionStatus is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ?
                 InductionStatusRegistry.ValidStatusChangesWhenManagedByCpd
-                    .Concat(new[] { InductionStatusRegistry.All.Single(i => i.Value == CurrentInductionStatus) })
+                    .Append(InductionStatusRegistry.All.Single(i => i.Value == CurrentInductionStatus))
                     .OrderBy(i => i.Value)
                     .ToArray()
                 : InductionStatusRegistry.All.ToArray()[1..];
