@@ -41,7 +41,7 @@
                         {
                             if (User.IsActiveTrsUser())
                             {
-                                <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/persons") ? "govuk-header__navigation-item--active" : "")">
+                                <li class="govuk-header__navigation-item @(Context.Request.Path == "/persons" ? "govuk-header__navigation-item--active" : "")">
                                     <a class="govuk-header__link" href="@LinkGenerator.Persons()">Find a record</a>
                                 </li>
 
@@ -52,15 +52,11 @@
                                     </li>
                                 }
 
-                                if (User.IsInRole(UserRoles.Administrator))
+                                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
                                 {
                                     <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/users") ? "govuk-header__navigation-item--active" : "")">
                                         <a class="govuk-header__link" href="@LinkGenerator.Users()">Users</a>
                                     </li>
-                                }
-
-                                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
-                                {
                                     <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/application-users") || Context.Request.Path.StartsWithSegments("/api-keys") ? "govuk-header__navigation-item--active" : "")">
                                         <a class="govuk-header__link" href="@LinkGenerator.ApplicationUsers()">Application users</a>
                                     </li>
