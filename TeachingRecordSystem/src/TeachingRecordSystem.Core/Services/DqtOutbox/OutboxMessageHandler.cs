@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Services.DqtOutbox;
 
-public partial class OutboxMessageHandler(MessageSerializer messageSerializer, IServiceProvider serviceProvider)
+public class OutboxMessageHandler(MessageSerializer messageSerializer, IServiceProvider serviceProvider)
 {
     public async Task HandleOutboxMessageAsync(dfeta_TrsOutboxMessage outboxMessage)
     {

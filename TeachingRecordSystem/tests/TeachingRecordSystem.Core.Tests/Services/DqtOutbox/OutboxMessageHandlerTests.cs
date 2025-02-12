@@ -24,8 +24,6 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
 
     public OutboxMessageHandlerFixture Fixture { get; }
 
-    public DbFixture DbFixture => Fixture.DbFixture;
-
     public IClock Clock => Fixture.Clock;
 
     public MessageSerializer MessageSerializer => Fixture.MessageSerializer;
@@ -33,6 +31,12 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
     public OutboxMessageHandler Handler { get; }
 
     public TestData TestData => Fixture.TestData;
+
+    private async Task WithDbContextAsync(Func<TrsDbContext, Task> action)
+    {
+        await using var dbContext = await Fixture.ServiceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
+        await action(dbContext);
+    }
 
     [Fact]
     public async Task HandleOutboxMessage_ForTrnRequestMetadataMessage_AddsTrnRequestMetadataToDb()
@@ -69,7 +73,7 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         await Handler.HandleOutboxMessageAsync(outboxMessage);
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var oneLoginUser = await dbContext.OneLoginUsers.SingleOrDefaultAsync(u => u.Subject == oneLoginUserSubject);
             Assert.Null(oneLoginUser);
@@ -109,7 +113,7 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         await Handler.HandleOutboxMessageAsync(outboxMessage);
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(InductionStatus.Exempt, updatedPerson.InductionStatus);
@@ -128,7 +132,7 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
             .WithQts()
             .WithInductionStatus(i => i.WithStatus(InductionStatus.RequiredToComplete)));
 
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             dbContext.Attach(person.Person);
 
@@ -164,7 +168,7 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         await Handler.HandleOutboxMessageAsync(outboxMessage);
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(InductionStatus.RequiredToComplete, updatedPerson.InductionStatus);
@@ -194,7 +198,7 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         await Handler.HandleOutboxMessageAsync(outboxMessage);
 
         // Assert
-        await DbFixture.WithDbContextAsync(async dbContext =>
+        await WithDbContextAsync(async dbContext =>
         {
             var updatedPerson = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.Equal(InductionStatus.RequiredToComplete, updatedPerson.InductionStatus);
@@ -213,7 +217,6 @@ public class OutboxMessageHandlerFixture
         ILoggerFactory loggerFactory)
     {
         Clock = new TestableClock();
-        DbFixture = dbFixture;
         MessageSerializer = new MessageSerializer();
 
         var testDataSyncHelper = new TrsDataSyncHelper(
@@ -252,8 +255,6 @@ public class OutboxMessageHandlerFixture
     }
 
     public IClock Clock { get; }
-
-    public DbFixture DbFixture { get; }
 
     public MessageSerializer MessageSerializer { get; }
 
