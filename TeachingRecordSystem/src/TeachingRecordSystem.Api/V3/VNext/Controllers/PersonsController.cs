@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Optional.Unsafe;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
@@ -40,11 +42,37 @@ public class PersonsController : ControllerBase
     [SwaggerOperation(
         OperationId = "SetProfessionalStatus",
         Summary = "Sets a professional status")]
-    //[ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetProfessionalStatus)]
-    public IActionResult SetProfessionalStatus(
+    public async Task<IActionResult> SetProfessionalStatusAsync(
+        [FromRoute] string trn,
         [FromRoute] string id,
-        [FromBody] SetProfessionalStatusRequest request) =>
-        NoContent();
+        [FromBody] SetProfessionalStatusRequest request,
+        [FromServices] SetProfessionalStatusHandler handler)
+    {
+        var command = new SetProfessionalStatusCommand(
+            trn,
+            id,            
+            request.RouteTypeId,
+            request.Status.ConvertToProfessionalStatusStatus(),
+            request.AwardedDate,
+            request.TrainingStartDate,
+            request.TrainingEndDate,
+            request.TrainingSubjectReferences.HasValue ? request.TrainingSubjectReferences.ValueOrDefault() : null,
+            request.TrainingAgeSpecialism is null
+                ? null
+                : new SetProfessionalStatusTrainingAgeSpecialismCommand(
+                    request.TrainingAgeSpecialism.Type.ConvertToTrainingAgeSpecialismType(),
+                    request.TrainingAgeSpecialism.From,
+                    request.TrainingAgeSpecialism.To),
+            request.TrainingCountryReference,
+            request.TrainingProviderUkprn,
+            request.DegreeTypeId);
+
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(_ => NoContent())
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+    }
 }

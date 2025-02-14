@@ -21,6 +21,7 @@ public class ReferenceDataCache(
     private Task<dfeta_country[]>? _getCountriesTask;
     private Task<dfeta_ittsubject[]>? _getIttSubjectsTask;
     private Task<dfeta_ittqualification[]>? _getIttQualificationsTask;
+    private Task<Account[]>? _getIttProvidersTask;
 
     // TRS
     private Task<AlertCategory[]>? _alertCategoriesTask;
@@ -210,6 +211,19 @@ public class ReferenceDataCache(
         return ittQualifications.ToArray();
     }
 
+    public async Task<dfeta_ittqualification> GetIttQualificationByValueAsync(string value)
+    {
+        var ittQualifications = await EnsureIttQualificationsAsync();
+        // build environment has some duplicate ITT Qualifications, which prevent us using Single() here
+        return ittQualifications.First(s => s.dfeta_Value == value, $"Could not find ITT qualification with value: '{value}'.");
+    }
+
+    public async Task<Account?> GetIttProviderByUkPrnAsync(string ukPrn)
+    {
+        var ittProviders = await EnsureIttProvidersAsync();
+        return ittProviders.SingleOrDefault(p => p.dfeta_UKPRN == ukPrn);
+    }
+
     public async Task<InductionExemptionReason[]> GetInductionExemptionReasonsAsync(bool activeOnly = false)
     {
         var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
@@ -335,6 +349,11 @@ public class ReferenceDataCache(
             ref _getIttQualificationsTask,
             () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttQualificationsQuery()));
 
+    private Task<Account[]> EnsureIttProvidersAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getIttProvidersTask,
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttProvidersQuery()));
+
     private Task<InductionExemptionReason[]> EnsureInductionExemptionReasonsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _inductionExemptionReasonsTask,
@@ -394,6 +413,7 @@ public class ReferenceDataCache(
         await EnsureCountriesAsync();
         await EnsureIttSubjectsAsync();
         await EnsureIttQualificationsAsync();
+        await EnsureIttProvidersAsync();
 
         // TRS
         await EnsureAlertCategoriesAsync();
