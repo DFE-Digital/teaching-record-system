@@ -25,6 +25,7 @@ public class SeedCrmReferenceData : IStartupTask
         AddCountries();
         AddITTSubjects();
         AddITTQualifications();
+        AddITTProviders();
 
         return Task.CompletedTask;
     }
@@ -420,11 +421,40 @@ public class SeedCrmReferenceData : IStartupTask
             dfeta_Value = "XK"
         });
 
-
         _xrmFakedContext.CreateEntity(new dfeta_country()
         {
             dfeta_name = "Wales",
             dfeta_Value = "WA"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "Northern Ireland",
+            dfeta_Value = "XG"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "Scotland",
+            dfeta_Value = "XH"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "Portugal",
+            dfeta_Value = "PT"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "Spain",
+            dfeta_Value = "ES"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
+            dfeta_name = "France",
+            dfeta_Value = "FR"
         });
     }
 
@@ -479,6 +509,35 @@ public class SeedCrmReferenceData : IStartupTask
         {
             dfeta_name = "Degree",
             dfeta_Value = "400"
+        });
+    }
+
+    private void AddITTProviders()
+    {
+        _xrmFakedContext.CreateEntity(new Account()
+        {
+            Name = "ARK Teacher Training",
+            dfeta_TrainingProvider = true,
+            dfeta_UKPRN = "10044534"
+        });
+
+        _xrmFakedContext.CreateEntity(new Account()
+        {
+            Name = "University of Newcastle Upon Tyne",
+            dfeta_TrainingProvider = true,
+            dfeta_UKPRN = "10007799"
+        });
+
+        _xrmFakedContext.CreateEntity(new Account()
+        {
+            Name = "Non-UK establishment",
+            dfeta_TrainingProvider = true
+        });
+
+        _xrmFakedContext.CreateEntity(new Account()
+        {
+            Name = "UK establishment (Scotland/Northern Ireland)",
+            dfeta_TrainingProvider = true
         });
     }
 }
