@@ -45,19 +45,14 @@ domains:
 	$(eval include global_config/domains.sh)
 
 set-azure-account: ${environment}
-	echo "Logging on to ${AZURE_SUBSCRIPTION}"
-	az account set -s ${AZURE_SUBSCRIPTION}
-
-set-azure-pd-subscription:
-	$(eval AZURE_SUBSCRIPTION=s189-teacher-services-cloud-production)
-	echo "setting subscription to"${AZURE_SUBSCRIPTION}
-	az account set -s ${AZURE_SUBSCRIPTION}
+	[ "${SKIP_AZURE_LOGIN}" != "true" ] && az account set -s ${AZURE_SUBSCRIPTION} || true
 
 ci:	## Run in automation environment
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SP_AUTH=true)
 	$(eval CONFIRM_DEPLOY=true)
 	$(eval SKIP_CONFIRM=true)
+	$(eval SKIP_AZURE_LOGIN=true)
 
 vendor-modules:
 	rm -rf terraform/aks/vendor/modules/aks
@@ -90,10 +85,12 @@ deploy-azure-resources: set-azure-account # make dev deploy-azure-resources CONF
 validate-azure-resources: set-azure-account # make dev validate-azure-resources
 	az deployment sub create --name "resourcedeploy-trs-$(shell date +%Y%m%d%H%M%S)" -l "${REGION}" --template-uri "https://raw.githubusercontent.com/DFE-Digital/tra-shared-services/main/azure/resourcedeploy.json" --parameters "resourceGroupName=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" 'tags=${RG_TAGS}' "tfStorageAccountName=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}tfstate${CONFIG_SHORT}" "tfStorageContainerName=${SERVICE_SHORT}-tfstate" "dbBackupStorageAccountName=${AZURE_BACKUP_STORAGE_ACCOUNT_NAME}" "dbBackupStorageContainerName=${AZURE_BACKUP_STORAGE_CONTAINER_NAME}" "keyVaultNames=['${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-api-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-authz-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-ui-kv', '${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-worker-kv']" --what-if
 
-domains-init: domains set-azure-pd-subscription ## make [env] domains-init - terraform init for environment dns/afd resources
+.PHONY: vendor-domain-modules
+vendor-domain-modules:
 	rm -rf terraform/domains/environment_domains/vendor/modules/domains
 	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_TAG} https://github.com/DFE-Digital/terraform-modules.git terraform/domains/environment_domains/vendor/modules/domains
 
+domains-init: vendor-domain-modules domains set-azure-account ## terraform init for dns resources: make <env>  domains-init
 	terraform -chdir=terraform/domains/environment_domains init -reconfigure -upgrade -backend-config=config/${CONFIG}_backend.tfvars
 
 domains-plan: domains-init ## terraform plan for environment dns/afd resources
@@ -102,7 +99,7 @@ domains-plan: domains-init ## terraform plan for environment dns/afd resources
 domains-apply: domains-init ## terraform apply for environment dns/afd resources, needs CONFIRM_DEPLOY=1 for production
 	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${CONFIG}.tfvars.json
 
-domains-infra-init: domains set-azure-pd-subscription ## make domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
+domains-infra-init: domains ## make domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
 	rm -rf terraform/domains/infrastructure/vendor/modules/domains
 	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_TAG} https://github.com/DFE-Digital/terraform-modules.git terraform/domains/infrastructure/vendor/modules/domains
 
