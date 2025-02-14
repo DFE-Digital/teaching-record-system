@@ -1,0 +1,622 @@
+using Medallion.Threading;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
+using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using System.Diagnostics;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
+using ProfessionalStatusStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.ProfessionalStatusStatus;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+
+namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
+
+public record SetProfessionalStatusCommand(
+    string Trn,
+    string SlugId,
+    Guid RouteTypeId,
+    ProfessionalStatusStatus Status,
+    DateOnly? AwardedDate,
+    DateOnly? TrainingStartDate,
+    DateOnly? TrainingEndDate,
+    string[]? TrainingSubjectReferences,
+    SetProfessionalStatusTrainingAgeSpecialismCommand? TrainingAgeSpecialism,
+    string? TrainingCountryReference,
+    string? TrainingProviderUkprn,
+    Guid? DegreeTypeId,
+    bool? IsExemptFromInduction);
+
+public record SetProfessionalStatusTrainingAgeSpecialismCommand(
+    TrainingAgeSpecialismType Type,
+    int? From,
+    int? To);
+
+public record SetProfessionalStatusResult;
+
+public class SetProfessionalStatusHandler(
+    TrsDbContext dbContext,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    TrsDataSyncHelper syncHelper,
+    ICurrentUserProvider currentUserProvider,
+    ReferenceDataCache referenceDataCache,
+    IDistributedLockProvider distributedLockProvider)
+{
+    private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
+
+    public async Task<ApiResult<SetProfessionalStatusResult>> HandleAsync(SetProfessionalStatusCommand command)
+    {
+        await using var trnLock = await distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(command.Trn), _lockTimeout);
+
+        var dqtContact = await crmQueryDispatcher.ExecuteQueryAsync(
+            new GetActiveContactByTrnQuery(
+                command.Trn,
+                new ColumnSet(
+                    Contact.Fields.dfeta_SlugId,
+                    Contact.Fields.dfeta_HUSID,
+                    Contact.Fields.dfeta_QTSDate,
+                    Contact.Fields.dfeta_EYTSDate)));
+        if (dqtContact is null || dqtContact.dfeta_SlugId != command.SlugId)
+        {
+            return ApiError.PersonNotFound(command.Trn);
+        }
+
+        // Alerts and induction are in TRS so make sure contact record is synced to TRS
+        var person = await GetPersonAsync();
+        if (person is null)
+        {
+            var synced = await syncHelper.SyncPersonAsync(dqtContact.Id, syncAudit: true);
+            if (!synced)
+            {
+                throw new Exception($"Could not sync Person with contact ID: '{dqtContact.Id}'.");
+            }
+
+            person = await GetPersonAsync();
+            Debug.Assert(person is not null);
+        }
+
+        var lookupData = await LookupDataAsync(dqtContact);        
+
+        if (!command.RouteTypeId.TryConvertFromTrsRouteType(out (dfeta_ITTProgrammeType? ProgrammeType, RecognitionRouteType? RecognitionRouteType) routeTypeMapped))
+        {
+            return ApiError.InvalidRouteType(command.RouteTypeId);
+        }
+
+        var isEarlyYears = command.RouteTypeId.IsEarlyYears();
+        var teacherStatus = await DeriveTeacherStatusAsync(command.RouteTypeId, command.Status);
+        var earlyYearsTeacherStatus = await DeriveEarlyYearsTeacherStatusAsync(command.RouteTypeId, command.Status);
+        var inductionExemptionId = command.IsExemptFromInduction.HasValue && command.IsExemptFromInduction.Value ? DeriveInductionExemptionId(command.RouteTypeId) : null;
+
+        if (!command.Status.TryConvertToITTResult(out var ittResult))
+        {
+            return ApiError.InvalidProfessionalStatusStatus(command.Status.ToString());
+        }
+
+        if (command.RouteTypeId == RouteToProfessionalStatus.AssessmentOnlyRouteId && command.Status == ProfessionalStatusStatus.InTraining)
+        {
+            return ApiError.InTrainingProfessionalStatusNotPermittedForRouteType(command.RouteTypeId);
+        }
+
+        if (command.RouteTypeId != RouteToProfessionalStatus.AssessmentOnlyRouteId && command.Status == ProfessionalStatusStatus.UnderAssessment)
+        {
+            return ApiError.UnderAssessmentOnlyPermittedForRouteType(RouteToProfessionalStatus.AssessmentOnlyRouteId);
+        }
+
+        (dfeta_AgeRange From, dfeta_AgeRange To)? ageRange = null;
+        if (command.TrainingAgeSpecialism is not null && !command.TrainingAgeSpecialism.TryConvertToAgeRange(out ageRange))
+        {
+            return ApiError.InvalidTrainingAgeSpecialism(command.TrainingAgeSpecialism.Type.ToString());
+        }
+
+        Guid? subjectId1 = null;
+        if (command.TrainingSubjectReferences?.Length > 0)
+        {
+            var (IsSuccess, Result) = await command.TrainingSubjectReferences[0].TryConvertFromTrsTrainingSubjectReferenceAsync(referenceDataCache);
+            if (!IsSuccess)
+            {
+                return ApiError.InvalidTrainingSubjectReference(command.TrainingSubjectReferences[0]);
+            }
+
+            subjectId1 = Result!.Id;
+        }
+
+        Guid? subjectId2 = null;
+        if (command.TrainingSubjectReferences?.Length > 1)
+        {
+            var (IsSuccess, Result) = await command.TrainingSubjectReferences[1].TryConvertFromTrsTrainingSubjectReferenceAsync(referenceDataCache);
+            if (!IsSuccess)
+            {
+                return ApiError.InvalidTrainingSubjectReference(command.TrainingSubjectReferences[1]);
+            }
+
+            subjectId2 = Result!.Id;
+        }
+
+        Guid? subjectId3 = null;
+        if (command.TrainingSubjectReferences?.Length > 2)
+        {
+            var (IsSuccess, Result) = await command.TrainingSubjectReferences[2].TryConvertFromTrsTrainingSubjectReferenceAsync(referenceDataCache);
+            if (!IsSuccess)
+            {
+                return ApiError.InvalidTrainingSubjectReference(command.TrainingSubjectReferences[2]);
+            }
+
+            subjectId3 = Result!.Id;
+        }
+
+        Guid? countryId = null;
+        if (command.TrainingCountryReference is not null)
+        {
+            var (IsSuccess, Result) = await command.TrainingCountryReference.TryConvertFromTrsCountryReferenceAsync(referenceDataCache);
+            if (!IsSuccess)
+            {
+                return ApiError.InvalidTrainingCountryReference(command.TrainingCountryReference);
+            }
+
+            countryId = Result!.Id;
+        }
+
+        Guid? providerId = null;
+        if (command.TrainingProviderUkprn is not null)
+        {
+            var (IsSuccess, Result) = await command.TrainingProviderUkprn.TryConvertFromUkPrnAsync(referenceDataCache);
+            if (providerId is null)
+            {
+                return ApiError.InvalidTrainingProviderUkprn(command.TrainingProviderUkprn);
+            }
+        }
+
+        if (command.RouteTypeId.IsOverseas())
+        {
+            providerId = await DeriveIttProviderForOverseasQualifiedTeacherAsync(command.RouteTypeId);
+        }
+
+        Guid? ittQualificationId = null;
+        if (command.DegreeTypeId is not null)
+        {
+            var (IsSuccess, Result) = await command.DegreeTypeId.Value.TryConvertFromTrsDegreeTypeIdAsync(referenceDataCache);
+            if (!IsSuccess)
+            {
+                return ApiError.InvalidDegreeType(command.DegreeTypeId.Value);
+            }
+
+            ittQualificationId = Result!.Id;
+        }
+
+        var itt = lookupData.Itt;
+        var isNewItt = itt is null;
+        var cohortYear = command.TrainingEndDate?.Year.ToString();
+        var existingProgrammeType = itt?.dfeta_ProgrammeType;
+        if (isNewItt)
+        {
+            itt = new dfeta_initialteachertraining
+            {
+                Id = Guid.NewGuid(),
+                dfeta_PersonId = dqtContact.Id.ToEntityReference(Contact.EntityLogicalName),                
+                dfeta_SlugId = command.SlugId,
+                dfeta_TraineeID = dqtContact.dfeta_HUSID                
+            };
+        }
+        else
+        {
+            // If the route has already been Awarded then this can't be changed via the API - needs to be altered via TRS console
+            if (itt!.dfeta_Result == dfeta_ITTResult.Pass)
+            {
+                return ApiError.RouteToProfessionalStatusAlreadyAwarded();
+            }
+            
+            switch (itt.dfeta_Result)
+            {                
+                case dfeta_ITTResult.Fail:
+                    switch (command.Status)
+                    {
+                        case ProfessionalStatusStatus.Failed:
+                            return new SetProfessionalStatusResult();
+                        case ProfessionalStatusStatus.Deferred:
+                        case ProfessionalStatusStatus.InTraining:
+                        case ProfessionalStatusStatus.UnderAssessment:
+                            return ApiError.UnableToChangeFailProfessionalStatusStatus();                        
+                    }
+                    break;
+                case dfeta_ITTResult.Withdrawn:
+                    switch (command.Status)
+                    {
+                        case ProfessionalStatusStatus.Withdrawn:
+                            return new SetProfessionalStatusResult();
+                        case ProfessionalStatusStatus.Deferred:                        
+                            return ApiError.UnableToChangeWithdrawnProfessionalStatusStatus();
+                    }
+                    break;
+                default:
+                    break;
+            }            
+        }
+
+        itt!.dfeta_EstablishmentId = providerId?.ToEntityReference(Account.EntityLogicalName);
+        itt.dfeta_ProgrammeStartDate = command.TrainingStartDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
+        itt.dfeta_ProgrammeEndDate = command.TrainingEndDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
+        itt.dfeta_ProgrammeType = routeTypeMapped.ProgrammeType;
+        itt.dfeta_CohortYear = cohortYear;
+        itt.dfeta_Subject1Id = subjectId1?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
+        itt.dfeta_Subject2Id = subjectId2?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
+        itt.dfeta_Subject3Id = subjectId3?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
+        itt.dfeta_AgeRangeFrom = ageRange!.Value.From;
+        itt.dfeta_AgeRangeTo = ageRange!.Value.To;
+        itt.dfeta_Result = ittResult;
+        itt.dfeta_ITTQualificationId = ittQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName);
+        itt.dfeta_CountryId = countryId?.ToEntityReference(dfeta_country.EntityLogicalName);
+
+        var qtsRegistration = !isNewItt ? lookupData.QtsRegistrations.FirstOrDefault(qts => qts.dfeta_qtsregistrationId == itt!.dfeta_qtsregistration.Id) : null;        
+        if (qtsRegistration is null)
+        {
+            // Programme type could change in this API call so need to match against original one if there is a matching QTS record
+            var compatibleQtsRegistrations = SelectCompatibleQtsRegistrationRecords(
+                lookupData.QtsRegistrations,
+                existingProgrammeType ?? routeTypeMapped.ProgrammeType!.Value,
+                isEarlyYears,
+                lookupData.EarlyYearsTraineeStatusId,
+                lookupData.AorCandidateTeacherStatusId,
+                lookupData.TraineeTeacherDmsTeacherStatusId);
+
+            if (compatibleQtsRegistrations.Count() > 1)
+            {
+                return ApiError.MultipleQtsRecords(command.Trn);
+            }
+
+            qtsRegistration = compatibleQtsRegistrations.SingleOrDefault();
+        }
+
+        var isNewQts = qtsRegistration is null;
+        if (isNewQts)
+        {
+            qtsRegistration = new dfeta_qtsregistration
+            {
+                Id = Guid.NewGuid(),
+                dfeta_PersonId = dqtContact.Id.ToEntityReference(Contact.EntityLogicalName)
+            };
+        }
+        else
+        {
+            // Remove existing teaching status if status is withdrawn
+            if (command.Status == ProfessionalStatusStatus.Withdrawn)
+            { 
+                if (isEarlyYears)
+                {
+                    qtsRegistration!.Attributes[dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId] = null;
+                }
+                else
+                {
+                    qtsRegistration!.Attributes[dfeta_qtsregistration.Fields.dfeta_TeacherStatusId] = null;
+                }
+            }
+        }
+        
+        if (command.Status != ProfessionalStatusStatus.Withdrawn)
+        {
+            // Set teaching status and awarded date appropriate to route type and status in API call
+            if (isEarlyYears)
+            {
+                qtsRegistration!.dfeta_EarlyYearsStatusId = earlyYearsTeacherStatus!.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
+                if (command.Status == ProfessionalStatusStatus.Awarded)
+                {
+                    qtsRegistration.dfeta_EYTSDate = command.AwardedDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
+                }
+            }
+            else
+            {
+                qtsRegistration!.dfeta_TeacherStatusId = teacherStatus!.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
+                if (command.Status == ProfessionalStatusStatus.Awarded)
+                {
+                    qtsRegistration.dfeta_QTSDate = command.AwardedDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
+                }
+            }
+        }
+
+        // Create link between ITT and QTS if it doesn't exist yet
+        if (itt.dfeta_qtsregistration is null)
+        {
+            itt.dfeta_qtsregistration = qtsRegistration!.Id.ToEntityReference(dfeta_qtsregistration.EntityLogicalName);
+        }
+
+        // Trigger induction related actions if status is awarded
+        dfeta_TrsOutboxMessage? inductionOutboxMessage = null;
+        if (command.Status == ProfessionalStatusStatus.Awarded)
+        {
+            var (currentUserId, _) = currentUserProvider.GetCurrentApplicationUser();
+
+            var serializer = new MessageSerializer();
+            if (inductionExemptionId.HasValue)
+            {
+                inductionOutboxMessage = serializer.CreateCrmOutboxMessage(new AddInductionExemptionMessage()
+                {
+                    PersonId = dqtContact.Id,
+                    ExemptionReasonId = inductionExemptionId.Value,
+                    TrsUserId = currentUserId
+                });
+            }
+            else
+            {
+                inductionOutboxMessage = serializer.CreateCrmOutboxMessage(new SetInductionRequiredToCompleteMessage()
+                {
+                    PersonId = dqtContact.Id,
+                    TrsUserId = currentUserId
+                });
+            }
+        }
+
+        var setQuery = new SetProfessionalStatusQuery(
+            dqtContact.Id,
+            command.Trn,
+            lookupData.HasActiveAlert,
+            itt!,
+            isNewItt,
+            qtsRegistration!,
+            isNewQts,
+            inductionOutboxMessage);
+
+        _ = await crmQueryDispatcher.ExecuteQueryAsync(setQuery);
+
+        return new SetProfessionalStatusResult();
+
+        Task<Person?> GetPersonAsync() => dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
+    }
+
+    public IEnumerable<dfeta_qtsregistration> SelectCompatibleQtsRegistrationRecords(
+            IEnumerable<dfeta_qtsregistration> qtsRecords,
+            dfeta_ITTProgrammeType programmeType,
+            bool isEarlyYears,
+            Guid earlyYearsTraineeStatusId,
+            Guid aorCandidateTeacherStatusId,
+            Guid traineeTeacherDmsTeacherStatusId)
+    {
+        // Find an active QTS registration entity where either
+        //   programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
+        //   programme type is AssessmentOnly and the Teacher Status is 212 ('AOR Candidate') *OR*
+        //   programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS') *OR*        
+        var matching = new List<dfeta_qtsregistration>();
+
+        foreach (var qts in qtsRecords)
+        {
+            if (isEarlyYears)
+            {
+                //programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
+                if (qts.dfeta_EarlyYearsStatusId?.Id == earlyYearsTraineeStatusId)
+                {
+                    matching.Add(qts);
+                }
+            }
+            else
+            {
+                //programme type is AssessmentOnly and the Teacher Status is 212('AOR Candidate') * OR *
+                if (programmeType == dfeta_ITTProgrammeType.AssessmentOnlyRoute && qts.dfeta_TeacherStatusId?.Id == aorCandidateTeacherStatusId)
+                {
+                    matching.Add(qts);
+                }
+
+                //programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS')
+                else if ((programmeType != dfeta_ITTProgrammeType.AssessmentOnlyRoute && qts.dfeta_TeacherStatusId?.Id == traineeTeacherDmsTeacherStatusId))
+                {
+                    matching.Add(qts);
+                }
+            }
+        }
+
+        // if there are no matches based on status and programme type then look for Withdrawn ones i.e. with no status set
+        if (matching.Count == 0)
+        {
+            if (isEarlyYears)
+            {
+                matching.AddRange(qtsRecords.Where(qts => qts.dfeta_EarlyYearsStatusId is null));
+            }
+            else
+            {
+                matching.AddRange(qtsRecords.Where(qts => qts.dfeta_TeacherStatusId is null));
+            }            
+        }
+
+        return matching;
+    }
+
+    public async Task<dfeta_teacherstatus?> DeriveTeacherStatusAsync(Guid routeTypeId, ProfessionalStatusStatus status)
+    {
+        if (routeTypeId.IsEarlyYears())
+        {
+            return null;
+        }   
+
+        var teacherStatusValue = routeTypeId switch
+        {            
+            var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => "104", // Apply for QTS -> Qualified Teacher (by virtue of non-UK teaching qualifications)
+            var guid when guid == Guid.Parse("2B106B9D-BA39-4E2D-A42E-0CE827FDC324") => "223",  // European Recognition -> Qualified Teacher (by virtue of European teaching qualifications)
+            var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => "69",  // NI R -> Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
+            var guid when guid == Guid.Parse("CE61056E-E681-471E-AF48-5FFBF2653500") => "103",  // Overseas Trained Teacher Recognition -> Qualified Teacher: By virtue of overseas qualifications
+            var guid when guid == Guid.Parse("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") => "68",  // Scotland R -> Qualified Teacher: Teachers trained/registered in Scotland
+            var guid when guid == Guid.Parse("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1") =>
+                status switch
+                {
+                    ProfessionalStatusStatus.Awarded => "90", // International Qualified Teacher Status (Awarded) -> Qualified teacher: by virtue of achieving international qualified teacher status
+                    ProfessionalStatusStatus.Withdrawn => null, // International Qualified Teacher Status (Withdrawn) -> null
+                    _ => "211" // International Qualified Teacher Status (Not Awarded) -> Trainee Teacher
+                },
+            var guid when guid == RouteToProfessionalStatus.AssessmentOnlyRouteId =>
+                status switch
+                {
+                    ProfessionalStatusStatus.Awarded => "100",  // Assessment Only Route (Awarded) -> Qualified Teacher: Assessment Only Route
+                    ProfessionalStatusStatus.Withdrawn => null, // Assessment Only Route (Withdrawn) -> null
+                    _ => "212",  // Assessment Only Route (Not Awarded) -> AOR Candidate
+                },            
+            _ =>
+            status switch
+            {
+                ProfessionalStatusStatus.Awarded => "71", // Other route types (Awarded) -> Qualified teacher (trained)
+                ProfessionalStatusStatus.Withdrawn => null, // Other route types (Withdrawn) -> null
+                _ => "211" // Other route types -> Trainee Teacher
+            },
+        };
+
+        if (teacherStatusValue is null)
+        {
+            return null;
+        }
+
+        var teacherStatus = await referenceDataCache.GetTeacherStatusByValueAsync(teacherStatusValue);
+        return teacherStatus;
+    }
+
+    public async Task<dfeta_earlyyearsstatus?> DeriveEarlyYearsTeacherStatusAsync(Guid routeTypeId, ProfessionalStatusStatus status)
+    {
+        if (!routeTypeId.IsEarlyYears())
+        {
+            return null;
+        }
+
+        var earlyYearsTeacherStatusValue = status switch
+        {
+            ProfessionalStatusStatus.Awarded => "221", // Early Years Teacher Status
+            ProfessionalStatusStatus.Withdrawn => null,
+            _ => "220" // Early Years Trainee
+        };
+
+        if (earlyYearsTeacherStatusValue is null)
+        {
+            return null;
+        }
+
+        var earlyYearsTeacherStatus = await referenceDataCache.GetEarlyYearsStatusByValueAsync(earlyYearsTeacherStatusValue);
+        return earlyYearsTeacherStatus;
+    }
+
+    public async Task<Guid> DeriveIttProviderForOverseasQualifiedTeacherAsync(Guid routeTypeId)
+    {
+        var ittProviderName = routeTypeId switch
+        {
+            var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => "Non-UK establishment", // Apply for QTS
+            var guid when guid == Guid.Parse("2B106B9D-BA39-4E2D-A42E-0CE827FDC324") => "Non-UK establishment", // European Recognition
+            var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => "UK establishment (Scotland/Northern Ireland)", // NI R
+            var guid when guid == Guid.Parse("CE61056E-E681-471E-AF48-5FFBF2653500") => "Non-UK establishment",  // Overseas Trained Teacher Recognition
+            var guid when guid == Guid.Parse("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") => "UK establishment (Scotland/Northern Ireland)", // Scotland R
+            _ => throw new ArgumentException($"Unknown route type ID: '{routeTypeId}'.", nameof(routeTypeId))
+        };
+
+        var ittProvider = await referenceDataCache.GetIttProviderByNameAsync(ittProviderName);
+        return ittProvider!.Id;
+    }
+
+    public Guid? DeriveInductionExemptionId(Guid routeTypeId) => routeTypeId switch
+    {
+        var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"), // Apply for QTS -> Overseas Trained Teacher
+        var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => new("3471ab35-e6e4-4fa9-a72b-b8bd113df591"), // NI R -> Passed induction in Northern Ireland
+        var guid when guid == Guid.Parse("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") => new("a112e691-1694-46a7-8f33-5ec5b845c181"), // Scotland R -> Has, or is eligible for, full registration in Scotland
+        var guid when guid == Guid.Parse("BE6EAF8C-92DD-4EFF-AAD3-1C89C4BEC18C") => InductionExemptionReason.QtlsId, // QTLS and SET Membership -> Exempt through QTLS status provided they maintain membership of The Society of Education and Training
+        _ => null
+    };
+
+    private async Task<SetProfessionalStatusLookupResult> LookupDataAsync(Contact contact)
+    {
+        var ittTask = crmQueryDispatcher.ExecuteQueryAsync(
+            new GetActiveInitialTeacherTrainingRecordByContactIdAndSlugIdQuery(contact.Id, contact.dfeta_SlugId));
+
+        var qtsRegistrationsTask = crmQueryDispatcher.ExecuteQueryAsync(
+            new GetActiveQtsRegistrationsByContactIdsQuery(
+                [contact.Id],
+                new ColumnSet(
+                    dfeta_qtsregistration.Fields.dfeta_PersonId,
+                    dfeta_qtsregistration.Fields.dfeta_QTSDate,
+                    dfeta_qtsregistration.Fields.dfeta_EYTSDate,
+                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                    dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId)
+                )
+            );
+
+        var hasActiveAlertTask = dbContext.Alerts.Where(a => a.PersonId == contact.Id && a.IsOpen).AnyAsync();
+        var getEarlyYearsTraineeStatusTask = referenceDataCache.GetEarlyYearsStatusByValueAsync("220");
+        var getAorCandidateTeacherStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("212");
+        var getTraineeTeacherDmsTeacherStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("211");
+        var getEarlyYearsTeacherStatusTask = referenceDataCache.GetEarlyYearsStatusByValueAsync("221");
+        var getQualifiedTeacherTrainedStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("71");
+        var getQualifiedTeacherAssessmentOnlyRouteTask = referenceDataCache.GetTeacherStatusByValueAsync("100");
+        var getQualifiedTeacherInternationalTeacherStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("90");
+
+        await Task.WhenAll(
+            ittTask,
+            qtsRegistrationsTask,
+            hasActiveAlertTask,
+            getEarlyYearsTraineeStatusTask,
+            getAorCandidateTeacherStatusTask,
+            getTraineeTeacherDmsTeacherStatusTask,
+            getEarlyYearsTeacherStatusTask,
+            getQualifiedTeacherTrainedStatusTask,
+            getQualifiedTeacherAssessmentOnlyRouteTask,
+            getQualifiedTeacherInternationalTeacherStatusTask);
+
+        return new SetProfessionalStatusLookupResult()
+        {
+            Teacher = contact,
+            HasActiveAlert = hasActiveAlertTask.Result,
+            Itt = ittTask.Result,
+            QtsRegistrations = qtsRegistrationsTask.Result[contact.Id],
+            EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusTask.Result.Id,
+            AorCandidateTeacherStatusId = getAorCandidateTeacherStatusTask.Result.Id,
+            TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusTask.Result.Id,
+            EarlyYearsTeacherStatusId = getEarlyYearsTeacherStatusTask.Result.Id,
+            QualifiedTeacherTrainedStatusId = getQualifiedTeacherTrainedStatusTask.Result.Id,
+            QualifiedTeacherAssessmentOnlyRouteId = getQualifiedTeacherAssessmentOnlyRouteTask.Result.Id,
+            QualifiedTeacherInternationalTeacherStatusId = getQualifiedTeacherInternationalTeacherStatusTask.Result.Id
+        };
+    }
+
+    internal class SetProfessionalStatusLookupResult
+    {
+        public Contact Teacher { get; set; } = null!;
+        public bool HasActiveAlert { get; set; }
+        public dfeta_initialteachertraining? Itt { get; set; }
+        public IEnumerable<dfeta_qtsregistration> QtsRegistrations { get; set; } = [];
+        public Guid EarlyYearsTraineeStatusId { get; set; }
+        public Guid AorCandidateTeacherStatusId { get; set; }
+        public Guid TraineeTeacherDmsTeacherStatusId { get; set; }
+        public Guid EarlyYearsTeacherStatusId { get; set; }
+        public Guid QualifiedTeacherTrainedStatusId { get; set; }
+        public Guid QualifiedTeacherAssessmentOnlyRouteId { get; set; }
+        public Guid QualifiedTeacherInternationalTeacherStatusId { get; set; }
+    }
+}
+
+public static class SetProfessionalStatusTrainingAgeSpecialismCommandExtensions
+{
+    public static (dfeta_AgeRange, dfeta_AgeRange)? ConvertToAgeRange(this SetProfessionalStatusTrainingAgeSpecialismCommand input)
+    {
+        if (!input.TryConvertToAgeRange(out var result))
+        {
+            throw new FormatException($"Unknown {typeof(TrainingAgeSpecialismType).Name}: '{input.Type}'.");
+        }
+
+        return result;
+    }
+
+    public static bool TryConvertToAgeRange(this SetProfessionalStatusTrainingAgeSpecialismCommand input, out (dfeta_AgeRange, dfeta_AgeRange)? result)
+    {
+        var mapped = input.Type switch
+        {
+            TrainingAgeSpecialismType.Range => (AgeRange.ConvertFromValue(input.From!.Value), AgeRange.ConvertFromValue(input.To!.Value)),
+            TrainingAgeSpecialismType.FoundationStage => (dfeta_AgeRange.FoundationStage, dfeta_AgeRange.FoundationStage),
+            TrainingAgeSpecialismType.FurtherEducation => (dfeta_AgeRange.FurtherEducation, dfeta_AgeRange.FurtherEducation),
+            TrainingAgeSpecialismType.KeyStage1 => (dfeta_AgeRange.KeyStage1, dfeta_AgeRange.KeyStage1),
+            TrainingAgeSpecialismType.KeyStage2 => (dfeta_AgeRange.KeyStage2, dfeta_AgeRange.KeyStage2),
+            TrainingAgeSpecialismType.KeyStage3 => (dfeta_AgeRange.KeyStage3, dfeta_AgeRange.KeyStage3),
+            TrainingAgeSpecialismType.KeyStage4 => (dfeta_AgeRange.KeyStage4, dfeta_AgeRange.KeyStage4),
+            _ => ((dfeta_AgeRange, dfeta_AgeRange)?)null
+        };
+
+        if (mapped is null)
+        {
+            result = default;
+            return false;
+        }
+
+        result = mapped.Value;
+        return true;
+    }
+}

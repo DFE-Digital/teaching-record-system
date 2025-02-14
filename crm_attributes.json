@@ -163,7 +163,8 @@
     "dfeta_traineeid",
     "statecode",
     "dfeta_ittqualificationaim",
-    "dfeta_slugid"
+    "dfeta_slugid",
+    "dfeta_qtsregistration"
   ],
   "dfeta_ittsubject": [
     "dfeta_name",
@@ -191,6 +192,7 @@
     "statecode"
   ],
   "dfeta_qtsregistration": [
+    "dfeta_qtsregistrationid",
     "createdon",
     "dfeta_earlyyearsstatusid",
     "dfeta_eytsdate",

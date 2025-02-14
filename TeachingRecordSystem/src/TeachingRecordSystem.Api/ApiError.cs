@@ -21,6 +21,23 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int ForbiddenForAppropriateBody => 10040;
         public static int PiiUpdatesForbidden => 10041;
         public static int PiiUpdatesForbiddenPersonHasQts => 10042;
+
+        public static int InvalidRouteType => 10043;
+        public static int InvalidProfessionalStatusStatus => 10044;
+        public static int InvalidTrainingSubjectReference => 10045;
+        public static int InvalidTrainingAgeSpecialism => 10046;
+        public static int InvalidTrainingCountryReference => 10047;
+        public static int InvalidTrainingProviderUkprn => 10048;
+        public static int InvalidDegreeType => 10049;
+        public static int InvalidInductionExemptionReason => 10050;
+        public static int InTrainingProfessionalStatusNotPermittedForRouteType => 10051;
+        public static int UnderAssessmentOnlyPermittedForRouteType => 10052;
+        public static int UpdatesNotAllowedForRouteType => 10053;
+        public static int RouteToProfessionalStatusAlreadyAwarded => 10054;        
+        public static int MultipleQtsRecords => 10056;
+        public static int UnableToChangeRouteType => 10057;
+        public static int UnableToChangeFailProfessionalStatusStatus => 10058;
+        public static int UnableToChangeWithdrawnProfessionalStatusStatus => 10059;
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -72,12 +89,6 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
 
     public static ApiError ForbiddenForAppropriateBody() =>
         new(ErrorCodes.ForbiddenForAppropriateBody, "Forbidden.", "");
-
-    public static ApiError PiiUpdatesForbidden() =>
-        new(ErrorCodes.PiiUpdatesForbidden, "Updates to PII data is not permitted.", "");
-
-    public static ApiError PiiUpdatesForbiddenPersonHasQts() =>
-        new(ErrorCodes.PiiUpdatesForbiddenPersonHasQts, "Updates to PII data is not permitted. Person has QTS.", "");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {

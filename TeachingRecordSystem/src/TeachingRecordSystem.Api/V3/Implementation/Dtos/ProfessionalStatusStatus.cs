@@ -1,4 +1,6 @@
-namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+using TeachingRecordSystem.Core.Dqt.Models;
+
+namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 public enum ProfessionalStatusStatus
 {
@@ -74,6 +76,43 @@ public static class ProfessionalStatusStatusExtensions
             ProfessionalStatusStatus.UnderAssessment => Core.ProfessionalStatusStatus.UnderAssessment,
             ProfessionalStatusStatus.Approved => Core.ProfessionalStatusStatus.Approved,
             _ => (Core.ProfessionalStatusStatus?)null
+        };
+
+        if (mapped.HasValue)
+        {
+            result = mapped.Value;
+            return true;
+        }
+        else
+        {
+            result = default;
+            return false;
+        }
+    }
+
+    public static dfeta_ITTResult ConvertToITTResult(this ProfessionalStatusStatus input)
+    {
+        if (!input.TryConvertToITTResult(out var result))
+        {
+            throw new FormatException($"Unknown {typeof(ProfessionalStatusStatus).Name}: '{input}'.");
+        }
+
+        return result;
+    }
+
+    public static bool TryConvertToITTResult(this ProfessionalStatusStatus input, out dfeta_ITTResult result)
+    {
+        var mapped = input switch
+        {
+            ProfessionalStatusStatus.InTraining => dfeta_ITTResult.InTraining,
+            ProfessionalStatusStatus.Awarded => dfeta_ITTResult.Approved,
+            ProfessionalStatusStatus.Deferred => dfeta_ITTResult.Deferred,
+            ProfessionalStatusStatus.DeferredForSkillsTest => dfeta_ITTResult.DeferredforSkillsTests,
+            ProfessionalStatusStatus.Failed => dfeta_ITTResult.Fail,
+            ProfessionalStatusStatus.Withdrawn => dfeta_ITTResult.Withdrawn,
+            ProfessionalStatusStatus.UnderAssessment => dfeta_ITTResult.UnderAssessment,
+            ProfessionalStatusStatus.Approved => dfeta_ITTResult.Approved,
+            _ => (dfeta_ITTResult?)null
         };
 
         if (mapped.HasValue)

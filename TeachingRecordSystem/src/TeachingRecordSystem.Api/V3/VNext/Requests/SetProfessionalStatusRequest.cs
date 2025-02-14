@@ -16,7 +16,7 @@ public record SetProfessionalStatusRequest
     public string? TrainingCountryReference { get; init; }
     public string? TrainingProviderUkprn { get; init; }
     public Guid? DegreeTypeId { get; init; }
-    public Guid? InductionExemptionReasonId { get; init; }
+    public bool? IsExemptFromInduction { get; init; }
 }
 
 public record SetProfessionalStatusRequestTrainingAgeSpecialism
