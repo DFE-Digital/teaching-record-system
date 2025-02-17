@@ -628,14 +628,15 @@ public partial class TestData
                     .ToArrayAsync();
 
                 var personProfessionalStatuses = await dbContext.ProfessionalStatuses
-                    .Where(p => p.PersonId == contact.Id)
+                    .Where(p => p.PersonId == PersonId)
                     .ToArrayAsync();
 
                 // Get MQs and Alerts that we've added *in the same order they were specified*.
                 var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
                 var alerts = alertIds.Select(id => person.Alerts.Single(a => a.AlertId == id)).AsReadOnly();
-                IReadOnlyCollection<ProfessionalStatus> professionalStatuses = routeIds.Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id)).AsReadOnly(); // CML TODO understand this
-                return (mqs, alerts, person, professionalStatuses);
+                var routesToProfessionalStatus = routeIds.Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id)).AsReadOnly();
+
+                return (mqs, alerts, person, routesToProfessionalStatus);
 
                 async Task<IReadOnlyCollection<Guid>> AddMqsAsync()
                 {
@@ -657,8 +658,8 @@ public partial class TestData
 
                     foreach (var builder in _professionalStatusBuilders)
                     {
-                        var status = await builder.ExecuteAsync(this, testData, dbContext);
-                        routeIds.Add(status.RouteToProfessionalStatusId);
+                        var routeId = await builder.ExecuteAsync(this, testData, dbContext);
+                        routeIds.Add(routeId);
                     }
 
                     return routeIds;

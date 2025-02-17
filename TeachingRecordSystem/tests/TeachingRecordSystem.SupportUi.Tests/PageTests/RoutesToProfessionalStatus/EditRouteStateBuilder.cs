@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Pages.Routes;
 using TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
 
@@ -114,7 +113,7 @@ public class EditRouteStateBuilder
 
     public EditRouteState Build()
     {
-        return new EditRouteState(new Mock<IFileService>().Object)
+        return new EditRouteState()
         {
             QualificationType = _qualificationType ?? default,
             RouteToProfessionalStatusId = _routeToProfessionalStatusId ?? default,

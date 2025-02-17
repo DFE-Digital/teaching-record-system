@@ -26,6 +26,8 @@ public partial class TestData
         //private Guid? _inductionExemptionReasonId;
         private InductionExemptionReason? _inductionExemptionReason;
 
+        private Guid QualificationId { get; } = Guid.NewGuid();
+
         public CreatePersonProfessionalStatusBuilder WithPersonId(Guid personId)
         {
             if (_personId is not null && _personId != personId)
@@ -103,7 +105,7 @@ public partial class TestData
             return this;
         }
 
-        internal Task<ProfessionalStatus> ExecuteAsync(
+        internal async Task<Guid> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
@@ -111,18 +113,12 @@ public partial class TestData
             var personId = createPersonBuilder.PersonId;
 
             // for referense data, create some nonsense values temporarily for the the reference tables that aren't populated
-            _routeToProfessionalStatus = new RouteToProfessionalStatus()
-            {
-                RouteToProfessionalStatusId = Guid.NewGuid(),
-                Name = "RouteToProfessionalStatusName",
-                IsActive = true,
-                QualificationType = _qualificationType,
-            };
             _trainingCountry = new Country()
             {
-                CountryId = Guid.NewGuid().ToString(),
+                CountryId = "fran",
                 Name = "CountryName"
             };
+            dbContext.Countries.Add(_trainingCountry);
             _trainingProvider = new TrainingProvider()
             {
                 TrainingProviderId = Guid.NewGuid(),
@@ -130,11 +126,12 @@ public partial class TestData
                 Name = "TrainingProviderName",
                 IsActive = true,
             };
+            dbContext.TrainingProviders.Add(_trainingProvider);
 
-            return Task.FromResult(new ProfessionalStatus()
+            var professionalStatus = new ProfessionalStatus()
             {
                 PersonId = personId,
-                QualificationId = new Guid(),
+                QualificationId = QualificationId,
                 QualificationType = _qualificationType,
                 RouteToProfessionalStatusId = _routeToProfessionalStatus!.RouteToProfessionalStatusId,
                 Status = _status,
@@ -150,7 +147,13 @@ public partial class TestData
                 InductionExemptionReasonId = _inductionExemptionReason?.InductionExemptionReasonId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
-            });
+            };
+
+            await dbContext.ProfessionalStatuses.AddAsync(professionalStatus);
+
+            // CML TODO - raise event
+
+            return professionalStatus.QualificationId;
         }
     }
 }

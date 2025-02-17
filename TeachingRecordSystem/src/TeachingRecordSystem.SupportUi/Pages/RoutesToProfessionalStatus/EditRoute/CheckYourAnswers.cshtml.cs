@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
 
@@ -13,6 +14,8 @@ public class CheckYourAnswersModel(
     ReferenceDataCache referenceDataCache,
     IFileService fileService) : PageModel
 {
+    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+
     public string? PersonName { get; set; }
 
     public QualificationType QualificationType { get; set; }
@@ -29,17 +32,12 @@ public class CheckYourAnswersModel(
     public Guid? TrainingProviderId { get; set; }
     public Guid? InductionExemptionReasonId { get; set; }
 
-    public ChangeReasonState ChangeReasonDetail { get; set; } = new(fileService);
+    public ChangeReasonState ChangeReasonDetail { get; set; } = new();
 
     [FromRoute]
     public Guid QualificationId { get; set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     public string BackLink { get; set; }
-
-    public void OnGet()
-    {
-    }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
@@ -64,5 +62,12 @@ public class CheckYourAnswersModel(
         InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId;
 
         return next();
+    }
+
+    public async Task<string?> GetEvidenceFileUrlAsync()
+    {
+        return ChangeReasonDetail.EvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, InductionDefaults.FileUrlExpiry) : // CML TODO - move to a general defaults file
+            null;
     }
 }

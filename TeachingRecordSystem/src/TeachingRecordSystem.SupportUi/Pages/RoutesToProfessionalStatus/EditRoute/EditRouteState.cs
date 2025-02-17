@@ -1,8 +1,6 @@
-using TeachingRecordSystem.Core.Services.Files;
-
 namespace TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
 
-public class EditRouteState(IFileService fileService) : IRegisterJourney
+public class EditRouteState : IRegisterJourney
 {
     public static JourneyDescriptor Journey => new (
         JourneyNames.EditRouteToProfessionalStatus,
@@ -26,7 +24,7 @@ public class EditRouteState(IFileService fileService) : IRegisterJourney
     public Guid? TrainingProviderId { get; set; }
     public Guid? InductionExemptionReasonId { get; set; }
 
-    public ChangeReasonState ChangeReasonDetail { get; set; } = new(fileService);
+    public ChangeReasonState ChangeReasonDetail { get; set; } = new();
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {

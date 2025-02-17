@@ -1,5 +1,4 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 
@@ -25,8 +24,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new Mock<IFileService>().Object,
+            qualificationid,
             editRouteState
             );
 
@@ -68,7 +66,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            new Mock<IFileService>().Object,
             editRouteState
             );
 
@@ -96,9 +93,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal("Not provided", valueFileUpload!.TextContent.Trim());
     }
 
-    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid personId, IFileService fileService, EditRouteState? state = null) =>
+    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditRouteToProfessionalStatus,
-            state ?? new EditRouteState(fileService),
-            new KeyValuePair<string, object>("personId", personId));
+            state ?? new EditRouteState(),
+            new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

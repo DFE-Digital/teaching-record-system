@@ -1,4 +1,4 @@
-@page "/route/{qualificationId}/edit/check-answers"
+@page "/route/{qualificationId}/edit/check-answers/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute.CheckYourAnswersModel
 @{
     ViewBag.Title = "Check details and edit route";
@@ -70,7 +70,7 @@
                     <govuk-summary-list-row-value data-testid="evidence">
                         @if (Model.ChangeReasonDetail.EvidenceFileId is not null)
                         {
-                            <a href="@Model.ChangeReasonDetail.GetEvidenceFileUrlAsync()" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.ChangeReasonDetail.EvidenceFileName} (opens in new tab)")</a>
+                            <a href="@Model.GetEvidenceFileUrlAsync()" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.ChangeReasonDetail.EvidenceFileName} (opens in new tab)")</a>
                         }
                         else
                         {

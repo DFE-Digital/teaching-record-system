@@ -21,7 +21,7 @@ public class ChangeReasonStateBuilder
 
     public ChangeReasonState Build()
     {
-        return new ChangeReasonState(new Mock<IFileService>().Object) {
+        return new ChangeReasonState {
             ChangeReason = _changeReason,
             ChangeReasonDetail = _changeReasonDetail,
             UploadEvidence = _uploadEvidence,
