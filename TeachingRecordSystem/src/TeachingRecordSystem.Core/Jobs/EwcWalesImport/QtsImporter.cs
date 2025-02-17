@@ -29,11 +29,24 @@ public class QtsImporter
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
     {
+        // There are two file types for qts files, both with different headings.
+        // We don't validate the headings,but reference them by index.
+        //
+        //file1: REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,CODE,QTS_DATE
+        //file2: QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,
+        //       ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,
+        //       ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,
+        //       ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max
+        //       Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,
+        //       PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,
+        //       PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3
         var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            TrimOptions = TrimOptions.Trim
+            HasHeaderRecord = true, 
+            MissingFieldFound = null
         };
         using var csv = new CsvReader(csvReaderStream, csvConfig);
+        csv.Context.RegisterClassMap<EwcWalesQtsFileImportDataMapper>();
         var records = csv.GetRecords<EwcWalesQtsFileImportData>().ToList();
         var totalRowCount = 0;
         var successCount = 0;
@@ -675,6 +688,43 @@ public class QtsImporter
         else
         {
             return (EwcWalesMatchStatus.NoAssociatedQts, contact.ContactId!);
+        }
+    }
+
+    public class EwcWalesQtsFileImportDataMapper : ClassMap<EwcWalesQtsFileImportData>
+    {
+        public EwcWalesQtsFileImportDataMapper()
+        {
+            Map(m => m.QtsRefNo).Index(0).Optional();
+            Map(m => m.Forename).Index(1).Optional();
+            Map(m => m.Surname).Index(2).Optional();
+            Map(m => m.DateOfBirth).Index(3).Optional();
+            Map(m => m.QtsStatus).Index(4).Optional();
+            Map(m => m.QtsDate).Index(5).Optional();
+            Map(m => m.IttStartMonth).Index(6).Optional();
+            Map(m => m.IttStartYear).Index(7).Optional();
+            Map(m => m.IttEndDate).Index(8).Optional();
+            Map(m => m.ITTCourseLength).Index(9).Optional();
+            Map(m => m.IttEstabLeaCode).Index(10).Optional();
+            Map(m => m.IttEstabCode).Index(11).Optional();
+            Map(m => m.IttQualCode).Index(12).Optional();
+            Map(m => m.IttClassCode).Index(13).Optional();
+            Map(m => m.IttSubjectCode1).Index(14).Optional();
+            Map(m => m.IttSubjectCode2).Index(15).Optional();
+            Map(m => m.IttMinAgeRange).Index(16).Optional();
+            Map(m => m.IttMaxAgeRange).Index(17).Optional();
+            Map(m => m.IttMinSpAgeRange).Index(18).Optional();
+            Map(m => m.IttMaxSpAgeRange).Index(19).Optional();
+            Map(m => m.PqCourseLength).Index(20).Optional();
+            Map(m => m.PqYearOfAward).Index(21).Optional();
+            Map(m => m.Country).Index(22).Optional();
+            Map(m => m.PqEstabCode).Index(23).Optional();
+            Map(m => m.PqQualCode).Index(24).Optional();
+            Map(m => m.Honours).Index(25).Optional();
+            Map(m => m.PqClassCode).Index(26).Optional();
+            Map(m => m.PqSubjectCode1).Index(27).Optional();
+            Map(m => m.PqSubjectCode2).Index(28).Optional();
+            Map(m => m.PqSubjectCode3).Index(29).Optional();
         }
     }
 
