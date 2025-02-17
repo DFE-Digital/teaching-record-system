@@ -19,5 +19,5 @@ public static class JourneyNames
     public const string ReopenAlert = nameof(ReopenAlert);
     public const string DeleteAlert = nameof(DeleteAlert);
     public const string EditInduction = nameof(EditInduction);
-    public const string EditRoute = nameof(EditRoute);
+    public const string EditRouteToProfessionalStatus = nameof(EditRouteToProfessionalStatus);
 }

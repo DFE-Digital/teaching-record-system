@@ -26,6 +26,7 @@ public class ReferenceDataCache(
     private Task<AlertCategory[]>? _alertCategoriesTask;
     private Task<AlertType[]>? _alertTypesTask;
     private Task<InductionExemptionReason[]>? _inductionExemptionReasonsTask;
+    private Task<RouteToProfessionalStatus[]>? _routesToProfessionalStatusTask;
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
     {
@@ -218,6 +219,12 @@ public class ReferenceDataCache(
         return inductionExemptionReasons.Single(er => er.InductionExemptionReasonId == inductionExemptionReasonId, $"Could not find induction exemption reason with ID: '{inductionExemptionReasonId}'.");
     }
 
+    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusesAsync(bool activeOnly = false)
+    {
+        var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
+        return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).ToArray();
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -300,6 +307,15 @@ public class ReferenceDataCache(
                 return await dbContext.InductionExemptionReasons.AsNoTracking().ToArrayAsync();
             });
 
+    private Task<RouteToProfessionalStatus[]> EnsureRoutesToProfessionalStatusAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _routesToProfessionalStatusTask,
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.RoutesToProfessionalStatus.AsNoTracking().ToArrayAsync();
+            });
+
     async Task IStartupTask.ExecuteAsync()
     {
         // CRM
@@ -319,5 +335,6 @@ public class ReferenceDataCache(
         await EnsureAlertCategoriesAsync();
         await EnsureAlertTypesAsync();
         await EnsureInductionExemptionReasonsAsync();
+        await EnsureRoutesToProfessionalStatusAsync();
     }
 }

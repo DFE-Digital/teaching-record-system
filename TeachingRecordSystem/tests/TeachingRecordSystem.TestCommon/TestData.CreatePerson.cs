@@ -43,6 +43,7 @@ public partial class TestData
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
+        private readonly List<CreatePersonProfessionalStatusBuilder> _professionalStatusBuilders = [];
         private DateOnly? _qtlsDate;
         private readonly List<DqtInduction> _dqtInductions = [];
         private readonly List<DqtInductionPeriod> _dqtInductionPeriods = [];
@@ -163,6 +164,17 @@ public partial class TestData
             var mqBuilder = new CreatePersonMandatoryQualificationBuilder();
             configure?.Invoke(mqBuilder);
             _mqBuilders.Add(mqBuilder);
+
+            return this;
+        }
+
+        public CreatePersonBuilder WithProfessionalStatus(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
+        {
+            EnsureTrn();
+
+            var builder = new CreatePersonProfessionalStatusBuilder();
+            configure?.Invoke(builder);
+            _professionalStatusBuilders.Add(builder);
 
             return this;
         }
@@ -576,7 +588,7 @@ public partial class TestData
                 helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
                 _syncEnabledOverride);
 
-            var (mqs, alerts, person) = await testData.WithDbContextAsync(async dbContext =>
+            var (mqs, alerts, person, routes) = await testData.WithDbContextAsync(async dbContext =>
             {
                 if (!syncedPerson)
                 {
@@ -597,6 +609,7 @@ public partial class TestData
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
+                var routeIds = await AddProfessionalStatusRoutesAsync();
 
                 await dbContext.SaveChangesAsync();
 
@@ -614,11 +627,15 @@ public partial class TestData
                     .Where(p => p.PersonId == contact.Id)
                     .ToArrayAsync();
 
+                var personProfessionalStatuses = await dbContext.ProfessionalStatuses
+                    .Where(p => p.PersonId == contact.Id)
+                    .ToArrayAsync();
+
                 // Get MQs and Alerts that we've added *in the same order they were specified*.
                 var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
                 var alerts = alertIds.Select(id => person.Alerts.Single(a => a.AlertId == id)).AsReadOnly();
-
-                return (mqs, alerts, person);
+                IReadOnlyCollection<ProfessionalStatus> professionalStatuses = routeIds.Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id)).AsReadOnly(); // CML TODO understand this
+                return (mqs, alerts, person, professionalStatuses);
 
                 async Task<IReadOnlyCollection<Guid>> AddMqsAsync()
                 {
@@ -632,6 +649,19 @@ public partial class TestData
                     }
 
                     return mqIds;
+                }
+
+                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync()
+                {
+                    var routeIds = new List<Guid>();
+
+                    foreach (var builder in _professionalStatusBuilders)
+                    {
+                        var status = await builder.ExecuteAsync(this, testData, dbContext);
+                        routeIds.Add(status.RouteToProfessionalStatusId);
+                    }
+
+                    return routeIds;
                 }
 
                 async Task<IReadOnlyCollection<Guid>> AddAlertsAsync()
@@ -710,7 +740,8 @@ public partial class TestData
                 DqtInductions = [.. _dqtInductions],
                 DqtInductionPeriods = [.. _dqtInductionPeriods],
                 Alerts = alerts,
-                DqtContactAuditDetail = auditDetail
+                DqtContactAuditDetail = auditDetail,
+                ProfessionalStatuses = routes
             };
         }
 
@@ -1184,6 +1215,7 @@ public partial class TestData
         public required IReadOnlyCollection<DqtInduction> DqtInductions { get; init; }
         public required IReadOnlyCollection<DqtInductionPeriod> DqtInductionPeriods { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
+        public required IReadOnlyCollection<ProfessionalStatus> ProfessionalStatuses { get; init; }
         public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
 
