@@ -249,7 +249,8 @@ public class OutboxMessageHandlerFixture
             .AddSingleton<WebhookMessageFactory>()
             .AddSingleton<EventMapperRegistry>()
             .AddSingleton<PersonInfoCache>()
-            .AddMemoryCache();
+            .AddMemoryCache()
+            .AddSingleton(testDataSyncHelper);
 
         ServiceProvider = services.BuildServiceProvider();
     }
