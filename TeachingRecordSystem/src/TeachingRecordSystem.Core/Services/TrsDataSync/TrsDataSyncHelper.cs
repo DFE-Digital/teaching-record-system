@@ -636,7 +636,11 @@ public class TrsDataSyncHelper(
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
                 InductionStatus = mappedInduction.InductionStatus,
-                InductionExemptionReasonId = mappedInduction.InductionExemptionReasonIds.SingleOrDefault(),
+                InductionExemptionReasonId = mappedInduction.InductionExemptionReasonIds switch
+                {
+                    [var id] => id,
+                    _ => null
+                },
                 DqtInduction = GetEventDqtInduction(dqtInduction)
             };
         }
