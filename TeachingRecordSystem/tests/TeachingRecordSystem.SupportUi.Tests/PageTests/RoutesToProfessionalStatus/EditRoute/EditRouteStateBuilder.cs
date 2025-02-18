@@ -1,7 +1,7 @@
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
 public class EditRouteStateBuilder
 {

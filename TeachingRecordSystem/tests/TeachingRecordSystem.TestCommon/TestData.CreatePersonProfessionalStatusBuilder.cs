@@ -7,6 +7,31 @@ public partial class TestData
 {
     public class CreatePersonProfessionalStatusBuilder
     {
+
+        // for reference data, create some nonsense values temporarily for the reference tables that aren't populated
+        public static Country TrainingCountry = new ()
+        {
+            CountryId = "fran",
+            Name = "CountryName"
+        };
+
+        public static TrainingProvider TrainingProvider = new ()
+        {
+            TrainingProviderId = Guid.NewGuid(),
+            Ukprn = "12345678",
+            Name = "TrainingProviderName",
+            IsActive = true,
+        };
+
+        public static TrainingSubject[] TrainingSubjects = new TrainingSubject[]
+        {
+            new() {
+                TrainingSubjectId = Guid.NewGuid(),
+                Name = "TrainingSubjectName",
+                IsActive = true
+                }
+        };
+
         private Guid? _personId = null;
         private QualificationType _qualificationType;
         //private Guid _routeToProfessionalStatusId;
@@ -18,13 +43,14 @@ public partial class TestData
         private TrainingAgeSpecialismType? _trainingAgeSpecialismType;
         private int? _trainingAgeSpecialismRangeFrom;
         private int? _trainingAgeSpecialismRangeTo;
-        //private string? _trainingCountryId;
-        //private Guid? _trainingProviderId;
+        private string? _trainingCountryId;
+        private Guid? _trainingProviderId;
         private RouteToProfessionalStatus? _routeToProfessionalStatus;
-        private Country? _trainingCountry;
-        private TrainingProvider? _trainingProvider;
-        //private Guid? _inductionExemptionReasonId;
-        private InductionExemptionReason? _inductionExemptionReason;
+        //private Country? _trainingCountry;
+        //private TrainingProvider? _trainingProvider;
+
+        private Guid? _inductionExemptionReasonId;
+        //private InductionExemptionReason? _inductionExemptionReason;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -101,7 +127,19 @@ public partial class TestData
 
         public CreatePersonProfessionalStatusBuilder WithTrainingCountry(Country trainingCountry)
         {
-            _trainingCountry = trainingCountry;
+            _trainingCountryId = trainingCountry.CountryId;
+            return this;
+        }
+
+        public CreatePersonProfessionalStatusBuilder WithTrainingProvider(TrainingProvider trainingProvider)
+        {
+            _trainingProviderId = trainingProvider.TrainingProviderId;
+            return this;
+        }
+
+        public CreatePersonProfessionalStatusBuilder WithTrainingSubject(TrainingSubject[] trainingSubject)
+        {
+            _trainingSubjectIds = trainingSubject.Select(s => s.TrainingSubjectId).ToArray();
             return this;
         }
 
@@ -112,21 +150,13 @@ public partial class TestData
         {
             var personId = createPersonBuilder.PersonId;
 
-            // for referense data, create some nonsense values temporarily for the the reference tables that aren't populated
-            _trainingCountry = new Country()
+            // for reference data, add temporary values for the reference tables that aren't yet populated
+            dbContext.Countries.Add(TrainingCountry);
+            dbContext.TrainingProviders.Add(TrainingProvider);
+            foreach (var s in TrainingSubjects)
             {
-                CountryId = "fran",
-                Name = "CountryName"
-            };
-            dbContext.Countries.Add(_trainingCountry);
-            _trainingProvider = new TrainingProvider()
-            {
-                TrainingProviderId = Guid.NewGuid(),
-                Ukprn = "12345678",
-                Name = "TrainingProviderName",
-                IsActive = true,
-            };
-            dbContext.TrainingProviders.Add(_trainingProvider);
+                dbContext.TrainingSubjects.Add(s);
+            }
 
             var professionalStatus = new ProfessionalStatus()
             {
@@ -142,9 +172,9 @@ public partial class TestData
                 TrainingAgeSpecialismType = _trainingAgeSpecialismType,
                 TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
                 TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
-                TrainingCountryId = _trainingCountry?.CountryId,
-                TrainingProviderId = _trainingProvider?.TrainingProviderId,
-                InductionExemptionReasonId = _inductionExemptionReason?.InductionExemptionReasonId,
+                TrainingCountryId = _trainingCountryId,
+                TrainingProviderId = _trainingProviderId,
+                InductionExemptionReasonId = _inductionExemptionReasonId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
             };

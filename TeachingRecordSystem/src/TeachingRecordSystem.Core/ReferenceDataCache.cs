@@ -216,16 +216,22 @@ public class ReferenceDataCache(
         return inductionExemptionReasons.Where(e => !activeOnly || e.IsActive).ToArray();
     }
 
-    public async Task<InductionExemptionReason> GetInductionExemptionReasonByIdAsync(Guid inductionExemptionReasonId)
+    public async Task<InductionExemptionReason> GetInductionExemptionReasonByIdAsync(Guid id)
     {
         var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
-        return inductionExemptionReasons.Single(er => er.InductionExemptionReasonId == inductionExemptionReasonId, $"Could not find induction exemption reason with ID: '{inductionExemptionReasonId}'.");
+        return inductionExemptionReasons.Single(er => er.InductionExemptionReasonId == id, $"Could not find induction exemption reason with ID: '{id}'.");
     }
 
     public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusesAsync(bool activeOnly = false)
     {
         var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
         return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).ToArray();
+    }
+
+    public async Task<RouteToProfessionalStatus> GetRouteToProfessionalStatusByIdAsync(Guid id)
+    {
+        var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
+        return routesToProfessionalStatuses.Single(r => r.RouteToProfessionalStatusId == id, $"Could not find route to professional status with ID: '{id}'.");
     }
 
     public async Task<TrainingSubject[]> GetTrainingSubjectsAsync(bool activeOnly = false)

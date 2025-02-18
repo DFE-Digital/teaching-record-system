@@ -59,4 +59,13 @@ public static partial class AssertEx
         var value = label.NextElementSibling;
         Assert.Equal(expected, value!.TextContent.Trim());
     }
+
+    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, IEnumerable<string> expected)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        Assert.NotNull(label);
+        var value = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TextContent.Trim());
+        Assert.NotEmpty(value);
+        Assert.Equal(expected, value);
+    }
 }

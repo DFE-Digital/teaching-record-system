@@ -44,6 +44,7 @@ public class CheckYourAnswersModel(
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
     public string[] TrainingSubjects { get; set; } = [];
+    public string? RouteToProfessionalStatusName { get; set; }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
@@ -74,6 +75,7 @@ public class CheckYourAnswersModel(
         TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
         InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId;
 
+        RouteToProfessionalStatusName = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteToProfessionalStatusId))?.Name!;
         ExemptionReason = InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReasonId!.Value))?.Name : null;
         TrainingProvider = TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(TrainingProviderId!.Value))?.Name : null;
         TrainingCountry = TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(TrainingCountryId))?.Name : null;

@@ -30,7 +30,7 @@ public class EditRouteState : IRegisterJourney
     public ChangeReasonDetailsState? ChangeReasonDetail { get; set; } = new();
 
     [JsonIgnore]
-    public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields depends on the route and status
+    public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields also depends on the route and status
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {
