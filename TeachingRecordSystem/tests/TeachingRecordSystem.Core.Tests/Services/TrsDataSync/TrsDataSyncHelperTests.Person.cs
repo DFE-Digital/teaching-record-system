@@ -1,5 +1,6 @@
 using FakeXrmEasy.Extensions;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -83,50 +84,6 @@ public partial class TrsDataSyncHelperTests
         await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
     }
 
-    [Fact]
-    public async Task SyncPersonAsync_WithContactOnlyInductionStatus_UpdatesPersonRecordAndCreatesExpectedEvent()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(
-            p => p.WithTrn()
-                .WithSyncOverride(false));
-
-        var auditDetails = new AuditDetailCollection();
-        auditDetails.Add(person.DqtContactAuditDetail);
-
-        var qtlsDate = new DateOnly(2024, 11, 2);
-        var inductionStatus = dfeta_InductionStatus.Exempt;
-        var updatedContactQtlsDate = await CreateUpdatedContactEntityVersion(
-            person.Contact,
-            auditDetails,
-            updatedQtlsDate: qtlsDate);
-
-        Clock.Advance(TimeSpan.FromSeconds(5));
-        var updatedContact = await CreateUpdatedContactEntityVersion(
-            updatedContactQtlsDate,
-            auditDetails,
-            updatedInductionStatus: inductionStatus);
-
-        var auditDetailsDict = new Dictionary<Guid, AuditDetailCollection>()
-        {
-            { person.ContactId, auditDetails }
-        };
-
-        // Act
-        await Helper.SyncPersonsAsync([updatedContact], auditDetailsDict, ignoreInvalid: true, dryRun: false, CancellationToken.None);
-
-        // Assert
-        var events = await GetEventsForPerson(person.PersonId);
-        Assert.Single(events);
-        Assert.IsType<DqtContactInductionStatusChangedEvent>(events[0]);
-
-        await DbFixture.WithDbContextAsync(async dbContext =>
-        {
-            var updatedPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == person.ContactId);
-            Assert.Equal(inductionStatus.ToInductionStatus(), updatedPerson!.InductionStatus);
-        });
-    }
-
     private async Task AssertDatabasePersonMatchesEntity(
         Contact entity,
         DateTime? expectedFirstSync = null,
@@ -202,4 +159,76 @@ public partial class TrsDataSyncHelperTests
 
             return results.Select(r => EventBase.Deserialize(r.Payload, r.EventName)).ToArray();
         });
+
+    private async Task<Contact> CreateUpdatedContactEntityVersion(
+        Contact existingContact,
+        AuditDetailCollection auditDetailCollection,
+        dfeta_InductionStatus? updatedInductionStatus = null,
+        DateOnly? updatedQtlsDate = null)
+    {
+        var currentDqtUser = await TestData.GetCurrentCrmUserAsync();
+
+        var updatedContact = existingContact.Clone<Contact>();
+        updatedContact.ModifiedOn = Clock.UtcNow;
+
+        if (updatedQtlsDate is not null)
+        {
+            updatedContact.dfeta_qtlsdate = updatedQtlsDate.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
+
+            var oldValueQtlsDate = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            oldValueQtlsDate.Attributes[Contact.Fields.ModifiedOn] = existingContact.Attributes[Contact.Fields.ModifiedOn];
+            oldValueQtlsDate.Attributes[Contact.Fields.dfeta_qtlsdate] = existingContact.GetAttributeValue<DateTime?>(Contact.Fields.dfeta_qtlsdate);
+
+            var newValueQtlsDate = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            newValueQtlsDate.Attributes[Contact.Fields.ModifiedOn] = updatedContact.Attributes[Contact.Fields.ModifiedOn];
+            newValueQtlsDate.Attributes[Contact.Fields.dfeta_qtlsdate] = updatedContact.Attributes[Contact.Fields.dfeta_qtlsdate];
+
+            var auditId = Guid.NewGuid();
+            auditDetailCollection.Add(new AttributeAuditDetail()
+            {
+                AuditRecord = new Audit()
+                {
+                    Action = Audit_Action.Update,
+                    AuditId = auditId,
+                    CreatedOn = Clock.UtcNow,
+                    Id = auditId,
+                    Operation = Audit_Operation.Update,
+                    UserId = currentDqtUser
+                },
+                OldValue = oldValueQtlsDate,
+                NewValue = newValueQtlsDate
+            });
+        }
+
+        if (updatedInductionStatus is not null)
+        {
+            updatedContact.dfeta_InductionStatus = updatedInductionStatus;
+
+            var oldValueStatus = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            oldValueStatus.Attributes[Contact.Fields.ModifiedOn] = existingContact.Attributes[Contact.Fields.ModifiedOn];
+            oldValueStatus.Attributes[Contact.Fields.dfeta_InductionStatus] = existingContact.GetAttributeValue<dfeta_InductionStatus?>(Contact.Fields.dfeta_InductionStatus);
+
+            var newValueStatus = new Entity(Contact.EntityLogicalName, existingContact.Id);
+            newValueStatus.Attributes[Contact.Fields.ModifiedOn] = updatedContact.Attributes[Contact.Fields.ModifiedOn];
+            newValueStatus.Attributes[Contact.Fields.dfeta_InductionStatus] = updatedContact.Attributes[Contact.Fields.dfeta_InductionStatus];
+
+            var auditId = Guid.NewGuid();
+            auditDetailCollection.Add(new AttributeAuditDetail()
+            {
+                AuditRecord = new Audit()
+                {
+                    Action = Audit_Action.Update,
+                    AuditId = auditId,
+                    CreatedOn = Clock.UtcNow,
+                    Id = auditId,
+                    Operation = Audit_Operation.Update,
+                    UserId = currentDqtUser
+                },
+                OldValue = oldValueStatus,
+                NewValue = newValueStatus
+            });
+        }
+
+        return updatedContact;
+    }
 }

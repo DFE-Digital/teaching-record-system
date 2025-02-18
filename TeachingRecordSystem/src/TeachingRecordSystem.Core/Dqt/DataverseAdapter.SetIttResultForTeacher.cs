@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Xrm.Sdk.Messages;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -13,9 +15,10 @@ public partial class DataverseAdapter
         string ittProviderUkprn,
         dfeta_ITTResult result,
         DateOnly? assessmentDate,
+        Guid trsUserId,
         string slugId = null)
     {
-        var (r, _) = await SetIttResultForTeacherImplAsync(teacherId, ittProviderUkprn, result, assessmentDate, slugId);
+        var (r, _) = await SetIttResultForTeacherImplAsync(teacherId, ittProviderUkprn, result, assessmentDate, trsUserId, slugId);
         return r;
     }
 
@@ -25,6 +28,7 @@ public partial class DataverseAdapter
         string ittProviderUkprn,
         dfeta_ITTResult result,
         DateOnly? assessmentDate,
+        Guid trsUserId,
         string slugId = null)
     {
         switch (result)
@@ -172,14 +176,16 @@ public partial class DataverseAdapter
 
                 if (!qtsRegistration.dfeta_QTSDate.HasValue)
                 {
-                    txnRequest.Requests.Add(new CreateRequest()
-                    {
-                        Target = new dfeta_induction()
+                    var messageSerializer = new MessageSerializer();
+
+                    var outboxMessage = messageSerializer.CreateCrmOutboxMessage(
+                        new SetInductionRequiredToCompleteMessage()
                         {
-                            dfeta_PersonId = teacherId.ToEntityReference(Contact.EntityLogicalName),
-                            dfeta_InductionStatus = dfeta_InductionStatus.RequiredtoComplete
-                        }
-                    });
+                            PersonId = teacherId,
+                            TrsUserId = trsUserId
+                        });
+
+                    txnRequest.Requests.Add(new CreateRequest() { Target = outboxMessage });
                 }
 
                 qtsUpdate.dfeta_TeacherStatusId = teacherStatus.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);

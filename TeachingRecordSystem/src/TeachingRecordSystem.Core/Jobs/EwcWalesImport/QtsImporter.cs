@@ -7,6 +7,7 @@ using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
@@ -54,7 +55,6 @@ public class QtsImporter
             var qualificationId = default(Guid?);
             Guid? ittId = null;
             var qtsRegistrationId = default(Guid?);
-            Guid? inductionId = null;
             var itrFailureMessage = new StringBuilder();
             using var rowTransaction = _crmQueryDispatcher.CreateTransactionRequestBuilder();
 
@@ -126,16 +126,11 @@ public class QtsImporter
 
                     if (row.QtsStatus == "67")
                     {
-                        inductionId = Guid.NewGuid();
-                        var induction = new CreateInductionTransactionalQuery()
+                        rowTransaction.AppendQuery(new CreateDqtOutboxMessageTransactionalQuery(new SetInductionRequiredToCompleteMessage()
                         {
-                            Id = inductionId.Value,
-                            ContactId = lookupData.PersonId.Value,
-                            StartDate = null,
-                            CompletionDate = null,
-                            InductionStatus = dfeta_InductionStatus.RequiredtoComplete
-                        };
-                        rowTransaction.AppendQuery(induction);
+                            PersonId = lookupData.PersonId.Value,
+                            TrsUserId = DataStore.Postgres.Models.SystemUser.SystemUserId
+                        }));
                     }
 
                     if (lookupData.HasActiveAlerts)
@@ -160,7 +155,7 @@ public class QtsImporter
                     ContactId = lookupData.PersonId,
                     InitialTeacherTrainingId = ittId,
                     QualificationId = qualificationId,
-                    InductionId = inductionId,
+                    InductionId = null,
                     InductionPeriodId = null,
                     DuplicateStatus = null,
                     FailureMessage = itrFailureMessage.ToString(),

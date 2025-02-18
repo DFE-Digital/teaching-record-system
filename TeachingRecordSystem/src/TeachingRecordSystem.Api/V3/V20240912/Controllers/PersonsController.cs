@@ -17,7 +17,6 @@ public class PersonsController(IMapper mapper) : ControllerBase
         Summary = "Set QTLS status for a teacher",
         Description = "Sets the QTLS status for the teacher with the given TRN.")]
     [ProducesResponseType(typeof(QtlsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.AssignQtls)]
     public async Task<IActionResult> PutQtlsAsync(
@@ -28,7 +27,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
         var command = new SetQtlsCommand(trn, request.QtsDate);
         var result = await handler.HandleAsync(command);
 
-        return result.ToActionResult(r => r is { Succeeded: true } ? Ok(mapper.Map<QtlsResponse>(r.QtlsInfo)) : Accepted())
+        return result.ToActionResult(r => Ok(mapper.Map<QtlsResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 

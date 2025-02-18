@@ -31,13 +31,6 @@ public interface IDataverseAdapter
         string[] columnNames,
         string[] contactColumnNames = null);
 
-    Task<(dfeta_induction, dfeta_inductionperiod[])> GetInductionByTeacherAsync(
-        Guid teacherId,
-        string[] columnNames,
-        string[] inductionPeriodColumnNames = null,
-        string[] appropriateBodyColumnNames = null,
-        string[] contactColumnNames = null);
-
     Task<Contact> GetTeacherAsync(Guid teacherId, string[] columnNames, bool resolveMerges = true);
 
     Task<Contact> GetTeacherByTrnAsync(string trn, string[] columnNames, bool activeOnly = true);
@@ -71,6 +64,7 @@ public interface IDataverseAdapter
         string ittProviderUkprn,
         dfeta_ITTResult result,
         DateOnly? assessmentDate,
+        Guid trsUserId,
         string slugId = null);
 
     Task SetTsPersonIdAsync(Guid teacherId, string tsPersonId);
@@ -94,8 +88,6 @@ public interface IDataverseAdapter
     IAsyncEnumerable<InternationalQtsAwardee[]> GetInternationalQtsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
 
     IAsyncEnumerable<EytsAwardee[]> GetEytsAwardeesForDateRangeAsync(DateTime startDate, DateTime endDate);
-
-    IAsyncEnumerable<InductionCompletee[]> GetInductionCompleteesForDateRangeAsync(DateTime startDate, DateTime endDate);
 
     Task<Contact[]> GetTeachersBySlugIdAndTrnAsync(string slugId, string trn, string[] columnNames, bool activeOnly = true);
 

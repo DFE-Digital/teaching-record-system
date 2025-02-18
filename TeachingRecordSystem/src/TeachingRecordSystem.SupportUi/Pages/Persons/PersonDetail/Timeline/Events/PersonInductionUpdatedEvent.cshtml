@@ -88,14 +88,6 @@
                     <govuk-summary-list-row-value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-
-            @if (induction.CpdCpdModifiedOn.HasValue)
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>CPD modified on</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="cpd-modified-on" use-empty-fallback>@induction.CpdCpdModifiedOn.ValueOrDefault()!.ToString(TimelineItem.TimestampFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
         </govuk-summary-list>
 
         <govuk-details class="govuk-!-margin-bottom-2">

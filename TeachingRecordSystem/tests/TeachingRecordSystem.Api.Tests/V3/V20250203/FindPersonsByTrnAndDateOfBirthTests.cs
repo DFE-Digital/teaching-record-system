@@ -53,8 +53,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var dqtInductionStatus = dfeta_InductionStatus.Pass;
-        var inductionStatus = dqtInductionStatus.ToInductionStatus();
+        var inductionStatus = InductionStatus.Passed;
         var inductionStartDate = new DateOnly(1996, 2, 3);
         var inductionCompletedDate = new DateOnly(1996, 6, 7);
 
@@ -62,11 +61,10 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithDqtInduction(
-                dqtInductionStatus,
-                inductionExemptionReason: null,
-                inductionStartDate,
-                inductionCompletedDate));
+            .WithInductionStatus(i => i
+                .WithStatus(inductionStatus)
+                .WithStartDate(inductionStartDate)
+                .WithCompletedDate(inductionCompletedDate)));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
         {
@@ -98,22 +96,13 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var dqtInductionStatus = dfeta_InductionStatus.Pass;
-        var inductionStatus = dqtInductionStatus.ToInductionStatus();
-        var inductionStartDate = new DateOnly(1996, 2, 3);
-        var inductionCompletedDate = new DateOnly(1996, 6, 7);
         var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQtlsDate(qtlsDate)
             .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithDqtInduction(
-                dqtInductionStatus,
-                inductionExemptionReason: null,
-                inductionStartDate,
-                inductionCompletedDate));
+            .WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
         {
@@ -145,20 +134,11 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var dqtInductionStatus = dfeta_InductionStatus.Pass;
-        var inductionStatus = dqtInductionStatus.ToInductionStatus();
-        var inductionStartDate = new DateOnly(1996, 2, 3);
-        var inductionCompletedDate = new DateOnly(1996, 6, 7);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithDqtInduction(
-                dqtInductionStatus,
-                inductionExemptionReason: null,
-                inductionStartDate,
-                inductionCompletedDate));
+            .WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
         {
@@ -190,22 +170,13 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
-        var dqtInductionStatus = dfeta_InductionStatus.Pass;
-        var inductionStatus = dqtInductionStatus.ToInductionStatus();
-        var inductionStartDate = new DateOnly(1996, 2, 3);
-        var inductionCompletedDate = new DateOnly(1996, 6, 7);
         var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQtlsDate(qtlsDate)
             .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithDqtInduction(
-                dqtInductionStatus,
-                inductionExemptionReason: null,
-                inductionStartDate,
-                inductionCompletedDate));
+            .WithDateOfBirth(dateOfBirth));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
         entity[Contact.Fields.dfeta_qtlsdate] = null;

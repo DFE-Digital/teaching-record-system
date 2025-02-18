@@ -453,15 +453,6 @@ public abstract class GetPersonTestBase(HostFixture hostFixture) : TestBase(host
             .ReturnsAsync(itt != null ? new[] { itt } : Array.Empty<dfeta_initialteachertraining>());
 
         DataverseAdapterMock
-            .Setup(mock => mock.GetInductionByTeacherAsync(
-                contact.Id,
-                It.IsAny<string[]>(),
-                It.IsAny<string[]>(),
-                It.IsAny<string[]>(),
-                It.IsAny<string[]>()))
-            .ReturnsAsync((induction, inductionPeriods));
-
-        DataverseAdapterMock
              .Setup(mock => mock.GetQualificationsForTeacherAsync(
                  contact.Id,
                  It.IsAny<string[]>(),

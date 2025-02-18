@@ -274,7 +274,7 @@ public class SetIttOutcomeTests : TestBase
             .ReturnsAsync(new[] { contact });
 
         DataverseAdapterMock
-            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
+            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<Guid>(), It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Failed(SetIttResultForTeacherFailedReason.QtsDateMismatch));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -314,7 +314,7 @@ public class SetIttOutcomeTests : TestBase
             .ReturnsAsync(new[] { contact });
 
         DataverseAdapterMock
-            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null, It.IsAny<string>()))
+            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), null, It.IsAny<Guid>(), It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Success(null));
 
         var requestBody = new SetIttOutcomeRequest()
@@ -361,7 +361,7 @@ public class SetIttOutcomeTests : TestBase
             .ReturnsAsync(new[] { contact });
 
         DataverseAdapterMock
-            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<string>()))
+            .Setup(mock => mock.SetIttResultForTeacherAsync(contact.Id, ittProviderUkprn, outcome.ConvertToITTResult(), assessmentDate, It.IsAny<Guid>(), It.IsAny<string>()))
             .ReturnsAsync(SetIttResultForTeacherResult.Failed(failedReason));
 
         var requestBody = new SetIttOutcomeRequest()

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Tests.ApiSchema;
+using TeachingRecordSystem.Core.Tests.Jobs;
 using TeachingRecordSystem.Core.Tests.Services.Webhooks;
 
 namespace TeachingRecordSystem.Core.Tests;
@@ -34,5 +35,6 @@ public class Startup
                 services.AddSingleton<WebhookReceiver>();
                 services.AddSingleton<PersonInfoCache>();
                 services.AddSingleton<EventMapperFixture>();
+                services.AddSingleton<NightlyEmailJobFixture>();
             });
 }

@@ -273,7 +273,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Pass,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -473,7 +474,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Fail,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, _) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -528,7 +530,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Fail,
-            null);
+            null,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -583,7 +586,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -635,7 +639,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -688,7 +693,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -743,7 +749,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -799,7 +806,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -851,7 +859,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -1048,7 +1057,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -1102,7 +1112,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -1157,7 +1168,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -1213,7 +1225,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -1265,7 +1278,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
@@ -1332,7 +1346,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
@@ -1400,7 +1415,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         var qts = await _dataverseAdapter.GetQtsRegistrationsByTeacherAsync(teacherId, new[] { dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
                     dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
@@ -1467,7 +1483,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()
@@ -1521,7 +1538,8 @@ public class UpdateTeacherTests : IAsyncLifetime
             teacherId,
             ittProviderUkprn,
             dfeta_ITTResult.Withdrawn,
-            assessmentDate);
+            assessmentDate,
+            Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
 
         // Act
         var (result, transactionRequest) = await _dataverseAdapter.UpdateTeacherImplAsync(new UpdateTeacherCommand()

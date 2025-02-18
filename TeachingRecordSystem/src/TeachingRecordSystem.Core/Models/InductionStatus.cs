@@ -64,6 +64,35 @@ public static class InductionStatusRegistry
         _ => throw new ArgumentException($"Failed mapping '{status}' to {nameof(InductionStatus)}.", nameof(status))
     };
 
+    public static string? ToDqtInductionStatus(this InductionStatus status, out string? statusDescription)
+    {
+        switch (status)
+        {
+            case InductionStatus.RequiredToComplete:
+                statusDescription = "Required to Complete";
+                return "RequiredtoComplete";
+            case InductionStatus.Exempt:
+                statusDescription = "Exempt";
+                return "Exempt";
+            case InductionStatus.InProgress:
+                statusDescription = "In Progress";
+                return "InProgress";
+            case InductionStatus.Passed:
+                statusDescription = "Pass";
+                return "Pass";
+            case InductionStatus.Failed:
+                statusDescription = "Fail";
+                return "Fail";
+            case InductionStatus.FailedInWales:
+                statusDescription = "Failed in Wales";
+                return "FailedinWales";
+            case InductionStatus.None:
+            default:
+                statusDescription = null;
+                return null;
+        }
+    }
+
     private static int GetPriority(this InductionStatus status) => _info[status].Priority;
 
     private static InductionStatusInfo GetInfo(InductionStatus status)

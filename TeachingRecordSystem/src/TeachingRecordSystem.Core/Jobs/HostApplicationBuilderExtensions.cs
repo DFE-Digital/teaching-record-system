@@ -170,22 +170,9 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
 
-                recurringJobManager.AddOrUpdate<SyncAllInductionsFromCrmJob>(
-                    nameof(SyncAllInductionsFromCrmJob),
-                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<SyncAllInductionsFromCrmJob>(
-                    $"{nameof(SyncAllInductionsFromCrmJob)} & (dry-run)",
-                    job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.RemoveIfExists($"{nameof(SyncAllInductionsFromCrmJob)} & migrate");
-
-                recurringJobManager.AddOrUpdate<BackfillDqtInductionEventEnumDescriptionsJob>(
-                    nameof(BackfillDqtInductionEventEnumDescriptionsJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never);
+                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob");
+                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & (dry-run)");
+                recurringJobManager.RemoveIfExists("SyncAllInductionsFromCrmJob & migrate");
 
                 recurringJobManager.AddOrUpdate<CpdInductionImporterJob>(
                     nameof(CpdInductionImporterJob),
@@ -231,16 +218,6 @@ public static class HostApplicationBuilderExtensions
                     nameof(EwcWalesImportJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     EwcWalesImportJob.JobSchedule);
-
-                recurringJobManager.AddOrUpdate<MigrateInductionsFromCrmJob>(
-                    nameof(MigrateInductionsFromCrmJob),
-                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<MigrateInductionsFromCrmJob>(
-                    $"{nameof(MigrateInductionsFromCrmJob)} & (dry-run)",
-                    job => job.ExecuteAsync(/*dryRun: */true, CancellationToken.None),
-                    Cron.Never);
 
                 var publishApiOptions = sp.GetRequiredService<IOptions<PublishApiOptions>>().Value;
                 recurringJobManager.AddOrUpdate<RefreshTrainingProvidersJob>(

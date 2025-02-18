@@ -431,8 +431,6 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
     private async Task ConfigureMocks(
         Contact contact,
         dfeta_initialteachertraining? itt = null,
-        dfeta_induction? induction = null,
-        dfeta_inductionperiod[]? inductionPeriods = null,
         dfeta_qualification[]? qualifications = null,
         Incident[]? incidents = null,
         (string FirstName, string? MiddleName, string LastName)[]? updatedNames = null,
@@ -451,15 +449,6 @@ public abstract class GetTeacherTestBase(HostFixture hostFixture) : TestBase(hos
                 It.IsAny<string[]>(),
                 /*activeOnly: */true))
             .ReturnsAsync(itt != null ? new[] { itt } : Array.Empty<dfeta_initialteachertraining>());
-
-        DataverseAdapterMock
-            .Setup(mock => mock.GetInductionByTeacherAsync(
-                contact.Id,
-                It.IsAny<string[]>(),
-                It.IsAny<string[]>(),
-                It.IsAny<string[]>(),
-                It.IsAny<string[]>()))
-            .ReturnsAsync((induction, inductionPeriods));
 
         DataverseAdapterMock
              .Setup(mock => mock.GetQualificationsForTeacherAsync(

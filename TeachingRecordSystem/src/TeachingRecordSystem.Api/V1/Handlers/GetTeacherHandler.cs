@@ -44,6 +44,8 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
             return null;
         }
 
+        var person = await _dbContext.Persons.SingleAsync(p => p.PersonId == teacher.Id);
+
         var qualifications = await _dataverseAdapter.GetQualificationsForTeacherAsync(
             teacher.Id,
             columnNames: new[]
@@ -71,11 +73,11 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         var hasActiveAlert = await _dbContext.Alerts.Where(a => a.PersonId == teacher.Id && a.IsOpen).AnyAsync();
 
-        var response = MapContactToResponse(teacher, hasActiveAlert);
+        var response = MapContactToResponse(teacher, hasActiveAlert, person);
         return response;
     }
 
-    internal static GetTeacherResponse MapContactToResponse(Contact teacher, bool hasActiveAlert)
+    internal static GetTeacherResponse MapContactToResponse(Contact teacher, bool hasActiveAlert, PostgresModels.Person person)
     {
         return new GetTeacherResponse()
         {
@@ -94,25 +96,18 @@ public class GetTeacherHandler : IRequestHandler<GetTeacherRequest, GetTeacherRe
 
         Induction MapInduction()
         {
-            var induction = teacher.Extract<dfeta_induction>();
-            var inductionStatus = teacher.FormattedValues.ContainsKey(Contact.Fields.dfeta_InductionStatus) ? teacher.FormattedValues[Contact.Fields.dfeta_InductionStatus] : null;
+            var dqtStatus = person.InductionStatus.ToDqtInductionStatus(out var statusDescription);
 
-            return induction != null ?
+            return dqtStatus != null ?
                 new Induction()
                 {
-                    StartDate = induction.dfeta_StartDate,
-                    CompletionDate = induction.dfeta_CompletionDate,
-                    InductionStatusName = inductionStatus,
-                    State = induction.StateCode.Value,
-                    StateName = induction.FormattedValues[dfeta_induction.Fields.StateCode]
+                    StartDate = person.InductionStartDate.ToDateTime(),
+                    CompletionDate = person.InductionCompletedDate.ToDateTime(),
+                    InductionStatusName = statusDescription,
+                    State = dfeta_inductionState.Active,
+                    StateName = "Active"
                 } :
-                !string.IsNullOrEmpty(inductionStatus) ?
-                    new Induction()
-                    {
-                        StartDate = null,
-                        CompletionDate = null,
-                        InductionStatusName = inductionStatus
-                    } : null;
+                null;
         }
 
         QualifiedTeacherStatus MapQualifiedTeacherStatus()
