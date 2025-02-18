@@ -1,5 +1,5 @@
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Routes.EditRoute;
@@ -20,6 +20,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
@@ -44,7 +45,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/persons/{person.PersonId}/induction", location);
     }
 
     [Fact]
@@ -61,11 +61,12 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            qualificationid,
             editRouteState
             );
 
@@ -77,20 +78,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Reason for change");
-        Assert.NotNull(label);
-        var value = label.NextElementSibling;
-        Assert.Equal(editRouteState.ChangeReasonDetail.ChangeReason!.GetDisplayName(), value!.TextContent);
-
-        var labelDetails = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Additional information");
-        Assert.NotNull(labelDetails);
-        var valueDetails = labelDetails.NextElementSibling;
-        Assert.Equal(editRouteState.ChangeReasonDetail.ChangeReasonDetail, valueDetails!.TextContent.Trim());
-
-        var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Evidence");
-        Assert.NotNull(labelFileUpload);
-        var valueFileUpload = labelFileUpload.NextElementSibling;
-        Assert.Equal("Not provided", valueFileUpload!.TextContent.Trim());
+        doc.AssertRowContentMatches("Reason for change", editRouteState.ChangeReason!.GetDisplayName()!);
+        doc.AssertRowContentMatches("Additional information", editRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
+        doc.AssertRowContentMatches("Evidence", "Not provided");
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>

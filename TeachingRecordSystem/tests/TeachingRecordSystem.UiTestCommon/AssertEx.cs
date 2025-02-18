@@ -51,4 +51,12 @@ public static partial class AssertEx
         var doc = await HtmlResponseAsync(response, expectedStatusCode);
         HtmlDocumentHasError(doc, fieldName, expectedMessage);
     }
+
+    public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, string expected)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        Assert.NotNull(label);
+        var value = label.NextElementSibling;
+        Assert.Equal(expected, value!.TextContent.Trim());
+    }
 }

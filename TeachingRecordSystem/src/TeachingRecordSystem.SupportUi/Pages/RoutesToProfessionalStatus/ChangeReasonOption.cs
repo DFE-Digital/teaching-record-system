@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Routes;
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
 public enum ChangeReasonOption
 {

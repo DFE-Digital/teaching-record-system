@@ -1,8 +1,8 @@
-namespace TeachingRecordSystem.SupportUi.Pages.Routes;
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
-public class ChangeReasonState
+public class ChangeReasonDetailsState
+
 {
-    public ChangeReasonOption? ChangeReason;
     public string? ChangeReasonDetail { get; set; }
 
     public bool? UploadEvidence { get; set; }
@@ -12,4 +12,5 @@ public class ChangeReasonState
     public string? EvidenceFileName { get; set; }
 
     public string? EvidenceFileSizeDescription { get; set; }
+    public bool IsComplete => UploadEvidence == false || UploadEvidence == true && !string.IsNullOrWhiteSpace(EvidenceFileName);
 }

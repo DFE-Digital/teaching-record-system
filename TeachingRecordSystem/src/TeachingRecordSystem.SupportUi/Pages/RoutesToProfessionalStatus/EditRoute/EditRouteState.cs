@@ -1,8 +1,10 @@
-namespace TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
+using System.Text.Json.Serialization;
+
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 public class EditRouteState : IRegisterJourney
 {
-    public static JourneyDescriptor Journey => new (
+    public static JourneyDescriptor Journey => new(
         JourneyNames.EditRouteToProfessionalStatus,
         typeof(EditRouteState),
         requestDataKeys: ["qualificationId"],
@@ -10,7 +12,7 @@ public class EditRouteState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
-    public QualificationType QualificationType { get; set; }
+    public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
@@ -24,7 +26,11 @@ public class EditRouteState : IRegisterJourney
     public Guid? TrainingProviderId { get; set; }
     public Guid? InductionExemptionReasonId { get; set; }
 
-    public ChangeReasonState ChangeReasonDetail { get; set; } = new();
+    public ChangeReasonOption? ChangeReason { get; set; }
+    public ChangeReasonDetailsState? ChangeReasonDetail { get; set; } = new();
+
+    [JsonIgnore]
+    public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields depends on the route and status
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {

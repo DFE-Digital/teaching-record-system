@@ -48,10 +48,3 @@ public class CheckProfessionalStatusExistsFilterFactory() : Attribute, IFilterFa
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
         ActivatorUtilities.CreateInstance<CheckProfessionalStatusExistsFilter>(serviceProvider);
 }
-
-public class CheckProfessionalStatusExistsAttribute : TypeFilterAttribute
-{
-    public CheckProfessionalStatusExistsAttribute() : base(typeof(CheckProfessionalStatusExistsFilter))
-    {
-    }
-}

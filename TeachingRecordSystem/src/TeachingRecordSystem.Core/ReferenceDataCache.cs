@@ -27,6 +27,9 @@ public class ReferenceDataCache(
     private Task<AlertType[]>? _alertTypesTask;
     private Task<InductionExemptionReason[]>? _inductionExemptionReasonsTask;
     private Task<RouteToProfessionalStatus[]>? _routesToProfessionalStatusTask;
+    private Task<TrainingSubject[]>? _trainingSubjectsTask;
+    private Task<Country[]>? _countriesTask;
+    private Task<TrainingProvider[]>? _trainingProvidersTask;
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
     {
@@ -225,6 +228,34 @@ public class ReferenceDataCache(
         return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).ToArray();
     }
 
+    public async Task<TrainingSubject[]> GetTrainingSubjectsAsync(bool activeOnly = false)
+    {
+        var trainingSubjects = await EnsureTrainingSubjectsAsync();
+        return trainingSubjects.Where(e => !activeOnly || e.IsActive).ToArray();
+    }
+
+    public async Task<Country[]> GetTrainingCountriesAsync()
+    {
+        return await EnsureTrainingCountriesAsync();
+    }
+    public async Task<Country> GetTrainingCountryByIdAsync(string countryId)
+    {
+        var countries = await EnsureTrainingCountriesAsync();
+        return countries.Single(c => c.CountryId == countryId, $"Could not find country with ID: '{countryId}'.");
+    }
+
+    public async Task<TrainingProvider[]> GetTrainingProvidersAsync(bool activeOnly = false)
+    {
+        var trainingProviders = await EnsureTrainingProvidersAsync();
+        return trainingProviders.Where(e => !activeOnly || e.IsActive).ToArray();
+    }
+
+    public async Task<TrainingProvider> GetTrainingProviderByIdAsync(Guid trainingProviderId)
+    {
+        var trainingProviders = await EnsureTrainingProvidersAsync();
+        return trainingProviders.Single(tp => tp.TrainingProviderId == trainingProviderId, $"Could not find training provider with ID: '{trainingProviderId}'.");
+    }
+
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getSanctionCodesTask,
@@ -315,6 +346,33 @@ public class ReferenceDataCache(
                 using var dbContext = dbContextFactory.CreateDbContext();
                 return await dbContext.RoutesToProfessionalStatus.AsNoTracking().ToArrayAsync();
             });
+
+    private Task<Country[]> EnsureTrainingCountriesAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _countriesTask,
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.Countries.AsNoTracking().ToArrayAsync();
+            });
+
+    private Task<TrainingSubject[]> EnsureTrainingSubjectsAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _trainingSubjectsTask,
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.TrainingSubjects.AsNoTracking().ToArrayAsync();
+            });
+
+    private Task<TrainingProvider[]> EnsureTrainingProvidersAsync() =>
+    LazyInitializer.EnsureInitialized(
+        ref _trainingProvidersTask,
+        async () =>
+        {
+            using var dbContext = dbContextFactory.CreateDbContext();
+            return await dbContext.TrainingProviders.AsNoTracking().ToArrayAsync();
+        });
 
     async Task IStartupTask.ExecuteAsync()
     {

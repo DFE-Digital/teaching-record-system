@@ -1,5 +1,5 @@
-using TeachingRecordSystem.SupportUi.Pages.Routes;
-using TeachingRecordSystem.SupportUi.Pages.Routes.EditRoute;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 
@@ -11,14 +11,15 @@ public class EditRouteStateBuilder
     private DateOnly? _awardedDate;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
-    private Guid[]? _trainingSubjectIds;
+    private Guid[] _trainingSubjectIds = [];
     private TrainingAgeSpecialismType? _trainingAgeSpecialismType;
     private int? _trainingAgeSpecialismRangeFrom;
     private int? _trainingAgeSpecialismRangeTo;
     private string? _trainingCountryId;
     private Guid? _trainingProviderId;
     private Guid? _inductionExemptionReasonId;
-    private ChangeReasonState? _changeReasonDetail;
+    private ChangeReasonOption? _changeReasonOption;
+    private ChangeReasonDetailsState? _changeReasonDetail;
 
     public EditRouteStateBuilder WithQualificationType(QualificationType qualificationType)
     {
@@ -97,9 +98,15 @@ public class EditRouteStateBuilder
         return this;
     }
 
+    public EditRouteStateBuilder WithValidChangeReasonOption()
+    {
+        _changeReasonOption = ChangeReasonOption.AnotherReason;
+        return this;
+    }
+
     public EditRouteStateBuilder WithDefaultChangeReasonNoUploadFileDetail()
     {
-        _changeReasonDetail = new ChangeReasonStateBuilder().WithValidChangeReason().Build();
+        _changeReasonDetail = new ChangeReasonStateBuilder().WithValidChangeReasonDetail().Build();
         return this;
     }
 
@@ -115,20 +122,22 @@ public class EditRouteStateBuilder
     {
         return new EditRouteState()
         {
-            QualificationType = _qualificationType ?? default,
-            RouteToProfessionalStatusId = _routeToProfessionalStatusId ?? default,
-            Status = _status ?? default,
-            AwardedDate = _awardedDate ?? default,
-            TrainingStartDate = _trainingStartDate ?? default,
-            TrainingEndDate = _trainingEndDate ?? default,
-            TrainingSubjectIds = _trainingSubjectIds ?? default,
-            TrainingAgeSpecialismType = _trainingAgeSpecialismType ?? default,
-            TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom ?? default,
-            TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo ?? default,
-            TrainingCountryId = _trainingCountryId ?? default,
-            TrainingProviderId = _trainingProviderId ?? default,
-            InductionExemptionReasonId = _inductionExemptionReasonId ?? default,
-            ChangeReasonDetail = _changeReasonDetail ?? null
+            Initialized = true,
+            RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
+            Status = _status!.Value,
+            AwardedDate = _awardedDate,
+            TrainingStartDate = _trainingStartDate,
+            TrainingEndDate = _trainingEndDate,
+            TrainingSubjectIds = _trainingSubjectIds,
+            TrainingAgeSpecialismType = _trainingAgeSpecialismType,
+            TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
+            TrainingCountryId = _trainingCountryId,
+            TrainingProviderId = _trainingProviderId,
+            InductionExemptionReasonId = _inductionExemptionReasonId,
+            ChangeReason = _changeReasonOption,
+            QualificationType = _qualificationType,
+            ChangeReasonDetail = _changeReasonDetail
         };
     }
 }

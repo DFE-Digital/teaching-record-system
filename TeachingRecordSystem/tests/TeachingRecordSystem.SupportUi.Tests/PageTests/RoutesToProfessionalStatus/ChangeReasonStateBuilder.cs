@@ -1,28 +1,26 @@
-using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.SupportUi.Pages.Routes;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 
 public class ChangeReasonStateBuilder
 {
-    private ChangeReasonOption? _changeReason;
+    //private ChangeReasonOption? _changeReason;
     private string? _changeReasonDetail;
     private bool? _uploadEvidence;
     private Guid? _evidenceFileId;
     private string? _evidenceFileName;
     private string? _evidenceFileSizeDescription;
 
-    public ChangeReasonStateBuilder WithValidChangeReason()
+    public ChangeReasonStateBuilder WithValidChangeReasonDetail()
     {
-        _changeReason = ChangeReasonOption.AnotherReason;
+        _changeReasonDetail = "Some free text reason detail";
         _uploadEvidence = false;
         return this;
     }
 
-    public ChangeReasonState Build()
+    public ChangeReasonDetailsState Build()
     {
-        return new ChangeReasonState {
-            ChangeReason = _changeReason,
+        return new ChangeReasonDetailsState {
             ChangeReasonDetail = _changeReasonDetail,
             UploadEvidence = _uploadEvidence,
             EvidenceFileId = _evidenceFileId,
