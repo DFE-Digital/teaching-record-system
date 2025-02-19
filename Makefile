@@ -97,7 +97,7 @@ domains-plan: domains-init ## terraform plan for environment dns/afd resources
 	terraform -chdir=terraform/domains/environment_domains plan -var-file config/${CONFIG}.tfvars.json
 
 domains-apply: domains-init ## terraform apply for environment dns/afd resources, needs CONFIRM_DEPLOY=1 for production
-	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${CONFIG}.tfvars.json
+	terraform -chdir=terraform/domains/environment_domains apply -var-file config/${CONFIG}.tfvars.json ${AUTO_APPROVE}
 
 domains-infra-init: domains ## make domains-infra-init - terraform init for dns/afd core resources, eg Main FrontDoor resource
 	rm -rf terraform/domains/infrastructure/vendor/modules/domains
@@ -109,7 +109,7 @@ domains-infra-plan: domains-infra-init ## terraform plan for dns core resources
 	terraform -chdir=terraform/domains/infrastructure plan -var-file config/trs.tfvars.json
 
 domains-infra-apply: domains-infra-init ## terraform apply for dns core resources
-	terraform -chdir=terraform/domains/infrastructure apply -var-file config/trs.tfvars.json
+	terraform -chdir=terraform/domains/infrastructure apply -var-file config/trs.tfvars.json ${AUTO_APPROVE}
 
 domains-azure-resources: domains set-azure-account # make domains-azure-resources CONFIRM_DEPLOY=1, creates core DNA/AKS
 	$(if $(CONFIRM_DEPLOY), , $(error can only run with CONFIRM_DEPLOY))
