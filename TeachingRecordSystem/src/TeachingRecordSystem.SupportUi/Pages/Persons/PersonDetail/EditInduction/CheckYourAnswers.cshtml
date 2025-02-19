@@ -62,12 +62,15 @@
                     <govuk-summary-list-row class="govuk-list--spaced">
                         <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>
-                            <ul class="govuk-list">
-                                @foreach (var exemptionReason in Model.SelectedExemptionReasonsValues!)
-                                {
-                                    <li>@exemptionReason</li>
-                                }
-                            </ul>
+                            @if (Model.SelectedExemptionReasonsValues is not null)
+                            {
+                                <ul class="govuk-list">
+                                    @foreach (var exemptionReason in Model.SelectedExemptionReasonsValues)
+                                    {
+                                        <li>@exemptionReason</li>
+                                    }
+                                </ul>
+                            }
                         </govuk-summary-list-row-value>
                         @if (Model.ShowExemptionReasonsChangeLink)
                         {
