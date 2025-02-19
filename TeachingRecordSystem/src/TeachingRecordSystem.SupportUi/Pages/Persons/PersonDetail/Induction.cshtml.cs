@@ -17,7 +17,8 @@ public class InductionModel(
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
     private bool _statusIsManagedByCpd;
-    private bool _teacherHoldsQualifiedTeacherStatus;
+
+    public bool HasQts { get; set; }
 
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -48,7 +49,7 @@ public class InductionModel(
 
     public string? StatusWarningMessage =>
         _statusIsManagedByCpd && CanWrite && (Status is not InductionStatus.FailedInWales and not InductionStatus.Exempt) ? InductionIsManagedByCpdWarning :
-        _teacherHoldsQualifiedTeacherStatus ? NoQualifiedTeacherStatusWarning :
+        !HasQts ? NoQualifiedTeacherStatusWarning :
         null;
 
     public bool CanWrite { get; set; }
@@ -69,17 +70,12 @@ public class InductionModel(
         CompletedDate = person.InductionCompletedDate;
         ExemptionReasonIds = person.InductionExemptionReasonIds;
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
-        _teacherHoldsQualifiedTeacherStatus = TeacherHoldsQualifiedTeacherStatusRule(result?.Contact.dfeta_QTSDate);
+        HasQts = result!.Contact.dfeta_QTSDate is not null;
 
         var allExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync();
         ExemptionReasonValues = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId)).Select(r => r.Name);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;
-    }
-
-    private bool TeacherHoldsQualifiedTeacherStatusRule(DateTime? qtsDate)
-    {
-        return qtsDate is null;
     }
 }
