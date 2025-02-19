@@ -1,4 +1,5 @@
 using System.Transactions;
+using Medallion.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Xrm.Sdk;
@@ -14,7 +15,8 @@ namespace TeachingRecordSystem.Core.Services.DqtOutbox;
 public class DqtOutboxMessageProcessorService(
     [FromKeyedServices(DqtOutboxMessageProcessorService.CrmClientName)] ICrmEntityChangesService crmEntityChangesService,
     OutboxMessageHandler outboxMessageHandler,
-    IDbContextFactory<TrsDbContext> dbContextFactory)
+    IDbContextFactory<TrsDbContext> dbContextFactory,
+    IDistributedLockProvider distributedLockProvider)
     : BackgroundService
 {
     private const string CrmClientName = TrsDataSyncService.CrmClientName;
@@ -28,6 +30,7 @@ public class DqtOutboxMessageProcessorService(
         dfeta_TrsOutboxMessage.Fields.dfeta_MessageName,
         dfeta_TrsOutboxMessage.Fields.dfeta_Payload);
 
+    private static readonly TimeSpan _acquireLockInterval = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan _pollInterval = TimeSpan.FromSeconds(60);
 
     private static readonly ResiliencePipeline _resiliencePipeline = new ResiliencePipelineBuilder()
@@ -41,6 +44,30 @@ public class DqtOutboxMessageProcessorService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        using var timer = new PeriodicTimer(_acquireLockInterval);
+
+        do
+        {
+            // Ensure only one node is processing changes outbox messages at once
+            var @lock = await distributedLockProvider.TryAcquireLockAsync(
+                DistributedLockKeys.DqtOutboxMessageProcessorService(),
+                cancellationToken: stoppingToken);
+
+            if (@lock is null)
+            {
+                continue;
+            }
+
+            await using (@lock)
+            {
+                await ProcessMessagesAsync(stoppingToken);
+            }
+        }
+        while (await timer.WaitForNextTickAsync(stoppingToken));
+    }
+
+    private async Task ProcessMessagesAsync(CancellationToken cancellationToken)
+    {
         DateTime? ignoreUntil = null;
 
         await using (var dbContext = await dbContextFactory.CreateDbContextAsync())
@@ -51,13 +78,14 @@ public class DqtOutboxMessageProcessorService(
 
             if (ignoreUntilMetadata is not null)
             {
-                ignoreUntil = DateTime.ParseExact(ignoreUntilMetadata.Value, DateTimeMetadataFormat, provider: null);
+                ignoreUntil =
+                    DateTime.ParseExact(ignoreUntilMetadata.Value, DateTimeMetadataFormat, provider: null);
             }
         }
 
         using var timer = new PeriodicTimer(_pollInterval);
 
-        while (await timer.WaitForNextTickAsync(stoppingToken))
+        while (await timer.WaitForNextTickAsync(cancellationToken))
         {
             await _resiliencePipeline.ExecuteAsync(async ct =>
             {
@@ -97,11 +125,12 @@ public class DqtOutboxMessageProcessorService(
 
                             if (ignoreUntilMetadata is null)
                             {
-                                dbContext.OutboxMessageProcessorMetadata.Add(new OutboxMessageProcessorMetadata()
-                                {
-                                    Key = OutboxMessageProcessorMetadata.Keys.IgnoreUntil,
-                                    Value = createdOn.ToString(DateTimeMetadataFormat)
-                                });
+                                dbContext.OutboxMessageProcessorMetadata.Add(
+                                    new OutboxMessageProcessorMetadata()
+                                    {
+                                        Key = OutboxMessageProcessorMetadata.Keys.IgnoreUntil,
+                                        Value = createdOn.ToString(DateTimeMetadataFormat)
+                                    });
                             }
                             else
                             {
@@ -115,7 +144,7 @@ public class DqtOutboxMessageProcessorService(
                     }
                 }
             },
-            stoppingToken);
+            cancellationToken);
         }
     }
 }
