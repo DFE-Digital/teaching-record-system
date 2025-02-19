@@ -46,6 +46,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
     }
 
     [Fact]
@@ -93,7 +94,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
-        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply
+        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
         doc.AssertRowContentMatches("Training provider", CreatePersonProfessionalStatusBuilder.TrainingProvider.Name);
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
         doc.AssertRowContentMatches("Country of training", CreatePersonProfessionalStatusBuilder.TrainingCountry.Name);
@@ -143,7 +144,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
-        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply
+        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
         doc.AssertRowContentMatches("Training provider", CreatePersonProfessionalStatusBuilder.TrainingProvider.Name);
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
         doc.AssertRowContentMatches("Country of training", "Not provided");

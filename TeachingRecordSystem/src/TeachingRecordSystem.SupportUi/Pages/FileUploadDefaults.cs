@@ -1,6 +1,6 @@
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+namespace TeachingRecordSystem.SupportUi.Pages;
 
-public static class InductionDefaults
+public static class FileUploadDefaults
 {
     public const int MaxFileUploadSizeMb = 50;
     public const int DetailMaxCharacterCount = 4000;

@@ -11,6 +11,7 @@ public partial class TestData
         // for reference data, create some nonsense values temporarily for the reference tables that aren't populated
         public static Country TrainingCountry = new ()
         {
+
             CountryId = "fran",
             Name = "CountryName"
         };
