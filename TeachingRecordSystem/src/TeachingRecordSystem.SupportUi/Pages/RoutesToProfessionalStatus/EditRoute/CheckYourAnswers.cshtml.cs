@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
@@ -10,7 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IFileService fileService) : PageModel
 {
@@ -39,7 +37,6 @@ public class CheckYourAnswersModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public string BackLink { get; set; } // CML TODO when I have a page to go back to
     public string? ExemptionReason { get; set; }
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
