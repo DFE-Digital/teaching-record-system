@@ -1,8 +1,6 @@
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
@@ -41,7 +39,7 @@ public class CheckYourAnswersModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
-    public string BackLink { get; set; }
+    public string BackLink { get; set; } // CML TODO when I have a page to go back to
     public string? ExemptionReason { get; set; }
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
@@ -83,7 +81,7 @@ public class CheckYourAnswersModel(
         JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
         if (!JourneyInstance!.State.IsComplete)
         {
-            //context.Result = Redirect(linkGenerator.RouteEditPage(QualificationId, JourneyInstance.InstanceId));
+            //context.Result = Redirect(linkGenerator.RouteEditPage(QualificationId, JourneyInstance.InstanceId)); // CML TODo go back to the start when i have that page
             return;
         }
 

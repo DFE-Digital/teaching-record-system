@@ -4,7 +4,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class ChangeReasonStateBuilder
 {
-    //private ChangeReasonOption? _changeReason;
     private string? _changeReasonDetail;
     private bool? _uploadEvidence;
     private Guid? _evidenceFileId;
@@ -15,6 +14,18 @@ public class ChangeReasonStateBuilder
     {
         _changeReasonDetail = "Some free text reason detail";
         _uploadEvidence = false;
+        return this;
+    }
+
+    public ChangeReasonStateBuilder WithFileUploadChoice(bool uploadFile)
+    {
+        _uploadEvidence = uploadFile;
+        if (uploadFile)
+        {
+            _evidenceFileId = Guid.NewGuid();
+            _evidenceFileName = "evidence.jpeg";
+            _evidenceFileSizeDescription = "5MB";
+        }
         return this;
     }
 

@@ -15,7 +15,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route)
+                .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -50,6 +50,40 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
+    public async Task Post_RedirectsToExpectedPage()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Deferred)));
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var location = response.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+    }
+
+    [Fact]
     public async Task Get_ShowsAnswers_AsExpected()
     {
         // Arrange
@@ -59,7 +93,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route)
+                .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.InTraining)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -112,7 +146,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route)
+                .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.InTraining)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -160,7 +194,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route)
+                .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()

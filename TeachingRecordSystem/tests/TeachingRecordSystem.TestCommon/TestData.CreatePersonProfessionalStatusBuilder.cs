@@ -7,7 +7,6 @@ public partial class TestData
 {
     public class CreatePersonProfessionalStatusBuilder
     {
-
         // for reference data, create some nonsense values temporarily for the reference tables that aren't populated
         public static Country TrainingCountry = new ()
         {
@@ -35,7 +34,7 @@ public partial class TestData
 
         private Guid? _personId = null;
         private QualificationType _qualificationType;
-        //private Guid _routeToProfessionalStatusId;
+        private Guid? _routeToProfessionalStatusId;
         private ProfessionalStatusStatus _status;
         private DateOnly? _awardedDate;
         private DateOnly? _trainingStartDate;
@@ -46,12 +45,7 @@ public partial class TestData
         private int? _trainingAgeSpecialismRangeTo;
         private string? _trainingCountryId;
         private Guid? _trainingProviderId;
-        private RouteToProfessionalStatus? _routeToProfessionalStatus;
-        //private Country? _trainingCountry;
-        //private TrainingProvider? _trainingProvider;
-
         private Guid? _inductionExemptionReasonId;
-        //private InductionExemptionReason? _inductionExemptionReason;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -59,7 +53,7 @@ public partial class TestData
         {
             if (_personId is not null && _personId != personId)
             {
-                throw new InvalidOperationException("WithPersonId has already been set");
+                throw new InvalidOperationException("PersonId has already been set");
             }
 
             _personId = personId;
@@ -120,9 +114,9 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithRoute(RouteToProfessionalStatus route)
+        public CreatePersonProfessionalStatusBuilder WithRoute(Guid routeId)
         {
-            _routeToProfessionalStatus = route;
+            _routeToProfessionalStatusId = routeId;
             return this;
         }
 
@@ -144,11 +138,22 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonProfessionalStatusBuilder WithInductionExemptionReason(Guid inductionExemptionReasonId)
+        {
+            _inductionExemptionReasonId = inductionExemptionReasonId;
+            return this;
+        }
+
         internal async Task<Guid> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
         {
+            if (_routeToProfessionalStatusId is null)
+            {
+                throw new InvalidOperationException("RouteToProfessionalStatusId has not been set");
+            }
+
             var personId = createPersonBuilder.PersonId;
 
             // for reference data, add temporary values for the reference tables that aren't yet populated
@@ -164,7 +169,7 @@ public partial class TestData
                 PersonId = personId,
                 QualificationId = QualificationId,
                 QualificationType = _qualificationType,
-                RouteToProfessionalStatusId = _routeToProfessionalStatus!.RouteToProfessionalStatusId,
+                RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
                 Status = _status,
                 AwardedDate = _awardedDate,
                 TrainingStartDate = _trainingStartDate,
