@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,10 +26,11 @@ public class CheckYourAnswersModel(
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }
-    public Guid[] TrainingSubjectIds { get; set; } = [];
+    public Guid[]? TrainingSubjectIds { get; set; }
     public TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
     public int? TrainingAgeSpecialismRangeFrom { get; set; }
     public int? TrainingAgeSpecialismRangeTo { get; set; }
+    public string? TrainingAgeSpecialismRange => TrainingAgeSpecialismRangeFrom is not null ? $"From {TrainingAgeSpecialismRangeFrom} to {TrainingAgeSpecialismRangeTo}" : null;
     public string? TrainingCountryId { get; set; }
     public Guid? TrainingProviderId { get; set; }
     public Guid? InductionExemptionReasonId { get; set; }
@@ -43,7 +45,7 @@ public class CheckYourAnswersModel(
     public string? ExemptionReason { get; set; }
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
-    public string[] TrainingSubjects { get; set; } = [];
+    public string[]? TrainingSubjects { get; set; }
     public string? RouteToProfessionalStatusName { get; set; }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -75,16 +77,16 @@ public class CheckYourAnswersModel(
         TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
         InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId;
 
+        // CML TODO move to get?
         RouteToProfessionalStatusName = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteToProfessionalStatusId))?.Name!;
         ExemptionReason = InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReasonId!.Value))?.Name : null;
         TrainingProvider = TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(TrainingProviderId!.Value))?.Name : null;
         TrainingCountry = TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(TrainingCountryId))?.Name : null;
-
-         TrainingSubjects = TrainingSubjectIds
+        TrainingSubjects = TrainingSubjectIds is not null ?
+            TrainingSubjectIds
                 .Join((await referenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
                 .OrderByDescending(name => name)
-                .ToArray();
-
+                .ToArray() : null;
         await next();
     }
 

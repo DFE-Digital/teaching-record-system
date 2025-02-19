@@ -36,7 +36,7 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.ExemptionReason</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.ExemptionReason</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
@@ -44,26 +44,40 @@
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.QualificationType</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.QualificationType</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.TrainingCountry</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
                     @if (Model.TrainingAgeSpecialismRangeFrom is not null && Model.TrainingAgeSpecialismRangeTo is not null)
                     {
-                        <govuk-summary-list-row-value>From @Model.TrainingAgeSpecialismRangeFrom to @Model.TrainingAgeSpecialismRangeTo</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
                     }
                     else
                     {
-                        <govuk-summary-list-row-value>@Model.TrainingAgeSpecialismType</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
                     }
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>@Model.TrainingSubjects</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-value>
+                        @if (Model.TrainingSubjects is not null)
+                        {
+                            <ul class="govuk-list">
+                            @foreach (var subject in Model.TrainingSubjects)
+                            {
+                                <li>@subject</li>
+                            }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             </govuk-summary-list>
             <h2 class="govuk-heading-l">Why are you editing this route?</h2>
