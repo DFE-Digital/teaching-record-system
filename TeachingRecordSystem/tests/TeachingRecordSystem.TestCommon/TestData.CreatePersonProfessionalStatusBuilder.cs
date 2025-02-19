@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.TestCommon;
 
+using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -47,6 +48,26 @@ public partial class TestData
         private Guid? _inductionExemptionReasonId;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
+
+        public async Task PopulateLookupsAsync(TrsDbContext dbContext)
+        {
+            // for reference data, add temporary values for the reference tables that aren't yet populated
+            if (!await dbContext.Countries.AnyAsync())
+            {
+                dbContext.Countries.Add(TrainingCountry);
+            }
+            if (!await dbContext.TrainingProviders.AnyAsync())
+            {
+                dbContext.TrainingProviders.Add(TrainingProvider);
+            }
+            if (!await dbContext.TrainingSubjects.AnyAsync())
+            {
+                foreach (var s in TrainingSubjects)
+                {
+                    dbContext.TrainingSubjects.Add(s);
+                }
+            }
+        }
 
         public CreatePersonProfessionalStatusBuilder WithPersonId(Guid personId)
         {
@@ -155,13 +176,7 @@ public partial class TestData
 
             var personId = createPersonBuilder.PersonId;
 
-            // for reference data, add temporary values for the reference tables that aren't yet populated
-            dbContext.Countries.Add(TrainingCountry);
-            dbContext.TrainingProviders.Add(TrainingProvider);
-            foreach (var s in TrainingSubjects)
-            {
-                dbContext.TrainingSubjects.Add(s);
-            }
+            await PopulateLookupsAsync(dbContext); // temporarily setup some lookups
 
             var professionalStatus = new ProfessionalStatus()
             {
