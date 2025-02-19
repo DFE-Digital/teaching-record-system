@@ -47,7 +47,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
     }
 
     [Fact]
-    public async Task EwcWalesImportJobQts_ImportsQtsFileSuccessfully()
+    public async Task EwcWalesImportJobQts_Format1ImportsQtsFileSuccessfully()
     {
         // Arrange
         var expectedTotalRowCount = 1;
@@ -58,6 +58,48 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn = person.Trn;
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString("dd/MM/yyyy")},49,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n";
+        var csvBytes = Encoding.UTF8.GetBytes(csvContent);
+        var stream = new MemoryStream(csvBytes);
+        var reader = new StreamReader(stream);
+
+        // Act
+        var integrationTransactionId = await Job.ImportAsync(fileName, reader);
+
+        // Assert
+        using var ctx = new DqtCrmServiceContext(OrganizationService);
+        var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
+        var itrRecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
+        var qualification = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person.ContactId);
+        var itt = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person.ContactId);
+        var qts = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.ContactId);
+        Assert.NotNull(integrationTransaction);
+        Assert.Collection(itrRecords, item1 =>
+        {
+            Assert.Empty(item1.dfeta_FailureMessage);
+        });
+        Assert.NotNull(qualification);
+        Assert.NotNull(itt);
+        Assert.NotNull(qts);
+        Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);
+        Assert.Equal(expectedSuccessCount, integrationTransaction.dfeta_SuccessCount);
+        Assert.Equal(expectedDuplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
+        Assert.Equal(expectedFailureRowCount, integrationTransaction.dfeta_FailureCount);
+        Assert.Empty(integrationTransaction.dfeta_FailureMessage);
+        Assert.Equal(fileName, integrationTransaction.dfeta_Filename);
+    }
+
+    [Fact]
+    public async Task EwcWalesImportJobQts_Format2ImportsQtsFileSuccessfully()
+    {
+        // Arrange
+        var expectedTotalRowCount = 1;
+        var expectedSuccessCount = 1;
+        var expectedDuplicateRowCount = 0;
+        var expectedFailureRowCount = 0;
+        var fileName = "QTS.csv";
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var trn = person.Trn;
+        var csvContent = $"REFERENCE_NO,FIRST_NAME,LAST_NAME,DATE_OF_BIRTH,CODE,QTS_DATE\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString("dd/MM/yyyy")},49,04/04/2014\r\n";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
