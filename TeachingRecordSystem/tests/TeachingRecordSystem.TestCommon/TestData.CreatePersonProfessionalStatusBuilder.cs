@@ -9,12 +9,6 @@ public partial class TestData
     public class CreatePersonProfessionalStatusBuilder
     {
         // for reference data, create some nonsense values temporarily for the reference tables that aren't populated
-        public static Country TrainingCountry = new()
-        {
-            CountryId = "fran",
-            Name = "CountryName"
-        };
-
         public static TrainingProvider TrainingProvider = new()
         {
             TrainingProviderId = Guid.NewGuid(),
@@ -52,10 +46,6 @@ public partial class TestData
         public async Task PopulateLookupsAsync(TrsDbContext dbContext)
         {
             // for reference data, add temporary values for the reference tables that aren't yet populated
-            if (!await dbContext.Countries.AnyAsync())
-            {
-                dbContext.Countries.Add(TrainingCountry);
-            }
             if (!await dbContext.TrainingProviders.AnyAsync())
             {
                 dbContext.TrainingProviders.Add(TrainingProvider);

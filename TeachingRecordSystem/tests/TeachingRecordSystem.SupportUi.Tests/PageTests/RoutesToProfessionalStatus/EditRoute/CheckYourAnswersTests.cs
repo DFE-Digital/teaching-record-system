@@ -102,7 +102,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithTrainingProviderId(CreatePersonProfessionalStatusBuilder.TrainingProvider.TrainingProviderId)
-            .WithTrainingCountryId(CreatePersonProfessionalStatusBuilder.TrainingCountry.CountryId)
+            .WithTrainingCountryId("UK")
             .WithTrainingSubjectIds(CreatePersonProfessionalStatusBuilder.TrainingSubjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
             .WithValidChangeReasonOption()
@@ -130,7 +130,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
         doc.AssertRowContentMatches("Training provider", CreatePersonProfessionalStatusBuilder.TrainingProvider.Name);
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
-        doc.AssertRowContentMatches("Country of training", CreatePersonProfessionalStatusBuilder.TrainingCountry.Name);
+        doc.AssertRowContentMatches("Country of training", "United Kingdom");
         doc.AssertRowContentMatches("Age range", "Foundation stage");
         doc.AssertRowContentMatches("Subjects", CreatePersonProfessionalStatusBuilder.TrainingSubjects.Select(s => s.Name));
     }
