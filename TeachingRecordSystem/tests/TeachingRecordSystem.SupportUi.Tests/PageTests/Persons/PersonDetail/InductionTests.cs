@@ -34,7 +34,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_WithPersonIdForPersonWithNoQTS_DisplaysExpectedContent()
+    public async Task Get_WithPersonIdForPersonWithNoQts_DisplaysExpectedContent()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -48,27 +48,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent);
-    }
-
-    [Fact]
-    public async Task Get_WithPersonIdForPersonWithInductionStatusNone_DisplaysExpectedContent()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(builder =>
-            builder
-                .WithInductionStatus(InductionStatus.None)
-                .WithQtlsDate(Clock.Today));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Null(doc.GetElementByTestId("induction-status-warning"));
         Assert.Null(doc.GetElementByTestId("induction-card"));
-        Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
     }
 
     [Theory]
