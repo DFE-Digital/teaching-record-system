@@ -31,7 +31,8 @@ public class ChangeReasonStateBuilder
 
     public ChangeReasonDetailsState Build()
     {
-        return new ChangeReasonDetailsState {
+        return new ChangeReasonDetailsState
+        {
             ChangeReasonDetail = _changeReasonDetail,
             UploadEvidence = _uploadEvidence,
             EvidenceFileId = _evidenceFileId,

@@ -8,14 +8,13 @@ public partial class TestData
     public class CreatePersonProfessionalStatusBuilder
     {
         // for reference data, create some nonsense values temporarily for the reference tables that aren't populated
-        public static Country TrainingCountry = new ()
+        public static Country TrainingCountry = new()
         {
-
             CountryId = "fran",
             Name = "CountryName"
         };
 
-        public static TrainingProvider TrainingProvider = new ()
+        public static TrainingProvider TrainingProvider = new()
         {
             TrainingProviderId = Guid.NewGuid(),
             Ukprn = "12345678",
