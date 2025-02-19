@@ -1,9 +1,8 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
-using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 using static TeachingRecordSystem.TestCommon.TestData;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Routes.EditRoute;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
