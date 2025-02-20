@@ -112,7 +112,12 @@ public class DqtOutboxMessageProcessorService(
                             continue;
                         }
 
-                        using var txn = new TransactionScope(TransactionScopeOption.RequiresNew,
+                        using var txn = new TransactionScope(
+                            TransactionScopeOption.RequiresNew,
+                            new TransactionOptions
+                            {
+                                IsolationLevel = IsolationLevel.ReadCommitted
+                            },
                             TransactionScopeAsyncFlowOption.Enabled);
 
                         await outboxMessageHandler.HandleOutboxMessageAsync(message);
