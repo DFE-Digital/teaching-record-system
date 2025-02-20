@@ -1014,9 +1014,7 @@ public class TrsDataSyncHelper(
             "dqt_modified_on",
             "dqt_first_name",
             "dqt_middle_name",
-            "dqt_last_name",
-            "induction_status",
-            "induction_status_without_exemption"
+            "dqt_last_name"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -1081,8 +1079,6 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
-            writer.WriteValueOrNull((int?)person.InductionStatus, NpgsqlDbType.Integer);
-            writer.WriteValueOrNull((int?)person.InductionStatus, NpgsqlDbType.Integer);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -1335,10 +1331,7 @@ public class TrsDataSyncHelper(
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty,
-            InductionStatus = c.dfeta_InductionStatus.ToInductionStatus(),
-            InductionStatusWithoutExemption = c.dfeta_InductionStatus.ToInductionStatus() is InductionStatus i and not InductionStatus.Exempt ?
-                i : c.dfeta_QTSDate is not null ? InductionStatus.RequiredToComplete : InductionStatus.None
+            DqtLastName = c.LastName ?? string.Empty
         })
         .ToList();
 
@@ -1615,8 +1608,6 @@ public class TrsDataSyncHelper(
         public required DateOnly? DateOfBirth { get; init; }
         public required string? EmailAddress { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
-        public required InductionStatus InductionStatus { get; init; }
-        public required InductionStatus InductionStatusWithoutExemption { get; init; }
         public required Guid? DqtContactId { get; init; }
         public required int? DqtState { get; init; }
         public required DateTime? DqtCreatedOn { get; init; }
