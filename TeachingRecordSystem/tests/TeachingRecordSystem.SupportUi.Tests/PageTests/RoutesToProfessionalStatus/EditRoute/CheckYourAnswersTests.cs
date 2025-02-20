@@ -12,7 +12,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
@@ -54,7 +53,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
@@ -89,8 +87,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "Apprenticeship").Single();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.InTraining)));
@@ -103,7 +101,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingEndDate(endDate)
             .WithTrainingProviderId(CreatePersonProfessionalStatusBuilder.TrainingProvider.TrainingProviderId)
             .WithTrainingCountryId("UK")
-            .WithTrainingSubjectIds(CreatePersonProfessionalStatusBuilder.TrainingSubjects.Select(s => s.TrainingSubjectId).ToArray())
+            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
@@ -132,7 +130,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
         doc.AssertRowContentMatches("Country of training", "United Kingdom");
         doc.AssertRowContentMatches("Age range", "Foundation stage");
-        doc.AssertRowContentMatches("Subjects", CreatePersonProfessionalStatusBuilder.TrainingSubjects.Select(s => s.Name));
+        doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
     }
 
     [Fact]
@@ -143,7 +141,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "Apprenticeship").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.InTraining)));
@@ -191,7 +188,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));

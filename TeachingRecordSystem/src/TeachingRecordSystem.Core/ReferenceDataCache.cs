@@ -372,13 +372,13 @@ public class ReferenceDataCache(
             });
 
     private Task<TrainingProvider[]> EnsureTrainingProvidersAsync() =>
-    LazyInitializer.EnsureInitialized(
-        ref _trainingProvidersTask,
-        async () =>
-        {
-            using var dbContext = dbContextFactory.CreateDbContext();
-            return await dbContext.TrainingProviders.AsNoTracking().ToArrayAsync();
-        });
+        LazyInitializer.EnsureInitialized(
+            ref _trainingProvidersTask,
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.TrainingProviders.AsNoTracking().ToArrayAsync();
+            });
 
     async Task IStartupTask.ExecuteAsync()
     {

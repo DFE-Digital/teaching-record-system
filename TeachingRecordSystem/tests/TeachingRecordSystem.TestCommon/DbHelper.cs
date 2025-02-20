@@ -109,7 +109,8 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "alert_categories",
                     "induction_exemption_reasons",
                     "routes_to_professional_status",
-                    "countries"
+                    "countries",
+                    "training_providers"
                 ]
             });
 }

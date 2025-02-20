@@ -1,8 +1,7 @@
-namespace TeachingRecordSystem.TestCommon;
-
-using Microsoft.EntityFrameworkCore;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
+namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
@@ -15,15 +14,6 @@ public partial class TestData
             Ukprn = "12345678",
             Name = "TrainingProviderName",
             IsActive = true,
-        };
-
-        public static TrainingSubject[] TrainingSubjects = new TrainingSubject[]
-        {
-            new() {
-                TrainingSubjectId = Guid.NewGuid(),
-                Name = "TrainingSubjectName",
-                IsActive = true
-                }
         };
 
         private Guid? _personId = null;
@@ -49,13 +39,6 @@ public partial class TestData
             if (!await dbContext.TrainingProviders.AnyAsync())
             {
                 dbContext.TrainingProviders.Add(TrainingProvider);
-            }
-            if (!await dbContext.TrainingSubjects.AnyAsync())
-            {
-                foreach (var s in TrainingSubjects)
-                {
-                    dbContext.TrainingSubjects.Add(s);
-                }
             }
         }
 
