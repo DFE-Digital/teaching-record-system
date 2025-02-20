@@ -45,6 +45,7 @@ public class HostFixture : WebApplicationFactory<Program>
             // Publish events synchronously
             PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
+            services.AddStartupTask<SeedLookupData>();
             services.AddSingleton<CurrentUserProvider>();
             services.AddSingleton<TestUsers>();
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());

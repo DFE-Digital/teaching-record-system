@@ -7,15 +7,6 @@ public partial class TestData
 {
     public class CreatePersonProfessionalStatusBuilder
     {
-        // for reference data, create some nonsense values temporarily for the reference tables that aren't populated
-        public static TrainingProvider TrainingProvider = new()
-        {
-            TrainingProviderId = Guid.NewGuid(),
-            Ukprn = "12345678",
-            Name = "TrainingProviderName",
-            IsActive = true,
-        };
-
         private Guid? _personId = null;
         private QualificationType _qualificationType;
         private Guid? _routeToProfessionalStatusId;
@@ -32,15 +23,6 @@ public partial class TestData
         private Guid? _inductionExemptionReasonId;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
-
-        public async Task PopulateLookupsAsync(TrsDbContext dbContext)
-        {
-            // for reference data, add temporary values for the reference tables that aren't yet populated
-            if (!await dbContext.TrainingProviders.AnyAsync())
-            {
-                dbContext.TrainingProviders.Add(TrainingProvider);
-            }
-        }
 
         public CreatePersonProfessionalStatusBuilder WithPersonId(Guid personId)
         {
@@ -148,8 +130,6 @@ public partial class TestData
             }
 
             var personId = createPersonBuilder.PersonId;
-
-            await PopulateLookupsAsync(dbContext); // temporarily setup some lookups
 
             var professionalStatus = new ProfessionalStatus()
             {

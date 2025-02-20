@@ -1,6 +1,5 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
-using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
@@ -88,6 +87,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "Apprenticeship").Single();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -99,7 +99,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStatus(ProfessionalStatusStatus.InTraining)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithTrainingProviderId(CreatePersonProfessionalStatusBuilder.TrainingProvider.TrainingProviderId)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithTrainingCountryId("UK")
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
@@ -126,7 +126,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
         doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
-        doc.AssertRowContentMatches("Training provider", CreatePersonProfessionalStatusBuilder.TrainingProvider.Name);
+        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
         doc.AssertRowContentMatches("Country of training", "United Kingdom");
         doc.AssertRowContentMatches("Age range", "Foundation stage");
@@ -140,6 +140,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "Apprenticeship").Single();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -151,7 +152,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStatus(ProfessionalStatusStatus.InTraining)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithTrainingProviderId(CreatePersonProfessionalStatusBuilder.TrainingProvider.TrainingProviderId)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -175,7 +176,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
         doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
-        doc.AssertRowContentMatches("Training provider", CreatePersonProfessionalStatusBuilder.TrainingProvider.Name);
+        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
         doc.AssertRowContentMatches("Country of training", "Not provided");
         doc.AssertRowContentMatches("Age range", "Not provided");
