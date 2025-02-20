@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi;
 
-public class TrsLinkGenerator(LinkGenerator linkGenerator)
+public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 {
     protected const string DateOnlyFormat = DateOnlyModelBinder.Format;
 
@@ -204,7 +204,7 @@ public class TrsLinkGenerator(LinkGenerator linkGenerator)
         GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string InductionCheckYourAnswersCancel(Guid personId, JourneyInstanceId? journeyInstanceId) =>
-    GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/Persons/PersonDetail/EditInduction/CheckYourAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string EditChangeRequest(string ticketNumber) => GetRequiredPathByPage("/ChangeRequests/EditChangeRequest/Index", routeValues: new { ticketNumber });
 

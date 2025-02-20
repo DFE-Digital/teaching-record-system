@@ -117,6 +117,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<OutboxMessageProcessorMetadata> OutboxMessageProcessorMetadata => Set<OutboxMessageProcessorMetadata>();
 
+    public DbSet<ProfessionalStatus> ProfessionalStatuses => Set<ProfessionalStatus>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

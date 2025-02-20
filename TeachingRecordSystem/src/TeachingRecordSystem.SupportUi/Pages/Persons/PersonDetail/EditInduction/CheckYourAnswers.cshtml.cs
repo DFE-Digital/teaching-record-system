@@ -137,7 +137,7 @@ public class CheckYourAnswersModel(
         StartDate = JourneyInstance!.State.StartDate;
         CompletedDate = JourneyInstance!.State.CompletedDate;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, InductionDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
 
         await next();

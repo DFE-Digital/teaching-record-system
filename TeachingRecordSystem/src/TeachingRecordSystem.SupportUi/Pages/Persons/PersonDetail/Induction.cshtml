@@ -36,12 +36,15 @@
                 <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
+                        @if (Model.ExemptionReasonValues is not null)
+                        {
                             <ul class="govuk-list">
-                            @foreach (var exemptionReason in Model.ExemptionReasonValues!)
-                            {
-                                <li>@exemptionReason</li>
-                            }
+                                @foreach (var exemptionReason in Model.ExemptionReasonValues)
+                                {
+                                    <li>@exemptionReason</li>
+                                }
                             </ul>
+                        }
                     </govuk-summary-list-row-value>
                     @if (Model.CanWrite)
                     {

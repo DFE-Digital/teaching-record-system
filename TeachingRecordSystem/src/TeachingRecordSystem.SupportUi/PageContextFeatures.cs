@@ -26,6 +26,12 @@ public static class HttpContextExtensions
     public static void SetCurrentMandatoryQualificationFeature(this HttpContext context, CurrentMandatoryQualificationFeature currentMandatoryQualificationFeature) =>
         context.Features.Set(currentMandatoryQualificationFeature);
 
+    public static CurrentProfessionalStatusFeature GetCurrentProfessionalStatusFeature(this HttpContext context) =>
+        context.Features.GetRequiredFeature<CurrentProfessionalStatusFeature>();
+
+    public static void SetCurrentProfessionalStatusFeature(this HttpContext context, CurrentProfessionalStatusFeature currentProfessionalStatusFeature) =>
+        context.Features.Set(currentProfessionalStatusFeature);
+
     public static CurrentSupportTaskFeature GetCurrentSupportTaskFeature(this HttpContext context) =>
         context.Features.GetRequiredFeature<CurrentSupportTaskFeature>();
 
@@ -49,3 +55,5 @@ public record CurrentMandatoryQualificationFeature(MandatoryQualification Mandat
 public record CurrentSupportTaskFeature(SupportTask SupportTask);
 
 public record CurrentAlertFeature(Alert Alert);
+
+public record CurrentProfessionalStatusFeature(ProfessionalStatus ProfessionalStatus);
