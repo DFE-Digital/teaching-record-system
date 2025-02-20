@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -109,7 +110,8 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "alert_categories",
                     "induction_exemption_reasons",
                     "routes_to_professional_status",
-                    "countries"
+                    "countries",
+                    "training_subjects"
                 ]
             });
 }
