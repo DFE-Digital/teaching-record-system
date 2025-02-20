@@ -400,5 +400,8 @@ public class ReferenceDataCache(
         await EnsureAlertTypesAsync();
         await EnsureInductionExemptionReasonsAsync();
         await EnsureRoutesToProfessionalStatusAsync();
+        await EnsureTrainingCountriesAsync();
+        await EnsureTrainingSubjectsAsync();
+        await EnsureTrainingProvidersAsync();
     }
 }
