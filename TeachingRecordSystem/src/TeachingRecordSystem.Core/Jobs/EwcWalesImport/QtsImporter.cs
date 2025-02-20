@@ -18,6 +18,7 @@ public class QtsImporter
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _cache;
+    public DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate => new DateOnly(2023, 02, 01);
 
     public QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache)
     {
@@ -138,7 +139,15 @@ public class QtsImporter
                         failureMessage.AppendLine(validationMessage);
                     }
 
-                    if (row.QtsStatus == "67")
+                    // Set Induction status to 'Required to complete' if
+                    //  Qts status is Qualified teacher: under the EC Directive (67)  with qts date before regs changed, set induction status to
+                    //  Qts status is Qualified teacher: Following at least one term's service on the Graduate Teacher Programme (49)
+                    //  Qts status is Qualified teacher (trained) (71)
+                    if (row.QtsStatus == "67" &&
+                        DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate) &&
+                        qtsDate < _ecDirectiveQualifiedTeacherRegsChangeDate ||
+                        row.QtsStatus == "71" ||
+                        row.QtsStatus == "49")
                     {
                         rowTransaction.AppendQuery(new CreateDqtOutboxMessageTransactionalQuery(new SetInductionRequiredToCompleteMessage()
                         {
@@ -321,6 +330,17 @@ public class QtsImporter
             errors.Add($"Validation Failed: Invalid Date of Birth {row.DateOfBirth}");
         }
 
+        // qts status
+        if (string.IsNullOrEmpty(row.QtsStatus))
+        {
+            errors.Add("Qts status is missing");
+        }
+
+        if (lookups.TeacherStatusMatchStatus == EwcWalesMatchStatus.NoMatch)
+        {
+            errors.Add("Qts Status must be 49,71 or 67");
+        }
+
         //QTS Date
         if (string.IsNullOrEmpty(row.QtsDate))
         {
@@ -330,7 +350,15 @@ public class QtsImporter
         {
             errors.Add($"Validation Failed: Invalid QTS Date {row.QtsDate}");
         }
-
+        else if (!string.IsNullOrEmpty(row.QtsStatus) &&
+            row.QtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase) &&
+            DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate) &&
+            qtsDate >= _ecDirectiveQualifiedTeacherRegsChangeDate)
+        {
+            // if a qts status of 67 (Qualified Teacher: under the EC Directive) then the date cannot be passed
+            // 01/02/2023 because of change of regulations.
+            errors.Add("Qualified Teacher: under the EC Directive must be before 01/02/2023");
+        }
 
         switch (lookups.PersonMatchStatus)
         {
@@ -547,15 +575,20 @@ public class QtsImporter
     {
         var results = await _cache.GetTeacherStatusesAsync();
 
-        if (qtsStatus != null && qtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase))
+        if (qtsStatus != null && (qtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase)))
         {
             var status = results.Single(x => x.dfeta_Value == qtsStatus); //67 - Qualified Teacher: under the EC Directive
             return (EwcWalesMatchStatus.OneMatch, status.Id);
         }
-        else
+        else if (qtsStatus != null && (qtsStatus.Equals("71", StringComparison.InvariantCultureIgnoreCase) ||
+            qtsStatus.Equals("49", StringComparison.InvariantCultureIgnoreCase)))
         {
             var status = results.Single(x => x.dfeta_Value == "213"); //213 - Qualified Teacher: QTS awarded in Wales
             return (EwcWalesMatchStatus.OneMatch, status.Id);
+        }
+        else
+        {
+            return (EwcWalesMatchStatus.NoMatch, null);
         }
     }
 
