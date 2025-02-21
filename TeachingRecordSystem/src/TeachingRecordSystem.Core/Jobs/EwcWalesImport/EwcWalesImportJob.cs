@@ -10,7 +10,7 @@ public class EwcWalesImportJob(BlobServiceClient blobServiceClient, InductionImp
     private const string ProcessedFolder = "ewc/processed";
     private const string PickupFolder = "ewc/pickup";
     private const string StorageContainer = "dqt-integrations";
-    public const string JobSchedule = "0 0 31 2 *"; //disable job
+    public const string JobSchedule = "0 8 * * *";
 
     private async Task<string[]> GetImportFilesAsync(CancellationToken cancellationToken)
     {

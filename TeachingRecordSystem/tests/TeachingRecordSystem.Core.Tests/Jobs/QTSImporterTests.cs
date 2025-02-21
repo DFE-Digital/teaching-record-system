@@ -488,6 +488,64 @@ public class QtsImporterTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Validate_QualifiedTeacherEcDirectiveStatusAfterRegsChangeDate_ReturnErrorMessage()
+    {
+        // Arrange
+        var accountNumber = "13571";
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var row = GetDefaultRow(x =>
+        {
+            x.QtsRefNo = person.Trn!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.PqEstabCode = "InvalidOrg";
+            x.QtsStatus = "67";
+            x.QtsDate = "01/05/2025";
+            return x;
+        });
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Act
+        var (failures, errors) = Importer.Validate(row, lookups);
+
+        // Assert
+        Assert.Contains(errors, item => item.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023"));
+    }
+
+    [Fact]
+    public async Task Validate_QualifiedTeacherEcDirectiveStatusBeforeRegsChangeDate_DoesNotReturnErrorMessage()
+    {
+        // Arrange
+        var accountNumber = "13571";
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var row = GetDefaultRow(x =>
+        {
+            x.QtsRefNo = person.Trn!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.PqEstabCode = "InvalidOrg";
+            x.QtsStatus = "67";
+            x.QtsDate = "01/01/2023";
+            return x;
+        });
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Act
+        var (failures, errors) = Importer.Validate(row, lookups);
+
+        // Assert
+        Assert.DoesNotContain(errors, item => item.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023"));
+    }
+
+    [Fact]
     public async Task Validate_ValidPqEstabCode_DoesNotReturnErrorMessage()
     {
         // Arrange
@@ -781,9 +839,10 @@ public class QtsImporterTests : IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("63")]
-    [InlineData("")]
-    public async Task GetLookupData_TeacherStatusIsNotNull(string qtsStatus)
+    [InlineData("67")]
+    [InlineData("49")]
+    [InlineData("71")]
+    public async Task GetLookupData_TeacherStatusIsNotNullForRecognizedStatus(string qtsStatus)
     {
         // Arrange
         var accountNumber = "1357";
@@ -807,6 +866,35 @@ public class QtsImporterTests : IAsyncLifetime
 
         // Assert
         Assert.NotNull(lookups.TeacherStatusId);
+    }
+
+    [Theory]
+    [InlineData("63")]
+    [InlineData("")]
+    public async Task GetLookupData_TeacherStatusIsNullForUnrecognizedStatus(string qtsStatus)
+    {
+        // Arrange
+        var accountNumber = "1357";
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var row = GetDefaultRow(x =>
+        {
+            x.QtsRefNo = person.Trn!;
+            x.IttEstabCode = accountNumber;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.QtsStatus = qtsStatus;
+            return x;
+        });
+
+        // Act
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Assert
+        Assert.Null(lookups.TeacherStatusId);
     }
 
     [Fact]
@@ -882,6 +970,7 @@ public class QtsImporterTests : IAsyncLifetime
             x.QtsRefNo = person.Trn!;
             x.PqEstabCode = account.AccountNumber;
             x.IttEstabCode = account.AccountNumber;
+            x.QtsStatus = "67";
             return x;
         });
 
