@@ -1,0 +1,23 @@
+@page "/route/{qualificationId}/edit/detail/{handler?}"
+@model DetailModel
+@{
+    ViewBag.Title = "Edit route details";
+}
+
+@section BeforeContent {
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <partial name="_RouteDetail" model="@Model.RouteDetail" />
+            <div class="govuk-button-group">
+                <govuk-button-link data-testid="continue-button" href="@LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)">Continue</govuk-button-link>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteDetailCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
+

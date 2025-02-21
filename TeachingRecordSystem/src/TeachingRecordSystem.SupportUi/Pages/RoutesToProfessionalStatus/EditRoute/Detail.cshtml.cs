@@ -1,27 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
-public class CheckYourAnswersModel(
+public class DetailModel(
     TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    IFileService fileService) : PageModel
+    ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     public RouteDetailViewModel RouteDetail { get; set; } = new();
-
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
-
-    public ChangeReasonOption? ChangeReason;
-    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -39,38 +33,19 @@ public class CheckYourAnswersModel(
                 .ToArray() : null;
     }
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        // save the changes
-
-        // broadcast event
-
-        await JourneyInstance!.CompleteAsync();
-
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
-    }
-
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
-            return;
-        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
-
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail!;
 
         RouteDetail = new RouteDetailViewModel
         {
@@ -89,13 +64,6 @@ public class CheckYourAnswersModel(
             InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId
         };
 
-        await next();
-    }
-
-    public async Task<string?> GetEvidenceFileUrlAsync()
-    {
-        return ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
-            null;
+        return next();
     }
 }
