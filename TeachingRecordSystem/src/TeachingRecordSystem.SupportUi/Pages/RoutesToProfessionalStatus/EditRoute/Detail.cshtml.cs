@@ -13,7 +13,7 @@ public class DetailModel(
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
-    public RouteDetailViewModel RouteDetail { get; set; }
+    public RouteDetailViewModel RouteDetail { get; set; } = new();
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
@@ -33,19 +33,13 @@ public class DetailModel(
                 .ToArray() : null;
     }
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        // CML TODO - go to the change reason page when it exists
-        return Redirect(linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId));
-    }
-
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
 
@@ -70,6 +64,6 @@ public class DetailModel(
             InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId
         };
 
-        next();
+        return next();
     }
 }
