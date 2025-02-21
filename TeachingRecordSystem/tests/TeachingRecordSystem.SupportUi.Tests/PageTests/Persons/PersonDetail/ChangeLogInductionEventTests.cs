@@ -410,6 +410,7 @@ public class ChangeLogInductionEventTests : TestBase
         DateOnly? startDate = Clock.Today.AddYears(-1);
         DateOnly? completionDate = Clock.Today.AddDays(-10);
         dfeta_InductionStatus? inductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? Core.Dqt.Models.dfeta_InductionStatus.Exempt : Core.Dqt.Models.dfeta_InductionStatus.InProgress;
+        string dqtInductionStatus = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? "Exempt" : "In progress";
         dfeta_InductionExemptionReason? inductionExemptionReason = Core.Dqt.Models.dfeta_InductionExemptionReason.QualifiedthroughEEAmutualrecognitionroute;
         InductionStatus migratedInductionStatus = inductionStatus == dfeta_InductionStatus.Exempt ? InductionStatus.Exempt : InductionStatus.InProgress;
         var exemptionReason = await ReferenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReason.PassedInWalesId);
@@ -435,7 +436,8 @@ public class ChangeLogInductionEventTests : TestBase
             InductionExemptionReasonId = populatedFields.HasFlag(DqtInductionFields.ExemptionReason) ? migratedInductionExemptionReasonId : null,
             InductionStartDate = populatedFields.HasFlag(DqtInductionFields.StartDate) ? startDate : null,
             InductionCompletedDate = populatedFields.HasFlag(DqtInductionFields.CompletionDate) ? completionDate : null,
-            DqtInduction = induction
+            DqtInduction = induction,
+            DqtInductionStatus = dqtInductionStatus
         };
 
         await WithDbContext(async dbContext =>
