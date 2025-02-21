@@ -15,7 +15,7 @@ public class CheckYourAnswersModel(
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
-    public RouteDetailViewModel RouteDetail { get; set; } = new(); 
+    public RouteDetailViewModel RouteDetail { get; set; } = new();
 
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
