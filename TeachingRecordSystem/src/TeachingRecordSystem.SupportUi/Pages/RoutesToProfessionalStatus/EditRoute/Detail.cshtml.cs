@@ -1,27 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
-public class CheckYourAnswersModel(
+public class DetailModel(
     TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache,
-    IFileService fileService) : PageModel
+    ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     public RouteDetailViewModel RouteDetail { get; set; }
-
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
-
-    public ChangeReasonOption? ChangeReason;
-    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -41,13 +35,8 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // save the changes
-
-        // broadcast event
-
-        await JourneyInstance!.CompleteAsync();
-
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        // CML TODO - go to the change reason page when it exists
+        return Redirect(linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -59,18 +48,10 @@ public class CheckYourAnswersModel(
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
-        if (!JourneyInstance!.State.IsComplete)
-        {
-            //context.Result = Redirect(linkGenerator.RouteEditPage(QualificationId, JourneyInstance.InstanceId)); // CML TODo go back to the start when i have that page
-            return;
-        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
-
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail!;
 
         RouteDetail = new RouteDetailViewModel
         {
@@ -89,13 +70,6 @@ public class CheckYourAnswersModel(
             InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId
         };
 
-        await next();
-    }
-
-    public async Task<string?> GetEvidenceFileUrlAsync()
-    {
-        return ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
-            null;
+        next();
     }
 }
