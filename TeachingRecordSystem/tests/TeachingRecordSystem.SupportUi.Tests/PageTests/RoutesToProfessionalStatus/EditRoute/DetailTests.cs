@@ -47,7 +47,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_RedirectsToExpectedPage()
+    public async Task Continue_LinksToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
@@ -68,15 +68,15 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        var location = response.Headers.Location?.OriginalString;
-        Assert.Equal($"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", location); // will go to change reason page
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var continueButton = doc.GetElementByTestId("continue-button") as IHtmlAnchorElement;
+        Assert.Contains($"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", continueButton!.Href);
     }
 
     [Fact]

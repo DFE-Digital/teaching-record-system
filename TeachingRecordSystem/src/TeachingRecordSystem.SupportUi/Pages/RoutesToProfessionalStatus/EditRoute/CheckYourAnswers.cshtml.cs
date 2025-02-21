@@ -15,7 +15,7 @@ public class CheckYourAnswersModel(
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
-    public RouteDetailViewModel RouteDetail { get; set; }
+    public RouteDetailViewModel RouteDetail { get; set; } = new(); 
 
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
@@ -61,7 +61,7 @@ public class CheckYourAnswersModel(
         JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
         if (!JourneyInstance!.State.IsComplete)
         {
-            //context.Result = Redirect(linkGenerator.RouteEditPage(QualificationId, JourneyInstance.InstanceId)); // CML TODo go back to the start when i have that page
+            context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
