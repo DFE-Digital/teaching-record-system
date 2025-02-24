@@ -49,14 +49,11 @@
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    @if (@dqtInduction.InductionStatus.HasValue)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>DQT induction status</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="dqt-induction-status">@dqtInduction.InductionStatus.ValueOrDefault()</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
-                    @if (@dqtInduction.InductionExemptionReason.HasValue)
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>DQT induction status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="dqt-induction-status">@migratedEvent.DqtInductionStatus</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    @if (@dqtInduction?.InductionExemptionReason.HasValue == true)
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>DQT induction exemption reason</govuk-summary-list-row-key>
