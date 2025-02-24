@@ -1,0 +1,9 @@
+alter table trs_qualifications add training_age_specialism_type int
+alter table trs_qualifications add training_age_specialism_range_from int
+alter table trs_qualifications add training_age_specialism_range_to int
+alter table trs_qualifications add training_start_date date
+alter table trs_qualifications add training_country_id uniqueidentifier
+alter table trs_qualifications add source_application_reference varchar(max)
+alter table trs_qualifications add source_application_user_id uniqueidentifier
+alter table trs_qualifications add awarded_date date
+alter table trs_qualifications add training_end_date date
