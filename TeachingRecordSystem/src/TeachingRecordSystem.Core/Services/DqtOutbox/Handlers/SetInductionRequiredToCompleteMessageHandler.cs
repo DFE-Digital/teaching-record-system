@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Services.DqtOutbox.Handlers;
 
@@ -16,7 +17,7 @@ public class SetInductionRequiredToCompleteMessageHandler(TrsDbContext dbContext
 
         var updatedBy = message.DqtUserId is not null && message.DqtUserName is not null
             ? EventModels.RaisedByUserInfo.FromDqtUser(message.DqtUserId.Value, message.DqtUserName)
-            : EventModels.RaisedByUserInfo.FromUserId(message.TrsUserId!.Value);
+            : EventModels.RaisedByUserInfo.FromUserId(message.TrsUserId! ?? SystemUser.SystemUserId);
 
         person.SetInductionStatus(
             InductionStatus.RequiredToComplete,
