@@ -9,6 +9,7 @@ on:
         default: test
         type: choice
         options:
+        - dev
         - test
         - production
       backup-file:
