@@ -6,7 +6,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class ChangeReasonTests(HostFixture hostFixture) :TestBase(hostFixture)
+public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
