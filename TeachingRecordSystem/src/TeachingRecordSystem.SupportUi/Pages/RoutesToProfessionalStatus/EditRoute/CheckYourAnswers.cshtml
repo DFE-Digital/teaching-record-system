@@ -20,10 +20,18 @@
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.RouteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                        visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.RouteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
@@ -37,6 +45,11 @@
                             <span use-empty-fallback></span>
                         }
                     </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.RouteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+
                 </govuk-summary-list-row>
             </govuk-summary-list>
             <div class="govuk-button-group">
