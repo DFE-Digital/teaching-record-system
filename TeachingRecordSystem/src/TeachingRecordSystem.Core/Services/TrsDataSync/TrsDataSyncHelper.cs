@@ -626,7 +626,8 @@ public class TrsDataSyncHelper(
 
         EventBase MapMigratedEvent(Contact contact, dfeta_induction? dqtInduction, InductionInfo mappedInduction)
         {
-            var dqtInductionStatus = contact.dfeta_InductionStatus!.Value.GetMetadata().Name;
+            var dqtInductionStatus = (contact.dfeta_InductionStatus?.GetMetadata().Name ??
+                dqtInduction?.dfeta_InductionStatus?.GetMetadata().Name)!;
 
             return new InductionMigratedEvent()
             {
