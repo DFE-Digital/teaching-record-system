@@ -27,7 +27,7 @@ public class EditRouteState : IRegisterJourney
     public Guid? InductionExemptionReasonId { get; set; }
 
     public ChangeReasonOption? ChangeReason { get; set; }
-    public ChangeReasonDetailsState? ChangeReasonDetail { get; set; } = new();
+    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [JsonIgnore]
     public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields also depends on the route and status

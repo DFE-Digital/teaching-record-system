@@ -19,7 +19,7 @@ public class EditRouteStateBuilder
     private Guid? _trainingProviderId;
     private Guid? _inductionExemptionReasonId;
     private ChangeReasonOption? _changeReasonOption;
-    private ChangeReasonDetailsState? _changeReasonDetail;
+    private ChangeReasonDetailsState _changeReasonDetail = new();
 
     public EditRouteStateBuilder WithQualificationType(QualificationType qualificationType)
     {
@@ -98,9 +98,21 @@ public class EditRouteStateBuilder
         return this;
     }
 
+    public EditRouteStateBuilder WithChangeReasonOption(ChangeReasonOption reason)
+    {
+        _changeReasonOption = reason;
+        return this;
+    }
+
     public EditRouteStateBuilder WithValidChangeReasonOption()
     {
         _changeReasonOption = ChangeReasonOption.AnotherReason;
+        return this;
+    }
+
+    public EditRouteStateBuilder WithChangeReasonDetail(string detail, bool fileUpload)
+    {
+        _changeReasonDetail = new ChangeReasonStateBuilder().WithChangeReasonDetail(detail).WithFileUploadChoice(fileUpload).Build();
         return this;
     }
 
@@ -137,7 +149,15 @@ public class EditRouteStateBuilder
             InductionExemptionReasonId = _inductionExemptionReasonId,
             ChangeReason = _changeReasonOption,
             QualificationType = _qualificationType,
-            ChangeReasonDetail = _changeReasonDetail
+            ChangeReasonDetail = new ChangeReasonDetailsState()
+            {
+                ChangeReasonDetail = _changeReasonDetail.ChangeReasonDetail,
+                EvidenceFileId = _changeReasonDetail.EvidenceFileId,
+                EvidenceFileName = _changeReasonDetail.EvidenceFileName,
+                EvidenceFileSizeDescription = _changeReasonDetail.EvidenceFileSizeDescription,
+                HasAdditionalReasonDetail = _changeReasonDetail.HasAdditionalReasonDetail,
+                UploadEvidence = _changeReasonDetail.UploadEvidence
+            }
         };
     }
 }

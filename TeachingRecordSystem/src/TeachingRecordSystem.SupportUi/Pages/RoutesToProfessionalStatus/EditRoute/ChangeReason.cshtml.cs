@@ -5,8 +5,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
+using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
+
+[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
 
 public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
@@ -63,7 +66,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     public async Task OnGetAsync()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance!.State.ChangeReasonDetail.ChangeReasonDetail is not null;
+        HasAdditionalReasonDetail = JourneyInstance!.State.ChangeReasonDetail.HasAdditionalReasonDetail;
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.ChangeReasonDetail.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.ChangeReasonDetail.EvidenceFileId is not null ?
@@ -120,6 +123,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
             state.ChangeReasonDetail.UploadEvidence = UploadEvidence;
+            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
         });
 
         return Redirect(NextPage);
@@ -142,7 +146,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         EvidenceFileId = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
-        HasAdditionalReasonDetail = JourneyInstance!.State.ChangeReasonDetail.HasAdditionalReasonDetail;
 
         return next();
     }
