@@ -8,7 +8,7 @@ public partial class TestData
     public class CreatePersonProfessionalStatusBuilder
     {
         private Guid? _personId = null;
-        private QualificationType _qualificationType;
+        private ProfessionalStatusType _professionalStatusType;
         private Guid? _routeToProfessionalStatusId;
         private ProfessionalStatusStatus _status;
         private DateOnly? _awardedDate;
@@ -35,9 +35,9 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithQualificationType(QualificationType qualificationType)
+        public CreatePersonProfessionalStatusBuilder WithProfessionalStatusType(ProfessionalStatusType professionalStatusType)
         {
-            _qualificationType = qualificationType;
+            _professionalStatusType = professionalStatusType;
             return this;
         }
 
@@ -135,7 +135,7 @@ public partial class TestData
             {
                 PersonId = personId,
                 QualificationId = QualificationId,
-                QualificationType = _qualificationType,
+                ProfessionalStatusType = _professionalStatusType,
                 RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
                 Status = _status,
                 AwardedDate = _awardedDate,
