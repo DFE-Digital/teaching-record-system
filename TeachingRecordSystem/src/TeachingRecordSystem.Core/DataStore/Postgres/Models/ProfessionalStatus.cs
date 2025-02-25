@@ -4,7 +4,12 @@ public class ProfessionalStatus : Qualification
 {
     public const int SourceApplicationReferenceMaxLength = 200;
 
-    public new required QualificationType QualificationType { get; set; }
+    public ProfessionalStatus()
+    {
+        QualificationType = QualificationType.ProfessionalStatus;
+    }
+
+    public required ProfessionalStatusType ProfessionalStatusType { get; set; }
     public required Guid RouteToProfessionalStatusId { get; init; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }

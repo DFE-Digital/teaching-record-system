@@ -2,139 +2,139 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum RouteToProfessionalStatus2
 {
-    [RouteToProfessionalStatusInfo("Apply for QTS", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Apply for QTS", ProfessionalStatusType.QualifiedTeacherStatus)]
     ApplyForQts,
-    [RouteToProfessionalStatusInfo("Apprenticeship", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Apprenticeship", ProfessionalStatusType.QualifiedTeacherStatus)]
     Apprenticeship,
-    [RouteToProfessionalStatusInfo("Assessment Only Route", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Assessment Only Route", ProfessionalStatusType.QualifiedTeacherStatus)]
     AssessmentOnlyRoute,  // Do we need the 'Route' suffix here?
-    [RouteToProfessionalStatusInfo("Authorised Teacher Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Authorised Teacher Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     AuthorisedTeacherProgramme,  // Nit: English/American spelling?
-    [RouteToProfessionalStatusInfo("Core - Core Programme Type", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Core - Core Programme Type", ProfessionalStatusType.QualifiedTeacherStatus)]
     CoreProgrammeType,
-    [RouteToProfessionalStatusInfo("Core Flexible", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Core Flexible", ProfessionalStatusType.QualifiedTeacherStatus)]
     CoreFlexible,
-    [RouteToProfessionalStatusInfo("CTC or CCTA", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("CTC or CCTA", ProfessionalStatusType.QualifiedTeacherStatus)]
     CtcOrCcta,
-    [RouteToProfessionalStatusInfo("Early Years ITT Assessment Only", QualificationType.EarlyYearsTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Early Years ITT Assessment Only", ProfessionalStatusType.EarlyYearsTeacherStatus)]
     EarlyYearsIttAssessmentOnly,
-    [RouteToProfessionalStatusInfo("Early Years ITT Graduate Employment Based", QualificationType.EarlyYearsTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Early Years ITT Graduate Employment Based", ProfessionalStatusType.EarlyYearsTeacherStatus)]
     EarlyYearsIttGraduateEmploymentBased,
-    [RouteToProfessionalStatusInfo("Early Years ITT Graduate Entry", QualificationType.EarlyYearsTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Early Years ITT Graduate Entry", ProfessionalStatusType.EarlyYearsTeacherStatus)]
     EarlyYearsIttGraduateEntry,
-    [RouteToProfessionalStatusInfo("Early Years ITT School Direct", QualificationType.EarlyYearsTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Early Years ITT School Direct", ProfessionalStatusType.EarlyYearsTeacherStatus)]
     EarlyYearsIttSchoolDirect,
-    [RouteToProfessionalStatusInfo("Early Years ITT Undergraduate", QualificationType.EarlyYearsTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Early Years ITT Undergraduate", ProfessionalStatusType.EarlyYearsTeacherStatus)]
     EarlyYearsIttUndergraduate,
-    [RouteToProfessionalStatusInfo("EC directive", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("EC directive", ProfessionalStatusType.QualifiedTeacherStatus)]
     EcDirective,
-    [RouteToProfessionalStatusInfo("European Recognition", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("European Recognition", ProfessionalStatusType.QualifiedTeacherStatus)]
     EuropeanRecognition,
-    [RouteToProfessionalStatusInfo("European Recognition - PQTS", QualificationType.PartialQualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("European Recognition - PQTS", ProfessionalStatusType.PartialQualifiedTeacherStatus)]
     EuropeanRecognitionPqts,
-    [RouteToProfessionalStatusInfo("EYPS", QualificationType.EarlyYearsProfessionalStatus)]
+    [RouteToProfessionalStatusInfo("EYPS", ProfessionalStatusType.EarlyYearsProfessionalStatus)]
     Eyps,
-    [RouteToProfessionalStatusInfo("EYPS ITT Migrated", QualificationType.EarlyYearsProfessionalStatus)]
+    [RouteToProfessionalStatusInfo("EYPS ITT Migrated", ProfessionalStatusType.EarlyYearsProfessionalStatus)]
     EypsIttMigrated,
-    [RouteToProfessionalStatusInfo("EYTS ITT Migrated", QualificationType.EarlyYearsTeacherStatus)]
+    [RouteToProfessionalStatusInfo("EYTS ITT Migrated", ProfessionalStatusType.EarlyYearsTeacherStatus)]
     EytsIttMigrated,
-    [RouteToProfessionalStatusInfo("FE Recognition 2000-2004", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("FE Recognition 2000-2004", ProfessionalStatusType.QualifiedTeacherStatus)]
     FeRecognition2000To2004,
-    [RouteToProfessionalStatusInfo("Flexible ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Flexible ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     FlexibleItt,
-    [RouteToProfessionalStatusInfo("Future Teaching Scholars", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Future Teaching Scholars", ProfessionalStatusType.QualifiedTeacherStatus)]
     FutureTeachingScholars,
-    [RouteToProfessionalStatusInfo("Graduate non-trained", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Graduate non-trained", ProfessionalStatusType.QualifiedTeacherStatus)]
     GraduateNonTrained,
-    [RouteToProfessionalStatusInfo("Graduate Teacher Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Graduate Teacher Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     GraduateTeacherProgramme,
-    [RouteToProfessionalStatusInfo("HEI - HEI Programme Type", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("HEI - HEI Programme Type", ProfessionalStatusType.QualifiedTeacherStatus)]
     HeiProgrammeType,
-    [RouteToProfessionalStatusInfo("HEI - Historic", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("HEI - Historic", ProfessionalStatusType.QualifiedTeacherStatus)]
     HeiHistoric,
-    [RouteToProfessionalStatusInfo("High Potential ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("High Potential ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     HighPotentialItt,
-    [RouteToProfessionalStatusInfo("International Qualified Teacher Status", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("International Qualified Teacher Status", ProfessionalStatusType.QualifiedTeacherStatus)]
     InternationalQualifiedTeacherStatus,
-    [RouteToProfessionalStatusInfo("Legacy ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Legacy ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     LegacyItt,
-    [RouteToProfessionalStatusInfo("Legacy Migration", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Legacy Migration", ProfessionalStatusType.QualifiedTeacherStatus)]
     LegacyMigration,
-    [RouteToProfessionalStatusInfo("Licensed Teacher Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Licensed Teacher Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     LicensedTeacherProgramme,
-    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - Armed Forces", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - Armed Forces", ProfessionalStatusType.QualifiedTeacherStatus)]
     LicensedTeacherProgrammeArmedForces,
-    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - FE", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - FE", ProfessionalStatusType.QualifiedTeacherStatus)]
     LicensedTeacherProgrammeFe,
-    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - Independent School", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - Independent School", ProfessionalStatusType.QualifiedTeacherStatus)]
     LicensedTeacherProgrammeIndependentSchool,
-    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - Maintained School", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - Maintained School", ProfessionalStatusType.QualifiedTeacherStatus)]
     LicensedTeacherProgrammeMaintainedSchool,
-    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - OTT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Licensed Teacher Programme - OTT", ProfessionalStatusType.QualifiedTeacherStatus)]
     LicensedTeacherProgrammeOtt,
-    [RouteToProfessionalStatusInfo("Long Service", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Long Service", ProfessionalStatusType.QualifiedTeacherStatus)]
     LongService,
-    [RouteToProfessionalStatusInfo("NI R", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("NI R", ProfessionalStatusType.QualifiedTeacherStatus)]
     NiR,
-    [RouteToProfessionalStatusInfo("Other Qualifications non ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Other Qualifications non ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     OtherQualificationsNonItt,
-    [RouteToProfessionalStatusInfo("Overseas Trained Teacher Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Overseas Trained Teacher Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     OverseasTrainedTeacherProgramme,
-    [RouteToProfessionalStatusInfo("Overseas Trained Teacher Recognition", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Overseas Trained Teacher Recognition", ProfessionalStatusType.QualifiedTeacherStatus)]
     OverseasTrainedTeacherRecognition,
-    [RouteToProfessionalStatusInfo("PGATC ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("PGATC ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     PgatcItt,
-    [RouteToProfessionalStatusInfo("PGATD ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("PGATD ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     PgatcdItt,
-    [RouteToProfessionalStatusInfo("PGCE ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("PGCE ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     PgceItt,
-    [RouteToProfessionalStatusInfo("PGDE ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("PGDE ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     PgdeItt,
-    [RouteToProfessionalStatusInfo("Primary and secondary postgraduate fee funded", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Primary and secondary postgraduate fee funded", ProfessionalStatusType.QualifiedTeacherStatus)]
     PrimaryAndSecondaryPostgraduateFeeFunded,
-    [RouteToProfessionalStatusInfo("Primary and secondary undergraduate fee funded", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Primary and secondary undergraduate fee funded", ProfessionalStatusType.QualifiedTeacherStatus)]
     PrimaryAndSecondaryUndergraduateFeeFunded,
-    [RouteToProfessionalStatusInfo("ProfGCE ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("ProfGCE ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     ProfGceItt,
-    [RouteToProfessionalStatusInfo("ProfGDE ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("ProfGDE ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     ProfGdeItt,
-    [RouteToProfessionalStatusInfo("Provider led Postgrad", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Provider led Postgrad", ProfessionalStatusType.QualifiedTeacherStatus)]
     ProviderLedPostgrad,
-    [RouteToProfessionalStatusInfo("Provider led Undergrad", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Provider led Undergrad", ProfessionalStatusType.QualifiedTeacherStatus)]
     ProviderLedUndergrad,
-    [RouteToProfessionalStatusInfo("QTLS and SET Membership", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("QTLS and SET Membership", ProfessionalStatusType.QualifiedTeacherStatus)]
     QtlsAndSetMembership,
-    [RouteToProfessionalStatusInfo("Registered Teacher Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Registered Teacher Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     RegisteredTeacherProgramme,
-    [RouteToProfessionalStatusInfo("School Centered ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("School Centered ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     SchoolCenteredItt,
-    [RouteToProfessionalStatusInfo("School Direct Training Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("School Direct Training Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     SchoolDirectTrainingProgramme,
-    [RouteToProfessionalStatusInfo("School Direct Training Programme Salaried", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("School Direct Training Programme Salaried", ProfessionalStatusType.QualifiedTeacherStatus)]
     SchoolDirectTrainingProgrammeSalaried,
-    [RouteToProfessionalStatusInfo("School Direct Training Programme Self Funded", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("School Direct Training Programme Self Funded", ProfessionalStatusType.QualifiedTeacherStatus)]
     SchoolDirectTrainingProgrammeSelfFunded,
-    [RouteToProfessionalStatusInfo("Scotland R", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Scotland R", ProfessionalStatusType.QualifiedTeacherStatus)]
     ScotlandR,
-    [RouteToProfessionalStatusInfo("TC ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("TC ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     TcItt,
-    [RouteToProfessionalStatusInfo("TCMH", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("TCMH", ProfessionalStatusType.QualifiedTeacherStatus)]
     Tcmh,
-    [RouteToProfessionalStatusInfo("Teach First Programme", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Teach First Programme", ProfessionalStatusType.QualifiedTeacherStatus)]
     TeachFirstProgramme,
-    [RouteToProfessionalStatusInfo("Troops to Teach", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Troops to Teach", ProfessionalStatusType.QualifiedTeacherStatus)]
     TroopsToTeach,
-    [RouteToProfessionalStatusInfo("UGMT ITT", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("UGMT ITT", ProfessionalStatusType.QualifiedTeacherStatus)]
     UgmtItt,
-    [RouteToProfessionalStatusInfo("Undergraduate Opt In", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Undergraduate Opt In", ProfessionalStatusType.QualifiedTeacherStatus)]
     UndergraduateOptIn,
-    [RouteToProfessionalStatusInfo("Welsh R", QualificationType.QualifiedTeacherStatus)]
+    [RouteToProfessionalStatusInfo("Welsh R", ProfessionalStatusType.QualifiedTeacherStatus)]
     WelshR,
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-file sealed class RouteToProfessionalStatusInfoAttribute(string name, QualificationType qualificationType) : Attribute
+file sealed class RouteToProfessionalStatusInfoAttribute(string name, ProfessionalStatusType professionalStatusType) : Attribute
 {
     public string Name => name;
-    public QualificationType QualificationType => qualificationType;
+    public ProfessionalStatusType ProfessionalStatusType => professionalStatusType;
 }
