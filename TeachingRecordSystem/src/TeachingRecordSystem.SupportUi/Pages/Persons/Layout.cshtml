@@ -22,9 +22,18 @@
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(personId)">General</a>
                 </li>
 
-                <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Qualifications</a>
-                </li>
+                @if (FeatureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Routes and qualifications</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Qualifications</a>
+                    </li>
+                }
 
                 @if (FeatureProvider.IsEnabled(FeatureNames.Induction))
                 {

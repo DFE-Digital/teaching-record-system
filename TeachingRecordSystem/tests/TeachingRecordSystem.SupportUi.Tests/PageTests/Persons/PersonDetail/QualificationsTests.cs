@@ -22,7 +22,8 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     [Fact]
     public async Task Get_WithPersonIdForPersonWithNoMandatoryQualifications_DisplaysNoMandatoryQualifications()
     {
-        // Arrange        
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
@@ -34,6 +35,24 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var doc = await AssertEx.HtmlResponseAsync(response);
         var noMandatoryQualifications = doc.GetElementByTestId("no-mandatory-qualifications");
         Assert.NotNull(noMandatoryQualifications);
+    }
+
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithProfessionalStatuses_DisplaysNoProfessionalStatuses()
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var person = await TestData.CreatePersonAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var professionalStatuses = doc.GetElementByTestId("no-professional-statuses");
+        Assert.NotNull(professionalStatuses);
     }
 
     [Theory]
@@ -77,5 +96,58 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(startDate is not null ? startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-start-date-{qualificationId}")!.TextContent);
         Assert.Equal(status is not null ? status.Value.ToString() : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-status-{qualificationId}")!.TextContent);
         Assert.Equal(endDate is not null ? endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", mandatoryQualificationSummary.GetElementByTestId($"mq-end-date-{qualificationId}")!.TextContent);
+    }
+
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithProfessionalStatus_DisplaysExpectedContent()
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var status = ProfessionalStatusStatus.InTraining;
+        DateOnly? startDate = new DateOnly(2022, 01, 01);
+        DateOnly? endDate = new DateOnly(2023, 01, 01);
+        DateOnly awardedDate = new DateOnly(2024, 01, 01);
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var ageRange = TrainingAgeSpecialismType.KeyStage3;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r =>
+            {
+                r.WithRoute(route.RouteToProfessionalStatusId);
+                r.WithStatus(status);
+                r.WithTrainingStartDate(startDate.Value);
+                r.WithTrainingEndDate(endDate.Value);
+                r.WithTrainingProvider(trainingProvider);
+                r.WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray());
+                r.WithTrainingCountry(country);
+                r.WithTrainingAgeSpecialismType(ageRange);
+                r.WithAwardedDate(awardedDate);
+            })
+        );
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var professionalStatuses = doc.GetElementByTestId("no-professional-statuses");
+        Assert.Null(professionalStatuses);
+
+        var professionalStatus = doc.GetElementByTestId($"professionalstatus-id-{qualificationid}");
+        Assert.NotNull(professionalStatus);
+        Assert.Equal(route.Name, professionalStatus.GetElementByTestId($"training-route-{qualificationid}")!.TextContent);
+        Assert.Equal(startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"training-start-date-{qualificationid}")!.TextContent);
+        Assert.Equal(endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"training-end-date-{qualificationid}")!.TextContent);
+        Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TextContent);
+        Assert.Equal("No", professionalStatus.GetElementByTestId($"training-exemption-{qualificationid}")!.TextContent);
+        Assert.Equal(trainingProvider.Name, professionalStatus.GetElementByTestId($"training-provider-{qualificationid}")!.TextContent);
+        Assert.Equal(route.ProfessionalStatusType.ToString(), professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent);
+        Assert.Equal(country.Name, professionalStatus.GetElementByTestId($"training-country-{qualificationid}")!.TextContent);
+        Assert.Equal(ageRange.ToString(), professionalStatus.GetElementByTestId($"training-agespecialism-{qualificationid}")!.TextContent);
+        doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
     }
 }
