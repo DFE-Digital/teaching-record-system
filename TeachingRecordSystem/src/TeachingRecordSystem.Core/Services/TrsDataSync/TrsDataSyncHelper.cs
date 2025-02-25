@@ -593,7 +593,7 @@ public class TrsDataSyncHelper(
                 }
             }
 
-            if (induction is null)
+            if (induction is null && contact.dfeta_InductionStatus is null)
             {
                 continue;
             }
@@ -604,7 +604,7 @@ public class TrsDataSyncHelper(
                 continue;
             }
 
-            var migratedEvent = MapMigratedEvent(contact.ContactId!.Value, induction, mapped);
+            var migratedEvent = MapMigratedEvent(contact, induction, mapped);
             events.Add(migratedEvent);
         }
 
@@ -624,15 +624,18 @@ public class TrsDataSyncHelper(
 
         return events.Count;
 
-        EventBase MapMigratedEvent(Guid contactId, dfeta_induction dqtInduction, InductionInfo mappedInduction)
+        EventBase MapMigratedEvent(Contact contact, dfeta_induction? dqtInduction, InductionInfo mappedInduction)
         {
+            var dqtInductionStatus = (contact.dfeta_InductionStatus?.GetMetadata().Name ??
+                dqtInduction?.dfeta_InductionStatus?.GetMetadata().Name)!;
+
             return new InductionMigratedEvent()
             {
                 EventId = Guid.NewGuid(),
-                Key = $"{dqtInduction.Id}-Migrated",
+                Key = $"{dqtInduction?.Id ?? contact.Id}-Migrated",
                 CreatedUtc = new DateTime(2025, 02, 18, 10, 17, 05, DateTimeKind.Utc),
                 RaisedBy = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
-                PersonId = contactId,
+                PersonId = contact.Id,
                 InductionStartDate = mappedInduction.InductionStartDate,
                 InductionCompletedDate = mappedInduction.InductionCompletedDate,
                 InductionStatus = mappedInduction.InductionStatus,
@@ -641,7 +644,8 @@ public class TrsDataSyncHelper(
                     [var id] => id,
                     _ => null
                 },
-                DqtInduction = GetEventDqtInduction(dqtInduction)
+                DqtInduction = dqtInduction is not null ? GetEventDqtInduction(dqtInduction) : null,
+                DqtInductionStatus = dqtInductionStatus
             };
         }
     }
