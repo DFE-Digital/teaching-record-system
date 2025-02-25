@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
@@ -10,7 +9,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 [Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
 public class DetailModel(
     TrsLinkGenerator linkGenerator,
-    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
@@ -18,6 +16,8 @@ public class DetailModel(
     public RouteDetailViewModel RouteDetail { get; set; } = new();
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
+
+    public string BackLink => linkGenerator.PersonQualifications(PersonId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }
