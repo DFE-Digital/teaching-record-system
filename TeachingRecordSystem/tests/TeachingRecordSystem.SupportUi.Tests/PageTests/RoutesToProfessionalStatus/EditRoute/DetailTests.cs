@@ -76,7 +76,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var continueButton = doc.GetElementByTestId("continue-button") as IHtmlAnchorElement;
-        Assert.Contains($"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", continueButton!.Href);
+        Assert.Contains($"/route/{qualificationid}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}", continueButton!.Href);
     }
 
     [Fact]
