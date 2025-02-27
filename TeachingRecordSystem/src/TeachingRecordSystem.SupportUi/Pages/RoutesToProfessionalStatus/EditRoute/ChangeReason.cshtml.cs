@@ -135,7 +135,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
