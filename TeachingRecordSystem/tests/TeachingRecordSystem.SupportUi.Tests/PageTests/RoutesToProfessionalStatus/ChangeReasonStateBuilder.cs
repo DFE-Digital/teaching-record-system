@@ -9,9 +9,17 @@ public class ChangeReasonStateBuilder
     private Guid? _evidenceFileId;
     private string? _evidenceFileName;
     private string? _evidenceFileSizeDescription;
+    private bool? _hasAdditionalReasonDetail;
+
+    public ChangeReasonStateBuilder WithChangeReasonDetail(string detail)
+    {
+        _changeReasonDetail = detail;
+        return this;
+    }
 
     public ChangeReasonStateBuilder WithValidChangeReasonDetail()
     {
+        _hasAdditionalReasonDetail = true;
         _changeReasonDetail = "Some free text reason detail";
         _uploadEvidence = false;
         return this;
@@ -34,6 +42,7 @@ public class ChangeReasonStateBuilder
         return new ChangeReasonDetailsState
         {
             ChangeReasonDetail = _changeReasonDetail,
+            HasAdditionalReasonDetail = _hasAdditionalReasonDetail,
             UploadEvidence = _uploadEvidence,
             EvidenceFileId = _evidenceFileId,
             EvidenceFileName = _evidenceFileName,

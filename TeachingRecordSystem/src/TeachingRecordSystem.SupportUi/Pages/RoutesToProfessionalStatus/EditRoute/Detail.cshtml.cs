@@ -17,6 +17,8 @@ public class DetailModel(
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
+    public string BackLink => linkGenerator.PersonQualifications(PersonId);
+
     [FromRoute]
     public Guid QualificationId { get; set; }
 
