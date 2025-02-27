@@ -88,7 +88,9 @@ public class CheckYourAnswersModel(
             TrainingAgeSpecialismRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
             TrainingCountryId = JourneyInstance!.State.TrainingCountryId,
             TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
-            InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId
+            InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId,
+            QualificationId = QualificationId,
+            JourneyInstance = JourneyInstance
         };
 
         await next();
