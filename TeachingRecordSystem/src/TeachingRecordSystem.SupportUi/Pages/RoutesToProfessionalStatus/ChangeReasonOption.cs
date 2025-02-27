@@ -9,7 +9,7 @@ public enum ChangeReasonOption
     [Display(Name = "New information received")]
     NewInformation,
     [Display(Name = "No longer exempt from induction")]
-    NoLongerExempt,
+    NoLongerExemptFromInduction,
     [Display(Name = "Another reason")]
     AnotherReason
 }
