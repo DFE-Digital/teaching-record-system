@@ -100,7 +100,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithTrainingCountryId("UK")
+            .WithTrainingCountryId("GB")
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
             .WithValidChangeReasonOption()

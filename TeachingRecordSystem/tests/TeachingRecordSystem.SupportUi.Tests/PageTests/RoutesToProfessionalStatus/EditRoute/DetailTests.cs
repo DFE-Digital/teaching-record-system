@@ -87,7 +87,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "Apprenticeship").Single();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(1);
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
 
@@ -103,7 +103,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
+            .WithTrainingSubjectIds([subject.TrainingSubjectId])
             .WithTrainingCountryId(country.CountryId)
             .WithTrainingAgeSpecialismType(ageRange)
             .WithValidChangeReasonOption()
@@ -133,7 +133,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
         doc.AssertRowContentMatches("Country of training", country.Name);
         doc.AssertRowContentMatches("Age range", ageRange.GetDisplayName()!);
-        doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
+        doc.AssertRowContentMatches("Subjects", subject.Name);
     }
 
     [Fact]
