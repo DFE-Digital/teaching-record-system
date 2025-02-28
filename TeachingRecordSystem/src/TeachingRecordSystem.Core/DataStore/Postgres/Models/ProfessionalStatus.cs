@@ -9,7 +9,7 @@ public class ProfessionalStatus : Qualification
         QualificationType = QualificationType.ProfessionalStatus;
     }
 
-    public required ProfessionalStatusType ProfessionalStatusType { get; set; }
+    public required ProfessionalStatusType ProfessionalStatusType { get; set; } // CML TODO - don't think I need this?
     public required Guid RouteToProfessionalStatusId { get; init; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }
@@ -34,4 +34,54 @@ public class ProfessionalStatus : Qualification
     public string? DqtEarlyYearsStatusValue { get; init; }
     public Guid? DqtInitialTeacherTrainingId { get; init; }
     public Guid? DqtQtsRegistrationId { get; init; }
+
+    public void Update(
+        Action<ProfessionalStatus> updateAction,
+        string? changeReason,
+        string? changeReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now,
+        out ProfessionalStatusUpdatedEvent? @event)
+    {
+        var oldEventModel = EventModels.ProfessionalStatus.FromModel(this);
+
+        updateAction(this);
+
+        var changes = ProfessionalStatusUpdatedEventChanges.None |
+            (RouteToProfessionalStatusId != oldEventModel.Route?.RouteToProfessionalStatusId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
+            (Status != oldEventModel.Status ? ProfessionalStatusUpdatedEventChanges.Status : ProfessionalStatusUpdatedEventChanges.None) |
+            (AwardedDate != oldEventModel.AwardedDate ? ProfessionalStatusUpdatedEventChanges.AwardedDate : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingStartDate != oldEventModel.TrainingStartDate ? ProfessionalStatusUpdatedEventChanges.StartDate : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingEndDate != oldEventModel.TrainingEndDate ? ProfessionalStatusUpdatedEventChanges.EndDate : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingSubjectIds != oldEventModel.TrainingSubjectIds ? ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismType != oldEventModel.TrainingAgeSpecialismType ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismRangeFrom != oldEventModel.TrainingAgeSpecialismRangeFrom ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismRangeTo != oldEventModel.TrainingAgeSpecialismRangeTo ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingCountry != oldEventModel.TrainingCountry ? ProfessionalStatusUpdatedEventChanges.TrainingCountry : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingProvider != oldEventModel.TrainingProvider ? ProfessionalStatusUpdatedEventChanges.TrainingProvider : ProfessionalStatusUpdatedEventChanges.None) |
+            (InductionExemptionReason != oldEventModel.InductionExemptionReason ? ProfessionalStatusUpdatedEventChanges.InductionExemptionReason : ProfessionalStatusUpdatedEventChanges.None);
+
+        if (changes == ProfessionalStatusUpdatedEventChanges.None)
+        {
+            @event = null;
+            return;
+        }
+
+        UpdatedOn = now;
+
+        @event = new ProfessionalStatusUpdatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            Changes = changes,
+            CreatedUtc = now,
+            EvidenceFile = evidenceFile,
+            OldProfessionalStatus = oldEventModel,
+            PersonId = PersonId,
+            RaisedBy = updatedBy,
+            ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(this)
+        };
+    }
 }
