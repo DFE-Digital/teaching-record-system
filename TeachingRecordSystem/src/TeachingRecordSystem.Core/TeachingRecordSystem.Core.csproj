@@ -72,6 +72,7 @@
     <None Remove="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
     <None Remove="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
     <None Remove="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -149,6 +150,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0043_InductionExemptWithoutReason.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0045_InductionExemptWithoutReason.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0046_ProfessionalStatusUpdates.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
   </ItemGroup>
 
   <ItemGroup>

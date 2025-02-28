@@ -4,5 +4,6 @@ public class TrainingSubject
 {
     public required Guid TrainingSubjectId { get; init; }
     public required string Name { get; set; }
+    public required string Reference { get; set; }
     public required bool IsActive { get; set; }
 }
