@@ -22,6 +22,9 @@ public class DetailModel(
     [FromRoute]
     public Guid QualificationId { get; set; }
 
+    [FromQuery]
+    public bool FromCheckAnswers { get; set; }
+
     public async Task OnGetAsync()
     {
         RouteDetail.RouteToProfessionalStatusName = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId))?.Name!;
@@ -63,7 +66,9 @@ public class DetailModel(
             TrainingAgeSpecialismRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
             TrainingCountryId = JourneyInstance!.State.TrainingCountryId,
             TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
-            InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId
+            InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId,
+            QualificationId = QualificationId,
+            JourneyInstance = JourneyInstance
         };
 
         return next();
