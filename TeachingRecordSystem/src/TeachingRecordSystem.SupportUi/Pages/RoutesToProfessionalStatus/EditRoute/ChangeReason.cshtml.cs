@@ -121,6 +121,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
+            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
             state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
             state.ChangeReasonDetail.UploadEvidence = UploadEvidence;
             state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;

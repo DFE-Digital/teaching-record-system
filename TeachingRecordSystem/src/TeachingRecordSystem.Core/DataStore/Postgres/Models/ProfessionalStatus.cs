@@ -9,7 +9,7 @@ public class ProfessionalStatus : Qualification
         QualificationType = QualificationType.ProfessionalStatus;
     }
 
-    public required ProfessionalStatusType ProfessionalStatusType { get; set; } // CML TODO - don't think I need this?
+    public required ProfessionalStatusType ProfessionalStatusType { get; set; }
     public required Guid RouteToProfessionalStatusId { get; init; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }

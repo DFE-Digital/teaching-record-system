@@ -81,9 +81,9 @@ public class CheckYourAnswersModel(
             await dbContext.SaveChangesAsync();
         }
 
-        // broadcast event
-
         await JourneyInstance!.CompleteAsync();
+
+        TempData.SetFlashSuccess("Induction details have been updated");
 
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }

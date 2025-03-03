@@ -21,6 +21,25 @@ public class EditRouteStateBuilder
     private ChangeReasonOption? _changeReasonOption;
     private ChangeReasonDetailsState _changeReasonDetail = new();
 
+
+    public async Task<EditRouteStateBuilder> WithPopulatedReferenceFieldsAsync(ReferenceDataCache referenceDataCache)
+    {
+        _routeToProfessionalStatusId = (await referenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne().RouteToProfessionalStatusId;
+        _trainingCountryId = (await referenceDataCache.GetTrainingCountriesAsync()).RandomOne().CountryId;
+        _trainingProviderId = (await referenceDataCache.GetTrainingProvidersAsync()).RandomOne().TrainingProviderId;
+        _trainingSubjectIds = (await referenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(1).Select(x => x.TrainingSubjectId).ToArray();
+        _trainingAgeSpecialismType = TrainingAgeSpecialismType.KeyStage1;
+        return this;
+    }
+    public EditRouteStateBuilder WithAwardedStatusFields(IClock clock)
+    {
+        _trainingStartDate = clock.Today.AddYears(-1);
+        _trainingEndDate = clock.Today.AddDays(-1);
+        _awardedDate = clock.Today;
+        _status = ProfessionalStatusStatus.Awarded;
+        return this;
+    }
+
     public EditRouteStateBuilder WithQualificationType(QualificationType qualificationType)
     {
         _qualificationType = qualificationType;
@@ -32,6 +51,7 @@ public class EditRouteStateBuilder
         _routeToProfessionalStatusId = routeToProfessionalStatusId;
         return this;
     }
+
     public EditRouteStateBuilder WithStatus(ProfessionalStatusStatus status)
     {
         _status = status;
@@ -132,6 +152,10 @@ public class EditRouteStateBuilder
 
     public EditRouteState Build()
     {
+        if(!_routeToProfessionalStatusId.HasValue || !_status.HasValue)
+        {
+            throw new InvalidOperationException("RouteToProfessionalStatusId and Status must be set");
+        }
         return new EditRouteState()
         {
             Initialized = true,
