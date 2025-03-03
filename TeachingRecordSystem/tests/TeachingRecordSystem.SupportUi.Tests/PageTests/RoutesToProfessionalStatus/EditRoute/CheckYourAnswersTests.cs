@@ -222,7 +222,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_Confirm_UpdatesProfessionalStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsTeacherStatus)
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
@@ -230,8 +230,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = (await (new EditRouteStateBuilder())
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithPopulatedReferenceFieldsAsync(ReferenceDataCache))
             .WithAwardedStatusFields(Clock)
+            .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
@@ -250,13 +252,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Professional status details have been updated");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status updated");
 
         await WithDbContext(async dbContext =>
         {
-            // CML TODO: should use routeState as expected values?
-            var updatedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.RouteToProfessionalStatusId == route.RouteToProfessionalStatusId);
+            var updatedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.QualificationId == qualificationid);
             Assert.Equal(journeyInstance.State.InductionExemptionReasonId, updatedProfessionalStatusRecord!.InductionExemptionReasonId);
+            Assert.Equal(journeyInstance.State.Status, updatedProfessionalStatusRecord!.Status);
+            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, updatedProfessionalStatusRecord!.RouteToProfessionalStatusId);
             Assert.Equal(journeyInstance.State.TrainingStartDate, updatedProfessionalStatusRecord!.TrainingStartDate);
             Assert.Equal(journeyInstance.State.TrainingEndDate, updatedProfessionalStatusRecord!.TrainingEndDate);
             Assert.Equal(journeyInstance.State.AwardedDate, updatedProfessionalStatusRecord!.AwardedDate);
@@ -275,23 +278,24 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         {
             var actualInductionUpdatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
 
-            Assert.Equal(actualInductionUpdatedEvent.CreatedUtc, Clock.UtcNow);
-            Assert.Equal(actualInductionUpdatedEvent.PersonId, person.PersonId);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.Status, journeyInstance.State.Status);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingStartDate, journeyInstance.State.TrainingStartDate);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingEndDate, journeyInstance.State.TrainingEndDate);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.AwardedDate, journeyInstance.State.AwardedDate);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingProvider?.TrainingProviderId, journeyInstance.State.TrainingProviderId);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingCountry?.CountryId, journeyInstance.State.TrainingCountryId);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismType, journeyInstance.State.TrainingAgeSpecialismType);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom, journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo, journeyInstance.State.TrainingAgeSpecialismRangeTo);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.TrainingSubjectIds, journeyInstance.State.TrainingSubjectIds);
-            Assert.Equal(actualInductionUpdatedEvent.ProfessionalStatus.InductionExemptionReason?.InductionExemptionReasonId, journeyInstance.State.InductionExemptionReasonId);
-            Assert.Equal(actualInductionUpdatedEvent.ChangeReason, journeyInstance.State.ChangeReason!.GetDisplayName());
-            Assert.Equal(actualInductionUpdatedEvent.ChangeReasonDetail, journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail);
-            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile!.FileId, journeyInstance.State.ChangeReasonDetail.EvidenceFileId!.Value);
-            Assert.Equal(actualInductionUpdatedEvent.EvidenceFile.Name, journeyInstance.State.ChangeReasonDetail.EvidenceFileName);
+            Assert.Equal(Clock.UtcNow, actualInductionUpdatedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, actualInductionUpdatedEvent.PersonId);
+            Assert.Equal(journeyInstance.State.Status, actualInductionUpdatedEvent.ProfessionalStatus.Status);
+            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualInductionUpdatedEvent.ProfessionalStatus.Route.RouteToProfessionalStatusId);
+            Assert.Equal(journeyInstance.State.TrainingStartDate, actualInductionUpdatedEvent.ProfessionalStatus.TrainingStartDate);
+            Assert.Equal(journeyInstance.State.TrainingEndDate, actualInductionUpdatedEvent.ProfessionalStatus.TrainingEndDate);
+            Assert.Equal(journeyInstance.State.AwardedDate, actualInductionUpdatedEvent.ProfessionalStatus.AwardedDate);
+            Assert.Equal(journeyInstance.State.TrainingProviderId, actualInductionUpdatedEvent.ProfessionalStatus.TrainingProvider?.TrainingProviderId);
+            Assert.Equal(journeyInstance.State.TrainingCountryId, actualInductionUpdatedEvent.ProfessionalStatus.TrainingCountry?.CountryId);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismType);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo);
+            Assert.Equal(journeyInstance.State.TrainingSubjectIds, actualInductionUpdatedEvent.ProfessionalStatus.TrainingSubjectIds);
+            Assert.Equal(journeyInstance.State.InductionExemptionReasonId, actualInductionUpdatedEvent.ProfessionalStatus.InductionExemptionReason?.InductionExemptionReasonId);
+            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), actualInductionUpdatedEvent.ChangeReason);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, actualInductionUpdatedEvent.ChangeReasonDetail);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId!.Value, actualInductionUpdatedEvent.EvidenceFile!.FileId);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualInductionUpdatedEvent.EvidenceFile.Name);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

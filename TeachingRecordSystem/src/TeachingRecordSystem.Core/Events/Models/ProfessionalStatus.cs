@@ -18,7 +18,7 @@ public record ProfessionalStatus
     public required TrainingProvider? TrainingProvider { get; init; }
     public required InductionExemptionReason? InductionExemptionReason { get; init; }
 
-    public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model) => new()
+    public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model, string? providerNameHint = null) => new()
     {
         ProfessionalStatusType = model.ProfessionalStatusType,
         Route = model.Route,
@@ -31,7 +31,13 @@ public record ProfessionalStatus
         TrainingAgeSpecialismRangeFrom = model.TrainingAgeSpecialismRangeFrom,
         TrainingAgeSpecialismRangeTo = model.TrainingAgeSpecialismRangeTo,
         TrainingCountry = model.TrainingCountry,
-        TrainingProvider = model.TrainingProvider,
+        TrainingProvider = model.TrainingProviderId is not null ? new TrainingProvider
+        {
+            IsActive = model.TrainingProvider.IsActive,
+            Name = model.TrainingProvider.Name,
+            TrainingProviderId = model.TrainingProvider.TrainingProviderId,
+            Ukprn = model.TrainingProvider.Ukprn
+        } : null,
         InductionExemptionReason = model.InductionExemptionReason
     };
 }

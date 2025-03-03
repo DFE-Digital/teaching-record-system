@@ -47,10 +47,13 @@ public class CheckYourAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-
+        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId)).ProfessionalStatusType;
         professionalStatus.Update(
             s =>
             {
+                s.ProfessionalStatusType = professionalStatusType;
+                s.Status = RouteDetail.Status;
+                s.RouteToProfessionalStatusId = RouteDetail.RouteToProfessionalStatusId;
                 s.AwardedDate = RouteDetail.AwardedDate;
                 s.TrainingStartDate = RouteDetail.TrainingStartDate;
                 s.TrainingEndDate = RouteDetail.TrainingEndDate;
@@ -83,7 +86,7 @@ public class CheckYourAnswersModel(
 
         await JourneyInstance!.CompleteAsync();
 
-        TempData.SetFlashSuccess("Induction details have been updated");
+        TempData.SetFlashSuccess("Route to professional status updated");
 
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }

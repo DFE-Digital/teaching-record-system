@@ -24,7 +24,6 @@ public class EditRouteStateBuilder
 
     public async Task<EditRouteStateBuilder> WithPopulatedReferenceFieldsAsync(ReferenceDataCache referenceDataCache)
     {
-        _routeToProfessionalStatusId = (await referenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne().RouteToProfessionalStatusId;
         _trainingCountryId = (await referenceDataCache.GetTrainingCountriesAsync()).RandomOne().CountryId;
         _trainingProviderId = (await referenceDataCache.GetTrainingProvidersAsync()).RandomOne().TrainingProviderId;
         _trainingSubjectIds = (await referenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(1).Select(x => x.TrainingSubjectId).ToArray();
