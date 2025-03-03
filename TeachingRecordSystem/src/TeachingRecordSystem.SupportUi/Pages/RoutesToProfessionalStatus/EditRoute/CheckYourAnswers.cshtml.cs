@@ -51,7 +51,6 @@ public class CheckYourAnswersModel(
         professionalStatus.Update(
             s =>
             {
-                s.ProfessionalStatusType = professionalStatusType;
                 s.Status = RouteDetail.Status;
                 s.RouteToProfessionalStatusId = RouteDetail.RouteToProfessionalStatusId;
                 s.AwardedDate = RouteDetail.AwardedDate;

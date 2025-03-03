@@ -145,7 +145,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TextContent);
         Assert.Equal("No", professionalStatus.GetElementByTestId($"training-exemption-{qualificationid}")!.TextContent);
         Assert.Equal(trainingProvider.Name, professionalStatus.GetElementByTestId($"training-provider-{qualificationid}")!.TextContent);
-        Assert.Equal(route.ProfessionalStatusType.ToString(), professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent);
+        Assert.Empty(professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent); // TODO - don't have degree type yet
         Assert.Equal(country.Name, professionalStatus.GetElementByTestId($"training-country-{qualificationid}")!.TextContent);
         Assert.Equal(ageRange.ToString(), professionalStatus.GetElementByTestId($"training-agespecialism-{qualificationid}")!.TextContent);
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));

@@ -4,7 +4,6 @@ namespace TeachingRecordSystem.Core.Events.Models;
 
 public record ProfessionalStatus
 {
-    public required ProfessionalStatusType ProfessionalStatusType { get; set; }
     public required RouteToProfessionalStatus Route { get; init; }
     public required ProfessionalStatusStatus Status { get; init; }
     public required DateOnly? AwardedDate { get; init; }
@@ -20,7 +19,6 @@ public record ProfessionalStatus
 
     public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model) => new()
     {
-        ProfessionalStatusType = model.ProfessionalStatusType,
         Route = model.Route,
         Status = model.Status,
         AwardedDate = model.AwardedDate,
