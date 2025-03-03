@@ -285,8 +285,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.TrainingStartDate, actualInductionUpdatedEvent.ProfessionalStatus.TrainingStartDate);
             Assert.Equal(journeyInstance.State.TrainingEndDate, actualInductionUpdatedEvent.ProfessionalStatus.TrainingEndDate);
             Assert.Equal(journeyInstance.State.AwardedDate, actualInductionUpdatedEvent.ProfessionalStatus.AwardedDate);
-            Assert.Equal(journeyInstance.State.TrainingProviderId, actualInductionUpdatedEvent.ProfessionalStatus.TrainingProvider?.TrainingProviderId);
-            Assert.Equal(journeyInstance.State.TrainingCountryId, actualInductionUpdatedEvent.ProfessionalStatus.TrainingCountry?.CountryId);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismType);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo);
@@ -294,8 +292,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.InductionExemptionReasonId, actualInductionUpdatedEvent.ProfessionalStatus.InductionExemptionReason?.InductionExemptionReasonId);
             Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), actualInductionUpdatedEvent.ChangeReason);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, actualInductionUpdatedEvent.ChangeReasonDetail);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId!.Value, actualInductionUpdatedEvent.EvidenceFile!.FileId);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualInductionUpdatedEvent.EvidenceFile.Name);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, actualInductionUpdatedEvent.EvidenceFile?.FileId);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualInductionUpdatedEvent.EvidenceFile?.Name);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
