@@ -151,7 +151,7 @@ public class EditRouteStateBuilder
 
     public EditRouteState Build()
     {
-        if(!_routeToProfessionalStatusId.HasValue || !_status.HasValue)
+        if (!_routeToProfessionalStatusId.HasValue || !_status.HasValue)
         {
             throw new InvalidOperationException("RouteToProfessionalStatusId and Status must be set");
         }
