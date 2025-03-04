@@ -137,6 +137,94 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Get_EndDateApplies_EndDateAndChangeLinkShown()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.Value.GetEndDateRequirement() == FieldRequirement.Mandatory)
+            .RandomOne();
+
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = Clock.Today;
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.InTraining)));
+
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status.Value)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "End date");
+        Assert.NotNull(label);
+        var value = label.NextElementSibling;
+        Assert.NotNull(value!.NextElementSibling!.GetElementsByTagName("a").First());
+    }
+
+    [Fact]
+    public async Task Get_EndDateNotApplicable_EndDateNotShown()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.NotRequired)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.Value.GetEndDateRequirement() == FieldRequirement.NotRequired)
+            .RandomOne();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.InTraining)));
+
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status.Value)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TextContent == "End date"));
+    }
+
+    [Fact]
     public async Task Get_ShowsOptionalAnswers_AsExpected()
     {
         // Arrange

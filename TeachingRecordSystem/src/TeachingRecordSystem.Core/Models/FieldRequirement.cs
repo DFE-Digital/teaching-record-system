@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
+namespace TeachingRecordSystem.Core.Models;
 
 public enum FieldRequirement
 {
