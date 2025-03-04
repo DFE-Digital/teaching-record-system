@@ -28,7 +28,7 @@ public enum ProfessionalStatusStatus
         subjects: FieldRequirement.Optional)]
     Awarded = 1,
     [ProfessionalStatusStatusInfo("Deferred",
-        startDate: FieldRequirement .NotRequired,
+        startDate: FieldRequirement.NotRequired,
         endDate: FieldRequirement.NotRequired,
         awardDate: FieldRequirement.NotRequired,
         inductionExemption: FieldRequirement.NotRequired,
