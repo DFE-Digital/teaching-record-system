@@ -13,13 +13,16 @@
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
     </govuk-summary-list-row>
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action href="@LinkGenerator.RouteEditEndDate(Model.QualificationId, Model.JourneyInstance!.InstanceId)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
+    @if (Model.EndDateRequired != FieldRequirement.NotRequired)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action href="@LinkGenerator.RouteEditEndDate(Model.QualificationId, Model.JourneyInstance!.InstanceId)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Award date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>

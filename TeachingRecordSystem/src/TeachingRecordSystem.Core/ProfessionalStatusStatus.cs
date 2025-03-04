@@ -2,102 +2,96 @@ using System.Reflection;
 
 namespace TeachingRecordSystem.Core;
 
-public enum FieldRequirementLevel
-{
-    NotAppplicable,
-    Required,
-    Optional
-}
 
 public enum ProfessionalStatusStatus
 {
     [ProfessionalStatusStatusInfo("In training",
-        startDate: FieldRequirementLevel.Required,
-        endDate: FieldRequirementLevel.Required,
-        awardDate: FieldRequirementLevel.NotAppplicable,
-        inductionExemption: FieldRequirementLevel.NotAppplicable,
-        trainingProvider: FieldRequirementLevel.Optional,
-        degreeType: FieldRequirementLevel.Optional,
-        country: FieldRequirementLevel.Optional,
-        ageRange: FieldRequirementLevel.Optional,
-        subjects: FieldRequirementLevel.Optional)]
+        startDate: FieldRequirement.Mandatory,
+        endDate: FieldRequirement.Mandatory,
+        awardDate: FieldRequirement.NotRequired,
+        inductionExemption: FieldRequirement.NotRequired,
+        trainingProvider: FieldRequirement.Optional,
+        degreeType: FieldRequirement.Optional,
+        country: FieldRequirement.Optional,
+        ageRange: FieldRequirement.Optional,
+        subjects: FieldRequirement.Optional)]
     InTraining = 0,
     [ProfessionalStatusStatusInfo("Awarded",
-        startDate: FieldRequirementLevel.Required,
-        endDate: FieldRequirementLevel.Required,
-        awardDate: FieldRequirementLevel.Required,
-        inductionExemption: FieldRequirementLevel.Required,
-        trainingProvider: FieldRequirementLevel.Optional,
-        degreeType: FieldRequirementLevel.Optional,
-        country: FieldRequirementLevel.Optional,
-        ageRange: FieldRequirementLevel.Optional,
-        subjects: FieldRequirementLevel.Optional)]
+        startDate: FieldRequirement.Mandatory,
+        endDate: FieldRequirement.Mandatory,
+        awardDate: FieldRequirement.Mandatory,
+        inductionExemption: FieldRequirement.Mandatory,
+        trainingProvider: FieldRequirement.Optional,
+        degreeType: FieldRequirement.Optional,
+        country: FieldRequirement.Optional,
+        ageRange: FieldRequirement.Optional,
+        subjects: FieldRequirement.Optional)]
     Awarded = 1,
     [ProfessionalStatusStatusInfo("Deferred",
-        startDate: FieldRequirementLevel.NotAppplicable,
-        endDate: FieldRequirementLevel.NotAppplicable,
-        awardDate: FieldRequirementLevel.NotAppplicable,
-        inductionExemption: FieldRequirementLevel.NotAppplicable,
-        trainingProvider: FieldRequirementLevel.NotAppplicable,
-        degreeType: FieldRequirementLevel.NotAppplicable,
-        country: FieldRequirementLevel.NotAppplicable,
-        ageRange: FieldRequirementLevel.NotAppplicable,
-        subjects: FieldRequirementLevel.NotAppplicable)]
+        startDate: FieldRequirement .NotRequired,
+        endDate: FieldRequirement.NotRequired,
+        awardDate: FieldRequirement.NotRequired,
+        inductionExemption: FieldRequirement.NotRequired,
+        trainingProvider: FieldRequirement.NotRequired,
+        degreeType: FieldRequirement.NotRequired,
+        country: FieldRequirement.NotRequired,
+        ageRange: FieldRequirement.NotRequired,
+        subjects: FieldRequirement.NotRequired)]
     Deferred = 2,
     [ProfessionalStatusStatusInfo("Deferred for skills tests",
-        startDate: FieldRequirementLevel.NotAppplicable,
-        endDate: FieldRequirementLevel.NotAppplicable,
-        awardDate: FieldRequirementLevel.NotAppplicable,
-        inductionExemption: FieldRequirementLevel.NotAppplicable,
-        trainingProvider: FieldRequirementLevel.NotAppplicable,
-        degreeType: FieldRequirementLevel.NotAppplicable,
-        country: FieldRequirementLevel.NotAppplicable,
-        ageRange: FieldRequirementLevel.NotAppplicable,
-        subjects: FieldRequirementLevel.NotAppplicable)]
+        startDate: FieldRequirement.NotRequired,
+        endDate: FieldRequirement.NotRequired,
+        awardDate: FieldRequirement.NotRequired,
+        inductionExemption: FieldRequirement.NotRequired,
+        trainingProvider: FieldRequirement.NotRequired,
+        degreeType: FieldRequirement.NotRequired,
+        country: FieldRequirement.NotRequired,
+        ageRange: FieldRequirement.NotRequired,
+        subjects: FieldRequirement.NotRequired)]
     DeferredForSkillsTest = 3,
     [ProfessionalStatusStatusInfo("Failed",
-        startDate: FieldRequirementLevel.NotAppplicable,
-        endDate: FieldRequirementLevel.NotAppplicable,
-        awardDate: FieldRequirementLevel.NotAppplicable,
-        inductionExemption: FieldRequirementLevel.NotAppplicable,
-        trainingProvider: FieldRequirementLevel.NotAppplicable,
-        degreeType: FieldRequirementLevel.NotAppplicable,
-        country: FieldRequirementLevel.NotAppplicable,
-        ageRange: FieldRequirementLevel.NotAppplicable,
-        subjects: FieldRequirementLevel.NotAppplicable)]
+        startDate: FieldRequirement.NotRequired,
+        endDate: FieldRequirement.NotRequired,
+        awardDate: FieldRequirement.NotRequired,
+        inductionExemption: FieldRequirement.NotRequired,
+        trainingProvider: FieldRequirement.NotRequired,
+        degreeType: FieldRequirement.NotRequired,
+        country: FieldRequirement.NotRequired,
+        ageRange: FieldRequirement.NotRequired,
+        subjects: FieldRequirement.NotRequired)]
     Failed = 4,
     [ProfessionalStatusStatusInfo("Withdrawn",
-        startDate: FieldRequirementLevel.NotAppplicable,
-        endDate: FieldRequirementLevel.NotAppplicable,
-        awardDate: FieldRequirementLevel.NotAppplicable,
-        inductionExemption: FieldRequirementLevel.NotAppplicable,
-        trainingProvider: FieldRequirementLevel.NotAppplicable,
-        degreeType: FieldRequirementLevel.NotAppplicable,
-        country: FieldRequirementLevel.NotAppplicable,
-        ageRange: FieldRequirementLevel.NotAppplicable,
-        subjects: FieldRequirementLevel.NotAppplicable)]
+        startDate: FieldRequirement.NotRequired,
+        endDate: FieldRequirement.NotRequired,
+        awardDate: FieldRequirement.NotRequired,
+        inductionExemption: FieldRequirement.NotRequired,
+        trainingProvider: FieldRequirement.NotRequired,
+        degreeType: FieldRequirement.NotRequired,
+        country: FieldRequirement.NotRequired,
+        ageRange: FieldRequirement.NotRequired,
+        subjects: FieldRequirement.NotRequired)]
     Withdrawn = 5,
     [ProfessionalStatusStatusInfo("Under assessment",
-        startDate: FieldRequirementLevel.Required,
-        endDate: FieldRequirementLevel.Required,
-        awardDate: FieldRequirementLevel.NotAppplicable,
-        inductionExemption: FieldRequirementLevel.NotAppplicable,
-        trainingProvider: FieldRequirementLevel.Optional,
-        degreeType: FieldRequirementLevel.Optional,
-        country: FieldRequirementLevel.Optional,
-        ageRange: FieldRequirementLevel.Optional,
-        subjects: FieldRequirementLevel.Optional)]
+        startDate: FieldRequirement.Mandatory,
+        endDate: FieldRequirement.Mandatory,
+        awardDate: FieldRequirement.NotRequired,
+        inductionExemption: FieldRequirement.NotRequired,
+        trainingProvider: FieldRequirement.Optional,
+        degreeType: FieldRequirement.Optional,
+        country: FieldRequirement.Optional,
+        ageRange: FieldRequirement.Optional,
+        subjects: FieldRequirement.Optional)]
     UnderAssessment = 6,
     [ProfessionalStatusStatusInfo("Approved",
-        startDate: FieldRequirementLevel.Required,
-        endDate: FieldRequirementLevel.Required,
-        awardDate: FieldRequirementLevel.Required,
-        inductionExemption: FieldRequirementLevel.Required,
-        trainingProvider: FieldRequirementLevel.Optional,
-        degreeType: FieldRequirementLevel.Optional,
-        country: FieldRequirementLevel.Optional,
-        ageRange: FieldRequirementLevel.Optional,
-        subjects: FieldRequirementLevel.Optional)]
+        startDate: FieldRequirement.Mandatory,
+        endDate: FieldRequirement.Mandatory,
+        awardDate: FieldRequirement.Mandatory,
+        inductionExemption: FieldRequirement.Mandatory,
+        trainingProvider: FieldRequirement.Optional,
+        degreeType: FieldRequirement.Optional,
+        country: FieldRequirement.Optional,
+        ageRange: FieldRequirement.Optional,
+        subjects: FieldRequirement.Optional)]
     Approved = 7
 }
 
@@ -112,23 +106,23 @@ public static class ProfessionalStatusStatusRegistry
 
     public static string GetTitle(this ProfessionalStatusStatus status) => _info[status].Title;
 
-    public static FieldRequirementLevel GetStartDateRequirement(this ProfessionalStatusStatus status) => _info[status].StartDate;
+    public static FieldRequirement GetStartDateRequirement(this ProfessionalStatusStatus status) => _info[status].StartDate;
 
-    public static FieldRequirementLevel GetEndDateRequirement(this ProfessionalStatusStatus status) => _info[status].EndDate;
+    public static FieldRequirement GetEndDateRequirement(this ProfessionalStatusStatus status) => _info[status].EndDate;
 
-    public static FieldRequirementLevel GetAwardDateRequirement(this ProfessionalStatusStatus status) => _info[status].AwardDate;
+    public static FieldRequirement GetAwardDateRequirement(this ProfessionalStatusStatus status) => _info[status].AwardDate;
 
-    public static FieldRequirementLevel GetInductionExemptionRequirement(this ProfessionalStatusStatus status) => _info[status].InductionExemption;
+    public static FieldRequirement GetInductionExemptionRequirement(this ProfessionalStatusStatus status) => _info[status].InductionExemption;
 
-    public static FieldRequirementLevel GetTrainingProviderRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingProvider;
+    public static FieldRequirement GetTrainingProviderRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingProvider;
 
-    public static FieldRequirementLevel GetDegreeTypeRequirement(this ProfessionalStatusStatus status) => _info[status].DegreeType;
+    public static FieldRequirement GetDegreeTypeRequirement(this ProfessionalStatusStatus status) => _info[status].DegreeType;
 
-    public static FieldRequirementLevel GetCountryRequirement(this ProfessionalStatusStatus status) => _info[status].Country;
+    public static FieldRequirement GetCountryRequirement(this ProfessionalStatusStatus status) => _info[status].Country;
 
-    public static FieldRequirementLevel GetAgeRangeRequirement(this ProfessionalStatusStatus status) => _info[status].AgeRange;
+    public static FieldRequirement GetAgeRangeRequirement(this ProfessionalStatusStatus status) => _info[status].AgeRange;
 
-    public static FieldRequirementLevel GetSubjectsRequirement(this ProfessionalStatusStatus status) => _info[status].Subjects;
+    public static FieldRequirement GetSubjectsRequirement(this ProfessionalStatusStatus status) => _info[status].Subjects;
 
     private static ProfessionalStatusStatusInfo GetInfo(ProfessionalStatusStatus status)
     {
@@ -146,15 +140,15 @@ public static class ProfessionalStatusStatusRegistry
 public sealed record ProfessionalStatusStatusInfo(
     ProfessionalStatusStatus Value,
     string Name,
-    FieldRequirementLevel StartDate,
-    FieldRequirementLevel EndDate,
-    FieldRequirementLevel AwardDate,
-    FieldRequirementLevel InductionExemption,
-    FieldRequirementLevel TrainingProvider,
-    FieldRequirementLevel DegreeType,
-    FieldRequirementLevel Country,
-    FieldRequirementLevel AgeRange,
-    FieldRequirementLevel Subjects)
+    FieldRequirement StartDate,
+    FieldRequirement EndDate,
+    FieldRequirement AwardDate,
+    FieldRequirement InductionExemption,
+    FieldRequirement TrainingProvider,
+    FieldRequirement DegreeType,
+    FieldRequirement Country,
+    FieldRequirement AgeRange,
+    FieldRequirement Subjects)
 {
     public string Title => Name[..1].ToUpper() + Name[1..];
 }
@@ -162,25 +156,25 @@ public sealed record ProfessionalStatusStatusInfo(
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 file sealed class ProfessionalStatusStatusInfoAttribute(
         string name,
-        FieldRequirementLevel startDate,
-        FieldRequirementLevel endDate,
-        FieldRequirementLevel awardDate,
-        FieldRequirementLevel inductionExemption,
-        FieldRequirementLevel trainingProvider,
-        FieldRequirementLevel degreeType,
-        FieldRequirementLevel country,
-        FieldRequirementLevel ageRange,
-        FieldRequirementLevel subjects
+        FieldRequirement startDate,
+        FieldRequirement endDate,
+        FieldRequirement awardDate,
+        FieldRequirement inductionExemption,
+        FieldRequirement trainingProvider,
+        FieldRequirement degreeType,
+        FieldRequirement country,
+        FieldRequirement ageRange,
+        FieldRequirement subjects
     ) : Attribute
 {
     public string Name => name;
-    public FieldRequirementLevel StartDate => startDate;
-    public FieldRequirementLevel EndDate => endDate;
-    public FieldRequirementLevel AwardDate => awardDate;
-    public FieldRequirementLevel InductionExemption => inductionExemption;
-    public FieldRequirementLevel TrainingProvider => trainingProvider;
-    public FieldRequirementLevel DegreeType => degreeType;
-    public FieldRequirementLevel Country => country;
-    public FieldRequirementLevel AgeRange => ageRange;
-    public FieldRequirementLevel Subjects => subjects;
+    public FieldRequirement StartDate => startDate;
+    public FieldRequirement EndDate => endDate;
+    public FieldRequirement AwardDate => awardDate;
+    public FieldRequirement InductionExemption => inductionExemption;
+    public FieldRequirement TrainingProvider => trainingProvider;
+    public FieldRequirement DegreeType => degreeType;
+    public FieldRequirement Country => country;
+    public FieldRequirement AgeRange => ageRange;
+    public FieldRequirement Subjects => subjects;
 }

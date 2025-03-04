@@ -30,6 +30,8 @@ public class CheckYourAnswersModel(
 
     public async Task OnGetAsync()
     {
+        var routeToProfessionalStatus = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId);
+        RouteDetail.EndDateRequired = QuestionDriverHelper.FieldRequired(routeToProfessionalStatus.TrainingEndDateRequired, JourneyInstance!.State.Status.GetEndDateRequirement());
         RouteDetail.RouteToProfessionalStatusName = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId))?.Name!;
         RouteDetail.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;

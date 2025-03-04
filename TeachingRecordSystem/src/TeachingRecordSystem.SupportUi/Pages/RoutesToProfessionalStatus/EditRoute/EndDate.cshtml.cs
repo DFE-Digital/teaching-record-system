@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance]
-public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
+[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+public class EndDateModel(
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -22,6 +23,7 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "End date")]
+    [Required(ErrorMessage = "Enter an end date")]
     [Display(Name = "Enter the route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
@@ -32,11 +34,6 @@ public class EndDateModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        //TODO: This property will be conditionally required based on RouteToProfessionalStatus.EndDateRequired
-        if (TrainingEndDate is null)
-        {
-            ModelState.AddModelError(nameof(TrainingEndDate), "Enter a end date");
-        }
         if (TrainingEndDate.HasValue && JourneyInstance!.State.TrainingStartDate is DateOnly startDate && startDate >= TrainingEndDate)
         {
             ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");

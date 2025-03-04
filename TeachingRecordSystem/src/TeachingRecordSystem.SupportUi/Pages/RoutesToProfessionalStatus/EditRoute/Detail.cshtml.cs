@@ -27,7 +27,9 @@ public class DetailModel(
 
     public async Task OnGetAsync()
     {
-        RouteDetail.RouteToProfessionalStatusName = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId))?.Name!;
+        var routeToProfessionalStatus = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId);
+        RouteDetail.EndDateRequired = QuestionDriverHelper.FieldRequired(routeToProfessionalStatus.TrainingEndDateRequired, JourneyInstance!.State.Status.GetEndDateRequirement());
+        RouteDetail.RouteToProfessionalStatusName = routeToProfessionalStatus?.Name;
         RouteDetail.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
@@ -52,7 +54,7 @@ public class DetailModel(
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        RouteDetail = new RouteDetailViewModel
+        RouteDetail = new RouteDetailViewModel()
         {
             QualificationType = JourneyInstance!.State.QualificationType,
             RouteToProfessionalStatusId = JourneyInstance!.State.RouteToProfessionalStatusId,

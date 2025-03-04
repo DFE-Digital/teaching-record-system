@@ -2,7 +2,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
-public class RouteDetailViewModel
+public class RouteDetailViewModel()
 {
     public Guid QualificationId { get; set; }
     public QualificationType? QualificationType { get; set; }
@@ -25,4 +25,6 @@ public class RouteDetailViewModel
     public string[]? TrainingSubjects { get; set; }
     public string? RouteToProfessionalStatusName { get; set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+
+    public FieldRequirement EndDateRequired { get; set; }
 }

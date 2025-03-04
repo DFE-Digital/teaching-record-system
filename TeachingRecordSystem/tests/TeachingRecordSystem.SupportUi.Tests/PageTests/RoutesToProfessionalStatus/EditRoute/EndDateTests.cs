@@ -98,7 +98,9 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = new DateOnly(2025, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -106,7 +108,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(ProfessionalStatusStatus.InTraining)
             .WithTrainingStartDate(startDate)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
@@ -126,7 +128,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter a end date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter an end date");
     }
 
     [Fact]
