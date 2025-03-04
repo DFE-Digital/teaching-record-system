@@ -13,7 +13,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddDays(daysAfter);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -55,7 +55,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = new DateOnly(2025, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -98,7 +98,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = new DateOnly(2025, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync())
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
@@ -137,7 +137,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = new DateOnly(2025, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)

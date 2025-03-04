@@ -140,7 +140,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_EndDateApplies_EndDateAndChangeLinkShown()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync())
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -190,7 +190,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_EndDateNotApplicable_EndDateNotShown()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync())
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.NotRequired)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
