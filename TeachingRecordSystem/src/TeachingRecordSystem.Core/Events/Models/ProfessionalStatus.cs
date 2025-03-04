@@ -1,10 +1,8 @@
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-
 namespace TeachingRecordSystem.Core.Events.Models;
 
 public record ProfessionalStatus
 {
-    public required RouteToProfessionalStatus Route { get; init; }
+    public required Guid RouteToProfessionalStatusId { get; init; }
     public required ProfessionalStatusStatus Status { get; init; }
     public required DateOnly? AwardedDate { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
@@ -13,13 +11,13 @@ public record ProfessionalStatus
     public required TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; init; }
     public required int? TrainingAgeSpecialismRangeFrom { get; init; }
     public required int? TrainingAgeSpecialismRangeTo { get; init; }
-    public required Country? TrainingCountry { get; init; }
-    public required TrainingProvider? TrainingProvider { get; init; }
-    public required InductionExemptionReason? InductionExemptionReason { get; init; }
+    public required string? TrainingCountryId { get; init; }
+    public required Guid? TrainingProviderId { get; init; }
+    public required Guid? InductionExemptionReasonId { get; init; }
 
     public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model) => new()
     {
-        Route = model.Route,
+        RouteToProfessionalStatusId = model.Route.RouteToProfessionalStatusId,
         Status = model.Status,
         AwardedDate = model.AwardedDate,
         TrainingStartDate = model.TrainingStartDate,
@@ -28,8 +26,8 @@ public record ProfessionalStatus
         TrainingAgeSpecialismType = model.TrainingAgeSpecialismType,
         TrainingAgeSpecialismRangeFrom = model.TrainingAgeSpecialismRangeFrom,
         TrainingAgeSpecialismRangeTo = model.TrainingAgeSpecialismRangeTo,
-        TrainingCountry = model.TrainingCountry,
-        TrainingProvider = model.TrainingProvider,
-        InductionExemptionReason = model.InductionExemptionReason
+        TrainingCountryId = model.TrainingCountry?.CountryId,
+        TrainingProviderId = model.TrainingProvider?.TrainingProviderId,
+        InductionExemptionReasonId = model.InductionExemptionReason?.InductionExemptionReasonId
     };
 }
