@@ -19,17 +19,16 @@ public record ProfessionalStatusUpdatedEvent : EventBase, IEventWithPersonId, IE
 public enum ProfessionalStatusUpdatedEventChanges
 {
     None = 0,
-    ProfessionalStatus = 1 << 0, // CML TODO needed?
-    Route = 1 << 1,
-    Status = 1 << 2,
-    StartDate = 1 << 3,
-    EndDate = 1 << 4,
-    AwardedDate = 1 << 5,
-    TrainingSubjectIds = 1 << 6,
-    TrainingAgeSpecialismType = 1 << 7,
-    TrainingAgeSpecialismRangeFrom = 1 << 8,
-    TrainingAgeSpecialismRangeTo = 1 << 9,
-    TrainingCountry = 1 << 10,
-    TrainingProvider = 1 << 11,
-    InductionExemptionReason = 1 << 12
+    Route = 1 << 0,
+    Status = 1 << 1,
+    StartDate = 1 << 2,
+    EndDate = 1 << 3,
+    AwardedDate = 1 << 4,
+    TrainingSubjectIds = 1 << 5,
+    TrainingAgeSpecialismType = 1 << 6,
+    TrainingAgeSpecialismRangeFrom = 1 << 7,
+    TrainingAgeSpecialismRangeTo = 1 << 8,
+    TrainingCountry = 1 << 9,
+    TrainingProvider = 1 << 10,
+    InductionExemptionReason = 1 << 11
 }

@@ -154,8 +154,6 @@ public partial class TestData
 
             await dbContext.ProfessionalStatuses.AddAsync(professionalStatus);
 
-            // CML TODO - raise event
-
             return professionalStatus.QualificationId;
         }
     }
