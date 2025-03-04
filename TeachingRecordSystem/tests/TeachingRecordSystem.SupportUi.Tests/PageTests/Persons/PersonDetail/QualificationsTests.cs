@@ -110,7 +110,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
         DateOnly awardedDate = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r =>
@@ -145,7 +145,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TextContent);
         Assert.Equal("No", professionalStatus.GetElementByTestId($"training-exemption-{qualificationid}")!.TextContent);
         Assert.Equal(trainingProvider.Name, professionalStatus.GetElementByTestId($"training-provider-{qualificationid}")!.TextContent);
-        Assert.Equal(route.ProfessionalStatusType.ToString(), professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent);
+        Assert.Empty(professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent); // TODO - don't have degree type yet
         Assert.Equal(country.Name, professionalStatus.GetElementByTestId($"training-country-{qualificationid}")!.TextContent);
         Assert.Equal(ageRange.ToString(), professionalStatus.GetElementByTestId($"training-agespecialism-{qualificationid}")!.TextContent);
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));

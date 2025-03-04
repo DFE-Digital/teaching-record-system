@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
@@ -10,8 +11,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
-    IFileService fileService) : PageModel
+    IFileService fileService,
+    IClock clock) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -45,11 +48,46 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // save the changes
+        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
+        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId)).ProfessionalStatusType;
+        professionalStatus.Update(
+            s =>
+            {
+                s.Status = RouteDetail.Status;
+                s.RouteToProfessionalStatusId = RouteDetail.RouteToProfessionalStatusId;
+                s.AwardedDate = RouteDetail.AwardedDate;
+                s.TrainingStartDate = RouteDetail.TrainingStartDate;
+                s.TrainingEndDate = RouteDetail.TrainingEndDate;
+                s.TrainingSubjectIds = RouteDetail.TrainingSubjectIds ?? [];
+                s.TrainingAgeSpecialismType = RouteDetail.TrainingAgeSpecialismType;
+                s.TrainingAgeSpecialismRangeFrom = RouteDetail.TrainingAgeSpecialismRangeFrom;
+                s.TrainingAgeSpecialismRangeTo = RouteDetail.TrainingAgeSpecialismRangeTo;
+                s.TrainingCountryId = RouteDetail.TrainingCountryId;
+                s.TrainingProviderId = RouteDetail.TrainingProviderId;
+                s.InductionExemptionReasonId = RouteDetail.InductionExemptionReasonId;
+            },
+            changeReason: ChangeReason?.GetDisplayName(),
+            ChangeReasonDetail.ChangeReasonDetail,
+            evidenceFile: JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId is Guid fileId ?
+                new EventModels.File()
+                {
+                    FileId = fileId,
+                    Name = JourneyInstance.State.ChangeReasonDetail.EvidenceFileName!
+                } :
+                null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var updatedEvent);
 
-        // broadcast event
+        if (updatedEvent is not null)
+        {
+            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        }
 
         await JourneyInstance!.CompleteAsync();
+
+        TempData.SetFlashSuccess("Route to professional status updated");
 
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }

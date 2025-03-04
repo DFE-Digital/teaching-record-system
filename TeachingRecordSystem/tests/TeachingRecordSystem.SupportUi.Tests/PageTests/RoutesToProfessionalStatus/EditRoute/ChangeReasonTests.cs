@@ -11,7 +11,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -60,7 +60,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var expectedChoices = Enum.GetValues<ChangeReasonOption>().Select(s => s.ToString());
 
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -110,7 +110,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = ChangeReasonOption.NewInformation;
         var changeReasonDetails = "A description about why the change typed into the box";
 
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -148,7 +148,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -177,7 +177,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_AdditionalDetailYes_NoDetailAdded_ReturnsError()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -215,7 +215,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = ChangeReasonOption.NewInformation;
         var changeReasonDetails = "A description about why the change typed into the box";
 
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -255,7 +255,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = ChangeReasonOption.NewInformation;
         var changeReasonDetails = "A description about why the change typed into the box";
         var evidenceFileName = "evidence.pdf";
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusesAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)

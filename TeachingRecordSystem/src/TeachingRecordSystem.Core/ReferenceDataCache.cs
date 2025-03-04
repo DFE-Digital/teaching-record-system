@@ -222,7 +222,7 @@ public class ReferenceDataCache(
         return inductionExemptionReasons.Single(er => er.InductionExemptionReasonId == id, $"Could not find induction exemption reason with ID: '{id}'.");
     }
 
-    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusesAsync(bool activeOnly = false)
+    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusAsync(bool activeOnly = false)
     {
         var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
         return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).ToArray();

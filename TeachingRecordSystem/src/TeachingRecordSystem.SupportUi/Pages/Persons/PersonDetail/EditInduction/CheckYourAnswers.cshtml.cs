@@ -104,9 +104,8 @@ public class CheckYourAnswersModel(
         if (updatedEvent is not null)
         {
             await dbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await dbContext.SaveChangesAsync();
         }
-
-        await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
 

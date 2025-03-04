@@ -23,9 +23,15 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
             return;
         }
 
-        var currentProfessionalStatus = await dbContext.ProfessionalStatuses
+        var request = dbContext.ProfessionalStatuses
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update") // https://github.com/dotnet/efcore/issues/26042
             .Include(ps => ps.Person)
+            .Include(ps => ps.TrainingProvider)
+            .Include(ps => ps.TrainingCountry)
+            .Include(ps => ps.Route)
+            .Include(ps => ps.InductionExemptionReason);
+
+        var currentProfessionalStatus = await request
             .SingleOrDefaultAsync();
 
         if (currentProfessionalStatus is null)
