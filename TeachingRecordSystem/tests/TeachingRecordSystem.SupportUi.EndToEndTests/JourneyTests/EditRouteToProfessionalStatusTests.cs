@@ -10,6 +10,41 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
+    public async Task Details_BackLink_QualificationPage()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var startDate = new DateOnly(2021, 1, 1);
+        var endDate = startDate.AddDays(1);
+        var setEndDate = startDate.AddDays(2);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                    .WithTrainingStartDate(startDate)
+                    .WithTrainingEndDate(endDate)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+    }
+
+    [Fact]
     public async Task EditEndDate_ToCya_EditEndDate_Continue()
     {
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
