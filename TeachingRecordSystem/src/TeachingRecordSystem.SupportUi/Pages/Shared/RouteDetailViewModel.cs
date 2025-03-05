@@ -27,4 +27,6 @@ public class RouteDetailViewModel()
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     public FieldRequirement EndDateRequired { get; set; }
+
+    public bool FromCheckAnswers { get; set; }
 }
