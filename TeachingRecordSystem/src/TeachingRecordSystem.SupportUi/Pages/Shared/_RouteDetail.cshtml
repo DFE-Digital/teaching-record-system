@@ -57,7 +57,7 @@
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>
-            @if (Model.TrainingSubjects is not null)
+            @if (Model.TrainingSubjects is not null && Model.TrainingSubjects.Any())
             {
                 <ul class="govuk-list">
                     @foreach (var subject in Model.TrainingSubjects)

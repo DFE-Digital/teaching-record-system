@@ -48,24 +48,10 @@ public class DetailModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
-        var journeyState = JourneyInstance!.State;
-        await JourneyInstance!.UpdateStateAsync(state =>
+        if (!JourneyInstance!.State.Initialized)
         {
-            state.AwardedDate = journeyState.AwardedDate;
-            state.TrainingStartDate = journeyState.TrainingStartDate;
-            state.TrainingEndDate = journeyState.TrainingEndDate;
-            state.TrainingSubjectIds = journeyState.TrainingSubjectIds;
-            state.TrainingAgeSpecialismType = journeyState.TrainingAgeSpecialismType;
-            state.TrainingAgeSpecialismRangeFrom = journeyState.TrainingAgeSpecialismRangeFrom;
-            state.TrainingAgeSpecialismRangeTo = journeyState.TrainingAgeSpecialismRangeTo;
-            state.TrainingCountryId = journeyState.TrainingCountryId;
-            state.TrainingProviderId = journeyState.TrainingProviderId;
-            state.InductionExemptionReasonId = journeyState.InductionExemptionReasonId;
-            state.QualificationType = journeyState.QualificationType;
-            state.RouteToProfessionalStatusId = journeyState.RouteToProfessionalStatusId;
-            state.Status = journeyState.Status;
-        });
+            await JourneyInstance.UpdateStateAsync(state => state.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature()));
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
