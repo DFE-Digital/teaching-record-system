@@ -32,7 +32,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/enddate?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -74,7 +74,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/enddate?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -119,7 +119,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/enddate?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>())
         };
@@ -156,7 +156,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/enddate?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
