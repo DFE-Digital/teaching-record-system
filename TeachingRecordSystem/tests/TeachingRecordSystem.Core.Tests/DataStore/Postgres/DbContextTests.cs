@@ -20,7 +20,14 @@ public class DbContextTests(DbFixture dbFixture)
                 snapshotModel = mutableModel.FinalizeModel();
             }
 
+
             snapshotModel = dbContext.GetService<IModelRuntimeInitializer>().Initialize(snapshotModel);
+
+            var migratedModel = snapshotModel.GetRelationalModel();
+            var contextModel = dbContext.GetService<IDesignTimeModel>().Model.GetRelationalModel();
+            var differences = dbContext.GetService<IMigrationsModelDiffer>().GetDifferences(
+                migratedModel,
+                contextModel);
             var hasDifferences = dbContext.GetService<IMigrationsModelDiffer>().HasDifferences(
                 snapshotModel.GetRelationalModel(),
                 dbContext.GetService<IDesignTimeModel>().Model.GetRelationalModel());
