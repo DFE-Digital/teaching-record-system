@@ -37,7 +37,10 @@
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.QualificationType</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
+        <govuk-summary-list-row-actions>
+            <govuk-summary-list-row-action data -testid="edit-degree-type-link" href="@LinkGenerator.RouteEditDegreeType(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
+        </govuk-summary-list-row-actions>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>

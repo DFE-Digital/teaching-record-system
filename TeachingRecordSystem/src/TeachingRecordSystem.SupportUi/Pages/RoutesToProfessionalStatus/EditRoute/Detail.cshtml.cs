@@ -73,6 +73,7 @@ public class DetailModel(
             TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
             InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId,
             QualificationId = QualificationId,
+            DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
             JourneyInstance = JourneyInstance
         };
 

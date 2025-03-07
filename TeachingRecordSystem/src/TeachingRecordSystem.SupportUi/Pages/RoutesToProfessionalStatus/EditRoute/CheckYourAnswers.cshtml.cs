@@ -67,6 +67,7 @@ public class CheckYourAnswersModel(
                 s.TrainingCountryId = RouteDetail.TrainingCountryId;
                 s.TrainingProviderId = RouteDetail.TrainingProviderId;
                 s.InductionExemptionReasonId = RouteDetail.InductionExemptionReasonId;
+                s.DegreeTypeId = RouteDetail.DegreeTypeId;
             },
             changeReason: ChangeReason?.GetDisplayName(),
             ChangeReasonDetail.ChangeReasonDetail,
