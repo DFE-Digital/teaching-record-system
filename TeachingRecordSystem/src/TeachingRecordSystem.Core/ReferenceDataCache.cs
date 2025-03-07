@@ -30,6 +30,7 @@ public class ReferenceDataCache(
     private Task<TrainingSubject[]>? _trainingSubjectsTask;
     private Task<Country[]>? _countriesTask;
     private Task<TrainingProvider[]>? _trainingProvidersTask;
+    private Task<DegreeType[]>? _degreeTypesTask;
 
     public async Task<dfeta_sanctioncode> GetSanctionCodeByValueAsync(string value)
     {
@@ -244,10 +245,22 @@ public class ReferenceDataCache(
     {
         return await EnsureTrainingCountriesAsync();
     }
+
     public async Task<Country> GetTrainingCountryByIdAsync(string countryId)
     {
         var countries = await EnsureTrainingCountriesAsync();
         return countries.Single(c => c.CountryId == countryId, $"Could not find country with ID: '{countryId}'.");
+    }
+
+    public Task<DegreeType[]> GetDegreeTypesAsync()
+    {
+        return EnsureDegreeTypesAsync();
+    }
+
+    public async Task<DegreeType> GetDegreeTypeByIdAsync(Guid degreeTypeId)
+    {
+        var degreeTypes = await EnsureDegreeTypesAsync();
+        return degreeTypes.Single(dt => dt.DegreeTypeId == degreeTypeId, $"Could not find degree type with ID: '{degreeTypeId}'.");
     }
 
     public async Task<TrainingProvider[]> GetTrainingProvidersAsync(bool activeOnly = false)
@@ -378,6 +391,15 @@ public class ReferenceDataCache(
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
                 return await dbContext.TrainingProviders.AsNoTracking().ToArrayAsync();
+            });
+
+    private Task<DegreeType[]> EnsureDegreeTypesAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _degreeTypesTask,
+            async () =>
+            {
+                using var dbContext = dbContextFactory.CreateDbContext();
+                return await dbContext.DegreeTypes.AsNoTracking().ToArrayAsync();
             });
 
     async Task IStartupTask.ExecuteAsync()

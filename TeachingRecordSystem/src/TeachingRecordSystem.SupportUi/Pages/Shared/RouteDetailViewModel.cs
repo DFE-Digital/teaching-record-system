@@ -19,6 +19,8 @@ public class RouteDetailViewModel()
     public string? TrainingCountryId { get; set; }
     public Guid? TrainingProviderId { get; set; }
     public Guid? InductionExemptionReasonId { get; set; }
+    public Guid? DegreeTypeId { get; set; }
+    public string? DegreeType { get; set; }
     public string? ExemptionReason { get; set; }
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
@@ -27,4 +29,6 @@ public class RouteDetailViewModel()
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     public FieldRequirement EndDateRequired { get; set; }
+
+    public bool FromCheckAnswers { get; set; }
 }

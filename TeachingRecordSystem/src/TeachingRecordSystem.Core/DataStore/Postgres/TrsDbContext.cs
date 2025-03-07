@@ -119,6 +119,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<ProfessionalStatus> ProfessionalStatuses => Set<ProfessionalStatus>();
 
+    public DbSet<DegreeType> DegreeTypes => Set<DegreeType>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

@@ -1,0 +1,28 @@
+"/route/{qualificationId}/edit/degree-type/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.DegreeTypeModel
+@{
+    ViewBag.Title = Html.DisplayNameFor(m => m.DegreeTypeId);
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswer == true ? LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteDegreeType(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <govuk-select asp-for="DegreeTypeId" label="Select the degree type" data-testid="degree-type">
+                @foreach (var degreeType in Model.DegreeTypes)
+                {
+                    <govuk-select-item value="@degreeType.DegreeTypeId">@degreeType.Name</govuk-select-item>
+                }
+            </govuk-select>
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="confirm-button">Confirm and commit changes</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteDegreeTypeCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -19,7 +19,7 @@
             <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
             <govuk-summary-list-row-value>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action href="@LinkGenerator.RouteEditEndDate(Model.QualificationId, Model.JourneyInstance!.InstanceId)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="edit-end-date-link" href="@LinkGenerator.RouteEditEndDate(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -57,7 +57,7 @@
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>
-            @if (Model.TrainingSubjects is not null)
+            @if (Model.TrainingSubjects is not null && Model.TrainingSubjects.Any())
             {
                 <ul class="govuk-list">
                     @foreach (var subject in Model.TrainingSubjects)

@@ -28,6 +28,8 @@ public class ProfessionalStatus : Qualification
     public TrainingProvider? TrainingProvider { get; }
     public required Guid? InductionExemptionReasonId { get; set; }
     public InductionExemptionReason? InductionExemptionReason { get; }
+    public required Guid? DegreeTypeId { get; set; }
+    public DegreeType? DegreeType { get; }
     public string? DqtTeacherStatusName { get; init; }
     public string? DqtTeacherStatusValue { get; init; }
     public string? DqtEarlyYearsStatusName { get; init; }

@@ -489,6 +489,15 @@ public static class PageExtensions
         await page.FillAsync("input[type='email']", email);
     }
 
+    public static async Task AssertContentEquals(this IPage page, string content, string label)
+    {
+        var dtElement = page.Locator($"dt:has-text('{label}')");
+        var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
+        var ddText = ddElement != null ? await ddElement.InnerTextAsync() : "Not found";
+
+        Assert.Equal(content, ddText);
+    }
+
     public static async Task SubmitAddAlertIndexPageAsync(this IPage page, string alertType, string? details, string link, DateOnly startDate)
     {
         await page.AssertOnAddAlertTypePageAsync();
