@@ -12,7 +12,7 @@ public class EndDateModel(
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
-    public bool FromCheckDetails { get; set; }
+    public bool FromCheckAnswers { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -45,8 +45,8 @@ public class EndDateModel(
         }
 
         await JourneyInstance!.UpdateStateAsync(state => state.TrainingEndDate = TrainingEndDate);
-        return Redirect(FromCheckDetails ?
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId) :
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 

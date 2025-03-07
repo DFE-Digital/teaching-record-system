@@ -235,22 +235,17 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(ProfessionalStatusStatus.InTraining)
+                .WithTrainingStartDate(startDate)
+                .WithTrainingEndDate(endDate)
+                .WithTrainingProvider(trainingProvider)
+                ));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.InTraining)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
-            .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
-            editRouteState
+            new EditRouteState()
             );
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");

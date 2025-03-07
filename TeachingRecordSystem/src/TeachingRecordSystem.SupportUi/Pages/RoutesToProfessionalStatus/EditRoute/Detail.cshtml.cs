@@ -46,9 +46,12 @@ public class DetailModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
+        if (!JourneyInstance!.State.Initialized)
+        {
+            await JourneyInstance.UpdateStateAsync(state => state.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature()));
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
@@ -73,6 +76,6 @@ public class DetailModel(
             JourneyInstance = JourneyInstance
         };
 
-        return next();
+        await next();
     }
 }

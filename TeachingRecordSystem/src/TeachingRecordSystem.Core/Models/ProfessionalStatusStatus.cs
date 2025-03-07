@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace TeachingRecordSystem.Core;
+namespace TeachingRecordSystem.Core.Models;
 
 
 public enum ProfessionalStatusStatus

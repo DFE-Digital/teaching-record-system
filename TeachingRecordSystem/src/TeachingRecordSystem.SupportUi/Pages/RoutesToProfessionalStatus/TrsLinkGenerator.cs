@@ -18,8 +18,8 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/CheckYourAnswers", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
     public string RouteAdd(Guid personId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Index", routeValues: new { personId });
-    public string RouteEditEndDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromDetails = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/EndDate", routeValues: new { qualificationId, fromDetails }, journeyInstanceId: journeyInstanceId);
+    public string RouteEditEndDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/EndDate", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditEndDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/EndDate", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
 }
