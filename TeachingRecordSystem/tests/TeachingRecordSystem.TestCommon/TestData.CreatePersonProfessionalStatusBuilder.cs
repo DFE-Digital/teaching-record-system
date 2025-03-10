@@ -21,6 +21,7 @@ public partial class TestData
         private string? _trainingCountryId;
         private Guid? _trainingProviderId;
         private Guid? _inductionExemptionReasonId;
+        private Guid? _degreeTypeId;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -104,6 +105,12 @@ public partial class TestData
         public CreatePersonProfessionalStatusBuilder WithTrainingProvider(TrainingProvider trainingProvider)
         {
             _trainingProviderId = trainingProvider.TrainingProviderId;
+            return this;
+        }
+
+        public CreatePersonProfessionalStatusBuilder WithDegreeType(DegreeType degreeType)
+        {
+            _degreeTypeId = degreeType.DegreeTypeId;
             return this;
         }
 

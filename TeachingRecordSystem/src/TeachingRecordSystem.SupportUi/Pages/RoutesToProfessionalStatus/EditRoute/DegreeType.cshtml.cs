@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
@@ -22,25 +23,37 @@ public class DegreeTypeModel(
 
     public Guid PersonId { get; set; }
 
-    public DegreeType[]? DegreeTypes { get; set; }
+    public DegreeType[] DegreeTypes { get; set; } = [];
 
-    [Required]
     [BindProperty]
-    public Guid? DegreeTypeId { get; init; }
+    [Required(ErrorMessage = "Select a degree type")]
+    public Guid? DegreeTypeId { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public void OnGet()
     {
-        DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
-        return Page();
+        DegreeTypeId = JourneyInstance!.State.DegreeTypeId;
     }
 
     public async Task<IActionResult>OnPostAsync()
     {
-        JourneyInstance!.State.DegreeTypeId = DegreeTypeId!.Value;
-        await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId!.Value);
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
+        await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
         return Redirect(FromCheckAnswer ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonName = personInfo.Name;
+        PersonId = personInfo.PersonId;
+        DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

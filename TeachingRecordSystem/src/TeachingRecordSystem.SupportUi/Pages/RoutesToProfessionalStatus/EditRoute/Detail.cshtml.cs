@@ -27,12 +27,10 @@ public class DetailModel(
 
     public async Task OnGetAsync()
     {
-        var routeToProfessionalStatus = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId);
-        RouteDetail.EndDateRequired = QuestionDriverHelper.FieldRequired(routeToProfessionalStatus.TrainingEndDateRequired, JourneyInstance!.State.Status.GetEndDateRequirement());
-        RouteDetail.RouteToProfessionalStatusName = routeToProfessionalStatus?.Name;
         RouteDetail.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
+        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
         RouteDetail.TrainingSubjects = RouteDetail.TrainingSubjectIds is not null ?
             RouteDetail.TrainingSubjectIds
                 .Join((await referenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
@@ -57,10 +55,11 @@ public class DetailModel(
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
+        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         RouteDetail = new RouteDetailViewModel()
         {
+            RouteToProfessionalStatus = route,
             QualificationType = JourneyInstance!.State.QualificationType,
-            RouteToProfessionalStatusId = JourneyInstance!.State.RouteToProfessionalStatusId,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,

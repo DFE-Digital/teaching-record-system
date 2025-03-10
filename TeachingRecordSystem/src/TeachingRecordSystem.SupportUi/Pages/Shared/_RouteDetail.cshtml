@@ -3,7 +3,7 @@
 <govuk-summary-list>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>@Model.RouteToProfessionalStatusName</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value>@Model.RouteToProfessionalStatus.Name</govuk-summary-list-row-value>
     </govuk-summary-list-row>
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
@@ -35,13 +35,16 @@
         <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.TrainingProvider</govuk-summary-list-row-value>
     </govuk-summary-list-row>
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
+    @if (Model.DegreeTypeRequired != FieldRequirement.NotRequired)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
         <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
             <govuk-summary-list-row-action data-testid="edit-degree-type-link" href="@LinkGenerator.RouteEditDegreeType(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
+        </govuk-summary-list-row>
+    }
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
         <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>

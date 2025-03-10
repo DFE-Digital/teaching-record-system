@@ -1,7 +1,7 @@
 @page "/route/{qualificationId}/edit/degree-type/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.DegreeTypeModel
 @{
-    ViewBag.Title = Html.DisplayNameFor(m => m.DegreeTypeId);
+    ViewBag.Title = "Edit degree type";
 }
 
 @section BeforeContent {
@@ -14,13 +14,14 @@
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
             <govuk-select asp-for="DegreeTypeId" label="Select the degree type" data-testid="degree-type">
+                <govuk-select-item selected>Please select</govuk-select-item>
                 @foreach (var degreeType in Model.DegreeTypes)
                 {
-                    <govuk-select-item value="@degreeType.DegreeTypeId">@degreeType.Name</govuk-select-item>
+                    <govuk-select-item value="@degreeType.DegreeTypeId" selected="@Model.DegreeTypeId==degreeType.DegreeTypeId">@degreeType.Name</govuk-select-item>
                 }
             </govuk-select>
             <div class="govuk-button-group">
-                <govuk-button type="submit" data-testid="confirm-button">Confirm and commit changes</govuk-button>
+                <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditDegreeTypeCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
