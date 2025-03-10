@@ -1,7 +1,24 @@
 @page "/route/{qualificationId}/edit/degree-type/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.DegreeTypeModel
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 @{
     ViewBag.Title = "Edit degree type";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            accessibleAutocomplete.enhanceSelectElement({
+                defaultValue: '',
+                selectElement: document.querySelector('#@nameof(Model.DegreeTypeId)')
+            })
+        }
+    </script>
 }
 
 @section BeforeContent {
@@ -14,7 +31,7 @@
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-select asp-for="DegreeTypeId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true" />
-                <govuk-select-item selected>Please select</govuk-select-item>
+                <govuk-select-item value=""></govuk-select-item>
                 @foreach (var degreeType in Model.DegreeTypes)
                 {
                     <govuk-select-item value="@degreeType.DegreeTypeId" selected="@Model.DegreeTypeId==degreeType.DegreeTypeId">@degreeType.Name</govuk-select-item>
