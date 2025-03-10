@@ -18,7 +18,7 @@ public class CheckYourAnswersModel(
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
-    public RouteDetailViewModel RouteDetail { get; set; } = new();
+    public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
@@ -33,7 +33,7 @@ public class CheckYourAnswersModel(
 
     public async Task OnGetAsync()
     {
-        RouteDetail.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
+        RouteDetail!.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
         RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
@@ -48,7 +48,7 @@ public class CheckYourAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatus.RouteToProfessionalStatusId)).ProfessionalStatusType;
+        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail!.RouteToProfessionalStatus.RouteToProfessionalStatusId)).ProfessionalStatusType;
         professionalStatus.Update(
             s =>
             {
@@ -117,7 +117,6 @@ public class CheckYourAnswersModel(
         RouteDetail = new RouteDetailViewModel
         {
             QualificationType = JourneyInstance!.State.QualificationType,
-            //RouteToProfessionalStatusId = JourneyInstance!.State.RouteToProfessionalStatusId,
             RouteToProfessionalStatus = route,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,

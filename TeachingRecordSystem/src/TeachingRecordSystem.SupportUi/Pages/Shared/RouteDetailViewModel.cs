@@ -8,7 +8,7 @@ public class RouteDetailViewModel()
 {
     public Guid QualificationId { get; set; }
     public QualificationType? QualificationType { get; set; }
-    public RouteToProfessionalStatus RouteToProfessionalStatus { get; set; } = null!;
+    public required RouteToProfessionalStatus RouteToProfessionalStatus { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }

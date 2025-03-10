@@ -1,4 +1,3 @@
-using TeachingRecordSystem.Core.Services.Establishments.Tps;
 using TeachingRecordSystem.SupportUi.Pages.Common;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
