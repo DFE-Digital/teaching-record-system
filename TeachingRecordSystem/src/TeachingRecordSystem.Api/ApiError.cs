@@ -19,6 +19,7 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int InductionStartDateIsNotPermitted => 10038;
         public static int InductionCompletedDateIsNotPermitted => 10039;
         public static int ForbiddenForAppropriateBody => 10040;
+        public static int PIIUpdatesForbidden => 10041;
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -70,6 +71,9 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
 
     public static ApiError ForbiddenForAppropriateBody() =>
         new(ErrorCodes.ForbiddenForAppropriateBody, "Forbidden.", "");
+
+    public static ApiError PIIUpdatesForbidden() =>
+        new(ErrorCodes.PIIUpdatesForbidden, "Updates to PII data is not permitted.", "");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {
