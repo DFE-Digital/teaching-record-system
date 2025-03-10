@@ -291,5 +291,5 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             var actualValue = property.GetValue(item);
             return actualValue?.Equals(expectedValue) ?? false;
         };
-     }
+    }
 }

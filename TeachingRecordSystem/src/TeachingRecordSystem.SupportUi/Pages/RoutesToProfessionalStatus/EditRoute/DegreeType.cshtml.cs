@@ -35,7 +35,7 @@ public class DegreeTypeModel(
         DegreeTypeId = JourneyInstance!.State.DegreeTypeId;
     }
 
-    public async Task<IActionResult>OnPostAsync()
+    public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
         {
