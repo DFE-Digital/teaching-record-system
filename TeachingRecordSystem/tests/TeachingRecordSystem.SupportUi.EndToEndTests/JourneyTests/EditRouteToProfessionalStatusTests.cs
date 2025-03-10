@@ -217,4 +217,46 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
+
+    [Fact]
+    public async Task EditDegreeType_BackLinks()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var newDegreeType = (await TestData.ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
+
+        await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
+
+        await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
+        await page.FillAsync($"label:text-is('Degree type')", newDegreeType.Name);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+    }
 }

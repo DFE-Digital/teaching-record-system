@@ -18,7 +18,7 @@ public class CheckYourAnswersModel(
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
-    public RouteDetailViewModel RouteDetail { get; set; } = new();
+    public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
@@ -33,12 +33,10 @@ public class CheckYourAnswersModel(
 
     public async Task OnGetAsync()
     {
-        var routeToProfessionalStatus = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId);
-        RouteDetail.EndDateRequired = QuestionDriverHelper.FieldRequired(routeToProfessionalStatus.TrainingEndDateRequired, JourneyInstance!.State.Status.GetEndDateRequirement());
-        RouteDetail.RouteToProfessionalStatusName = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId))?.Name!;
-        RouteDetail.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
+        RouteDetail!.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
+        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
         RouteDetail.TrainingSubjects = RouteDetail.TrainingSubjectIds is not null ?
             RouteDetail.TrainingSubjectIds
                 .Join((await referenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
@@ -50,12 +48,12 @@ public class CheckYourAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatusId)).ProfessionalStatusType;
+        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail!.RouteToProfessionalStatus.RouteToProfessionalStatusId)).ProfessionalStatusType;
         professionalStatus.Update(
             s =>
             {
                 s.Status = RouteDetail.Status;
-                s.RouteToProfessionalStatusId = RouteDetail.RouteToProfessionalStatusId;
+                s.RouteToProfessionalStatusId = RouteDetail.RouteToProfessionalStatus.RouteToProfessionalStatusId;
                 s.AwardedDate = RouteDetail.AwardedDate;
                 s.TrainingStartDate = RouteDetail.TrainingStartDate;
                 s.TrainingEndDate = RouteDetail.TrainingEndDate;
@@ -66,6 +64,7 @@ public class CheckYourAnswersModel(
                 s.TrainingCountryId = RouteDetail.TrainingCountryId;
                 s.TrainingProviderId = RouteDetail.TrainingProviderId;
                 s.InductionExemptionReasonId = RouteDetail.InductionExemptionReasonId;
+                s.DegreeTypeId = RouteDetail.DegreeTypeId;
             },
             changeReason: ChangeReason?.GetDisplayName(),
             ChangeReasonDetail.ChangeReasonDetail,
@@ -114,11 +113,11 @@ public class CheckYourAnswersModel(
 
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail!;
-
+        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         RouteDetail = new RouteDetailViewModel
         {
             QualificationType = JourneyInstance!.State.QualificationType,
-            RouteToProfessionalStatusId = JourneyInstance!.State.RouteToProfessionalStatusId,
+            RouteToProfessionalStatus = route,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
@@ -131,6 +130,7 @@ public class CheckYourAnswersModel(
             TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
             InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId,
             QualificationId = QualificationId,
+            DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
             JourneyInstance = JourneyInstance
         };
 

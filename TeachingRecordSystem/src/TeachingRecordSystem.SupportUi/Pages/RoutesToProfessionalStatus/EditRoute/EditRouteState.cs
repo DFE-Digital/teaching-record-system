@@ -25,6 +25,7 @@ public class EditRouteState : IRegisterJourney
     public string? TrainingCountryId { get; set; }
     public Guid? TrainingProviderId { get; set; }
     public Guid? InductionExemptionReasonId { get; set; }
+    public Guid? DegreeTypeId { get; set; }
 
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
@@ -52,7 +53,7 @@ public class EditRouteState : IRegisterJourney
         TrainingCountryId = professionalStatusInfo.ProfessionalStatus.TrainingCountryId;
         TrainingProviderId = professionalStatusInfo.ProfessionalStatus.TrainingProviderId;
         InductionExemptionReasonId = professionalStatusInfo.ProfessionalStatus.InductionExemptionReasonId;
-
+        DegreeTypeId = professionalStatusInfo.ProfessionalStatus.DegreeTypeId;
         Initialized = true;
     }
 }

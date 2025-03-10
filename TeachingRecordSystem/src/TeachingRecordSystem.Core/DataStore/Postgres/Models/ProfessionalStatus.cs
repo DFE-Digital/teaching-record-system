@@ -28,6 +28,8 @@ public class ProfessionalStatus : Qualification
     public TrainingProvider? TrainingProvider { get; }
     public required Guid? InductionExemptionReasonId { get; set; }
     public InductionExemptionReason? InductionExemptionReason { get; }
+    public required Guid? DegreeTypeId { get; set; }
+    public DegreeType? DegreeType { get; }
     public string? DqtTeacherStatusName { get; init; }
     public string? DqtTeacherStatusValue { get; init; }
     public string? DqtEarlyYearsStatusName { get; init; }
@@ -60,7 +62,8 @@ public class ProfessionalStatus : Qualification
             (TrainingAgeSpecialismRangeTo != oldEventModel.TrainingAgeSpecialismRangeTo ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo : ProfessionalStatusUpdatedEventChanges.None) |
             (TrainingCountryId != oldEventModel.TrainingCountryId ? ProfessionalStatusUpdatedEventChanges.TrainingCountry : ProfessionalStatusUpdatedEventChanges.None) |
             (TrainingProviderId != oldEventModel.TrainingProviderId ? ProfessionalStatusUpdatedEventChanges.TrainingProvider : ProfessionalStatusUpdatedEventChanges.None) |
-            (InductionExemptionReasonId != oldEventModel.InductionExemptionReasonId ? ProfessionalStatusUpdatedEventChanges.InductionExemptionReason : ProfessionalStatusUpdatedEventChanges.None);
+            (InductionExemptionReasonId != oldEventModel.InductionExemptionReasonId ? ProfessionalStatusUpdatedEventChanges.InductionExemptionReason : ProfessionalStatusUpdatedEventChanges.None) |
+            (DegreeTypeId != oldEventModel.DegreeTypeId ? ProfessionalStatusUpdatedEventChanges.DegreeType : ProfessionalStatusUpdatedEventChanges.None);
 
         if (changes == ProfessionalStatusUpdatedEventChanges.None)
         {

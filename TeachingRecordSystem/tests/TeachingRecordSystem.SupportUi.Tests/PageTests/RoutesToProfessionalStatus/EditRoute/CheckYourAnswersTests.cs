@@ -87,7 +87,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -100,9 +102,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithTrainingCountryId("GB")
+            .WithTrainingCountryId(country.CountryId)
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -127,8 +130,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
         doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
-        doc.AssertRowContentMatches("Country of training", "United Kingdom");
+        doc.AssertRowContentMatches("Degree type", degreeType.Name);
+        doc.AssertRowContentMatches("Country of training", country.Name);
         doc.AssertRowContentMatches("Age range", "Foundation stage");
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
     }
@@ -177,7 +180,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
         doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        //doc.AssertRowContentMatches("Degree type", ); // CML TODO degree type not defined yet
+        doc.AssertRowContentMatches("Degree type", "Not provided");
         doc.AssertRowContentMatches("Country of training", "Not provided");
         doc.AssertRowContentMatches("Age range", "Not provided");
         doc.AssertRowContentMatches("Subjects", "Not provided");

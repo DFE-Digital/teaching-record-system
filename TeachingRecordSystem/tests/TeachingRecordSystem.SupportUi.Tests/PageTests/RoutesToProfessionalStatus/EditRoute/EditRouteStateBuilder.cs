@@ -17,6 +17,7 @@ public class EditRouteStateBuilder
     private int? _trainingAgeSpecialismRangeTo;
     private string? _trainingCountryId;
     private Guid? _trainingProviderId;
+    private Guid? _degreeTypeId;
     private Guid? _inductionExemptionReasonId;
     private ChangeReasonOption? _changeReasonOption;
     private ChangeReasonDetailsState _changeReasonDetail = new();
@@ -111,6 +112,12 @@ public class EditRouteStateBuilder
         return this;
     }
 
+    public EditRouteStateBuilder WithDegreeTypeId(Guid degreeTypeId)
+    {
+        _degreeTypeId = degreeTypeId;
+        return this;
+    }
+
     public EditRouteStateBuilder WithInductionExemptionReasonId(Guid inductionExemptionReasonId)
     {
         _inductionExemptionReasonId = inductionExemptionReasonId;
@@ -172,6 +179,7 @@ public class EditRouteStateBuilder
             InductionExemptionReasonId = _inductionExemptionReasonId,
             ChangeReason = _changeReasonOption,
             QualificationType = _qualificationType,
+            DegreeTypeId = _degreeTypeId,
             ChangeReasonDetail = new ChangeReasonDetailsState()
             {
                 ChangeReasonDetail = _changeReasonDetail.ChangeReasonDetail,
