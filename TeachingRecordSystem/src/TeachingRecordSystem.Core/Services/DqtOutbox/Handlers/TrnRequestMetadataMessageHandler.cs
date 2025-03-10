@@ -1,4 +1,3 @@
-using Npgsql;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
@@ -8,7 +7,7 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
 {
     public async Task HandleMessageAsync(TrnRequestMetadataMessage message)
     {
-        try
+        if (!await dbContext.TrnRequestMetadata.AnyAsync(m => m.ApplicationUserId == message.ApplicationUserId && m.RequestId == message.RequestId))
         {
             dbContext.TrnRequestMetadata.Add(new DataStore.Postgres.Models.TrnRequestMetadata()
             {
@@ -31,10 +30,6 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
                 Country = message.Country
             });
             await dbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException dex) when (dex.InnerException is PostgresException { SqlState: "23505" })
-        {
-            // Already added
         }
     }
 }
