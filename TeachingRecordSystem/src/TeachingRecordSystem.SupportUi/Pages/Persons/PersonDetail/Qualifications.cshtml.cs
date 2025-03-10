@@ -26,14 +26,15 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
 
     public async Task OnGetAsync()
     {
-        ProfessionalStatuses = dbContext.ProfessionalStatuses
+        ProfessionalStatuses = await dbContext.ProfessionalStatuses
             .Include(q => q.TrainingProvider)
             .Include(q => q.InductionExemptionReason)
             .Include(q => q.TrainingCountry)
             .Include(q => q.Route)
+            .Include(q => q.DegreeType)
             .Where(x => x.PersonId == PersonId)
             .OrderBy(x => x.CreatedOn)
-        .ToArray();
+            .ToArrayAsync();
         var uniqueSubjectIds = ProfessionalStatuses
             .SelectMany(x => x.TrainingSubjectIds)
             .Distinct()

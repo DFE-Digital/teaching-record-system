@@ -12,8 +12,8 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteEditDegreeType(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
-            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-            <govuk-select asp-for="DegreeTypeId" label="Select the degree type" data-testid="degree-type">
+            <govuk-select asp-for="DegreeTypeId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
                 <govuk-select-item selected>Please select</govuk-select-item>
                 @foreach (var degreeType in Model.DegreeTypes)
                 {

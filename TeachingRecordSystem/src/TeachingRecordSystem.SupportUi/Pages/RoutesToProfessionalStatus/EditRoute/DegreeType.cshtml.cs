@@ -27,6 +27,7 @@ public class DegreeTypeModel(
 
     [BindProperty]
     [Required(ErrorMessage = "Select a degree type")]
+    [Display(Name = "Degree type")]
     public Guid? DegreeTypeId { get; set; }
 
     public void OnGet()
