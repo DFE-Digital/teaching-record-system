@@ -29,7 +29,9 @@ public class RouteDetailViewModel()
     public string[]? TrainingSubjects { get; set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
+    public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingStartDateRequired, Status.GetStartDateRequirement());
     public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingEndDateRequired, Status.GetEndDateRequirement());
+    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.AwardDateRequired, Status.GetAwardDateRequirement());
     public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
 
     public bool FromCheckAnswers { get; set; }

@@ -28,6 +28,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
                 ));
+
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
 
@@ -156,6 +157,109 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
+    public async Task EditStartDate_ToCya_EditStartDate_Continue()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var startDate = new DateOnly(2021, 1, 1);
+        var endDate = startDate.AddDays(30);
+        var setStartDate = startDate.AddDays(2);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                    .WithTrainingStartDate(startDate)
+                    .WithTrainingEndDate(endDate)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
+
+        await page.AssertOnRouteEditStartDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
+
+        await page.AssertOnRouteEditStartDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(setStartDate.AddDays(1));
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+        await page.ClickButtonAsync("Confirm and commit changes");
+
+        await page.AssertOnPersonQualificationsPageAsync(personId);
+    }
+
+    [Fact]
+    public async Task EditStartDate_InvalidatesEndDate_GoesToEndDate_Continue()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var startDate = new DateOnly(2021, 1, 1);
+        var endDate = startDate.AddDays(30);
+        var setStartDate = endDate.AddDays(2);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                    .WithTrainingStartDate(startDate)
+                    .WithTrainingEndDate(endDate)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
+
+        await page.AssertOnRouteEditStartDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditEndDatePageAsync(qualificationId);
+        await page.ClickContinueButtonAsync();
+        await page.AssertOnRouteEditEndDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(setStartDate.AddDays(1));
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+    }
+
+    [Fact]
     public async Task EditEndDate_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
@@ -210,6 +314,69 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-end-date-link");
 
         await page.AssertOnRouteEditEndDatePageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+        await page.ClickButtonAsync("Confirm and commit changes");
+
+        await page.AssertOnPersonQualificationsPageAsync(personId);
+    }
+
+    [Fact]
+    public async Task EditStartDate_BackLinks()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var startDate = new DateOnly(2021, 1, 1);
+        var endDate = startDate.AddDays(30);
+        var setStartDate = startDate.AddDays(2);
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                    .WithTrainingStartDate(startDate)
+                    .WithTrainingEndDate(endDate)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
+
+        await page.AssertOnRouteEditStartDatePageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
+
+        await page.AssertOnRouteEditStartDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(setStartDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-start-date-link");
+
+        await page.AssertOnRouteEditStartDatePageAsync(qualificationId);
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);

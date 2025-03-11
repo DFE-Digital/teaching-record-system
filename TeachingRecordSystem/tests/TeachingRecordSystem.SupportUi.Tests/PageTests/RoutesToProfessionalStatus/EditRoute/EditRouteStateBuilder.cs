@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class EditRouteStateBuilder
+public class EditRouteStateBuilder()
 {
     private QualificationType? _qualificationType;
     private Guid? _routeToProfessionalStatusId;
@@ -22,15 +22,23 @@ public class EditRouteStateBuilder
     private ChangeReasonOption? _changeReasonOption;
     private ChangeReasonDetailsState _changeReasonDetail = new();
 
-
-    public async Task<EditRouteStateBuilder> WithPopulatedReferenceFieldsAsync(ReferenceDataCache referenceDataCache)
+    public EditRouteStateBuilder WithStatusWhereAllFieldsApply()
     {
-        _trainingCountryId = (await referenceDataCache.GetTrainingCountriesAsync()).RandomOne().CountryId;
-        _trainingProviderId = (await referenceDataCache.GetTrainingProvidersAsync()).RandomOne().TrainingProviderId;
-        _trainingSubjectIds = (await referenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(1).Select(x => x.TrainingSubjectId).ToArray();
-        _trainingAgeSpecialismType = TrainingAgeSpecialismType.KeyStage1;
+        _status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.AgeRange != FieldRequirement.NotRequired
+                && s.AwardDate != FieldRequirement.NotRequired
+                && s.Country != FieldRequirement.NotRequired
+                && s.DegreeType != FieldRequirement.NotRequired
+                && s.EndDate != FieldRequirement.NotRequired
+                && s.InductionExemption != FieldRequirement.NotRequired
+                && s.TrainingProvider != FieldRequirement.NotRequired
+                && s.StartDate != FieldRequirement.NotRequired
+                && s.Subjects != FieldRequirement.NotRequired)
+            .RandomOne()
+            .Value;
         return this;
     }
+
     public EditRouteStateBuilder WithAwardedStatusFields(IClock clock)
     {
         _trainingStartDate = clock.Today.AddYears(-1);

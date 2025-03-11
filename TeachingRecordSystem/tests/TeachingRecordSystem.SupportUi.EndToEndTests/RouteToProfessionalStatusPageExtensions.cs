@@ -4,6 +4,11 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
 public static class RouteToProfessionalStatusPageExtensions
 {
+    public static Task AssertOnRouteEditStartDatePageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/start-date");
+    }
+
     public static Task AssertOnRouteEditEndDatePageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/end-date");

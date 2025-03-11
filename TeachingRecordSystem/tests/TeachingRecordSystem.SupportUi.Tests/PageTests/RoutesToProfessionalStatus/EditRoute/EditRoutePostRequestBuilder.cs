@@ -5,8 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class EditRoutePostRequestBuilder
 {
-    private DateOnly? StartDate { get; set; }
-    private DateOnly? EndDate { get; set; }
+    private DateOnly? TrainingStartDate { get; set; }
+    private DateOnly? TrainingEndDate { get; set; }
     private ProfessionalStatusStatus? RouteStatus { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
     private ChangeReasonOption? ChangeReason { get; set; }
@@ -19,13 +19,13 @@ public class EditRoutePostRequestBuilder
 
     public EditRoutePostRequestBuilder WithStartDate(DateOnly date)
     {
-        StartDate = date;
+        TrainingStartDate = date;
         return this;
     }
 
     public EditRoutePostRequestBuilder WithCompletedDate(DateOnly date)
     {
-        EndDate = date;
+        TrainingEndDate = date;
         return this;
     }
 
