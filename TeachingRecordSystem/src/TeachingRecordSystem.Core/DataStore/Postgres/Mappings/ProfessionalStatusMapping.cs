@@ -11,6 +11,7 @@ public class ProfessionalStatusMapping : IEntityTypeConfiguration<ProfessionalSt
         builder.HasOne(q => q.TrainingCountry).WithMany().HasForeignKey(q => q.TrainingCountryId);
         builder.HasOne(q => q.TrainingProvider).WithMany().HasForeignKey(q => q.TrainingProviderId);
         builder.HasOne(q => q.InductionExemptionReason).WithMany().HasForeignKey(q => q.InductionExemptionReasonId);
+        builder.HasOne(q => q.DegreeType).WithMany().HasForeignKey(q => q.DegreeTypeId);
         builder.HasOne<ApplicationUser>().WithMany().HasForeignKey(q => q.SourceApplicationUserId);
         builder
             .Property(q => q.SourceApplicationReference)
