@@ -17387,6 +17387,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus", b =>
                 {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.DegreeType", "DegreeType")
+                        .WithMany()
+                        .HasForeignKey("DegreeTypeId")
+                        .HasConstraintName("fk_qualifications_degree_types_degree_type_id");
+
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.InductionExemptionReason", "InductionExemptionReason")
                         .WithMany()
                         .HasForeignKey("InductionExemptionReasonId")
@@ -17413,6 +17418,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("TrainingProviderId")
                         .HasConstraintName("fk_qualifications_training_providers_training_provider_id");
+
+                    b.Navigation("DegreeType");
 
                     b.Navigation("InductionExemptionReason");
 

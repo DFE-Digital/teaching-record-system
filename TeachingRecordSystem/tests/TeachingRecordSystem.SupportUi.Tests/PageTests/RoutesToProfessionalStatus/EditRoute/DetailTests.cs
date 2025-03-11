@@ -279,11 +279,11 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         state ?? new EditRouteState(),
         new KeyValuePair<string, object>("qualificationId", qualificationId));
 
-    private Func<RouteToProfessionalStatus, bool> PropertyHasFieldRequirement<RouteToProfessionalStatus>(string propertyName, FieldRequirement expectedValue)
+    private Func<RouteToProfessionalStatus, bool> PropertyHasFieldRequirement<T>(string propertyName, FieldRequirement expectedValue)
     {
         return item =>
         {
-            var property = typeof(RouteToProfessionalStatus).GetProperty(propertyName);
+            var property = typeof(T).GetProperty(propertyName);
             if (property is null)
             {
                 throw new InvalidOperationException($"Property {propertyName} not found on type RouteToProfessionalStatus");
