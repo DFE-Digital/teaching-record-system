@@ -85,7 +85,12 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.Value.GetEndDateRequirement() == FieldRequirement.Mandatory)
+            .RandomOne();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
@@ -178,7 +183,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
-        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
+        doc.AssertRowContentMatches("Has exemption", "Not provided");
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", "Not provided");
         doc.AssertRowContentMatches("Country of training", "Not provided");
@@ -224,18 +229,30 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [Fact]
     public async Task Post_Confirm_UpdatesProfessionalStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
-            .RandomOne();
+        var route = await TestDataHelper.GetRouteWhereAllFieldsApplyASync(ReferenceDataCache);
+        var status = TestDataHelper.GetStatusWhereAllFieldsApply();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var ageRange = TrainingAgeSpecialismType.KeyStage3;
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = (await (new EditRouteStateBuilder())
+        var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithPopulatedReferenceFieldsAsync(ReferenceDataCache))
+            .WithStatus(status)
             .WithAwardedStatusFields(Clock)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
+            .WithTrainingCountryId(country.CountryId)
+            .WithTrainingAgeSpecialismType(ageRange)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -273,6 +290,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, updatedProfessionalStatusRecord!.TrainingAgeSpecialismRangeTo);
             Assert.Equal(journeyInstance.State.TrainingSubjectIds, updatedProfessionalStatusRecord!.TrainingSubjectIds);
             Assert.Equal(journeyInstance.State.InductionExemptionReasonId, updatedProfessionalStatusRecord!.InductionExemptionReasonId);
+            Assert.Equal(journeyInstance.State.DegreeTypeId, updatedProfessionalStatusRecord!.DegreeTypeId);
         });
 
         var RaisedBy = GetCurrentUserId();

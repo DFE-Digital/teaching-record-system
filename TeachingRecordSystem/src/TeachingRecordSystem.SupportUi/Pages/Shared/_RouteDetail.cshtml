@@ -9,10 +9,16 @@
         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
     </govuk-summary-list-row>
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+    @if (Model.StartDateRequired != FieldRequirement.NotRequired)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-    </govuk-summary-list-row>
+        <govuk-summary-list-row-actions>
+            <govuk-summary-list-row-action data-testid="edit-start-date-link" href="@LinkGenerator.RouteEditStartDate(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+        </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
     @if (Model.EndDateRequired != FieldRequirement.NotRequired)
     {
         <govuk-summary-list-row>

@@ -10,7 +10,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -51,7 +51,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Continue_LinksToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -81,14 +81,16 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ShowsDetail_AsExpected()
+    public async Task Get_RouteAndStatusWithAllFieldsApplicable_AllFieldsShown()
     {
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
+        var awardDate = Clock.Today;
+        var route = await TestDataHelper.GetRouteWhereAllFieldsApplyASync(ReferenceDataCache);
+        var status = TestDataHelper.GetStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
-        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
@@ -96,16 +98,17 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(status)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.InTraining)
+            .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
+            .WithAwardedDate(awardDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithTrainingSubjectIds([subject.TrainingSubjectId])
+            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingCountryId(country.CountryId)
             .WithTrainingAgeSpecialismType(ageRange)
             .WithValidChangeReasonOption()
@@ -127,20 +130,20 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", "In training");
+        doc.AssertRowContentMatches("Status", status.GetDisplayName()!);
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
-        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
+        doc.AssertRowContentMatches("Award date", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Has exemption", "Not provided");
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
         doc.AssertRowContentMatches("Age range", ageRange.GetDisplayName()!);
-        doc.AssertRowContentMatches("Subjects", subject.Name);
+        doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
     }
 
     [Fact]
-    public async Task Get_EndDateApplies_EndDateAndChangeLinkShown()
+    public async Task Get_StartAndEndDatesApply_DatesAndChangeLinksShown()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
@@ -181,12 +184,10 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
+        doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertChangeLinkExists("Start date");
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "End date");
-        Assert.NotNull(label);
-        var value = label.NextElementSibling;
-        Assert.NotNull(value!.NextElementSibling!.GetElementsByTagName("a").First());
+        doc.AssertChangeLinkExists("End date");
     }
 
     [Fact]
@@ -225,8 +226,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowContentMatches("Status", "In training");
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        //Assert.Null(doc.GetSummaryListRowForKey("Has Exemption"));
-        doc.AssertRowContentMatches("Has exemption", "Not provided"); // CML TODO page will need to not show rows that don't apply to each RouteType and status combo
+        doc.AssertRowContentMatches("Has exemption", "Not provided");
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", "Not provided");
         doc.AssertRowContentMatches("Country of training", "Not provided");
@@ -235,13 +235,14 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
+    [InlineData("Start date", "TrainingStartDateRequired")]
     [InlineData("End date", "TrainingEndDateRequired")]
     [InlineData("Degree type", "DegreeTypeRequired")]
-    public async Task Get_PropertyNotApplicable_PropertyNotShown(string elementText, string propertySelector)
+    public async Task Get_FieldNotApplicable_FieldNotShown(string elementText, string propertySelector)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(PropertyHasFieldRequirement<RouteToProfessionalStatus>(propertySelector, FieldRequirement.NotRequired))
+            .Where(TestDataHelper.PropertyHasFieldRequirement<RouteToProfessionalStatus>(propertySelector, FieldRequirement.NotRequired))
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.Value.GetEndDateRequirement() == FieldRequirement.NotRequired)
@@ -278,18 +279,4 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         JourneyNames.EditRouteToProfessionalStatus,
         state ?? new EditRouteState(),
         new KeyValuePair<string, object>("qualificationId", qualificationId));
-
-    private Func<RouteToProfessionalStatus, bool> PropertyHasFieldRequirement<T>(string propertyName, FieldRequirement expectedValue)
-    {
-        return item =>
-        {
-            var property = typeof(T).GetProperty(propertyName);
-            if (property is null)
-            {
-                throw new InvalidOperationException($"Property {propertyName} not found on type RouteToProfessionalStatus");
-            }
-            var actualValue = property.GetValue(item);
-            return actualValue?.Equals(expectedValue) ?? false;
-        };
-    }
 }
