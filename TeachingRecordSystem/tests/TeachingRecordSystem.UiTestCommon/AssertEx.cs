@@ -68,4 +68,12 @@ public static partial class AssertEx
         Assert.NotEmpty(value);
         Assert.Equal(expected, value);
     }
+
+    public static void AssertChangeLinkExists(this IHtmlDocument doc, string keyContent)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        Assert.NotNull(label);
+        var value = label.NextElementSibling;
+        Assert.NotNull(value!.NextElementSibling!.GetElementsByTagName("a").First());
+    }
 }
