@@ -50,10 +50,9 @@ public class EndDateModel(
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public void OnPostCancel()
     {
-        await JourneyInstance!.DeleteAsync();
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

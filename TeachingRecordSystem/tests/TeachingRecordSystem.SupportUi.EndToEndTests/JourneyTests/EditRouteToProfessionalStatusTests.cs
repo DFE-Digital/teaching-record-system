@@ -420,7 +420,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
-        await page.FillAsync($"label:text-is('Degree type')", newDegreeType.Name);
+        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", newDegreeType.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 

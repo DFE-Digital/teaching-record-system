@@ -27,7 +27,7 @@ public class DegreeTypeModel(
 
     [BindProperty]
     [Required(ErrorMessage = "Select a degree type")]
-    [Display(Name = "Degree type")]
+    [Display(Name = "Enter the degree type awarded as part of this route")]
     public Guid? DegreeTypeId { get; set; }
 
     public void OnGet()
@@ -47,6 +47,11 @@ public class DegreeTypeModel(
         return Redirect(FromCheckAnswer ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+    }
+
+    public IActionResult OnPostCancel()
+    {
+        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

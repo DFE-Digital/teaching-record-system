@@ -33,6 +33,11 @@ public class RouteDetailViewModel()
     public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingEndDateRequired, Status.GetEndDateRequirement());
     public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.AwardDateRequired, Status.GetAwardDateRequirement());
     public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
+    public FieldRequirement TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
+    public FieldRequirement AgeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement());
+    public FieldRequirement TrainingCountryRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingCountryRequired, Status.GetCountryRequirement());
+    public FieldRequirement InductionExemptionReasonRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.InductionExemptionRequired, Status.GetInductionExemptionRequirement());
+    public FieldRequirement TrainingSubjectsRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingSubjectsRequired, Status.GetSubjectsRequirement());
 
     public bool FromCheckAnswers { get; set; }
 }

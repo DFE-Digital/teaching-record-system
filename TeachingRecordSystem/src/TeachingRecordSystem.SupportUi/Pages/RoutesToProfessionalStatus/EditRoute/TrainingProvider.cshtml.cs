@@ -2,17 +2,19 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartDateModel(
-    TrsLinkGenerator linkGenerator) : PageModel
+public class TrainingProviderModel(
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public bool FromCheckAnswer { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -21,15 +23,16 @@ public class StartDateModel(
 
     public Guid PersonId { get; set; }
 
+    public TrainingProvider[] TrainingProviders { get; set; } = [];
+
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Start date")]
-    [Required(ErrorMessage = "Enter a start date")]
-    [Display(Name = "Enter the route start date")]
-    public DateOnly? TrainingStartDate { get; set; }
+    [Required(ErrorMessage = "Select a training provider")]
+    [Display(Name = "Enter the training provider for this route")]
+    public Guid? TrainingProviderId { get; set; }
 
     public void OnGet()
     {
-        TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
+        TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -38,25 +41,25 @@ public class StartDateModel(
         {
             return this.PageWithErrors();
         }
-        await JourneyInstance!.UpdateStateAsync(state => state.TrainingStartDate = TrainingStartDate);
-        if (TrainingStartDate.HasValue && JourneyInstance!.State.TrainingEndDate is DateOnly endDate && TrainingStartDate >= endDate)
-        {
-            return Redirect(linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance.InstanceId));
-        }
-        return Redirect(FromCheckAnswers ?
+
+        await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
+
+        return Redirect(FromCheckAnswer ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public void OnPostCancel()
+    public IActionResult OnPostCancel()
     {
-        Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+        TrainingProviders = await referenceDataCache.GetTrainingProvidersAsync();
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
