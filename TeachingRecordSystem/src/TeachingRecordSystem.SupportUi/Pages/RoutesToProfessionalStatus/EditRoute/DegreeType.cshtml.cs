@@ -14,7 +14,7 @@ public class DegreeTypeModel(
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
-    public bool FromCheckAnswer { get; set; }
+    public bool FromCheckAnswers { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -44,7 +44,7 @@ public class DegreeTypeModel(
 
         await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
-        return Redirect(FromCheckAnswer ?
+        return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
