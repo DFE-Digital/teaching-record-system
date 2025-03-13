@@ -12,7 +12,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Mandatory)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -53,7 +53,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Mandatory)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -95,7 +95,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Mandatory)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

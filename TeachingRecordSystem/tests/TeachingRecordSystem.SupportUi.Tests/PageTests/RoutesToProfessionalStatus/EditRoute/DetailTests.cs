@@ -87,8 +87,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var awardDate = Clock.Today;
-        var route = await TestDataHelper.GetRouteWhereAllFieldsApplyASync(ReferenceDataCache);
-        var status = TestDataHelper.GetStatusWhereAllFieldsApply();
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -152,15 +152,14 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsHaveFieldRequirementAsync(FieldRequirement.Optional);
+        var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == ProfessionalStatusStatus.InTraining).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)
+                .WithStatus(status.Value)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
-                .WithTrainingProvider(trainingProvider)
                  ));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -179,11 +178,10 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", "In training");
+        doc.AssertRowContentMatches("Status", status.Title);
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Has exemption", "Not provided");
-        doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
+        doc.AssertRowContentMatches("Training provider", "Not provided");
         doc.AssertRowContentMatches("Degree type", "Not provided");
         doc.AssertRowContentMatches("Country of training", "Not provided");
         doc.AssertRowContentMatches("Age range", "Not provided");

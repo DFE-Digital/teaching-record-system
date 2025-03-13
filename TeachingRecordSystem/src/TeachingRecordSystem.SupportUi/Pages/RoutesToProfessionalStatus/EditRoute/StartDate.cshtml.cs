@@ -48,9 +48,9 @@ public class StartDateModel(
             linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public void OnPostCancel()
+    public IActionResult OnPostCancel()
     {
-        Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
