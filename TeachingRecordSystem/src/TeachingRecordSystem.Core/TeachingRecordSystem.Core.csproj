@@ -153,6 +153,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0046_ProfessionalStatusUpdates.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0048_TrsQualificationsProfessionalStatusType.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0049_TrsQualificationsDegreeTypeId.sql" />
   </ItemGroup>
 
   <ItemGroup>
