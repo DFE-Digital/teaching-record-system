@@ -446,7 +446,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Fact(Skip = "Waiting for training_provider table to be populated")]
     public async Task EditTrainingProvider_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
