@@ -5,9 +5,9 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum TrainingAgeSpecialismType
 {
-    [Description("Age range")]
-    [Display(Name = "Age range")]
-    Range = 0,
+    [Description("None")]
+    [Display(Name = "None")]
+    None = 0,
     [Description("Foundation stage")]
     [Display(Name = "Foundation stage")]
     FoundationStage = 1,

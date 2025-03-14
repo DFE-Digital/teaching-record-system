@@ -76,11 +76,17 @@
         @if (Model.TrainingAgeSpecialismRangeFrom is not null && Model.TrainingAgeSpecialismRangeTo is not null)
         {
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
         }
         else
         {
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
-        }
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-age-range-type-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+            }
         </govuk-summary-list-row>
     }
     @if (Model.TrainingSubjectsRequired != FieldRequirement.NotRequired)
