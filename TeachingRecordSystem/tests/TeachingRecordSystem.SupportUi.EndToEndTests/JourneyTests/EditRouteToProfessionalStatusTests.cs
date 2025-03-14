@@ -21,7 +21,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var endDate = startDate.AddDays(30);
         var setEndDate = endDate.AddDays(1);
         var setStartDate = startDate.AddDays(1);
-        var setDegreeType = (await TestData.ReferenceDataCache.GetDegreeTypesAsync()).RandomOne().Name;
+        var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
