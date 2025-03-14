@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class DegreeTypeModel(
+public class TrainingProviderModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
 {
@@ -23,16 +23,16 @@ public class DegreeTypeModel(
 
     public Guid PersonId { get; set; }
 
-    public DegreeType[] DegreeTypes { get; set; } = [];
+    public TrainingProvider[] TrainingProviders { get; set; } = [];
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a degree type")]
-    [Display(Name = "Enter the degree type awarded as part of this route")]
-    public Guid? DegreeTypeId { get; set; }
+    [Required(ErrorMessage = "Select a training provider")]
+    [Display(Name = "Enter the training provider for this route")]
+    public Guid? TrainingProviderId { get; set; }
 
     public void OnGet()
     {
-        DegreeTypeId = JourneyInstance!.State.DegreeTypeId;
+        TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -42,7 +42,7 @@ public class DegreeTypeModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
+        await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
 
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
@@ -59,7 +59,7 @@ public class DegreeTypeModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
-        DegreeTypes = await referenceDataCache.GetDegreeTypesAsync();
+        TrainingProviders = await referenceDataCache.GetTrainingProvidersAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
