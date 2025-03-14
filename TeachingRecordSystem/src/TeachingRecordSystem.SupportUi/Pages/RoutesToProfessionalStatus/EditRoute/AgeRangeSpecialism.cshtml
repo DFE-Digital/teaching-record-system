@@ -20,12 +20,8 @@
                     <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage3">@TrainingAgeSpecialismType.KeyStage3.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage4">@TrainingAgeSpecialismType.KeyStage4.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.FurtherEducation">@TrainingAgeSpecialismType.FurtherEducation.GetDisplayName()</govuk-radios-item>
-                </govuk-radios-fieldset>
-            </govuk-radios>
-            <govuk-radios name="blah">
-                <govuk-radios-divider>or</govuk-radios-divider>
-                    <govuk-radios-item value="@true">
-                        I want to provide an age range
+                    <govuk-radios-divider>or</govuk-radios-divider>
+                    <govuk-radios-item value="@TrainingAgeSpecialismType.None">I want to provide an age range
                         <govuk-radios-item-conditional>
                         <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeFrom">
                                 <govuk-input-label>From</govuk-input-label>
@@ -35,6 +31,7 @@
                             </govuk-input>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
+                </govuk-radios-fieldset>
             </govuk-radios>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>

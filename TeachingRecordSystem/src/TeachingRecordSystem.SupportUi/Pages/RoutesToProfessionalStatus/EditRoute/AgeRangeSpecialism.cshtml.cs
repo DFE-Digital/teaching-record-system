@@ -42,7 +42,6 @@ public class AgeRangeSpecialismModel(
         }
         await JourneyInstance!.UpdateStateAsync(s =>
             {
-                // CML TODO - type needs to be null if ints aren't - should be set from view?
                 s.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
                 s.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
                 s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
