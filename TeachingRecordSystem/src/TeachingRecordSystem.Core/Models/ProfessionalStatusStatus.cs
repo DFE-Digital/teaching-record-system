@@ -106,23 +106,23 @@ public static class ProfessionalStatusStatusRegistry
 
     public static string GetTitle(this ProfessionalStatusStatus status) => _info[status].Title;
 
-    public static FieldRequirement GetStartDateRequirement(this ProfessionalStatusStatus status) => _info[status].StartDate;
+    public static FieldRequirement GetStartDateRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingStartDateRequired;
 
-    public static FieldRequirement GetEndDateRequirement(this ProfessionalStatusStatus status) => _info[status].EndDate;
+    public static FieldRequirement GetEndDateRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingEndDateRequired;
 
-    public static FieldRequirement GetAwardDateRequirement(this ProfessionalStatusStatus status) => _info[status].AwardDate;
+    public static FieldRequirement GetAwardDateRequirement(this ProfessionalStatusStatus status) => _info[status].AwardDateRequired;
 
-    public static FieldRequirement GetInductionExemptionRequirement(this ProfessionalStatusStatus status) => _info[status].InductionExemption;
+    public static FieldRequirement GetInductionExemptionRequirement(this ProfessionalStatusStatus status) => _info[status].InductionExemptionRequired;
 
-    public static FieldRequirement GetTrainingProviderRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingProvider;
+    public static FieldRequirement GetTrainingProviderRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingProviderRequired;
 
-    public static FieldRequirement GetDegreeTypeRequirement(this ProfessionalStatusStatus status) => _info[status].DegreeType;
+    public static FieldRequirement GetDegreeTypeRequirement(this ProfessionalStatusStatus status) => _info[status].DegreeTypeRequired;
 
-    public static FieldRequirement GetCountryRequirement(this ProfessionalStatusStatus status) => _info[status].Country;
+    public static FieldRequirement GetCountryRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingCountryRequired;
 
-    public static FieldRequirement GetAgeRangeRequirement(this ProfessionalStatusStatus status) => _info[status].AgeRange;
+    public static FieldRequirement GetAgeSpecialismRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingAgeSpecialismTypeRequired;
 
-    public static FieldRequirement GetSubjectsRequirement(this ProfessionalStatusStatus status) => _info[status].Subjects;
+    public static FieldRequirement GetSubjectsRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingSubjectsRequired;
 
     private static ProfessionalStatusStatusInfo GetInfo(ProfessionalStatusStatus status)
     {
@@ -140,15 +140,15 @@ public static class ProfessionalStatusStatusRegistry
 public sealed record ProfessionalStatusStatusInfo(
     ProfessionalStatusStatus Value,
     string Name,
-    FieldRequirement StartDate,
-    FieldRequirement EndDate,
-    FieldRequirement AwardDate,
-    FieldRequirement InductionExemption,
-    FieldRequirement TrainingProvider,
-    FieldRequirement DegreeType,
-    FieldRequirement Country,
-    FieldRequirement AgeRange,
-    FieldRequirement Subjects)
+    FieldRequirement TrainingStartDateRequired,
+    FieldRequirement TrainingEndDateRequired,
+    FieldRequirement AwardDateRequired,
+    FieldRequirement InductionExemptionRequired,
+    FieldRequirement TrainingProviderRequired,
+    FieldRequirement DegreeTypeRequired,
+    FieldRequirement TrainingCountryRequired,
+    FieldRequirement TrainingAgeSpecialismTypeRequired,
+    FieldRequirement TrainingSubjectsRequired)
 {
     public string Title => Name[..1].ToUpper() + Name[1..];
 }
