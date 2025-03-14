@@ -14,6 +14,11 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/end-date");
     }
 
+    public static Task AssertOnRouteEditAwardDatePageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/award-date");
+    }
+
     public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/detail");

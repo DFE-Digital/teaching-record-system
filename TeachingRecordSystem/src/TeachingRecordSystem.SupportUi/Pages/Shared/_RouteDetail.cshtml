@@ -33,6 +33,9 @@
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Award date</govuk-summary-list-row-key>
             <govuk-summary-list-row-value>@Model.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-award-date-link" href="@LinkGenerator.RouteEditAwardDate(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="award date">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
     @if (Model.InductionExemptionReasonRequired != FieldRequirement.NotRequired)

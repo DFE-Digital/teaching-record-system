@@ -11,7 +11,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task Cya_ShowsEditedContent()
+    public async Task EditEachField_Cya_ShowsEditedContent()
     {
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
@@ -21,6 +21,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var endDate = startDate.AddDays(30);
         var setEndDate = endDate.AddDays(1);
         var setStartDate = startDate.AddDays(1);
+        var setAwardDate = setEndDate.AddDays(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
@@ -54,6 +55,13 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditEndDatePageAsync(qualificationId);
         await page.FillDateInputAsync(setEndDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-award-date-link");
+
+        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(setAwardDate);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);

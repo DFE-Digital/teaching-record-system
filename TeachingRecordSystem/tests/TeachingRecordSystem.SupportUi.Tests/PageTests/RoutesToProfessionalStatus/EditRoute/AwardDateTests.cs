@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Post_WhenTrainingAwardedDateIsEntered_SavesDateAndRedirectsToDetail()
@@ -22,7 +22,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(ProfessionalStatusStatus.Awarded)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .Build();
@@ -32,7 +32,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/awarded-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/award-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -48,6 +48,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(awardedDate, journeyInstance.State.AwardedDate);
     }
 
@@ -67,7 +68,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.InTraining)
+            .WithStatus(ProfessionalStatusStatus.Awarded)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .Build();
@@ -77,7 +78,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/awarded-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/award-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>())
         };
@@ -105,7 +106,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(ProfessionalStatusStatus.Awarded)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithValidChangeReasonOption()
@@ -116,7 +117,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId, editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/awarded-date?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/award-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

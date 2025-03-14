@@ -26,7 +26,6 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
-            .WithTrainingStartDate(startDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -50,6 +49,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(startDate, journeyInstance.State.TrainingStartDate);
     }
 
