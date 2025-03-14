@@ -14,7 +14,8 @@ public static class TestDataHelper
                 && r.TrainingSubjectsRequired != FieldRequirement.NotRequired
                 && r.InductionExemptionRequired != FieldRequirement.NotRequired
                 && r.TrainingStartDateRequired != FieldRequirement.NotRequired
-                && r.TrainingEndDateRequired != FieldRequirement.NotRequired)
+                && r.TrainingEndDateRequired != FieldRequirement.NotRequired
+                && r.AwardDateRequired != FieldRequirement.NotRequired)
             .RandomOne();
     }
 

@@ -84,13 +84,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
-            .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.Value.GetEndDateRequirement() == FieldRequirement.Mandatory)
-            .RandomOne();
+        var endDate = Clock.Today.AddDays(-1);
+        var awardedDate = endDate.AddDays(1);
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
@@ -103,9 +100,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.InTraining)
+            .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
+            .WithAwardedDate(awardedDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithTrainingCountryId(country.CountryId)
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
@@ -129,9 +127,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRowContentMatches("Route", route.Name);
-        doc.AssertRowContentMatches("Status", "In training");
+        doc.AssertRowContentMatches("Status", status.GetTitle());
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Award date", awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
