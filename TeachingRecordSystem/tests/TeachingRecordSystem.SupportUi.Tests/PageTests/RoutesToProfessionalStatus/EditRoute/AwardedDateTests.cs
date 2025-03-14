@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Post_WhenTrainingAwardedDateIsEntered_RedirectsToDetail()
+    public async Task Post_WhenTrainingAwardedDateIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -25,8 +25,6 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStatus(ProfessionalStatusStatus.Deferred)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -50,6 +48,7 @@ public class AwardedDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal(awardedDate, journeyInstance.State.AwardedDate);
     }
 
     [Fact]

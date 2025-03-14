@@ -50,7 +50,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenTrainingEndDateIsEntered_RedirectsToDetail()
+    public async Task Post_WhenTrainingEndDateIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -90,6 +90,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
     }
 
     [Fact]

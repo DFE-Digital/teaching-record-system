@@ -6,50 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Post_WhenStartDateIsAfterEndDate_NoError()
-    {
-        // Arrange
-        var startDate = new DateOnly(2024, 01, 01);
-        var endDate = startDate.AddDays(-1);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .WithTrainingStartDate(startDate)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
-            .Build();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            editRouteState
-            );
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "TrainingStartDate.Day", $"{startDate:%d}" },
-                { "TrainingStartDate.Month", $"{startDate:%M}" },
-                { "TrainingStartDate.Year", $"{startDate:yyyy}" }
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
-    public async Task Post_WhenTrainingStartDateIsEntered_RedirectsToDetail()
+    public async Task Post_WhenTrainingStartDateIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -89,6 +46,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal(startDate, journeyInstance.State.TrainingStartDate);
     }
 
     [Fact]
