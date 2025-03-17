@@ -23,6 +23,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setStartDate = startDate.AddDays(1);
         var setAwardDate = setEndDate.AddDays(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
+        var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -73,6 +74,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-age-range-type-link");
+
+        await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
+        await page.SelectAgeTypeAsync(setAgeRange);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
@@ -85,6 +94,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertContentEquals(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
         await page.AssertContentEquals(setEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
         await page.AssertContentEquals(setDegreeType, "Degree type");
+        await page.AssertContentEquals(setAgeRange.GetDisplayName()!, "Age range");
         await page.ClickButtonAsync("Confirm and commit changes");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
