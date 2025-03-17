@@ -94,6 +94,7 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.RemoveIfExists("MopUpQtsAwardeesJob");
                 recurringJobManager.RemoveIfExists("SyncAllMqsFromCrmJob");
+                recurringJobManager.RemoveIfExists("BackfillNinoAndPersonPostcodeInEmploymentHistoryJob");
 
                 recurringJobManager.AddOrUpdate<SyncAllPersonsFromCrmJob>(
                     nameof(SyncAllPersonsFromCrmJob),
@@ -128,11 +129,6 @@ public static class HostApplicationBuilderExtensions
 
                 recurringJobManager.AddOrUpdate<ProcessEndedEmploymentsJob>(
                     nameof(ProcessEndedEmploymentsJob),
-                    job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never);
-
-                recurringJobManager.AddOrUpdate<BackfillNinoAndPersonPostcodeInEmploymentHistoryJob>(
-                    nameof(BackfillNinoAndPersonPostcodeInEmploymentHistoryJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 

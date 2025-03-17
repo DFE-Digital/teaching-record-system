@@ -22,5 +22,7 @@ public enum TpsEmploymentUpdatedEventChanges
     LastExtractDate = 1 << 5,
     NationalInsuranceNumber = 1 << 6,
     PersonPostcode = 1 << 7,
-    WithdrawalConfirmed = 1 << 8
+    WithdrawalConfirmed = 1 << 8,
+    PersonEmailAddress = 1 << 9,
+    EmployerPostcode = 1 << 10
 }
