@@ -39,7 +39,7 @@ public class AgeRangeSpecialismModel(
     {
         if (!ModelState.IsValid)
         {
-            return Page();
+            return this.PageWithErrors();
         }
         await JourneyInstance!.UpdateStateAsync(s =>
             {

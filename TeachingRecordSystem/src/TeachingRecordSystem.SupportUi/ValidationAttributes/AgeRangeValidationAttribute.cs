@@ -12,19 +12,27 @@ public class AgeRangeValidationAttribute(string errorMessage) : ValidationAttrib
         {
             throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be appplied to {nameof(AgeRange)} types.");
         }
+        if (ageRange.AgeRangeType is null && ageRange.AgeRangeType is null)
+        {
+            return new ValidationResult("Select an age range", new List<string> { nameof(ageRange.AgeRangeType) });
+        }
         if (ageRange.AgeRangeType is null || ageRange.AgeRangeType == TrainingAgeSpecialismType.None)
         {
+            if (ageRange.AgeRangeFrom == null && ageRange.AgeRangeTo == null)
+            {
+                return new ValidationResult("Enter an age range", new List<string> { nameof(ageRange.AgeRangeFrom), nameof(ageRange.AgeRangeTo) });
+            }
             if (ageRange.AgeRangeFrom == null)
             {
-                return new ValidationResult("Age value must be provided.", new List<string> { nameof(ageRange.AgeRangeFrom) });
+                return new ValidationResult("Enter an age range", new List<string> { nameof(ageRange.AgeRangeFrom) });
             }
             if (ageRange.AgeRangeTo == null)
             {
-                return new ValidationResult("Age value must be provided.", new List<string> { nameof(ageRange.AgeRangeTo) });
+                return new ValidationResult("Enter an age range", new List<string> { nameof(ageRange.AgeRangeTo) });
             }
             if (ageRange.AgeRangeFrom > ageRange.AgeRangeTo)
             {
-                return new ValidationResult("The 'from' value must be less than or equal to the 'to' value.", new List<string> { nameof(ageRange.AgeRangeFrom) });
+                return new ValidationResult("The 'from' age must be less than or equal to the 'to' age", new List<string> { nameof(ageRange.AgeRangeFrom) });
             }
         }
         else

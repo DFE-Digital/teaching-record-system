@@ -446,6 +446,58 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
+    [Fact]
+    public async Task EditAgeRangeSpecialism_IncompleteInformation_ShowsError()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-age-range-type-link");
+
+        await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
+        page.AssertErrorSummary();
+        await page.SelectAgeTypeAsync(TrainingAgeSpecialismType.None);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
+        page.AssertErrorSummary();
+        await page.FillAsync($"label:text-is('From')", "6");
+        await page.FillAsync($"label:text-is('To')", "1");
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
+        page.AssertErrorSummary();
+        await page.FillAsync($"label:text-is('To')", "11");
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+    }
+
     [Fact(Skip = "Waiting for training_provider table to be populated")]
     public async Task EditTrainingProvider_BackLinks()
     {
