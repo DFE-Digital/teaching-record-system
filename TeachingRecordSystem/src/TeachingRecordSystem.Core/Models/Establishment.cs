@@ -13,6 +13,10 @@ public class Establishment
     public required string EstablishmentTypeGroupName { get; init; }
     public required int EstablishmentStatusCode { get; init; }
     public required string EstablishmentStatusName { get; init; }
+    public required int? PhaseOfEducationCode { get; init; }
+    public required string? PhaseOfEducationName { get; init; }
+    public required int? NumberOfPupils { get; set; }
+    public required decimal? FreeSchoolMealsPercentage { get; set; }
     public required string? Street { get; init; }
     public required string? Locality { get; init; }
     public required string? Address3 { get; init; }
