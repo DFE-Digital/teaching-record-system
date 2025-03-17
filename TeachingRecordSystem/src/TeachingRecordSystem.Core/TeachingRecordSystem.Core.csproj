@@ -74,6 +74,7 @@
     <None Remove="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
     <None Remove="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
     <None Remove="Services\DqtReporting\Migrations\0048_TrsQualificationsProfessionalStatusType.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0050_TrsEstablishmentsPhaseSizeFsm.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -154,6 +155,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0048_TrsQualificationsProfessionalStatusType.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0049_TrsQualificationsDegreeTypeId.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0050_TrsEstablishmentsPhaseSizeFsm.sql" />
   </ItemGroup>
 
   <ItemGroup>

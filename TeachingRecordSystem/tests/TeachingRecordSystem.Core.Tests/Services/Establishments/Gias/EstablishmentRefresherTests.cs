@@ -54,6 +54,10 @@ public class EstablishmentRefresherTests
                 EstablishmentTypeGroupName = "Academy",
                 EstablishmentStatusCode = 1,
                 EstablishmentStatusName = "Open",
+                PhaseOfEducationCode = 2,
+                PhaseOfEducationName = "Primary",
+                NumberOfPupils = 100,
+                FreeSchoolMealsPercentage = 10,
                 Street = "Test Street",
                 Locality = "Test Locality",
                 Address3 = "Test Address3",
@@ -74,6 +78,10 @@ public class EstablishmentRefresherTests
                 EstablishmentTypeGroupName = "Academy",
                 EstablishmentStatusCode = 2,
                 EstablishmentStatusName = "Closed",
+                PhaseOfEducationCode = 4,
+                PhaseOfEducationName = "Secondary",
+                NumberOfPupils = 200,
+                FreeSchoolMealsPercentage = 20,
                 Street = "Test Street 2",
                 Locality = "Test Locality 2",
                 Address3 = "Test Address3 2",
@@ -110,6 +118,10 @@ public class EstablishmentRefresherTests
                     Assert.Equal(establishment1.EstablishmentTypeGroupName, e.EstablishmentTypeGroupName);
                     Assert.Equal(establishment1.EstablishmentStatusCode, e.EstablishmentStatusCode);
                     Assert.Equal(establishment1.EstablishmentStatusName, e.EstablishmentStatusName);
+                    Assert.Equal(establishment1.PhaseOfEducationCode, e.PhaseOfEducationCode);
+                    Assert.Equal(establishment1.PhaseOfEducationName, e.PhaseOfEducationName);
+                    Assert.Equal(establishment1.NumberOfPupils, e.NumberOfPupils);
+                    Assert.Equal(establishment1.FreeSchoolMealsPercentage, e.FreeSchoolMealsPercentage);
                     Assert.Equal(establishment1.Street, e.Street);
                     Assert.Equal(establishment1.Locality, e.Locality);
                     Assert.Equal(establishment1.Address3, e.Address3);
@@ -130,6 +142,10 @@ public class EstablishmentRefresherTests
                     Assert.Equal(establishment2.EstablishmentTypeGroupName, e.EstablishmentTypeGroupName);
                     Assert.Equal(establishment2.EstablishmentStatusCode, e.EstablishmentStatusCode);
                     Assert.Equal(establishment2.EstablishmentStatusName, e.EstablishmentStatusName);
+                    Assert.Equal(establishment2.PhaseOfEducationCode, e.PhaseOfEducationCode);
+                    Assert.Equal(establishment2.PhaseOfEducationName, e.PhaseOfEducationName);
+                    Assert.Equal(establishment2.NumberOfPupils, e.NumberOfPupils);
+                    Assert.Equal(establishment2.FreeSchoolMealsPercentage, e.FreeSchoolMealsPercentage);
                     Assert.Equal(establishment2.Street, e.Street);
                     Assert.Equal(establishment2.Locality, e.Locality);
                     Assert.Equal(establishment2.Address3, e.Address3);
@@ -162,6 +178,10 @@ public class EstablishmentRefresherTests
                 EstablishmentTypeGroupName = "Academy",
                 EstablishmentStatusCode = 1,
                 EstablishmentStatusName = "Open",
+                PhaseOfEducationCode = 2,
+                PhaseOfEducationName = "Primary",
+                NumberOfPupils = 100,
+                FreeSchoolMealsPercentage = 10,
                 Street = "Test Street",
                 Locality = "Test Locality",
                 Address3 = "Test Address3",
@@ -184,6 +204,10 @@ public class EstablishmentRefresherTests
                 EstablishmentTypeGroupName = "School",
                 EstablishmentStatusCode = 2,
                 EstablishmentStatusName = "Closed",
+                PhaseOfEducationCode = 4,
+                PhaseOfEducationName = "Secondary",
+                NumberOfPupils = 200,
+                FreeSchoolMealsPercentage = 20,
                 Street = "Test2 Street",
                 Locality = "Test2 Locality",
                 Address3 = "Test2 Address3",
@@ -219,6 +243,10 @@ public class EstablishmentRefresherTests
             Assert.Equal(updatedEstablishment.EstablishmentTypeGroupName, establishmentActual.EstablishmentTypeGroupName);
             Assert.Equal(updatedEstablishment.EstablishmentStatusCode, establishmentActual.EstablishmentStatusCode);
             Assert.Equal(updatedEstablishment.EstablishmentStatusName, establishmentActual.EstablishmentStatusName);
+            Assert.Equal(updatedEstablishment.PhaseOfEducationCode, establishmentActual.PhaseOfEducationCode);
+            Assert.Equal(updatedEstablishment.PhaseOfEducationName, establishmentActual.PhaseOfEducationName);
+            Assert.Equal(updatedEstablishment.NumberOfPupils, establishmentActual.NumberOfPupils);
+            Assert.Equal(updatedEstablishment.FreeSchoolMealsPercentage, establishmentActual.FreeSchoolMealsPercentage);
             Assert.Equal(updatedEstablishment.Street, establishmentActual.Street);
             Assert.Equal(updatedEstablishment.Locality, establishmentActual.Locality);
             Assert.Equal(updatedEstablishment.Address3, establishmentActual.Address3);
