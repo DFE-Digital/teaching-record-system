@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,7 +22,7 @@ public class AgeRangeSpecialismModel(
     public Guid PersonId { get; set; }
 
     [BindProperty]
-    //[AgeRangeValidation]
+    [Display(Name = "Edit age range specialism")]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
     public void OnGet()
@@ -38,7 +39,7 @@ public class AgeRangeSpecialismModel(
     {
         if (!ModelState.IsValid)
         {
-            return this.PageWithErrors();
+            return Page();
         }
         await JourneyInstance!.UpdateStateAsync(s =>
             {

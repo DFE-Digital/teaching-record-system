@@ -3,35 +3,35 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.ValidationAttributes;
 
-public class AgeRangeValidationAttribute : ValidationAttribute
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+public class AgeRangeValidationAttribute(string errorMessage) : ValidationAttribute(errorMessage)
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         if (value is not AgeRange ageRange)
         {
-            return new ValidationResult("The value must be of type AgeRange.");
+            throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be appplied to {nameof(AgeRange)} types.");
         }
         if (ageRange.AgeRangeType is null || ageRange.AgeRangeType == TrainingAgeSpecialismType.None)
         {
-            if (ageRange.AgeRangeFrom == null || ageRange.AgeRangeTo == null)
+            if (ageRange.AgeRangeFrom == null)
             {
-                return new ValidationResult("Both range values must be provided.");
+                return new ValidationResult("Age value must be provided.", new List<string> { nameof(ageRange.AgeRangeFrom) });
             }
-            if (ageRange.AgeRangeFrom < 0 || ageRange.AgeRangeTo < 0)
+            if (ageRange.AgeRangeTo == null)
             {
-                return new ValidationResult("Both range values must be positive.");
+                return new ValidationResult("Age value must be provided.", new List<string> { nameof(ageRange.AgeRangeTo) });
             }
             if (ageRange.AgeRangeFrom > ageRange.AgeRangeTo)
             {
-                return new ValidationResult("The 'from' value must be less than or equal to the 'to' value.");
+                return new ValidationResult("The 'from' value must be less than or equal to the 'to' value.", new List<string> { nameof(ageRange.AgeRangeFrom) });
             }
         }
         else
         {
-            if (ageRange.AgeRangeFrom != null || ageRange.AgeRangeTo != null)
-            {
-                return new ValidationResult("Both range values must be null.");
-            }
+            // Clear any range values if an age range type has been selected
+            ageRange.AgeRangeFrom = null;
+            ageRange.AgeRangeTo = null;
         }
         return ValidationResult.Success;
     }
