@@ -20,6 +20,10 @@ public partial class TestData
         var establishmentTypeName = isHigherEducationInstitution ? "Higher education institutions" : "Community school";
         var establishmentTypeGroupCode = isHigherEducationInstitution ? 2 : 4;
         var establishmentTypeGroupName = isHigherEducationInstitution ? "Universities" : "Local authority maintained schools";
+        var phaseOfEducationCode = isHigherEducationInstitution ? 0 : 4;
+        var phaseOfEducationName = isHigherEducationInstitution ? "Not applicable" : "Secondary";
+        var numberOfPupils = isHigherEducationInstitution ? (int?)null : Faker.RandomNumber.Next(100, 500);
+        var freeSchoolMealsPercentage = isHigherEducationInstitution ? (decimal?)null : Faker.RandomNumber.Next(0, 75) / 100m;
         localAuthorityName ??= Faker.Address.City();
         establishmentName ??= Faker.Company.Name();
         postcode ??= Faker.Address.UkPostCode();
@@ -61,6 +65,10 @@ public partial class TestData
                 EstablishmentTypeGroupName = establishmentTypeGroupName,
                 EstablishmentStatusCode = establishmentStatusCode,
                 EstablishmentStatusName = establishmentStatusName,
+                PhaseOfEducationCode = phaseOfEducationCode,
+                PhaseOfEducationName = phaseOfEducationName,
+                NumberOfPupils = numberOfPupils,
+                FreeSchoolMealsPercentage = freeSchoolMealsPercentage,
                 Street = null,
                 Locality = null,
                 Address3 = null,

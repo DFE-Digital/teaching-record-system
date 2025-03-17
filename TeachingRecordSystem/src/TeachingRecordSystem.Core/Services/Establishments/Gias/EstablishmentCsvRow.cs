@@ -38,6 +38,20 @@ public class EstablishmentCsvRow
     [Name("EstablishmentStatus (name)")]
     public required string EstablishmentStatusName { get; init; }
 
+    [Name("PhaseOfEducation (code)")]
+    public string? PhaseOfEducationCode { get; init; }
+
+    [Name("PhaseOfEducation (name)")]
+    public string? PhaseOfEducationName { get; init; }
+
+    [Name("NumberOfPupils")]
+    [NullValues("")]
+    public string? NumberOfPupils { get; init; }
+
+    [Name("PercentageFSM")]
+    [NullValues("")]
+    public string? FreeSchoolMealsPercentage { get; init; }
+
     [Name("Street")]
     [NullValues("")]
     public string? Street { get; init; }
@@ -61,4 +75,6 @@ public class EstablishmentCsvRow
     [Name("Postcode")]
     [NullValues("")]
     public string? Postcode { get; init; }
+
+
 }

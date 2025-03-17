@@ -22,6 +22,8 @@ public class EstablishmentMapping : IEntityTypeConfiguration<Establishment>
         builder.Property(e => e.EstablishmentTypeName).HasMaxLength(100).UseCollation("case_insensitive");
         builder.Property(e => e.EstablishmentTypeGroupName).HasMaxLength(50);
         builder.Property(e => e.EstablishmentStatusName).HasMaxLength(50);
+        builder.Property(e => e.PhaseOfEducationName).HasMaxLength(50);
+        builder.Property(e => e.FreeSchoolMealsPercentage).HasPrecision(5, 2);
         builder.Property(e => e.Street).HasMaxLength(100).UseCollation("case_insensitive");
         builder.Property(e => e.Locality).HasMaxLength(100).UseCollation("case_insensitive");
         builder.Property(e => e.Address3).HasMaxLength(100).UseCollation("case_insensitive");

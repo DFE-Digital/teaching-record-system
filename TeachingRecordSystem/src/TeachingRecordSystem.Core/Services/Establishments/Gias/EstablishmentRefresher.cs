@@ -29,6 +29,10 @@ public class EstablishmentRefresher(
                     EstablishmentTypeGroupName = establishment.EstablishmentTypeGroupName,
                     EstablishmentStatusCode = establishment.EstablishmentStatusCode,
                     EstablishmentStatusName = establishment.EstablishmentStatusName,
+                    PhaseOfEducationCode = establishment.PhaseOfEducationCode,
+                    PhaseOfEducationName = establishment.PhaseOfEducationName,
+                    NumberOfPupils = establishment.NumberOfPupils,
+                    FreeSchoolMealsPercentage = establishment.FreeSchoolMealsPercentage,
                     Street = establishment.Street,
                     Locality = establishment.Locality,
                     Address3 = establishment.Address3,
@@ -49,6 +53,10 @@ public class EstablishmentRefresher(
                 existingEstablishment.EstablishmentTypeGroupName = establishment.EstablishmentTypeGroupName;
                 existingEstablishment.EstablishmentStatusCode = establishment.EstablishmentStatusCode;
                 existingEstablishment.EstablishmentStatusName = establishment.EstablishmentStatusName;
+                existingEstablishment.PhaseOfEducationCode = establishment.PhaseOfEducationCode;
+                existingEstablishment.PhaseOfEducationName = establishment.PhaseOfEducationName;
+                existingEstablishment.NumberOfPupils = establishment.NumberOfPupils;
+                existingEstablishment.FreeSchoolMealsPercentage = establishment.FreeSchoolMealsPercentage;
                 existingEstablishment.Street = establishment.Street;
                 existingEstablishment.Locality = establishment.Locality;
                 existingEstablishment.Address3 = establishment.Address3;

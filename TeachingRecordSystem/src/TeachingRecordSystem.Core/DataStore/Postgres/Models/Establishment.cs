@@ -19,10 +19,15 @@ public class Establishment
     public required string? EstablishmentTypeGroupName { get; set; }
     public required int? EstablishmentStatusCode { get; set; }
     public required string? EstablishmentStatusName { get; set; }
+    public required int? PhaseOfEducationCode { get; set; }
+    public required string? PhaseOfEducationName { get; set; }
+    public required int? NumberOfPupils { get; set; }
+    public required decimal? FreeSchoolMealsPercentage { get; set; }
     public required string? Street { get; set; }
     public required string? Locality { get; set; }
     public required string? Address3 { get; set; }
     public required string? Town { get; set; }
     public required string? County { get; set; }
     public required string? Postcode { get; set; }
+
 }
