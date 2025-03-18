@@ -10,13 +10,13 @@ public class AgeRangeValidationAttribute(string errorMessage) : ValidationAttrib
     {
         if (value is not AgeRange ageRange)
         {
-            throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be appplied to {nameof(AgeRange)} types.");
+            throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be applied to {nameof(AgeRange)} types.");
         }
-        if (ageRange.AgeRangeType is null && ageRange.AgeRangeType is null)
+        if (ageRange.AgeRangeType is null)
         {
             return new ValidationResult("Select an age range", new List<string> { nameof(ageRange.AgeRangeType) });
         }
-        if (ageRange.AgeRangeType is null || ageRange.AgeRangeType == TrainingAgeSpecialismType.None)
+        else if (ageRange.AgeRangeType == TrainingAgeSpecialismType.None)
         {
             if (ageRange.AgeRangeFrom == null && ageRange.AgeRangeTo == null)
             {
