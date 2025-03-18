@@ -13,6 +13,8 @@ public record UpdatedTpsEmployment
     public required DateOnly CurrentLastExtractDate { get; init; }
     public required string? CurrentNationalInsuranceNumber { get; init; }
     public required string? CurrentPersonPostcode { get; init; }
+    public required string? CurrentPersonEmailAddress { get; init; }
+    public required string? CurrentEmployerPostcode { get; init; }
     public required DateOnly? NewEndDate { get; init; }
     public required DateOnly NewLastKnownTpsEmployedDate { get; init; }
     public required EmploymentType NewEmploymentType { get; init; }
@@ -20,5 +22,7 @@ public record UpdatedTpsEmployment
     public required DateOnly NewLastExtractDate { get; init; }
     public required string? NewNationalInsuranceNumber { get; init; }
     public required string? NewPersonPostcode { get; init; }
+    public required string? NewPersonEmailAddress { get; init; }
+    public required string? NewEmployerPostcode { get; init; }
     public required string Key { get; init; }
 }

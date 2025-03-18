@@ -13,6 +13,8 @@ public record UpdatedTpsEmploymentEstablishment
     public required DateOnly LastExtractDate { get; init; }
     public required string? NationalInsuranceNumber { get; set; }
     public required string? PersonPostcode { get; set; }
+    public required string? PersonEmailAddress { get; set; }
+    public required string? EmployerPostcode { get; set; }
     public required string Key { get; init; }
     public required Guid NewEstablishmentId { get; init; }
 }

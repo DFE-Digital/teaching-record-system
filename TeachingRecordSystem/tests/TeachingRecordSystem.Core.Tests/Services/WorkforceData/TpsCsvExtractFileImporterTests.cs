@@ -33,6 +33,8 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
         var invalidFormatExtractDate = "1234";
         var validFormatGender = "Male";
         var invalidFormatGender = "None";
+        var invalidFormatEmailAddress = "test.com";
+        var validFormatEmailAddress = "test@myemail.com";
 
         return new()
         {
@@ -598,7 +600,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     DateOfBirth = validFormatDateOfBirth,
                     DateOfDeath = validFormatDateOfDeath,
                     MemberPostcode = null,
-                    MemberEmailAddress = null,
+                    MemberEmailAddress = validFormatEmailAddress,
                     LocalAuthorityCode = validFormatLocalAuthorityCode,
                     EstablishmentCode = validFormatEstablishmentNumber,
                     EstablishmentPostcode = null,
@@ -611,7 +613,31 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     Gender = invalidFormatGender
                 },
                 ExpectedResult = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat,
-            }
+            },
+            // Invalid Email Address
+            new ()
+            {
+                Row = new()
+                {
+                    Trn = validFormatTrn,
+                    NationalInsuranceNumber = validFormatNationalInsuranceNumber,
+                    DateOfBirth = validFormatDateOfBirth,
+                    DateOfDeath = validFormatDateOfDeath,
+                    MemberPostcode = null,
+                    MemberEmailAddress = invalidFormatEmailAddress,
+                    LocalAuthorityCode = validFormatLocalAuthorityCode,
+                    EstablishmentCode = validFormatEstablishmentNumber,
+                    EstablishmentPostcode = null,
+                    EstablishmentEmailAddress = null,
+                    EmploymentStartDate = validFormatEmploymentStartDate,
+                    EmploymentEndDate = validFormatEmploymentEndDate,
+                    FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
+                    WithdrawlIndicator = validWithdrawlIndicator,
+                    ExtractDate = validFormatExtractDate,
+                    Gender = validFormatGender
+                },
+                ExpectedResult = TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat,
+            },
         };
     }
 
@@ -677,7 +703,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             DateOfBirth = "01/01/1980",
             DateOfDeath = "01/02/2024",
             MemberPostcode = null,
-            MemberEmailAddress = null,
+            MemberEmailAddress = Faker.Internet.Email(),
             LocalAuthorityCode = "123",
             EstablishmentNumber = "1234",
             EstablishmentPostcode = null,
