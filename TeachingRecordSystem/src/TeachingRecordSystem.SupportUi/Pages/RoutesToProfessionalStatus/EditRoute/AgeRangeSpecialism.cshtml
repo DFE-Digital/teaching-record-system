@@ -23,11 +23,8 @@
                     <govuk-radios-divider>or</govuk-radios-divider>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.None">I want to provide an age range
                         <govuk-radios-item-conditional>
-                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeFrom">
-                            </govuk-input>
-                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeTo">
-                                <govuk-input-label>To</govuk-input-label>
-                            </govuk-input>
+                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeFrom"/>
+                            <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeTo"/>
                         </govuk-radios-item-conditional>
                     </govuk-radios-item>
                 </govuk-radios-fieldset>
