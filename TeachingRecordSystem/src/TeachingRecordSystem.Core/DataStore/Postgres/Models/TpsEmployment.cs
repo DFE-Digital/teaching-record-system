@@ -20,4 +20,6 @@ public class TpsEmployment
     public required string? NationalInsuranceNumber { get; set; }
     public required string? PersonPostcode { get; set; }
     public required bool WithdrawalConfirmed { get; set; }
+    public required string? PersonEmailAddress { get; set; }
+    public required string? EmployerPostcode { get; set; }
 }

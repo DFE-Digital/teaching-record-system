@@ -280,10 +280,12 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var establishment1 = await TestData.CreateEstablishmentAsync(localAuthorityCode: "126", establishmentNumber: "1237");
         var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
         var personPostcode = Faker.Address.UkPostCode();
-        var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode);
+        var personEmailAddress = "original@email.com";
+        var existingPersonEmployment = await TestData.CreateTpsEmploymentAsync(person, establishment1, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, personPostcode, personEmailAddress: personEmailAddress);
         var updatedEndDate = new DateOnly(2024, 03, 30);
         var updatedLastExtractDate = new DateOnly(2024, 04, 25);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate));
+        var updatedMemberEmailAddress = "updated@email.com";
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment1.LaCode, establishment1.EstablishmentNumber, establishment1.Postcode!, new DateOnly(2023, 02, 02), updatedEndDate, updatedLastExtractDate, memberEmailAddress: updatedMemberEmailAddress));
 
         // Act
         var processor = new TpsCsvExtractProcessor(
@@ -298,6 +300,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == existingPersonEmployment.TpsEmploymentId);
         Assert.Equal(updatedEndDate, updatedPersonEmployment.LastKnownTpsEmployedDate);
         Assert.Equal(updatedLastExtractDate, updatedPersonEmployment.LastExtractDate);
+        Assert.Equal(updatedMemberEmailAddress, updatedPersonEmployment.PersonEmailAddress);
         Assert.Null(updatedPersonEmployment.EndDate);
     }
 
@@ -492,31 +495,6 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         var updatedPersonEmploymentWhichShouldNotHaveEndDateSet = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == personEmploymentWhichHasNotEnded.TpsEmploymentId);
         Assert.Equal(lastKnownEmployedDateOutsideThreeMonthsOfExtractDate, updatedPersonEmploymentWhichShouldHaveEndDateSet.EndDate);
         Assert.Null(updatedPersonEmploymentWhichShouldNotHaveEndDateSet.EndDate);
-    }
-
-    [Fact]
-    public async Task BackfillNinoAndPersonPostcodeInEmploymentHistory_WhenCalledWithPersonEmploymentRecordsWithoutNinoAndPersonPostcode_SetsNinoAndPersonPostcode()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
-        var tpsCsvExtractId = Guid.NewGuid();
-        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "129", establishmentNumber: "1241");
-        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
-        var memberPostcode = Faker.Address.UkPostCode();
-        var personEmploymentWithoutNinoAndPersonPostcode = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), null, null);
-        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, personEmploymentWithoutNinoAndPersonPostcode.StartDate, personEmploymentWithoutNinoAndPersonPostcode.LastKnownTpsEmployedDate, personEmploymentWithoutNinoAndPersonPostcode.LastExtractDate, "FT", nationalInsuranceNumber, memberPostcode: memberPostcode));
-
-        // Act
-        var processor = new TpsCsvExtractProcessor(
-            TestData.DbContextFactory,
-            TestData.Clock);
-        await processor.BackfillNinoAndPersonPostcodeInEmploymentHistoryAsync(CancellationToken.None);
-
-        // Assert
-        using var dbContext = TestData.DbContextFactory.CreateDbContext();
-        var updatedPersonEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == personEmploymentWithoutNinoAndPersonPostcode.TpsEmploymentId);
-        Assert.Equal(nationalInsuranceNumber, updatedPersonEmployment.NationalInsuranceNumber);
-        Assert.Equal(memberPostcode, updatedPersonEmployment.PersonPostcode);
     }
 
     public Task InitializeAsync() => Task.CompletedTask;

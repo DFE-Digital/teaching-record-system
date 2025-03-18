@@ -19,6 +19,8 @@ public class TpsEmploymentMapping : IEntityTypeConfiguration<TpsEmployment>
         builder.Property(e => e.Key).HasMaxLength(50).IsRequired();
         builder.Property(e => e.NationalInsuranceNumber).HasMaxLength(9).IsFixedLength();
         builder.Property(e => e.PersonPostcode).HasMaxLength(10);
+        builder.Property(e => e.PersonEmailAddress).HasMaxLength(100);
+        builder.Property(e => e.EmployerPostcode).HasMaxLength(10);
         builder.HasIndex(e => e.Key).HasDatabaseName(TpsEmployment.KeyIndexName);
         builder.HasIndex(e => e.PersonId).HasDatabaseName(TpsEmployment.PersonIdIndexName);
         builder.HasIndex(e => e.EstablishmentId).HasDatabaseName(TpsEmployment.EstablishmentIdIndexName);

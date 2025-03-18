@@ -15,7 +15,9 @@ public partial class TestData
         string? nationalInsuranceNumber = null,
         string? personPostcode = null,
         DateOnly? endDate = null,
-        bool? withdrawalConfirmed = false)
+        bool? withdrawalConfirmed = false,
+        string? personEmailAddress = null,
+        string? employerPostcode = null)
     {
         var key = $"{person.Trn}.{establishment.LaCode}.{establishment.EstablishmentNumber}.{startDate:yyyyMMdd}";
 
@@ -34,6 +36,8 @@ public partial class TestData
                 LastExtractDate = lastExtractDate,
                 NationalInsuranceNumber = nationalInsuranceNumber,
                 PersonPostcode = personPostcode,
+                PersonEmailAddress = personEmailAddress,
+                EmployerPostcode = employerPostcode,
                 CreatedOn = Clock.UtcNow,
                 UpdatedOn = Clock.UtcNow,
                 Key = key
