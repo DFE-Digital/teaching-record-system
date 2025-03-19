@@ -24,6 +24,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setAwardDate = setEndDate.AddDays(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
+        var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
+            .RandomOne();
+        //var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
+        //    .RandomOne();
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -82,6 +86,22 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
+
+        await page.AssertOnRouteEditCountryPageAsync(qualificationId);
+        await page.FillAsync("label:text-is('Enter the country associated with their route')", setCountry.Name);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        //await page.AssertOnRouteDetailPageAsync(qualificationId);
+        //await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
+
+        //await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
+        //await page.FillAsync("label:text-is('Enter the training provider for this route')", setTrainingProvider.Name);
+        //await page.FocusAsync("button:text-is('Continue')");
+        //await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
@@ -95,6 +115,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertContentEquals(setEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
         await page.AssertContentEquals(setDegreeType, "Degree type");
         await page.AssertContentEquals(setAgeRange.GetDisplayName()!, "Age range");
+        await page.AssertContentEquals(setCountry.Name, "Country of training");
+        //await page.AssertContentEquals(setTrainingProvider.Name, "Training provider");
         await page.ClickButtonAsync("Confirm and commit changes");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
@@ -521,6 +543,49 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
         await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+    }
+
+    [Fact]
+    public async Task EditCountry_BackLinks()
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
+            .First();
+        var status = ProfessionalStatusStatus.Approved;
+        var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(
+                personBuilder => personBuilder
+                .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithStatus(status)
+                ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
+
+        await page.AssertOnRouteEditCountryPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
+
+        await page.AssertOnRouteEditCountryPageAsync(qualificationId);
+        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry.CountryId);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 

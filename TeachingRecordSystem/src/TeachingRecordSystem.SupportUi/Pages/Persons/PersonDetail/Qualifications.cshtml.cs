@@ -36,7 +36,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
             .OrderBy(x => x.CreatedOn)
             .ToArrayAsync();
         var uniqueSubjectIds = ProfessionalStatuses
-            .SelectMany(x => x.TrainingSubjectIds)
+            .SelectMany(x => x.TrainingSubjectIds ?? Array.Empty<Guid>())
             .Distinct()
             .ToArray();
         var trainingSubjectsLookup = (await referenceDataCache.GetTrainingSubjectsAsync())

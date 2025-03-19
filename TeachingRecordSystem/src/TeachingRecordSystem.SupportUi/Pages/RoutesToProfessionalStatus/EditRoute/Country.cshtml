@@ -1,0 +1,46 @@
+@page "/route/{qualificationId}/edit/country/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.CountryModel
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@{
+    ViewBag.Title = "Edit training country";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            accessibleAutocomplete.enhanceSelectElement({
+                defaultValue: '',
+                selectElement: document.querySelector('#@nameof(Model.TrainingCountryId)')
+            })
+        }
+    </script>
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteEditTrainingCountry(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <govuk-select asp-for="TrainingCountryId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var country in Model.TrainingCountries)
+                {
+                    <govuk-select-item value="@country.CountryId" selected="@Model.TrainingCountryId==country.CountryId">@country.Name</govuk-select-item>
+                }
+            </govuk-select>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditTrainingCountryCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

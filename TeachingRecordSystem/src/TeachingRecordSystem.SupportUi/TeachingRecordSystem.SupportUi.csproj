@@ -897,5 +897,5 @@
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\govuk-prototype-kit.config.json" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\package.json" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\README.md" />
-  </ItemGroup>  
+  </ItemGroup>
 </Project>
