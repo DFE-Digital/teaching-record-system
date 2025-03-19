@@ -40,6 +40,16 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/age-range");
     }
 
+    public static Task AssertOnRouteEditCountryPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/country");
+    }
+
+    public static Task AssertOnRouteEditTrainingProviderPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/training-provider");
+    }
+
     public static Task AssertOnRouteChangeReasonPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/change-reason");
