@@ -1,14 +1,35 @@
+using System.Diagnostics;
+using System.Transactions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Services.DqtOutbox.Handlers;
 
-public class SetInductionRequiredToCompleteMessageHandler(TrsDbContext dbContext, IClock clock) : IMessageHandler<SetInductionRequiredToCompleteMessage>
+public class SetInductionRequiredToCompleteMessageHandler(TrsDbContext dbContext, IClock clock, TrsDataSyncHelper syncHelper) :
+    IMessageHandler<SetInductionRequiredToCompleteMessage>
 {
     public async Task HandleMessageAsync(SetInductionRequiredToCompleteMessage message)
     {
-        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == message.PersonId);
+        var person = await GetPersonAsync();
+
+        if (person is null)
+        {
+            using (var txn = new TransactionScope(TransactionScopeOption.Suppress))
+            {
+                var synced = await syncHelper.SyncPersonAsync(message.PersonId, syncAudit: false);
+
+                if (!synced)
+                {
+                    throw new InvalidOperationException($"Failed syncing person '{message.PersonId}'.");
+                }
+            }
+
+            person = (await GetPersonAsync())!;
+            Debug.Assert(person is not null);
+        }
 
         if (!InductionStatus.RequiredToComplete.IsHigherPriorityThan(person.InductionStatus))
         {
@@ -37,5 +58,7 @@ public class SetInductionRequiredToCompleteMessageHandler(TrsDbContext dbContext
         }
 
         await dbContext.SaveChangesAsync();
+
+        async Task<Person?> GetPersonAsync() => await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == message.PersonId);
     }
 }

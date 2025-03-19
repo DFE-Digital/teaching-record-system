@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Transactions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
@@ -16,11 +17,14 @@ public class AddInductionExemptionMessageHandler(TrsDbContext dbContext, IClock 
 
         if (person is null)
         {
-            var synced = await syncHelper.SyncPersonAsync(message.PersonId, syncAudit: false);
-
-            if (!synced)
+            using (var txn = new TransactionScope(TransactionScopeOption.Suppress))
             {
-                throw new InvalidOperationException($"Failed syncing person '{message.PersonId}'.");
+                var synced = await syncHelper.SyncPersonAsync(message.PersonId, syncAudit: false);
+
+                if (!synced)
+                {
+                    throw new InvalidOperationException($"Failed syncing person '{message.PersonId}'.");
+                }
             }
 
             person = (await GetPersonAsync())!;
