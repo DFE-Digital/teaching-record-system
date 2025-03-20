@@ -14,7 +14,7 @@ public static class IttSubjectExtensions
     }
 
     public static async Task<(bool IsSuccess, dfeta_ittsubject? Result)> TryConvertFromTrsTrainingSubjectReferenceAsync(this string trainingSubjectReference, ReferenceDataCache referenceDataCache)
-    {        
+    {
         var converted = await referenceDataCache.GetIttSubjectBySubjectCodeAsync(trainingSubjectReference);
         if (converted is not null)
         {

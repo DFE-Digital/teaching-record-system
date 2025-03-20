@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models;
 public static class CountryExtensions
 {
     public static async Task<dfeta_country> ConvertFromTrsCountryReferenceAsync(this string countryReference, ReferenceDataCache referenceDataCache)
-    {        
+    {
         var result = await countryReference.TryConvertFromTrsCountryReferenceAsync(referenceDataCache);
         if (result.IsSuccess)
         {

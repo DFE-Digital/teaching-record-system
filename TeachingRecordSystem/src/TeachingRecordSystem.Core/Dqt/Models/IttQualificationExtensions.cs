@@ -19,11 +19,11 @@ public static class IttQualificationExtensions
         {
             var converted = await referenceDataCache.GetIttQualificationByValueAsync(dqtIttQualificationTypeCode!);
             if (converted is not null)
-            {                
+            {
                 return (true, converted);
             }
         }
-        
+
         return (false, default);
     }
 

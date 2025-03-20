@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
@@ -53,7 +54,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
     {
         var command = new SetProfessionalStatusCommand(
             trn,
-            id,            
+            id,
             request.RouteTypeId,
             mapper.Map<Implementation.Dtos.ProfessionalStatusStatus>(request.Status),
             request.AwardedDate,

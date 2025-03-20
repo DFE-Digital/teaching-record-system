@@ -1,17 +1,17 @@
+using System.Diagnostics;
 using Medallion.Threading;
+using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.DataStore.Postgres;
-using System.Diagnostics;
-using TeachingRecordSystem.Core.Services.TrsDataSync;
-using ProfessionalStatusStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.ProfessionalStatusStatus;
-using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using TeachingRecordSystem.Core.Services.TrsDataSync;
+using ProfessionalStatusStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.ProfessionalStatusStatus;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -78,7 +78,7 @@ public class SetProfessionalStatusHandler(
             Debug.Assert(person is not null);
         }
 
-        var lookupData = await LookupDataAsync(dqtContact);        
+        var lookupData = await LookupDataAsync(dqtContact);
 
         if (!command.RouteTypeId.TryConvertFromTrsRouteType(out (dfeta_ITTProgrammeType? ProgrammeType, RecognitionRouteType? RecognitionRouteType) routeTypeMapped))
         {
@@ -195,9 +195,9 @@ public class SetProfessionalStatusHandler(
             itt = new dfeta_initialteachertraining
             {
                 Id = Guid.NewGuid(),
-                dfeta_PersonId = dqtContact.Id.ToEntityReference(Contact.EntityLogicalName),                
+                dfeta_PersonId = dqtContact.Id.ToEntityReference(Contact.EntityLogicalName),
                 dfeta_SlugId = command.SlugId,
-                dfeta_TraineeID = dqtContact.dfeta_HUSID                
+                dfeta_TraineeID = dqtContact.dfeta_HUSID
             };
         }
         else
@@ -207,9 +207,9 @@ public class SetProfessionalStatusHandler(
             {
                 return ApiError.RouteToProfessionalStatusAlreadyAwarded();
             }
-            
+
             switch (itt.dfeta_Result)
-            {                
+            {
                 case dfeta_ITTResult.Fail:
                     switch (command.Status)
                     {
@@ -218,7 +218,7 @@ public class SetProfessionalStatusHandler(
                         case ProfessionalStatusStatus.Deferred:
                         case ProfessionalStatusStatus.InTraining:
                         case ProfessionalStatusStatus.UnderAssessment:
-                            return ApiError.UnableToChangeFailProfessionalStatusStatus();                        
+                            return ApiError.UnableToChangeFailProfessionalStatusStatus();
                     }
                     break;
                 case dfeta_ITTResult.Withdrawn:
@@ -226,13 +226,13 @@ public class SetProfessionalStatusHandler(
                     {
                         case ProfessionalStatusStatus.Withdrawn:
                             return new SetProfessionalStatusResult();
-                        case ProfessionalStatusStatus.Deferred:                        
+                        case ProfessionalStatusStatus.Deferred:
                             return ApiError.UnableToChangeWithdrawnProfessionalStatusStatus();
                     }
                     break;
                 default:
                     break;
-            }            
+            }
         }
 
         itt!.dfeta_EstablishmentId = providerId?.ToEntityReference(Account.EntityLogicalName);
@@ -249,7 +249,7 @@ public class SetProfessionalStatusHandler(
         itt.dfeta_ITTQualificationId = ittQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName);
         itt.dfeta_CountryId = countryId?.ToEntityReference(dfeta_country.EntityLogicalName);
 
-        var qtsRegistration = !isNewItt ? lookupData.QtsRegistrations.FirstOrDefault(qts => qts.dfeta_qtsregistrationId == itt!.dfeta_qtsregistration.Id) : null;        
+        var qtsRegistration = !isNewItt ? lookupData.QtsRegistrations.FirstOrDefault(qts => qts.dfeta_qtsregistrationId == itt!.dfeta_qtsregistration.Id) : null;
         if (qtsRegistration is null)
         {
             // Programme type could change in this API call so need to match against original one if there is a matching QTS record
@@ -263,7 +263,7 @@ public class SetProfessionalStatusHandler(
 
             if (compatibleQtsRegistrations.Count() > 1)
             {
-                return ApiError.MultipleQtsRecords(command.Trn);
+                return ApiError.MultipleQtsRecords();
             }
 
             qtsRegistration = compatibleQtsRegistrations.SingleOrDefault();
@@ -282,7 +282,7 @@ public class SetProfessionalStatusHandler(
         {
             // Remove existing teaching status if status is withdrawn
             if (command.Status == ProfessionalStatusStatus.Withdrawn)
-            { 
+            {
                 if (isEarlyYears)
                 {
                     qtsRegistration!.Attributes[dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId] = null;
@@ -293,7 +293,7 @@ public class SetProfessionalStatusHandler(
                 }
             }
         }
-        
+
         if (command.Status != ProfessionalStatusStatus.Withdrawn)
         {
             // Set teaching status and awarded date appropriate to route type and status in API call
@@ -414,7 +414,7 @@ public class SetProfessionalStatusHandler(
             else
             {
                 matching.AddRange(qtsRecords.Where(qts => qts.dfeta_TeacherStatusId is null));
-            }            
+            }
         }
 
         return matching;
@@ -425,10 +425,10 @@ public class SetProfessionalStatusHandler(
         if (routeTypeId.IsEarlyYears())
         {
             return null;
-        }   
+        }
 
         var teacherStatusValue = routeTypeId switch
-        {            
+        {
             var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => "104", // Apply for QTS -> Qualified Teacher (by virtue of non-UK teaching qualifications)
             var guid when guid == Guid.Parse("2B106B9D-BA39-4E2D-A42E-0CE827FDC324") => "223",  // European Recognition -> Qualified Teacher (by virtue of European teaching qualifications)
             var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => "69",  // NI R -> Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
@@ -447,7 +447,7 @@ public class SetProfessionalStatusHandler(
                     ProfessionalStatusStatus.Awarded => "100",  // Assessment Only Route (Awarded) -> Qualified Teacher: Assessment Only Route
                     ProfessionalStatusStatus.Withdrawn => null, // Assessment Only Route (Withdrawn) -> null
                     _ => "212",  // Assessment Only Route (Not Awarded) -> AOR Candidate
-                },            
+                },
             _ =>
             status switch
             {
@@ -600,7 +600,7 @@ public static class SetProfessionalStatusTrainingAgeSpecialismCommandExtensions
     {
         var mapped = input.Type switch
         {
-            TrainingAgeSpecialismType.Range => (AgeRange.ConvertFromValue(input.From!.Value), AgeRange.ConvertFromValue(input.To!.Value)),
+            TrainingAgeSpecialismType.None => (AgeRange.ConvertFromValue(input.From!.Value), AgeRange.ConvertFromValue(input.To!.Value)),
             TrainingAgeSpecialismType.FoundationStage => (dfeta_AgeRange.FoundationStage, dfeta_AgeRange.FoundationStage),
             TrainingAgeSpecialismType.FurtherEducation => (dfeta_AgeRange.FurtherEducation, dfeta_AgeRange.FurtherEducation),
             TrainingAgeSpecialismType.KeyStage1 => (dfeta_AgeRange.KeyStage1, dfeta_AgeRange.KeyStage1),

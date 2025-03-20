@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
 public class SetProfessionalStatusHandler(IClock clock) : ICrmQueryHandler<SetProfessionalStatusQuery, bool>
-{    
+{
     public async Task<bool> ExecuteAsync(SetProfessionalStatusQuery query, IOrganizationServiceAsync organizationService)
     {
         var txnRequest = new ExecuteTransactionRequest()
@@ -62,7 +62,7 @@ public class SetProfessionalStatusHandler(IClock clock) : ICrmQueryHandler<SetPr
         }
 
         _ = await organizationService.ExecuteAsync(txnRequest);
-        return true;        
+        return true;
     }
 
     public Models.Task CreateReviewTaskEntityForActiveSanctions(Guid contactId, string trn)

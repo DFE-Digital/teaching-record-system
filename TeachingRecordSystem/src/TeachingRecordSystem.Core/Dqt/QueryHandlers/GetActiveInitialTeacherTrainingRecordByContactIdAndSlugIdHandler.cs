@@ -38,6 +38,6 @@ public class GetActiveInitialTeacherTrainingRecordByContactIdAndSlugIdHandler : 
             Criteria = filter
         };
         var result = await organizationService.RetrieveMultipleAsync(query);
-        return result.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).FirstOrDefault();        
+        return result.Entities.Select(entity => entity.ToEntity<dfeta_initialteachertraining>()).FirstOrDefault();
     }
 }
