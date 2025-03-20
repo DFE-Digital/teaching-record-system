@@ -202,6 +202,12 @@ public class SetProfessionalStatusHandler(
         }
         else
         {
+            // No current provision for changing overseas
+            if (command.RouteTypeId.IsOverseas())
+            {
+                return ApiError.UpdatesNotAllowedForRouteType(command.RouteTypeId);
+            }
+
             // If the route has already been Awarded then this can't be changed via the API - needs to be altered via TRS console
             if (itt!.dfeta_Result == dfeta_ITTResult.Pass)
             {
@@ -214,7 +220,7 @@ public class SetProfessionalStatusHandler(
                     switch (command.Status)
                     {
                         case ProfessionalStatusStatus.Failed:
-                            return new SetProfessionalStatusResult();
+                            return new SetProfessionalStatusResult(); //No-op
                         case ProfessionalStatusStatus.Deferred:
                         case ProfessionalStatusStatus.InTraining:
                         case ProfessionalStatusStatus.UnderAssessment:
@@ -225,7 +231,7 @@ public class SetProfessionalStatusHandler(
                     switch (command.Status)
                     {
                         case ProfessionalStatusStatus.Withdrawn:
-                            return new SetProfessionalStatusResult();
+                            return new SetProfessionalStatusResult(); //No-op
                         case ProfessionalStatusStatus.Deferred:
                             return ApiError.UnableToChangeWithdrawnProfessionalStatusStatus();
                     }
