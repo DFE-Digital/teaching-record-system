@@ -64,7 +64,7 @@ public class SetProfessionalStatusHandler(
             return ApiError.PersonNotFound(command.Trn);
         }
 
-        // Alerts and induction are in TRS so make sure contact record is synced to TRS
+        // Alerts and inductions are in TRS so make sure contact record is synced to TRS
         var person = await GetPersonAsync();
         if (person is null)
         {
@@ -78,17 +78,11 @@ public class SetProfessionalStatusHandler(
             Debug.Assert(person is not null);
         }
 
-        var lookupData = await LookupDataAsync(dqtContact);
-
-        if (!command.RouteTypeId.TryConvertFromTrsRouteType(out (dfeta_ITTProgrammeType? ProgrammeType, RecognitionRouteType? RecognitionRouteType) routeTypeMapped))
+        dfeta_ITTProgrammeType? mappedIttProgrammeType = null;
+        if (!command.RouteTypeId.IsOverseas() && !command.RouteTypeId.TryConvertFromTrsRouteType(out mappedIttProgrammeType))
         {
             return ApiError.InvalidRouteType(command.RouteTypeId);
         }
-
-        var isEarlyYears = command.RouteTypeId.IsEarlyYears();
-        var teacherStatus = await DeriveTeacherStatusAsync(command.RouteTypeId, command.Status);
-        var earlyYearsTeacherStatus = await DeriveEarlyYearsTeacherStatusAsync(command.RouteTypeId, command.Status);
-        var inductionExemptionId = command.IsExemptFromInduction.HasValue && command.IsExemptFromInduction.Value ? DeriveInductionExemptionId(command.RouteTypeId) : null;
 
         if (!command.Status.TryConvertToITTResult(out var ittResult))
         {
@@ -104,6 +98,10 @@ public class SetProfessionalStatusHandler(
         {
             return ApiError.UnderAssessmentOnlyPermittedForRouteType(RouteToProfessionalStatus.AssessmentOnlyRouteId);
         }
+
+        var lookupData = await LookupDataAsync(dqtContact, command.RouteTypeId, command.Status);
+        var isEarlyYears = command.RouteTypeId.IsEarlyYears();
+        var inductionExemptionId = command.IsExemptFromInduction.HasValue && command.IsExemptFromInduction.Value ? DeriveInductionExemptionId(command.RouteTypeId) : null;
 
         (dfeta_AgeRange From, dfeta_AgeRange To)? ageRange = null;
         if (command.TrainingAgeSpecialism is not null && !command.TrainingAgeSpecialism.TryConvertToAgeRange(out ageRange))
@@ -246,7 +244,7 @@ public class SetProfessionalStatusHandler(
         itt!.dfeta_EstablishmentId = providerId?.ToEntityReference(Account.EntityLogicalName);
         itt.dfeta_ProgrammeStartDate = command.TrainingStartDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
         itt.dfeta_ProgrammeEndDate = command.TrainingEndDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
-        itt.dfeta_ProgrammeType = routeTypeMapped.ProgrammeType;
+        itt.dfeta_ProgrammeType = mappedIttProgrammeType;
         itt.dfeta_CohortYear = cohortYear;
         itt.dfeta_Subject1Id = subjectId1?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
         itt.dfeta_Subject2Id = subjectId2?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
@@ -263,7 +261,7 @@ public class SetProfessionalStatusHandler(
             // Programme type could change in this API call so need to match against original one if there is a matching QTS record
             var compatibleQtsRegistrations = SelectCompatibleQtsRegistrationRecords(
                 lookupData.QtsRegistrations,
-                existingProgrammeType ?? routeTypeMapped.ProgrammeType!.Value,
+                existingProgrammeType ?? mappedIttProgrammeType!.Value,
                 isEarlyYears,
                 lookupData.EarlyYearsTraineeStatusId,
                 lookupData.AorCandidateTeacherStatusId,
@@ -307,7 +305,7 @@ public class SetProfessionalStatusHandler(
             // Set teaching status and awarded date appropriate to route type and status in API call
             if (isEarlyYears)
             {
-                qtsRegistration!.dfeta_EarlyYearsStatusId = earlyYearsTeacherStatus!.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
+                qtsRegistration!.dfeta_EarlyYearsStatusId = lookupData.DerivedEarlyYearsTeacherStatus!.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
                 if (command.Status == ProfessionalStatusStatus.Awarded)
                 {
                     qtsRegistration.dfeta_EYTSDate = command.AwardedDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
@@ -315,7 +313,7 @@ public class SetProfessionalStatusHandler(
             }
             else
             {
-                qtsRegistration!.dfeta_TeacherStatusId = teacherStatus!.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
+                qtsRegistration!.dfeta_TeacherStatusId = lookupData.DerivedTeacherStatus!.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
                 if (command.Status == ProfessionalStatusStatus.Awarded)
                 {
                     qtsRegistration.dfeta_QTSDate = command.AwardedDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
@@ -437,12 +435,12 @@ public class SetProfessionalStatusHandler(
 
         var teacherStatusValue = routeTypeId switch
         {
-            var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => "104", // Apply for QTS -> Qualified Teacher (by virtue of non-UK teaching qualifications)
-            var guid when guid == Guid.Parse("2B106B9D-BA39-4E2D-A42E-0CE827FDC324") => "223",  // European Recognition -> Qualified Teacher (by virtue of European teaching qualifications)
-            var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => "69",  // NI R -> Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
-            var guid when guid == Guid.Parse("CE61056E-E681-471E-AF48-5FFBF2653500") => "103",  // Overseas Trained Teacher Recognition -> Qualified Teacher: By virtue of overseas qualifications
-            var guid when guid == Guid.Parse("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") => "68",  // Scotland R -> Qualified Teacher: Teachers trained/registered in Scotland
-            var guid when guid == Guid.Parse("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1") =>
+            var guid when guid == RouteToProfessionalStatus.ApplyforQtsId => "104", // Apply for QTS -> Qualified Teacher (by virtue of non-UK teaching qualifications)
+            var guid when guid == RouteToProfessionalStatus.EuropeanRecognitionId => "223",  // European Recognition -> Qualified Teacher (by virtue of European teaching qualifications)
+            var guid when guid == RouteToProfessionalStatus.NiRId => "69",  // NI R -> Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
+            var guid when guid == RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId => "103",  // Overseas Trained Teacher Recognition -> Qualified Teacher: By virtue of overseas qualifications
+            var guid when guid == RouteToProfessionalStatus.ScotlandRId => "68",  // Scotland R -> Qualified Teacher: Teachers trained/registered in Scotland
+            var guid when guid == RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId =>
                 status switch
                 {
                     ProfessionalStatusStatus.Awarded => "90", // International Qualified Teacher Status (Awarded) -> Qualified teacher: by virtue of achieving international qualified teacher status
@@ -501,11 +499,11 @@ public class SetProfessionalStatusHandler(
     {
         var ittProviderName = routeTypeId switch
         {
-            var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => "Non-UK establishment", // Apply for QTS
-            var guid when guid == Guid.Parse("2B106B9D-BA39-4E2D-A42E-0CE827FDC324") => "Non-UK establishment", // European Recognition
-            var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => "UK establishment (Scotland/Northern Ireland)", // NI R
-            var guid when guid == Guid.Parse("CE61056E-E681-471E-AF48-5FFBF2653500") => "Non-UK establishment",  // Overseas Trained Teacher Recognition
-            var guid when guid == Guid.Parse("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") => "UK establishment (Scotland/Northern Ireland)", // Scotland R
+            var guid when guid == RouteToProfessionalStatus.ApplyforQtsId => "Non-UK establishment", // Apply for QTS
+            var guid when guid == RouteToProfessionalStatus.EuropeanRecognitionId => "Non-UK establishment", // European Recognition
+            var guid when guid == RouteToProfessionalStatus.NiRId => "UK establishment (Scotland/Northern Ireland)", // NI R
+            var guid when guid == RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId => "Non-UK establishment",  // Overseas Trained Teacher Recognition
+            var guid when guid == RouteToProfessionalStatus.ScotlandRId => "UK establishment (Scotland/Northern Ireland)", // Scotland R
             _ => throw new ArgumentException($"Unknown route type ID: '{routeTypeId}'.", nameof(routeTypeId))
         };
 
@@ -515,14 +513,14 @@ public class SetProfessionalStatusHandler(
 
     public Guid? DeriveInductionExemptionId(Guid routeTypeId) => routeTypeId switch
     {
-        var guid when guid == Guid.Parse("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") => new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"), // Apply for QTS -> Overseas Trained Teacher
-        var guid when guid == Guid.Parse("3604EF30-8F11-4494-8B52-A2F9C5371E03") => new("3471ab35-e6e4-4fa9-a72b-b8bd113df591"), // NI R -> Passed induction in Northern Ireland
-        var guid when guid == Guid.Parse("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") => new("a112e691-1694-46a7-8f33-5ec5b845c181"), // Scotland R -> Has, or is eligible for, full registration in Scotland
-        var guid when guid == Guid.Parse("BE6EAF8C-92DD-4EFF-AAD3-1C89C4BEC18C") => InductionExemptionReason.QtlsId, // QTLS and SET Membership -> Exempt through QTLS status provided they maintain membership of The Society of Education and Training
+        var guid when guid == RouteToProfessionalStatus.ApplyforQtsId => new("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"), // Apply for QTS -> Overseas Trained Teacher
+        var guid when guid == RouteToProfessionalStatus.NiRId => new("3471ab35-e6e4-4fa9-a72b-b8bd113df591"), // NI R -> Passed induction in Northern Ireland
+        var guid when guid == RouteToProfessionalStatus.ScotlandRId => new("a112e691-1694-46a7-8f33-5ec5b845c181"), // Scotland R -> Has, or is eligible for, full registration in Scotland
+        var guid when guid == RouteToProfessionalStatus.QtlsAndSetMembershipId => InductionExemptionReason.QtlsId, // QTLS and SET Membership -> Exempt through QTLS status provided they maintain membership of The Society of Education and Training
         _ => null
     };
 
-    private async Task<SetProfessionalStatusLookupResult> LookupDataAsync(Contact contact)
+    private async Task<SetProfessionalStatusLookupResult> LookupDataAsync(Contact contact, Guid routeTypeId, ProfessionalStatusStatus status)
     {
         var ittTask = crmQueryDispatcher.ExecuteQueryAsync(
             new GetActiveInitialTeacherTrainingRecordByContactIdAndSlugIdQuery(contact.Id, contact.dfeta_SlugId));
@@ -543,11 +541,8 @@ public class SetProfessionalStatusHandler(
         var getEarlyYearsTraineeStatusTask = referenceDataCache.GetEarlyYearsStatusByValueAsync("220");
         var getAorCandidateTeacherStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("212");
         var getTraineeTeacherDmsTeacherStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("211");
-        var getEarlyYearsTeacherStatusTask = referenceDataCache.GetEarlyYearsStatusByValueAsync("221");
-        var getQualifiedTeacherTrainedStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("71");
-        var getQualifiedTeacherAssessmentOnlyRouteTask = referenceDataCache.GetTeacherStatusByValueAsync("100");
-        var getQualifiedTeacherInternationalTeacherStatusTask = referenceDataCache.GetTeacherStatusByValueAsync("90");
-
+        var deriveTeacherStatusTask = DeriveTeacherStatusAsync(routeTypeId, status);
+        var deriveEarlyYearsTeacherStatusTask = DeriveEarlyYearsTeacherStatusAsync(routeTypeId, status);
         await Task.WhenAll(
             ittTask,
             qtsRegistrationsTask,
@@ -555,10 +550,8 @@ public class SetProfessionalStatusHandler(
             getEarlyYearsTraineeStatusTask,
             getAorCandidateTeacherStatusTask,
             getTraineeTeacherDmsTeacherStatusTask,
-            getEarlyYearsTeacherStatusTask,
-            getQualifiedTeacherTrainedStatusTask,
-            getQualifiedTeacherAssessmentOnlyRouteTask,
-            getQualifiedTeacherInternationalTeacherStatusTask);
+            deriveTeacherStatusTask,
+            deriveEarlyYearsTeacherStatusTask);
 
         return new SetProfessionalStatusLookupResult()
         {
@@ -569,10 +562,8 @@ public class SetProfessionalStatusHandler(
             EarlyYearsTraineeStatusId = getEarlyYearsTraineeStatusTask.Result.Id,
             AorCandidateTeacherStatusId = getAorCandidateTeacherStatusTask.Result.Id,
             TraineeTeacherDmsTeacherStatusId = getTraineeTeacherDmsTeacherStatusTask.Result.Id,
-            EarlyYearsTeacherStatusId = getEarlyYearsTeacherStatusTask.Result.Id,
-            QualifiedTeacherTrainedStatusId = getQualifiedTeacherTrainedStatusTask.Result.Id,
-            QualifiedTeacherAssessmentOnlyRouteId = getQualifiedTeacherAssessmentOnlyRouteTask.Result.Id,
-            QualifiedTeacherInternationalTeacherStatusId = getQualifiedTeacherInternationalTeacherStatusTask.Result.Id
+            DerivedTeacherStatus = deriveTeacherStatusTask.Result,
+            DerivedEarlyYearsTeacherStatus = deriveEarlyYearsTeacherStatusTask.Result
         };
     }
 
@@ -585,10 +576,8 @@ public class SetProfessionalStatusHandler(
         public Guid EarlyYearsTraineeStatusId { get; set; }
         public Guid AorCandidateTeacherStatusId { get; set; }
         public Guid TraineeTeacherDmsTeacherStatusId { get; set; }
-        public Guid EarlyYearsTeacherStatusId { get; set; }
-        public Guid QualifiedTeacherTrainedStatusId { get; set; }
-        public Guid QualifiedTeacherAssessmentOnlyRouteId { get; set; }
-        public Guid QualifiedTeacherInternationalTeacherStatusId { get; set; }
+        public dfeta_teacherstatus? DerivedTeacherStatus { get; set; }
+        public dfeta_earlyyearsstatus? DerivedEarlyYearsTeacherStatus { get; set; }
     }
 }
 
