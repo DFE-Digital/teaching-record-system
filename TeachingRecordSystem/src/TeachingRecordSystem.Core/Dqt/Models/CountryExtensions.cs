@@ -15,9 +15,14 @@ public static class CountryExtensions
 
     public static async Task<(bool IsSuccess, dfeta_country? Result)> TryConvertFromTrsCountryReferenceAsync(this string countryReference, ReferenceDataCache referenceDataCache)
     {
-        // There are a couple of country codes that are different between TRS and DQT
+        // There are a few of country codes that are different between TRS and DQT
         var dqtCountryCode = countryReference switch
         {
+            "GB-ENG" => "XF",
+            "GB-NIR" => "XG",
+            "GB-SCT" => "XH",
+            "GB-WLS" => "XI",
+            "GB-CYM" => "XI",
             "XV" => "QO",
             "CY" => "XC",
             _ => countryReference

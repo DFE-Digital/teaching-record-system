@@ -163,10 +163,12 @@ public class SetProfessionalStatusHandler(
         if (command.TrainingProviderUkprn is not null)
         {
             var (IsSuccess, Result) = await command.TrainingProviderUkprn.TryConvertFromUkPrnAsync(referenceDataCache);
-            if (providerId is null)
+            if (!IsSuccess)
             {
                 return ApiError.InvalidTrainingProviderUkprn(command.TrainingProviderUkprn);
             }
+
+            providerId = Result!.Id;
         }
 
         if (command.RouteTypeId.IsOverseas())
@@ -249,8 +251,8 @@ public class SetProfessionalStatusHandler(
         itt.dfeta_Subject1Id = subjectId1?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
         itt.dfeta_Subject2Id = subjectId2?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
         itt.dfeta_Subject3Id = subjectId3?.ToEntityReference(dfeta_ittsubject.EntityLogicalName);
-        itt.dfeta_AgeRangeFrom = ageRange!.Value.From;
-        itt.dfeta_AgeRangeTo = ageRange!.Value.To;
+        itt.dfeta_AgeRangeFrom = ageRange is not null ? ageRange!.Value.From : null;
+        itt.dfeta_AgeRangeTo = ageRange is not null ? ageRange!.Value.To : null;
         itt.dfeta_Result = ittResult;
         itt.dfeta_ITTQualificationId = ittQualificationId?.ToEntityReference(dfeta_ittqualification.EntityLogicalName);
         itt.dfeta_CountryId = countryId?.ToEntityReference(dfeta_country.EntityLogicalName);

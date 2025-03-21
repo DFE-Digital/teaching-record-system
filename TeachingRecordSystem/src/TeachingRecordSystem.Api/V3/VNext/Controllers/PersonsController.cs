@@ -42,7 +42,8 @@ public class PersonsController(IMapper mapper) : ControllerBase
     [HttpPut("{trn}/professional-statuses/{id}")]
     [SwaggerOperation(
         OperationId = "SetProfessionalStatus",
-        Summary = "Sets a professional status")]
+        Summary = "Sets a professional status",
+        Description = "Sets a professional status the person with the given TRN.")]
     [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetProfessionalStatus)]
