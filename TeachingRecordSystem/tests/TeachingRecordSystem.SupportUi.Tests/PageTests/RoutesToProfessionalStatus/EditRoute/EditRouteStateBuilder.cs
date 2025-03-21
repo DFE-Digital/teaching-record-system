@@ -25,15 +25,15 @@ public class EditRouteStateBuilder()
     public EditRouteStateBuilder WithStatusWhereAllFieldsApply()
     {
         _status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotRequired
-                && s.AwardDateRequired != FieldRequirement.NotRequired
-                && s.TrainingCountryRequired != FieldRequirement.NotRequired
-                && s.DegreeTypeRequired != FieldRequirement.NotRequired
-                && s.TrainingEndDateRequired != FieldRequirement.NotRequired
-                && s.InductionExemptionRequired != FieldRequirement.NotRequired
-                && s.TrainingProviderRequired != FieldRequirement.NotRequired
-                && s.TrainingStartDateRequired != FieldRequirement.NotRequired
-                && s.TrainingSubjectsRequired != FieldRequirement.NotRequired)
+            .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
+                && s.AwardDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingCountryRequired != FieldRequirement.NotApplicable
+                && s.DegreeTypeRequired != FieldRequirement.NotApplicable
+                && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && s.InductionExemptionRequired != FieldRequirement.NotApplicable
+                && s.TrainingProviderRequired != FieldRequirement.NotApplicable
+                && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         return this;

@@ -4,9 +4,9 @@ public static class QuestionDriverHelper
 {
     public static FieldRequirement FieldRequired(FieldRequirement routeFieldRequirement, FieldRequirement statusFieldRequirement)
     {
-        if (routeFieldRequirement == FieldRequirement.NotRequired || statusFieldRequirement == FieldRequirement.NotRequired)
+        if (routeFieldRequirement == FieldRequirement.NotApplicable || statusFieldRequirement == FieldRequirement.NotApplicable)
         {
-            return FieldRequirement.NotRequired;
+            return FieldRequirement.NotApplicable;
         }
         else if (routeFieldRequirement == FieldRequirement.Mandatory || statusFieldRequirement == FieldRequirement.Mandatory)
         {

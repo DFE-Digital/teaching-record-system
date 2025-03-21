@@ -202,11 +202,11 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicableRoutes = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(TestDataHelper.PropertyHasFieldRequirement<RouteToProfessionalStatus>(propertySelector, FieldRequirement.NotRequired));
+            .Where(TestDataHelper.PropertyHasFieldRequirement<RouteToProfessionalStatus>(propertySelector, FieldRequirement.NotApplicable));
         var route = applicableRoutes.Any() ? applicableRoutes.RandomOne() : (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
 
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(TestDataHelper.PropertyHasFieldRequirement<ProfessionalStatusStatusInfo>(propertySelector, FieldRequirement.NotRequired))
+            .Where(TestDataHelper.PropertyHasFieldRequirement<ProfessionalStatusStatusInfo>(propertySelector, FieldRequirement.NotApplicable))
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p
