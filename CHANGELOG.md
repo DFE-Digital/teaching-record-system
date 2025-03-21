@@ -29,6 +29,7 @@ In addition, the status field will now only contain the following values:
 - `Passed`
 - `Failed`
 - `FailedInWales`.
+
 Note that `null` will no longer be returned.
 
 The responses for the following endpoints now contain a `qtlsStatus` property:
