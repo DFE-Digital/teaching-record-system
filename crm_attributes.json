@@ -89,7 +89,8 @@
     "dfeta_newvalue",
     "dfeta_oldvalue",
     "dfeta_person",
-    "statecode"
+    "statecode",
+    "dfeta_event"
   ],
   "dfeta_country": [
     "dfeta_name",
