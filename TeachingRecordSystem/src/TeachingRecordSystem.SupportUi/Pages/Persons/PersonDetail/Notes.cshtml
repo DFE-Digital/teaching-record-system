@@ -1,0 +1,47 @@
+@page "/persons/{personId}/notes"
+@using TeachingRecordSystem.Core.Dqt.Models
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@using TeachingRecordSystem.Core.Services.Files;
+@inject IFileService fileService;
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.NotesModel
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonSubNavigationTab.Notes;
+    var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.PersonDetail(person.PersonId)">Back to record</govuk-back-link>
+}
+
+<div>
+    <h2 class="govuk-heading-m">Notes</h2>
+
+</div>
+@if (Model.Notes.Count() == 0)
+{
+    <p class="govuk-body" data-testid="no-dqt-notes">There are no notes associated with this record</p>
+}
+else
+{
+    foreach (var note in Model.Notes)
+    {
+        var downloadUrl = await fileService.GetFileUrlAsync(note.NoteId, TimeSpan.FromMinutes(15));
+
+        <div data-testid="dqtnote">
+            <h3 class="govuk-heading-s">Added by <span data-testid="@note.NoteId-dqt-note-created-by">@note.CreatedByDqtUserName</span> on <span data-testid="@note.NoteId-dqt-note-created-on">@note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm")</span></h3>
+            <div class="govuk-details" data-testid="@note.NoteId-dqt-note">
+                <div class="govuk-details__text">
+                    <p>
+                        <span data-testid="@note.NoteId-dqt-note-text">@note.Description</span>
+                    </p>
+                    @if (note.OriginalFileName is not null)
+                    {
+                        <h2 class="govuk-heading-s">Attached file</h2>
+                        <a href=@downloadUrl target="_blank" class="govuk-link"><span data-testid="@note.NoteId-dqt-note-file-name">@note.OriginalFileName</span> (opens in a new tab)</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}

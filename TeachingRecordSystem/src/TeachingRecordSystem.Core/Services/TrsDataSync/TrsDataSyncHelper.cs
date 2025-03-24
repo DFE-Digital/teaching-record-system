@@ -14,8 +14,7 @@ using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
-using static System.Net.Mime.MediaTypeNames;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -28,7 +27,7 @@ public class TrsDataSyncHelper(
     IClock clock,
     IAuditRepository auditRepository,
     ILogger<TrsDataSyncHelper> logger,
-    IDqtNoteAttachmentStorage dqtNoteAttachment)
+    IFileService fileService)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -461,13 +460,13 @@ public class TrsDataSyncHelper(
         //upload attachments new or remove attachment
         foreach (var noteAttachment in toSync)
         {
-            var fileName = noteAttachment!.Id.ToString();
+            var fileId = noteAttachment!.Id;
 
             //if note does not have an attachment or length is 0, attempt delete
             if (noteAttachment!.AttachmentBytes is null || noteAttachment.AttachmentBytes!.Length == 0)
             {
                 //not ineterested if file exists or not
-                await dqtNoteAttachment.DeleteAttachmentAsync(fileName!);
+                await fileService.DeleteFileAsync(fileId!.Value);
                 noteAttachment.FileName = null;
                 noteAttachment.OriginalFileName = null;
             }
@@ -476,10 +475,13 @@ public class TrsDataSyncHelper(
             if (noteAttachment!.AttachmentBytes != null)
             {
                 //incoming note attachment filename is the annotation id
-                noteAttachment.FileName = fileName;
                 var bytes = noteAttachment.AttachmentBytes;
-                await dqtNoteAttachment.CreateAttachmentAsync(bytes, fileName!, noteAttachment.MimeType);
-                noteAttachment.OriginalFileName = noteAttachment.OriginalFileName;
+                using (var stream = new MemoryStream(bytes))
+                {
+                    await fileService.UploadFileAsync(stream, noteAttachment.MimeType, noteAttachment.Id);
+                    noteAttachment.OriginalFileName = noteAttachment.OriginalFileName;
+                    noteAttachment.FileName = fileId.ToString();
+                }
             }
         }
 
@@ -1167,6 +1169,9 @@ public class TrsDataSyncHelper(
             Annotation.Fields.ModifiedOn,
             Annotation.Fields.NoteText,
             Annotation.Fields.CreatedBy,
+            Annotation.Fields.CreatedOn,
+            Annotation.Fields.ModifiedBy,
+            Annotation.Fields.MimeType,
         };
 
         Action<NpgsqlBinaryImporter, DqtNoteInfo> writeRecord = (writer, person) =>

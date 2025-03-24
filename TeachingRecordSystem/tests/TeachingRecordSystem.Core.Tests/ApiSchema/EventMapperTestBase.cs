@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.ApiSchema;
@@ -46,7 +46,7 @@ public class EventMapperFixture
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            DqtNoteFileAttachment.Object);
+            BlobStorageFileService.Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -69,5 +69,5 @@ public class EventMapperFixture
 
     public IServiceProvider Services { get; }
 
-    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachment { get; } = new Mock<IDqtNoteAttachmentStorage>();
+    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 }

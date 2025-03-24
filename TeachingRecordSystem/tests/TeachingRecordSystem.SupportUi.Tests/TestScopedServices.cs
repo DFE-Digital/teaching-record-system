@@ -1,5 +1,5 @@
 using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 
@@ -16,7 +16,7 @@ public class TestScopedServices
         AzureActiveDirectoryUserServiceMock = new();
         EventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
-        DqtNoteAttachmentMock = new();
+        BlobStorageFileServiceMock = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -42,5 +42,5 @@ public class TestScopedServices
 
     public TestableFeatureProvider FeatureProvider { get; }
 
-    public Mock<IDqtNoteAttachmentStorage> DqtNoteAttachmentMock { get; }
+    public Mock<IFileService> BlobStorageFileServiceMock { get; }
 }

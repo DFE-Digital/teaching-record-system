@@ -6,9 +6,9 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
@@ -227,7 +227,7 @@ public class OutboxMessageHandlerFixture
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IDqtNoteAttachmentStorage>().Object);
+            new Mock<IFileService>().Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

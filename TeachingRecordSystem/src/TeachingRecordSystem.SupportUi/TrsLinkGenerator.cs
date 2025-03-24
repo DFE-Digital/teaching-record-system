@@ -337,6 +337,9 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string PersonChangeHistory(Guid personId, int? pageNumber = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/ChangeHistory", routeValues: new { personId, pageNumber });
 
+    public string PersonNotes(Guid personId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
+
     public string PersonEditName(Guid personId, JourneyInstanceId? journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string PersonEditNameConfirm(Guid personId, JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Confirm", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);

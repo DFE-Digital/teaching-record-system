@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -28,7 +27,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            DqtNoteFileAttachment.Object);
+            BlobStorageFileService.Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -49,7 +48,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachment { get; } = new Mock<IDqtNoteAttachmentStorage>();
+    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
     [Theory]
     [MemberData(nameof(MatchData))]
