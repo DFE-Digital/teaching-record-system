@@ -178,7 +178,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     }
 
     // Using local helper methods instead of the test extension methods which enforce smart quotes
-    // as Subject list contains names like "men's studies" without smart quotes
+    // because the subject list contains names like "men's studies" without smart quotes
     private async Task<IHtmlDocument> ReadContentAsync(HttpResponseMessage response)
     {
         var content = await response.Content.ReadAsStringAsync();
@@ -189,7 +189,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     private string GetErrorMessage(IHtmlDocument doc, string errorElementId)
     {
         var errorElement = doc.GetElementById(errorElementId);
-        var vht = errorElement.GetElementsByTagName("span")[0];
+        var vht = errorElement!.GetElementsByTagName("span")[0];
         return errorElement.InnerHtml[vht.OuterHtml.Length..];
     }
 

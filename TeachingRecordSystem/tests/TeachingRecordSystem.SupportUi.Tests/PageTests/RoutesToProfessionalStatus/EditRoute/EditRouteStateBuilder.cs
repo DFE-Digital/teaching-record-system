@@ -11,7 +11,7 @@ public class EditRouteStateBuilder()
     private DateOnly? _awardedDate;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
-    private Guid[]? _trainingSubjectIds;
+    private Guid[] _trainingSubjectIds = [];
     private TrainingAgeSpecialismType? _trainingAgeSpecialismType;
     private int? _trainingAgeSpecialismRangeFrom;
     private int? _trainingAgeSpecialismRangeTo;
