@@ -238,7 +238,7 @@ public class ReferenceDataCache(
     public async Task<TrainingSubject[]> GetTrainingSubjectsAsync(bool activeOnly = false)
     {
         var trainingSubjects = await EnsureTrainingSubjectsAsync();
-        return trainingSubjects.Where(e => !activeOnly || e.IsActive).ToArray();
+        return trainingSubjects.Where(e => !activeOnly || e.IsActive).OrderBy(s => s.Name).ToArray();
     }
 
     public async Task<Country[]> GetTrainingCountriesAsync()
