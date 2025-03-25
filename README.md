@@ -3,9 +3,9 @@ The TRS is a database of people who work in Education in the UK. It is the prima
 
 
 ## Teaching Reference Number
-The TRN is a unique 7  digit reference given to identify a person who's data is in the Teaching Record System (formerly Database Of Qualified Teachers). TRN's are given to trainee teachers, qualified teachers (QTS and many other teaching related qualifications), anyone eligible for a teaching pension and other related services.
+The TRN is a unique 7-digit reference given to identify a person whose data is in the Teaching Record System (formerly Database Of Qualified Teachers). TRNs are given to trainee teachers, qualified teachers (QTS and many other teaching related qualifications), and anyone eligible for a teaching pension and other related services.
 
-It is a character string of len(7). E.G:
+It is a character string of len(7) e.g.:
 ```shell
 '1234567', '0001234'
 ```
@@ -94,6 +94,8 @@ Playwright is used for end-to-end testing. Install it with a `just` recipe:
 just install-playwright
 ```
 
+**Note:** the solution must be built first as the recipe requires the existence of `bin/Debug/net8.0/playwright.ps1` which is generated when the `Microsoft.Playwright` package is built.
+
 ### Database setup
 
 Install Postgres then set a connection string configuration entry in user secrets for running the apps and another for running the tests.
@@ -101,7 +103,10 @@ Note you should use a different database for tests as the test database will be 
 
 e.g.
 ```shell
+# local settings
 just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
+
+# test settings
 just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
@@ -159,14 +164,75 @@ Ask a developer on the team for the user secrets for these dependencies.
 
 The `build` CRM environment is used for local development and automated tests.
 
+The secrets you will need to set are as follows:
+```shell
+# local settings
+just set-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+just set-secret CrmClientId "<REDACTED>"
+just set-secret CrmClientSecret "<REDACTED>"
+just set-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
+
+# test settings
+just set-tests-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+just set-tests-secret CrmClientId "<REDACTED>"
+just set-tests-secret CrmClientSecret "<REDACTED>"
+just set-tests-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
+```
+
 #### TRN Generation API
 
 The API calls the TRN Generation API to generate a TRNs.
+
+The secrets you will need to set are as follows:
+```shell
+# local settings
+just set-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
+just set-secret TrnGenerationApi:ApiKey "<REDACTED>"
+
+# test settings
+just set-tests-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
+just set-tests-secret TrnGenerationApi:ApiKey "<REDACTED>"
+```
 
 #### Azure AD
 
 Azure AD is used for authenticating users in the Support UI.
 
+The secrets you will need to set are as follows:
+
+```shell
+just set-secret AzureAd:ClientSecret "<REDACTED>"
+just set-secret AzureAd:ClientId "<REDACTED>"
+```
+
+#### Other settings
+
+There are additional secrets you will need to set are as follows:
+
+```shell
+# local settings
+just set-secret AccessYourTeachingQualifications:BaseAddress "https://dev.access-your-teaching-qualifications.education.gov.uk/"
+just set-secret AccessYourTeachingQualifications:StartUrlPath "/qualifications/start"
+
+just set-secret GetAnIdentity:WebHookClientSecret "dummy"
+just set-secret GetAnIdentity:TokenEndpoint "https://dev.teaching-identity.education.gov.uk/connect/token"
+just set-secret GetAnIdentity:ClientSecret "<REDACTED>"
+just set-secret GetAnIdentity:ClientId "dqt-api"
+just set-secret GetAnIdentity:BaseAddress "https://dev.teaching-identity.education.gov.uk/"
+
+just set-secret Webhooks:CanonicalDomain "https://localhost:5001"
+just set-secret Webhooks:SigningKeyId "devkey"
+just set-secret Webhooks:Keys:0:KeyId "devkey"
+just set-secret Webhooks:Keys:0:CertificatePem "<REDACTED>"
+just set-secret Webhooks:Keys:0:PrivateKeyPem "<REDACTED>"
+
+just set-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
+just set-secret BuildEnvLockBlobSasToken "<REDACTED>"
+
+# test settings
+just set-tests-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
+just set-tests-secret BuildEnvLockBlobSasToken "<REDACTED>"
+```
 
 ## CRM code generation
 
@@ -178,6 +244,7 @@ Run `just generate-crm-models` to run the code generator against the `build` env
 The CRM user secrets described within [Developer setup](#dynamics-crm) must be correctly set for the tool to run successfully.
 The tool is a .NET Framework application and requires .NET 4.6.
 
+**Note:** Make sure Visual Studio is closed before running this recipe as otherwise it may fail due to these files being already in use by the Visual Studio process.
 
 ## Environment configuration
 
