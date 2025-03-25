@@ -22,7 +22,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     public TrainingSubject[] Subjects { get; set; } = [];
 
     [BindProperty]
-    [Required(ErrorMessage = "select a subject")]
+    [Required(ErrorMessage = "Enter a subject")]
     [Display(Name = "Enter the subject they specialise in teaching")]
     public Guid? SubjectId1 { get; set; }
     [BindProperty]
@@ -34,9 +34,9 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public void OnGet()
     {
-        SubjectId1 = JourneyInstance!.State.TrainingSubjectIds.ElementAtOrDefault(0);
-        SubjectId2 = JourneyInstance!.State.TrainingSubjectIds.ElementAtOrDefault(1);
-        SubjectId3 = JourneyInstance!.State.TrainingSubjectIds.ElementAtOrDefault(2);
+        SubjectId1 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(0);
+        SubjectId2 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(1);
+        SubjectId3 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(2);
     }
 
     public IActionResult OnPostCancel()
@@ -64,8 +64,8 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     {
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
-
         Subjects = await referenceDataCache.GetTrainingSubjectsAsync();
+
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

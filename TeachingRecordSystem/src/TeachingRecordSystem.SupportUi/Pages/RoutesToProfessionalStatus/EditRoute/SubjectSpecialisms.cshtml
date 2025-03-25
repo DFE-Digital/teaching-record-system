@@ -10,10 +10,29 @@
     <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
     <script asp-add-nonce="true">
         window.onload = function () {
-            accessibleAutocomplete.enhanceSelectElement({
-                defaultValue: '',
-                selectElement: document.querySelector('#@nameof(Model.SubjectId1)')
-            })
+            const selectIds = [
+                '@nameof(Model.SubjectId1)',
+                '@nameof(Model.SubjectId2)',
+                '@nameof(Model.SubjectId3)'
+            ];
+            selectIds.forEach(id => {
+                const selectElement = document.querySelector(`#${id}`);
+                accessibleAutocomplete.enhanceSelectElement({
+                    selectElement: selectElement,
+                    defaultValue: '',
+                    selectElement: document.querySelector(`#${id}`)
+                });
+
+                // Get the newly created input element
+                const inputElement = selectElement.parentElement.querySelector("input");
+
+                // Clear the select element when the input is cleared
+                inputElement.addEventListener("input", function () {
+                    if (inputElement.value === "") {
+                        selectElement.value = "";
+                    }
+                });
+            });
         }
     </script>
 }
@@ -34,27 +53,25 @@
                     <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId1==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
                 }
             </govuk-select>
-            <govuk-accordion id="accordion-with-subject-section" heading-level="3">
-                <govuk-accordion-item expanded="true">
-                     <govuk-accordion-item-heading>Add additional subjects</govuk-accordion-item-heading>
-                     <govuk-accordion-item-content>
-                        <govuk-select asp-for="SubjectId2" label-class="govuk-label--m">
-                            <govuk-select-item value=""></govuk-select-item>
-                            @foreach (var subject in Model.Subjects)
-                            {
-                                <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId2==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
-                            }
-                        </govuk-select>
-                        <govuk-select asp-for="SubjectId3" label-class="govuk-label--m">
-                            <govuk-select-item value=""></govuk-select-item>
-                            @foreach (var subject in Model.Subjects)
-                            {
-                                <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId3==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
-                            }
-                        </govuk-select>
-                    </govuk-accordion-item-content>
-                </govuk-accordion-item>
-                </govuk-accordion>
+            <govuk-details>
+                <govuk-details-summary>Add additional subjects</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-select asp-for="SubjectId2" label-class="govuk-label--m">
+                        <govuk-select-item value=""></govuk-select-item>
+                        @foreach (var subject in Model.Subjects)
+                        {
+                            <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId2==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                        }
+                    </govuk-select>
+                    <govuk-select asp-for="SubjectId3" label-class="govuk-label--m">
+                        <govuk-select-item value=""></govuk-select-item>
+                        @foreach (var subject in Model.Subjects)
+                        {
+                            <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId3==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                        }
+                    </govuk-select>
+                </govuk-details-text>
+            </govuk-details>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>

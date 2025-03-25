@@ -3,18 +3,22 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFixture)
+
+public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    [Fact]
-    public async Task Post_WhenSubjectsAreEntered_SavesDataAndRedirectsToDetail()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task Post_WhenEndDateIsEqualOrBeforeStartDate_RendersError(int daysAfter)
     {
         // Arrange
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(3).ToArray();
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddDays(daysAfter);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -25,6 +29,9 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -36,9 +43,55 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "SubjectId1", subjects[0].TrainingSubjectId},
-                { "SubjectId2", subjects[1].TrainingSubjectId },
-                { "SubjectId3", subjects[2].TrainingSubjectId },
+                { "TrainingEndDate.Day", $"{endDate:%d}" },
+                { "TrainingEndDate.Month", $"{endDate:%M}" },
+                { "TrainingEndDate.Year", $"{endDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "End date must be after start date");
+    }
+
+    [Fact]
+    public async Task Post_WhenTrainingEndDateIsEntered_SavesDateAndRedirectsToDetail()
+    {
+        // Arrange
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = new DateOnly(2025, 01, 01);
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)));
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "TrainingEndDate.Day", $"{endDate:%d}" },
+                { "TrainingEndDate.Month", $"{endDate:%M}" },
+                { "TrainingEndDate.Year", $"{endDate:yyyy}" },
             }
         };
 
@@ -49,18 +102,20 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), journeyInstance.State.TrainingSubjectIds);
+        Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
     }
 
     [Fact]
-    public async Task Post_WhenNoSubjectIsEntered_ReturnsError()
+    public async Task Post_WhenNoEndDateIsEntered_ReturnsError()
     {
         // Arrange
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -71,6 +126,7 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
+            .WithTrainingStartDate(startDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -78,7 +134,7 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(new Dictionary<string, string>())
         };
@@ -87,28 +143,31 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "SubjectSpecialism", "Enter a subject");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "TrainingEndDate", "Enter an end date");
     }
 
     [Fact]
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status)));
+                .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(status)
+            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithTrainingStartDate(startDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -116,7 +175,7 @@ public class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase(hostFix
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
