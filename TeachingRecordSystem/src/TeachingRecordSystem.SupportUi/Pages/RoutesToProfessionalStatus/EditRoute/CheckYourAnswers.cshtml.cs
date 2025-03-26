@@ -33,7 +33,7 @@ public class CheckYourAnswersModel(
 
     public async Task OnGetAsync()
     {
-        RouteDetail!.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
+        RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
         RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
@@ -48,7 +48,7 @@ public class CheckYourAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail!.RouteToProfessionalStatus.RouteToProfessionalStatusId)).ProfessionalStatusType;
+        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatus.RouteToProfessionalStatusId)).ProfessionalStatusType;
         professionalStatus.Update(
             s =>
             {
@@ -63,7 +63,7 @@ public class CheckYourAnswersModel(
                 s.TrainingAgeSpecialismRangeTo = RouteDetail.TrainingAgeSpecialismRangeTo;
                 s.TrainingCountryId = RouteDetail.TrainingCountryId;
                 s.TrainingProviderId = RouteDetail.TrainingProviderId;
-                s.InductionExemptionReasonId = RouteDetail.InductionExemptionReasonId;
+                s.ExemptFromInduction = RouteDetail.IsExemptFromInduction;
                 s.DegreeTypeId = RouteDetail.DegreeTypeId;
             },
             changeReason: ChangeReason?.GetDisplayName(),
@@ -112,8 +112,12 @@ public class CheckYourAnswersModel(
         PersonId = personInfo.PersonId;
 
         ChangeReason = JourneyInstance!.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail!;
+        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
         var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue ?
+            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption
+            : false;
+
         RouteDetail = new RouteDetailViewModel
         {
             QualificationType = JourneyInstance!.State.QualificationType,
@@ -128,9 +132,10 @@ public class CheckYourAnswersModel(
             TrainingAgeSpecialismRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
             TrainingCountryId = JourneyInstance!.State.TrainingCountryId,
             TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
-            InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId,
             QualificationId = QualificationId,
             DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
+            HasImplicitExemption = hasImplicitExemption,
+            IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
             JourneyInstance = JourneyInstance
         };
 

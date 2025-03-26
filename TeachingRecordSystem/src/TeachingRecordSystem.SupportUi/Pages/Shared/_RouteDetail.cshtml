@@ -38,11 +38,17 @@
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
-    @if (Model.InductionExemptionReasonRequired != FieldRequirement.NotApplicable)
+    @if (Model.HasInductionExemptionRequired != FieldRequirement.NotApplicable)
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.ExemptionReason</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@(Model.IsExemptFromInduction.HasValue ? Model.IsExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
+            @if (!Model.HasImplicitExemption.HasValue || Model.HasImplicitExemption.HasValue && !Model.HasImplicitExemption.Value)
+            {
+                <govuk-summary-list-row-actions>
+                    <govuk-summary-list-row-action data-testid="edit-induction-exemption-link" href="@LinkGenerator.RouteEditInductionExemption(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="induction exemption">Change</govuk-summary-list-row-action>
+                </govuk-summary-list-row-actions>
+            }
         </govuk-summary-list-row>
     }
     @if (Model.TrainingProviderRequired != FieldRequirement.NotApplicable)

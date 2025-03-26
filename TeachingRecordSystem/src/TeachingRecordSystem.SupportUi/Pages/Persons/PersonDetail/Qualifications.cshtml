@@ -46,7 +46,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-exemption-@professionalStatus.QualificationId">@(professionalStatus.InductionExemptionReasonId.HasValue ? "Yes" : "No")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="training-exemption-@professionalStatus.QualificationId">@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value == true ? "Yes" : "No" : "Not applicable")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>

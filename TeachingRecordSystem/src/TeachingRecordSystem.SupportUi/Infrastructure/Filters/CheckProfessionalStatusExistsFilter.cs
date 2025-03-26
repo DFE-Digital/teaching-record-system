@@ -29,7 +29,6 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
             .Include(ps => ps.TrainingProvider)
             .Include(ps => ps.TrainingCountry)
             .Include(ps => ps.Route)
-            .Include(ps => ps.InductionExemptionReason)
             .Include(ps => ps.DegreeType);
 
         var currentProfessionalStatus = await request
