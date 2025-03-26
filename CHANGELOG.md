@@ -20,6 +20,7 @@ the `endDate` property replaced by `completedDate`:
 - `GET /v3/person`
 - `GET /v3/persons?findBy=LastNameAndDateOfBirth`
 - `GET /v3/persons/find`.
+
 In addition, the status field will now only contain the following values:
 - `None`
 - `RequiredToComplete`
@@ -28,6 +29,7 @@ In addition, the status field will now only contain the following values:
 - `Passed`
 - `Failed`
 - `FailedInWales`.
+
 Note that `null` will no longer be returned.
 
 The responses for the following endpoints now contain a `qtlsStatus` property:
