@@ -18,7 +18,7 @@ public class EditRouteState : IRegisterJourney
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }
-    public Guid[]? TrainingSubjectIds { get; set; }
+    public Guid[] TrainingSubjectIds { get; set; } = [];
     public TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
     public int? TrainingAgeSpecialismRangeFrom { get; set; }
     public int? TrainingAgeSpecialismRangeTo { get; set; }

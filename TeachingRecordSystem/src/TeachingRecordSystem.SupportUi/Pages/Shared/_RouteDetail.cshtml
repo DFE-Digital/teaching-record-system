@@ -114,6 +114,9 @@
                     <span use-empty-fallback></span>
                 }
             </govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-subjects-link" href="@LinkGenerator.RouteEditTrainingSubjects(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
 </govuk-summary-list>
