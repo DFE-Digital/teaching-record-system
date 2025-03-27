@@ -236,9 +236,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(true, "Yes")]
-    [InlineData(false, "No")]
-    public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(bool hasExemption, string expectedContent)
+    [InlineData(ProfessionalStatusStatus.Awarded, true, "Yes")]
+    [InlineData(ProfessionalStatusStatus.Awarded, false, "No")]
+    public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(ProfessionalStatusStatus status, bool? hasExemption, string expectedContent)
     {
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
@@ -247,10 +247,6 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.Name == "NI R")
             .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne()
-            .Value;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r

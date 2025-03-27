@@ -120,7 +120,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithExemptFromInduction(bool isExempt)
+        public CreatePersonProfessionalStatusBuilder WithExemptFromInduction(bool? isExempt)
         {
             _exemptFromInduction = isExempt;
             return this;

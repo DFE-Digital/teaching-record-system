@@ -126,7 +126,7 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithInductionExemption(bool isExempt)
+    public EditRouteStateBuilder WithInductionExemption(bool? isExempt)
     {
         _isExemptFromInduction = isExempt;
         return this;

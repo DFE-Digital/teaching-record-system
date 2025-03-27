@@ -99,13 +99,14 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     }
 
     [Fact]
-    public async Task Get_WithPersonIdForPersonWithProfessionalStatus_DisplaysExpectedContent()
+    public async Task Get_PersonWithRouteToProfessionalStatus_DisplaysExpectedContent()
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
         var status = ProfessionalStatusStatus.InTraining;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
@@ -123,6 +124,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 r.WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray());
                 r.WithTrainingCountry(country);
                 r.WithTrainingAgeSpecialismType(ageRange);
+                r.WithDegreeType(degreeType);
                 r.WithAwardedDate(awardedDate);
             })
         );
@@ -145,9 +147,48 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TextContent);
         Assert.Equal("No", professionalStatus.GetElementByTestId($"training-exemption-{qualificationid}")!.TextContent);
         Assert.Equal(trainingProvider.Name, professionalStatus.GetElementByTestId($"training-provider-{qualificationid}")!.TextContent);
-        Assert.Empty(professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent); // TODO - don't have degree type yet
+        Assert.Contains(degreeType.Name, professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TextContent);
         Assert.Equal(country.Name, professionalStatus.GetElementByTestId($"training-country-{qualificationid}")!.TextContent);
         Assert.Equal(ageRange.ToString(), professionalStatus.GetElementByTestId($"training-agespecialism-{qualificationid}")!.TextContent);
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
+    }
+
+    [Theory]
+    [InlineData(ProfessionalStatusStatus.Approved, false, "No")]
+    [InlineData(ProfessionalStatusStatus.Approved, true, "Yes")]
+    [InlineData(ProfessionalStatusStatus.InTraining, null, "Not provided")]
+    public async Task Get_PersonWithRouteToProfessionalStatus_RouteAllowsInductionExemption_DisplaysExpectedContent(ProfessionalStatusStatus status, bool? isExempt, string expectedContent)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        DateOnly? startDate = new DateOnly(2022, 01, 01);
+        DateOnly? endDate = new DateOnly(2023, 01, 01);
+        DateOnly awardedDate = new DateOnly(2024, 01, 01);
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r =>
+            {
+                r.WithRoute(route.RouteToProfessionalStatusId);
+                r.WithStatus(status);
+                r.WithTrainingStartDate(startDate.Value);
+                r.WithTrainingEndDate(endDate.Value);
+                r.WithAwardedDate(awardedDate);
+                r.WithExemptFromInduction(isExempt);
+            })
+        );
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var professionalStatuses = doc.GetElementByTestId("no-professional-statuses");
+        Assert.Null(professionalStatuses);
+
+        var professionalStatus = doc.GetElementByTestId($"professionalstatus-id-{qualificationid}");
+        Assert.NotNull(professionalStatus);
+        Assert.Equal(expectedContent, professionalStatus.GetElementByTestId($"training-exemption-{qualificationid}")!.TextContent);
     }
 }
