@@ -1,4 +1,3 @@
-
 using System.ServiceModel;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Extensions.Configuration;
@@ -142,10 +141,10 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                             // Assuming the audit detail holds the new values under the "NewValue" key.
                             if (detail.NewValue is not null)
                             {
-                                string? firstName = null;
-                                string? middleName = null;
-                                string? lastName = null;
-                                DateTime? dob = null;
+                                string firstName = string.Empty;
+                                string middleName = string.Empty;
+                                string lastName = string.Empty;
+                                DateTime dob = default(DateTime);
                                 int? gender = null;
                                 string? email = null;
                                 var addressline1 = default(string?);
@@ -164,7 +163,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                     middleName = middleNameOut;
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.LastName, out string lastNameOut))
                                     lastName = lastNameOut;
-                                if (detail.NewValue.TryGetAttributeValue<DateTime?>(Contact.Fields.BirthDate, out DateTime? dobOut))
+                                if (detail.NewValue.TryGetAttributeValue<DateTime>(Contact.Fields.BirthDate, out DateTime dobOut))
                                     dob = dobOut;
                                 if (detail.NewValue.TryGetAttributeValue<OptionSetValue?>(Contact.Fields.GenderCode, out OptionSetValue? genderOut))
                                     gender = genderOut?.Value;
@@ -209,7 +208,6 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.dfeta_NINumber, out string ninoOut))
                                     nino = ninoOut;
 
-
                                 //applicationUser & contact.dfeta_TrnRequestID
                                 var requestId = contact.Value;
 
@@ -218,7 +216,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                     ApplicationUserId = userId,
                                     RequestId = requestId,
                                     CreatedOn = createdOn,
-                                    DateOfBirth = dob.Value.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                                    DateOfBirth = dob.ToDateOnlyWithDqtBstFix(isLocalTime: false),
                                     EmailAddress = email ?? string.Empty,
                                     IdentityVerified = false,
                                     Name = new string[] { firstName, middleName, lastName }.Where(s => !string.IsNullOrEmpty(s)).ToArray(),
@@ -287,8 +285,6 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             await command.ExecuteNonQueryAsync();
         }
     }
-
-
 
     private async Task<IReadOnlyDictionary<Guid, AuditDetailCollection>> GetAuditRecordsAsync(
         string entityLogicalName,
