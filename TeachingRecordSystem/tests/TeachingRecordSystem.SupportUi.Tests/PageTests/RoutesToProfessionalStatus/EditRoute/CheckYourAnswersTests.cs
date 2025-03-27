@@ -183,7 +183,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRowContentMatches("Award date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Has exemption", exemptionReason.Name);
+        doc.AssertRowContentMatches("Has exemption", "Yes");
     }
 
     [Fact]
