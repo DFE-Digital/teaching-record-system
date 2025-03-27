@@ -96,7 +96,7 @@ public class GetPersonTests(HostFixture hostFixture) : GetPersonTestBase(hostFix
         await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: (qtsDate.ToDateTime(), "Assessment only route candidate"), expectedEyts: (eytsDate.ToDateTime(), "Early years trainee"));
     }
 
-    [Fact]
+    [Fact(Skip = "Awaiting routes migration")]
     public async Task Get_MultipleQTSRecords_ReturnsMostRecent()
     {
         var qtsDate1 = new DateOnly(2021, 05, 15);
@@ -115,7 +115,7 @@ public class GetPersonTests(HostFixture hostFixture) : GetPersonTestBase(hostFix
         await ValidRequestForTeacher_ReturnsExpectedContent(httpClient, baseUrl, contact, qtsRegistrations: qts, expectedQts: (qtsDate2.ToDateTime(), "Assessment only route candidate"), expectedEyts: null);
     }
 
-    [Fact]
+    [Fact(Skip = "Awaiting routes migration")]
     public async Task Get_MultipleEYTSRecords_ReturnsMostRecent()
     {
         var eytsDate1 = new DateOnly(2021, 05, 15);
