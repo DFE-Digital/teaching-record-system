@@ -16,8 +16,6 @@ public class InductionExemptionModel(
     public Guid PersonId { get; private set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
     public RouteToProfessionalStatus Route { get; set; } = null!;
-    public InductionExemptionReason? ExemptionReason { get; set; }
-    public string BackLink => linkGenerator.PersonQualifications(PersonId);
 
     [FromQuery]
     public bool? FromCheckAnswers { get; set; }
@@ -28,10 +26,11 @@ public class InductionExemptionModel(
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
     [Required(ErrorMessage = "Select yes if this route provides an induction exemption")]
-    public bool IsExemptFromInduction { get; set; }
+    public bool? IsExemptFromInduction { get; set; }
 
     public void OnGet()
     {
+        IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -40,11 +39,6 @@ public class InductionExemptionModel(
         {
             return this.PageWithErrors();
         }
-
-        //Guid? exemptionReasonId = IsExemptFromInduction ?
-        //    Route.InductionExemptionReasonId
-        //    : null;
-        //await JourneyInstance!.UpdateStateAsync(s => s.InductionExemptionReasonId = exemptionReasonId);
 
         await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
         return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
@@ -60,14 +54,16 @@ public class InductionExemptionModel(
         Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         if (Route.InductionExemptionReasonId is not null)
         {
-            ExemptionReason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId!.Value);
-            if (ExemptionReason.RouteImplicitExemption)
+            var exemptionReason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId!.Value);
+            if (exemptionReason.RouteImplicitExemption)
             {
+                //context.Result = new NotFoundResult();
                 throw new InvalidOperationException("This route provides an implict induction exemption");
             }
         }
         else
         {
+            //context.Result = new NotFoundResult();
             throw new InvalidOperationException("This route does not provide an induction exemption");
         }
 

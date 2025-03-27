@@ -76,4 +76,12 @@ public static partial class AssertEx
         var value = label.NextElementSibling;
         Assert.NotNull(value!.NextElementSibling!.GetElementsByTagName("a").First());
     }
+
+    public static void AssertNoChangeLink(this IHtmlDocument doc, string keyContent)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        Assert.NotNull(label);
+        var value = label.NextElementSibling;
+        Assert.Null(value!.NextElementSibling);
+    }
 }

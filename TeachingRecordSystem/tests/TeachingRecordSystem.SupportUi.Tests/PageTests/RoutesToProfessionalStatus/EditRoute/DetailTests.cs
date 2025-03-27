@@ -235,6 +235,102 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TextContent == elementText));
     }
 
+    [Theory]
+    [InlineData(true, "Yes")]
+    [InlineData(false, "No")]
+    public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(bool hasExemption, string expectedContent)
+    {
+        // Arrange
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = Clock.Today;
+        var awardDate = Clock.Today;
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.Name == "NI R")
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .RandomOne()
+            .Value;
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)));
+
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithAwardedDate(awardDate)
+            .WithInductionExemption(isExempt: hasExemption)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertRowContentMatches("Has exemption", expectedContent);
+        doc.AssertChangeLinkExists("Has exemption");
+    }
+
+    [Fact]
+    public async Task Get_RouteAndStatusWithImplictExemptionInduction_ShowsFieldButNoChangeLink()
+    {
+        // Arrange
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = Clock.Today;
+        var awardDate = Clock.Today;
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.Name == "Apply for QTS")
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .RandomOne()
+            .Value;
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)));
+
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithAwardedDate(awardDate)
+            .WithInductionExemption(true)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertRowContentMatches("Has exemption", "Yes");
+        doc.AssertNoChangeLink("Has exemption");
+    }
+
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
     CreateJourneyInstance(
         JourneyNames.EditRouteToProfessionalStatus,
