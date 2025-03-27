@@ -1,0 +1,1 @@
+alter table trs_qualifications add ExemptFromInduction boolean
