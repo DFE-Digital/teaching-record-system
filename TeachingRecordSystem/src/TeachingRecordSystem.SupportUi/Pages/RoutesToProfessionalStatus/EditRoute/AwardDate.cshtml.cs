@@ -7,7 +7,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class AwardDateModel(
-    TrsLinkGenerator linkGenerator) : PageModel
+    TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -40,14 +41,26 @@ public class AwardDateModel(
         }
 
         await JourneyInstance!.UpdateStateAsync(state => state.AwardedDate = AwardedDate);
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+
+        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+
+        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
+            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
+
+        if (JourneyInstance!.State.StatusAwardedOrApprovedJourney &&
+            route.InductionExemptionRequired == FieldRequirement.Mandatory &&
+            !hasImplicitExemption)
+        {
+            return Redirect(linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance.InstanceId));
+        }
+        else
+        {
+            return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+        }
     }
 
-    public async Task<IActionResult> OnPostCancelAsync()
+    public IActionResult OnPostCancel()
     {
-        await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
@@ -56,5 +69,7 @@ public class AwardDateModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+
+        base.OnPageHandlerExecuting(context);
     }
 }

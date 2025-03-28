@@ -1,0 +1,30 @@
+@page "/route/{qualificationId}/edit/status/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.StatusModel
+@{
+    ViewBag.Title = "status";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteEditStatus(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <govuk-radios asp-for=@Model.Status data-testid="status">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend data-testid="status-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
+                    @foreach (var status in Model.Statuses)
+                    {
+                        <govuk-radios-item value="@status.Value">@status.Name</govuk-radios-item>
+                    }
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditStatusCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

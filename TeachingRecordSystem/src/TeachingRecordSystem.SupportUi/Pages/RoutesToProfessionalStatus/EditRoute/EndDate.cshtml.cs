@@ -45,9 +45,12 @@ public class EndDateModel(
         }
 
         await JourneyInstance!.UpdateStateAsync(state => state.TrainingEndDate = TrainingEndDate);
+
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+                JourneyInstance!.State.StatusAwardedOrApprovedJourney ?
+                    linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance.InstanceId) :
+                    linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public IActionResult OnPostCancel()

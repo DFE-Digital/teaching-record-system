@@ -114,9 +114,8 @@ public class CheckYourAnswersModel(
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
         var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue ?
-            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption
-            : false;
+        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
+            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
 
         RouteDetail = new RouteDetailViewModel
         {

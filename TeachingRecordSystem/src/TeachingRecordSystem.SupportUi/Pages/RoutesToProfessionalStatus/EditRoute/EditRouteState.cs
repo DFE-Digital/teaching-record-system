@@ -14,6 +14,7 @@ public class EditRouteState : IRegisterJourney
 
     public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }
+    public ProfessionalStatusStatus CurrentStatus { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
@@ -33,6 +34,10 @@ public class EditRouteState : IRegisterJourney
     [JsonIgnore]
     public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields also depends on the route and status
 
+    [JsonIgnore]
+    public bool StatusAwardedOrApprovedJourney => Status == ProfessionalStatusStatus.Awarded && CurrentStatus != ProfessionalStatusStatus.Awarded
+        || Status == ProfessionalStatusStatus.Approved && CurrentStatus != ProfessionalStatusStatus.Approved;
+
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {
         if (Initialized)
@@ -42,6 +47,7 @@ public class EditRouteState : IRegisterJourney
 
         QualificationType = professionalStatusInfo.ProfessionalStatus.QualificationType;
         RouteToProfessionalStatusId = professionalStatusInfo.ProfessionalStatus.RouteToProfessionalStatusId;
+        CurrentStatus = professionalStatusInfo.ProfessionalStatus.Status;
         Status = professionalStatusInfo.ProfessionalStatus.Status;
         AwardedDate = professionalStatusInfo.ProfessionalStatus.AwardedDate;
         TrainingStartDate = professionalStatusInfo.ProfessionalStatus.TrainingStartDate;
