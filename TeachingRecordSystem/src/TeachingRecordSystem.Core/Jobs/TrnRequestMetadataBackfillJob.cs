@@ -25,8 +25,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
         using var writeDbContext = await dbContextFactory.CreateDbContextAsync();
         var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
 
-        //teacherid & trnrequestid dictionary
-        var teacherIds = new Dictionary<Guid, string>();
+        //teacherid, (applicationuserid, trnrequestid)
+        var teacherIds = new Dictionary<Guid, (string, string)>();
 
         //fetch trn requests from trs
         var trnRequests = writeDbContext.TrnRequests.ToArray();
@@ -34,23 +34,23 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             .GroupBy(x => x.TeacherId)
             .ToDictionary(
                 g => g.Key,
-                g => (g.First().TrnToken)
+                g => (g.First().ClientId, g.First().RequestId)
             );
 
         foreach (var kvp in teacherDictionary)
         {
             if (!teacherIds.ContainsKey(kvp.Key))
             {
-                teacherIds.Add(kvp.Key, kvp.Value!);
+                teacherIds.Add(kvp.Key, (kvp.Value.ClientId, kvp.Value.RequestId));
             }
         }
 
         var contactsQuery = new QueryExpression(Contact.EntityLogicalName)
         {
             ColumnSet = new ColumnSet(
-            Contact.Fields.CreatedOn,
-            Contact.Fields.CreatedBy,
-            Contact.Fields.dfeta_TrnRequestID
+                Contact.Fields.CreatedOn,
+                Contact.Fields.CreatedBy,
+                Contact.Fields.dfeta_TrnRequestID
             ),
             PageInfo = new()
             {
@@ -69,8 +69,14 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             {
                 var createdByUserId = record.GetAttributeValue<EntityReference>(Contact.Fields.CreatedBy).Id;
                 var trnRequestId = record.GetAttributeValue<string>(Contact.Fields.dfeta_TrnRequestID);
-                string request = TrnRequestHelper.GetCrmTrnRequestId(createdByUserId, trnRequestId);
-                teacherIds.Add(record.Id, trnRequestId);
+
+                var parts = trnRequestId.Split("::");
+                if (parts.Length != 2)
+                    continue;
+
+                var userid = parts[0];
+                var requestid = parts[1];
+                teacherIds.Add(record.Id, (userid, requestid));
             }
             contactsQuery.PageInfo.PageNumber++;
             contactsQuery.PageInfo.PagingCookie = result.PagingCookie;
@@ -122,7 +128,6 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                         potentialDuplicate = true;
                     }
 
-
                     // fetch audits
                     IEnumerable<Guid> ids = new[] { contact.Key };
                     var audit = await GetAuditRecordsAsync(Contact.EntityLogicalName, ids, cancellationToken);
@@ -153,10 +158,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                 var city = default(string?);
                                 var country = default(string?);
                                 var nino = default(string?);
-                                var postcode = default(string?);
-                                Guid userId = detail.AuditRecord.GetAttributeValue<EntityReference>(Audit.Fields.UserId).Id;
+                                var postcode = default(string?);                  
                                 DateTime createdOn = detail.AuditRecord.GetAttributeValue<DateTime>(Audit.Fields.CreatedOn);
-
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.FirstName, out string firstNameOut))
                                     firstName = firstNameOut;
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.MiddleName, out string middleNameOut))
@@ -208,12 +211,12 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.dfeta_NINumber, out string ninoOut))
                                     nino = ninoOut;
 
-                                //applicationUser & contact.dfeta_TrnRequestID
-                                var requestId = contact.Value;
+                                var applicationUserId = Guid.Parse(contact.Value.Item1);
+                                var requestId = contact.Value.Item2;
 
                                 recordsToInsert.Add(new TrnRequestMetadata
                                 {
-                                    ApplicationUserId = userId,
+                                    ApplicationUserId = applicationUserId,
                                     RequestId = requestId,
                                     CreatedOn = createdOn,
                                     DateOfBirth = dob.ToDateOnlyWithDqtBstFix(isLocalTime: false),
