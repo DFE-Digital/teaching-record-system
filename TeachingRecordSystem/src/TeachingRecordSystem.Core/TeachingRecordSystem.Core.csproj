@@ -158,6 +158,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0049_TrsQualificationsDegreeTypeId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0050_TrsEstablishmentsPhaseSizeFsm.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0051_TpsEmploymentsPersonEmailAndEmployerPostcode.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0052_TrsQualificationsExemptFromInduction.sql" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,7 +28,6 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
     {
         ProfessionalStatuses = await dbContext.ProfessionalStatuses
             .Include(q => q.TrainingProvider)
-            .Include(q => q.InductionExemptionReason)
             .Include(q => q.TrainingCountry)
             .Include(q => q.Route)
             .Include(q => q.DegreeType)

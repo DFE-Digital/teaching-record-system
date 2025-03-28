@@ -18,22 +18,22 @@ public class EditRouteStateBuilder()
     private string? _trainingCountryId;
     private Guid? _trainingProviderId;
     private Guid? _degreeTypeId;
-    private Guid? _inductionExemptionReasonId;
+    private bool? _isExemptFromInduction;
     private ChangeReasonOption? _changeReasonOption;
     private ChangeReasonDetailsState _changeReasonDetail = new();
 
     public EditRouteStateBuilder WithStatusWhereAllFieldsApply()
     {
         _status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotRequired
-                && s.AwardDateRequired != FieldRequirement.NotRequired
-                && s.TrainingCountryRequired != FieldRequirement.NotRequired
-                && s.DegreeTypeRequired != FieldRequirement.NotRequired
-                && s.TrainingEndDateRequired != FieldRequirement.NotRequired
-                && s.InductionExemptionRequired != FieldRequirement.NotRequired
-                && s.TrainingProviderRequired != FieldRequirement.NotRequired
-                && s.TrainingStartDateRequired != FieldRequirement.NotRequired
-                && s.TrainingSubjectsRequired != FieldRequirement.NotRequired)
+            .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
+                && s.AwardDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingCountryRequired != FieldRequirement.NotApplicable
+                && s.DegreeTypeRequired != FieldRequirement.NotApplicable
+                && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && s.InductionExemptionRequired != FieldRequirement.NotApplicable
+                && s.TrainingProviderRequired != FieldRequirement.NotApplicable
+                && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         return this;
@@ -126,9 +126,9 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithInductionExemptionReasonId(Guid inductionExemptionReasonId)
+    public EditRouteStateBuilder WithInductionExemption(bool? isExempt)
     {
-        _inductionExemptionReasonId = inductionExemptionReasonId;
+        _isExemptFromInduction = isExempt;
         return this;
     }
 
@@ -184,7 +184,7 @@ public class EditRouteStateBuilder()
             TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
             TrainingCountryId = _trainingCountryId,
             TrainingProviderId = _trainingProviderId,
-            InductionExemptionReasonId = _inductionExemptionReasonId,
+            IsExemptFromInduction = _isExemptFromInduction,
             ChangeReason = _changeReasonOption,
             QualificationType = _qualificationType,
             DegreeTypeId = _degreeTypeId,

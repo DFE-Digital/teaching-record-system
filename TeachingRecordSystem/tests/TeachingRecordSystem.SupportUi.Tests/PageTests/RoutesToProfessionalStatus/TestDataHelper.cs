@@ -7,15 +7,15 @@ public static class TestDataHelper
     public static async Task<RouteToProfessionalStatus> GetRouteWhereAllFieldsApplyAsync(this ReferenceDataCache referenceDataCache)
     {
         return (await referenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotRequired
-                && r.TrainingCountryRequired != FieldRequirement.NotRequired
-                && r.TrainingProviderRequired != FieldRequirement.NotRequired
-                && r.DegreeTypeRequired != FieldRequirement.NotRequired
-                && r.TrainingSubjectsRequired != FieldRequirement.NotRequired
-                && r.InductionExemptionRequired != FieldRequirement.NotRequired
-                && r.TrainingStartDateRequired != FieldRequirement.NotRequired
-                && r.TrainingEndDateRequired != FieldRequirement.NotRequired
-                && r.AwardDateRequired != FieldRequirement.NotRequired)
+            .Where(r => r.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
+                && r.TrainingCountryRequired != FieldRequirement.NotApplicable
+                && r.TrainingProviderRequired != FieldRequirement.NotApplicable
+                && r.DegreeTypeRequired != FieldRequirement.NotApplicable
+                && r.TrainingSubjectsRequired != FieldRequirement.NotApplicable
+                && r.InductionExemptionRequired != FieldRequirement.NotApplicable
+                && r.TrainingStartDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && r.AwardDateRequired != FieldRequirement.NotApplicable)
             .RandomOne();
     }
 
@@ -36,15 +36,15 @@ public static class TestDataHelper
     public static ProfessionalStatusStatus GetRouteStatusWhereAllFieldsApply(this ReferenceDataCache referenceDataCache)
     {
         return ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotRequired
-                && s.AwardDateRequired != FieldRequirement.NotRequired
-                && s.TrainingCountryRequired != FieldRequirement.NotRequired
-                && s.DegreeTypeRequired != FieldRequirement.NotRequired
-                && s.TrainingEndDateRequired != FieldRequirement.NotRequired
-                && s.InductionExemptionRequired != FieldRequirement.NotRequired
-                && s.TrainingProviderRequired != FieldRequirement.NotRequired
-                && s.TrainingStartDateRequired != FieldRequirement.NotRequired
-                && s.TrainingSubjectsRequired != FieldRequirement.NotRequired)
+            .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
+                && s.AwardDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingCountryRequired != FieldRequirement.NotApplicable
+                && s.DegreeTypeRequired != FieldRequirement.NotApplicable
+                && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && s.InductionExemptionRequired != FieldRequirement.NotApplicable
+                && s.TrainingProviderRequired != FieldRequirement.NotApplicable
+                && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
     }
