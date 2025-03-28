@@ -212,8 +212,6 @@ public class SetProfessionalStatusHandler(
                 case dfeta_ITTResult.Fail:
                     switch (command.Status)
                     {
-                        case ProfessionalStatusStatus.Failed:
-                            return new SetProfessionalStatusResult(); //No-op
                         case ProfessionalStatusStatus.Deferred:
                         case ProfessionalStatusStatus.InTraining:
                         case ProfessionalStatusStatus.UnderAssessment:
@@ -221,12 +219,9 @@ public class SetProfessionalStatusHandler(
                     }
                     break;
                 case dfeta_ITTResult.Withdrawn:
-                    switch (command.Status)
+                    if (command.Status == ProfessionalStatusStatus.Deferred)
                     {
-                        case ProfessionalStatusStatus.Withdrawn:
-                            return new SetProfessionalStatusResult(); //No-op
-                        case ProfessionalStatusStatus.Deferred:
-                            return ApiError.UnableToChangeWithdrawnProfessionalStatusStatus();
+                        return ApiError.UnableToChangeWithdrawnProfessionalStatusStatus();
                     }
                     break;
                 default:

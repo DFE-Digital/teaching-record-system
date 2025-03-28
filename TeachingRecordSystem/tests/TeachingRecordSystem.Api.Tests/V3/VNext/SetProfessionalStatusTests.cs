@@ -1705,12 +1705,36 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_ITTProgrammeType.HEI,
             null,
             null,
-            dfeta_ITTResult.InTraining,
+            dfeta_ITTResult.Withdrawn,
             RouteToProfessionalStatus.SchoolDirectTrainingProgrammeId,
             dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme,
             ProfessionalStatusStatus.Awarded,
             dfeta_ITTResult.Pass,
             "71",
+            null
+        },
+        {
+            dfeta_ITTProgrammeType.HEI,
+            null,
+            null,
+            dfeta_ITTResult.Withdrawn,
+            RouteToProfessionalStatus.SchoolDirectTrainingProgrammeId,
+            dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme,
+            ProfessionalStatusStatus.Withdrawn,
+            dfeta_ITTResult.Withdrawn,
+            null,
+            null
+        },
+        {
+            dfeta_ITTProgrammeType.HEI,
+            "211",
+            null,
+            dfeta_ITTResult.Fail,
+            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            dfeta_ITTProgrammeType.AssessmentOnlyRoute,
+            ProfessionalStatusStatus.Failed,
+            dfeta_ITTResult.Fail,
+            "212",
             null
         }
     };
