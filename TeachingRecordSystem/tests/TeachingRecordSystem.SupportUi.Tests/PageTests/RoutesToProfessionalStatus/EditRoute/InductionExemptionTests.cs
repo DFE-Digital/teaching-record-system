@@ -169,7 +169,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .Where(r => r.Name == "NI R") // a route that requires the induction exemption question
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
