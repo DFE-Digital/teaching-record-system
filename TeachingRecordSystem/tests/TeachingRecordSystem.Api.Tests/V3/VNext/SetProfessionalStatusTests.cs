@@ -986,7 +986,7 @@ public class SetProfessionalStatusTests : TestBase
             Assert.Equal(person.PersonId, message.PersonId);
             Assert.Equal(ApplicationUserId, message.TrsUserId);
         }
-    }    
+    }
 
     [Fact]
     public async Task Put_EarlyYearsRouteTypeWithExistingNonEarlyYearsItt_ReturnsBadRequest()
@@ -1115,7 +1115,7 @@ public class SetProfessionalStatusTests : TestBase
 
     [Theory]
     [InlineData(ProfessionalStatusStatus.Deferred)]
-    [InlineData(ProfessionalStatusStatus.InTraining)]    
+    [InlineData(ProfessionalStatusStatus.InTraining)]
     [InlineData(ProfessionalStatusStatus.UnderAssessment)]
     public async Task Put_InvalidStatusWithExistingIttWithFailResult_ReturnsBadRequest(ProfessionalStatusStatus status)
     {
@@ -1601,12 +1601,12 @@ public class SetProfessionalStatusTests : TestBase
     public static TheoryData<Guid, string?, string?> ExistingQtsData { get; } = new()
     {
         {
-            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,            
+            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,
             null,
             "220"
         },
         {
-            RouteToProfessionalStatus.HeiProgrammeTypeId,            
+            RouteToProfessionalStatus.HeiProgrammeTypeId,
             "211",
             null
         },
@@ -1627,7 +1627,7 @@ public class SetProfessionalStatusTests : TestBase
         }
     };
 
-    public static TheoryData<dfeta_ITTProgrammeType, string?, string?, dfeta_ITTResult,Guid, dfeta_ITTProgrammeType, ProfessionalStatusStatus, dfeta_ITTResult, string?, string?> UpdatedRouteData { get; } = new()
+    public static TheoryData<dfeta_ITTProgrammeType, string?, string?, dfeta_ITTResult, Guid, dfeta_ITTProgrammeType, ProfessionalStatusStatus, dfeta_ITTResult, string?, string?> UpdatedRouteData { get; } = new()
     {
         {
             dfeta_ITTProgrammeType.EYITTGraduateEntry,                  // ExistingIttProgrammeType
@@ -1653,7 +1653,7 @@ public class SetProfessionalStatusTests : TestBase
             "71",
             null
         },
-        {            
+        {
             dfeta_ITTProgrammeType.AssessmentOnlyRoute,
             "212",
             null,
