@@ -57,14 +57,12 @@ public class InductionExemptionModel(
             var exemptionReason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId!.Value);
             if (exemptionReason.RouteImplicitExemption)
             {
-                //context.Result = new NotFoundResult();
-                throw new InvalidOperationException("This route provides an implict induction exemption");
+                context.Result = new BadRequestResult();
             }
         }
         else
         {
-            //context.Result = new NotFoundResult();
-            throw new InvalidOperationException("This route does not provide an induction exemption");
+            context.Result = new BadRequestResult();
         }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
