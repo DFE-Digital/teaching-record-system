@@ -28,5 +28,5 @@ public class RouteToProfessionalStatus
     public required FieldRequirement TrainingCountryRequired { get; init; }
     public required FieldRequirement TrainingAgeSpecialismTypeRequired { get; init; }
     public required FieldRequirement TrainingSubjectsRequired { get; init; }
-
+    public required Guid? InductionExemptionReasonId { get; init; }
 }

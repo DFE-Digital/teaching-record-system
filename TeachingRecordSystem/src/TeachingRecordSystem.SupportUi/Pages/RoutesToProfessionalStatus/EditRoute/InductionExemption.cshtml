@@ -1,0 +1,32 @@
+@page "/route/{qualificationId}/edit/induction-exemption/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.InductionExemptionModel
+@{
+    ViewBag.Title = "Induction exemption";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteEditInductionExemption(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <govuk-radios asp-for=@Model.IsExemptFromInduction data-testid="induction-exemption">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend data-testid="induction-exemption-legend" class="govuk-fieldset__legend--l" is-page-heading="true" />
+                    <govuk-radios-item value="@true">
+                        Yes
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditInductionExemptionCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
