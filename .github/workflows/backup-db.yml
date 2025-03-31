@@ -11,6 +11,7 @@ on:
         options:
         - dev
         - test
+        - preprod
         - production
       backup-file:
         description: |
