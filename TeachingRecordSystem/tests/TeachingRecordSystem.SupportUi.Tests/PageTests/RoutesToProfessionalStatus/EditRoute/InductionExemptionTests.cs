@@ -112,7 +112,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "IsExemptFromInduction", "true"},
+                { "IsExemptFromInduction", true.ToString()},
             }
         };
 
