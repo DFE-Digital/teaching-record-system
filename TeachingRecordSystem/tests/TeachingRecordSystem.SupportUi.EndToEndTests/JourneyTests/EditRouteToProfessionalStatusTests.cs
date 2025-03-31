@@ -596,7 +596,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
 
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
-        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry.CountryId);
+        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
