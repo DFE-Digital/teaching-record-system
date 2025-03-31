@@ -167,7 +167,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                 var city = default(string?);
                                 var country = default(string?);
                                 var nino = default(string?);
-                                var postcode = default(string?);                  
+                                var postcode = default(string?);
                                 DateTime createdOn = detail.AuditRecord.GetAttributeValue<DateTime>(Audit.Fields.CreatedOn);
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.FirstName, out string firstNameOut))
                                     firstName = firstNameOut;
