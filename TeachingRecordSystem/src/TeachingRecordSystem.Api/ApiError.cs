@@ -21,6 +21,20 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int ForbiddenForAppropriateBody => 10040;
         public static int PiiUpdatesForbidden => 10041;
         public static int PiiUpdatesForbiddenPersonHasQts => 10042;
+        public static int InvalidRouteType => 10043;
+        public static int InvalidProfessionalStatusStatus => 10044;
+        public static int InvalidTrainingSubjectReference => 10045;
+        public static int InvalidTrainingAgeSpecialism => 10046;
+        public static int InvalidTrainingCountryReference => 10047;
+        public static int InvalidTrainingProviderUkprn => 10048;
+        public static int InvalidDegreeType => 10049;
+        public static int InvalidInductionExemptionReason => 10050;
+        public static int UpdatesNotAllowedForRouteType => 10051;
+        public static int RouteToProfessionalStatusAlreadyAwarded => 10052;
+        public static int MultipleQtsRecords => 10053;
+        public static int UnableToChangeRouteType => 10054;
+        public static int UnableToChangeFailProfessionalStatusStatus => 10055;
+        public static int UnableToChangeWithdrawnProfessionalStatusStatus => 10056;
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -78,6 +92,48 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
 
     public static ApiError PiiUpdatesForbiddenPersonHasQts() =>
         new(ErrorCodes.PiiUpdatesForbiddenPersonHasQts, "Updates to PII data is not permitted. Person has QTS.", "");
+
+    public static ApiError InvalidRouteType(Guid routeTypeId) =>
+        new(ErrorCodes.InvalidRouteType, "Invalid route type.", $"Route type: '{routeTypeId}'");
+
+    public static ApiError InvalidProfessionalStatusStatus(string status) =>
+        new(ErrorCodes.InvalidProfessionalStatusStatus, "Invalid professional status status.", $"Status: '{status}'");
+
+    public static ApiError InvalidTrainingSubjectReference(string trainingSubjectReference) =>
+        new(ErrorCodes.InvalidTrainingSubjectReference, "Invalid training subject reference.", $"Training subject reference: '{trainingSubjectReference}'");
+
+    public static ApiError InvalidTrainingAgeSpecialism(string trainingAgeSpecialism) =>
+        new(ErrorCodes.InvalidTrainingAgeSpecialism, "Invalid training age specialism.", $"Training age specialism: '{trainingAgeSpecialism}'");
+
+    public static ApiError InvalidTrainingCountryReference(string trainingCountryReference) =>
+        new(ErrorCodes.InvalidTrainingCountryReference, "Invalid training country reference.", $"Training country reference: '{trainingCountryReference}'");
+
+    public static ApiError InvalidTrainingProviderUkprn(string trainingProviderUkprn) =>
+        new(ErrorCodes.InvalidTrainingProviderUkprn, "Invalid training provider UKPRN.", $"Training provider UKPRN: '{trainingProviderUkprn}'");
+
+    public static ApiError InvalidDegreeType(Guid degreeTypeId) =>
+        new(ErrorCodes.InvalidDegreeType, "Invalid degree type.", $"Degree type: '{degreeTypeId}'");
+
+    public static ApiError InvalidInductionExemptionReason(Guid inductionExemptionReasonId) =>
+        new(ErrorCodes.InvalidInductionExemptionReason, "Invalid induction exemption reason.", $"Induction exemption reason: '{inductionExemptionReasonId}'");
+
+    public static ApiError UpdatesNotAllowedForRouteType(Guid routeTypeId) =>
+        new(ErrorCodes.UpdatesNotAllowedForRouteType, "Updates not allowed for route type.", $"Route type: '{routeTypeId}'");
+
+    public static ApiError RouteToProfessionalStatusAlreadyAwarded() =>
+        new(ErrorCodes.RouteToProfessionalStatusAlreadyAwarded, "Route to professional status already awarded.", "");
+
+    public static ApiError MultipleQtsRecords() =>
+        new(ErrorCodes.MultipleQtsRecords, "Multiple QTS records found.", "");
+
+    public static ApiError UnableToChangeRouteType() =>
+        new(ErrorCodes.UnableToChangeRouteType, "Unable to change route type.", "");
+
+    public static ApiError UnableToChangeFailProfessionalStatusStatus() =>
+        new(ErrorCodes.UnableToChangeFailProfessionalStatusStatus, "Unable to change fail professional status status.", "");
+
+    public static ApiError UnableToChangeWithdrawnProfessionalStatusStatus() =>
+        new(ErrorCodes.UnableToChangeWithdrawnProfessionalStatusStatus, "Unable to change withdrawn professional status status.", "");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {
