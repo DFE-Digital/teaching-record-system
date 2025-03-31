@@ -7,12 +7,7 @@ public class Startup
         hostBuilder
             .ConfigureHostConfiguration(builder => builder
                 .AddUserSecrets<HostFixture>(optional: true)
-                .AddEnvironmentVariables()
-                .AddInMemoryCollection(
-                    new Dictionary<string, string?>
-                    {
-                        ["AllowContactPiiUpdatesFromUserIds:0"] = HostFixture.DefaultApplicationUserId.ToString()
-                    }))
+                .AddEnvironmentVariables())
             .ConfigureServices(services =>
             {
                 services.AddSingleton<HostFixture>();
