@@ -115,7 +115,15 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                         Contact.Fields.Address1_Country,
                         Contact.Fields.Address1_PostalCode
                     );
-                    var crmContact = serviceClient.Retrieve(Contact.EntityLogicalName, contact.Key, contactColumnSet);
+                    Entity? crmContact = null;
+
+                    try
+                    {
+                        crmContact = serviceClient.Retrieve(Contact.EntityLogicalName, contact.Key, contactColumnSet);
+                    } catch(Exception)
+                    {
+                        continue;
+                    }
 
 
                     //fetch any tasks for contact that were created if flagged as potential duplicate
