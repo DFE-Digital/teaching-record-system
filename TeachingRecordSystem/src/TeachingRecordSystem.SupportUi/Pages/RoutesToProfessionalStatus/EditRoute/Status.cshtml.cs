@@ -42,13 +42,23 @@ public class StatusModel(
             return this.PageWithErrors();
         }
 
-        if (Route.InductionExemptionReasonId is not null && Status.GetInductionExemptionRequirement() == FieldRequirement.Mandatory)
+        if (Route.InductionExemptionReasonId is not null && Status.GetInductionExemptionRequirement() == FieldRequirement.Mandatory) // route and status mean exemption might apply
         {
             var exemption = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId.Value);
             await JourneyInstance!.UpdateStateAsync(s =>
             {
                 s.Status = Status;
                 s.IsExemptFromInduction = exemption.RouteImplicitExemption;
+            });
+        }
+        else if (JourneyInstance!.State.Status.GetInductionExemptionRequirement() == FieldRequirement.Mandatory
+            && Status.GetInductionExemptionRequirement() == FieldRequirement.NotApplicable) // moving from an awarded/approved status to a non-awarded/approved status
+        {
+            await JourneyInstance!.UpdateStateAsync(s =>
+            {
+                s.AwardedDate = null;
+                s.IsExemptFromInduction = null;
+                s.Status = Status;
             });
         }
         else

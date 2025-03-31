@@ -40,74 +40,6 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(status.ToString(), statusChoice);
     }
 
-    // CML TODO - this might be a job for the final submission, rather than here - depends what we want to happen if
-    // user changes status from InTraining to Deferred and then back again in 1 journey - do we want to keep the
-    // previously stored data or reset it?
-    [Fact(Skip = "It seems we may not want any of the data to be cleared, even if it's not applicable to the new status")]
-    public async Task Post_StatusChange_ResetsJourneyStateForNonApplicableFields_PersistsDataAndRedirectsToDetail()
-    {
-        // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
-        var awardedDate = endDate.AddDays(1);
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsHaveFieldRequirementAsync(FieldRequirement.Optional);
-        var currentStatus = ProfessionalStatusStatus.InTraining;
-        var newStatus = ProfessionalStatusStatus.Deferred;
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(currentStatus)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithCurrentStatus(currentStatus)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithAwardedDate(awardedDate)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithTrainingCountryId(country.CountryId)
-            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
-            .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
-            .WithDegreeTypeId(degreeType.DegreeTypeId)
-            .Build();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
-            editRouteState
-            );
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { nameof(StatusModel.Status), newStatus }
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(newStatus, journeyInstance.State.Status);
-        Assert.Null(journeyInstance.State.DegreeTypeId);
-        Assert.Null(journeyInstance.State.TrainingProviderId);
-        Assert.Null(journeyInstance.State.TrainingCountryId);
-        Assert.Empty(journeyInstance.State.TrainingSubjectIds);
-        Assert.Null(journeyInstance.State.TrainingAgeSpecialismType);
-        Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-        Assert.Null(journeyInstance.State.TrainingAgeSpecialismRangeTo);
-        Assert.Null(journeyInstance.State.TrainingStartDate);
-        Assert.Null(journeyInstance.State.TrainingEndDate);
-        Assert.Null(journeyInstance.State.AwardedDate);
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
     [Fact]
     public async Task Post_StatusIsNotAwardedOrApprovedStatus_PersistsDataAndRedirectsToDetail()
     {
@@ -187,6 +119,51 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(status, journeyInstance.State.Status);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_StatusMovesFromAwardedToAnotherStatus_RemovesAwardedDateAndExemptionFlag()
+    {
+        // Arrange
+        var awardedDate = Clock.Today;
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .RandomOne();
+        var newStatus = ProfessionalStatusStatus.UnderAssessment;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate)
+                .WithExemptFromInduction(true)));
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(ProfessionalStatusStatus.Awarded)
+            .WithAwardedDate(awardedDate)
+            .WithInductionExemption(true)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { nameof(StatusModel.Status), newStatus }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(newStatus, journeyInstance.State.Status);
+        Assert.Null(journeyInstance.State.AwardedDate);
+        Assert.Null(journeyInstance.State.IsExemptFromInduction);
     }
 
     [Fact]
