@@ -232,14 +232,8 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", location);
+        var cancelLink = doc.QuerySelector("a.govuk-link:contains('Cancel')") as IHtmlAnchorElement;
+        Assert.Contains($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", cancelLink!.Href);
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>

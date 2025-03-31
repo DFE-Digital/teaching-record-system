@@ -43,7 +43,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     // CML TODO - this might be a job for the final submission, rather than here - depends what we want to happen if
     // user changes status from InTraining to Deferred and then back again in 1 journey - do we want to keep the
     // previously stored data or reset it?
-    [Fact]
+    [Fact(Skip = "It seems we may not want any of the data to be cleared, even if it's not applicable to the new status")]
     public async Task Post_StatusChange_ResetsJourneyStateForNonApplicableFields_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
@@ -190,6 +190,56 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_StatusMovesToAwarded_RouteHasImplictExemption_ExemptionSetToTrue()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.InductionExemptionReasonId.HasValue)
+            .Join(
+                (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption),
+                r => r.InductionExemptionReasonId,
+                e => e.InductionExemptionReasonId,
+                (r, e) => r
+            )
+        .RandomOne();
+
+        var exemptionReasons = await ReferenceDataCache.GetInductionExemptionReasonsAsync();
+
+        var status = ProfessionalStatusStatus.Awarded;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status)
+            .WithCurrentStatus(ProfessionalStatusStatus.UnderAssessment)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { nameof(StatusModel.Status), status }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(status, journeyInstance.State.Status);
+        Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
+    }
+
+    [Fact]
     public async Task Post_StatusStaysAwarded_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
@@ -259,14 +309,8 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
-        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
-        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
-        var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", location);
+        var cancelLink = doc.QuerySelector("a.govuk-link:contains('Cancel')") as IHtmlAnchorElement;
+        Assert.Contains($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", cancelLink!.Href);
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>

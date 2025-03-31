@@ -556,4 +556,7 @@ public static class PageExtensions
 
     public static Task ClickBackLink(this IPage page) =>
         page.ClickAsync($".govuk-back-link");
+
+    public static Task ClickCancelLink(this IPage page) =>
+        page.ClickAsync("a.govuk-link:contains('Cancel')");
 }
