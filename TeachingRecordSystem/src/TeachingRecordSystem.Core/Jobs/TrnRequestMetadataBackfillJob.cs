@@ -14,7 +14,9 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Jobs;
 
-public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbContextFactory, ICrmServiceClientProvider crmServiceClientProvider, IConfiguration config,
+public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbContextFactory,
+    ICrmServiceClientProvider crmServiceClientProvider,
+    IConfiguration config,
     ILogger<TrsDataSyncHelper> logger,
     IOrganizationServiceAsync2 organizationService)
 {
@@ -58,6 +60,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 Count = 500
             }
         };
+
         contactsQuery.Criteria.AddCondition(Contact.Fields.dfeta_TrnRequestID, ConditionOperator.NotNull);
         EntityCollection result;
 
@@ -72,7 +75,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
 
                 var parts = trnRequestId.Split("::");
                 if (parts.Length != 2)
-                    continue;
+                    throw new Exception($"ContactId: {record.Id} requestid: {trnRequestId} unable to be split");
 
                 var userid = parts[0];
                 var requestid = parts[1];
@@ -86,7 +89,13 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
         using var conn = new NpgsqlConnection(connstring);
         await conn.OpenAsync();
         using var transaction = await conn.BeginTransactionAsync();
+
+        //backup of existing trn_request_metadata table
+        await BackupTrnRequestsTableAsync(conn);
+
+        //temp table for each iteration
         await CreateTempTableAsync(conn, transaction);
+
         try
         {
             foreach (var chunk in teacherIds.Chunk(BATCH_SIZE))
@@ -211,7 +220,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                 if (detail.NewValue.TryGetAttributeValue<string>(Contact.Fields.dfeta_NINumber, out string ninoOut))
                                     nino = ninoOut;
 
-                                var applicationUserId = Guid.Parse(contact.Value.Item1);
+                                Guid.TryParse(contact.Value.Item1, out Guid applicationUserId);
                                 var requestId = contact.Value.Item2;
 
                                 recordsToInsert.Add(new TrnRequestMetadata
@@ -382,6 +391,18 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
     {
         var sql = "TRUNCATE TABLE temp_import_trn_request_metadata;";
         using (var command = new NpgsqlCommand(sql, conn, transaction))
+        {
+            await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    private async Task BackupTrnRequestsTableAsync(NpgsqlConnection conn)
+    {
+        using (var command = new NpgsqlCommand(@"
+        DROP TABLE IF EXISTS trn_request_metadata_backup;
+        CREATE TABLE trn_request_metadata_backup AS 
+            SELECT * FROM trn_request_metadata;
+    ", conn))
         {
             await command.ExecuteNonQueryAsync();
         }
