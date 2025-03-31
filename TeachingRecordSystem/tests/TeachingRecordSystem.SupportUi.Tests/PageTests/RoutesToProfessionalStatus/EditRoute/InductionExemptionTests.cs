@@ -36,10 +36,10 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act, Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await HttpClient.SendAsync(request));
+        var response = await HttpClient.SendAsync(request);
 
         // Assert
-        //Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "IsExemptFromInduction", "true"},
+                { "IsExemptFromInduction", true.ToString()},
             }
         };
 
@@ -169,7 +169,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .Where(r => r.Name == "NI R") // a route that requires the induction exemption question
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)

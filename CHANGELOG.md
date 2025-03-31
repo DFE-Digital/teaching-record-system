@@ -1,5 +1,12 @@
 # API Changelog
 
+## vNext
+
+The following new endpoints have been added:  
+- `PUT /v3/persons/<trn>` - to set a person's PII.  
+- `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.   
+- `PUT /v3/persons/<trn>/professional-statuses/<id>` - to set a professional status.    
+
 ## 20250203
 
 The `PUT /v3/persons/<trn>/cpd-induction` endpoint has been added.

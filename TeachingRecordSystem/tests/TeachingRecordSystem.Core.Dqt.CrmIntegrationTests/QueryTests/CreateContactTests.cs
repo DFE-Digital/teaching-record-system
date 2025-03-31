@@ -46,7 +46,8 @@ public class CreateContactTests : IAsyncLifetime
             Trn = trn,
             PotentialDuplicates = [],
             ApplicationUserName = "Tests",
-            OutboxMessages = []
+            OutboxMessages = [],
+            AllowPiiUpdates = true
         };
 
         // Act
@@ -65,6 +66,7 @@ public class CreateContactTests : IAsyncLifetime
         Assert.Equal(nino, contact.dfeta_NINumber);
         Assert.Equal(dateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(true));
         Assert.Equal(gender, contact.GenderCode);
+        Assert.True(contact.dfeta_AllowPiiUpdatesFromRegister);
     }
 
     [Fact]
@@ -128,7 +130,8 @@ public class CreateContactTests : IAsyncLifetime
                 HasActiveAlert: false)
             ],
             ApplicationUserName = "Tests",
-            OutboxMessages = []
+            OutboxMessages = [],
+            AllowPiiUpdates = false
         };
         var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQueryAsync(query);
         using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);

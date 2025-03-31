@@ -21,6 +21,7 @@ public class ReferenceDataCache(
     private Task<dfeta_country[]>? _getCountriesTask;
     private Task<dfeta_ittsubject[]>? _getIttSubjectsTask;
     private Task<dfeta_ittqualification[]>? _getIttQualificationsTask;
+    private Task<Account[]>? _getIttProvidersTask;
 
     // TRS
     private Task<AlertCategory[]>? _alertCategoriesTask;
@@ -196,19 +197,40 @@ public class ReferenceDataCache(
     public async Task<dfeta_country?> GetCountryByCountryCodeAsync(string countryCode)
     {
         var countries = await EnsureCountriesAsync();
-        return countries.SingleOrDefault(at => at.dfeta_Value == countryCode);
+        // build environment has duplicate Countries, which prevent us using Single() here
+        return countries.FirstOrDefault(at => at.dfeta_Value == countryCode);
     }
 
     public async Task<dfeta_ittsubject?> GetIttSubjectBySubjectCodeAsync(string subjectCode)
     {
         var ittSubjects = await EnsureIttSubjectsAsync();
-        return ittSubjects.SingleOrDefault(at => at.dfeta_Value == subjectCode);
+        // build environment has duplicate ITT Subjects, which prevent us using Single() here
+        return ittSubjects.FirstOrDefault(at => at.dfeta_Value == subjectCode);
     }
 
     public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync()
     {
         var ittQualifications = await EnsureIttQualificationsAsync();
         return ittQualifications.ToArray();
+    }
+
+    public async Task<dfeta_ittqualification> GetIttQualificationByValueAsync(string value)
+    {
+        var ittQualifications = await EnsureIttQualificationsAsync();
+        // build environment has some duplicate ITT Qualifications, which prevent us using Single() here
+        return ittQualifications.First(s => s.dfeta_Value == value, $"Could not find ITT qualification with value: '{value}'.");
+    }
+
+    public async Task<Account?> GetIttProviderByUkPrnAsync(string ukPrn)
+    {
+        var ittProviders = await EnsureIttProvidersAsync();
+        return ittProviders.SingleOrDefault(p => p.dfeta_UKPRN == ukPrn);
+    }
+
+    public async Task<Account?> GetIttProviderByNameAsync(string name)
+    {
+        var ittProviders = await EnsureIttProvidersAsync();
+        return ittProviders.SingleOrDefault(p => p.Name == name);
     }
 
     public async Task<InductionExemptionReason[]> GetInductionExemptionReasonsAsync(bool activeOnly = false)
@@ -348,6 +370,11 @@ public class ReferenceDataCache(
             ref _getIttQualificationsTask,
             () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttQualificationsQuery()));
 
+    private Task<Account[]> EnsureIttProvidersAsync() =>
+        LazyInitializer.EnsureInitialized(
+            ref _getIttProvidersTask,
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttProvidersQuery()));
+
     private Task<InductionExemptionReason[]> EnsureInductionExemptionReasonsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _inductionExemptionReasonsTask,
@@ -416,6 +443,7 @@ public class ReferenceDataCache(
         await EnsureCountriesAsync();
         await EnsureIttSubjectsAsync();
         await EnsureIttQualificationsAsync();
+        await EnsureIttProvidersAsync();
 
         // TRS
         await EnsureAlertCategoriesAsync();

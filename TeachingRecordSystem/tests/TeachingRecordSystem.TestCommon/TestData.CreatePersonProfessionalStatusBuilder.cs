@@ -155,7 +155,7 @@ public partial class TestData
                 TrainingCountryId = _trainingCountryId,
                 TrainingProviderId = _trainingProviderId,
                 ExemptFromInduction = _exemptFromInduction,
-                DegreeTypeId = null,
+                DegreeTypeId = _degreeTypeId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
             };
