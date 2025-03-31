@@ -35,7 +35,8 @@ public class CreateTrnRequestHandler(
     INameSynonymProvider nameSynonymProvider,
 #pragma warning restore CS9113 // Parameter is unread.
     MessageSerializer messageSerializer,
-    IClock clock)
+    IClock clock,
+    IConfiguration configuration)
 {
     public async Task<ApiResult<TrnRequestInfo>> HandleAsync(CreateTrnRequestCommand command)
     {
@@ -137,6 +138,8 @@ public class CreateTrnRequestHandler(
             })
         };
 
+        var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
+
         await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
             FirstName = firstName,
@@ -153,7 +156,8 @@ public class CreateTrnRequestHandler(
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
-            OutboxMessages = outboxMessages
+            OutboxMessages = outboxMessages,
+            AllowPiiUpdates = allowContactPiiUpdatesFromUserIds.Contains(currentApplicationUserId.ToString())
         });
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
