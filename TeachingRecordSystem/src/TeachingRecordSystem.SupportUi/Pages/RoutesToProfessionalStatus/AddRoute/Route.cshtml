@@ -1,0 +1,60 @@
+@page "/route/add/route/{handler?}"
+
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.RouteModel
+@{
+    ViewBag.Title = "Enter the route type";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            accessibleAutocomplete.enhanceSelectElement({
+                defaultValue: '',
+                selectElement: document.querySelector('#@nameof(Model.RouteId)')
+            })
+        }
+    </script>
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator.PersonQualifications(Model.PersonId) :LinkGenerator.RouteCheckYourAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteAddRoute(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <govuk-select asp-for="RouteId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var route in Model.Routes)
+                {
+                    <govuk-select-item value="@route.RouteToProfessionalStatusId" selected="@Model.RouteId==route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
+                }
+            </govuk-select>
+            <govuk-details open="false">
+                <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
+                    <govuk-details-text>
+                    <govuk-select asp-for="RouteId" label-class="govuk-label--l">
+                    <govuk-select-label is-page-heading="true" />
+                    <govuk-select-item value=""></govuk-select-item>
+                    @foreach (var route in Model.OldRoutes)
+                    {
+                        <govuk-select-item value="@route.RouteToProfessionalStatusId" selected="@Model.RouteId==route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
+                    }
+                    </govuk-select>
+                    </govuk-details-text>
+            </govuk-details> 
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <a href="@LinkGenerator.RouteAddRouteCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-link">Cancel and return to record</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -248,7 +248,13 @@ public class ReferenceDataCache(
     public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusAsync(bool activeOnly = false)
     {
         var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
-        return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).ToArray();
+        return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).OrderBy(x => x.Name).ToArray();
+    }
+
+    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusInactiveOnlyAsync()
+    {
+        var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
+        return routesToProfessionalStatuses.Where(e => !e.IsActive).OrderBy(x => x.Name).ToArray();
     }
 
     public async Task<RouteToProfessionalStatus> GetRouteToProfessionalStatusByIdAsync(Guid id)
@@ -265,7 +271,7 @@ public class ReferenceDataCache(
 
     public async Task<Country[]> GetTrainingCountriesAsync()
     {
-        return await EnsureTrainingCountriesAsync();
+        return (await EnsureTrainingCountriesAsync()).OrderBy(x => x.Name).ToArray();
     }
 
     public async Task<Country> GetTrainingCountryByIdAsync(string countryId)
@@ -274,9 +280,9 @@ public class ReferenceDataCache(
         return countries.Single(c => c.CountryId == countryId, $"Could not find country with ID: '{countryId}'.");
     }
 
-    public Task<DegreeType[]> GetDegreeTypesAsync()
+    public async Task<DegreeType[]> GetDegreeTypesAsync()
     {
-        return EnsureDegreeTypesAsync();
+        return (await EnsureDegreeTypesAsync()).OrderBy(x => x.Name).ToArray();
     }
 
     public async Task<DegreeType> GetDegreeTypeByIdAsync(Guid degreeTypeId)
