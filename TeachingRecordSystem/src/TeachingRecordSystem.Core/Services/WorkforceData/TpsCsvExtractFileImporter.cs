@@ -146,6 +146,11 @@ public class TpsCsvExtractFileImporter(
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat;
             }
 
+            if (row.EstablishmentEmailAddress is not null && !EmailAddress.TryParse(row.EstablishmentEmailAddress, out _))
+            {
+                loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat;
+            }
+
             writer.StartRow();
             writer.Write(Guid.NewGuid(), NpgsqlDbType.Uuid);
             writer.Write(tpsCsvExtractId, NpgsqlDbType.Uuid);
@@ -236,7 +241,12 @@ public class TpsCsvExtractFileImporter(
             writer.Write(item.LocalAuthorityCode, NpgsqlDbType.Char);
             writer.Write(item.EstablishmentNumber, NpgsqlDbType.Char);
             writer.Write(item.EstablishmentPostcode, NpgsqlDbType.Varchar);
-            writer.Write(item.EstablishmentEmailAddress, NpgsqlDbType.Varchar);
+            string? establishmentEmailAddress = null;
+            if (item.EstablishmentEmailAddress != null)
+            {
+                establishmentEmailAddress = EmailAddress.Parse(item.EstablishmentEmailAddress).ToString();
+            }
+            writer.Write(establishmentEmailAddress, NpgsqlDbType.Varchar);
             writer.Write(employmentStartDate, NpgsqlDbType.Date);
             writer.Write(!string.IsNullOrEmpty(item.EmploymentEndDate) ? DateOnly.ParseExact(item.EmploymentEndDate!, "dd/MM/yyyy") : (DateOnly?)null, NpgsqlDbType.Date);
             writer.Write((int)EmploymentTypeHelper.FromFullOrPartTimeIndicator(item.FullOrPartTimeIndicator!), NpgsqlDbType.Integer);

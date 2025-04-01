@@ -22,4 +22,5 @@ public class TpsEmployment
     public required bool WithdrawalConfirmed { get; set; }
     public required string? PersonEmailAddress { get; set; }
     public required string? EmployerPostcode { get; set; }
+    public required string? EmployerEmailAddress { get; set; }
 }
