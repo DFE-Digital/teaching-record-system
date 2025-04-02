@@ -74,9 +74,11 @@ public partial class DqtReportingService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return Task.WhenAll(ProcessCrmChangesWrapperAsync(), ProcessTrsChangesWrapperAsync());
+        return Task.WhenAll(/*ProcessCrmChangesWrapperAsync(), */ProcessTrsChangesWrapperAsync());
 
+#pragma warning disable CS8321 // Local function is declared but never used
         async Task ProcessCrmChangesWrapperAsync()
+#pragma warning restore CS8321 // Local function is declared but never used
         {
             await LoadEntityMetadataAsync();
 
@@ -109,7 +111,8 @@ public partial class DqtReportingService : BackgroundService
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
+                await ProcessTrsChangesAsync(observer: null, stoppingToken);
+                //await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -451,13 +454,22 @@ public partial class DqtReportingService : BackgroundService
             return;
         }
 
-        await using var replicationConn = new LogicalReplicationConnection(_configuration.GetPostgresConnectionString());
+        var builder = new NpgsqlConnectionStringBuilder(_configuration.GetPostgresConnectionString());
+        builder.CommandTimeout = 0;
+
+        await using var replicationConn = new LogicalReplicationConnection(builder.ConnectionString);
+        //replicationConn.CommandTimeout = Timeout.InfiniteTimeSpan;
+        replicationConn.WalReceiverTimeout = Timeout.InfiniteTimeSpan;
+        Console.WriteLine($"CommandTimeout: {replicationConn.CommandTimeout}");
+        Console.WriteLine($"WalReceiverTimeout: {replicationConn.WalReceiverTimeout}");
         await replicationConn.Open();
 
         var slot = await GetReplicationSlotAsync(replicationConn, cancellationToken);
         observer?.OnNext(TrsReplicationStatus.ReplicationSlotEstablished);
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var replicationOptions = new PgOutputReplicationOptions(TrsDbPublicationName, protocolVersion: 1, binary: true);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         await foreach (var message in replicationConn.StartReplication(slot, replicationOptions, cancellationToken))
         {

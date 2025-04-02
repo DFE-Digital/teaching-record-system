@@ -197,6 +197,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
     <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" />
     <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics" />
+    <PackageReference Include="Npgsql" />
     <PackageReference Include="Npgsql.DependencyInjection" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="NSign.Client" />

@@ -20,7 +20,7 @@ install-tools:
 
 # Restore dependencies
 restore:
-  @cd {{solution-root}} && dotnet restore --locked-mode
+  @cd {{solution-root}} && dotnet restore
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet libman restore --verbosity quiet
   @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess" }} && dotnet libman restore --verbosity quiet
 
