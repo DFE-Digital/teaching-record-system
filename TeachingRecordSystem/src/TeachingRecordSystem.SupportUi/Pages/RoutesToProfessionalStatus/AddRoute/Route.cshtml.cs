@@ -16,7 +16,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public RouteToProfessionalStatus[] Routes { get; set; } = [];
 
-    public RouteToProfessionalStatus[] OldRoutes { get; set; } = [];
+    public RouteToProfessionalStatus[] ArchivedRoutes { get; set; } = [];
 
     [FromQuery]
     public Guid PersonId { get; set; }
@@ -26,13 +26,16 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     [BindProperty]
     [Display(Name = "Route type")]
-    [Required(ErrorMessage = "Enter a route type")]
     public Guid? RouteId { get; set; }
 
-    public async Task OnGetAsync()
+    [BindProperty]
+    [Display(Name = "Inactive route type")]
+    public Guid? ArchivedRouteId { get; set; }
+
+    public Guid? PreselectedRouteId { get; set; }
+
+    public void OnGet()
     {
-        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: true);
-        OldRoutes = await referenceDataCache.GetRoutesToProfessionalStatusInactiveOnlyAsync();
     }
 
     public async Task<IActionResult> OnGetCancelAsync()
@@ -43,6 +46,14 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (RouteId == null && ArchivedRouteId == null)
+        {
+            ModelState.AddModelError(nameof(RouteId), "Enter a route type");
+        }
+        else if (RouteId is not null && ArchivedRouteId is not null)
+        {
+            ModelState.AddModelError(nameof(RouteId), "Enter only one route type");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -57,11 +68,15 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
             : linkGenerator.RouteAddStatus(PersonId, JourneyInstance!.InstanceId));
     }
 
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
+        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: true);
+        ArchivedRoutes = await referenceDataCache.GetRoutesToProfessionalStatusInactiveOnlyAsync();
+        PreselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
 
-        base.OnPageHandlerExecuting(context);
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
