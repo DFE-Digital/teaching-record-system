@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
-[Authorize(Roles = UserRoles.Administrator)]
+[Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class ConfirmModel(
     TrsDbContext dbContext,
     IAadUserService userService,
