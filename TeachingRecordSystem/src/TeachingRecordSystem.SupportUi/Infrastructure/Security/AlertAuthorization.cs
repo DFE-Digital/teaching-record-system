@@ -55,5 +55,10 @@ public static class AlertAuthorization
             AuthorizationPolicies.NonDbsAlertWrite,
             policy => policy
                 .RequireAuthenticatedUser()
-                .RequireRole(UserRoles.AlertsReadWrite, UserRoles.Administrator));
+                .RequireRole(UserRoles.AlertsReadWrite, UserRoles.Administrator))
+        .AddPolicy(
+            AuthorizationPolicies.AlertWrite,
+            policy => policy
+                .RequireAuthenticatedUser()
+                .RequireRole(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite, UserRoles.Administrator));
 }
