@@ -3273,6 +3273,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<bool>("RouteImplicitExemption")
+                        .HasColumnType("boolean")
+                        .HasColumnName("route_implicit_exemption");
+
                     b.HasKey("InductionExemptionReasonId")
                         .HasName("pk_induction_exemption_reasons");
 
@@ -3283,103 +3287,120 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         {
                             InductionExemptionReasonId = new Guid("5a80cee8-98a8-426b-8422-b0e81cb49b36"),
                             IsActive = true,
-                            Name = "Qualified before 07 May 2000"
+                            Name = "Qualified before 07 May 2000",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("15014084-2d8d-4f51-9198-b0e1881f8896"),
                             IsActive = true,
-                            Name = "Qualified between 07 May 1999 and 01 Apr 2003. First post was in Wales and lasted a minimum of two terms."
+                            Name = "Qualified between 07 May 1999 and 01 Apr 2003. First post was in Wales and lasted a minimum of two terms.",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("0997ab13-7412-4560-8191-e51ed4d58d2a"),
                             IsActive = true,
-                            Name = "Qualified through Further Education route between 1 Sep 2001 and 1 Sep 2004"
+                            Name = "Qualified through Further Education route between 1 Sep 2001 and 1 Sep 2004",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("fea2db23-93e0-49af-96fd-83c815c17c0b"),
                             IsActive = true,
-                            Name = "Passed induction in Guernsey"
+                            Name = "Passed induction in Guernsey",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("e5c3847d-8fb6-4b31-8726-812392da8c5c"),
                             IsActive = true,
-                            Name = "Passed induction in Isle of Man"
+                            Name = "Passed induction in Isle of Man",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("243b21a8-0be4-4af5-8874-85944357e7f8"),
                             IsActive = true,
-                            Name = "Passed induction in Jersey"
+                            Name = "Passed induction in Jersey",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
                             IsActive = true,
-                            Name = "Passed induction in Northern Ireland"
+                            Name = "Passed induction in Northern Ireland",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("7d17d904-c1c6-451b-9e09-031314bd35f7"),
                             IsActive = true,
-                            Name = "Passed induction in Service Children's Education schools in Germany or Cyprus"
+                            Name = "Passed induction in Service Children's Education schools in Germany or Cyprus",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("39550fa9-3147-489d-b808-4feea7f7f979"),
                             IsActive = true,
-                            Name = "Passed induction in Wales"
+                            Name = "Passed induction in Wales",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("a751494a-7e7a-4836-96cb-00b9ed6e1b5f"),
                             IsActive = true,
-                            Name = "Passed probationary period in Gibraltar"
+                            Name = "Passed probationary period in Gibraltar",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("a5faff9f-29ce-4a6b-a7b8-0c1f57f15920"),
                             IsActive = true,
-                            Name = "Exempt"
+                            Name = "Exempt",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("204f86eb-0383-40eb-b793-6fccb76ecee2"),
                             IsActive = true,
-                            Name = "Exempt - Data Loss/Error Criteria"
+                            Name = "Exempt - Data Loss/Error Criteria",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("a112e691-1694-46a7-8f33-5ec5b845c181"),
                             IsActive = true,
-                            Name = "Has, or is eligible for, full registration in Scotland"
+                            Name = "Has, or is eligible for, full registration in Scotland",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             IsActive = true,
-                            Name = "Overseas Trained Teacher"
+                            Name = "Overseas Trained Teacher",
+                            RouteImplicitExemption = true
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85"),
                             IsActive = true,
-                            Name = "Qualified through EEA mutual recognition route"
+                            Name = "Qualified through EEA mutual recognition route",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("42bb7bbc-a92c-4886-b319-3c1a5eac319a"),
                             IsActive = true,
-                            Name = "Registered teacher with at least 2 years full-time teaching experience"
+                            Name = "Registered teacher with at least 2 years full-time teaching experience",
+                            RouteImplicitExemption = false
                         },
                         new
                         {
                             InductionExemptionReasonId = new Guid("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
                             IsActive = true,
-                            Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training"
+                            Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training",
+                            RouteImplicitExemption = false
                         });
                 });
 
@@ -4058,6 +4079,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("degree_type_required");
 
+                    b.Property<Guid?>("InductionExemptionReasonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("induction_exemption_reason_id");
+
                     b.Property<int>("InductionExemptionRequired")
                         .HasColumnType("integer")
                         .HasColumnName("induction_exemption_required");
@@ -4110,6 +4135,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("6f27bdeb-d00a-4ef9-b0ea-26498ce64713"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
                             Name = "Apply for QTS",
@@ -4430,7 +4456,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("f85962c9-cf0c-415d-9de5-a397f95ae261"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
-                            InductionExemptionRequired = 1,
+                            InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Future Teaching Scholars",
                             ProfessionalStatusType = 0,
@@ -4510,7 +4536,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("bfef20b2-5ac4-486d-9493-e5a4538e1be9"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
-                            InductionExemptionRequired = 1,
+                            InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "High Potential ITT",
                             ProfessionalStatusType = 0,
@@ -4686,6 +4712,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("3604ef30-8f11-4494-8b52-a2f9c5371e03"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            InductionExemptionReasonId = new Guid("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
                             Name = "NI R",
@@ -4798,7 +4825,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("7721655f-165f-4737-97d4-17fc6991c18c"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
-                            InductionExemptionRequired = 1,
+                            InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "PGDE ITT",
                             ProfessionalStatusType = 0,
@@ -4910,7 +4937,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("be6eaf8c-92dd-4eff-aad3-1c89c4bec18c"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
-                            InductionExemptionRequired = 2,
+                            InductionExemptionReasonId = new Guid("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
+                            InductionExemptionRequired = 1,
                             IsActive = true,
                             Name = "QTLS and SET Membership",
                             ProfessionalStatusType = 0,
@@ -5006,6 +5034,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("52835b1f-1f2e-4665-abc6-7fb1ef0a80bb"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            InductionExemptionReasonId = new Guid("a112e691-1694-46a7-8f33-5ec5b845c181"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
                             Name = "Scotland R",
@@ -5118,7 +5147,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             RouteToProfessionalStatusId = new Guid("877ba701-fe26-4951-9f15-171f3755d50d"),
                             AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
-                            InductionExemptionRequired = 1,
+                            InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Welsh R",
                             ProfessionalStatusType = 0,
@@ -5459,6 +5488,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
+
+                    b.Property<string>("EmployerEmailAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("employer_email_address");
 
                     b.Property<string>("EmployerPostcode")
                         .HasMaxLength(10)
@@ -16982,9 +17016,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("dqt_teacher_status_value");
 
-                    b.Property<Guid?>("InductionExemptionReasonId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("induction_exemption_reason_id");
+                    b.Property<bool?>("ExemptFromInduction")
+                        .HasColumnType("boolean")
+                        .HasColumnName("exempt_from_induction");
 
                     b.Property<int>("ProfessionalStatusType")
                         .HasColumnType("integer")
@@ -17420,11 +17454,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasForeignKey("DegreeTypeId")
                         .HasConstraintName("fk_qualifications_degree_types_degree_type_id");
 
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.InductionExemptionReason", "InductionExemptionReason")
-                        .WithMany()
-                        .HasForeignKey("InductionExemptionReasonId")
-                        .HasConstraintName("fk_qualifications_induction_exemption_reasons_induction_exempt");
-
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatus", "Route")
                         .WithMany()
                         .HasForeignKey("RouteToProfessionalStatusId")
@@ -17448,8 +17477,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_qualifications_training_providers_training_provider_id");
 
                     b.Navigation("DegreeType");
-
-                    b.Navigation("InductionExemptionReason");
 
                     b.Navigation("Route");
 

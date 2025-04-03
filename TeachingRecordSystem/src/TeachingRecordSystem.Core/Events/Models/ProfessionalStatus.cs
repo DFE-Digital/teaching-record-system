@@ -13,7 +13,7 @@ public record ProfessionalStatus
     public required int? TrainingAgeSpecialismRangeTo { get; init; }
     public required string? TrainingCountryId { get; init; }
     public required Guid? TrainingProviderId { get; init; }
-    public required Guid? InductionExemptionReasonId { get; init; }
+    public bool? ExemptFromInduction { get; set; }
     public required Guid? DegreeTypeId { get; init; }
 
     public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model) => new()
@@ -29,7 +29,7 @@ public record ProfessionalStatus
         TrainingAgeSpecialismRangeTo = model.TrainingAgeSpecialismRangeTo,
         TrainingCountryId = model.TrainingCountryId,
         TrainingProviderId = model.TrainingProviderId,
-        InductionExemptionReasonId = model.InductionExemptionReasonId,
+        ExemptFromInduction = model.ExemptFromInduction,
         DegreeTypeId = model.DegreeTypeId
     };
 }

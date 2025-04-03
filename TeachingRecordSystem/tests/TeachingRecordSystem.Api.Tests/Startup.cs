@@ -2,7 +2,8 @@ namespace TeachingRecordSystem.Api.Tests;
 
 public class Startup
 {
-    public void ConfigureHost(IHostBuilder hostBuilder) =>
+    public void ConfigureHost(IHostBuilder hostBuilder)
+    {
         hostBuilder
             .ConfigureHostConfiguration(builder => builder
                 .AddUserSecrets<HostFixture>(optional: true)
@@ -11,4 +12,5 @@ public class Startup
             {
                 services.AddSingleton<HostFixture>();
             });
+    }
 }

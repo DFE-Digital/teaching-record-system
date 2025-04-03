@@ -29,9 +29,9 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             GenderCode = query.Gender,
             dfeta_NINumber = query.NationalInsuranceNumber,
             EMailAddress1 = query.EmailAddress,
-            dfeta_AllowPiiUpdatesFromRegister = false,
+            dfeta_AllowPiiUpdatesFromRegister = query.AllowPiiUpdates,
             dfeta_TrnRequestID = query.TrnRequestId,
-            dfeta_TRN = query.Trn
+            dfeta_TRN = query.Trn,
         };
 
         if (query.Trn is null)

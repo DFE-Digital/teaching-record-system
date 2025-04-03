@@ -358,18 +358,17 @@ public class GetPersonHandler(
         var middleName = contact.ResolveMiddleName();
         var lastName = contact.ResolveLastName();
 
-        var qtsRegistrations = await WithDataverseAdapterLockAsync(() => dataverseAdapter.GetQtsRegistrationsByTeacherAsync(
-            contact.Id,
-            columnNames:
-            [
-                dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
-                dfeta_qtsregistration.Fields.dfeta_name,
-                dfeta_qtsregistration.Fields.dfeta_EYTSDate,
-                dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId
-            ]));
+        var qtsRegistrations = (await crmQueryDispatcher.ExecuteQueryAsync(
+            new GetActiveQtsRegistrationsByContactIdsQuery(
+                [contact.Id],
+                new ColumnSet(
+                    dfeta_qtsregistration.Fields.dfeta_QTSDate,
+                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                    dfeta_qtsregistration.Fields.dfeta_name,
+                    dfeta_qtsregistration.Fields.dfeta_EYTSDate,
+                    dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+                    dfeta_qtsregistration.Fields.dfeta_PersonId))))[contact.Id];
 
-        var qts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_QTSDate is not null);
         var eyts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
 
         var allowIdSignInWithProhibitions = command.Include.HasFlag(GetPersonCommandIncludes.AllowIdSignInWithProhibitions) ?
@@ -397,7 +396,7 @@ public class GetPersonHandler(
             NationalInsuranceNumber = contact.dfeta_NINumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
-            Qts = await QtsInfo.CreateAsync(qts, referenceDataCache, contact.dfeta_qtlsdate),
+            Qts = await QtsInfo.CreateAsync(qtsRegistrations, contact.dfeta_qtlsdate, referenceDataCache),
             QtlsStatus = qtlsStatus,
             Eyts = await EytsInfo.CreateAsync(eyts, referenceDataCache),
             EmailAddress = contact.EMailAddress1,
@@ -470,8 +469,7 @@ public class GetPersonHandler(
         {
             (not null, _) => QtlsStatus.Active,
             (null, true) => QtlsStatus.Expired,
-            (null, false) => QtlsStatus.None,
-            (_, _) => QtlsStatus.None,
+            _ => QtlsStatus.None
         };
     }
 

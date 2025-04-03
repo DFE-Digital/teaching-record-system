@@ -27,7 +27,7 @@ public class DetailModel(
 
     public async Task OnGetAsync()
     {
-        RouteDetail.ExemptionReason = RouteDetail.InductionExemptionReasonId is not null ? (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteDetail.InductionExemptionReasonId!.Value))?.Name : null;
+        RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
         RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
@@ -56,6 +56,11 @@ public class DetailModel(
         PersonId = personInfo.PersonId;
 
         var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+
+        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue ?
+            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption
+            : false;
+
         RouteDetail = new RouteDetailViewModel()
         {
             RouteToProfessionalStatus = route,
@@ -70,10 +75,11 @@ public class DetailModel(
             TrainingAgeSpecialismRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
             TrainingCountryId = JourneyInstance!.State.TrainingCountryId,
             TrainingProviderId = JourneyInstance!.State.TrainingProviderId,
-            InductionExemptionReasonId = JourneyInstance!.State.InductionExemptionReasonId,
+            IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
             QualificationId = QualificationId,
             DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
-            JourneyInstance = JourneyInstance
+            HasImplicitExemption = hasImplicitExemption,
+            JourneyInstance = JourneyInstance,
         };
 
         await next();

@@ -30,6 +30,6 @@ public enum ProfessionalStatusUpdatedEventChanges
     TrainingAgeSpecialismRangeTo = 1 << 8,
     TrainingCountry = 1 << 9,
     TrainingProvider = 1 << 10,
-    InductionExemptionReason = 1 << 11,
+    ExemptFromInduction = 1 << 11,
     DegreeType = 1 << 12
 }

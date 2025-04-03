@@ -497,6 +497,31 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
         Assert.Null(updatedPersonEmploymentWhichShouldNotHaveEndDateSet.EndDate);
     }
 
+    [Fact]
+    public async Task BackfillEmployerEmailAddressInEmploymentHistory_WhenCalledWithTpsEmploymentRecordsWithoutEmployerEmailAddress_SetsEmployerEmailAddress()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var tpsCsvExtractId = Guid.NewGuid();
+        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "129", establishmentNumber: "1241");
+        var nationalInsuranceNumber = TestData.GenerateNationalInsuranceNumber();
+        var memberPostcode = Faker.Address.UkPostCode();
+        var employerEmailAddress = Faker.Internet.Email();
+        var personEmploymentWithoutEmployerEmailAddress = await TestData.CreateTpsEmploymentAsync(person, establishment, new DateOnly(2023, 02, 02), new DateOnly(2024, 02, 29), EmploymentType.FullTime, new DateOnly(2024, 03, 25), nationalInsuranceNumber, memberPostcode);
+        await TestData.CreateTpsCsvExtractAsync(b => b.WithTpsCsvExtractId(tpsCsvExtractId).WithItem(person!.Trn!, establishment.LaCode, establishment.EstablishmentNumber, establishment.Postcode!, personEmploymentWithoutEmployerEmailAddress.StartDate, personEmploymentWithoutEmployerEmailAddress.LastKnownTpsEmployedDate, personEmploymentWithoutEmployerEmailAddress.LastExtractDate, "FT", personEmploymentWithoutEmployerEmailAddress.NationalInsuranceNumber, memberPostcode: personEmploymentWithoutEmployerEmailAddress.PersonPostcode, employerEmailAddress: employerEmailAddress));
+
+        // Act
+        var processor = new TpsCsvExtractProcessor(
+            TestData.DbContextFactory,
+            TestData.Clock);
+        await processor.BackfillEmployerEmailAddressInEmploymentHistoryAsync(CancellationToken.None);
+
+        // Assert
+        using var dbContext = TestData.DbContextFactory.CreateDbContext();
+        var updatedTpsEmployment = await dbContext.TpsEmployments.SingleAsync(e => e.TpsEmploymentId == personEmploymentWithoutEmployerEmailAddress.TpsEmploymentId);
+        Assert.Equal(employerEmailAddress, updatedTpsEmployment.EmployerEmailAddress);
+    }
+
     public Task InitializeAsync() => Task.CompletedTask;
 
     public Task DisposeAsync() => DbFixture.DbHelper.ClearDataAsync();

@@ -50,6 +50,16 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/training-provider");
     }
 
+    public static Task AssertOnRouteEditSubjectsPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/subjects");
+    }
+
+    public static Task AssertOnRouteEditInductionExemptionPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/induction-exemption");
+    }
+
     public static Task AssertOnRouteChangeReasonPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/change-reason");

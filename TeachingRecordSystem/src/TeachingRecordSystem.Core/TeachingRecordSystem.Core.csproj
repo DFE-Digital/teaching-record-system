@@ -76,6 +76,7 @@
     <None Remove="Services\DqtReporting\Migrations\0048_TrsQualificationsProfessionalStatusType.sql" />
     <None Remove="Services\DqtReporting\Migrations\0050_TrsEstablishmentsPhaseSizeFsm.sql" />
     <None Remove="Services\DqtReporting\Migrations\0051_TpsEmploymentsPersonEmailAndEmployerPostcode.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -158,6 +159,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0049_TrsQualificationsDegreeTypeId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0050_TrsEstablishmentsPhaseSizeFsm.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0051_TpsEmploymentsPersonEmailAndEmployerPostcode.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0052_TrsQualificationsExemptFromInduction.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
   </ItemGroup>
 
   <ItemGroup>

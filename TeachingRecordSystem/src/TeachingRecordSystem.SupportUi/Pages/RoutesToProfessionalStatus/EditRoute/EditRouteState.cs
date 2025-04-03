@@ -18,13 +18,13 @@ public class EditRouteState : IRegisterJourney
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }
-    public Guid[]? TrainingSubjectIds { get; set; }
+    public Guid[] TrainingSubjectIds { get; set; } = [];
     public TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
     public int? TrainingAgeSpecialismRangeFrom { get; set; }
     public int? TrainingAgeSpecialismRangeTo { get; set; }
     public string? TrainingCountryId { get; set; }
     public Guid? TrainingProviderId { get; set; }
-    public Guid? InductionExemptionReasonId { get; set; }
+    public bool? IsExemptFromInduction { get; set; }
     public Guid? DegreeTypeId { get; set; }
 
     public ChangeReasonOption? ChangeReason { get; set; }
@@ -52,7 +52,7 @@ public class EditRouteState : IRegisterJourney
         TrainingAgeSpecialismRangeTo = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismRangeTo;
         TrainingCountryId = professionalStatusInfo.ProfessionalStatus.TrainingCountryId;
         TrainingProviderId = professionalStatusInfo.ProfessionalStatus.TrainingProviderId;
-        InductionExemptionReasonId = professionalStatusInfo.ProfessionalStatus.InductionExemptionReasonId;
+        IsExemptFromInduction = professionalStatusInfo.ProfessionalStatus.ExemptFromInduction;
         DegreeTypeId = professionalStatusInfo.ProfessionalStatus.DegreeTypeId;
         Initialized = true;
     }

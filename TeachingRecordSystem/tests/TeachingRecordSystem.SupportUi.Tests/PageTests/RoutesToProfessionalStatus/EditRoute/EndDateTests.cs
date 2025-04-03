@@ -3,6 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
+
 public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Theory]

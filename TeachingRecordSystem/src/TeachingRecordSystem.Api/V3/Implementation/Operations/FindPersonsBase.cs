@@ -56,8 +56,7 @@ public abstract class FindPersonsHandlerBase(
         {
             (not null, _) => QtlsStatus.Active,
             (null, true) => QtlsStatus.Expired,
-            (null, false) => QtlsStatus.None,
-            (_, _) => QtlsStatus.None,
+            _ => QtlsStatus.None
         };
     }
 
@@ -146,7 +145,7 @@ public abstract class FindPersonsHandlerBase(
                         StatusDescription = statusDescription!
                     } :
                     null,
-                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_QTSDate is not null), referenceDataCache, r.dfeta_qtlsdate),
+                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id], r.dfeta_qtlsdate, referenceDataCache),
                 Eyts = await EytsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_EYTSDate is not null), referenceDataCache),
                 QtlsStatus = MapQtlsStatus(r.dfeta_qtlsdate, r.dfeta_QtlsDateHasBeenSet),
             })

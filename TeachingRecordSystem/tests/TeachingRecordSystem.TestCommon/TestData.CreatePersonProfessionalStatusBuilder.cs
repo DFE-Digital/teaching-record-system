@@ -20,8 +20,8 @@ public partial class TestData
         private int? _trainingAgeSpecialismRangeTo;
         private string? _trainingCountryId;
         private Guid? _trainingProviderId;
-        private Guid? _inductionExemptionReasonId;
         private Guid? _degreeTypeId;
+        private bool? _exemptFromInduction;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -120,9 +120,9 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithInductionExemptionReason(Guid inductionExemptionReasonId)
+        public CreatePersonProfessionalStatusBuilder WithExemptFromInduction(bool? isExempt)
         {
-            _inductionExemptionReasonId = inductionExemptionReasonId;
+            _exemptFromInduction = isExempt;
             return this;
         }
 
@@ -154,8 +154,8 @@ public partial class TestData
                 TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
                 TrainingCountryId = _trainingCountryId,
                 TrainingProviderId = _trainingProviderId,
-                InductionExemptionReasonId = _inductionExemptionReasonId,
-                DegreeTypeId = null,
+                ExemptFromInduction = _exemptFromInduction,
+                DegreeTypeId = _degreeTypeId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
             };

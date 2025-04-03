@@ -15,6 +15,7 @@ public record UpdatedTpsEmployment
     public required string? CurrentPersonPostcode { get; init; }
     public required string? CurrentPersonEmailAddress { get; init; }
     public required string? CurrentEmployerPostcode { get; init; }
+    public required string? CurrentEmployerEmailAddress { get; init; }
     public required DateOnly? NewEndDate { get; init; }
     public required DateOnly NewLastKnownTpsEmployedDate { get; init; }
     public required EmploymentType NewEmploymentType { get; init; }
@@ -24,5 +25,6 @@ public record UpdatedTpsEmployment
     public required string? NewPersonPostcode { get; init; }
     public required string? NewPersonEmailAddress { get; init; }
     public required string? NewEmployerPostcode { get; init; }
+    public required string? NewEmployerEmailAddress { get; init; }
     public required string Key { get; init; }
 }
