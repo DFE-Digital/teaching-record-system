@@ -52,9 +52,10 @@ public class AgeRangeSpecialismModel(
             linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
-    public void OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

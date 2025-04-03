@@ -76,9 +76,10 @@ public class StatusModel(
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public IActionResult OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

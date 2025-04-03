@@ -134,7 +134,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     }
 
     [Fact]
-    public async Task Cancel_RedirectsToExpectedPage()
+    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
@@ -166,8 +166,17 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
 
         // Assert
         var doc = await ReadContentAsync(response);
-        var cancelLink = doc.QuerySelector("a.govuk-link:contains('Cancel')") as IHtmlAnchorElement;
-        Assert.Contains($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", cancelLink!.Href);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     // Using local helper methods instead of the test extension methods which enforce smart quotes

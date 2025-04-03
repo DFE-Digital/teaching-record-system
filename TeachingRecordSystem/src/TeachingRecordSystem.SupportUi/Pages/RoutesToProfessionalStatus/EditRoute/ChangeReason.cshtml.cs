@@ -130,9 +130,10 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         return Redirect(NextPage);
     }
 
-    public IActionResult OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

@@ -238,7 +238,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Cancel_RedirectsToExpectedPage()
+    public async Task Cancel_DeleteJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -271,8 +271,17 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var cancelLink = doc.QuerySelector("a.govuk-link:contains('Cancel')") as IHtmlAnchorElement;
-        Assert.Contains($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", cancelLink!.Href);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>

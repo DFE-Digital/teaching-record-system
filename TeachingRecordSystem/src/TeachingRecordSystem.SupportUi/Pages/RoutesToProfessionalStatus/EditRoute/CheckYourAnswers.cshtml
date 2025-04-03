@@ -54,7 +54,7 @@
             </govuk-summary-list>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">Confirm and commit changes</govuk-button>
-                <a href="@LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-link">Cancel and return to record</a>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteCheckYourAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>
