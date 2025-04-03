@@ -141,12 +141,16 @@ public class TpsCsvExtractFileImporter(
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.GenderIncorrectFormat;
             }
 
-            if (row.MemberEmailAddress is not null && !EmailAddress.TryParse(row.MemberEmailAddress, out _))
+            var memberEmailAddress = row.MemberEmailAddress?.Trim();
+            memberEmailAddress = memberEmailAddress?.Length > 0 ? memberEmailAddress : null;
+            if (memberEmailAddress is not null && !EmailAddress.TryParse(memberEmailAddress, out _))
             {
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat;
             }
 
-            if (row.EstablishmentEmailAddress is not null && !EmailAddress.TryParse(row.EstablishmentEmailAddress, out _))
+            var establishmentEmailAddress = row.EstablishmentEmailAddress?.Trim();
+            establishmentEmailAddress = establishmentEmailAddress?.Length > 0 ? establishmentEmailAddress : null;
+            if (establishmentEmailAddress is not null && !EmailAddress.TryParse(establishmentEmailAddress, out _))
             {
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat;
             }
@@ -159,11 +163,11 @@ public class TpsCsvExtractFileImporter(
             writer.Write(row.DateOfBirth, NpgsqlDbType.Varchar);
             writer.Write(row.DateOfDeath, NpgsqlDbType.Varchar);
             writer.Write(row.MemberPostcode, NpgsqlDbType.Varchar);
-            writer.Write(row.MemberEmailAddress, NpgsqlDbType.Varchar);
+            writer.Write(memberEmailAddress, NpgsqlDbType.Varchar);
             writer.Write(row.LocalAuthorityCode, NpgsqlDbType.Varchar);
             writer.Write(row.EstablishmentCode, NpgsqlDbType.Varchar);
             writer.Write(row.EstablishmentPostcode, NpgsqlDbType.Varchar);
-            writer.Write(row.EstablishmentEmailAddress, NpgsqlDbType.Varchar);
+            writer.Write(establishmentEmailAddress, NpgsqlDbType.Varchar);
             writer.Write(row.EmploymentStartDate, NpgsqlDbType.Varchar);
             writer.Write(row.EmploymentEndDate, NpgsqlDbType.Varchar);
             writer.Write(row.FullOrPartTimeIndicator, NpgsqlDbType.Varchar);
