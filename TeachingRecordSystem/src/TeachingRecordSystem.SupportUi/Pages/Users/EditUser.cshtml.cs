@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
-[Authorize(Roles = UserRoles.Administrator)]
+[Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class EditUser(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
