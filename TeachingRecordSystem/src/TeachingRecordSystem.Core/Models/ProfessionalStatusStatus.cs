@@ -100,7 +100,7 @@ public static class ProfessionalStatusStatusRegistry
     private static readonly IReadOnlyDictionary<ProfessionalStatusStatus, ProfessionalStatusStatusInfo> _info =
         Enum.GetValues<ProfessionalStatusStatus>().ToDictionary(s => s, GetInfo);
 
-    public static IReadOnlyCollection<ProfessionalStatusStatusInfo> All => _info.Values.ToArray();
+    public static IReadOnlyCollection<ProfessionalStatusStatusInfo> All => _info.Values.OrderBy(s => s.Name).ToArray();
 
     public static string GetName(this ProfessionalStatusStatus status) => _info[status].Name;
 

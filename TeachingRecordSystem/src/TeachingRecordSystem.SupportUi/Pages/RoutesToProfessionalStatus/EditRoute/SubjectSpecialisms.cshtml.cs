@@ -17,6 +17,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     [FromRoute]
     public Guid QualificationId { get; set; }
 
+    public Guid PersonId { get; private set; }
     public string? PersonName { get; set; }
 
     public TrainingSubject[] Subjects { get; set; } = [];
@@ -39,9 +40,10 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         SubjectId3 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(2);
     }
 
-    public IActionResult OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -65,7 +67,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         Subjects = await referenceDataCache.GetTrainingSubjectsAsync();
-
+        PersonId = personInfo.PersonId;
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

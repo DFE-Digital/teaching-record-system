@@ -8,6 +8,7 @@ public class EditRouteStateBuilder()
     private QualificationType? _qualificationType;
     private Guid? _routeToProfessionalStatusId;
     private ProfessionalStatusStatus? _status;
+    private ProfessionalStatusStatus? _currentStatus;
     private DateOnly? _awardedDate;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
@@ -63,6 +64,13 @@ public class EditRouteStateBuilder()
     public EditRouteStateBuilder WithStatus(ProfessionalStatusStatus status)
     {
         _status = status;
+        _currentStatus = status;
+        return this;
+    }
+
+    public EditRouteStateBuilder WithCurrentStatus(ProfessionalStatusStatus status)
+    {
+        _currentStatus = status;
         return this;
     }
 
@@ -175,6 +183,7 @@ public class EditRouteStateBuilder()
             Initialized = true,
             RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
             Status = _status!.Value,
+            CurrentStatus = _currentStatus!.Value,
             AwardedDate = _awardedDate,
             TrainingStartDate = _trainingStartDate,
             TrainingEndDate = _trainingEndDate,

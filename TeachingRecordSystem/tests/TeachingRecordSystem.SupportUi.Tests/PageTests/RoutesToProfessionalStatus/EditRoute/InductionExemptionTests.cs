@@ -165,7 +165,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     }
 
     [Fact]
-    public async Task Cancel_RedirectsToExpectedPage()
+    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
@@ -198,13 +198,16 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
         var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", location);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
