@@ -18,7 +18,7 @@ public class InductionExemptionModel(
     public RouteToProfessionalStatus Route { get; set; } = null!;
 
     [FromQuery]
-    public bool? FromCheckAnswers { get; set; }
+    public bool FromCheckAnswers { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -40,8 +40,25 @@ public class InductionExemptionModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        if (CompletingRoute)
+        {
+            await JourneyInstance!.UpdateStateAsync(s =>
+            {
+                s.Status = s.EditStatusState!.Status;
+                s.TrainingEndDate = s.EditStatusState!.TrainingEndDate;
+                s.AwardedDate = s.EditStatusState!.AwardedDate;
+                s.IsExemptFromInduction = IsExemptFromInduction;
+                s.EditStatusState = null;
+            });
+        }
+        else
+        {
+            await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
+        }
+
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -72,4 +89,13 @@ public class InductionExemptionModel(
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
+
+    public string BackLink => FromCheckAnswers ?
+        linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+        CompletingRoute ?
+            linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+
+    // CML TODO add method to JourneyState
+    private bool CompletingRoute => JourneyInstance!.State.EditStatusState != null;
 }

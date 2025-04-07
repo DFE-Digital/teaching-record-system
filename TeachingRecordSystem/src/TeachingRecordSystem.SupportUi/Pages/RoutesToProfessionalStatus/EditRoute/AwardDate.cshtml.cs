@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -22,6 +23,8 @@ public class AwardDateModel(
 
     public Guid PersonId { get; set; }
 
+    public RouteToProfessionalStatus? RouteToProfessionalStatus { get; set; }
+
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Award date")]
     [Required(ErrorMessage = "Enter an award date")]
@@ -40,23 +43,36 @@ public class AwardDateModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.AwardedDate = AwardedDate);
+        var nextPage = CompletingRoute ?
+            (await NextCompletingRoutePageAsync()) :
+            FromCheckAnswers ?
+                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 
-        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-
-        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
-            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
-
-        if (JourneyInstance!.State.StatusAwardedOrApprovedJourney &&
-            route.InductionExemptionRequired == FieldRequirement.Mandatory &&
-            !hasImplicitExemption)
+        if (CompletingRoute)
         {
-            return Redirect(linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance.InstanceId));
+            if (await LastCompletingRoutePageAsync())
+            {
+                await JourneyInstance!.UpdateStateAsync(s =>
+                {
+                    s.Status = s.EditStatusState!.Status;
+                    s.TrainingEndDate = s.EditStatusState?.TrainingEndDate;
+                    s.AwardedDate = AwardedDate;
+                    s.IsExemptFromInduction = s.EditStatusState?.InductionExemption;
+                    s.EditStatusState = null;
+                });
+            }
+            else
+            {
+                await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.AwardedDate = AwardedDate);
+            }
         }
         else
         {
-            return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+            await JourneyInstance!.UpdateStateAsync(s => s.AwardedDate = AwardedDate);
         }
+
+        return Redirect(nextPage);
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -71,6 +87,55 @@ public class AwardDateModel(
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
+        var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
+        RouteToProfessionalStatus = routeFeature.ProfessionalStatus.Route;
         base.OnPageHandlerExecuting(context);
+    }
+
+    // Detail, end-date, CYA 
+    public string BackLink => FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            CompletingRoute ?
+                PreviousCompletingRoutePage() :
+                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+
+
+    private bool CompletingRoute => JourneyInstance!.State.EditStatusState != null;
+
+    private async Task<bool> LastCompletingRoutePageAsync()
+    {
+        if (JourneyInstance!.State.EditStatusState != null)
+        {
+            // CML TODO - if i do a migration so that ExemptionReason can be included in getting the Route, can avoid these asyncs
+            if (QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
+                == FieldRequirement.NotApplicable)
+            {
+                return true;
+            }
+            else
+            {
+                return RouteToProfessionalStatus.InductionExemptionReasonId.HasValue &&
+                    (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteToProfessionalStatus.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    private async Task<string> NextCompletingRoutePageAsync()
+    {
+        return !(await LastCompletingRoutePageAsync()) ?
+            linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+    }
+
+    private string PreviousCompletingRoutePage()
+    {
+        return QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
+            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
     }
 }

@@ -128,6 +128,8 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStatus(status)
             .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
             .WithTrainingStartDate(startDate)
+                .WithEditRouteStatusState(builder => builder
+                .WithStatus(status))
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -152,7 +154,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/award-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
+        Assert.Equal(endDate, journeyInstance.State.EditStatusState!.TrainingEndDate);
     }
 
     [Fact]

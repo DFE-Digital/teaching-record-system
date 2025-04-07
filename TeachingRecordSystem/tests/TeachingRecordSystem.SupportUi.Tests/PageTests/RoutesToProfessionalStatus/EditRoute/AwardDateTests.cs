@@ -122,6 +122,10 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
+            .WithEditRouteStatusState(builder => builder
+                .WithStatus(status)
+                .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
+                .WithEndDate(endDate))
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -146,20 +150,26 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationId}/edit/induction-exemption?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(awardedDate, journeyInstance.State.AwardedDate);
+        Assert.Equal(awardedDate, journeyInstance.State.EditStatusState!.AwardedDate);
     }
 
     [Theory]
     [InlineData(ProfessionalStatusStatus.Approved)]
     [InlineData(ProfessionalStatusStatus.Awarded)]
-    public async Task Post_StatusAwardedJourney_RouteHasImplictExemption_TrainingAwardedDateIsEntered_SavesDateAndRedirectsToDetailPage(ProfessionalStatusStatus status)
+    public async Task Post_StatusAwardedJourney_RouteHasImplictExemption_TrainingAwardedDateIsEntered_SavesDateAndExemptionAndRedirectsToDetailPage(ProfessionalStatusStatus status)
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = new DateOnly(2025, 01, 01);
         var awardedDate = endDate;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.Name == "Apply for QTS") // an induction exemption route that who's exemption is implicit and therefore doesn't require the exemption question
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()) // an induction exemption route who's exemption is implicit and therefore doesn't require the exemption question
+            .Where(r => r.InductionExemptionReasonId.HasValue)
+            .Join(
+                (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption),
+                r => r.InductionExemptionReasonId,
+                e => e.InductionExemptionReasonId,
+                (r, e) => r
+            )
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
@@ -172,6 +182,12 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
+            .WithEditRouteStatusState(builder => builder
+                .WithStatus(status)
+                .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
+                .WithEndDate(endDate)
+                .WithHasInductionExemption(true)
+                .WithRouteImplicitExemption(true))
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -197,6 +213,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(awardedDate, journeyInstance.State.AwardedDate);
+        Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
     }
 
     [Fact]

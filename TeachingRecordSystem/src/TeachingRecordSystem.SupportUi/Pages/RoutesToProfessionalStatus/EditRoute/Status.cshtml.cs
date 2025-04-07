@@ -42,17 +42,24 @@ public class StatusModel(
             return this.PageWithErrors();
         }
 
-        if (Route.InductionExemptionReasonId is not null && Status.GetInductionExemptionRequirement() == FieldRequirement.Mandatory) // route and status mean exemption might apply
+        if (CompletingRoute)
         {
-            var exemption = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId.Value);
-            await JourneyInstance!.UpdateStateAsync(s =>
-            {
-                s.Status = Status;
-                s.IsExemptFromInduction = exemption.RouteImplicitExemption;
-            });
+            var hasImplicitExemption =
+                Route.InductionExemptionReasonId.HasValue ?
+                    (await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId.Value)).RouteImplicitExemption
+                    : false;
+            await JourneyInstance!.UpdateStateAsync(
+                s =>
+                {
+                    s.EditStatusState = new EditRouteStatusState
+                    {
+                        Status = Status,
+                        RouteImplicitExemption = hasImplicitExemption,
+                        InductionExemption = hasImplicitExemption ? true : null
+                    };
+                });
         }
-        else if (JourneyInstance!.State.Status.GetInductionExemptionRequirement() == FieldRequirement.Mandatory
-            && Status.GetInductionExemptionRequirement() == FieldRequirement.NotApplicable) // moving from an awarded/approved status to a non-awarded/approved status
+        else if (NotCompletedRoute)
         {
             await JourneyInstance!.UpdateStateAsync(s =>
             {
@@ -61,18 +68,15 @@ public class StatusModel(
                 s.Status = Status;
             });
         }
-        else
+        else // must be going from Approved to Awarded or vice versa
         {
             await JourneyInstance!.UpdateStateAsync(s => s.Status = Status);
         }
 
-        var justCompletedRoute = JourneyInstance!.State.Status == ProfessionalStatusStatus.Awarded && JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Awarded
-            || JourneyInstance!.State.Status == ProfessionalStatusStatus.Approved && JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Approved;
-
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            justCompletedRoute ?
-                linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance.InstanceId) :
+        return Redirect(CompletingRoute ?
+            NextCompletingRoutePage(Status) :
+            FromCheckAnswers ?
+                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
@@ -92,4 +96,22 @@ public class StatusModel(
 
         await next();
     }
+
+    public string BackLink =>
+         FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+
+    private string NextCompletingRoutePage(ProfessionalStatusStatus status)
+    {
+        return (QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, status.GetEndDateRequirement()) != FieldRequirement.NotApplicable) ?
+            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId);
+    }
+
+    private bool CompletingRoute => Status == ProfessionalStatusStatus.Awarded && (JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Awarded && JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Approved)
+        || Status == ProfessionalStatusStatus.Approved && (JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Approved && JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Awarded);
+
+    public bool NotCompletedRoute => Status != ProfessionalStatusStatus.Approved && Status != ProfessionalStatusStatus.Awarded;
+
 }

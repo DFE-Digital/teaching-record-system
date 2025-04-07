@@ -116,7 +116,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(status, journeyInstance.State.Status);
+        Assert.Equal(status, journeyInstance.State.EditStatusState!.Status);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/end-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -212,8 +212,9 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(status, journeyInstance.State.Status);
-        Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
+        Assert.Equal(status, journeyInstance.State.EditStatusState!.Status);
+        Assert.True(journeyInstance.State.EditStatusState!.RouteImplicitExemption);
+        Assert.Equal(true, journeyInstance.State.EditStatusState!.InductionExemption);
     }
 
     [Fact]
@@ -231,7 +232,6 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
-            .WithCurrentStatus(status)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -243,7 +243,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(StatusModel.Status), status }
+                { nameof(StatusModel.Status), ProfessionalStatusStatus.Approved }
             }
         };
 
@@ -252,7 +252,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(status, journeyInstance.State.Status);
+        Assert.Equal(ProfessionalStatusStatus.Approved, journeyInstance.State.Status);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }

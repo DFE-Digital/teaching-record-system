@@ -136,9 +136,18 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task Details_BackLink_QualificationPage()
     {
+        //var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        //    .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+        //    .First();
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
-            .First();
+            .Where(r => r.InductionExemptionReasonId.HasValue)
+            .Join(
+                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
+                r => r.InductionExemptionReasonId,
+                e => e.InductionExemptionReasonId,
+                (r, e) => r
+            )
+            .RandomOne();
         var status = ProfessionalStatusStatus.Approved;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);

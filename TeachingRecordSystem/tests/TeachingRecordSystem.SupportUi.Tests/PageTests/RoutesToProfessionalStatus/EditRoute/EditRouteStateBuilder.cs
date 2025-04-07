@@ -22,6 +22,7 @@ public class EditRouteStateBuilder()
     private bool? _isExemptFromInduction;
     private ChangeReasonOption? _changeReasonOption;
     private ChangeReasonDetailsState _changeReasonDetail = new();
+    private EditRouteStatusState? _editRouteStatusState;
 
     public EditRouteStateBuilder WithStatusWhereAllFieldsApply()
     {
@@ -172,11 +173,19 @@ public class EditRouteStateBuilder()
         return this;
     }
 
+    public EditRouteStateBuilder WithEditRouteStatusState(Action<EditRouteStatusStateBuilder> builderAction)
+    {
+        var builder = new EditRouteStatusStateBuilder();
+        builderAction(builder);
+        _editRouteStatusState = builder.Build();
+        return this;
+    }
+
     public EditRouteState Build()
     {
-        if (!_routeToProfessionalStatusId.HasValue || !_status.HasValue)
+        if (!_routeToProfessionalStatusId.HasValue || !_currentStatus.HasValue)
         {
-            throw new InvalidOperationException("RouteToProfessionalStatusId and Status must be set");
+            throw new InvalidOperationException("RouteToProfessionalStatusId and CurrentStatus must be set");
         }
         return new EditRouteState()
         {
@@ -205,7 +214,75 @@ public class EditRouteStateBuilder()
                 EvidenceFileSizeDescription = _changeReasonDetail.EvidenceFileSizeDescription,
                 HasAdditionalReasonDetail = _changeReasonDetail.HasAdditionalReasonDetail,
                 UploadEvidence = _changeReasonDetail.UploadEvidence
-            }
+            },
+            EditStatusState = _editRouteStatusState
+        };
+    }
+}
+
+public class EditRouteStatusStateBuilder
+{
+    private Guid _routeToProfessionalStatusId;
+    private ProfessionalStatusStatus _currentStatus;
+    private ProfessionalStatusStatus _status;
+    private DateOnly? _awardedDate;
+    private DateOnly? _trainingEndDate;
+    private bool? _inductionExemption;
+    private bool _routeImplicitExemption;
+
+    public EditRouteStatusStateBuilder WithStatus(ProfessionalStatusStatus status)
+    {
+        _status = status;
+        return this;
+    }
+
+    public EditRouteStatusStateBuilder WithRouteId(Guid routeToProfessionalStatusId)
+    {
+        _routeToProfessionalStatusId = routeToProfessionalStatusId;
+        return this;
+    }
+
+    public EditRouteStatusStateBuilder WithCurrentStatus(ProfessionalStatusStatus status)
+    {
+        _currentStatus = status;
+        return this;
+    }
+
+    public EditRouteStatusStateBuilder WithAwardedDate(DateOnly awardDate)
+    {
+        _awardedDate = awardDate;
+        return this;
+    }
+
+    public EditRouteStatusStateBuilder WithEndDate(DateOnly endDate)
+    {
+        _trainingEndDate = endDate;
+        return this;
+    }
+
+    public EditRouteStatusStateBuilder WithHasInductionExemption(bool hasExemption)
+    {
+        _inductionExemption = hasExemption;
+        return this;
+    }
+
+    public EditRouteStatusStateBuilder WithRouteImplicitExemption(bool hasRouteImplicitExemption)
+    {
+        _routeImplicitExemption = hasRouteImplicitExemption;
+        return this;
+    }
+
+    public EditRouteStatusState Build()
+    {
+        return new EditRouteStatusState
+        {
+            AwardedDate = _awardedDate,
+            CurrentStatus = _currentStatus,
+            InductionExemption = _inductionExemption,
+            RouteImplicitExemption = _routeImplicitExemption,
+            RouteToProfessionalStatusId = _routeToProfessionalStatusId,
+            Status = _status,
+            TrainingEndDate = _trainingEndDate
         };
     }
 }

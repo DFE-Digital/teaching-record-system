@@ -44,13 +44,20 @@ public class EndDateModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.TrainingEndDate = TrainingEndDate);
+        if (CompletingRoute)
+        {
+            await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.TrainingEndDate = TrainingEndDate);
+        }
+        else
+        {
+            await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
+        }
 
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-                JourneyInstance!.State.StatusAwardedOrApprovedJourney ?
-                    linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance.InstanceId) :
-                    linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+        return Redirect(CompletingRoute ?
+            NextCompletingRoutePage() :
+            FromCheckAnswers ?
+                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+                linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -64,5 +71,19 @@ public class EndDateModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+    }
+
+    // Detail, status, CYA 
+    public string BackLink => FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            CompletingRoute ?
+                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
+                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+
+    private bool CompletingRoute => JourneyInstance!.State.EditStatusState != null;
+
+    private string NextCompletingRoutePage()
+    {
+        return linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId);
     }
 }
