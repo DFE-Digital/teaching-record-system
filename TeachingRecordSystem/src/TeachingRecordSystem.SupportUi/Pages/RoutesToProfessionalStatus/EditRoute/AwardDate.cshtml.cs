@@ -134,7 +134,7 @@ public class AwardDateModel(
 
     private string PreviousCompletingRoutePage()
     {
-        return QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
+        return QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
             linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
     }
