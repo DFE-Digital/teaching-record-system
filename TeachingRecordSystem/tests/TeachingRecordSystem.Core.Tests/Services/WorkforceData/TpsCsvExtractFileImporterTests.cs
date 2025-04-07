@@ -35,6 +35,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
         var invalidFormatGender = "None";
         var invalidFormatEmailAddress = "test.com";
         var validFormatEmailAddress = "test@myemail.com";
+        var whitespace = " ";
 
         return new()
         {
@@ -638,6 +639,30 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                 },
                 ExpectedResult = TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat,
             },
+            // Whitespace in Member Email Address
+            new ()
+            {
+                Row = new()
+                {
+                    Trn = validFormatTrn,
+                    NationalInsuranceNumber = validFormatNationalInsuranceNumber,
+                    DateOfBirth = validFormatDateOfBirth,
+                    DateOfDeath = validFormatDateOfDeath,
+                    MemberPostcode = null,
+                    MemberEmailAddress = whitespace,
+                    LocalAuthorityCode = validFormatLocalAuthorityCode,
+                    EstablishmentCode = validFormatEstablishmentNumber,
+                    EstablishmentPostcode = null,
+                    EstablishmentEmailAddress = validFormatEmailAddress,
+                    EmploymentStartDate = validFormatEmploymentStartDate,
+                    EmploymentEndDate = validFormatEmploymentEndDate,
+                    FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
+                    WithdrawlIndicator = validWithdrawlIndicator,
+                    ExtractDate = validFormatExtractDate,
+                    Gender = validFormatGender
+                },
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+            },
             // Invalid Establishment Email Address
             new ()
             {
@@ -661,6 +686,30 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     Gender = validFormatGender
                 },
                 ExpectedResult = TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat,
+            },
+            // Whitespace in Establishment Email Address
+            new ()
+            {
+                Row = new()
+                {
+                    Trn = validFormatTrn,
+                    NationalInsuranceNumber = validFormatNationalInsuranceNumber,
+                    DateOfBirth = validFormatDateOfBirth,
+                    DateOfDeath = validFormatDateOfDeath,
+                    MemberPostcode = null,
+                    MemberEmailAddress = validFormatEmailAddress,
+                    LocalAuthorityCode = validFormatLocalAuthorityCode,
+                    EstablishmentCode = validFormatEstablishmentNumber,
+                    EstablishmentPostcode = null,
+                    EstablishmentEmailAddress = whitespace,
+                    EmploymentStartDate = validFormatEmploymentStartDate,
+                    EmploymentEndDate = validFormatEmploymentEndDate,
+                    FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
+                    WithdrawlIndicator = validWithdrawlIndicator,
+                    ExtractDate = validFormatExtractDate,
+                    Gender = validFormatGender
+                },
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
             }
         };
     }
