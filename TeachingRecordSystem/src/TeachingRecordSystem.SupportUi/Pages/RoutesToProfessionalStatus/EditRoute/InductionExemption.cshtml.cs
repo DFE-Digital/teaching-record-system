@@ -40,7 +40,7 @@ public class InductionExemptionModel(
             return this.PageWithErrors();
         }
 
-        if (CompletingRoute)
+        if (JourneyInstance!.State.CompletingRoute)
         {
             await JourneyInstance!.UpdateStateAsync(s =>
             {
