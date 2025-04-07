@@ -92,10 +92,7 @@ public class InductionExemptionModel(
 
     public string BackLink => FromCheckAnswers ?
         linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-        CompletingRoute ?
+        JourneyInstance!.State.CompletingRoute ?
             linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
-
-    // CML TODO add method to JourneyState
-    private bool CompletingRoute => JourneyInstance!.State.EditStatusState != null;
 }

@@ -106,7 +106,6 @@ public class AwardDateModel(
     {
         if (JourneyInstance!.State.EditStatusState != null)
         {
-            // CML TODO - if i do a migration so that ExemptionReason can be included in getting the Route, can avoid these asyncs
             if (QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.InductionExemptionRequired, JourneyInstance!.State.EditStatusState.Status.GetInductionExemptionRequirement())
                 == FieldRequirement.NotApplicable)
             {
