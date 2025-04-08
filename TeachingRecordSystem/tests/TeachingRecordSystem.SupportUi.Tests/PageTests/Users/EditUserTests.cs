@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
 public class EditUserTests : TestBase
@@ -10,7 +12,7 @@ public class EditUserTests : TestBase
     public async Task Get_UserWithOutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
         var userId = Guid.NewGuid();
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(userId));
@@ -99,7 +101,7 @@ public class EditUserTests : TestBase
 
         var rolesList = doc.GetElementsByName("Roles");
         Assert.NotNull(rolesList);
-        Assert.Equal(UserRoles.All.Count(), rolesList!.Count());
+        Assert.Equal(LegacyUserRoles.All.Count(), rolesList!.Count());
 
         var dqtRolesList = doc.GetElementByTestId("dqt-roles-list");
         if (hasDqtRoles)
@@ -120,7 +122,7 @@ public class EditUserTests : TestBase
     public async Task Post_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var user = await TestData.CreateUserAsync();
 
@@ -167,7 +169,7 @@ public class EditUserTests : TestBase
     {
         // Arrange
         var user = await TestData.CreateUserAsync();
-        const string role = UserRoles.Administrator;
+        const string role = LegacyUserRoles.Administrator;
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
         {
@@ -195,9 +197,9 @@ public class EditUserTests : TestBase
         UserUpdatedEventChanges expectedChanges)
     {
         // Arrange
-        var currentUser = await TestData.CreateUserAsync(roles: new[] { UserRoles.Helpdesk });
+        var currentUser = await TestData.CreateUserWithLegacyRolesAsync(roles: new[] { LegacyUserRoles.Helpdesk });
         var newName = changeName ? TestData.GenerateChangedName(currentUser.Name) : currentUser.Name;
-        var roles = changeRoles ? new[] { UserRoles.Administrator } : currentUser.Roles;
+        var roles = changeRoles ? new[] { LegacyUserRoles.Administrator } : currentUser.Roles;
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(currentUser.UserId))
         {
@@ -235,7 +237,7 @@ public class EditUserTests : TestBase
                 Assert.Equal(updatedUser.Email, userCreatedEvent.User.Email);
                 Assert.Equal(updatedUser.AzureAdUserId, userCreatedEvent.User.AzureAdUserId);
                 Assert.Equal(expectedChanges, userCreatedEvent.Changes);
-                Assert.True(userCreatedEvent.User.Roles.SequenceEqual(roles));
+                Assert.True((userCreatedEvent.User.Roles ?? []).SequenceEqual(roles));
             });
         }
 

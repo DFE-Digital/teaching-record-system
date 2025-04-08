@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
@@ -58,7 +59,7 @@ public class ConfirmModel(
         var roles = Roles ?? [];
 
         // Ensure submitted roles are valid
-        if (roles.Any(r => !UserRoles.All.Contains(r)))
+        if (roles.Any(r => !LegacyUserRoles.All.Contains(r)))
         {
             return BadRequest();
         }

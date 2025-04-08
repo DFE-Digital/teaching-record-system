@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Legacy;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
 
 public class ConfirmTests : TestBase
@@ -10,7 +12,7 @@ public class ConfirmTests : TestBase
     public async Task Get_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
@@ -118,7 +120,7 @@ public class ConfirmTests : TestBase
 
         var rolesList = doc.GetElementsByName("Roles");
         Assert.NotNull(rolesList);
-        Assert.Equal(UserRoles.All.Count(), rolesList!.Count());
+        Assert.Equal(LegacyUserRoles.All.Count(), rolesList!.Count());
 
         var dqtRolesList = doc.GetElementByTestId("dqt-roles-list");
         if (hasDqtRoles)
@@ -139,13 +141,13 @@ public class ConfirmTests : TestBase
     public async Task Post_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid().ToString();
         var newName = Faker.Name.FullName();
-        var role = UserRoles.Administrator;
+        var role = LegacyUserRoles.Administrator;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
         {
@@ -176,7 +178,7 @@ public class ConfirmTests : TestBase
         // Arrange
         var userId = Guid.NewGuid().ToString();
         var newName = Faker.Name.FullName();
-        var role = UserRoles.Administrator;
+        var role = LegacyUserRoles.Administrator;
 
         ConfigureUserServiceMock(userId, null);
 
@@ -203,7 +205,7 @@ public class ConfirmTests : TestBase
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid().ToString();
-        var role = UserRoles.Administrator;
+        var role = LegacyUserRoles.Administrator;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
         {
@@ -235,7 +237,7 @@ public class ConfirmTests : TestBase
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid().ToString();
         var newName = Faker.Name.FullName();
-        var role = UserRoles.Administrator;
+        var role = LegacyUserRoles.Administrator;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
         {
@@ -276,7 +278,7 @@ public class ConfirmTests : TestBase
             Assert.Equal(newName, userCreatedEvent.User.Name);
             Assert.Equal(email, userCreatedEvent.User.Email);
             Assert.Equal(userId, userCreatedEvent.User.AzureAdUserId);
-            Assert.Collection(userCreatedEvent.User.Roles, r => Assert.Equal(role, r));
+            Assert.Collection(userCreatedEvent.User.Roles ?? [], r => Assert.Equal(role, r));
         });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

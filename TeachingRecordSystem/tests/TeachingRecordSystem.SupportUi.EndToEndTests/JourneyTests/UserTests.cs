@@ -44,7 +44,7 @@ public class UserTests : TestBase
     {
         var azAdUserId = Guid.NewGuid();
         await TestData.CreateCrmUserAsync(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
-        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, roles: ["Administrator"]);
+        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, role: UserRoles.Administrator);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -72,7 +72,7 @@ public class UserTests : TestBase
     {
         var azAdUserId = Guid.NewGuid();
         await TestData.CreateCrmUserAsync(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
-        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, roles: ["Administrator"]);
+        var user = await TestData.CreateUserAsync(azureAdUserId: azAdUserId, role: UserRoles.Administrator);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();
@@ -97,7 +97,7 @@ public class UserTests : TestBase
     {
         var azAdUserId = Guid.NewGuid();
         await TestData.CreateCrmUserAsync(azureAdUserId: azAdUserId, dqtRoles: ["CRM Helpdesk"]);
-        var user = await TestData.CreateUserAsync(active: false, azureAdUserId: azAdUserId, roles: ["Administrator"]);
+        var user = await TestData.CreateUserAsync(active: false, azureAdUserId: azAdUserId, role: UserRoles.Administrator);
 
         await using var context = await HostFixture.CreateBrowserContext();
         var page = await context.NewPageAsync();

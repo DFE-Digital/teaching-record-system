@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
@@ -66,7 +67,7 @@ public class EditUser(
     public async Task<IActionResult> OnPostAsync()
     {
         // Sanitize roles
-        var newRoles = Roles!.Where(r => UserRoles.All.Contains(r)).ToArray();
+        var newRoles = Roles!.Where(r => LegacyUserRoles.All.Contains(r)).ToArray();
 
         if (!ModelState.IsValid)
         {

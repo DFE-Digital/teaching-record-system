@@ -10,7 +10,7 @@ public class IndexTests : TestBase
     public async Task Get_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
         var request = new HttpRequestMessage(HttpMethod.Get, "/users/add");
 
         // Act
@@ -37,7 +37,7 @@ public class IndexTests : TestBase
     public async Task Post_UserWithoutAdministratorRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add");
 
         // Act
