@@ -35,7 +35,7 @@ public partial class DataverseAdapter
         }
 
         var newContact = helper.CreateContactEntity();
-        var metadataOutboxMessage = helper.CreateTrnRequestMetadataOutboxMessage();
+
 
         // Send a single Transaction request with all the data changes in.
         // This is important for atomicity; we really do not want torn writes here.
@@ -45,7 +45,6 @@ public partial class DataverseAdapter
             Requests = new()
             {
                 new CreateRequest() { Target = newContact },
-                new CreateRequest() { Target = metadataOutboxMessage },
                 new CreateRequest() { Target = helper.CreateInitialTeacherTrainingEntity(referenceData) },
                 new CreateRequest() { Target = helper.CreateQualificationEntity(referenceData) }
             }
@@ -56,12 +55,14 @@ public partial class DataverseAdapter
         var findExistingTeacherResult = await (findExistingTeacher ?? helper.FindExistingTeacherAsync)();
         var allocateTrn = findExistingTeacherResult.Length == 0;
         string trn = null;
+        string trnToken = null;
 
         if (allocateTrn)
         {
             trn = await GenerateTrnAsync();
+            trnToken = command.GetTrnToken is not null ? await command.GetTrnToken(trn) : null;
             newContact.dfeta_TRN = trn;
-            newContact.dfeta_TrnToken = command.GetTrnToken is not null ? await command.GetTrnToken(trn) : null;
+            newContact.dfeta_TrnToken = trnToken;
         }
         else
         {
@@ -76,6 +77,9 @@ public partial class DataverseAdapter
                 });
             }
         }
+
+        var metadataOutboxMessage = helper.CreateTrnRequestMetadataOutboxMessage(potentialDuplicate: !allocateTrn, trnToken);
+        txnRequest.Requests.Add(new CreateRequest() { Target = metadataOutboxMessage });
 
         var qtsEntity = helper.CreateQtsRegistrationEntity(referenceData);
         txnRequest.Requests.Add(new CreateRequest() { Target = qtsEntity });
@@ -837,7 +841,7 @@ public partial class DataverseAdapter
             return failedReasons;
         }
 
-        public dfeta_TrsOutboxMessage CreateTrnRequestMetadataOutboxMessage()
+        public dfeta_TrsOutboxMessage CreateTrnRequestMetadataOutboxMessage(bool potentialDuplicate, string trnToken)
         {
             var name = new List<string>()
             {
@@ -851,7 +855,7 @@ public partial class DataverseAdapter
                 name.RemoveAt(1);
             }
 
-            var message = new TrnRequestMetadataMessage()
+            var message = new TrnRequestMetadataMessage
             {
                 ApplicationUserId = _command.ApplicationUserId,
                 RequestId = _command.TrnRequestId,
@@ -860,7 +864,17 @@ public partial class DataverseAdapter
                 OneLoginUserSubject = _command.OneLoginUserSubject,
                 EmailAddress = _command.EmailAddress,
                 Name = name.ToArray(),
-                DateOfBirth = _command.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false)
+                DateOfBirth = _command.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                PotentialDuplicate = potentialDuplicate,
+                NationalInsuranceNumber = null,
+                Gender = (int?)_command.GenderCode,
+                AddressLine1 = _command.Address.AddressLine1,
+                AddressLine2 = _command.Address.AddressLine2,
+                AddressLine3 = _command.Address.AddressLine3,
+                City = _command.Address.City,
+                Postcode = _command.Address.PostalCode,
+                Country = _command.Address.Country,
+                TrnToken = trnToken
             };
 
             var serializer = new MessageSerializer();

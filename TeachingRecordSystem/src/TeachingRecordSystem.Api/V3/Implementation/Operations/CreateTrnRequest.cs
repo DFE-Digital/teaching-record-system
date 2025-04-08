@@ -130,11 +130,21 @@ public class CreateTrnRequestHandler(
                 CreatedOn = clock.UtcNow,
                 IdentityVerified = command.IdentityVerified,
                 OneLoginUserSubject = command.OneLoginUserSubject,
-                Name = GetNonEmptyValues(command.FirstName, command.MiddleName, command.LastName),
+                Name = GetNonEmptyValues(command.FirstName,
+                    command.MiddleName,
+                    command.LastName),
                 DateOfBirth = command.DateOfBirth,
+                PotentialDuplicate = null,
                 EmailAddress = emailAddress,
                 NationalInsuranceNumber = command.NationalInsuranceNumber,
-                Gender = (int?)command.Gender
+                Gender = (int?)command.Gender,
+                AddressLine1 = null,
+                AddressLine2 = null,
+                AddressLine3 = null,
+                City = null,
+                Postcode = null,
+                Country = null,
+                TrnToken = null
             })
         };
 
