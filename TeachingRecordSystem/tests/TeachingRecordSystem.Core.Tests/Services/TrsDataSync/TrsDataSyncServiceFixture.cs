@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Services.TrsDataSync;
@@ -26,7 +27,8 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
             referenceDataCache,
             Clock,
             AuditRepository,
-            loggerFactory.CreateLogger<TrsDataSyncHelper>());
+            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
+            DqtNoteFileAttachment.Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -46,6 +48,8 @@ public class TrsDataSyncServiceFixture : IAsyncLifetime
     public TestData TestData { get; }
 
     public TestableAuditRepository AuditRepository { get; }
+
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachment { get; } = new Mock<IDqtNoteAttachmentStorage>();
 
     public Task PublishChangedItemAndConsumeAsync(string modelType, IChangedItem changedItem)
     {
