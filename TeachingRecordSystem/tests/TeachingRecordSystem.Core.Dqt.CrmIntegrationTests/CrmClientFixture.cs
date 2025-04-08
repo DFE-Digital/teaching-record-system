@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.TestCommon;
@@ -47,6 +48,8 @@ public sealed class CrmClientFixture : IDisposable
 
     public DbFixture DbFixture { get; }
 
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; } = new Mock<IDqtNoteAttachmentStorage>();
+
     public CrmQueryDispatcher CreateQueryDispatcher() =>
         new CrmQueryDispatcher(CreateQueryServiceProvider(_baseServiceClient, _referenceDataCache), serviceClientName: null);
 
@@ -69,7 +72,7 @@ public sealed class CrmClientFixture : IDisposable
                 _referenceDataCache,
                 Clock,
                 () => _trnGenerationApiClient.GenerateTrnAsync(),
-                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock, new TestableAuditRepository(), _loggerFactory.CreateLogger<TrsDataSyncHelper>())) : TestDataSyncConfiguration.NoSync()),
+                withSync ? TestDataSyncConfiguration.Sync(new(DbFixture.GetDataSource(), orgService, _referenceDataCache, Clock, new TestableAuditRepository(), _loggerFactory.CreateLogger<TrsDataSyncHelper>(), DqtNoteFileAttachmentStorageMock.Object)) : TestDataSyncConfiguration.NoSync()),
             _memoryCache,
             onAsyncDispose);
     }
@@ -137,6 +140,8 @@ public sealed class CrmClientFixture : IDisposable
         public DataverseAdapter CreateDataverseAdapter() => _createDataverseAdapter(OrganizationService);
 
         public TestDataHelper CreateTestDataHelper() => new TestDataHelper(this, _memoryCache);
+
+        public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; } = new Mock<IDqtNoteAttachmentStorage>();
 
         public async ValueTask DisposeAsync()
         {

@@ -121,6 +121,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<DegreeType> DegreeTypes => Set<DegreeType>();
 
+    public DbSet<DqtNote> DqtNotes => Set<DqtNote>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

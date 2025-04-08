@@ -9,6 +9,7 @@ using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure.Json;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
@@ -62,6 +63,8 @@ public abstract class TestBase
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: _jsonSerializerOptions);
+
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachment => _testServices.DqtNoteFileAttachmentStorageMock;
 
     public virtual HttpClient GetHttpClient(string? version = null)
     {

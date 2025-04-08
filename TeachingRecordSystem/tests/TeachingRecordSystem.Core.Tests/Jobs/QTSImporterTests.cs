@@ -2,7 +2,9 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -26,7 +28,8 @@ public class QtsImporterTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>());
+            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
+            DqtNoteFileAttachmentStorageMock.Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -52,6 +55,8 @@ public class QtsImporterTests : IAsyncLifetime
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
     public QtsImporter Importer { get; }
+
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; } = new Mock<IDqtNoteAttachmentStorage>();
 
     [Fact]
     public async Task Validate_NoneExistentTeacher_ReturnsErrorMessage()
