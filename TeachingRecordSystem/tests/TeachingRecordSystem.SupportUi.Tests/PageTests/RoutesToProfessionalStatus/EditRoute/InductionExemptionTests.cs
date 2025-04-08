@@ -105,7 +105,6 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .WithStatus(status)
                 .WithEditRouteStatusState(builder => builder
                 .WithStatus(status)
-                .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
                 .WithEndDate(endDate)
                 .WithAwardedDate(awardDate)
                 .WithHasInductionExemption(true))

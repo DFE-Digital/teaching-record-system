@@ -222,8 +222,6 @@ public class EditRouteStateBuilder()
 
 public class EditRouteStatusStateBuilder
 {
-    private Guid _routeToProfessionalStatusId;
-    private ProfessionalStatusStatus _currentStatus;
     private ProfessionalStatusStatus _status;
     private DateOnly? _awardedDate;
     private DateOnly? _trainingEndDate;
@@ -233,18 +231,6 @@ public class EditRouteStatusStateBuilder
     public EditRouteStatusStateBuilder WithStatus(ProfessionalStatusStatus status)
     {
         _status = status;
-        return this;
-    }
-
-    public EditRouteStatusStateBuilder WithRouteId(Guid routeToProfessionalStatusId)
-    {
-        _routeToProfessionalStatusId = routeToProfessionalStatusId;
-        return this;
-    }
-
-    public EditRouteStatusStateBuilder WithCurrentStatus(ProfessionalStatusStatus status)
-    {
-        _currentStatus = status;
         return this;
     }
 
@@ -277,10 +263,8 @@ public class EditRouteStatusStateBuilder
         return new EditRouteStatusState
         {
             AwardedDate = _awardedDate,
-            CurrentStatus = _currentStatus,
             InductionExemption = _inductionExemption,
             RouteImplicitExemption = _routeImplicitExemption,
-            RouteToProfessionalStatusId = _routeToProfessionalStatusId,
             Status = _status,
             TrainingEndDate = _trainingEndDate
         };

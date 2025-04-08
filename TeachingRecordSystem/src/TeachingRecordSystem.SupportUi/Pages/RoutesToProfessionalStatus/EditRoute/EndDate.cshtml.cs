@@ -73,7 +73,6 @@ public class EndDateModel(
         PersonId = personInfo.PersonId;
     }
 
-    // Detail, status, CYA 
     public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             CompletingRoute ?

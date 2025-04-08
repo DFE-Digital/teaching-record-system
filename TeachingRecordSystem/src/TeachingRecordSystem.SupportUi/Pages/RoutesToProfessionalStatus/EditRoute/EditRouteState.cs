@@ -12,7 +12,7 @@ public class EditRouteState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
-    public EditRouteStatusState? EditStatusState { get; set; } // for when we're completing a route (moving it to awarded or approved)
+    public EditRouteStatusState? EditStatusState { get; set; } // store temp data while completing a route (moving it to awarded or approved)
 
     public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }
@@ -34,13 +34,10 @@ public class EditRouteState : IRegisterJourney
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [JsonIgnore]
-    public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields also depends on the route and status
+    public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
 
     [JsonIgnore]
     public bool CompletingRoute => EditStatusState != null;
-
-    //[JsonIgnore]
-    //public bool NotCompletedRoute => Status != ProfessionalStatusStatus.Approved && Status != ProfessionalStatusStatus.Awarded;
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {

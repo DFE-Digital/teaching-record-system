@@ -124,7 +124,6 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithTrainingEndDate(endDate)
             .WithEditRouteStatusState(builder => builder
                 .WithStatus(status)
-                .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
                 .WithEndDate(endDate))
             .Build();
 
@@ -184,7 +183,6 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithTrainingEndDate(endDate)
             .WithEditRouteStatusState(builder => builder
                 .WithStatus(status)
-                .WithCurrentStatus(person.ProfessionalStatuses.First().Status)
                 .WithEndDate(endDate)
                 .WithHasInductionExemption(true)
                 .WithRouteImplicitExemption(true))

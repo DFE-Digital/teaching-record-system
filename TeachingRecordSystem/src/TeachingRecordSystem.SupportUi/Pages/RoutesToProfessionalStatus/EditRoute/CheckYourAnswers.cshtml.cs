@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
@@ -99,8 +101,13 @@ public class CheckYourAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
-        if (!JourneyInstance!.State.IsComplete)
+        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        var status = JourneyInstance!.State.Status;
+
+        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
+            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
+
+        if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
         {
             context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
             return;
@@ -112,9 +119,6 @@ public class CheckYourAnswersModel(
 
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
-        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
-            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
 
         RouteDetail = new RouteDetailViewModel
         {
@@ -146,5 +150,27 @@ public class CheckYourAnswersModel(
         return ChangeReasonDetail.EvidenceFileId is not null ?
             await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
+    }
+
+    private bool IsComplete(RouteToProfessionalStatus route, ProfessionalStatusStatus status)
+    {
+        return (QuestionDriverHelper.FieldRequired(route.TrainingStartDateRequired, status.GetStartDateRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.TrainingStartDate is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.TrainingEndDate is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.AwardDateRequired, status.GetAwardDateRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.AwardedDate is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.DegreeTypeRequired, status.GetDegreeTypeRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.DegreeTypeId is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.TrainingAgeSpecialismTypeRequired, status.GetAgeSpecialismRequirement()) != FieldRequirement.Mandatory
+            || (JourneyInstance!.State.TrainingAgeSpecialismRangeFrom is not null && JourneyInstance!.State.TrainingAgeSpecialismRangeTo is not null) || JourneyInstance!.State.TrainingAgeSpecialismType is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.TrainingCountryRequired, status.GetCountryRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.TrainingCountryId is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.TrainingSubjectsRequired, status.GetSubjectsRequirement()) != FieldRequirement.Mandatory
+            || !JourneyInstance!.State.TrainingSubjectIds.IsNullOrEmpty()) &&
+            (QuestionDriverHelper.FieldRequired(route.TrainingProviderRequired, status.GetTrainingProviderRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.TrainingProviderId is not null) &&
+            (QuestionDriverHelper.FieldRequired(route.InductionExemptionRequired, status.GetInductionExemptionRequirement()) != FieldRequirement.Mandatory
+            || JourneyInstance!.State.IsExemptFromInduction is not null);
     }
 }
