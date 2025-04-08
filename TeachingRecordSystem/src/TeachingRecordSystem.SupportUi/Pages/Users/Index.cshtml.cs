@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
-[Authorize(Roles = UserRoles.Administrator)]
+[Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class IndexModel : PageModel
 {
     private readonly TrsDbContext _dbContext;
