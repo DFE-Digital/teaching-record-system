@@ -221,6 +221,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     publishApiOptions.RefreshTrainingProvidersJobSchedule);
 
+                recurringJobManager.AddOrUpdate<BackfillEmployerEmailAddressInEmploymentHistoryJob>(
+                    nameof(BackfillEmployerEmailAddressInEmploymentHistoryJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }

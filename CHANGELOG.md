@@ -2,10 +2,18 @@
 
 ## vNext
 
-The following new endpoints have been added:  
-- `PUT /v3/persons/<trn>` - to set a person's PII.  
-- `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.   
-- `PUT /v3/persons/<trn>/professional-statuses/<id>` - to set a professional status.    
+The following new endpoints have been added:
+- `PUT /v3/persons/<trn>` - to set a person's PII.
+- `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
+- `PUT /v3/persons/<trn>/professional-statuses/<id>` - to set a professional status.
+
+## 20250327
+
+The `qts` object in responses to the following endpoints has a new `awardedOrApprovedCount` property:
+- `GET /v3/persons/<trn>`
+- `GET /v3/person`
+- `GET /v3/persons?findBy=LastNameAndDateOfBirth`
+- `GET /v3/persons/find`.
 
 ## 20250203
 
