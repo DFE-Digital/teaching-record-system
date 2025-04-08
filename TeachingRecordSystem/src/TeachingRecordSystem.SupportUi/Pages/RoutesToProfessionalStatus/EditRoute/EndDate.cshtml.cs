@@ -44,7 +44,7 @@ public class EndDateModel(
             return this.PageWithErrors();
         }
 
-        if (CompletingRoute)
+        if (JourneyInstance!.State.IsCompletingRoute)
         {
             await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.TrainingEndDate = TrainingEndDate);
         }
@@ -53,7 +53,7 @@ public class EndDateModel(
             await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
         }
 
-        return Redirect(CompletingRoute ?
+        return Redirect(JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage() :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
@@ -75,11 +75,9 @@ public class EndDateModel(
 
     public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            CompletingRoute ?
+            JourneyInstance!.State.IsCompletingRoute ?
                 linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
-
-    private bool CompletingRoute => JourneyInstance!.State.EditStatusState != null;
 
     private string NextCompletingRoutePage()
     {

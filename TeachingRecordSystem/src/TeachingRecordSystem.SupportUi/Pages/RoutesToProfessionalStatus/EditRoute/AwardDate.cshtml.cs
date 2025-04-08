@@ -43,22 +43,22 @@ public class AwardDateModel(
             return this.PageWithErrors();
         }
 
-        var nextPage = CompletingRoute ?
+        var nextPage = JourneyInstance!.State.IsCompletingRoute ?
             (await NextCompletingRoutePageAsync()) :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 
-        if (CompletingRoute)
+        if (JourneyInstance!.State.IsCompletingRoute)
         {
-            if (await LastCompletingRoutePageAsync())
+            if (await IsLastCompletingRoutePageAsync())
             {
                 await JourneyInstance!.UpdateStateAsync(s =>
                 {
                     s.Status = s.EditStatusState!.Status;
-                    s.TrainingEndDate = s.EditStatusState?.TrainingEndDate;
+                    s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
                     s.AwardedDate = AwardedDate;
-                    s.IsExemptFromInduction = s.EditStatusState?.InductionExemption;
+                    s.IsExemptFromInduction = s.EditStatusState.InductionExemption;
                     s.EditStatusState = null;
                 });
             }
@@ -92,17 +92,14 @@ public class AwardDateModel(
         base.OnPageHandlerExecuting(context);
     }
 
-    // Detail, end-date, CYA 
     public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            CompletingRoute ?
+            JourneyInstance!.State.IsCompletingRoute ?
                 PreviousCompletingRoutePage() :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
-    private bool CompletingRoute => JourneyInstance!.State.EditStatusState != null;
-
-    private async Task<bool> LastCompletingRoutePageAsync()
+    private async Task<bool> IsLastCompletingRoutePageAsync()
     {
         if (JourneyInstance!.State.EditStatusState != null)
         {
@@ -125,9 +122,9 @@ public class AwardDateModel(
 
     private async Task<string> NextCompletingRoutePageAsync()
     {
-        return !(await LastCompletingRoutePageAsync()) ?
-            linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+        return (await IsLastCompletingRoutePageAsync()) ?
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
     }
 
     private string PreviousCompletingRoutePage()

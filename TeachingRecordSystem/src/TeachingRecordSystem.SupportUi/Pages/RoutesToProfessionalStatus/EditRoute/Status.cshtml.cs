@@ -68,7 +68,7 @@ public class StatusModel(
                 s.Status = Status;
             });
         }
-        else // must be going from Approved to Awarded or vice versa
+        else // going from Approved to Awarded or vice versa
         {
             await JourneyInstance!.UpdateStateAsync(s => s.Status = Status);
         }

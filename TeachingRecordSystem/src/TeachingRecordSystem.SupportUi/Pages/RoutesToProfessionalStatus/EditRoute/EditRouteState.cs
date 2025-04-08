@@ -37,7 +37,7 @@ public class EditRouteState : IRegisterJourney
     public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
 
     [JsonIgnore]
-    public bool CompletingRoute => EditStatusState != null;
+    public bool IsCompletingRoute => EditStatusState != null;
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {

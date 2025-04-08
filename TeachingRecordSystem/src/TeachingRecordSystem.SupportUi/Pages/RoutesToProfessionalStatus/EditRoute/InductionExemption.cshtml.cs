@@ -40,13 +40,13 @@ public class InductionExemptionModel(
             return this.PageWithErrors();
         }
 
-        if (JourneyInstance!.State.CompletingRoute)
+        if (JourneyInstance!.State.IsCompletingRoute)
         {
             await JourneyInstance!.UpdateStateAsync(s =>
             {
                 s.Status = s.EditStatusState!.Status;
-                s.TrainingEndDate = s.EditStatusState!.TrainingEndDate;
-                s.AwardedDate = s.EditStatusState!.AwardedDate;
+                s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
+                s.AwardedDate = s.EditStatusState.AwardedDate;
                 s.IsExemptFromInduction = IsExemptFromInduction;
                 s.EditStatusState = null;
             });
@@ -92,7 +92,7 @@ public class InductionExemptionModel(
 
     public string BackLink => FromCheckAnswers ?
         linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-        JourneyInstance!.State.CompletingRoute ?
+        JourneyInstance!.State.IsCompletingRoute ?
             linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 }
