@@ -11,5 +11,6 @@ public static class AuthorizationPolicies
     public const string NonDbsAlertFlag = "NonDbsAlertFlag";
     public const string NonDbsAlertRead = "NonDbsAlertRead";
     public const string NonDbsAlertWrite = "NonDbsAlertWrite";
+    public const string AlertWrite = "AlertWrite";
     public const string InductionReadWrite = "InductionReadWrite";
 }
