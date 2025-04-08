@@ -251,7 +251,7 @@ public class ReferenceDataCache(
         return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).OrderBy(x => x.Name).ToArray();
     }
 
-    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusInactiveOnlyAsync()
+    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusArchivedOnlyAsync()
     {
         var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
         return routesToProfessionalStatuses.Where(e => !e.IsActive).OrderBy(x => x.Name).ToArray();

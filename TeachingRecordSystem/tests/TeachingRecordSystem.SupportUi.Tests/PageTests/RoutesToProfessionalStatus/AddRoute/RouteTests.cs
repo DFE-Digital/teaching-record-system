@@ -64,6 +64,38 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         await AssertEx.HtmlResponseHasErrorAsync(response, "RouteId", "Enter a route type");
     }
 
+    [Fact(Skip = "Waiting for archived route data")]
+    public async Task Post_TwoRoutesSelected_ShowsError()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+            .RandomOne();
+        var archivedRoute = (await ReferenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync())
+            .RandomOne();
+
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteState();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "RouteId", route.RouteToProfessionalStatusId.ToString() },
+                { "ArchivedRouteId", archivedRoute.RouteToProfessionalStatusId.ToString() }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "RouteId", "Enter only one route type");
+    }
+
     [Fact]
     public async Task Post_SelectRoute_PersistsSelection()
     {

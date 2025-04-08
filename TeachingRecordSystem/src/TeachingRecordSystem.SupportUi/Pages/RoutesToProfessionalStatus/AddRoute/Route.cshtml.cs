@@ -61,7 +61,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
         await JourneyInstance!.UpdateStateAsync(
             state =>
             {
-                state.RouteToProfessionalStatusId = RouteId!.Value;
+                state.RouteToProfessionalStatusId = RouteId.HasValue ? RouteId.Value : ArchivedRouteId!.Value;
             });
         return Redirect(FromCheckAnswers
             ? linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId)
@@ -71,7 +71,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: true);
-        ArchivedRoutes = await referenceDataCache.GetRoutesToProfessionalStatusInactiveOnlyAsync();
+        ArchivedRoutes = await referenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync();
         PreselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
