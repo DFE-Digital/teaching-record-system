@@ -42,7 +42,6 @@ public class CheckYourAnswersModel(
                 .Join((await referenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
                 .OrderByDescending(name => name)
                 .ToArray() : null;
-        RouteDetail.FromCheckAnswers = true;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -135,6 +134,7 @@ public class CheckYourAnswersModel(
             DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
             HasImplicitExemption = hasImplicitExemption,
             IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
+            FromCheckAnswers = true,
             JourneyInstance = JourneyInstance
         };
 

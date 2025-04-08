@@ -123,7 +123,6 @@ public class AwardDateModel(
         }
     }
 
-
     private async Task<string> NextCompletingRoutePageAsync()
     {
         return !(await LastCompletingRoutePageAsync()) ?

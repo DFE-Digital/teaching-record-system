@@ -136,18 +136,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task Details_BackLink_QualificationPage()
     {
-        //var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-        //    .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
-        //    .First();
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionReasonId.HasValue)
-            .Join(
-                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
-                r => r.InductionExemptionReasonId,
-                e => e.InductionExemptionReasonId,
-                (r, e) => r
-            )
-            .RandomOne();
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .First();
+
         var status = ProfessionalStatusStatus.Approved;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);
@@ -818,5 +810,217 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+    }
+
+    [Fact]
+    public async Task EditStatus_Awarded_Continue_Exemption_Continue()
+    {
+        var awardDate = new DateOnly(2021, 1, 1);
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.InductionExemptionReasonId.HasValue)
+            .Join(
+                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
+                r => r.InductionExemptionReasonId,
+                e => e.InductionExemptionReasonId,
+                (r, e) => r
+            )
+            .RandomOne();
+
+        var status = ProfessionalStatusStatus.InTraining;
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var person = await TestData.CreatePersonAsync(
+            personBuilder => personBuilder
+            .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)
+            ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
+
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickRadioAsync("Awarded");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(awardDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
+        await page.SetCheckedAsync($"label:text-is('Yes')", true);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+    }
+
+    [Fact]
+    public async Task EditStatusRouteWithImplicitExemption_Awarded_Continue_Cya_EditStatus_Continue_Cya()
+    {
+        var awardDate = new DateOnly(2021, 1, 1);
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.InductionExemptionReasonId.HasValue)
+            .Join(
+                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == true),
+                r => r.InductionExemptionReasonId,
+                e => e.InductionExemptionReasonId,
+                (r, e) => r
+            )
+            .RandomOne();
+
+        var status = ProfessionalStatusStatus.InTraining;
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var person = await TestData.CreatePersonAsync(
+            personBuilder => personBuilder
+            .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)
+            ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
+
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickRadioAsync("Awarded");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(awardDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
+        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+        await page.AssertContentEquals(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Award date");
+        await page.AssertContentEquals("Yes", "Has exemption");
+
+        await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickRadioAsync("Deferred");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
+        await page.AssertContentEquals("Deferred", "Status");
+    }
+
+    [Theory]
+    [InlineData("Deferred")]
+    [InlineData("Awarded")]
+    public async Task EditStatus_StatusAlreadyAwarded_Continue_Details(string status)
+    {
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(
+            personBuilder => personBuilder
+            .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+            ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
+
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickRadioAsync(status);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+    }
+
+    [Fact]
+    public async Task EditStatus_Awarded_Continue_Exemption_Back()
+    {
+        var awardDate = new DateOnly(2021, 1, 1);
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.InductionExemptionReasonId.HasValue)
+            .Join(
+                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
+                r => r.InductionExemptionReasonId,
+                e => e.InductionExemptionReasonId,
+                (r, e) => r
+            )
+            .RandomOne();
+
+        var status = ProfessionalStatusStatus.InTraining;
+        var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var person = await TestData.CreatePersonAsync(
+            personBuilder => personBuilder
+            .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)
+            ));
+        var personId = person.PersonId;
+        var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
+
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickRadioAsync("Awarded");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.FillDateInputAsync(awardDate);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }
 }
