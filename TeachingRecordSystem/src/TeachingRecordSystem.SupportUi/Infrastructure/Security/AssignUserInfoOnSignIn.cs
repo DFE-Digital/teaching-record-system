@@ -52,18 +52,9 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
 
             await SyncUserInfoAsync();
 
-            var claims = user.Roles.Select(r => new Claim(ClaimTypes.Role, r))
-                .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
-                .Append(new Claim(ClaimTypes.Name, user.Name));
-
-            if (user.DqtUserId is Guid dqtUserId)
-            {
-                claims = claims.Append(new Claim(CustomClaims.DqtUserId, dqtUserId.ToString()));
-            }
-
             var identityWithRoles = new ClaimsIdentity(
                 ctx.Principal!.Identity,
-                claims,
+                user.CreateClaims(),
                 authenticationType: ctx.Principal.Identity!.AuthenticationType,
                 nameType: ClaimTypes.Name,
                 roleType: ClaimTypes.Role);

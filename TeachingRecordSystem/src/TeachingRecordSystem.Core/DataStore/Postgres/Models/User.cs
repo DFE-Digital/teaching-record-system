@@ -17,9 +17,14 @@ public abstract class UserBase
 
 public class User : UserBase
 {
+    public const int RoleMaxLength = 50;
+
     public required string? Email { get; set; }
     public string? AzureAdUserId { get; set; }
-    public required string[] Roles { get; set; }
+    // Column containing Legacy user roles, delete when existing users have been migrated to new user roles.
+    public string[] Roles { get; set; } = [];
+    // Make required when existing users have been migrated to new user roles.
+    public string? Role { get; set; }
     public Guid? DqtUserId { get; set; }
 }
 
