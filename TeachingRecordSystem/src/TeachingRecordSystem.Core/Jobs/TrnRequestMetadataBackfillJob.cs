@@ -492,9 +492,9 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 city = COALESCE(EXCLUDED.city, trn_request_metadata.city),
                 country = COALESCE(EXCLUDED.country, trn_request_metadata.country),
                 national_insurance_number = COALESCE(EXCLUDED.national_insurance_number, trn_request_metadata.national_insurance_number),
-                trn_token = COALESCE(EXCLUDED.trn_token, trn_request_metadata.trn_token);
-                first_name = COALESCE(EXCLUDED.first_name, trn_request_metadata.first_name);
-                middle_name = COALESCE(EXCLUDED.middle_name, trn_request_metadata.middle_name);
+                trn_token = COALESCE(EXCLUDED.trn_token, trn_request_metadata.trn_token),
+                first_name = COALESCE(EXCLUDED.first_name, trn_request_metadata.first_name),
+                middle_name = COALESCE(EXCLUDED.middle_name, trn_request_metadata.middle_name),
                 last_name = COALESCE(EXCLUDED.last_name, trn_request_metadata.last_name);
         ", conn, transaction))
         {
