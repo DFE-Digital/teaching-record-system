@@ -1,0 +1,31 @@
+@page "/route/add/start-date/{handler?}"
+
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StartDateModel
+@{
+    ViewBag.Title = Html.DisplayNameFor(m => m.TrainingStartDate);
+}
+
+@section BeforeContent {
+    <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteEditStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+
+            <govuk-date-input asp-for="TrainingStartDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddStartDateCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
+
