@@ -305,7 +305,10 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 city text,
                 country text,
                 national_insurance_number text,
-                trn_token text
+                trn_token text,
+                first_name text,
+                middle_name text,
+                last_name text
             ) ON COMMIT DROP;
         ", conn, transaction))
         {
@@ -446,7 +449,10 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 city,
                 country,
                 national_insurance_number,
-                trn_token
+                trn_token,
+                first_name,
+                middle_name,
+                last_name
             )
             SELECT 
                 application_user_id,
@@ -465,7 +471,10 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 city,
                 country,
                 national_insurance_number,
-                trn_token
+                trn_token,
+                first_name,
+                middle_name,
+                last_name
             FROM temp_import_trn_request_metadata
             ON CONFLICT (application_user_id, request_id)
             DO UPDATE SET 
@@ -484,6 +493,9 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 country = COALESCE(EXCLUDED.country, trn_request_metadata.country),
                 national_insurance_number = COALESCE(EXCLUDED.national_insurance_number, trn_request_metadata.national_insurance_number),
                 trn_token = COALESCE(EXCLUDED.trn_token, trn_request_metadata.trn_token);
+                first_name = COALESCE(EXCLUDED.first_name, trn_request_metadata.first_name);
+                middle_name = COALESCE(EXCLUDED.middle_name, trn_request_metadata.middle_name);
+                last_name = COALESCE(EXCLUDED.last_name, trn_request_metadata.last_name);
         ", conn, transaction))
         {
             await command.ExecuteNonQueryAsync();
@@ -518,7 +530,10 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 city,
                 country,
                 national_insurance_number,
-                trn_token
+                trn_token,
+                first_name,
+                middle_name,
+                last_name
             ) FROM STDIN (FORMAT BINARY)");
 
         foreach (var record in records)
@@ -541,6 +556,9 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             await writer.WriteAsync(record.Country, NpgsqlTypes.NpgsqlDbType.Text);
             await writer.WriteAsync(record.NationalInsuranceNumber, NpgsqlTypes.NpgsqlDbType.Text);  // national_insurance_number
             await writer.WriteAsync(record.TrnToken, NpgsqlTypes.NpgsqlDbType.Text);
+            await writer.WriteAsync(record.FirstName, NpgsqlTypes.NpgsqlDbType.Text);
+            await writer.WriteAsync(record.MiddleName, NpgsqlTypes.NpgsqlDbType.Text);
+            await writer.WriteAsync(record.LastName, NpgsqlTypes.NpgsqlDbType.Text);
         }
 
         await writer.CompleteAsync();
