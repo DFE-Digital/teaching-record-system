@@ -15,6 +15,7 @@ public record TpsEmployment
     public required string? PersonPostcode { get; init; }
     public required string? PersonEmailAddress { get; init; }
     public required string? EmployerPostcode { get; init; }
+    public required string? EmployerEmailAddress { get; init; }
     public required string Key { get; init; }
 
     public static TpsEmployment FromModel(DataStore.Postgres.Models.TpsEmployment model) => new()
@@ -32,6 +33,7 @@ public record TpsEmployment
         PersonPostcode = model.PersonPostcode,
         PersonEmailAddress = model.PersonEmailAddress,
         EmployerPostcode = model.EmployerPostcode,
+        EmployerEmailAddress = model.EmployerEmailAddress,
         Key = model.Key
     };
 }

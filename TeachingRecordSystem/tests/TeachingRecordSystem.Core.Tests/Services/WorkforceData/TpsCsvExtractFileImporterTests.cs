@@ -35,6 +35,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
         var invalidFormatGender = "None";
         var invalidFormatEmailAddress = "test.com";
         var validFormatEmailAddress = "test@myemail.com";
+        var whitespace = " ";
 
         return new()
         {
@@ -604,7 +605,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                     LocalAuthorityCode = validFormatLocalAuthorityCode,
                     EstablishmentCode = validFormatEstablishmentNumber,
                     EstablishmentPostcode = null,
-                    EstablishmentEmailAddress = null,
+                    EstablishmentEmailAddress = validFormatEmailAddress,
                     EmploymentStartDate = validFormatEmploymentStartDate,
                     EmploymentEndDate = validFormatEmploymentEndDate,
                     FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
@@ -614,7 +615,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                 },
                 ExpectedResult = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat,
             },
-            // Invalid Email Address
+            // Invalid Member Email Address
             new ()
             {
                 Row = new()
@@ -638,6 +639,78 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
                 },
                 ExpectedResult = TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat,
             },
+            // Whitespace in Member Email Address
+            new ()
+            {
+                Row = new()
+                {
+                    Trn = validFormatTrn,
+                    NationalInsuranceNumber = validFormatNationalInsuranceNumber,
+                    DateOfBirth = validFormatDateOfBirth,
+                    DateOfDeath = validFormatDateOfDeath,
+                    MemberPostcode = null,
+                    MemberEmailAddress = whitespace,
+                    LocalAuthorityCode = validFormatLocalAuthorityCode,
+                    EstablishmentCode = validFormatEstablishmentNumber,
+                    EstablishmentPostcode = null,
+                    EstablishmentEmailAddress = validFormatEmailAddress,
+                    EmploymentStartDate = validFormatEmploymentStartDate,
+                    EmploymentEndDate = validFormatEmploymentEndDate,
+                    FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
+                    WithdrawlIndicator = validWithdrawlIndicator,
+                    ExtractDate = validFormatExtractDate,
+                    Gender = validFormatGender
+                },
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+            },
+            // Invalid Establishment Email Address
+            new ()
+            {
+                Row = new()
+                {
+                    Trn = validFormatTrn,
+                    NationalInsuranceNumber = validFormatNationalInsuranceNumber,
+                    DateOfBirth = validFormatDateOfBirth,
+                    DateOfDeath = validFormatDateOfDeath,
+                    MemberPostcode = null,
+                    MemberEmailAddress = validFormatEmailAddress,
+                    LocalAuthorityCode = validFormatLocalAuthorityCode,
+                    EstablishmentCode = validFormatEstablishmentNumber,
+                    EstablishmentPostcode = null,
+                    EstablishmentEmailAddress = invalidFormatEmailAddress,
+                    EmploymentStartDate = validFormatEmploymentStartDate,
+                    EmploymentEndDate = validFormatEmploymentEndDate,
+                    FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
+                    WithdrawlIndicator = validWithdrawlIndicator,
+                    ExtractDate = validFormatExtractDate,
+                    Gender = validFormatGender
+                },
+                ExpectedResult = TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat,
+            },
+            // Whitespace in Establishment Email Address
+            new ()
+            {
+                Row = new()
+                {
+                    Trn = validFormatTrn,
+                    NationalInsuranceNumber = validFormatNationalInsuranceNumber,
+                    DateOfBirth = validFormatDateOfBirth,
+                    DateOfDeath = validFormatDateOfDeath,
+                    MemberPostcode = null,
+                    MemberEmailAddress = validFormatEmailAddress,
+                    LocalAuthorityCode = validFormatLocalAuthorityCode,
+                    EstablishmentCode = validFormatEstablishmentNumber,
+                    EstablishmentPostcode = null,
+                    EstablishmentEmailAddress = whitespace,
+                    EmploymentStartDate = validFormatEmploymentStartDate,
+                    EmploymentEndDate = validFormatEmploymentEndDate,
+                    FullOrPartTimeIndicator = validFullOrPartTimeIndicator,
+                    WithdrawlIndicator = validWithdrawlIndicator,
+                    ExtractDate = validFormatExtractDate,
+                    Gender = validFormatGender
+                },
+                ExpectedResult = TpsCsvExtractItemLoadErrors.None,
+            }
         };
     }
 
@@ -707,7 +780,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             LocalAuthorityCode = "123",
             EstablishmentNumber = "1234",
             EstablishmentPostcode = null,
-            EstablishmentEmailAddress = null,
+            EstablishmentEmailAddress = Faker.Internet.Email(),
             MemberId = null,
             EmploymentStartDate = "03/02/2023",
             EmploymentEndDate = "03/05/2024",
@@ -738,7 +811,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
             FullOrPartTimeIndicator = "PTI",
             WithdrawalIndicator = null,
             ExtractDate = "07/03/2024",
-            Gender = "Male",
+            Gender = "Not a gender",
             Created = clock.UtcNow,
             Errors = TpsCsvExtractItemLoadErrors.GenderIncorrectFormat
         };

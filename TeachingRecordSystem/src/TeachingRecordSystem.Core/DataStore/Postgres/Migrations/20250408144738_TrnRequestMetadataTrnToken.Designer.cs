@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408144738_TrnRequestMetadataTrnToken")]
+    partial class TrnRequestMetadataTrnToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -16748,10 +16751,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("email_address");
 
-                    b.Property<string>("FirstName")
-                        .HasColumnType("text")
-                        .HasColumnName("first_name");
-
                     b.Property<int?>("Gender")
                         .HasColumnType("integer")
                         .HasColumnName("gender");
@@ -16759,14 +16758,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<bool?>("IdentityVerified")
                         .HasColumnType("boolean")
                         .HasColumnName("identity_verified");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("text")
-                        .HasColumnName("last_name");
-
-                    b.Property<string>("MiddleName")
-                        .HasColumnType("text")
-                        .HasColumnName("middle_name");
 
                     b.Property<string[]>("Name")
                         .IsRequired()

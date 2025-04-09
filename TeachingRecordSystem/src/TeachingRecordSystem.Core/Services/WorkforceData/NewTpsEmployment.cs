@@ -16,6 +16,7 @@ public record NewTpsEmployment
     public required string? PersonPostcode { get; init; }
     public required string? PersonEmailAddress { get; init; }
     public required string? EmployerPostcode { get; init; }
+    public required string? EmployerEmailAddress { get; init; }
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; init; }
 }

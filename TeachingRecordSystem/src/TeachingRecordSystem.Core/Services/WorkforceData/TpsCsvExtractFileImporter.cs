@@ -141,9 +141,18 @@ public class TpsCsvExtractFileImporter(
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.GenderIncorrectFormat;
             }
 
-            if (row.MemberEmailAddress is not null && !EmailAddress.TryParse(row.MemberEmailAddress, out _))
+            var memberEmailAddress = row.MemberEmailAddress?.Trim();
+            memberEmailAddress = memberEmailAddress?.Length > 0 ? memberEmailAddress : null;
+            if (memberEmailAddress is not null && !EmailAddress.TryParse(memberEmailAddress, out _))
             {
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.MemberEmailAddressIncorrectFormat;
+            }
+
+            var establishmentEmailAddress = row.EstablishmentEmailAddress?.Trim();
+            establishmentEmailAddress = establishmentEmailAddress?.Length > 0 ? establishmentEmailAddress : null;
+            if (establishmentEmailAddress is not null && !EmailAddress.TryParse(establishmentEmailAddress, out _))
+            {
+                loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.EstablishmentEmailAddressIncorrectFormat;
             }
 
             writer.StartRow();
@@ -154,11 +163,11 @@ public class TpsCsvExtractFileImporter(
             writer.Write(row.DateOfBirth, NpgsqlDbType.Varchar);
             writer.Write(row.DateOfDeath, NpgsqlDbType.Varchar);
             writer.Write(row.MemberPostcode, NpgsqlDbType.Varchar);
-            writer.Write(row.MemberEmailAddress, NpgsqlDbType.Varchar);
+            writer.Write(memberEmailAddress, NpgsqlDbType.Varchar);
             writer.Write(row.LocalAuthorityCode, NpgsqlDbType.Varchar);
             writer.Write(row.EstablishmentCode, NpgsqlDbType.Varchar);
             writer.Write(row.EstablishmentPostcode, NpgsqlDbType.Varchar);
-            writer.Write(row.EstablishmentEmailAddress, NpgsqlDbType.Varchar);
+            writer.Write(establishmentEmailAddress, NpgsqlDbType.Varchar);
             writer.Write(row.EmploymentStartDate, NpgsqlDbType.Varchar);
             writer.Write(row.EmploymentEndDate, NpgsqlDbType.Varchar);
             writer.Write(row.FullOrPartTimeIndicator, NpgsqlDbType.Varchar);
@@ -236,7 +245,12 @@ public class TpsCsvExtractFileImporter(
             writer.Write(item.LocalAuthorityCode, NpgsqlDbType.Char);
             writer.Write(item.EstablishmentNumber, NpgsqlDbType.Char);
             writer.Write(item.EstablishmentPostcode, NpgsqlDbType.Varchar);
-            writer.Write(item.EstablishmentEmailAddress, NpgsqlDbType.Varchar);
+            string? establishmentEmailAddress = null;
+            if (item.EstablishmentEmailAddress != null)
+            {
+                establishmentEmailAddress = EmailAddress.Parse(item.EstablishmentEmailAddress).ToString();
+            }
+            writer.Write(establishmentEmailAddress, NpgsqlDbType.Varchar);
             writer.Write(employmentStartDate, NpgsqlDbType.Date);
             writer.Write(!string.IsNullOrEmpty(item.EmploymentEndDate) ? DateOnly.ParseExact(item.EmploymentEndDate!, "dd/MM/yyyy") : (DateOnly?)null, NpgsqlDbType.Date);
             writer.Write((int)EmploymentTypeHelper.FromFullOrPartTimeIndicator(item.FullOrPartTimeIndicator!), NpgsqlDbType.Integer);
