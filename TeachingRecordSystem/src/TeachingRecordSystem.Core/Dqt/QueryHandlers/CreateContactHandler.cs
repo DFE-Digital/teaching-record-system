@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
@@ -13,6 +14,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
         var contactId = Guid.NewGuid();
 
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
+        var serializer = new MessageSerializer();
 
         Debug.Assert(query.Trn is null || query.PotentialDuplicates.Count == 0);
 
@@ -50,7 +52,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         foreach (var outboxMessage in query.OutboxMessages)
         {
-            requestBuilder.AddRequest(new CreateRequest() { Target = outboxMessage });
+            requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(outboxMessage) });
         }
 
         await requestBuilder.ExecuteAsync();
