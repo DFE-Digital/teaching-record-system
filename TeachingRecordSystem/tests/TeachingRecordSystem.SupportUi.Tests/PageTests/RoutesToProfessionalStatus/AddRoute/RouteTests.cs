@@ -6,10 +6,10 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithPreviouslyStoredRoute_ShowsSelectedRoute() // CML TODO test for an active route and an inactive - will have to set the correct box
+    public async Task Get_WithPreviouslyStoredRoute_ShowsSelectedRoute()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .RandomOne()
@@ -33,6 +33,36 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Equal(route.RouteToProfessionalStatusId.ToString(), ((IHtmlSelectElement)doc.GetElementById("RouteId")!).Value);
+    }
+
+    [Fact(Skip = "Waiting for archived routes")]
+    public async Task Get_WithPreviouslyStoredArchivedRoute_ShowsSelectedRoute()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync())
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync();
+
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(route.RouteToProfessionalStatusId.ToString(), ((IHtmlSelectElement)doc.GetElementById("ArchivedRouteId")!).Value);
     }
 
     [Fact]
@@ -154,6 +184,38 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Cancel_DeletesJourneyStateAndRedirectsToQualifications()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .RandomOne();
+
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteState();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/route?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>

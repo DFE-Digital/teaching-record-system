@@ -53,7 +53,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var route in Model.Routes)
                 {
-                    <govuk-select-item value="@route.RouteToProfessionalStatusId" selected="@Model.PreselectedRouteId==route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
+                    <govuk-select-item value="@route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
                 }
             </govuk-select>
             <govuk-details open="false">
@@ -64,7 +64,7 @@
                         <govuk-select-item value=""></govuk-select-item>
                         @foreach (var route in Model.ArchivedRoutes)
                         {
-                            <govuk-select-item value="@route.RouteToProfessionalStatusId" selected="@Model.PreselectedRouteId==route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
+                            <govuk-select-item value="@route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
                         }
                         </govuk-select>
                     </govuk-details-text>
@@ -72,7 +72,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
-                <a href="@LinkGenerator.RouteAddRouteCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-link">Cancel and return to record</a>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddRouteCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

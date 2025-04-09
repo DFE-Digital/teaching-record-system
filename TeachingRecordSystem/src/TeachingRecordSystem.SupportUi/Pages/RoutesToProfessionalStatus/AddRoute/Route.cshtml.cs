@@ -32,13 +32,11 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
     [Display(Name = "Inactive route type")]
     public Guid? ArchivedRouteId { get; set; }
 
-    public Guid? PreselectedRouteId { get; set; }
-
     public void OnGet()
     {
     }
 
-    public async Task<IActionResult> OnGetCancelAsync()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
         return Redirect(linkGenerator.PersonQualifications(PersonId));
@@ -72,7 +70,15 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
     {
         Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: true);
         ArchivedRoutes = await referenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync();
-        PreselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+        var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+        if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))
+        {
+            RouteId = preselectedRouteId;
+        }
+        else
+        {
+            ArchivedRouteId = preselectedRouteId;
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
