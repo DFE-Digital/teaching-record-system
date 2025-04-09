@@ -252,7 +252,10 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                     AddressLine3 = addressline3,
                                     City = city,
                                     Country = country,
-                                    TrnToken = contact.Value.Item3
+                                    TrnToken = contact.Value.Item3,
+                                    FirstName = firstName,
+                                    MiddleName = middleName,
+                                    LastName = lastName
                                 });
 
                             }
