@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Api.Tests.V3.V20250203;
@@ -56,10 +55,8 @@ public class CreateTrnRequestTests : TestBase
             crmQuery.OutboxMessages,
             outboxMessage =>
             {
-                Assert.Equal(nameof(TrnRequestMetadataMessage), outboxMessage.dfeta_MessageName);
+                var message = Assert.IsType<TrnRequestMetadataMessage>(outboxMessage);
 
-                var messageSerializer = HostFixture.Services.GetRequiredService<MessageSerializer>();
-                var message = Assert.IsType<TrnRequestMetadataMessage>(messageSerializer.DeserializeMessage(outboxMessage.dfeta_Payload, outboxMessage.dfeta_MessageName));
                 Assert.Equal(ApplicationUserId, message.ApplicationUserId);
                 Assert.Equal(requestId, message.RequestId);
                 Assert.Equal(Clock.UtcNow, message.CreatedOn);

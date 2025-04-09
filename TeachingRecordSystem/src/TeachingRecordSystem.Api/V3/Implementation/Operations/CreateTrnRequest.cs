@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGenerationApi;
@@ -34,7 +33,6 @@ public class CreateTrnRequestHandler(
 #pragma warning disable CS9113 // Parameter is unread.
     INameSynonymProvider nameSynonymProvider,
 #pragma warning restore CS9113 // Parameter is unread.
-    MessageSerializer messageSerializer,
     IClock clock,
     IConfiguration configuration)
 {
@@ -57,6 +55,7 @@ public class CreateTrnRequestHandler(
         var firstNameSynonyms = Array.Empty<string>();  // Disabled temporarily
 
         var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
+        var emailAddress = command.EmailAddresses.FirstOrDefault();
 
         // Check workforce data for NINO matches
         var workforceDataMatches = normalizedNino is not null ?
@@ -78,12 +77,43 @@ public class CreateTrnRequestHandler(
                 MatchedOnNationalInsuranceNumberContactIds = workforceDataMatches
             })).ToList();
 
+        TrnRequestMetadataMessage CreateMetadataOutboxMessage(bool potentialDuplicate) =>
+            new TrnRequestMetadataMessage
+            {
+                ApplicationUserId = currentApplicationUserId,
+                RequestId = command.RequestId,
+                CreatedOn = clock.UtcNow,
+                IdentityVerified = command.IdentityVerified,
+                OneLoginUserSubject = command.OneLoginUserSubject,
+                Name = GetNonEmptyValues(
+                    command.FirstName,
+                    command.MiddleName,
+                    command.LastName),
+                FirstName = command.FirstName,
+                MiddleName = command.MiddleName,
+                LastName = command.LastName,
+                DateOfBirth = command.DateOfBirth,
+                PotentialDuplicate = potentialDuplicate,
+                EmailAddress = emailAddress,
+                NationalInsuranceNumber = command.NationalInsuranceNumber,
+                Gender = (int?)command.Gender,
+                AddressLine1 = null,
+                AddressLine2 = null,
+                AddressLine3 = null,
+                City = null,
+                Postcode = null,
+                Country = null,
+                TrnToken = null
+            };
+
         // If any record has matched on NINO & DOB treat that as a definite match and return the existing record's details
         var matchedOnNinoAndDob = potentialDuplicates
             .FirstOrDefault(d => d.MatchedAttributes.Contains(Contact.Fields.dfeta_NINumber) && d.MatchedAttributes.Contains(Contact.Fields.BirthDate));
         if (matchedOnNinoAndDob is not null)
         {
             // FUTURE: consider whether we should be updating any missing attributes here
+
+            await crmQueryDispatcher.ExecuteQueryAsync(new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false)));
 
             var hasStatedNames = !string.IsNullOrEmpty(matchedOnNinoAndDob.StatedFirstName) &&
                 !string.IsNullOrEmpty(matchedOnNinoAndDob.StatedLastName);
@@ -119,36 +149,9 @@ public class CreateTrnRequestHandler(
             .Distinct()
             .ToArrayAsync();
 
-        var emailAddress = command.EmailAddresses.FirstOrDefault();
-
-        var outboxMessages = new List<dfeta_TrsOutboxMessage>
-        {
-            messageSerializer.CreateCrmOutboxMessage(new TrnRequestMetadataMessage
-            {
-                ApplicationUserId = currentApplicationUserId,
-                RequestId = command.RequestId,
-                CreatedOn = clock.UtcNow,
-                IdentityVerified = command.IdentityVerified,
-                OneLoginUserSubject = command.OneLoginUserSubject,
-                Name = GetNonEmptyValues(command.FirstName,
-                    command.MiddleName,
-                    command.LastName),
-                DateOfBirth = command.DateOfBirth,
-                PotentialDuplicate = null,
-                EmailAddress = emailAddress,
-                NationalInsuranceNumber = command.NationalInsuranceNumber,
-                Gender = (int?)command.Gender,
-                AddressLine1 = null,
-                AddressLine2 = null,
-                AddressLine3 = null,
-                City = null,
-                Postcode = null,
-                Country = null,
-                TrnToken = null
-            })
-        };
-
         var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
+
+        var metadataMessage = CreateMetadataOutboxMessage(potentialDuplicate);
 
         await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
@@ -166,7 +169,7 @@ public class CreateTrnRequestHandler(
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
-            OutboxMessages = outboxMessages,
+            OutboxMessages = [metadataMessage],
             AllowPiiUpdates = allowContactPiiUpdatesFromUserIds.Contains(currentApplicationUserId.ToString())
         });
 
