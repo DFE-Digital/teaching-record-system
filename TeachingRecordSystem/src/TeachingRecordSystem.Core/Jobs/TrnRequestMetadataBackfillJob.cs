@@ -27,8 +27,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
         using var writeDbContext = await dbContextFactory.CreateDbContextAsync();
         var serviceClient = crmServiceClientProvider.GetClient(TrsDataSyncService.CrmClientName);
 
-        //teacherid, (applicationuserid, trnrequestid)
-        var teacherIds = new Dictionary<Guid, (string, string)>();
+        //teacherid, (applicationuserid, trnrequestid, trntoken)
+        var teacherIds = new Dictionary<Guid, (string, string, string?)>();
 
         //fetch trn requests from trs
         var trnRequests = writeDbContext.TrnRequests.ToArray();
@@ -36,14 +36,14 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             .GroupBy(x => x.TeacherId)
             .ToDictionary(
                 g => g.Key,
-                g => (g.First().ClientId, g.First().RequestId)
+                g => (g.First().ClientId, g.First().RequestId, g.First().TrnToken)
             );
 
         foreach (var kvp in teacherDictionary)
         {
             if (!teacherIds.ContainsKey(kvp.Key))
             {
-                teacherIds.Add(kvp.Key, (kvp.Value.ClientId, kvp.Value.RequestId));
+                teacherIds.Add(kvp.Key, (kvp.Value.ClientId, kvp.Value.RequestId, kvp.Value.TrnToken));
             }
         }
 
@@ -52,7 +52,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             ColumnSet = new ColumnSet(
                 Contact.Fields.CreatedOn,
                 Contact.Fields.CreatedBy,
-                Contact.Fields.dfeta_TrnRequestID
+                Contact.Fields.dfeta_TrnRequestID,
+                Contact.Fields.dfeta_TrnToken
             ),
             PageInfo = new()
             {
@@ -72,6 +73,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             {
                 var createdByUserId = record.GetAttributeValue<EntityReference>(Contact.Fields.CreatedBy).Id;
                 var trnRequestId = record.GetAttributeValue<string>(Contact.Fields.dfeta_TrnRequestID);
+                var trnToken = record.GetAttributeValue<string?>(Contact.Fields.dfeta_TrnToken);
 
                 var parts = trnRequestId.Split("::");
                 if (parts.Length != 2)
@@ -79,7 +81,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
 
                 var userid = parts[0];
                 var requestid = parts[1];
-                teacherIds.Add(record.Id, (userid, requestid));
+                teacherIds.Add(record.Id, (userid, requestid, trnToken));
             }
             contactsQuery.PageInfo.PageNumber++;
             contactsQuery.PageInfo.PagingCookie = result.PagingCookie;
@@ -250,6 +252,7 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                                     AddressLine3 = addressline3,
                                     City = city,
                                     Country = country,
+                                    TrnToken = contact.Value.Item3
                                 });
 
                             }
@@ -298,7 +301,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 address_line3 text,
                 city text,
                 country text,
-                national_insurance_number text
+                national_insurance_number text,
+                trn_token text
             ) ON COMMIT DROP;
         ", conn, transaction))
         {
@@ -438,7 +442,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 address_line3,
                 city,
                 country,
-                national_insurance_number
+                national_insurance_number,
+                trn_token
             )
             SELECT 
                 application_user_id,
@@ -456,7 +461,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 address_line3,
                 city,
                 country,
-                national_insurance_number
+                national_insurance_number,
+                trn_token
             FROM temp_import_trn_request_metadata
             ON CONFLICT (application_user_id, request_id)
             DO UPDATE SET 
@@ -473,7 +479,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 address_line3 = COALESCE(EXCLUDED.address_line3, trn_request_metadata.address_line3),
                 city = COALESCE(EXCLUDED.city, trn_request_metadata.city),
                 country = COALESCE(EXCLUDED.country, trn_request_metadata.country),
-                national_insurance_number = COALESCE(EXCLUDED.national_insurance_number, trn_request_metadata.national_insurance_number);
+                national_insurance_number = COALESCE(EXCLUDED.national_insurance_number, trn_request_metadata.national_insurance_number),
+                trn_token = COALESCE(EXCLUDED.trn_token, trn_request_metadata.trn_token);
         ", conn, transaction))
         {
             await command.ExecuteNonQueryAsync();
@@ -507,7 +514,8 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
                 address_line3,
                 city,
                 country,
-                national_insurance_number
+                national_insurance_number,
+                trn_token
             ) FROM STDIN (FORMAT BINARY)");
 
         foreach (var record in records)
@@ -529,17 +537,9 @@ public class TrnRequestMetadataBackfillJob(IDbContextFactory<TrsDbContext> dbCon
             await writer.WriteAsync(record.City, NpgsqlTypes.NpgsqlDbType.Text);
             await writer.WriteAsync(record.Country, NpgsqlTypes.NpgsqlDbType.Text);
             await writer.WriteAsync(record.NationalInsuranceNumber, NpgsqlTypes.NpgsqlDbType.Text);  // national_insurance_number
+            await writer.WriteAsync(record.TrnToken, NpgsqlTypes.NpgsqlDbType.Text);
         }
 
         await writer.CompleteAsync();
-    }
-
-    public class TrnRequestBackfillItem
-    {
-        public Guid ContactId { get; set; }
-        public string? addressLine1 { get; set; }
-        public string? AddressLine2 { get; set; }
-        public string? AddressLine3 { get; set; }
-        public string? city { get; set; }
     }
 }
