@@ -627,6 +627,9 @@ public partial class TestData
                         OneLoginUserSubject = trnRequest.OneLoginUserSubject,
                         EmailAddress = _email,
                         Name = [firstName, lastName],
+                        FirstName = firstName,
+                        MiddleName = "",
+                        LastName = lastName,
                         DateOfBirth = dateOfBirth
                     });
                 }
