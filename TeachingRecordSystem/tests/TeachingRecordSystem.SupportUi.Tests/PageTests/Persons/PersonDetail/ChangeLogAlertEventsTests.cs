@@ -16,7 +16,7 @@ public class ChangeLogAlertEventsTests : TestBase
             new DateTime(2024, 7, 5, 19, 20, 21, DateTimeKind.Utc)   // BST
         };
         Clock.UtcNow = nows.RandomOne();
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Theory]
@@ -54,16 +54,19 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertCreatedEventGeneratedInTrs_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role is not null ? [role!] : []));
+        SetCurrentUser(TestUsers.GetUser(role));
 
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync();
@@ -120,11 +123,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertCreatedEventGeneratedInDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
@@ -190,11 +196,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDeletedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
@@ -262,11 +271,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDqtDeactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
@@ -328,11 +340,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDqtImportedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
@@ -394,11 +409,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertDqtReactivatedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
@@ -460,11 +478,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertMigratedEvent_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {
@@ -829,11 +850,14 @@ public class ChangeLogAlertEventsTests : TestBase
 
     [Theory]
     [InlineData(false, null, true)]
-    [InlineData(false, UserRoles.AlertsReadWrite, true)]
+    [InlineData(false, UserRoles.SupportOfficer, true)]
+    [InlineData(false, UserRoles.AlertsManagerTra, true)]
+    [InlineData(false, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(false, UserRoles.Administrator, true)]
     [InlineData(true, null, false)]
-    [InlineData(true, UserRoles.AlertsReadWrite, false)]
-    [InlineData(true, UserRoles.DbsAlertsReadWrite, true)]
-    [InlineData(true, UserRoles.DbsAlertsReadOnly, true)]
+    [InlineData(true, UserRoles.SupportOfficer, false)]
+    [InlineData(true, UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(true, UserRoles.AlertsManagerTra, true)]
     [InlineData(true, UserRoles.Administrator, true)]
     public async Task Person_WithAlertUpdatedEventFromDqt_DisplaysAsExpectedForUserRole(bool isDbsAlertType, string? role, bool shouldDisplay)
     {

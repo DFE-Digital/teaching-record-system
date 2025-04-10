@@ -54,13 +54,14 @@ public partial class TestData
             DateOnly? dateOfBirth = null,
             string? memberPostcode = null,
             string? withdrawalIndicator = null,
-            string? memberEmailAddress = null)
+            string? memberEmailAddress = null,
+            string? employerEmailAddress = null)
         {
             nationalInsuranceNumber ??= Faker.Identification.UkNationalInsuranceNumber();
             dateOfBirth ??= DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
             fullOrPartTimeIndicator ??= validFullOrPartTimeIndicatorValues[Faker.RandomNumber.Next(0, 2)];
 
-            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate, memberPostcode, withdrawalIndicator, memberEmailAddress));
+            _items.Add(new TpsCsvExtractItem(trn, nationalInsuranceNumber, dateOfBirth.Value, localAuthorityCode, establishmentPostcode, establishmentNumber, startDate, endDate, fullOrPartTimeIndicator, extractDate, memberPostcode, withdrawalIndicator, memberEmailAddress, employerEmailAddress));
             return this;
         }
 
@@ -101,7 +102,7 @@ public partial class TestData
                         LocalAuthorityCode = item.LocalAuthorityCode,
                         EstablishmentNumber = item.EstablishmentNumber,
                         EstablishmentPostcode = item.EstablishmentPostcode,
-                        EstablishmentEmailAddress = null,
+                        EstablishmentEmailAddress = item.EmployerEmailAddress,
                         MemberId = memberId++.ToString(),
                         EmploymentStartDate = item.StartDate.ToString("dd/MM/yyyy"),
                         EmploymentEndDate = item.EndDate.ToString("dd/MM/yyyy"),
@@ -150,5 +151,5 @@ public partial class TestData
         }
     }
 
-    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate, string? MemberPostcode, string? WithdrawalIndicator, string? MemberEmailAddress);
+    public record TpsCsvExtractItem(string Trn, string NationalInsuranceNumber, DateOnly DateOfBirth, string LocalAuthorityCode, string EstablishmentPostcode, string? EstablishmentNumber, DateOnly StartDate, DateOnly EndDate, string FullOrPartTimeIndicator, DateOnly ExtractDate, string? MemberPostcode, string? WithdrawalIndicator, string? MemberEmailAddress, string? EmployerEmailAddress);
 }

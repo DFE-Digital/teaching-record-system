@@ -5489,6 +5489,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
+                    b.Property<string>("EmployerEmailAddress")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("employer_email_address");
+
                     b.Property<string>("EmployerPostcode")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
@@ -16743,6 +16748,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("email_address");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
                     b.Property<int?>("Gender")
                         .HasColumnType("integer")
                         .HasColumnName("gender");
@@ -16750,6 +16759,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<bool?>("IdentityVerified")
                         .HasColumnType("boolean")
                         .HasColumnName("identity_verified");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("text")
+                        .HasColumnName("middle_name");
 
                     b.Property<string[]>("Name")
                         .IsRequired()
@@ -16772,6 +16789,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<bool?>("PotentialDuplicate")
                         .HasColumnType("boolean")
                         .HasColumnName("potential_duplicate");
+
+                    b.Property<string>("TrnToken")
+                        .HasColumnType("text")
+                        .HasColumnName("trn_token");
 
                     b.HasKey("ApplicationUserId", "RequestId")
                         .HasName("pk_trn_request_metadata");
@@ -17181,6 +17202,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("email")
                         .UseCollation("case_insensitive");
+
+                    b.Property<string>("Role")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("role");
 
                     b.Property<string[]>("Roles")
                         .IsRequired()

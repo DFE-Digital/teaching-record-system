@@ -424,7 +424,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         };
 
         var rolesWithoutWritePermission = UserRoles.All
-            .Except([UserRoles.InductionReadWrite, UserRoles.Administrator])
+            .Except([UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])
             .Append(null)
             .ToArray();
 

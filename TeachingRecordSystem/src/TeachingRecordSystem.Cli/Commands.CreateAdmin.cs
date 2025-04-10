@@ -43,7 +43,7 @@ public static partial class Commands
                     Active = true,
                     Email = email,
                     Name = name,
-                    Roles = [UserRoles.Administrator],
+                    Role = UserRoles.Administrator,
                     UserId = Guid.NewGuid()
                 });
 

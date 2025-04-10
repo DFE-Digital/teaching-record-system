@@ -8,7 +8,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
@@ -55,7 +55,7 @@ public class AddApiKeyTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_UserDoesNotHavePermission_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var applicationUser = await TestData.CreateApplicationUserAsync();
 

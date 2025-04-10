@@ -3,9 +3,9 @@ The TRS is a database of people who work in Education in the UK. It is the prima
 
 
 ## Teaching Reference Number
-The TRN is a unique 7  digit reference given to identify a person who's data is in the Teaching Record System (formerly Database Of Qualified Teachers). TRN's are given to trainee teachers, qualified teachers (QTS and many other teaching related qualifications), anyone eligible for a teaching pension and other related services.
+The TRN is a unique 7-digit reference given to identify a person whose data is in the Teaching Record System (formerly Database Of Qualified Teachers). TRNs are given to trainee teachers, qualified teachers (QTS and many other teaching related qualifications), and anyone eligible for a teaching pension and other related services.
 
-It is a character string of len(7). E.G:
+It is a character string of len(7) e.g.:
 ```shell
 '1234567', '0001234'
 ```
@@ -94,6 +94,8 @@ Playwright is used for end-to-end testing. Install it with a `just` recipe:
 just install-playwright
 ```
 
+**Note:** the solution must be built first as the recipe requires the existence of `bin/Debug/net8.0/playwright.ps1` which is generated when the `Microsoft.Playwright` package is built.
+
 ### Database setup
 
 Install Postgres then set a connection string configuration entry in user secrets for running the apps and another for running the tests.
@@ -101,7 +103,10 @@ Note you should use a different database for tests as the test database will be 
 
 e.g.
 ```shell
+# local settings
 just set-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs"
+
+# test settings
 just set-tests-secret ConnectionStrings:DefaultConnection "Host=localhost;Username=postgres;Password=your_postgres_password;Database=trs_tests"
 ```
 
@@ -112,6 +117,39 @@ just cli migrate-db
 ```
 
 The trs_tests database will be created automatically when running the tests.
+
+#### Database migrations
+
+If you need to change the Postgres database tables, the best way to do this is to update the Model files, in `TeachingRecordSystem.Core\DataStore\Postgres\Models\`, and update the appropriate Entity Framework mapping file in `TeachingRecordSystem.Core\DataStore\Postgres\Mappings\`.
+
+Once the model/mapping files have been changed, a migration file will need to be created - this can be done automatically by running:
+```shell
+just ef migrations add <a migration name>
+```
+where the migration name is conventionally a title-case short description of the change, e.g. `AddUserRoleColumn`.
+
+If you are seeing the error `DbContext has pending changes not covered by a migration` when running the tests or the web application locally, it usually means a change has been made to the model without an appropriate migration file. Running the recipe above to add the migration should fix this.
+
+#### Migrating the local database
+In order for the local `trs` database to pick up the change, the migrate recipe will need to be run:
+
+```shell
+just cli migrate-db
+```
+
+The trs_tests database for the tests should be migrated automatically when running the tests. 
+
+#### Regenerating the test cache
+
+The trs_tests database for the tests should be migrated automatically, however sometimes it gets stuck and the tests may fail with the message:
+```
+Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving the entity changes. See the inner exception for details.
+---- Npgsql.PostgresException : <some Postgres error, e.g. missing table or column>
+```
+If this happens, regenerating the test cache usually fixes this, there's a `just` recipe:
+```shell
+just remove-tests-schema-cache
+```
 
 #### DQT Reporting database setup
 
@@ -159,14 +197,75 @@ Ask a developer on the team for the user secrets for these dependencies.
 
 The `build` CRM environment is used for local development and automated tests.
 
+The secrets you will need to set are as follows:
+```shell
+# local settings
+just set-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+just set-secret CrmClientId "<REDACTED>"
+just set-secret CrmClientSecret "<REDACTED>"
+just set-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
+
+# test settings
+just set-tests-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+just set-tests-secret CrmClientId "<REDACTED>"
+just set-tests-secret CrmClientSecret "<REDACTED>"
+just set-tests-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
+```
+
 #### TRN Generation API
 
 The API calls the TRN Generation API to generate a TRNs.
+
+The secrets you will need to set are as follows:
+```shell
+# local settings
+just set-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
+just set-secret TrnGenerationApi:ApiKey "<REDACTED>"
+
+# test settings
+just set-tests-secret TrnGenerationApi:BaseAddress "https://dev.trn-generation-api.education.gov.uk/"
+just set-tests-secret TrnGenerationApi:ApiKey "<REDACTED>"
+```
 
 #### Azure AD
 
 Azure AD is used for authenticating users in the Support UI.
 
+The secrets you will need to set are as follows:
+
+```shell
+just set-secret AzureAd:ClientSecret "<REDACTED>"
+just set-secret AzureAd:ClientId "<REDACTED>"
+```
+
+#### Other settings
+
+There are additional secrets you will need to set are as follows:
+
+```shell
+# local settings
+just set-secret AccessYourTeachingQualifications:BaseAddress "https://dev.access-your-teaching-qualifications.education.gov.uk/"
+just set-secret AccessYourTeachingQualifications:StartUrlPath "/qualifications/start"
+
+just set-secret GetAnIdentity:WebHookClientSecret "dummy"
+just set-secret GetAnIdentity:TokenEndpoint "https://dev.teaching-identity.education.gov.uk/connect/token"
+just set-secret GetAnIdentity:ClientSecret "<REDACTED>"
+just set-secret GetAnIdentity:ClientId "dqt-api"
+just set-secret GetAnIdentity:BaseAddress "https://dev.teaching-identity.education.gov.uk/"
+
+just set-secret Webhooks:CanonicalDomain "https://localhost:5001"
+just set-secret Webhooks:SigningKeyId "devkey"
+just set-secret Webhooks:Keys:0:KeyId "devkey"
+just set-secret Webhooks:Keys:0:CertificatePem "<REDACTED>"
+just set-secret Webhooks:Keys:0:PrivateKeyPem "<REDACTED>"
+
+just set-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
+just set-secret BuildEnvLockBlobSasToken "<REDACTED>"
+
+# test settings
+just set-tests-secret BuildEnvLockBlobUri "https://s165d01inttests.blob.core.windows.net/leases/build.lock"
+just set-tests-secret BuildEnvLockBlobSasToken "<REDACTED>"
+```
 
 ## CRM code generation
 
@@ -178,6 +277,7 @@ Run `just generate-crm-models` to run the code generator against the `build` env
 The CRM user secrets described within [Developer setup](#dynamics-crm) must be correctly set for the tool to run successfully.
 The tool is a .NET Framework application and requires .NET 4.6.
 
+**Note:** Make sure Visual Studio is closed before running this recipe as otherwise it may fail due to these files being already in use by the Visual Studio process.
 
 ## Environment configuration
 
@@ -198,3 +298,8 @@ To format the entire codebase run
 ```shell
 just format
 ```
+
+### Visual Studio Code Cleanup
+If you're using Visual Studio 2022 you can also set up Code Cleanup, this will use the settings defined in the `.editorconfig` file in the repository root (this is also added to the Solution Items folder in the solution). 
+
+To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `Configure Code Cleanup`. This will present you with a window with two profiles to configure, the easiest thing to do is to select `Profile 1 (default)`, and select all the "Available fixers" (bottom panel), and add them to the "Included fixers" (top panel). Now you can use the "paintbrush" icon in the text editor status bar (to the left of the horizontal scrollbar) to format the document you're working on (keyboard shortcut: Ctrl+K, Ctrl+E) - or you can go to `Tools > Options > Text Editor > Code Cleanup` and check `Run Code Cleanup profile on Save`.

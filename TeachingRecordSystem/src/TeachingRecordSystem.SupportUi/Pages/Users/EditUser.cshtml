@@ -1,5 +1,6 @@
 @page "/users/{userId}/{handler?}"
 @using TeachingRecordSystem.Core
+@using TeachingRecordSystem.Core.Legacy
 @model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 @{
     ViewBag.Title = $"Edit {Model.Name}";
@@ -34,9 +35,9 @@
             <govuk-checkboxes asp-for="Roles">
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
-                    @foreach (var role in UserRoles.All)
+                    @foreach (var role in LegacyUserRoles.All)
                     {
-                        <govuk-checkboxes-item value="@role" disabled="@(!Model.IsActiveUser)">@UserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
+                        <govuk-checkboxes-item value="@role" disabled="@(!Model.IsActiveUser)">@LegacyUserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
                     }
                 </govuk-checkboxes-fieldset>
             </govuk-checkboxes>

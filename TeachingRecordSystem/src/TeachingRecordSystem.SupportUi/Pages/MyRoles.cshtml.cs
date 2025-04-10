@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages;
@@ -70,9 +71,9 @@ public class MyRolesModel(TrsDbContext dbContext) : PageModel
         _dbRoles = (await dbContext.Users.SingleAsync(u => u.UserId == User.GetUserId())).Roles;
 
         // Only make Administrator available to actual admins
-        AvailableRoles = (_dbRoles.Contains(UserRoles.Administrator) ?
-            UserRoles.All :
-            UserRoles.All.Except([UserRoles.Administrator])).ToArray();
+        AvailableRoles = (_dbRoles.Contains(LegacyUserRoles.Administrator) ?
+            LegacyUserRoles.All :
+            LegacyUserRoles.All.Except([LegacyUserRoles.Administrator])).ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

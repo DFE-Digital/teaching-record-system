@@ -9,7 +9,7 @@ public class ReasonTests : LinkTestBase
 
     public ReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Theory]

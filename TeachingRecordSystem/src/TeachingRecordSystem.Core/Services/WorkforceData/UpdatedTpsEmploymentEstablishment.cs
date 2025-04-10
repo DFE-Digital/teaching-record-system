@@ -15,6 +15,7 @@ public record UpdatedTpsEmploymentEstablishment
     public required string? PersonPostcode { get; set; }
     public required string? PersonEmailAddress { get; set; }
     public required string? EmployerPostcode { get; set; }
+    public required string? EmployerEmailAddress { get; set; }
     public required string Key { get; init; }
     public required Guid NewEstablishmentId { get; init; }
 }

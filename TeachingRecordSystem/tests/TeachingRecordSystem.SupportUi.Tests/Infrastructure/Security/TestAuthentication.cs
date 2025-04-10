@@ -28,13 +28,8 @@ public class TestAuthenticationHandler : AuthenticationHandler<TestAuthenticatio
 
         if (currentUser is not null)
         {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, currentUser.UserId.ToString()),
-                new Claim(CustomClaims.UserId, currentUser.UserId.ToString()),
-                new Claim("name", currentUser.Name)
-            }
-            .Concat(currentUser.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
+            var claims = currentUser.CreateClaims()
+                .Append(new Claim(ClaimTypes.NameIdentifier, currentUser.UserId.ToString()));
 
             var principal = new ClaimsPrincipal(
                 new ClaimsIdentity(claims, authenticationType: "Test", nameType: ClaimTypes.NameIdentifier, roleType: ClaimTypes.Role));

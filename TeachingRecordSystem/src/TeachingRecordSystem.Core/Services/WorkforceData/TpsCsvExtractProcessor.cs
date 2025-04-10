@@ -139,7 +139,8 @@ public class TpsCsvExtractProcessor(
                     x.national_insurance_number,
                     x.member_postcode as person_postcode,
                     x.member_email_address as person_email_address,
-                    x.establishment_postcode as employer_postcode
+                    x.establishment_postcode as employer_postcode,
+                    x.establishment_email_address as employer_email_address
                 FROM
                         tps_csv_extract_items x
                     JOIN
@@ -190,7 +191,8 @@ public class TpsCsvExtractProcessor(
                     u.national_insurance_number,
                     u.person_postcode,
                     u.person_email_address,
-                    u.employer_postcode
+                    u.employer_postcode,
+                    u.employer_email_address
             )
             INSERT INTO tps_employments
                 (
@@ -208,6 +210,7 @@ public class TpsCsvExtractProcessor(
                     person_postcode,
                     person_email_address,
                     employer_postcode,
+                    employer_email_address,
                     created_on,
                     updated_on
                 )
@@ -232,6 +235,7 @@ public class TpsCsvExtractProcessor(
                 person_postcode,
                 person_email_address,
                 employer_postcode,
+                employer_email_address,
                 created_on,
                 updated_on
             """;
@@ -264,7 +268,8 @@ public class TpsCsvExtractProcessor(
                     NationalInsuranceNumber = item.NationalInsuranceNumber,
                     PersonPostcode = item.PersonPostcode,
                     PersonEmailAddress = item.PersonEmailAddress,
-                    EmployerPostcode = item.EmployerPostcode
+                    EmployerPostcode = item.EmployerPostcode,
+                    EmployerEmailAddress = item.EmployerEmailAddress
                 };
 
                 var createdEvent = new TpsEmploymentCreatedEvent
@@ -308,6 +313,7 @@ public class TpsCsvExtractProcessor(
                     te.person_postcode as current_person_postcode,
                     te.person_email_address as current_person_email_address,
                     te.employer_postcode as current_employer_postcode,
+                    te.employer_email_address as current_employer_email_address,
                     x.employment_type as new_employment_type,
                     CASE WHEN x.withdrawal_indicator = 'W' OR AGE(x.extract_date, least(x.employment_end_date, x.extract_date)) > INTERVAL '5 months' THEN x.employment_end_date ELSE NULL END as new_end_date,
                     least(x.employment_end_date, x.extract_date) as new_last_known_tps_employed_date,
@@ -317,6 +323,7 @@ public class TpsCsvExtractProcessor(
                     x.member_postcode as new_person_postcode,
                     x.member_email_address as new_person_email_address,
                     x.establishment_postcode as new_employer_postcode,
+                    x.establishment_email_address as new_employer_email_address,
                     x.key,
                     CASE WHEN te.employment_type != x.employment_type OR te.last_known_tps_employed_date != least(x.employment_end_date, x.extract_date) OR te.last_extract_date != x.extract_date THEN 2 ELSE 0 END as result
                 FROM
@@ -347,6 +354,7 @@ public class TpsCsvExtractProcessor(
                     u.current_person_postcode,
                     u.current_person_email_address,
                     u.current_employer_postcode,
+                    u.current_employer_email_address,
                     u.new_end_date,
                     u.new_last_known_tps_employed_date,
                     u.new_employment_type,
@@ -355,7 +363,8 @@ public class TpsCsvExtractProcessor(
                     u.new_national_insurance_number,
                     u.new_person_postcode,
                     u.new_person_email_address,
-                    u.new_employer_postcode
+                    u.new_employer_postcode,
+                    u.new_employer_email_address
             )
             UPDATE
                 tps_employments te
@@ -369,6 +378,7 @@ public class TpsCsvExtractProcessor(
                 person_postcode = changes.new_person_postcode,
                 person_email_address = changes.new_person_email_address,
                 employer_postcode = changes.new_employer_postcode,
+                employer_email_address = changes.new_employer_email_address,
                 updated_on = {clock.UtcNow}
             FROM
                 changes
@@ -388,6 +398,7 @@ public class TpsCsvExtractProcessor(
                 changes.current_person_postcode,
                 changes.current_person_email_address,
                 changes.current_employer_postcode,
+                changes.current_employer_email_address,
                 changes.new_end_date,
                 changes.new_last_known_tps_employed_date,
                 changes.new_employment_type,
@@ -397,6 +408,7 @@ public class TpsCsvExtractProcessor(
                 changes.new_person_postcode,
                 changes.new_person_email_address,
                 changes.new_employer_postcode,
+                changes.new_employer_email_address,
                 te.key
             """;
 
@@ -420,14 +432,15 @@ public class TpsCsvExtractProcessor(
                     (item.CurrentNationalInsuranceNumber != item.NewNationalInsuranceNumber ? TpsEmploymentUpdatedEventChanges.NationalInsuranceNumber : TpsEmploymentUpdatedEventChanges.None) |
                     (item.CurrentPersonPostcode != item.NewPersonPostcode ? TpsEmploymentUpdatedEventChanges.PersonPostcode : TpsEmploymentUpdatedEventChanges.None) |
                     (item.CurrentPersonEmailAddress != item.NewPersonEmailAddress ? TpsEmploymentUpdatedEventChanges.PersonEmailAddress : TpsEmploymentUpdatedEventChanges.None) |
-                    (item.CurrentEmployerPostcode != item.NewEmployerPostcode ? TpsEmploymentUpdatedEventChanges.EmployerPostcode : TpsEmploymentUpdatedEventChanges.None);
+                    (item.CurrentEmployerPostcode != item.NewEmployerPostcode ? TpsEmploymentUpdatedEventChanges.EmployerPostcode : TpsEmploymentUpdatedEventChanges.None) |
+                    (item.CurrentEmployerEmailAddress != item.NewEmployerEmailAddress ? TpsEmploymentUpdatedEventChanges.EmployerEmailAddress : TpsEmploymentUpdatedEventChanges.None);
 
                 if (changes != TpsEmploymentUpdatedEventChanges.None)
                 {
                     var updatedEvent = new TpsEmploymentUpdatedEvent
                     {
                         EventId = Guid.NewGuid(),
-                        PersonId = item.TpsEmploymentId,
+                        PersonId = item.PersonId,
                         TpsEmployment = new()
                         {
                             PersonEmploymentId = item.TpsEmploymentId,
@@ -443,6 +456,7 @@ public class TpsCsvExtractProcessor(
                             PersonPostcode = item.NewPersonPostcode,
                             PersonEmailAddress = item.NewPersonEmailAddress,
                             EmployerPostcode = item.NewEmployerPostcode,
+                            EmployerEmailAddress = item.NewEmployerEmailAddress,
                             Key = item.Key
                         },
                         OldTpsEmployment = new()
@@ -460,6 +474,7 @@ public class TpsCsvExtractProcessor(
                             PersonPostcode = item.CurrentPersonPostcode,
                             PersonEmailAddress = item.CurrentPersonEmailAddress,
                             EmployerPostcode = item.CurrentEmployerPostcode,
+                            EmployerEmailAddress = item.CurrentEmployerEmailAddress,
                             Key = item.Key
                         },
                         Changes = changes,
@@ -570,6 +585,7 @@ public class TpsCsvExtractProcessor(
                 te.person_postcode,
                 te.person_email_address,
                 te.employer_postcode,
+                te.employer_email_address,
                 te.key,
                 changes.new_establishment_id            
             """;
@@ -587,7 +603,7 @@ public class TpsCsvExtractProcessor(
                 var updatedEvent = new TpsEmploymentUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    PersonId = item.TpsEmploymentId,
+                    PersonId = item.PersonId,
                     TpsEmployment = new()
                     {
                         PersonEmploymentId = item.TpsEmploymentId,
@@ -603,6 +619,7 @@ public class TpsCsvExtractProcessor(
                         PersonPostcode = item.PersonPostcode,
                         PersonEmailAddress = item.PersonEmailAddress,
                         EmployerPostcode = item.EmployerPostcode,
+                        EmployerEmailAddress = item.EmployerEmailAddress,
                         Key = item.Key
                     },
                     OldTpsEmployment = new()
@@ -620,6 +637,7 @@ public class TpsCsvExtractProcessor(
                         PersonPostcode = item.PersonPostcode,
                         PersonEmailAddress = item.PersonEmailAddress,
                         EmployerPostcode = item.EmployerPostcode,
+                        EmployerEmailAddress = item.EmployerEmailAddress,
                         Key = item.Key
                     },
                     Changes = TpsEmploymentUpdatedEventChanges.EstablishmentId,
@@ -681,6 +699,7 @@ public class TpsCsvExtractProcessor(
                 te.person_postcode,
                 te.person_email_address,
                 te.employer_postcode,
+                te.employer_email_address,
                 te.key,
                 changes.new_end_date
             """;
@@ -699,7 +718,7 @@ public class TpsCsvExtractProcessor(
                 var updatedEvent = new TpsEmploymentUpdatedEvent
                 {
                     EventId = Guid.NewGuid(),
-                    PersonId = item.TpsEmploymentId,
+                    PersonId = item.PersonId,
                     TpsEmployment = new()
                     {
                         PersonEmploymentId = item.TpsEmploymentId,
@@ -715,6 +734,7 @@ public class TpsCsvExtractProcessor(
                         PersonPostcode = item.PersonPostcode,
                         PersonEmailAddress = item.PersonEmailAddress,
                         EmployerPostcode = item.EmployerPostcode,
+                        EmployerEmailAddress = item.EmployerEmailAddress,
                         Key = item.Key
                     },
                     OldTpsEmployment = new()
@@ -732,6 +752,7 @@ public class TpsCsvExtractProcessor(
                         PersonPostcode = item.PersonPostcode,
                         PersonEmailAddress = item.PersonEmailAddress,
                         EmployerPostcode = item.EmployerPostcode,
+                        EmployerEmailAddress = item.EmployerEmailAddress,
                         Key = item.Key
                     },
                     Changes = TpsEmploymentUpdatedEventChanges.EndDate,
@@ -743,6 +764,128 @@ public class TpsCsvExtractProcessor(
             }
 
             await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken, 120);
+            await transaction.CommitAsync(cancellationToken);
+            events.Clear();
+        }
+        while (hasRecordsToUpdate);
+    }
+
+    public async Task BackfillEmployerEmailAddressInEmploymentHistoryAsync(CancellationToken cancellationToken)
+    {
+        using var dbContext = dbContextFactory.CreateDbContext();
+        var connection = (NpgsqlConnection)dbContext.Database.GetDbConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        FormattableString querySql =
+            $"""
+            WITH changes AS (
+                SELECT
+                    te.tps_employment_id,
+                    te.employer_email_address as current_employer_email_address,
+                    x.establishment_email_address as new_employer_email_address
+                FROM
+                        tps_csv_extract_items x
+                    JOIN
+                        tps_employments te ON te.key = x.key
+                                              AND te.last_extract_date = x.extract_date
+                WHERE
+                    te.employer_email_address IS NULL
+                    AND x.establishment_email_address IS NOT NULL
+                LIMIT 1000)
+                UPDATE
+                    tps_employments te
+                SET
+                    employer_email_address = changes.new_employer_email_address,
+                    updated_on = {clock.UtcNow}
+                FROM
+                    changes
+                WHERE
+                    changes.tps_employment_id = te.tps_employment_id
+                RETURNING
+                    te.tps_employment_id,
+                    te.person_id,
+                    te.establishment_id,
+                    te.start_date,
+                    te.end_date,
+                    te.employment_type,
+                    te.withdrawal_confirmed,
+                    te.last_known_tps_employed_date,
+                    te.last_extract_date,
+                    te.national_insurance_number,
+                    te.person_postcode,
+                    te.person_email_address,
+                    te.employer_postcode,
+                    changes.current_employer_email_address,
+                    changes.new_employer_email_address,
+                    te.key
+            """;
+
+        bool hasRecordsToUpdate = false;
+        var events = new List<EventBase>();
+
+        do
+        {
+            hasRecordsToUpdate = false;
+            using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+            dbContext.Database.UseTransaction(transaction);
+            await foreach (var item in dbContext.Database.SqlQuery<UpdatedTpsEmploymentEmployerEmailAddress>(querySql).AsAsyncEnumerable())
+            {
+                hasRecordsToUpdate = true;
+                var changes = TpsEmploymentUpdatedEventChanges.None |
+                    (item.CurrentEmployerEmailAddress != item.NewEmployerEmailAddress ? TpsEmploymentUpdatedEventChanges.EmployerEmailAddress : TpsEmploymentUpdatedEventChanges.None);
+
+                if (changes != TpsEmploymentUpdatedEventChanges.None)
+                {
+                    var updatedEvent = new TpsEmploymentUpdatedEvent
+                    {
+                        EventId = Guid.NewGuid(),
+                        PersonId = item.PersonId,
+                        TpsEmployment = new()
+                        {
+                            PersonEmploymentId = item.TpsEmploymentId,
+                            PersonId = item.PersonId,
+                            EstablishmentId = item.EstablishmentId,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
+                            EmploymentType = item.EmploymentType,
+                            WithdrawalConfirmed = item.WithdrawalConfirmed,
+                            LastExtractDate = item.LastExtractDate,
+                            NationalInsuranceNumber = item.NationalInsuranceNumber,
+                            PersonPostcode = item.PersonPostcode,
+                            PersonEmailAddress = item.PersonEmailAddress,
+                            EmployerPostcode = item.EmployerPostcode,
+                            EmployerEmailAddress = item.CurrentEmployerEmailAddress,
+                            Key = item.Key
+                        },
+                        OldTpsEmployment = new()
+                        {
+                            PersonEmploymentId = item.TpsEmploymentId,
+                            PersonId = item.PersonId,
+                            EstablishmentId = item.EstablishmentId,
+                            StartDate = item.StartDate,
+                            EndDate = item.EndDate,
+                            LastKnownTpsEmployedDate = item.LastKnownTpsEmployedDate,
+                            EmploymentType = item.EmploymentType,
+                            WithdrawalConfirmed = item.WithdrawalConfirmed,
+                            LastExtractDate = item.LastExtractDate,
+                            NationalInsuranceNumber = item.NationalInsuranceNumber,
+                            PersonPostcode = item.PersonPostcode,
+                            PersonEmailAddress = item.PersonEmailAddress,
+                            EmployerPostcode = item.EmployerPostcode,
+                            EmployerEmailAddress = item.NewEmployerEmailAddress,
+                            Key = item.Key
+                        },
+                        Changes = changes,
+                        CreatedUtc = clock.UtcNow,
+                        RaisedBy = DataStore.Postgres.Models.SystemUser.SystemUserId
+                    };
+
+                    events.Add(updatedEvent);
+                }
+            }
+
+            await transaction.SaveEventsAsync(events, TempEventsTableSuffix, clock, cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             events.Clear();
         }
