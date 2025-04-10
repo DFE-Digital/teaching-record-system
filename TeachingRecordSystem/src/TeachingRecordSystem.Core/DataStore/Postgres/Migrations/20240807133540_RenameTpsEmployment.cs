@@ -90,7 +90,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             migrationBuilder.Procedure("p_refresh_tps_employments_person_search_attributes_v1.sql");
             migrationBuilder.Procedure("fn_delete_tps_employments_person_search_attributes_v1.sql");
             migrationBuilder.Procedure("fn_insert_tps_employments_person_search_attributes_v1.sql");
-            migrationBuilder.Procedure("fn_update_tps_employments_person_search_attributes_v1.sql");            
+            migrationBuilder.Procedure("fn_update_tps_employments_person_search_attributes_v1.sql");
             migrationBuilder.Trigger("trg_delete_tps_employments_person_search_attributes_v1.sql");
             migrationBuilder.Trigger("trg_insert_tps_employments_person_search_attributes_v1.sql");
             migrationBuilder.Trigger("trg_update_tps_employments_person_search_attributes_v1.sql");
