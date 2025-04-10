@@ -91,7 +91,7 @@ jobs:
         project:
           [
             TeachingRecordSystem.Core.Tests,
-            TeachingRecordSystem.Api.Tests,
+            TeachingRecordSystem.Api.IntegrationTests,
             TeachingRecordSystem.SupportUi.Tests,
             TeachingRecordSystem.AuthorizeAccess.Tests,
             TeachingRecordSystem.SupportUi.EndToEndTests,
