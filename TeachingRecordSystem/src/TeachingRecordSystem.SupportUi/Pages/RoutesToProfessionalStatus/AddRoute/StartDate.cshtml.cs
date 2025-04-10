@@ -1,23 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartDateModel(
-    TrsLinkGenerator linkGenerator) : PageModel
+public class StartDateModel : AddRouteCommonPageModel
 {
-    public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
-
-    [FromQuery]
-    public Guid PersonId { get; set; }
-
-    public string? PersonName { get; set; }
+    public StartDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
+    {
+    }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -25,9 +17,9 @@ public class StartDateModel(
     [Display(Name = "Enter the route start date")]
     public DateOnly? TrainingStartDate { get; set; }
 
-    public string BackLink => !FromCheckAnswers ?
-        linkGenerator.RouteAddStatus(PersonId, JourneyInstance!.InstanceId) :
-        linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId);
+    public string BackLink => FromCheckAnswers ?
+        _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId) :
+        PageAddress(PreviousPage(AddRoutePage.StartDate) ?? AddRoutePage.Status);
 
     public void OnGet()
     {
@@ -43,23 +35,21 @@ public class StartDateModel(
         await JourneyInstance!.UpdateStateAsync(state => state.TrainingStartDate = TrainingStartDate);
         if (TrainingStartDate.HasValue && JourneyInstance!.State.TrainingEndDate is DateOnly endDate && TrainingStartDate >= endDate)
         {
-            return Redirect(linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId, FromCheckAnswers));
+            return Redirect(_linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId, FromCheckAnswers));
         }
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId));
+            _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            _linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId));
     }
 
     public IActionResult OnPostCancel()
     {
-        return Redirect(linkGenerator.PersonQualifications(PersonId));
+        return Redirect(_linkGenerator.PersonQualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
+        base.OnPageHandlerExecuting(context);
     }
 }
 
