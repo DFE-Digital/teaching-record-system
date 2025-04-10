@@ -118,6 +118,39 @@ just cli migrate-db
 
 The trs_tests database will be created automatically when running the tests.
 
+#### Database migrations
+
+If you need to change the Postgres database tables, the best way to do this is to update the Model files, in `TeachingRecordSystem.Core\DataStore\Postgres\Models\`, and update the appropriate Entity Framework mapping file in `TeachingRecordSystem.Core\DataStore\Postgres\Mappings\`.
+
+Once the model/mapping files have been changed, a migration file will need to be created - this can be done automatically by running:
+```shell
+just ef migrations add <a migration name>
+```
+where the migration name is conventionally a title-case short description of the change, e.g. `AddUserRoleColumn`.
+
+If you are seeing the error `DbContext has pending changes not covered by a migration` when running the tests or the web application locally, it usually means a change has been made to the model without an appropriate migration file. Running the recipe above to add the migration should fix this.
+
+#### Migrating the local database
+In order for the local `trs` database to pick up the change, the migrate recipe will need to be run:
+
+```shell
+just cli migrate-db
+```
+
+The trs_tests database for the tests should be migrated automatically when running the tests. 
+
+#### Regenerating the test cache
+
+The trs_tests database for the tests should be migrated automatically, however sometimes it gets stuck and the tests may fail with the message:
+```
+Microsoft.EntityFrameworkCore.DbUpdateException : An error occurred while saving the entity changes. See the inner exception for details.
+---- Npgsql.PostgresException : <some Postgres error, e.g. missing table or column>
+```
+If this happens, regenerating the test cache usually fixes this, there's a `just` recipe:
+```shell
+just remove-tests-schema-cache
+```
+
 #### DQT Reporting database setup
 
 This solution contains a service that synchronises changes from CRM into a SQL Server database used for reporting (this replaces the now-deprecated Data Export Service).
@@ -265,3 +298,8 @@ To format the entire codebase run
 ```shell
 just format
 ```
+
+### Visual Studio Code Cleanup
+If you're using Visual Studio 2022 you can also set up Code Cleanup, this will use the settings defined in the `.editorconfig` file in the repository root (this is also added to the Solution Items folder in the solution). 
+
+To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `Configure Code Cleanup`. This will present you with a window with two profiles to configure, the easiest thing to do is to select `Profile 1 (default)`, and select all the "Available fixers" (bottom panel), and add them to the "Included fixers" (top panel). Now you can use the "paintbrush" icon in the text editor status bar (to the left of the horizontal scrollbar) to format the document you're working on (keyboard shortcut: Ctrl+K, Ctrl+E) - or you can go to `Tools > Options > Text Editor > Code Cleanup` and check `Run Code Cleanup profile on Save`.
