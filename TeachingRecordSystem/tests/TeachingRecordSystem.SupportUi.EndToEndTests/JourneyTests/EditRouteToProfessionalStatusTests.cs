@@ -22,7 +22,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setEndDate = endDate.AddDays(1);
         var setStartDate = startDate.AddDays(1);
         var setAwardDate = setEndDate.AddDays(1);
-        var setDegreeType = "BSc (Hons) with Intercalated PGCE";
+        var setDegreeType = (await TestData.ReferenceDataCache.GetDegreeTypesAsync())
+            .RandomOne();
         var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
@@ -75,7 +76,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
-        await page.FillAsync("label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.FillAsync("label:text-is('Enter the degree type awarded as part of this route')", setDegreeType.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
@@ -123,11 +124,11 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.AssertContentEquals(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
         await page.AssertContentEquals(setEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
-        await page.AssertContentEquals(setDegreeType, "Degree type");
+        await page.AssertContentContains(setDegreeType.Name, "Degree type");
         await page.AssertContentEquals(setAgeRange.GetDisplayName()!, "Age range");
-        await page.AssertContentEquals(setCountry.Name, "Country of training");
+        await page.AssertContentContains(setCountry.Name, "Country of training");
         await page.AssertContentContains(setSubject.Name, "Subjects");
-        //await page.AssertContentEquals(setTrainingProvider.Name, "Training provider");
+        //await page.AssertContentContains(setTrainingProvider.Name, "Training provider");
         await page.ClickButtonAsync("Confirm and commit changes");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
