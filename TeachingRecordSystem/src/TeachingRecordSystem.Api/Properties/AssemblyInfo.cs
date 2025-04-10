@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("TeachingRecordSystem.Api.Tests")]
+[assembly: InternalsVisibleTo("TeachingRecordSystem.Api.IntegrationTests")]
