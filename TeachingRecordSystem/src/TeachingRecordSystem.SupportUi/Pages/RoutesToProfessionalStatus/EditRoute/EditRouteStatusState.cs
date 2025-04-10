@@ -2,8 +2,6 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 public class EditRouteStatusState
 {
-    //public Guid RouteToProfessionalStatusId { get; set; }
-    //public ProfessionalStatusStatus CurrentStatus { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }

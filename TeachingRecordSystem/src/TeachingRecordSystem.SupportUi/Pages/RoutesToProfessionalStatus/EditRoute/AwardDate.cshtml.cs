@@ -49,11 +49,11 @@ public class AwardDateModel(
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 
-        if (JourneyInstance!.State.IsCompletingRoute)
+        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
         {
-            if (await IsLastCompletingRoutePageAsync())
+            if (await IsLastCompletingRoutePageAsync()) // if this is the last page of the data collection for the status
             {
-                await JourneyInstance!.UpdateStateAsync(s =>
+                await JourneyInstance!.UpdateStateAsync(s => // update the main journey state with the data
                 {
                     s.Status = s.EditStatusState!.Status;
                     s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
@@ -62,12 +62,12 @@ public class AwardDateModel(
                     s.EditStatusState = null;
                 });
             }
-            else
+            else // there're more pages to come - store the data in the temporary journey state
             {
                 await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.AwardedDate = AwardedDate);
             }
         }
-        else
+        else // user is editing the awarded date on an already-completed route
         {
             await JourneyInstance!.UpdateStateAsync(s => s.AwardedDate = AwardedDate);
         }

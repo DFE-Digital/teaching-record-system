@@ -42,12 +42,15 @@ public class StatusModel(
             return this.PageWithErrors();
         }
 
-        if (CompletingRoute)
+        if (CompletingRoute) // if user has set the status to awarded or approved from another status
         {
+            // if the route has an implicit exemption it needs to be set now
             var hasImplicitExemption =
                 Route.InductionExemptionReasonId.HasValue ?
                     (await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId.Value)).RouteImplicitExemption
                     : false;
+
+            // initialise a temporary part of journey state for the data collection for a completing route
             await JourneyInstance!.UpdateStateAsync(
                 s =>
                 {
@@ -59,16 +62,16 @@ public class StatusModel(
                     };
                 });
         }
-        else if (NotCompletedRoute)
+        else if (NotCompletedRoute) // the status has been changed to something other than awarded or approved
         {
             await JourneyInstance!.UpdateStateAsync(s =>
             {
-                s.AwardedDate = null;
+                s.AwardedDate = null; // clear any previous awarded date and exemption
                 s.IsExemptFromInduction = null;
                 s.Status = Status;
             });
         }
-        else // going from Approved to Awarded or vice versa
+        else // going from approved to awarded or vice versa
         {
             await JourneyInstance!.UpdateStateAsync(s => s.Status = Status);
         }

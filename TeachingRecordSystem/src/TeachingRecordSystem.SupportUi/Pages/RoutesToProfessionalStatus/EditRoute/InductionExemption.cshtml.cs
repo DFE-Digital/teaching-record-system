@@ -40,8 +40,9 @@ public class InductionExemptionModel(
             return this.PageWithErrors();
         }
 
-        if (JourneyInstance!.State.IsCompletingRoute)
+        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
         {
+            // this is definitely the final page of the data collection for an awarded or approved status
             await JourneyInstance!.UpdateStateAsync(s =>
             {
                 s.Status = s.EditStatusState!.Status;
@@ -51,7 +52,7 @@ public class InductionExemptionModel(
                 s.EditStatusState = null;
             });
         }
-        else
+        else // user is simply editing the induction exemption question
         {
             await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
         }

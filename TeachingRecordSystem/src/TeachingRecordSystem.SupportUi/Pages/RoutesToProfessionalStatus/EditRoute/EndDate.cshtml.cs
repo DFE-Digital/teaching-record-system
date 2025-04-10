@@ -44,11 +44,11 @@ public class EndDateModel(
             return this.PageWithErrors();
         }
 
-        if (JourneyInstance!.State.IsCompletingRoute)
+        if (JourneyInstance!.State.IsCompletingRoute) // if user is here as part of the data collection for awarded or approved state
         {
             await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.TrainingEndDate = TrainingEndDate);
         }
-        else
+        else // user is simply editing the end date
         {
             await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
         }
