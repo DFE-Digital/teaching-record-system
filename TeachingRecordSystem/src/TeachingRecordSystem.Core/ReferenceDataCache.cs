@@ -263,6 +263,12 @@ public class ReferenceDataCache(
         return trainingSubjects.Where(e => !activeOnly || e.IsActive).OrderBy(s => s.Name).ToArray();
     }
 
+    public async Task<TrainingSubject> GetTrainingSubjectsByIdAsync(Guid id)
+    {
+        var trainingSubjects = await EnsureTrainingSubjectsAsync();
+        return trainingSubjects.Single(e => e.TrainingSubjectId == id, $"Could not find subject with ID: '{id}'.");
+    }
+
     public async Task<Country[]> GetTrainingCountriesAsync()
     {
         return await EnsureTrainingCountriesAsync();
