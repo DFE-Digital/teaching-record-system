@@ -204,8 +204,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         SetCurrentUser(hasReadWriteAccess
-            ? TestUsers.GetUser(UserRoles.InductionReadWrite)
-            : TestUsers.GetUser(roles: []));
+            ? TestUsers.GetUser(UserRoles.SupportOfficer)
+            : TestUsers.GetUser(role: null));
 
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
@@ -250,7 +250,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPersonIdForPersonWithInductionStatusManagedByCpd_ShowsNoWarning(InductionStatus trsInductionStatus)
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.InductionReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.SupportOfficer));
 
         var lessThanSevenYearsAgo = Clock.Today.AddYears(-1);
 
@@ -343,7 +343,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserHasInductionReadWritePermission_ShowsActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.InductionReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.SupportOfficer));
 
         var person = await TestData.CreatePersonAsync(
             builder => builder
@@ -366,7 +366,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_UserDoesNotHaveInductionReadWritePermission_DoesNotShowActions()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var person = await TestData.CreatePersonAsync(
             builder => builder

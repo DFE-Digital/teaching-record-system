@@ -9,10 +9,10 @@ public class UsersTests : TestBase
     }
 
     [Fact]
-    public async Task Get_UserWithOutAdministratorRole_ReturnsForbidden()
+    public async Task Get_UserWithOutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 
@@ -25,10 +25,10 @@ public class UsersTests : TestBase
     }
 
     [Fact]
-    public async Task Get_UserWithAdministratorRole_ReturnsOk()
+    public async Task Get_UserWithAccessManagerRole_ReturnsOk()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(roles: new[] { UserRoles.Administrator });
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
@@ -45,7 +45,7 @@ public class UsersTests : TestBase
     public async Task Get_ValidRequestAndUsersFound_RendersUsers()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(roles: new[] { UserRoles.Administrator });
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
 
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
 

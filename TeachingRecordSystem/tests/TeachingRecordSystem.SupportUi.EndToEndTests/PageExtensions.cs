@@ -9,7 +9,7 @@ public static class PageExtensions
         {
             var asUri = new Uri(url);
             return asUri.LocalPath == path;
-        });
+        }, new PageWaitForURLOptions { WaitUntil = WaitUntilState.Commit });
 
     public static async Task GoToHomePageAsync(this IPage page)
     {

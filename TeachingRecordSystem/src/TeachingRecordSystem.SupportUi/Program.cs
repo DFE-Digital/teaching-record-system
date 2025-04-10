@@ -79,21 +79,9 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 }
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy(
-        AuthorizationPolicies.ChangeRequestManagement,
-        policy => policy
-            .RequireAuthenticatedUser()
-            .RequireRole(UserRoles.Helpdesk, UserRoles.Administrator))
-    .AddPolicy(
-        AuthorizationPolicies.UserManagement,
-        policy => policy
-            .RequireAuthenticatedUser()
-            .RequireRole(UserRoles.Administrator))
-    .AddPolicy(
-        AuthorizationPolicies.Hangfire,
-        policy => policy
-            .RequireAuthenticatedUser()
-            .RequireRole(UserRoles.Administrator))
+    .AddAdminAreaPolicies()
+    .AddChangeRequestManagementPolicies()
+    .AddUserManagementPolicies()
     .AddAlertPolicies()
     .AddInductionPolicies();
 
@@ -104,10 +92,9 @@ builder.Services
         var policy = new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser()
             .Build();
+
         options.Filters.Add(new AuthorizeFilter(policy));
-
         options.Filters.Add(new CheckUserExistsFilter());
-
         options.Filters.Add(new NoCachePageFilter());
 
         options.ModelBinderProviders.Insert(2, new DateOnlyModelBinderProvider());

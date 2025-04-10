@@ -2,12 +2,48 @@ using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Legacy;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
     public async Task<User> CreateUserAsync(
+        bool? active = null,
+        string? name = null,
+        string? email = null,
+        string? role = null,
+        Guid? azureAdUserId = null)
+    {
+        var user = await WithDbContextAsync(async dbContext =>
+        {
+            active ??= true;
+            name ??= GenerateName();
+            email ??= GenerateUniqueEmail();
+            role ??= UserRoles.SupportOfficer;
+
+            var user = new User()
+            {
+                Active = active.Value,
+                Name = name,
+                Email = email,
+                Role = role,
+                UserId = Guid.NewGuid(),
+                AzureAdUserId = azureAdUserId?.ToString(),
+            };
+
+            dbContext.Users.Add(user);
+
+            await dbContext.SaveChangesAsync();
+
+            return user;
+        });
+
+        return user;
+    }
+
+
+    public async Task<User> CreateUserWithLegacyRolesAsync(
         bool? active = null,
         string? name = null,
         string? email = null,
@@ -19,7 +55,7 @@ public partial class TestData
             active ??= true;
             name ??= GenerateName();
             email ??= GenerateUniqueEmail();
-            roles ??= [UserRoles.Helpdesk];
+            roles ??= [LegacyUserRoles.Helpdesk];
 
             var user = new User()
             {
