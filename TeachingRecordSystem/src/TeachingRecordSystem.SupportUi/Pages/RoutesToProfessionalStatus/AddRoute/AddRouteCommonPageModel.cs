@@ -40,65 +40,12 @@ public class AddRouteCommonPageModel : PageModel
     // and also need hasImplicitexemption - from InductionExemptionReason
     public AddRoutePage? NextPage(AddRoutePage currentPage)
     {
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
-            .Where(p => p > currentPage)
-            .OrderBy(p => p);
-
-        foreach (var page in pagesInOrder)
-        {
-            FieldRequirement pageRequired = page switch
-            {
-                AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-                AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.AwardDateRequired, Status.GetAwardDateRequirement()),
-                AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
-                AddRoutePage.Route => throw new NotImplementedException(),
-                AddRoutePage.Status => throw new NotImplementedException(),
-                AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route.TrainingStartDateRequired, Status.GetStartDateRequirement()),
-                AddRoutePage.TrainingProvider => throw new NotImplementedException(),
-                AddRoutePage.DegreeType => throw new NotImplementedException(),
-                AddRoutePage.Country => throw new NotImplementedException(),
-                AddRoutePage.AgeSpecialism => throw new NotImplementedException(),
-                AddRoutePage.SubjectSpecialism => throw new NotImplementedException(),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            if (pageRequired != FieldRequirement.NotApplicable)
-            { return page; }
-        }
-        return null;
+        return PageDriver.NextPage(Route, Status, currentPage);
     }
+
     public AddRoutePage? PreviousPage(AddRoutePage currentPage)
     {
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
-            .Where(p => p <= currentPage)
-            .OrderByDescending(p => p);
-
-        foreach (var page in pagesInOrder)
-        {
-            FieldRequirement pageRequired = page switch
-            {
-                AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-                AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.AwardDateRequired, Status.GetAwardDateRequirement()),
-                AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
-                AddRoutePage.Route => FieldRequirement.Mandatory,
-                AddRoutePage.Status => FieldRequirement.Mandatory,
-                AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route.TrainingStartDateRequired, Status.GetStartDateRequirement()),
-                AddRoutePage.TrainingProvider => throw new NotImplementedException(),
-                AddRoutePage.DegreeType => throw new NotImplementedException(),
-                AddRoutePage.Country => throw new NotImplementedException(),
-                AddRoutePage.AgeSpecialism => throw new NotImplementedException(),
-                AddRoutePage.SubjectSpecialism => throw new NotImplementedException(),
-                _ => throw new ArgumentOutOfRangeException(nameof(page))
-            };
-
-            if (pageRequired != FieldRequirement.NotApplicable)
-            {
-                return page;
-            }
-        }
-        return null;
+        return PageDriver.PreviousPage(Route, Status, currentPage);
     }
 
     public bool IsLastPage(AddRoutePage currentPage)

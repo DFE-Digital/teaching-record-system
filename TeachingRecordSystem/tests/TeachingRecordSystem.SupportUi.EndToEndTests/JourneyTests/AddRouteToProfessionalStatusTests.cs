@@ -51,5 +51,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
 
         await page.AssertOnRouteAddStartDatePageAsync();
         await page.FillDateInputAsync(startDate);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddEndDatePageAsync();
     }
 }

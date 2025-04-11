@@ -30,9 +30,12 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
         public async Task<IActionResult> OnPostAsync()
         {
             // CML TODO - undo all these hard-coded values
-            Status = ProfessionalStatusStatus.Approved;
+            // this page is only a stub at the moment to allow for testing of start-date
+            Status = ProfessionalStatusStatus.InTraining;
+            var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId!.Value);
             await JourneyInstance!.UpdateStateAsync(x => x.Status = Status);
-            return Redirect(linkGenerator.RouteAddStartDate(PersonId, JourneyInstance!.InstanceId));
+            var nextPage = PageDriver.NextPage(route, Status, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
+            return Redirect(linkGenerator.AddRoutePage(nextPage, PersonId, JourneyInstance!.InstanceId));
         }
     }
 }

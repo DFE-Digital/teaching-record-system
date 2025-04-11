@@ -12,5 +12,6 @@ public enum AddRoutePage
     DegreeType,
     Country,
     AgeSpecialism,
-    SubjectSpecialism
+    SubjectSpecialism,
+    CheckYourAnswers
 }

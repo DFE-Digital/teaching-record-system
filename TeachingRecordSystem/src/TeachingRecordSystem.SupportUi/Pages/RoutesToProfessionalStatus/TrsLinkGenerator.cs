@@ -1,3 +1,5 @@
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
+
 namespace TeachingRecordSystem.SupportUi;
 
 public partial class TrsLinkGenerator
@@ -77,4 +79,13 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddEndDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string AddRoutePage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        page switch
+        {
+            Pages.RoutesToProfessionalStatus.AddRoutePage.Route => RouteAddRoute(personId, journeyInstanceId, fromCheckAnswers),
+            Pages.RoutesToProfessionalStatus.AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId, fromCheckAnswers),
+            Pages.RoutesToProfessionalStatus.AddRoutePage.StartDate => RouteAddStartDate(personId, journeyInstanceId, fromCheckAnswers),
+            _ => throw new ArgumentOutOfRangeException(nameof(page))
+        };
 }
