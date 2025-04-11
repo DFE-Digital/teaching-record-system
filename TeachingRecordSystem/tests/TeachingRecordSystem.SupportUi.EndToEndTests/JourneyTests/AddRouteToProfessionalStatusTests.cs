@@ -25,10 +25,12 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     }
 
     [Fact]
-    public async Task Route_QualificationPage_Continue_StatusPage()
+    public async Task Route_AddJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
             .RandomOne();
+        var startDate = new DateOnly(2021, 1, 1);
+
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
 
@@ -45,5 +47,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddStatusPageAsync();
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddStartDatePageAsync();
+        await page.FillDateInputAsync(startDate);
     }
 }

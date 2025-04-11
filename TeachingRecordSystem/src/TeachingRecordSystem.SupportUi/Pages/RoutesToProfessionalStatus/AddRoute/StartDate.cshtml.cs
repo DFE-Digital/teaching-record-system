@@ -39,12 +39,7 @@ public class StartDateModel : AddRouteCommonPageModel
         }
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            _linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId));
-    }
-
-    public IActionResult OnPostCancel()
-    {
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+            PageAddress(NextPage(AddRoutePage.StartDate) ?? AddRoutePage.TrainingProvider)); // CML TODO - default to cya page?
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

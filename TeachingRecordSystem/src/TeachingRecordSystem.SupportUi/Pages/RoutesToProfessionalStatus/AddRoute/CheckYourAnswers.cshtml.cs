@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
+
+[Journey(JourneyNames.AddRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance]
+public class CheckYourAnswersModel : PageModel
 {
-    public class CheckYourAnswersModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }

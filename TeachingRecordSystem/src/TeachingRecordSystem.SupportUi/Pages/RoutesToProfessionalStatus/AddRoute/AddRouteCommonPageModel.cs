@@ -26,8 +26,14 @@ public class AddRouteCommonPageModel : PageModel
 
     public string? PersonName { get; set; }
 
-    public RouteToProfessionalStatus? Route { get; set; }
+    public RouteToProfessionalStatus Route { get; set; } = null!;
     public ProfessionalStatusStatus Status { get; set; }
+
+    public async Task<IActionResult> OnPostCancelAsync()
+    {
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+    }
 
     // currently just uses a knowledge of page order combined with the FieldRequired method
     // page will also need to know whether the route can have an exemption (if status is awarded/approved)
@@ -43,12 +49,12 @@ public class AddRouteCommonPageModel : PageModel
         {
             FieldRequirement pageRequired = page switch
             {
-                AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route!.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-                AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route!.AwardDateRequired, Status.GetAwardDateRequirement()),
-                AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route!.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
+                AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
+                AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.AwardDateRequired, Status.GetAwardDateRequirement()),
+                AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
                 AddRoutePage.Route => throw new NotImplementedException(),
                 AddRoutePage.Status => throw new NotImplementedException(),
-                AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route!.TrainingStartDateRequired, Status.GetStartDateRequirement()),
+                AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route.TrainingStartDateRequired, Status.GetStartDateRequirement()),
                 AddRoutePage.TrainingProvider => throw new NotImplementedException(),
                 AddRoutePage.DegreeType => throw new NotImplementedException(),
                 AddRoutePage.Country => throw new NotImplementedException(),
@@ -73,12 +79,12 @@ public class AddRouteCommonPageModel : PageModel
         {
             FieldRequirement pageRequired = page switch
             {
-                AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route!.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-                AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route!.AwardDateRequired, Status.GetAwardDateRequirement()),
-                AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route!.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
+                AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
+                AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.AwardDateRequired, Status.GetAwardDateRequirement()),
+                AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
                 AddRoutePage.Route => FieldRequirement.Mandatory,
                 AddRoutePage.Status => FieldRequirement.Mandatory,
-                AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route!.TrainingStartDateRequired, Status.GetStartDateRequirement()),
+                AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route.TrainingStartDateRequired, Status.GetStartDateRequirement()),
                 AddRoutePage.TrainingProvider => throw new NotImplementedException(),
                 AddRoutePage.DegreeType => throw new NotImplementedException(),
                 AddRoutePage.Country => throw new NotImplementedException(),
