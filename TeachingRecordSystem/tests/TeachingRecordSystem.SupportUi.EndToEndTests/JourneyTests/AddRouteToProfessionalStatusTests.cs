@@ -28,7 +28,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_QualificationPage_Continue_StatusPage()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
-            .RandomOne();
+            .Single(r => r.Name == "Overseas Trained Teacher Recognition");
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
 
@@ -41,7 +41,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Add a route");
 
         await page.AssertOnRouteAddRoutePageAsync();
-        await page.SelectOptionAsync("#RouteId", setRoute.RouteToProfessionalStatusId.ToString());
+        await page.FillAsync($"label:text-is('Route type')", setRoute.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddStatusPageAsync();
