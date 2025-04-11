@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers.Legacy;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
@@ -28,37 +31,55 @@ public static class AlertAuthorization
         return authorizationService.AuthorizeAsync(user, policyName);
     }
 
-    public static AuthorizationBuilder AddAlertPolicies(this AuthorizationBuilder builder) => builder
-        .AddPolicy(
-            AuthorizationPolicies.DbsAlertFlag,
-            policy => policy
-                .RequireAuthenticatedUser())
-        .AddPolicy(
-            AuthorizationPolicies.DbsAlertRead,
-            policy => policy
-                .RequireAuthenticatedUser()
-                .RequireRole(UserRoles.DbsAlertsReadOnly, UserRoles.DbsAlertsReadWrite, UserRoles.Administrator))
-        .AddPolicy(
-            AuthorizationPolicies.DbsAlertWrite,
-            policy => policy
-                .RequireAuthenticatedUser()
-                .RequireRole(UserRoles.DbsAlertsReadWrite, UserRoles.Administrator))
-        .AddPolicy(
-            AuthorizationPolicies.NonDbsAlertFlag,
-            policy => policy
-                .RequireAuthenticatedUser())
-        .AddPolicy(
-            AuthorizationPolicies.NonDbsAlertRead,
-            policy => policy
-                .RequireAuthenticatedUser())
-        .AddPolicy(
-            AuthorizationPolicies.NonDbsAlertWrite,
-            policy => policy
-                .RequireAuthenticatedUser()
-                .RequireRole(UserRoles.AlertsReadWrite, UserRoles.Administrator))
-        .AddPolicy(
-            AuthorizationPolicies.AlertWrite,
-            policy => policy
-                .RequireAuthenticatedUser()
-                .RequireRole(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite, UserRoles.Administrator));
+    public static AuthorizationBuilder AddAlertPolicies(this AuthorizationBuilder builder)
+    {
+        builder
+            .AddPolicy(
+                AuthorizationPolicies.DbsAlertFlag,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new DbsAlertRequirement(Permissions.Alerts.Flag)))
+            .AddPolicy(
+                AuthorizationPolicies.DbsAlertRead,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new DbsAlertRequirement(Permissions.Alerts.Read)))
+            .AddPolicy(
+                AuthorizationPolicies.DbsAlertWrite,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new DbsAlertRequirement(Permissions.Alerts.Write)))
+            .AddPolicy(
+                AuthorizationPolicies.NonDbsAlertFlag,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new NonDbsAlertRequirement(Permissions.Alerts.Flag)))
+            .AddPolicy(
+                AuthorizationPolicies.NonDbsAlertRead,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new NonDbsAlertRequirement(Permissions.Alerts.Read)))
+            .AddPolicy(
+                AuthorizationPolicies.NonDbsAlertWrite,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new NonDbsAlertRequirement(Permissions.Alerts.Write)))
+            .AddPolicy(
+                AuthorizationPolicies.AlertWrite,
+                policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new AlertRequirement(Permissions.Alerts.Write)));
+
+        builder.Services
+            .AddSingleton<IAuthorizationHandler, DbsAlertAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, NonDbsAlertAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, AlertAuthorizationHandler>()
+
+            // AuthorizationHandlers for Legacy user roles, delete when existing users have been migrated to new user roles.
+            .AddSingleton<IAuthorizationHandler, LegacyDbsAlertAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, LegacyNonDbsAlertAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, LegacyAlertAuthorizationHandler>();
+
+        return builder;
+    }
 }

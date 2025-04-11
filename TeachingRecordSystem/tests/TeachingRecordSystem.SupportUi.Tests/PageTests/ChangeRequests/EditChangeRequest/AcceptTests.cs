@@ -5,14 +5,14 @@ public class AcceptTests : TestBase
     public AcceptTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.Helpdesk));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.SupportOfficer));
     }
 
     [Fact]
     public async Task Get_WhenUserHasNoRoles_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(roles: []));
+        SetCurrentUser(TestUsers.GetUser(role: null));
         var createPersonResult = await TestData.CreatePersonAsync();
         var createIncidentResult = await TestData.CreateNameChangeIncidentAsync(b => b.WithCustomerId(createPersonResult.ContactId));
 
@@ -26,8 +26,8 @@ public class AcceptTests : TestBase
     }
 
     [Theory]
-    [RoleNamesData(except: [UserRoles.Helpdesk, UserRoles.Administrator])]
-    public async Task Get_WhenUserDoesNotHaveHelpdeskOrAdministratorRole_ReturnsForbidden(string role)
+    [RoleNamesData(except: [UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])]
+    public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));
@@ -75,8 +75,8 @@ public class AcceptTests : TestBase
     }
 
     [Theory]
-    [RoleNamesData(except: [UserRoles.Helpdesk, UserRoles.Administrator])]
-    public async Task Post_WhenUserDoesNotHaveHelpdeskOrAdministratorRole_ReturnsForbidden(string role)
+    [RoleNamesData(except: [UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])]
+    public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role));

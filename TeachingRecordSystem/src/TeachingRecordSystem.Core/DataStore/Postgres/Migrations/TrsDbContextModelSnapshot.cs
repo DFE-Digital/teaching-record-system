@@ -17203,6 +17203,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("email")
                         .UseCollation("case_insensitive");
 
+                    b.Property<string>("Role")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("role");
+
                     b.Property<string[]>("Roles")
                         .IsRequired()
                         .HasColumnType("varchar[]")

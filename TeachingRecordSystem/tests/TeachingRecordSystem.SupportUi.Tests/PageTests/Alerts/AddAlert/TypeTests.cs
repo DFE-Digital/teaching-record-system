@@ -9,7 +9,7 @@ public class TypeTests : AddAlertTestBase
 
     public TypeTests(HostFixture hostFixture) : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite, UserRoles.DbsAlertsReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
     }
 
     [Theory]
@@ -67,7 +67,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_UserHasDbsAlertReadWriteRole_ShowsDbsAlertType()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTraDbs));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -87,7 +87,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_UserDoesNotHaveDbsAlertReadWriteRole_DoesNotShowDbsAlertType()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -107,7 +107,7 @@ public class TypeTests : AddAlertTestBase
     public async Task Get_UserHasAlertsReadWriteRole_ShowsAllNonDbsRoles()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsReadWrite));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.AlertsManagerTra));
 
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
@@ -122,27 +122,6 @@ public class TypeTests : AddAlertTestBase
         var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
         var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).Where(t => !t.IsDbsAlertType);
         Assert.True(alertTypeOptions.SequenceEqualIgnoringOrder(nonDbsAlertTypes.Select(t => t.AlertTypeId)));
-    }
-
-    [Fact]
-    public async Task Get_UserDoesNotHaveAlertsReadWriteRole_DoesNotShowAnyNonDbsRoles()
-    {
-        // Arrange
-        SetCurrentUser(TestUsers.GetUser(UserRoles.DbsAlertsReadWrite));
-
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateEmptyJourneyInstanceAsync(person.PersonId);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/alerts/add/type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        var alertTypeOptions = doc.GetElementsByName("AlertTypeId").Select(e => new Guid(e.GetAttribute("value")!));
-        var nonDbsAlertTypes = (await TestData.ReferenceDataCache.GetAlertTypesAsync(activeOnly: true)).Where(t => !t.IsDbsAlertType);
-        Assert.True(nonDbsAlertTypes.All(t => !alertTypeOptions.Contains(t.AlertTypeId)));
     }
 
     [Fact]

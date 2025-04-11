@@ -10,7 +10,7 @@ public static class TestUsers
     {
         Active = true,
         Name = "Test administrator",
-        Roles = [UserRoles.Administrator],
+        Role = UserRoles.Administrator,
         UserId = Guid.NewGuid(),
         Email = "test.admin@localhost"
     };

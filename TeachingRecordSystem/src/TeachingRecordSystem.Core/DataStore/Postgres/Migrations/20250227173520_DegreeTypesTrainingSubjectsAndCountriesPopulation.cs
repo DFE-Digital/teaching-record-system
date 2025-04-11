@@ -1923,7 +1923,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     { new Guid("ff481306-7d5b-4122-b46b-c6fee34abc43"), true, "property law", "100689" },
                     { new Guid("ff8b2f4d-fa71-48d5-a648-3e1474aabfb2"), true, "cinematics", "101214" },
                     { new Guid("ffb6663f-7034-4592-a149-adf0d5d49ee5"), true, "fabrication", "100211" }
-                });            
+                });
         }
 
         /// <inheritdoc />

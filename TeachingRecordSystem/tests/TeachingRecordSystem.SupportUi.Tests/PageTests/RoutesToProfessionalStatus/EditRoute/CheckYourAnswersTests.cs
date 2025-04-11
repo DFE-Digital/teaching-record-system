@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Cancel_RedirectsToExpectedPage()
+    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
@@ -44,6 +44,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     [Fact]
@@ -109,6 +110,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithInductionExemption(true)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -144,8 +146,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync())
+            .RandomOne();
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.Value.GetInductionExemptionRequirement() == FieldRequirement.Mandatory)
@@ -164,6 +168,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithAwardedDate(endDate)
+            .WithTrainingCountryId(country.CountryId)
             .WithInductionExemption(true)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
@@ -193,7 +198,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync())
+            .RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync())
+            .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
@@ -206,6 +214,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -228,7 +237,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        doc.AssertRowContentMatches("Degree type", "Not provided");
         doc.AssertRowContentMatches("Country of training", "Not provided");
         doc.AssertRowContentMatches("Age range", "Not provided");
         doc.AssertRowContentMatches("Subjects", "Not provided");
@@ -293,6 +301,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingCountryId(country.CountryId)
             .WithTrainingAgeSpecialismType(ageRange)
+            .WithInductionExemption(true)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .WithDegreeTypeId(degreeType.DegreeTypeId)
