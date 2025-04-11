@@ -85,6 +85,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
