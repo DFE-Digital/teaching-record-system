@@ -86,6 +86,8 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToDetail()
     {
         // Arrange
+        var awardDate = Clock.Today;
+        var endDate = awardDate.AddDays(-1);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.Name == "NI R")
             .First();
@@ -101,6 +103,11 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
+                .WithEditRouteStatusState(builder => builder
+                .WithStatus(status)
+                .WithEndDate(endDate)
+                .WithAwardedDate(awardDate)
+                .WithHasInductionExemption(true))
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -124,6 +131,8 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
+        Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
+        Assert.Equal(awardDate, journeyInstance.State.AwardedDate);
     }
 
     [Fact]
@@ -165,7 +174,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     }
 
     [Fact]
-    public async Task Cancel_RedirectsToExpectedPage()
+    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
@@ -198,13 +207,16 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
         var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
         var redirectResponse = await HttpClient.SendAsync(redirectRequest);
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
-        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", location);
+        Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>

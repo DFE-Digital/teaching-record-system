@@ -44,15 +44,26 @@ public class EndDateModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.TrainingEndDate = TrainingEndDate);
-        return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+        if (JourneyInstance!.State.IsCompletingRoute) // if user is here as part of the data collection for awarded or approved state
+        {
+            await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.TrainingEndDate = TrainingEndDate);
+        }
+        else // user is simply editing the end date
+        {
+            await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
+        }
+
+        return Redirect(JourneyInstance!.State.IsCompletingRoute ?
+            NextCompletingRoutePage() :
+            FromCheckAnswers ?
+                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+                linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public IActionResult OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -60,5 +71,16 @@ public class EndDateModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+    }
+
+    public string BackLink => FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            JourneyInstance!.State.IsCompletingRoute ?
+                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
+                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+
+    private string NextCompletingRoutePage()
+    {
+        return linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId);
     }
 }

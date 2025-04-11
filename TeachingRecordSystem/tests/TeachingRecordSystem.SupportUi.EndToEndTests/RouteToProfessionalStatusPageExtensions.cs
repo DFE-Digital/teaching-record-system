@@ -69,4 +69,9 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/check-answers");
     }
+
+    public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
+    }
 }

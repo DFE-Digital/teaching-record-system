@@ -12,8 +12,11 @@ public class EditRouteState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
+    public EditRouteStatusState? EditStatusState { get; set; } // store temp data while completing a route (moving it to awarded or approved)
+
     public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }
+    public ProfessionalStatusStatus CurrentStatus { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
@@ -31,7 +34,10 @@ public class EditRouteState : IRegisterJourney
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
     [JsonIgnore]
-    public bool IsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete; // CML TODO - required fields also depends on the route and status
+    public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
+
+    [JsonIgnore]
+    public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to awarded / approved 
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {
@@ -42,6 +48,7 @@ public class EditRouteState : IRegisterJourney
 
         QualificationType = professionalStatusInfo.ProfessionalStatus.QualificationType;
         RouteToProfessionalStatusId = professionalStatusInfo.ProfessionalStatus.RouteToProfessionalStatusId;
+        CurrentStatus = professionalStatusInfo.ProfessionalStatus.Status;
         Status = professionalStatusInfo.ProfessionalStatus.Status;
         AwardedDate = professionalStatusInfo.ProfessionalStatus.AwardedDate;
         TrainingStartDate = professionalStatusInfo.ProfessionalStatus.TrainingStartDate;
