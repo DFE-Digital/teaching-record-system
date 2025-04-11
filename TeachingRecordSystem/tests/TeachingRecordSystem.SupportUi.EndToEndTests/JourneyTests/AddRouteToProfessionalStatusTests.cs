@@ -6,7 +6,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_BackLink_QualificationPage()
     {
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
-            .RandomOne();
+            .Single(r => r.Name == "Apprenticeship");
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
 
@@ -19,6 +19,19 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Add a route");
 
         await page.AssertOnRouteAddRoutePageAsync();
+        await page.SelectOptionAsync("#RouteId", route.RouteToProfessionalStatusId.ToString());
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddStatusPageAsync();
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddStartDatePageAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddStatusPageAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddRoutePageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
@@ -28,7 +41,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     public async Task Route_AddJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
-            .RandomOne();
+            .Single(r => r.Name == "Apprenticeship");
         var startDate = new DateOnly(2021, 1, 1);
 
         var person = await TestData.CreatePersonAsync();
