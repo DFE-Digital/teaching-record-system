@@ -89,8 +89,8 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         var awardDate = Clock.Today;
         var endDate = awardDate.AddDays(-1);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory)
-            .RandomOne();
+            .Where(r => r.Name == "NI R")
+            .First();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)
             .RandomOne()

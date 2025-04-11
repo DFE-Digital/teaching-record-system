@@ -23,7 +23,7 @@ public static class CountryExtensions
             "GB-SCT" => "XH",
             "GB-WLS" => "XI",
             "GB-CYM" => "XI",
-            "XV" => "QO",
+            "XK" => "QO",
             "CY" => "XC",
             _ => countryReference
         };
