@@ -436,7 +436,7 @@ public class SetProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task Put_RouteTypeIsNotOverseasWithTrainingCountryReference_ReturnsBadRequest()
+    public async Task Put_RouteTypeIsNotOverseasOrInternationalQualifiedTeacherStatusWithTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
         var slugId = "123456789";
@@ -473,6 +473,30 @@ public class SetProfessionalStatusTests : TestBase
                 RouteTypeId = routeTypeId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
+                TrainingCountryReference = null
+            });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be specified when route type is '{routeTypeId}'.");
+    }
+
+    [Fact]
+    public async Task Put_RouteTypeIsInternationalQualifiedTeacherStatusWithoutTrainingCountryReference_ReturnsBadRequest()
+    {
+        // Arrange
+        var slugId = "123456789";
+        var routeTypeId = RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithSlugId(slugId));
+        var request = CreateJsonContent(
+            CreateRequest() with
+            {
+                RouteTypeId = routeTypeId,
+                Status = ProfessionalStatusStatus.InTraining,
                 TrainingCountryReference = null
             });
 
@@ -917,6 +941,7 @@ public class SetProfessionalStatusTests : TestBase
 
         var trainingProviderUkprn = "10044534";
         var expectedIttProviderName = "ARK Teacher Training";
+        var trainingCountryReference = RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId == routeTypeId ? "GB" : null;
         var request = new SetProfessionalStatusRequest
         {
             RouteTypeId = routeTypeId,
@@ -926,7 +951,8 @@ public class SetProfessionalStatusTests : TestBase
             TrainingEndDate = Clock.Today.AddMonths(9),
             TrainingSubjectReferences = Option.Some<string[]>(["100343", "100300", "100078"]),
             TrainingAgeSpecialism = trainingAgeSpecialism,
-            TrainingProviderUkprn = trainingProviderUkprn
+            TrainingProviderUkprn = trainingProviderUkprn,
+            TrainingCountryReference = trainingCountryReference,
         };
         var requestJson = CreateJsonContent(request);
 
