@@ -7,7 +7,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -16,14 +16,14 @@ public partial class DataverseAdapter : IDataverseAdapter
     private readonly IOrganizationServiceAsync _service;
     private readonly IClock _clock;
     private readonly IMemoryCache _cache;
-    private readonly ITrnGenerationApiClient _trnGenerationApiClient;
+    private readonly ITrnGenerator _trnGenerationApiClient;
     private readonly TrsDbContext _dbContext;
 
     public DataverseAdapter(
         IOrganizationServiceAsync organizationServiceAsync,
         IClock clock,
         IMemoryCache cache,
-        ITrnGenerationApiClient trnGenerationApiClient,
+        ITrnGenerator trnGenerationApiClient,
         TrsDbContext dbContext)
     {
         _service = organizationServiceAsync;

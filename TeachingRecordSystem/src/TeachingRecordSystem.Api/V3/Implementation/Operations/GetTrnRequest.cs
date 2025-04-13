@@ -23,7 +23,9 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
         return new TrnRequestInfo()
         {
             RequestId = command.RequestId,
+#pragma warning disable TRS0001
             Person = new TrnRequestInfoPerson()
+#pragma warning restore TRS0001
             {
                 // FUTURE - these values should be what was submitted in the original request
                 FirstName = contact.FirstName,

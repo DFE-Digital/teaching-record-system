@@ -1,3 +1,4 @@
+using System.Text;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -6,7 +7,8 @@ using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
+#pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -29,7 +31,7 @@ public class CreateTrnRequestHandler(
     ICrmQueryDispatcher crmQueryDispatcher,
     TrnRequestHelper trnRequestHelper,
     ICurrentUserProvider currentUserProvider,
-    ITrnGenerationApiClient trnGenerationApiClient,
+    ITrnGenerator trnGenerationApiClient,
 #pragma warning disable CS9113 // Parameter is unread.
     INameSynonymProvider nameSynonymProvider,
 #pragma warning restore CS9113 // Parameter is unread.
@@ -115,20 +117,17 @@ public class CreateTrnRequestHandler(
 
             await crmQueryDispatcher.ExecuteQueryAsync(new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false)));
 
-            var hasStatedNames = !string.IsNullOrEmpty(matchedOnNinoAndDob.StatedFirstName) &&
-                !string.IsNullOrEmpty(matchedOnNinoAndDob.StatedLastName);
-
             return new TrnRequestInfo()
             {
                 RequestId = command.RequestId,
                 Person = new TrnRequestInfoPerson()
                 {
-                    FirstName = hasStatedNames ? matchedOnNinoAndDob.StatedFirstName! : matchedOnNinoAndDob.FirstName,
-                    MiddleName = hasStatedNames ? matchedOnNinoAndDob.StatedMiddleName ?? "" : matchedOnNinoAndDob.MiddleName,
-                    LastName = hasStatedNames ? matchedOnNinoAndDob.StatedLastName! : matchedOnNinoAndDob.LastName,
-                    EmailAddress = matchedOnNinoAndDob.EmailAddress,
-                    DateOfBirth = matchedOnNinoAndDob.DateOfBirth!.Value,
-                    NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(matchedOnNinoAndDob.NationalInsuranceNumber)
+                    FirstName = command.FirstName,
+                    MiddleName = command.MiddleName,
+                    LastName = command.LastName,
+                    EmailAddress = emailAddress,
+                    DateOfBirth = command.DateOfBirth,
+                    NationalInsuranceNumber = command.NationalInsuranceNumber
                 },
                 Trn = matchedOnNinoAndDob.Trn,
                 Status = TrnRequestStatus.Completed
@@ -149,6 +148,11 @@ public class CreateTrnRequestHandler(
             .Distinct()
             .ToArrayAsync();
 
+        var reviewTasks = potentialDuplicates
+            .Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId)))
+            .Select(d => CreateDuplicateReviewTaskEntity(currentApplicationUserName, d.Duplicate, d.HasActiveAlert))
+            .ToArray();
+
         var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
 
         var metadataMessage = CreateMetadataOutboxMessage(potentialDuplicate);
@@ -165,11 +169,11 @@ public class CreateTrnRequestHandler(
             Gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,
             NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
-            PotentialDuplicates = potentialDuplicates.Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId))).ToArray(),
+            ReviewTasks = reviewTasks,
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,
             TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
-            OutboxMessages = [metadataMessage],
+            TrnRequestMetadataMessage = metadataMessage,
             AllowPiiUpdates = allowContactPiiUpdatesFromUserIds.Contains(currentApplicationUserId.ToString())
         });
 
@@ -204,6 +208,70 @@ public class CreateTrnRequestHandler(
             }
 
             return result.ToArray();
+        }
+    }
+
+    private CreateContactQueryDuplicateReviewTask CreateDuplicateReviewTaskEntity(
+        string applicationUserName,
+        FindPotentialDuplicateContactsResult duplicate,
+        bool hasActiveAlert)
+    {
+        var description = GetDescription();
+
+        var category = $"TRN request from {applicationUserName}";
+
+        return new CreateContactQueryDuplicateReviewTask()
+        {
+            PotentialDuplicateContactId = duplicate.ContactId,
+            Category = category,
+            Subject = "Notification for QTS Unit Team",
+            Description = description
+        };
+
+        string GetDescription()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Potential duplicate");
+            sb.AppendLine("Matched on");
+
+            foreach (var matchedAttribute in duplicate.MatchedAttributes)
+            {
+                sb.AppendLine(matchedAttribute switch
+                {
+                    Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
+                    Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
+                    Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
+                    Contact.Fields.dfeta_PreviousLastName => $"  - Previous last name: '{duplicate.PreviousLastName}'",
+                    Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
+                    Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
+                    Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
+                    _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
+                });
+            }
+
+            var additionalFlags = new List<string>();
+
+            if (hasActiveAlert)
+            {
+                additionalFlags.Add("active sanctions");
+            }
+
+            if (duplicate.HasQtsDate)
+            {
+                additionalFlags.Add("QTS date");
+            }
+
+            if (duplicate.HasEytsDate)
+            {
+                additionalFlags.Add("EYTS date");
+            }
+
+            if (additionalFlags.Count > 0)
+            {
+                sb.AppendLine($"Matched record has {string.Join(" & ", additionalFlags)}");
+            }
+
+            return sb.ToString();
         }
     }
 }

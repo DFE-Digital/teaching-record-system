@@ -1,8 +1,8 @@
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.TestCommon;
 
-public class FakeTrnGenerationApiClient(FakeTrnGenerator genrator) : ITrnGenerationApiClient
+public class FakeTrnGenerationApiClient(FakeTrnGenerator genrator) : ITrnGenerator
 {
     public Task<string> GenerateTrnAsync()
     {
