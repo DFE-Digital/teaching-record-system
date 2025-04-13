@@ -499,7 +499,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
     {
         // Any existing Contacts will affect our duplicate matching; clear them all out before every test
         await OperationTestFixture.DbFixture.DbHelper.ClearDataAsync();
-        OperationTestFixture.Services.GetRequiredService<IXrmFakedContext>().DeleteAllEntities<Contact>();
+        XrmFakedContext.DeleteAllEntities<Contact>();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
