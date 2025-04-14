@@ -25,7 +25,7 @@ public class ConfirmTests : TestBase
             UserId = userId
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/users/add/confirm?userId={userId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/legacy-users/add/confirm?userId={userId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -42,7 +42,7 @@ public class ConfirmTests : TestBase
 
         ConfigureUserServiceMock(userId, null);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/users/add/confirm?userId={userId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/legacy-users/add/confirm?userId={userId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -80,7 +80,7 @@ public class ConfirmTests : TestBase
             UserId = azureAdUserId.ToString()
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/users/add/confirm?userId={azureAdUserId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/legacy-users/add/confirm?userId={azureAdUserId}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -156,7 +156,7 @@ public class ConfirmTests : TestBase
             UserId = userId
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/legacy-users/add/confirm?userId={userId}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -182,7 +182,7 @@ public class ConfirmTests : TestBase
 
         ConfigureUserServiceMock(userId, null);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/legacy-users/add/confirm?userId={userId}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -214,7 +214,7 @@ public class ConfirmTests : TestBase
             UserId = userId
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/legacy-users/add/confirm?userId={userId}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -246,7 +246,7 @@ public class ConfirmTests : TestBase
             UserId = userId
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/users/add/confirm?userId={userId}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/legacy-users/add/confirm?userId={userId}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {

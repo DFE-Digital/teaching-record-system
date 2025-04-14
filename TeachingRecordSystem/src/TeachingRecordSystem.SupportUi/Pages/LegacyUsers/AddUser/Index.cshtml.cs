@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
+namespace TeachingRecordSystem.SupportUi.Pages.LegacyUsers.AddUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class IndexModel(
@@ -47,9 +47,9 @@ public class IndexModel(
         var existingUser = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == user.UserId);
         if (existingUser is not null)
         {
-            return Redirect(trsLinkGenerator.EditUser(existingUser.UserId));
+            return Redirect(trsLinkGenerator.LegacyEditUser(existingUser.UserId));
         }
 
-        return Redirect(trsLinkGenerator.AddUserConfirm(user.UserId));
+        return Redirect(trsLinkGenerator.LegacyAddUserConfirm(user.UserId));
     }
 }

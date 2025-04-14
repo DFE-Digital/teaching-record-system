@@ -8,7 +8,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Users;
+namespace TeachingRecordSystem.SupportUi.Pages.LegacyUsers;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class EditUser(
@@ -98,7 +98,7 @@ public class EditUser(
         }
 
         TempData.SetFlashSuccess("User updated");
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.LegacyUsers());
     }
 
     public async Task<IActionResult> OnPostDeactivateAsync()
@@ -123,7 +123,7 @@ public class EditUser(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User deactivated");
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.LegacyUsers());
     }
 
     public async Task<IActionResult> OnPostActivateAsync()
@@ -148,7 +148,7 @@ public class EditUser(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User reactivated");
-        return Redirect(linkGenerator.EditUser(UserId));
+        return Redirect(linkGenerator.LegacyEditUser(UserId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

@@ -10,7 +10,7 @@ public static class AdminAreaAuthorization
     public static AuthorizationBuilder AddAdminAreaPolicies(this AuthorizationBuilder builder)
     {
         builder.AddPolicy(
-            AuthorizationPolicies.Hangfire,
+            AuthorizationPolicies.AdminOnly,
             policy => policy
                 .RequireAuthenticatedUser()
                 .AddRequirements(new HangFireRequirement()));
