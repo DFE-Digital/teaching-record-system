@@ -1,3 +1,5 @@
+using FakeXrmEasy;
+using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 
@@ -25,6 +27,8 @@ public abstract class OperationTestBase
     public TestData TestData => OperationTestFixture.TestData;
 
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
+
+    public IXrmFakedContext XrmFakedContext => OperationTestFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public T AssertSuccess<T>(ApiResult<T> result) where T : notnull
     {
