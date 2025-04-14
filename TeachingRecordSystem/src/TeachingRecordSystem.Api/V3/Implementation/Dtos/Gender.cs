@@ -12,8 +12,11 @@ public enum Gender
 public static class GenderExtensions
 {
     public static Contact_GenderCode ConvertToContact_GenderCode(this Gender input) =>
-        input.ConvertToEnumByValue<Gender, Contact_GenderCode>();
-
-    public static bool TryConvertToContact_GenderCode(this Gender input, out Contact_GenderCode result) =>
-        input.TryConvertToEnumByValue(out result);
+        input switch
+        {
+            Gender.Male => Contact_GenderCode.Male,
+            Gender.Female => Contact_GenderCode.Female,
+            Gender.Other => Contact_GenderCode.Other,
+            _ => throw new ArgumentException($"Unknown {nameof(Gender)}: '{input}'.", nameof(input))
+        };
 }

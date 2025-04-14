@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240307.Dtos;
+#pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.V3.V20240307;
 

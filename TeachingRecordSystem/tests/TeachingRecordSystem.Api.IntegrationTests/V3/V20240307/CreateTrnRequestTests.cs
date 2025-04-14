@@ -23,8 +23,7 @@ public class CreateTrnRequestTests : TestBase
         // Arrange
         SetCurrentApiClient(roles);
 
-        var requestId = new string('x', 101);  // Limit is 100
-        var requestBody = CreateJsonContent(CreateDummyRequest() with { RequestId = requestId });
+        var requestBody = CreateJsonContent(CreateDummyRequest());
 
         var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
         {
@@ -268,99 +267,6 @@ public class CreateTrnRequestTests : TestBase
         await AssertEx.JsonResponseIsErrorAsync(response, expectedErrorCode: 10029, expectedStatusCode: StatusCodes.Status409Conflict);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus(bool apiKeyUserCanUpdatePii)
-    {
-        if (apiKeyUserCanUpdatePii)
-        {
-            // Default application user ID is in AllowContactPiiUpdatesFromUserIds array in config
-            SetCurrentApiClient([ApiRoles.CreateTrn], DefaultApplicationUserId);
-        }
-        else
-        {
-            var newApiUser = await TestData.CreateApplicationUserAsync();
-            SetCurrentApiClient([ApiRoles.CreateTrn], newApiUser.UserId);
-        }
-
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstNames = new string[] { Faker.Name.First(), Faker.Name.First() };
-        var firstName = string.Join(" ", firstNames);
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var configuration = HostFixture.Services.GetRequiredService<IConfiguration>();
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                Email = email,
-                NationalInsuranceNumber = nationalInsuranceNumber,
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.NotEmpty(contact.dfeta_TRN);
-        Assert.Equal(dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false), contact.BirthDate);
-        Assert.Equal(firstNames.First(), contact.FirstName);
-        Assert.Equal(string.Join(" ", firstNames.Skip(1).Append(middleName)), contact.MiddleName);
-        Assert.Equal(lastName, contact.LastName);
-        Assert.Equal(firstName, contact.dfeta_StatedFirstName);
-        Assert.Equal(middleName, contact.dfeta_StatedMiddleName);
-        Assert.Equal(lastName, contact.dfeta_StatedLastName);
-        Assert.Equal(email, contact.EMailAddress1);
-        Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
-        if (apiKeyUserCanUpdatePii)
-        {
-            Assert.True(contact.dfeta_AllowPiiUpdatesFromRegister);
-        }
-        else
-        {
-            Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
-        }
-
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber,
-                },
-                trn = contact.dfeta_TRN,
-                status = "Completed"
-            },
-            expectedStatusCode: 200);
-    }
-
     [Fact]
     public async Task Post_RequestWithInvalidNino_ReturnsError()
     {
@@ -493,8 +399,101 @@ public class CreateTrnRequestTests : TestBase
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus(bool apiKeyUserCanUpdatePii)
+    {
+        if (apiKeyUserCanUpdatePii)
+        {
+            // Default application user ID is in AllowContactPiiUpdatesFromUserIds array in config
+            SetCurrentApiClient([ApiRoles.CreateTrn], DefaultApplicationUserId);
+        }
+        else
+        {
+            var newApiUser = await TestData.CreateApplicationUserAsync();
+            SetCurrentApiClient([ApiRoles.CreateTrn], newApiUser.UserId);
+        }
+
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstNames = new string[] { Faker.Name.First(), Faker.Name.First() };
+        var firstName = string.Join(" ", firstNames);
+        var middleName = Faker.Name.Middle();
+        var lastName = Faker.Name.Last();
+        var dateOfBirth = new DateOnly(1990, 01, 01);
+        var email = Faker.Internet.Email();
+        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+        var configuration = HostFixture.Services.GetRequiredService<IConfiguration>();
+
+        var requestBody = CreateJsonContent(CreateDummyRequest() with
+        {
+            RequestId = requestId,
+            Person = new()
+            {
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Email = email,
+                NationalInsuranceNumber = nationalInsuranceNumber,
+            }
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = requestBody
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
+        Assert.NotNull(contact);
+        Assert.NotEmpty(contact.dfeta_TRN);
+        Assert.Equal(dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false), contact.BirthDate);
+        Assert.Equal(firstNames.First(), contact.FirstName);
+        Assert.Equal(string.Join(" ", firstNames.Skip(1).Append(middleName)), contact.MiddleName);
+        Assert.Equal(lastName, contact.LastName);
+        Assert.Equal(firstName, contact.dfeta_StatedFirstName);
+        Assert.Equal(middleName, contact.dfeta_StatedMiddleName);
+        Assert.Equal(lastName, contact.dfeta_StatedLastName);
+        Assert.Equal(email, contact.EMailAddress1);
+        Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
+        if (apiKeyUserCanUpdatePii)
+        {
+            Assert.True(contact.dfeta_AllowPiiUpdatesFromRegister);
+        }
+        else
+        {
+            Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
+        }
+
+        await AssertEx.JsonResponseEqualsAsync(
+            response,
+            expected: new
+            {
+                requestId,
+                person = new
+                {
+                    firstName,
+                    middleName,
+                    lastName,
+                    email,
+                    dateOfBirth,
+                    nationalInsuranceNumber,
+                },
+                trn = contact.dfeta_TRN,
+                status = "Completed"
+            },
+            expectedStatusCode: 200);
+    }
+
     [Fact]
-    public async Task Post_PotentialDuplicateContactOnNamesAndDateOfBirth_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    public async Task Post_PotentialDuplicateContact_CreatesContactWithoutTrnAndReturnsPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -556,290 +555,6 @@ public class CreateTrnRequestTests : TestBase
                 },
                 trn = (string?)null,
                 status = "Pending"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
-    public async Task Post_PotentialDuplicateContactMatchedOnDqtNinoOnly_CreatesContactWithoutTrnAndReturnsPendingStatus()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-            .WithLastName(TestData.GenerateChangedLastName(lastName))
-            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth))
-            .WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                Email = email,
-                NationalInsuranceNumber = nationalInsuranceNumber,
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.Null(contact.dfeta_TRN);
-
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber,
-                },
-                trn = (string?)null,
-                status = "Pending"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
-    public async Task Post_PotentialDuplicateContactMatchedOnWorkforceDataNinoOnly_CreatesContactWithoutTrnAndReturnsPendingStatus()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-            .WithLastName(TestData.GenerateChangedLastName(lastName))
-            .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(dateOfBirth)));
-
-        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
-        await TestData.CreateTpsEmploymentAsync(
-            person,
-            establishment,
-            startDate: new DateOnly(2024, 1, 1),
-            lastKnownEmployedDate: new DateOnly(2024, 10, 1),
-            EmploymentType.FullTime,
-            lastExtractDate: new DateOnly(2024, 10, 1),
-            nationalInsuranceNumber: nationalInsuranceNumber);
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                Email = email,
-                NationalInsuranceNumber = nationalInsuranceNumber,
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.Null(contact.dfeta_TRN);
-
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber,
-                },
-                trn = (string?)null,
-                status = "Pending"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
-    public async Task Post_DuplicateContactMatchedOnDqtNinoAndDateOfBirth_ReturnsExistingTrnAndDoesNotCreateNewContact()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-            .WithLastName(TestData.GenerateChangedLastName(lastName))
-            .WithDateOfBirth(dateOfBirth)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber));
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                Email = email,
-                NationalInsuranceNumber = nationalInsuranceNumber,
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
-
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                person = new
-                {
-                    firstName = person.FirstName,
-                    middleName = person.MiddleName,
-                    lastName = person.LastName,
-                    email = person.Email,
-                    dateOfBirth = person.DateOfBirth,
-                    nationalInsuranceNumber = person.NationalInsuranceNumber,
-                },
-                trn = person.Trn,
-                status = "Completed"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
-    public async Task Post_DuplicateContactMatchedOnWorkforceDataNinoAndDqtDateOfBirth_ReturnsExistingTrnAndDoesNotCreateNewContact()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-            .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-            .WithLastName(TestData.GenerateChangedLastName(lastName))
-            .WithDateOfBirth(dateOfBirth));
-
-        var establishment = await TestData.CreateEstablishmentAsync(localAuthorityCode: "321");
-        await TestData.CreateTpsEmploymentAsync(
-            person,
-            establishment,
-            startDate: new DateOnly(2024, 1, 1),
-            lastKnownEmployedDate: new DateOnly(2024, 10, 1),
-            EmploymentType.FullTime,
-            lastExtractDate: new DateOnly(2024, 10, 1),
-            nationalInsuranceNumber: nationalInsuranceNumber);
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                Email = email,
-                NationalInsuranceNumber = nationalInsuranceNumber,
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
-
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                person = new
-                {
-                    firstName = person.FirstName,
-                    middleName = person.MiddleName,
-                    lastName = person.LastName,
-                    email = person.Email,
-                    dateOfBirth = person.DateOfBirth,
-                    nationalInsuranceNumber = person.NationalInsuranceNumber,
-                },
-                trn = person.Trn,
-                status = "Completed"
             },
             expectedStatusCode: 200);
     }
