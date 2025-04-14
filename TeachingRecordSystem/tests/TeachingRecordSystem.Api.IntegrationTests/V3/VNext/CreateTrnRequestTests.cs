@@ -1,20 +1,21 @@
 using System.Net;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.V20240606.Requests;
+using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.VNext;
 
 [Collection(nameof(DisableParallelization))]
 public class CreateTrnRequestTests : TestBase
 {
-    public CreateTrnRequestTests(HostFixture hostFixture)
-        : base(hostFixture)
+    public CreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.CreateTrn]);
+        XrmFakedContext.DeleteAllEntities<Contact>();
 
         GetAnIdentityApiClientMock
             .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
@@ -244,7 +245,6 @@ public class CreateTrnRequestTests : TestBase
 
         var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithTrnRequest(ApplicationUserId, requestId)
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)
@@ -377,7 +377,7 @@ public class CreateTrnRequestTests : TestBase
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Theory]
+    [Theory(Skip = "Skipped until we have a way of processing outbox messages")]
     [InlineData(true)]
     [InlineData(false)]
     public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus(bool apiKeyUserCanUpdatePii)
@@ -402,8 +402,6 @@ public class CreateTrnRequestTests : TestBase
         var dateOfBirth = new DateOnly(1990, 01, 01);
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var configuration = HostFixture.Services.GetRequiredService<IConfiguration>();
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
@@ -450,13 +448,17 @@ public class CreateTrnRequestTests : TestBase
             Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
         }
 
+        var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
+
         await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
                 requestId,
                 trn = contact.dfeta_TRN,
-                status = "Completed"
+                status = "Completed",
+                potentialDuplicate = false,
+                accessYourTeachingQualificationsLink = aytqLink
             },
             expectedStatusCode: 200);
     }
@@ -514,7 +516,9 @@ public class CreateTrnRequestTests : TestBase
             {
                 requestId,
                 trn = (string?)null,
-                status = "Pending"
+                status = "Pending",
+                potentialDuplicate = true,
+                accessYourTeachingQualificationsLink = (string?)null
             },
             expectedStatusCode: 200);
     }
@@ -573,7 +577,9 @@ public class CreateTrnRequestTests : TestBase
             {
                 requestId,
                 trn = (string?)null,
-                status = "Pending"
+                status = "Pending",
+                potentialDuplicate = true,
+                accessYourTeachingQualificationsLink = (string?)null
             },
             expectedStatusCode: 200);
     }
@@ -647,6 +653,45 @@ public class CreateTrnRequestTests : TestBase
         await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, "person.emailAddresses[0]", "Email address cannot be null.");
     }
 
+    [Fact]
+    public async Task Post_ValidGender_PopulatesContactAddressGender()
+    {
+        // Arrange
+        var requestId = Guid.NewGuid().ToString();
+        var firstName = TestData.GenerateFirstName();
+        var middleName = TestData.GenerateMiddleName();
+        var lastName = TestData.GenerateLastName();
+        var dateOfBirth = TestData.GenerateDateOfBirth();
+        var email = TestData.GenerateUniqueEmail();
+        var gender = Gender.Female;
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
+        {
+            Content = CreateJsonContent(new
+            {
+                requestId = requestId,
+                person = new
+                {
+                    firstName = firstName,
+                    middleName = middleName,
+                    lastName = lastName,
+                    dateOfBirth = dateOfBirth,
+                    emailAddresses = new[] { email },
+                    gender = gender
+                }
+            })
+        };
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseAsync(response, expectedStatusCode: StatusCodes.Status200OK);
+
+        var (crmQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+        Assert.Equal(Contact_GenderCode.Female, crmQuery.Gender);
+    }
+
     private static CreateTrnRequestRequest CreateDummyRequest() => new()
     {
         RequestId = Guid.NewGuid().ToString(),
@@ -662,4 +707,22 @@ public class CreateTrnRequestTests : TestBase
         EmailAddresses = ["minnie.van.ryder@example.com"],
         NationalInsuranceNumber = "1234567D"
     };
+
+    private async Task<string> GetAccessYourTeachingQualificationsLinkAsync(string requestId)
+    {
+        var trnToken = await WithDbContextAsync(async dbContext =>
+        {
+            var metadata = await dbContext.TrnRequestMetadata.SingleAsync(r => r.ApplicationUserId == ApplicationUserId && r.RequestId == requestId);
+
+            if (metadata.TrnToken is null)
+            {
+                throw new InvalidOperationException("TRN request does not have a TRN token.");
+            }
+
+            return metadata.TrnToken!;
+        });
+
+        return HostFixture.Services.GetRequiredService<TrnRequestHelper>()
+            .GetAccessYourTeachingQualificationsLink(trnToken);
+    }
 }

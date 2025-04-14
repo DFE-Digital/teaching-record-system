@@ -7,6 +7,11 @@ The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 - `PUT /v3/persons/<trn>/professional-statuses/<id>` - to set a professional status.
 
+The `GET /v3/trn-requests` and `POST /v3/trn-requests` endpoints return the following additional properties:
+- `potentialDuplicate`;
+- `accessYourTeachingQualificationsLink`.
+`accessYourTeachingQualificationsLink` will only be populated for `Completed` requests.
+
 ## 20250327
 
 The `qts` object in responses to the following endpoints has a new `awardedOrApprovedCount` property:

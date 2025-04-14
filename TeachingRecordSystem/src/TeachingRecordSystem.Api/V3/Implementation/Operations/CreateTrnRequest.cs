@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -6,6 +7,8 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 #pragma warning disable TRS0001
@@ -58,6 +61,8 @@ public class CreateTrnRequestHandler(
 
         var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
+        string? trnToken;
+        string? aytqLink;
 
         // Check workforce data for NINO matches
         var workforceDataMatches = normalizedNino is not null ?
@@ -79,7 +84,7 @@ public class CreateTrnRequestHandler(
                 MatchedOnNationalInsuranceNumberContactIds = workforceDataMatches
             })).ToList();
 
-        TrnRequestMetadataMessage CreateMetadataOutboxMessage(bool potentialDuplicate) =>
+        TrnRequestMetadataMessage CreateMetadataOutboxMessage(bool potentialDuplicate, string? trnToken) =>
             new TrnRequestMetadataMessage
             {
                 ApplicationUserId = currentApplicationUserId,
@@ -105,7 +110,7 @@ public class CreateTrnRequestHandler(
                 City = null,
                 Postcode = null,
                 Country = null,
-                TrnToken = null
+                TrnToken = trnToken
             };
 
         // If any record has matched on NINO & DOB treat that as a definite match and return the existing record's details
@@ -115,7 +120,11 @@ public class CreateTrnRequestHandler(
         {
             // FUTURE: consider whether we should be updating any missing attributes here
 
-            await crmQueryDispatcher.ExecuteQueryAsync(new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false)));
+            trnToken = emailAddress is not null ? await trnRequestHelper.CreateTrnTokenAsync(matchedOnNinoAndDob.Trn, emailAddress) : null;
+            aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
+
+            await crmQueryDispatcher.ExecuteQueryAsync(
+                new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false, trnToken)));
 
             return new TrnRequestInfo()
             {
@@ -130,7 +139,9 @@ public class CreateTrnRequestHandler(
                     NationalInsuranceNumber = command.NationalInsuranceNumber
                 },
                 Trn = matchedOnNinoAndDob.Trn,
-                Status = TrnRequestStatus.Completed
+                Status = TrnRequestStatus.Completed,
+                PotentialDuplicate = false,
+                AccessYourTeachingQualificationsLink = aytqLink
             };
         }
 
@@ -155,7 +166,10 @@ public class CreateTrnRequestHandler(
 
         var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
 
-        var metadataMessage = CreateMetadataOutboxMessage(potentialDuplicate);
+        trnToken = emailAddress is not null && trn is not null ? await trnRequestHelper.CreateTrnTokenAsync(trn, emailAddress) : null;
+        aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
+
+        var metadataMessage = CreateMetadataOutboxMessage(potentialDuplicate, trnToken);
 
         await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
@@ -192,7 +206,9 @@ public class CreateTrnRequestHandler(
                 NationalInsuranceNumber = command.NationalInsuranceNumber
             },
             Trn = trn,
-            Status = status
+            Status = status,
+            PotentialDuplicate = potentialDuplicate,
+            AccessYourTeachingQualificationsLink = aytqLink
         };
 
         static string[] GetNonEmptyValues(params string?[] values)

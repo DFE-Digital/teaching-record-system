@@ -1,16 +1,14 @@
-
-using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
 
 [Collection(nameof(DisableParallelization))]
 public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : OperationTestBase(operationTestFixture), IAsyncLifetime
 {
-    //
     [Fact]
     public Task HandleAsync_RequestDoesNotExist_ReturnsError() =>
         WithHandler<GetTrnRequestHandler>(async handler =>
@@ -37,7 +35,8 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
 
             var person = await TestData.CreatePersonAsync(p => p
                 .WithTrn()
-                .WithTrnRequest(applicationUserId, requestId));
+                .WithTrnRequest(applicationUserId, requestId)
+                .WithEmail(TestData.GenerateUniqueEmail()));
 
             var command = new GetTrnRequestCommand(requestId);
 
@@ -48,6 +47,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
             var success = result.GetSuccess();
             Assert.Equal(TrnRequestStatus.Completed, success.Status);
             Assert.Equal(person.Trn, success.Trn);
+            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
         });
 
     [Fact]
@@ -100,6 +100,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
             var success = result.GetSuccess();
             Assert.Equal(TrnRequestStatus.Completed, success.Status);
             Assert.Equal(masterContact.Trn, success.Trn);
+            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
         });
 
     [Fact]
@@ -123,6 +124,7 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
             var success = result.GetSuccess();
             Assert.Equal(TrnRequestStatus.Pending, success.Status);
             Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
         });
 
     public async Task InitializeAsync()
@@ -130,6 +132,16 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
         // Any existing Contacts will affect our duplicate matching; clear them all out before every test
         await OperationTestFixture.DbFixture.DbHelper.ClearDataAsync();
         XrmFakedContext.DeleteAllEntities<Contact>();
+
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

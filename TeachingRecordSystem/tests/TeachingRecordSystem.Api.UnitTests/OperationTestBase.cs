@@ -2,6 +2,7 @@ using FakeXrmEasy;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -29,6 +30,8 @@ public abstract class OperationTestBase
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy => _testServices.CrmQueryDispatcherSpy;
 
     public IXrmFakedContext XrmFakedContext => OperationTestFixture.Services.GetRequiredService<IXrmFakedContext>();
+
+    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => Mock.Get(OperationTestFixture.Services.GetRequiredService<IGetAnIdentityApiClient>());
 
     public T AssertSuccess<T>(ApiResult<T> result) where T : notnull
     {
