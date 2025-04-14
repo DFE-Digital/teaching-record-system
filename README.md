@@ -284,7 +284,6 @@ The tool is a .NET Framework application and requires .NET 4.6.
 Environment-specific configuration is stored in Key Vault inside a single JSON-encoded key named 'AppConfig'.
 This is retrieved via Terraform at deployment time and is set as an environment variable so it can be accessed by the application.
 
-
 ## Formatting
 
 Pull request builds will run format checks on .NET and Terraform code changes; if there are any issues the build will fail.
@@ -299,7 +298,11 @@ To format the entire codebase run
 just format
 ```
 
+For either of these recipes to work, the [Terraform tool must be installed](https://developer.hashicorp.com/terraform/install?product_intent=terraform) - on Windows, download the binary, copy into an appropriate location and update the PATH environment variable to point to the downloaded file.
+
 ### Visual Studio Code Cleanup
 If you're using Visual Studio 2022 you can also set up Code Cleanup, this will use the settings defined in the `.editorconfig` file in the repository root (this is also added to the Solution Items folder in the solution). 
 
 To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `Configure Code Cleanup`. This will present you with a window with two profiles to configure, the easiest thing to do is to select `Profile 1 (default)`, and select all the "Available fixers" (bottom panel), and add them to the "Included fixers" (top panel). Now you can use the "paintbrush" icon in the text editor status bar (to the left of the horizontal scrollbar) to format the document you're working on (keyboard shortcut: Ctrl+K, Ctrl+E) - or you can go to `Tools > Options > Text Editor > Code Cleanup` and check `Run Code Cleanup profile on Save`.
+
+**Note:** `just format` and `just format-changed` call `dotnet dotnet-format` - this is different to `dotnet format` so be aware that calling `dotnet format` may produce different results.
