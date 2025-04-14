@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 
@@ -41,7 +42,8 @@ public class Startup
                             inner,
                             TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()))
                     .AddSingleton<ICurrentUserProvider>(Mock.Of<ICurrentUserProvider>())
-                    .AddNameSynonyms();
+                    .AddNameSynonyms()
+                    .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object);
             });
     }
 }

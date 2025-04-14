@@ -22,5 +22,5 @@ public class TrnRequestMetadata
     public string? City { get; init; }
     public string? Postcode { get; init; }
     public string? Country { get; init; }
-    public string? TrnToken { get; init; }
+    public string? TrnToken { get; set; }
 }

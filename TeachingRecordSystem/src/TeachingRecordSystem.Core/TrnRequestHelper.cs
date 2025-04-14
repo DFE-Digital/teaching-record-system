@@ -1,36 +1,57 @@
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Core;
 
-public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
+public class TrnRequestHelper(
+    TrsDbContext dbContext,
+    ICrmQueryDispatcher crmQueryDispatcher,
+    IGetAnIdentityApiClient idApiClient,
+    IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor)
 {
+    public async Task<string> CreateTrnTokenAsync(string trn, string emailAddress)
+    {
+        var response = await idApiClient.CreateTrnTokenAsync(new CreateTrnTokenRequest() { Email = emailAddress, Trn = trn });
+        return response.TrnToken;
+    }
+
+    public string GetAccessYourTeachingQualificationsLink(string trnToken) =>
+        $"{aytqOptionsAccessor.Value.BaseAddress}{aytqOptionsAccessor.Value.StartUrlPath}?trn_token={Uri.EscapeDataString(trnToken)}";
+
     public async Task<GetTrnRequestResult?> GetTrnRequestInfoAsync(Guid applicationUserId, string requestId)
     {
-        var getDbTrnRequestTask = dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
-
         var crmTrnRequestId = GetCrmTrnRequestId(applicationUserId, requestId);
         var getContactByTrnRequestIdTask = crmQueryDispatcher.ExecuteQueryAsync(
             new GetContactByTrnRequestIdQuery(crmTrnRequestId, new ColumnSet(Contact.Fields.ContactId, Contact.Fields.dfeta_TrnToken)));
 
-        if (await getDbTrnRequestTask is TrnRequest dbTrnRequest)
+        var dbTrnRequest = await dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
+        var metadata = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);
+
+        if (metadata is null)
+        {
+            return null;
+        }
+
+        if (dbTrnRequest is not null)
         {
             var contact = await GetContactAsync(dbTrnRequest.TeacherId);
-            return new(dbTrnRequest.TrnToken, applicationUserId, contact, IsCompleted(contact));
+            return new(applicationUserId, contact, metadata);
         }
 
         if (await getContactByTrnRequestIdTask is Contact trnRequestContact)
         {
             var contact = await GetContactAsync(trnRequestContact.Id);
-            return new(contact.dfeta_TrnToken, applicationUserId, contact, IsCompleted(contact));
+            return new(applicationUserId, contact, metadata);
         }
 
         return null;
-
-        bool IsCompleted(Contact contact) => !string.IsNullOrEmpty(contact.dfeta_TRN);
 
         Task<Contact> GetContactAsync(Guid contactId) =>
             crmQueryDispatcher.ExecuteQueryAsync(
@@ -61,4 +82,11 @@ public class TrnRequestHelper(TrsDbContext dbContext, ICrmQueryDispatcher crmQue
         dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId);
 }
 
-public record GetTrnRequestResult(string? TrnToken, Guid ApplicationUserId, Contact Contact, bool IsCompleted);
+public record GetTrnRequestResult(Guid ApplicationUserId, Contact Contact, TrnRequestMetadata Metadata)
+{
+    public string? Trn => Contact.dfeta_TRN;
+    public bool PotentialDuplicate => Metadata.PotentialDuplicate == true;
+    public string? TrnToken => Metadata.TrnToken;
+    [MemberNotNullWhen(true, nameof(Trn))]
+    public bool IsCompleted => Trn is not null;
+}

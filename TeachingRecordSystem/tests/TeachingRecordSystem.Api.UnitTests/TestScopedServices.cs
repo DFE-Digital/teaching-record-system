@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -10,6 +11,7 @@ public class TestScopedServices
     {
         CrmQueryDispatcherSpy = new();
         Clock = new();
+        GetAnIdentityApiClient = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -40,4 +42,6 @@ public class TestScopedServices
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy { get; }
 
     public TestableClock Clock { get; }
+
+    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 }

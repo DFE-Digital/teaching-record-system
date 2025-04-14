@@ -6,6 +6,9 @@ using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+
 #pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.UnitTests.V3;
@@ -174,6 +177,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             Assert.Equal(command.RequestId, success.RequestId);
             Assert.Equal(TrnRequestStatus.Pending, success.Status);
             Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
             var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
@@ -224,6 +228,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             Assert.Equal(command.RequestId, success.RequestId);
             Assert.Equal(TrnRequestStatus.Completed, success.Status);
             Assert.NotNull(success.Trn);
+            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
             Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
@@ -279,6 +284,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             Assert.Equal(command.RequestId, success.RequestId);
             Assert.Equal(TrnRequestStatus.Completed, success.Status);
             Assert.NotNull(success.Trn);
+            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
             Assert.Empty(CrmQueryDispatcherSpy.GetAllQueries<CreateContactQuery, Guid>());
@@ -402,6 +408,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             Assert.Equal(command.RequestId, success.RequestId);
             Assert.Equal(TrnRequestStatus.Completed, success.Status);
             Assert.NotNull(success.Trn);
+            Assert.NotNull(success.AccessYourTeachingQualificationsLink);
             AssertResultPersonMatchesCommand(command, success.Person);
 
             var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
@@ -492,7 +499,15 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         Assert.Null(message.City);
         Assert.Null(message.Postcode);
         Assert.Null(message.Country);
-        Assert.Null(message.TrnToken);
+
+        if (expectedPotentialDuplicate)
+        {
+            Assert.Null(message.TrnToken);
+        }
+        else
+        {
+            Assert.NotNull(message.TrnToken);
+        }
     }
 
     public async Task InitializeAsync()
@@ -500,6 +515,16 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         // Any existing Contacts will affect our duplicate matching; clear them all out before every test
         await OperationTestFixture.DbFixture.DbHelper.ClearDataAsync();
         XrmFakedContext.DeleteAllEntities<Contact>();
+
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
     }
 
     public Task DisposeAsync() => Task.CompletedTask;

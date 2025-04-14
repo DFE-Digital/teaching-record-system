@@ -25,6 +25,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon;
@@ -170,7 +171,9 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
     builder.Services.AddDbContext<IdDbContext>(options => options.UseNpgsql(builder.Configuration.GetRequiredConnectionString("Id")));
 }
 
-builder.AddBlobStorage();
+builder
+    .AddBlobStorage()
+    .AddIdentityApi();
 
 builder.Services
     .AddTrsBaseServices()
@@ -188,7 +191,8 @@ builder.Services
     .AddTransient<SignInJourneyHelper>()
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
     .AddFileService()
-    .AddPersonMatching();
+    .AddPersonMatching()
+    .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment);
 
 builder.Services.AddOptions<AuthorizeAccessOptions>()
     .Bind(builder.Configuration)

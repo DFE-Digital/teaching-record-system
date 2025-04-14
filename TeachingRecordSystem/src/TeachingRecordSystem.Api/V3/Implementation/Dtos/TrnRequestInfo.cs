@@ -8,12 +8,13 @@ public record TrnRequestInfo
 #pragma warning restore TRS0001
     public required TrnRequestStatus Status { get; init; }
     public required string? Trn { get; init; }
+    public required bool PotentialDuplicate { get; init; }
+    public required string? AccessYourTeachingQualificationsLink { get; init; }
 }
 
 // The CreateTrnRequest API populates this with the data from the original request
-// but we want to return the details of the resolved person instead.
-// As such, newer CreateTrnRequest versions don't return data like this at all
-// but the GetTrnRequest endpoint will return the data for the resolved record. 
+// but the GetTrnRequest endpoint uses the resolved record.
+// To remove the inconsistency newer API versions don't return this object at all.
 [Obsolete("Maintained for older API versions", DiagnosticId = "TRS0001")]
 public record TrnRequestInfoPerson
 {

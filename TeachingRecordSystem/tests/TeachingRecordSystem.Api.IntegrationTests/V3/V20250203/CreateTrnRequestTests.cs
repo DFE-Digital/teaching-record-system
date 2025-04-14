@@ -5,6 +5,7 @@ using TeachingRecordSystem.Api.V3.V20250203.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
@@ -15,6 +16,16 @@ public class CreateTrnRequestTests : TestBase
     {
         SetCurrentApiClient([ApiRoles.CreateTrn]);
         XrmFakedContext.DeleteAllEntities<Contact>();
+
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
     }
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
@@ -174,6 +185,7 @@ public class CreateTrnRequestTests : TestBase
 
         var existingContact = await TestData.CreatePersonAsync(p => p
             .WithTrn()
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithFirstName(firstName)
             .WithMiddleName(middleName)
             .WithLastName(lastName)

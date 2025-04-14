@@ -1,3 +1,6 @@
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using Xunit.Sdk;
+
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
 public class TestScopedServices
@@ -8,6 +11,7 @@ public class TestScopedServices
     {
         Clock = new();
         EventObserver = new();
+        GetAnIdentityApiClient = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -26,4 +30,6 @@ public class TestScopedServices
     public TestableClock Clock { get; }
 
     public CaptureEventObserver EventObserver { get; }
+
+    public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 }

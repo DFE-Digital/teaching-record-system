@@ -12,6 +12,16 @@ public class GetOrCreateTrnRequestTests : TestBase
     public GetOrCreateTrnRequestTests(HostFixture hostFixture) : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.UpdatePerson]);
+
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
     }
 
     [Theory, RoleNamesData(except: [ApiRoles.UpdatePerson])]
@@ -38,7 +48,8 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn());
+            .WithTrn()
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         ConfigureDataverseAdapterGetTeacher(person.Contact);
 
@@ -124,7 +135,8 @@ public class GetOrCreateTrnRequestTests : TestBase
         var requestId = Guid.NewGuid().ToString();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithoutTrn());
+            .WithoutTrn()
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         await WithDbContextAsync(async dbContext =>
         {

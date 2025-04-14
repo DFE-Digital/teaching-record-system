@@ -356,6 +356,11 @@ public partial class TestData
                 contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false);
             }
 
+            if (trn is not null && _trnToken is null && _email is not null)
+            {
+                _trnToken = Guid.NewGuid().ToString();
+            }
+
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
             txnRequestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
@@ -630,7 +635,8 @@ public partial class TestData
                         FirstName = firstName,
                         MiddleName = "",
                         LastName = lastName,
-                        DateOfBirth = dateOfBirth
+                        DateOfBirth = dateOfBirth,
+                        TrnToken = _trnToken
                     });
                 }
             });
