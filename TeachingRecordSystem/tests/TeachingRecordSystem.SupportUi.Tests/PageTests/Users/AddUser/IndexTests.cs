@@ -11,7 +11,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: null));
-        var request = new HttpRequestMessage(HttpMethod.Get, "/users/add");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/legacy-users/add");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -24,7 +24,7 @@ public class IndexTests : TestBase
     public async Task Get_WithAdministratorUser_ReturnsOk()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Get, "/users/add");
+        var request = new HttpRequestMessage(HttpMethod.Get, "/legacy-users/add");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -38,7 +38,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         SetCurrentUser(TestUsers.GetUser(role: null));
-        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add");
+        var request = new HttpRequestMessage(HttpMethod.Post, "/legacy-users/add");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -51,7 +51,7 @@ public class IndexTests : TestBase
     public async Task Post_NoEmailEntered_RendersErrorMessage()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/legacy-users/add")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -75,7 +75,7 @@ public class IndexTests : TestBase
 
         ConfigureUserServiceMock(email, null);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/legacy-users/add")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -96,7 +96,7 @@ public class IndexTests : TestBase
         // Arrange
         var email = "an.email";
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/legacy-users/add")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -126,7 +126,7 @@ public class IndexTests : TestBase
             UserId = userId
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/legacy-users/add")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -139,7 +139,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/users/add/confirm?userId={userId}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/legacy-users/add/confirm?userId={userId}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class IndexTests : TestBase
             UserId = userId.ToString()
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/users/add")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/legacy-users/add")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -171,7 +171,7 @@ public class IndexTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/users/{user.UserId}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/legacy-users/{user.UserId}", response.Headers.Location?.OriginalString);
     }
 
 

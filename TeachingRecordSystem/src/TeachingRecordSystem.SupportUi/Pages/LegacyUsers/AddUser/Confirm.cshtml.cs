@@ -9,7 +9,7 @@ using TeachingRecordSystem.Core.Legacy;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
+namespace TeachingRecordSystem.SupportUi.Pages.LegacyUsers.AddUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 public class ConfirmModel(
@@ -93,7 +93,7 @@ public class ConfirmModel(
         await dbContext.SaveChangesAsync();
 
         TempData.SetFlashSuccess("User added");
-        return Redirect(linkGenerator.Users());
+        return Redirect(linkGenerator.LegacyUsers());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
