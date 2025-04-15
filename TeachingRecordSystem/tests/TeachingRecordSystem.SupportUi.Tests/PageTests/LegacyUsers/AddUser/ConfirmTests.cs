@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Legacy;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.AddUser;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.LegacyUsers.AddUser;
 
 public class ConfirmTests : TestBase
 {
