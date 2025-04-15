@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using FakeXrmEasy.Abstractions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -417,6 +418,52 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             AssertContactMatchesCommand(command, createContactQuery);
             AssertMetadataMessageMatchesCommand(command, createContactQuery.TrnRequestMetadataMessage, expectedPotentialDuplicate: false);
         });
+
+    [Fact]
+    public Task HandleAsync_ClientIsInAllowContactPiiUpdatesFromUserIdsConfig_SetsAllowPiiUpdatesFromRegisterToTrue()
+    {
+        var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddConfiguration(OperationTestFixture.Services.GetRequiredService<IConfiguration>())
+            .AddInMemoryCollection([new KeyValuePair<string, string?>("AllowContactPiiUpdatesFromUserIds:0", $"{applicationUserId}")])
+            .Build();
+
+        return WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var command = CreateCommand();
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+            Assert.True(createContactQuery.AllowPiiUpdates);
+        }, configuration);
+    }
+
+    [Fact]
+    public Task HandleAsync_ClientIsNotInAllowContactPiiUpdatesFromUserIdsConfig_SetsAllowPiiUpdatesFromRegisterToFalse()
+    {
+        var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+
+        IConfiguration configuration = OperationTestFixture.Services.GetRequiredService<IConfiguration>();
+        Debug.Assert(!(configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? []).Contains($"{applicationUserId}"));
+
+        return WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var command = CreateCommand();
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+            Assert.False(createContactQuery.AllowPiiUpdates);
+        }, configuration);
+    }
 
     private CreateTrnRequestCommand CreateCommand() => new CreateTrnRequestCommand
     {
