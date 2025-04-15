@@ -284,6 +284,24 @@ The tool is a .NET Framework application and requires .NET 4.6.
 Environment-specific configuration is stored in Key Vault inside a single JSON-encoded key named 'AppConfig'.
 This is retrieved via Terraform at deployment time and is set as an environment variable so it can be accessed by the application.
 
+## Local development
+
+When developing locally there are a number of recipes that may be useful (`just` with no parameters lists all available recipes):
+
+```shell
+watch-api                  # Run the API project in Development mode and watch for file changes
+watch-authz                # Run the AuthorizeAccess project in Development mode and watch for file changes
+watch-ui                   # Run the UI project in Development mode and watch for file changes
+watch-ui-sass              # Watch for file changes and compile any SASS files that have changed
+watch-worker               # Run the Worker project in Development mode and watch for file changes
+```
+
+When working on the Support UI project it may be useful to have both `watch-ui` and `watch-ui-sass` running in parallel (e.g. in separate terminal windows) - this should pick up on any changes and hot reload the web application, refreshing the web browser.
+
+The Visual Studio debugger can also be attached to the watched web application via `Debug > Attach to Process...` and selecting the `TeachingRecordSystem.SupportUi.exe` process.
+
+Sometimes the `watch-ui` process may fail with the error message `ArgumentOutOfRangeException: Token 2007ffe is not valid in the scope of module System.ModuleHandle` - it is unclear what causes this but it is usually resolved by killing the watch process, cleaning the solution and restarting the watch process.
+
 ## Formatting
 
 Pull request builds will run format checks on .NET and Terraform code changes; if there are any issues the build will fail.
@@ -300,9 +318,13 @@ just format
 
 For either of these recipes to work, the [Terraform tool must be installed](https://developer.hashicorp.com/terraform/install?product_intent=terraform) - on Windows, download the binary, copy into an appropriate location and update the PATH environment variable to point to the downloaded file.
 
+**Note:** `just format` and `just format-changed` call `dotnet dotnet-format` - this is different to `dotnet format` so be aware that calling `dotnet format` may produce different results.
+
 ### Visual Studio Code Cleanup
 If you're using Visual Studio 2022 you can also set up Code Cleanup, this will use the settings defined in the `.editorconfig` file in the repository root (this is also added to the Solution Items folder in the solution). 
 
-To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `Configure Code Cleanup`. This will present you with a window with two profiles to configure, the easiest thing to do is to select `Profile 1 (default)`, and select all the "Available fixers" (bottom panel), and add them to the "Included fixers" (top panel). Now you can use the "paintbrush" icon in the text editor status bar (to the left of the horizontal scrollbar) to format the document you're working on (keyboard shortcut: Ctrl+K, Ctrl+E) - or you can go to `Tools > Options > Text Editor > Code Cleanup` and check `Run Code Cleanup profile on Save`.
+To set this up, go to `Tools > Options > Text Editor > Code Cleanup` and click `Configure Code Cleanup`. This will present you with a window with two profiles to configure, the easiest thing to do is to select `Profile 1 (default)`, and select the following from "Available fixers" (bottom panel), and add them to the "Included fixers" (top panel):
 
-**Note:** `just format` and `just format-changed` call `dotnet dotnet-format` - this is different to `dotnet format` so be aware that calling `dotnet format` may produce different results.
+- Format document
+
+Now you can use the "paintbrush" icon in the text editor status bar (to the left of the horizontal scrollbar) to format the document you're working on (keyboard shortcut: Ctrl+K, Ctrl+E) - or you can go to `Tools > Options > Text Editor > Code Cleanup` and check `Run Code Cleanup profile on Save`.
