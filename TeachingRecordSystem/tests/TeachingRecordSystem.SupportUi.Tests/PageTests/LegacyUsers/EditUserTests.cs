@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Legacy;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.LegacyUsers;
 
 public class EditUserTests : TestBase
 {
