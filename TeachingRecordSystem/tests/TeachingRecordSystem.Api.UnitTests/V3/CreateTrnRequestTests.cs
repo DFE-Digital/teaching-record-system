@@ -188,7 +188,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
                 createContactQuery.ReviewTasks,
                 task => AssertReviewTaskCreated(matchedPerson, task));
 
-            AssertContactMatchesCommand(command, createContactQuery);
+            AssertContactMatchesCommand(command, createContactQuery, expectTrn: false);
             AssertMetadataMessageMatchesCommand(command, createContactQuery.TrnRequestMetadataMessage, expectedPotentialDuplicate: true);
         });
 
@@ -197,25 +197,16 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
             // Arrange
-            var firstName = Faker.Name.First();
-            var middleName = Faker.Name.Middle();
-            var lastName = Faker.Name.Last();
             var dateOfBirth = new DateOnly(1990, 01, 01);
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             await TestData.CreatePersonAsync(p => p
                 .WithTrn()
-                .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-                .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-                .WithLastName(TestData.GenerateChangedLastName(lastName))
                 .WithDateOfBirth(dateOfBirth)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber));
 
             var command = CreateCommand() with
             {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 NationalInsuranceNumber = nationalInsuranceNumber
             };
@@ -239,21 +230,55 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         });
 
     [Fact]
+    public Task HandleAsync_MatchingMultipleExistingPersonsOnDqtNinoAndDob_CreatesContactWithoutTrnAndReviewTask() =>
+        WithHandler<CreateTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var dateOfBirth = new DateOnly(1990, 01, 01);
+            var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
+
+            await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithDateOfBirth(dateOfBirth)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+            await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithDateOfBirth(dateOfBirth)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber));
+
+            var command = CreateCommand() with
+            {
+                DateOfBirth = dateOfBirth,
+                NationalInsuranceNumber = nationalInsuranceNumber
+            };
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = AssertSuccess(result);
+
+            Assert.Equal(command.RequestId, success.RequestId);
+            Assert.Equal(TrnRequestStatus.Pending, success.Status);
+            Assert.Null(success.Trn);
+            Assert.Null(success.AccessYourTeachingQualificationsLink);
+            AssertResultPersonMatchesCommand(command, success.Person);
+
+            var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
+            Assert.NotEmpty(createContactQuery.ReviewTasks);
+        });
+
+    [Fact]
     public Task HandleAsync_MatchingExistingPersonOnWorkforceNinoAndDob_ReturnsTrnOfExistingPersonDoesNotCreateContact() =>
         WithHandler<CreateTrnRequestHandler>(async handler =>
         {
             // Arrange
-            var firstName = Faker.Name.First();
-            var middleName = Faker.Name.Middle();
-            var lastName = Faker.Name.Last();
             var dateOfBirth = new DateOnly(1990, 01, 01);
             var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
 
             var person = await TestData.CreatePersonAsync(p => p
                 .WithTrn()
-                .WithFirstName(TestData.GenerateChangedFirstName(firstName))
-                .WithMiddleName(TestData.GenerateChangedMiddleName(middleName))
-                .WithLastName(TestData.GenerateChangedLastName(lastName))
                 .WithDateOfBirth(dateOfBirth));
             Debug.Assert(person.NationalInsuranceNumber is null);
 
@@ -269,9 +294,6 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
             var command = CreateCommand() with
             {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 NationalInsuranceNumber = nationalInsuranceNumber
             };
@@ -415,7 +437,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
             Assert.NotNull(createContactQuery.Trn);
             Assert.Empty(createContactQuery.ReviewTasks);
-            AssertContactMatchesCommand(command, createContactQuery);
+            AssertContactMatchesCommand(command, createContactQuery, expectTrn: true);
             AssertMetadataMessageMatchesCommand(command, createContactQuery.TrnRequestMetadataMessage, expectedPotentialDuplicate: false);
         });
 
@@ -503,7 +525,8 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
     private void AssertContactMatchesCommand(
         CreateTrnRequestCommand command,
-        CreateContactQuery query)
+        CreateContactQuery query,
+        bool expectTrn)
     {
         var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
 
@@ -514,6 +537,15 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         Assert.Equal(command.Gender?.ConvertToContact_GenderCode(), query.Gender);
         Assert.Equal(command.NationalInsuranceNumber, query.NationalInsuranceNumber);
         Assert.Equal(TrnRequestHelper.GetCrmTrnRequestId(applicationUserId, command.RequestId), query.TrnRequestId);
+
+        if (expectTrn)
+        {
+            Assert.NotNull(query.Trn);
+        }
+        else
+        {
+            Assert.Null(query.Trn);
+        }
     }
 
     private void AssertMetadataMessageMatchesCommand(
