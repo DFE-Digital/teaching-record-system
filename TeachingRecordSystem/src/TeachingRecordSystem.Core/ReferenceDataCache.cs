@@ -257,12 +257,6 @@ public class ReferenceDataCache(
         return routesToProfessionalStatuses.Single(r => r.RouteToProfessionalStatusId == id, $"Could not find route to professional status with ID: '{id}'.");
     }
 
-    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusArchivedOnlyAsync()
-    {
-        var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
-        return routesToProfessionalStatuses.Where(e => !e.IsActive).OrderBy(x => x.Name).ToArray();
-    }
-
     public async Task<TrainingSubject[]> GetTrainingSubjectsAsync(bool activeOnly = false)
     {
         var trainingSubjects = await EnsureTrainingSubjectsAsync();

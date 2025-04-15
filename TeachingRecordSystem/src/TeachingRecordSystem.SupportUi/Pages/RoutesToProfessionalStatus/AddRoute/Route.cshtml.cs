@@ -62,14 +62,14 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
                 state.RouteToProfessionalStatusId = RouteId.HasValue ? RouteId.Value : ArchivedRouteId!.Value;
             });
         return Redirect(FromCheckAnswers
-            ? linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId)
+            ? linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
             : linkGenerator.RouteAddStatus(PersonId, JourneyInstance!.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: true);
-        ArchivedRoutes = await referenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync();
+        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync();
+        ArchivedRoutes = Routes.Where(r => !r.IsActive).ToArray();
         var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
         if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))
         {

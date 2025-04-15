@@ -39,7 +39,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPreviouslyStoredArchivedRoute_ShowsSelectedRoute()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync())
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => !r.IsActive)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .RandomOne()
@@ -100,7 +101,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
             .RandomOne();
-        var archivedRoute = (await ReferenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync())
+        var archivedRoute = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => !r.IsActive)
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync();
