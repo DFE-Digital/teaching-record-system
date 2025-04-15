@@ -115,12 +115,14 @@ public class CreateTrnRequestHandler(
 
         // If any record has matched on NINO & DOB treat that as a definite match and return the existing record's details
         var matchedOnNinoAndDob = potentialDuplicates
-            .FirstOrDefault(d => d.MatchedAttributes.Contains(Contact.Fields.dfeta_NINumber) && d.MatchedAttributes.Contains(Contact.Fields.BirthDate));
-        if (matchedOnNinoAndDob is not null)
+            .Where(d => d.MatchedAttributes.Contains(Contact.Fields.dfeta_NINumber) && d.MatchedAttributes.Contains(Contact.Fields.BirthDate))
+            .ToArray();
+
+        if (matchedOnNinoAndDob is [var singleMatchOnNinoAndDob])
         {
             // FUTURE: consider whether we should be updating any missing attributes here
 
-            trnToken = emailAddress is not null ? await trnRequestHelper.CreateTrnTokenAsync(matchedOnNinoAndDob.Trn, emailAddress) : null;
+            trnToken = emailAddress is not null ? await trnRequestHelper.CreateTrnTokenAsync(singleMatchOnNinoAndDob.Trn, emailAddress) : null;
             aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
 
             await crmQueryDispatcher.ExecuteQueryAsync(
@@ -138,7 +140,7 @@ public class CreateTrnRequestHandler(
                     DateOfBirth = command.DateOfBirth,
                     NationalInsuranceNumber = command.NationalInsuranceNumber
                 },
-                Trn = matchedOnNinoAndDob.Trn,
+                Trn = singleMatchOnNinoAndDob.Trn,
                 Status = TrnRequestStatus.Completed,
                 PotentialDuplicate = false,
                 AccessYourTeachingQualificationsLink = aytqLink
