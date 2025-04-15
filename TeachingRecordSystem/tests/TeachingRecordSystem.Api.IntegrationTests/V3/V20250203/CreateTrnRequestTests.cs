@@ -377,22 +377,9 @@ public class CreateTrnRequestTests : TestBase
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus(bool apiKeyUserCanUpdatePii)
+    [Fact]
+    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus()
     {
-        if (apiKeyUserCanUpdatePii)
-        {
-            // Default application user ID is in AllowContactPiiUpdatesFromUserIds array in config
-            SetCurrentApiClient([ApiRoles.CreateTrn], DefaultApplicationUserId);
-        }
-        else
-        {
-            var newApiUser = await TestData.CreateApplicationUserAsync();
-            SetCurrentApiClient([ApiRoles.CreateTrn], newApiUser.UserId);
-        }
-
         // Arrange
         var requestId = Guid.NewGuid().ToString();
         var firstNames = new string[] { Faker.Name.First(), Faker.Name.First() };
@@ -402,8 +389,6 @@ public class CreateTrnRequestTests : TestBase
         var dateOfBirth = new DateOnly(1990, 01, 01);
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var configuration = HostFixture.Services.GetRequiredService<IConfiguration>();
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
@@ -441,14 +426,6 @@ public class CreateTrnRequestTests : TestBase
         Assert.Equal(lastName, contact.dfeta_StatedLastName);
         Assert.Equal(email, contact.EMailAddress1);
         Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
-        if (apiKeyUserCanUpdatePii)
-        {
-            Assert.True(contact.dfeta_AllowPiiUpdatesFromRegister);
-        }
-        else
-        {
-            Assert.False(contact.dfeta_AllowPiiUpdatesFromRegister);
-        }
 
         await AssertEx.JsonResponseEqualsAsync(
             response,

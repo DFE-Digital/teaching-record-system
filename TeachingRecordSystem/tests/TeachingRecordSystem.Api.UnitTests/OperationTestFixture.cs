@@ -5,7 +5,7 @@ using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
-public class OperationTestFixture : IAsyncLifetime
+public class OperationTestFixture
 {
     private readonly ICurrentUserProvider _currentUserProvider;
 
@@ -36,6 +36,12 @@ public class OperationTestFixture : IAsyncLifetime
             Clock,
             new FakeTrnGenerator(),
             TestDataSyncConfiguration.Sync(syncHelper));
+
+        var applicationUser = TestData.CreateApplicationUserAsync().GetAwaiter().GetResult();
+
+        Mock.Get(_currentUserProvider)
+            .Setup(mock => mock.GetCurrentApplicationUser())
+            .Returns((applicationUser.UserId, applicationUser.Name));
     }
 
     public TestableClock Clock { get; }
@@ -45,15 +51,4 @@ public class OperationTestFixture : IAsyncLifetime
     public DbFixture DbFixture { get; }
 
     public TestData TestData { get; }
-
-    public async Task InitializeAsync()
-    {
-        var applicationUser = await TestData.CreateApplicationUserAsync();
-
-        Mock.Get(_currentUserProvider)
-            .Setup(mock => mock.GetCurrentApplicationUser())
-            .Returns((applicationUser.UserId, applicationUser.Name));
-    }
-
-    public Task DisposeAsync() => Task.CompletedTask;
 }
