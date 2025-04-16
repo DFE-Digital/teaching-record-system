@@ -19,7 +19,7 @@ public class StartDateModel : AddRouteCommonPageModel
 
     public string BackLink => FromCheckAnswers ?
         _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId) :
-        PageAddress(PreviousPage(AddRoutePage.StartDate) ?? AddRoutePage.Status);
+        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.StartDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -39,7 +39,7 @@ public class StartDateModel : AddRouteCommonPageModel
         }
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
-            PageAddress(NextPage(AddRoutePage.StartDate) ?? AddRoutePage.CheckYourAnswers));
+            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.StartDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

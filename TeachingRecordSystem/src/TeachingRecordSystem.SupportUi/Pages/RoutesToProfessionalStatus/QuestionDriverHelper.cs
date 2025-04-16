@@ -2,9 +2,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
-// currently just uses a knowledge of page order combined with the FieldRequired method
-// page will also need to know whether the route can have an exemption (if status is awarded/approved)
-// and also need hasImplicitexemption - from InductionExemptionReason
 public static class PageDriver
 {
     public static AddRoutePage? NextPage(RouteToProfessionalStatus route, ProfessionalStatusStatus status, AddRoutePage currentPage)
@@ -38,7 +35,9 @@ public static class PageDriver
             var pageRequired = page.ToFieldRequirement(route, status);
 
             if (pageRequired != FieldRequirement.NotApplicable)
-            { return page; }
+            {
+                return page;
+            }
         }
 
         return null;
@@ -71,14 +70,18 @@ public static class QuestionDriverHelper
             AddRoutePage.Country => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement()),
             AddRoutePage.AgeSpecialism => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement()),
             AddRoutePage.SubjectSpecialism => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement()),
+            AddRoutePage.CheckYourAnswers => FieldRequirement.Mandatory,
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
     }
 
-    // CML TODO - temporary whilst waiting to find out how the combination should work
     public static FieldRequirement FieldRequired(FieldRequirement routeFieldRequirement, FieldRequirement statusFieldRequirement)
     {
-        if (routeFieldRequirement == FieldRequirement.Mandatory || statusFieldRequirement == FieldRequirement.Mandatory)
+        if (routeFieldRequirement == FieldRequirement.NotApplicable || statusFieldRequirement == FieldRequirement.NotApplicable)
+        {
+            return FieldRequirement.NotApplicable;
+        }
+        else if (routeFieldRequirement == FieldRequirement.Mandatory || statusFieldRequirement == FieldRequirement.Mandatory)
         {
             return FieldRequirement.Mandatory;
         }

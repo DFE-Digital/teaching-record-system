@@ -94,4 +94,9 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync("/route/add/end-date");
     }
+
+    public static Task AssertOnRouteAddTrainingProviderAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/training-provider");
+    }
 }

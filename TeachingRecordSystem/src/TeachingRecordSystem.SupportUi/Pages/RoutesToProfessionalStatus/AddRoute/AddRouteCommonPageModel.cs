@@ -37,7 +37,7 @@ public class AddRouteCommonPageModel : PageModel
 
     // currently just uses a knowledge of page order combined with the FieldRequired method
     // page will also need to know whether the route can have an exemption (if status is awarded/approved)
-    // and also need hasImplicitexemption - from InductionExemptionReason
+    // and whether hasImplicitexemption - from InductionExemptionReason
     public AddRoutePage? NextPage(AddRoutePage currentPage)
     {
         return PageDriver.NextPage(Route, Status, currentPage);
@@ -50,24 +50,9 @@ public class AddRouteCommonPageModel : PageModel
 
     public bool IsLastPage(AddRoutePage currentPage)
     {
-        var lastPage = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
-            .OrderByDescending(p => p)
-            .First();
-        return lastPage == currentPage;
+        return PageDriver.IsLastPage(currentPage);
     }
 
-    public string PageAddress(AddRoutePage page)
-    {
-        return page switch
-        {
-            AddRoutePage.EndDate => _linkGenerator.RouteAddEndDate(PersonId, JourneyInstance!.InstanceId),
-            AddRoutePage.StartDate => _linkGenerator.RouteAddStartDate(PersonId, JourneyInstance!.InstanceId),
-            AddRoutePage.Status => _linkGenerator.RouteAddStatus(PersonId, JourneyInstance!.InstanceId),
-            AddRoutePage.Route => _linkGenerator.RouteAddRoute(PersonId, JourneyInstance!.InstanceId),
-            _ => throw new ArgumentOutOfRangeException(nameof(page))
-        };
-    }
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))

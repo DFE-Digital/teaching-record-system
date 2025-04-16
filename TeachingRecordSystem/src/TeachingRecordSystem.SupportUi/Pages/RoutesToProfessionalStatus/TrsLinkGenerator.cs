@@ -76,16 +76,22 @@ public partial class TrsLinkGenerator
     public string RouteAddStartDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/StartDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddEndDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddEndDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddTrainingProvider(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddTrainingProviderCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string AddRoutePage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string RouteAddPage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId) =>
         page switch
         {
-            Pages.RoutesToProfessionalStatus.AddRoutePage.Route => RouteAddRoute(personId, journeyInstanceId, fromCheckAnswers),
-            Pages.RoutesToProfessionalStatus.AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId, fromCheckAnswers),
-            Pages.RoutesToProfessionalStatus.AddRoutePage.StartDate => RouteAddStartDate(personId, journeyInstanceId, fromCheckAnswers),
-            _ => throw new ArgumentOutOfRangeException(nameof(page))
+            AddRoutePage.Route => RouteAddRoute(personId, journeyInstanceId),
+            AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId),
+            AddRoutePage.StartDate => RouteAddStartDate(personId, journeyInstanceId),
+            AddRoutePage.EndDate => RouteAddEndDate(personId, journeyInstanceId),
+            AddRoutePage.TrainingProvider => RouteAddTrainingProvider(personId, journeyInstanceId),
+            _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };
 }

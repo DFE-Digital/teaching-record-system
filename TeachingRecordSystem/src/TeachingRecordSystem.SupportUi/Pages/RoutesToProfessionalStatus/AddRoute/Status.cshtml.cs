@@ -35,7 +35,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
             var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId!.Value);
             await JourneyInstance!.UpdateStateAsync(x => x.Status = Status);
             var nextPage = PageDriver.NextPage(route, Status, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
-            return Redirect(linkGenerator.AddRoutePage(nextPage, PersonId, JourneyInstance!.InstanceId));
+            return Redirect(linkGenerator.RouteAddPage(nextPage, PersonId, JourneyInstance!.InstanceId));
         }
     }
 }

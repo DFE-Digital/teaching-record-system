@@ -43,6 +43,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
             .Single(r => r.Name == "Apprenticeship");
         var startDate = new DateOnly(2021, 1, 1);
+        var endDate = startDate.AddMonths(1);
 
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -67,5 +68,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddEndDatePageAsync();
+        await page.FillDateInputAsync(endDate);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddTrainingProviderAsync();
     }
 }
