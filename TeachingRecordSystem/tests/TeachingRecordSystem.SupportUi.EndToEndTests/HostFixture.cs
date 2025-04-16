@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -79,6 +80,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton<IAuditRepository, TestableAuditRepository>();
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton(GetMockAdUserService());
+                    services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
 
                     IFileService GetMockFileService()
                     {
