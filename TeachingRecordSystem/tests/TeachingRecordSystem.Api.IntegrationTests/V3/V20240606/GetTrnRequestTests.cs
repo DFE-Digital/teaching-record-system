@@ -2,7 +2,7 @@ using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240307;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 
 public class GetTrnRequestTests : TestBase
 {
@@ -98,15 +98,6 @@ public class GetTrnRequestTests : TestBase
             expected: new
             {
                 requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber = existingContact.NationalInsuranceNumber,
-                },
                 trn = existingContact.Trn,
                 status = "Completed"
             },
@@ -144,15 +135,6 @@ public class GetTrnRequestTests : TestBase
             expected: new
             {
                 requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber,
-                },
                 trn = (string?)null,
                 status = "Pending"
             },

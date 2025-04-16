@@ -28,7 +28,7 @@ using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.WebCommon;
@@ -199,7 +199,7 @@ public class Program
         if (!env.IsUnitTests())
         {
             var crmServiceClient = GetCrmServiceClient();
-            services.AddTrnGenerationApi(configuration);
+            services.AddApiTrnGeneration(configuration);
             services.AddPooledDefaultServiceClient(crmServiceClient, size: 200);
             services.AddTransient<IDataverseAdapter, DataverseAdapter>();
 

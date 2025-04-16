@@ -1,13 +1,13 @@
 using Polly;
 
-namespace TeachingRecordSystem.Core.Services.TrnGenerationApi;
+namespace TeachingRecordSystem.Core.Services.TrnGeneration;
 
-public class TrnGenerationApiClient : ITrnGenerationApiClient
+public class ApiTrnGenerator : ITrnGenerator
 {
     private readonly HttpClient _httpClient;
     private readonly ResiliencePipeline _resiliencePipeline;
 
-    public TrnGenerationApiClient(HttpClient httpClient)
+    public ApiTrnGenerator(HttpClient httpClient)
     {
         _httpClient = httpClient;
 

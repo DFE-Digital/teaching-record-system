@@ -9,6 +9,7 @@ using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
@@ -94,6 +95,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                     services.AddSingleton<IAuditRepository, TestableAuditRepository>();
                     services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
                     services.AddSingleton(GetMockFileService());
+                    services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
 
                     IFileService GetMockFileService()
                     {

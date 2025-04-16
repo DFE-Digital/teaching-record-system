@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class CreateContactTests : IAsyncLifetime
@@ -44,9 +46,37 @@ public class CreateContactTests : IAsyncLifetime
             DateOfBirth = dateOfBirth,
             Gender = gender,
             Trn = trn,
-            PotentialDuplicates = [],
+            ReviewTasks = [],
             ApplicationUserName = "Tests",
-            OutboxMessages = [],
+            TrnRequestMetadataMessage = new TrnRequestMetadataMessage
+            {
+                ApplicationUserId = Guid.NewGuid(),
+                RequestId = Guid.NewGuid().ToString(),
+                CreatedOn = DateTime.UtcNow,
+                IdentityVerified = null,
+                EmailAddress = email,
+                OneLoginUserSubject = null,
+                Name = new string[]
+                {
+                    firstName,
+                    middleName,
+                    lastName
+                },
+                FirstName = firstName,
+                MiddleName = middleName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                PotentialDuplicate = false,
+                NationalInsuranceNumber = nino,
+                Gender = null,
+                AddressLine1 = null,
+                AddressLine2 = null,
+                AddressLine3 = null,
+                City = null,
+                Postcode = null,
+                Country = null,
+                TrnToken = null
+            },
             AllowPiiUpdates = true
         };
 
@@ -67,82 +97,5 @@ public class CreateContactTests : IAsyncLifetime
         Assert.Equal(dateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(true));
         Assert.Equal(gender, contact.GenderCode);
         Assert.True(contact.dfeta_AllowPiiUpdatesFromRegister);
-    }
-
-    [Fact]
-    public async Task QueryWithMatchedDuplicateContactName_ExecutesSuccessfully_CreatesTask()
-    {
-        // Arrange
-        var firstName = $"{_dataScope.TestData.GenerateFirstName()}";
-        var middleName = $"{_dataScope.TestData.GenerateMiddleName()}";
-        var lastName = $"{_dataScope.TestData.GenerateLastName()}";
-        var email = _dataScope.TestData.GenerateUniqueEmail();
-        var nino = _dataScope.TestData.GenerateNationalInsuranceNumber();
-        var dateOfBirth = _dataScope.TestData.GenerateDateOfBirth();
-
-        var existingContactId = Guid.NewGuid();
-        var existingContactTrn = await _dataScope.TestData.GenerateTrnAsync();
-        await _dataScope.OrganizationService.CreateAsync(new Contact()
-        {
-            Id = existingContactId,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            BirthDate = dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
-            dfeta_TRN = existingContactTrn
-        });
-
-        // Act
-        var query = new CreateContactQuery()
-        {
-            TrnRequestId = null,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = lastName,
-            StatedFirstName = firstName,
-            StatedMiddleName = middleName,
-            StatedLastName = lastName,
-            EmailAddress = email,
-            NationalInsuranceNumber = nino,
-            DateOfBirth = dateOfBirth,
-            Gender = Contact_GenderCode.Notavailable,
-            Trn = null,
-            PotentialDuplicates =
-            [
-                (Duplicate: new FindPotentialDuplicateContactsResult()
-                {
-                    ContactId = existingContactId,
-                    Trn = existingContactTrn,
-                    MatchedAttributes = [Contact.Fields.FirstName, Contact.Fields.MiddleName, Contact.Fields.LastName],
-                    HasEytsDate = false,
-                    HasQtsDate = false,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    StatedFirstName = firstName,
-                    StatedMiddleName = middleName,
-                    StatedLastName = lastName,
-                    PreviousLastName = null,
-                    DateOfBirth = dateOfBirth,
-                    EmailAddress = email,
-                    NationalInsuranceNumber = nino
-                },
-                HasActiveAlert: false)
-            ],
-            ApplicationUserName = "Tests",
-            OutboxMessages = [],
-            AllowPiiUpdates = false
-        };
-        var createdTeacherId2 = await _crmQueryDispatcher.ExecuteQueryAsync(query);
-        using var ctx = new DqtCrmServiceContext(_dataScope.OrganizationService);
-        var contact = ctx.ContactSet.SingleOrDefault(i => i.GetAttributeValue<Guid>(Contact.PrimaryIdAttribute) == createdTeacherId2);
-        var potentialDuplicateTask = ctx.TaskSet.FirstOrDefault(x => x.RegardingObjectId == createdTeacherId2.ToEntityReference(Contact.EntityLogicalName));
-
-        // Assert
-        Assert.NotNull(contact);
-        Assert.Null(contact.dfeta_TRN);
-        Assert.NotNull(potentialDuplicateTask);
-        Assert.Contains("Potential duplicate", potentialDuplicateTask.Description);
-        Assert.Equal("TRN request from Tests", potentialDuplicateTask.Category);
     }
 }

@@ -1,8 +1,10 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Queries;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240307;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.VNext;
 
 public class GetTrnRequestTests : TestBase
 {
@@ -10,6 +12,16 @@ public class GetTrnRequestTests : TestBase
         : base(hostFixture)
     {
         SetCurrentApiClient([ApiRoles.CreateTrn]);
+
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
     }
 
     [Theory, RoleNamesData(except: ApiRoles.CreateTrn)]
@@ -93,22 +105,17 @@ public class GetTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
 
         // Assert
+        var aytqLink = await GetAccessYourTeachingQualificationsLinkAsync(requestId);
+
         await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
             {
                 requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber = existingContact.NationalInsuranceNumber,
-                },
                 trn = existingContact.Trn,
-                status = "Completed"
+                status = "Completed",
+                potentialDuplicate = false,
+                accessYourTeachingQualificationsLink = aytqLink
             },
             expectedStatusCode: 200);
     }
@@ -133,7 +140,7 @@ public class GetTrnRequestTests : TestBase
             .WithDateOfBirth(dateOfBirth)
             .WithEmail(email)
             .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequest(ApplicationUserId, requestId));
+            .WithTrnRequest(ApplicationUserId, requestId, potentialDuplicate: true));
 
         // Act
         var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
@@ -144,18 +151,33 @@ public class GetTrnRequestTests : TestBase
             expected: new
             {
                 requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber,
-                },
                 trn = (string?)null,
-                status = "Pending"
+                status = "Pending",
+                potentialDuplicate = true,
+                accessYourTeachingQualificationsLink = (string?)null
             },
             expectedStatusCode: 200);
+    }
+
+    private async Task<string> GetAccessYourTeachingQualificationsLinkAsync(string requestId)
+    {
+        // We need Metadata in the DB to retrieve the TrnToken
+        await ProcessOutboxMessages<CreateContactQuery, Guid>(q => q.TrnRequestMetadataMessage);
+        await ProcessOutboxMessages<CreateDqtOutboxMessageQuery, Guid>(q => q.Message);
+
+        var trnToken = await WithDbContextAsync(async dbContext =>
+        {
+            var metadata = await dbContext.TrnRequestMetadata.SingleAsync(r => r.ApplicationUserId == ApplicationUserId && r.RequestId == requestId);
+
+            if (metadata.TrnToken is null)
+            {
+                throw new InvalidOperationException("TRN request does not have a TRN token.");
+            }
+
+            return metadata.TrnToken!;
+        });
+
+        return HostFixture.Services.GetRequiredService<TrnRequestHelper>()
+            .GetAccessYourTeachingQualificationsLink(trnToken);
     }
 }

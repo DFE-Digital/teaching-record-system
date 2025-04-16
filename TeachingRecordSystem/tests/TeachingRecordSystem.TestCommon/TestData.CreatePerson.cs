@@ -45,7 +45,7 @@ public partial class TestData
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private readonly List<CreatePersonProfessionalStatusBuilder> _professionalStatusBuilders = [];
         private DateOnly? _qtlsDate;
-        private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject)? _trnRequest;
+        private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
         private string? _trnToken;
         private string? _slugId;
         private int? _loginFailedCounter;
@@ -239,9 +239,10 @@ public partial class TestData
             string requestId,
             bool? identityVerified = null,
             string? oneLoginUserSubject = null,
-            bool writeMetadata = true)
+            bool writeMetadata = true,
+            bool? potentialDuplicate = null)
         {
-            _trnRequest = (applicationUserId, requestId, writeMetadata, identityVerified, oneLoginUserSubject);
+            _trnRequest = (applicationUserId, requestId, writeMetadata, identityVerified, oneLoginUserSubject, potentialDuplicate);
             return this;
         }
 
@@ -354,6 +355,11 @@ public partial class TestData
             if (_qtlsDate is not null)
             {
                 contact.dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false);
+            }
+
+            if (trn is not null && _trnToken is null && _email is not null)
+            {
+                _trnToken = Guid.NewGuid().ToString();
             }
 
             var txnRequestBuilder = RequestBuilder.CreateTransaction(testData.OrganizationService);
@@ -630,7 +636,9 @@ public partial class TestData
                         FirstName = firstName,
                         MiddleName = "",
                         LastName = lastName,
-                        DateOfBirth = dateOfBirth
+                        DateOfBirth = dateOfBirth,
+                        TrnToken = _trnToken,
+                        PotentialDuplicate = trnRequest.PotentialDuplicate ?? _hasTrn != true
                     });
                 }
             });

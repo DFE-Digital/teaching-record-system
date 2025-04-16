@@ -76,7 +76,8 @@ public class GetTrnRequestTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithoutTrn()
-            .WithSlugId(slugId));
+            .WithSlugId(slugId)
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -147,7 +148,8 @@ public class GetTrnRequestTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithSlugId(slugId));
+            .WithSlugId(slugId)
+            .WithTrnRequest(ApplicationUserId, requestId));
 
         await WithDbContextAsync(async dbContext =>
         {
@@ -220,6 +222,7 @@ public class GetTrnRequestTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithSlugId(slugId)
+            .WithTrnRequest(ApplicationUserId, requestId)
             .WithTrnToken(trnToken));
 
         await WithDbContextAsync(async dbContext =>

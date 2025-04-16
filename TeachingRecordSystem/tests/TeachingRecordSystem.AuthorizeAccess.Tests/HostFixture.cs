@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
@@ -64,6 +65,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton(GetMockFileService());
+            services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object);
 
             IFileService GetMockFileService()
             {

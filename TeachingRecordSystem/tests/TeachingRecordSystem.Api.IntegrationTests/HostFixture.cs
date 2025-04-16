@@ -10,8 +10,9 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 
@@ -81,11 +82,13 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-            services.AddSingleton<ITrnGenerationApiClient, FakeTrnGenerationApiClient>();
+            services.AddSingleton<ITrnGenerator, FakeTrnGenerationApiClient>();
             services.Decorate<ICrmQueryDispatcher>(
                 inner => new CrmQueryDispatcherDecorator(
                     inner,
                     TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()));
+            services.AddSingleton<OutboxMessageHandler>();
+            services.AddSingleton<MessageSerializer>();
 
             services.Configure<GetAnIdentityOptions>(options =>
             {

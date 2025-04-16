@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Text;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.Dqt.Queries;
@@ -15,8 +13,6 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
         var serializer = new MessageSerializer();
-
-        Debug.Assert(query.Trn is null || query.PotentialDuplicates.Count == 0);
 
         var contact = new Contact()
         {
@@ -44,81 +40,26 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 
         requestBuilder.AddRequest(new CreateRequest() { Target = contact });
 
-        foreach (var (duplicate, hasActiveAlert) in query.PotentialDuplicates)
+        foreach (var reviewTask in query.ReviewTasks)
         {
-            var task = CreateDuplicateReviewTaskEntity(duplicate, hasActiveAlert);
+            var task = new CrmTask()
+            {
+                RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
+                dfeta_potentialduplicateid = reviewTask.PotentialDuplicateContactId.ToEntityReference(Contact.EntityLogicalName),
+                Category = reviewTask.Category,
+                Subject = reviewTask.Subject,
+                Description = reviewTask.Description
+            };
+
             requestBuilder.AddRequest(new CreateRequest() { Target = task });
         }
 
-        foreach (var outboxMessage in query.OutboxMessages)
-        {
-            requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(outboxMessage) });
-        }
+        requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(query.TrnRequestMetadataMessage) });
 
         await requestBuilder.ExecuteAsync();
 
         return contactId;
 
-        CrmTask CreateDuplicateReviewTaskEntity(FindPotentialDuplicateContactsResult duplicate, bool hasActiveAlert)
-        {
-            var description = GetDescription();
 
-            var category = $"TRN request from {query.ApplicationUserName}";
-
-            return new CrmTask()
-            {
-                RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_potentialduplicateid = duplicate.ContactId.ToEntityReference(Contact.EntityLogicalName),
-                Category = category,
-                Subject = "Notification for QTS Unit Team",
-                Description = description
-            };
-
-            string GetDescription()
-            {
-                var sb = new StringBuilder();
-                sb.AppendLine("Potential duplicate");
-                sb.AppendLine("Matched on");
-
-                foreach (var matchedAttribute in duplicate.MatchedAttributes)
-                {
-                    sb.AppendLine(matchedAttribute switch
-                    {
-                        Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
-                        Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
-                        Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
-                        Contact.Fields.dfeta_PreviousLastName => $"  - Previous last name: '{duplicate.PreviousLastName}'",
-                        Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
-                        Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
-                        Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
-                        _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
-                    });
-                }
-
-                var additionalFlags = new List<string>();
-
-                if (hasActiveAlert)
-                {
-                    additionalFlags.Add("active sanctions");
-                }
-
-                if (duplicate.HasQtsDate)
-                {
-                    additionalFlags.Add("QTS date");
-                }
-
-                if (duplicate.HasEytsDate)
-                {
-                    additionalFlags.Add("EYTS date");
-                }
-
-                if (additionalFlags.Count > 0)
-                {
-                    sb.AppendLine($"Matched record has {string.Join(" & ", additionalFlags)}");
-                }
-
-                return sb.ToString();
-            }
-        }
     }
 }

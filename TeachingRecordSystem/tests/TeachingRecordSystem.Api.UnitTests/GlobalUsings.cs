@@ -1,1 +1,1 @@
-//global using TeachingRecordSystem.TestCommon;
+global using TeachingRecordSystem.TestCommon;

@@ -104,7 +104,18 @@ public partial class TestData
         return newName;
     }
 
-    public DateOnly GenerateDateOfBirth() => DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
+    public DateOnly GenerateDateOfBirth()
+    {
+        DateOnly dateOfBirth;
+
+        do
+        {
+            dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
+        }
+        while (dateOfBirth < new DateOnly(1940, 1, 1));
+
+        return dateOfBirth;
+    }
 
     public DateOnly GenerateChangedDateOfBirth(DateOnly currentDateOfBirth)
     {
