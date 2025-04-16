@@ -67,6 +67,8 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Route", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddCheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckYourAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddCheckAnswersCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckYourAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddStatus(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddStatusCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>

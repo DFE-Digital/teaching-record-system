@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -43,12 +42,5 @@ public class EndDateModel : AddRouteCommonPageModel
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.EndDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
     }
 }

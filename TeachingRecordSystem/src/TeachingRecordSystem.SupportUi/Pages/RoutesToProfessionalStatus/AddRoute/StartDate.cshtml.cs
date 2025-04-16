@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -35,16 +34,11 @@ public class StartDateModel : AddRouteCommonPageModel
         await JourneyInstance!.UpdateStateAsync(state => state.TrainingStartDate = TrainingStartDate);
         if (TrainingStartDate.HasValue && JourneyInstance!.State.TrainingEndDate is DateOnly endDate && TrainingStartDate >= endDate)
         {
-            return Redirect(_linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId, FromCheckAnswers));
+            return Redirect(_linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId));
         }
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.StartDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
-    }
-
-    public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
-    {
-        base.OnPageHandlerExecuting(context);
     }
 }
 

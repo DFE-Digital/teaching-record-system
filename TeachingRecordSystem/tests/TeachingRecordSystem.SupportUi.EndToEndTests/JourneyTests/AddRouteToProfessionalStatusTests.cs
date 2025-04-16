@@ -19,7 +19,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Add a route");
 
         await page.AssertOnRouteAddRoutePageAsync();
-        await page.SelectOptionAsync("#RouteId", route.RouteToProfessionalStatusId.ToString());
+        await page.FillAsync($"label:text-is('Route type')", route.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddStatusPageAsync();
@@ -57,7 +58,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Add a route");
 
         await page.AssertOnRouteAddRoutePageAsync();
-        await page.SelectOptionAsync("#RouteId", setRoute.RouteToProfessionalStatusId.ToString());
+        await page.FillAsync($"label:text-is('Route type')", setRoute.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddStatusPageAsync();

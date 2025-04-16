@@ -68,8 +68,8 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: true);
-        ArchivedRoutes = await referenceDataCache.GetRoutesToProfessionalStatusArchivedOnlyAsync();
+        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync();
+        ArchivedRoutes = Routes.Where(r => !r.IsActive).ToArray();
         var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
         if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))
         {

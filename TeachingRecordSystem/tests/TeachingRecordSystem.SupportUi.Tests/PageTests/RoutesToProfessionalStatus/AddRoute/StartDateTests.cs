@@ -164,6 +164,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        var expected = $"/route/add/end-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}";
         Assert.StartsWith($"/route/add/end-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
