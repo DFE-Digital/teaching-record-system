@@ -75,13 +75,10 @@ public static class QuestionDriverHelper
         };
     }
 
+    // CML TODO - temporary whilst waiting to find out how the combination should work
     public static FieldRequirement FieldRequired(FieldRequirement routeFieldRequirement, FieldRequirement statusFieldRequirement)
     {
-        if (routeFieldRequirement == FieldRequirement.NotApplicable || statusFieldRequirement == FieldRequirement.NotApplicable)
-        {
-            return FieldRequirement.NotApplicable;
-        }
-        else if (routeFieldRequirement == FieldRequirement.Mandatory || statusFieldRequirement == FieldRequirement.Mandatory)
+        if (routeFieldRequirement == FieldRequirement.Mandatory || statusFieldRequirement == FieldRequirement.Mandatory)
         {
             return FieldRequirement.Mandatory;
         }
