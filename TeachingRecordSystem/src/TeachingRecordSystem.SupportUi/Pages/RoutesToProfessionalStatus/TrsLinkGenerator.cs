@@ -58,4 +58,17 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Status", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditStatusCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Status", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+
+    public string RouteAddRoute(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+       GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Route", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddRouteCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Route", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddCheckYourAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddCheckYourAnswersCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddStatus(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddStatusCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Status", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 }
