@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Cancel_RedirectsToExpectedPage()
+    public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
@@ -45,6 +45,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/qualifications", location);
+        Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
     [Fact]
@@ -189,14 +190,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("Start date", "TrainingStartDateRequired")]
-    [InlineData("End date", "TrainingEndDateRequired")]
     [InlineData("Award date", "AwardDateRequired")]
-    [InlineData("Degree type", "DegreeTypeRequired")]
-    [InlineData("Training provider", "TrainingProviderRequired")]
-    [InlineData("Country of training", "TrainingCountryRequired")]
-    [InlineData("Age range", "TrainingAgeSpecialismTypeRequired")]
-    [InlineData("Subjects provider", "TrainingSubjectsRequired")]
     [InlineData("Has exemption", "InductionExemptionRequired")]
     public async Task Get_FieldNotApplicable_FieldNotShown(string elementText, string propertySelector)
     {

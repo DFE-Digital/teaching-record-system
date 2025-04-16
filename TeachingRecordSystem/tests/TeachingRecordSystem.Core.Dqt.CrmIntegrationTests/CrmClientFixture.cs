@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.TestCommon;
 
@@ -21,7 +21,7 @@ public sealed class CrmClientFixture : IDisposable
     private readonly EnvironmentLockManager _lockManager;
     private readonly IMemoryCache _memoryCache;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly ITrnGenerationApiClient _trnGenerationApiClient;
+    private readonly ITrnGenerator _trnGenerationApiClient;
     private readonly ReferenceDataCache _referenceDataCache;
 
     public CrmClientFixture(ServiceClient serviceClient, DbFixture dbFixture, IConfiguration configuration, IMemoryCache memoryCache, ILoggerFactory loggerFactory)
@@ -94,14 +94,14 @@ public sealed class CrmClientFixture : IDisposable
         return services.BuildServiceProvider();
     }
 
-    private ITrnGenerationApiClient GetTrnGenerationApiClient()
+    private ITrnGenerator GetTrnGenerationApiClient()
     {
         var httpClient = new HttpClient
         {
             BaseAddress = new Uri(Configuration.GetRequiredValue("TrnGenerationApi:BaseAddress"))
         };
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["TrnGenerationApi:ApiKey"]);
-        return new TrnGenerationApiClient(httpClient);
+        return new ApiTrnGenerator(httpClient);
     }
 
     public sealed class TestDataScope : IAsyncDisposable

@@ -14,7 +14,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
 using TeachingRecordSystem.Core.Services.PublishApi;
-using TeachingRecordSystem.Core.Services.TrnGenerationApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.Core.Services.WorkforceData;
@@ -74,10 +74,10 @@ await host.RunAsync();
 void AddLegacyDataverseAdapterServices()
 {
     builder.Services.AddTransient<IDataverseAdapter, DataverseAdapter>();
-    builder.Services.AddSingleton<ITrnGenerationApiClient, DummyTrnGenerationApiClient>();
+    builder.Services.AddSingleton<ITrnGenerator, DummyTrnGenerationApiClient>();
 }
 
-sealed class DummyTrnGenerationApiClient : ITrnGenerationApiClient
+sealed class DummyTrnGenerationApiClient : ITrnGenerator
 {
     public Task<string> GenerateTrnAsync() => throw new NotImplementedException();
 }

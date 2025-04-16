@@ -423,6 +423,12 @@ public class SeedCrmReferenceData : IStartupTask
 
         _xrmFakedContext.CreateEntity(new dfeta_country()
         {
+            dfeta_name = "United Kingdom",
+            dfeta_Value = "GB"
+        });
+
+        _xrmFakedContext.CreateEntity(new dfeta_country()
+        {
             dfeta_name = "Wales",
             dfeta_Value = "WA"
         });

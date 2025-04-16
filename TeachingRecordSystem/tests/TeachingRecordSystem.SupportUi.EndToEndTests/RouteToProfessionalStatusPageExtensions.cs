@@ -10,6 +10,11 @@ public static class RouteToProfessionalStatusPageExtensions
         return checkbox.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
+    public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
+    }
+
     public static Task AssertOnRouteEditStartDatePageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/start-date");

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TeachingRecordSystem.Core.Services.TrnGenerationApi;
+namespace TeachingRecordSystem.Core.Services.TrnGeneration;
 
 public class TrnGenerationApiOptions
 {

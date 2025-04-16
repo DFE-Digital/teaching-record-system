@@ -556,4 +556,12 @@ public static class PageExtensions
 
     public static Task ClickBackLink(this IPage page) =>
         page.ClickAsync($".govuk-back-link");
+
+    public static Task ClickCancelLink(this IPage page) =>
+        page.ClickAsync("a.govuk-link:contains('Cancel')");
+
+    public static Task ClickRadioAsync(this IPage page, string value) =>
+        page.Locator($"input[type='radio'][value='{value}']")
+        .Locator("xpath=following-sibling::label")
+        .ClickAsync();
 }

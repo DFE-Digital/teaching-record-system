@@ -3,11 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace TeachingRecordSystem.Core.Services.TrnGenerationApi;
+namespace TeachingRecordSystem.Core.Services.TrnGeneration;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddTrnGenerationApi(
+    public static IServiceCollection AddApiTrnGeneration(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -16,8 +16,8 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations();
 
         services
-            .AddSingleton<ITrnGenerationApiClient, TrnGenerationApiClient>()
-            .AddHttpClient<ITrnGenerationApiClient, TrnGenerationApiClient>((sp, httpClient) =>
+            .AddSingleton<ITrnGenerator, ApiTrnGenerator>()
+            .AddHttpClient<ITrnGenerator, ApiTrnGenerator>((sp, httpClient) =>
             {
                 var options = sp.GetRequiredService<IOptions<TrnGenerationApiOptions>>();
                 httpClient.BaseAddress = new Uri(options.Value.BaseAddress);

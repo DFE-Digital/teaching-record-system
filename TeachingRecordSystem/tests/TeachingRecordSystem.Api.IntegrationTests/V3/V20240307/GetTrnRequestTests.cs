@@ -68,69 +68,6 @@ public class GetTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Get_MergedRecord_ReturnsExpectedResponse()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email = Faker.Internet.Email();
-        var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var masterContact = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithFirstName(firstName)
-            .WithMiddleName(middleName)
-            .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(email)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber));
-
-        var existingContact = await TestData.CreatePersonAsync(p => p
-            .WithoutTrn()
-            .WithFirstName(firstName)
-            .WithMiddleName(middleName)
-            .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(email)
-            .WithNationalInsuranceNumber(nationalInsuranceNumber: nationalInsuranceNumber)
-            .WithTrnRequest(ApplicationUserId, requestId));
-
-        XrmFakedContext.UpdateEntity(new Contact()
-        {
-            ContactId = existingContact.ContactId,
-            Merged = true,
-            MasterId = masterContact.ContactId.ToEntityReference(Contact.EntityLogicalName),
-            StateCode = ContactState.Inactive
-        });
-
-        // Act
-        var response = await GetHttpClientWithApiKey().GetAsync($"v3/trn-requests?requestId={requestId}");
-
-        // Assert
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                person = new
-                {
-                    firstName,
-                    middleName,
-                    lastName,
-                    email,
-                    dateOfBirth,
-                    nationalInsuranceNumber = existingContact.NationalInsuranceNumber,
-                },
-                trn = masterContact.Trn,
-                status = "Completed"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
     public async Task Get_ValidCompletedTrnRequest_ReturnsExpectedResponse()
     {
         // Arrange

@@ -18,7 +18,7 @@ public class InductionExemptionModel(
     public RouteToProfessionalStatus Route { get; set; } = null!;
 
     [FromQuery]
-    public bool? FromCheckAnswers { get; set; }
+    public bool FromCheckAnswers { get; set; }
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -40,13 +40,32 @@ public class InductionExemptionModel(
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
+        {
+            // this is definitely the final page of the data collection for an awarded or approved status
+            await JourneyInstance!.UpdateStateAsync(s =>
+            {
+                s.Status = s.EditStatusState!.Status;
+                s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
+                s.AwardedDate = s.EditStatusState.AwardedDate;
+                s.IsExemptFromInduction = IsExemptFromInduction;
+                s.EditStatusState = null;
+            });
+        }
+        else // user is simply editing the induction exemption question
+        {
+            await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
+        }
+
+        return Redirect(FromCheckAnswers ?
+            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
-    public IActionResult OnPostCancel()
+    public async Task<IActionResult> OnPostCancelAsync()
     {
-        return Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+        await JourneyInstance!.DeleteAsync();
+        return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
     public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -71,4 +90,10 @@ public class InductionExemptionModel(
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
+
+    public string BackLink => FromCheckAnswers ?
+        linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+        JourneyInstance!.State.IsCompletingRoute ?
+            linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 }
