@@ -436,7 +436,7 @@ public class SetProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task Put_RouteTypeIsNotOverseasOrInternationalQualifiedTeacherStatusWithTrainingCountryReference_ReturnsBadRequest()
+    public async Task Put_RouteTypeIsNotOverseasOrInternationalQualifiedTeacherStatusWithNonGBTrainingCountryReference_ReturnsBadRequest()
     {
         // Arrange
         var slugId = "123456789";
@@ -448,14 +448,14 @@ public class SetProfessionalStatusTests : TestBase
             {
                 RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
-                TrainingCountryReference = "GB"
+                TrainingCountryReference = "FR"
             });
 
         // Act
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be specified when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB' when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -626,6 +626,55 @@ public class SetProfessionalStatusTests : TestBase
 
         // Assert
         await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatus.NiRId}'.");
+    }
+
+    [Fact]
+    public async Task Put_RouteTypeIsWalesWithNonWalesTrainingCountryReference_ReturnsBadRequest()
+    {
+        // Arrange
+        var slugId = "123456789";
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithSlugId(slugId));
+        var request = CreateJsonContent(
+            CreateRequest() with
+            {
+                RouteTypeId = RouteToProfessionalStatus.WelshRId,
+                Status = ProfessionalStatusStatus.Approved,
+                AwardedDate = Clock.Today,
+                TrainingCountryReference = "PT"
+            });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatus.WelshRId}'.");
+    }
+
+    [Theory]
+    [InlineData("GB-WLS")]
+    [InlineData("GB-CYM")]
+    public async Task Put_RouteTypeIsNotWalesWithWalesTrainingCountryReference_ReturnsBadRequest(string trainingCountryReference)
+    {
+        // Arrange
+        var slugId = "123456789";
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithSlugId(slugId));
+        var request = CreateJsonContent(
+            CreateRequest() with
+            {
+                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                Status = ProfessionalStatusStatus.InTraining,
+                TrainingCountryReference = trainingCountryReference
+            });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
+
+        // Assert
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be '{trainingCountryReference}' when route type is not '{RouteToProfessionalStatus.WelshRId}'.");
     }
 
     [Fact]
@@ -941,7 +990,7 @@ public class SetProfessionalStatusTests : TestBase
 
         var trainingProviderUkprn = "10044534";
         var expectedIttProviderName = "ARK Teacher Training";
-        var trainingCountryReference = RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId == routeTypeId ? "GB" : null;
+        var trainingCountryReference = "GB";
         var request = new SetProfessionalStatusRequest
         {
             RouteTypeId = routeTypeId,
@@ -974,6 +1023,17 @@ public class SetProfessionalStatusTests : TestBase
         Assert.Equal(expectedAgeRangeTo, itt.dfeta_AgeRangeTo);
         var expectedIttProvider = ctx.AccountSet.Single(a => a.Name == expectedIttProviderName);
         Assert.Equal(expectedIttProvider.Id, itt.dfeta_EstablishmentId?.Id);
+        var country = ctx.dfeta_countrySet.SingleOrDefault(c => c.dfeta_Value == trainingCountryReference);
+        var defaultCountry = ctx.dfeta_countrySet.SingleOrDefault(c => c.dfeta_Value == "XK");
+        if (trainingCountryReference is null)
+        {
+            Assert.Equal(defaultCountry!.Id, itt.dfeta_CountryId.Id);
+        }
+        else
+        {
+            Assert.Equal(country!.Id, itt.dfeta_CountryId.Id);
+        }
+
         // Check QTS record
         var qts = ctx.dfeta_qtsregistrationSet.SingleOrDefault(q => q.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.PersonId);
         Assert.NotNull(qts);
@@ -1335,7 +1395,7 @@ public class SetProfessionalStatusTests : TestBase
                 From = 3,
                 To = 7
             },
-            TrainingCountryReference = null,
+            TrainingCountryReference = "GB",
             TrainingProviderUkprn = "10007799"
         };
 

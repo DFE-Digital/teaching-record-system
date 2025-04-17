@@ -138,10 +138,10 @@ public class SetProfessionalStatusHandler(
         Guid? countryId = null;
         if (command.TrainingCountryReference is not null)
         {
-            var (IsSuccess, Result) = await command.TrainingCountryReference.TryConvertFromTrsCountryReferenceAsync(referenceDataCache);
+            var (IsSuccess, Result) = await command.TrainingCountryReference!.TryConvertFromTrsCountryReferenceAsync(referenceDataCache);
             if (!IsSuccess)
             {
-                return ApiError.InvalidTrainingCountryReference(command.TrainingCountryReference);
+                return ApiError.InvalidTrainingCountryReference(command.TrainingCountryReference!);
             }
 
             countryId = Result!.Id;
