@@ -17,7 +17,7 @@ public class StartDateModel : AddRouteCommonPageModel
     public DateOnly? TrainingStartDate { get; set; }
 
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId) :
+        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
         _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.StartDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
@@ -37,7 +37,7 @@ public class StartDateModel : AddRouteCommonPageModel
             return Redirect(_linkGenerator.RouteAddEndDate(PersonId, JourneyInstance.InstanceId));
         }
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance.InstanceId) :
+            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.StartDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 }

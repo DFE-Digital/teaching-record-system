@@ -20,7 +20,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
         ProfessionalStatusStatus Status { get; set; }
 
         public string BackLink => FromCheckAnswers ?
-            linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteAddRoute(PersonId, JourneyInstance!.InstanceId);
 
         public void OnGet()

@@ -62,7 +62,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
                 state.RouteToProfessionalStatusId = RouteId.HasValue ? RouteId.Value : ArchivedRouteId!.Value;
             });
         return Redirect(FromCheckAnswers
-            ? linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId)
+            ? linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
             : linkGenerator.RouteAddStatus(PersonId, JourneyInstance!.InstanceId));
     }
 

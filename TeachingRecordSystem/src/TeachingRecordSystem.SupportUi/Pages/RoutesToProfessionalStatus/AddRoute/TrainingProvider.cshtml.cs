@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class TrainingProviderModel : AddRouteCommonPageModel
 {
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckAnswers(PersonId, JourneyInstance!.InstanceId) :
+        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
         _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)

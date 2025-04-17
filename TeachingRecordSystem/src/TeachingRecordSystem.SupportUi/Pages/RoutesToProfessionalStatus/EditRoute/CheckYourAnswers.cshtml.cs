@@ -107,7 +107,7 @@ public class CheckYourAnswersModel(
         var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
             (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
 
-        if (!JourneyInstance!.State.ChangeReasonIsComplete)
+        if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
         {
             context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
             return;
