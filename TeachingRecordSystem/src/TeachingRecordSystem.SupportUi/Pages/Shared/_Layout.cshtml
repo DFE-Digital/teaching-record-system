@@ -54,9 +54,21 @@
 
                                 if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.UserManagement)).Succeeded)
                                 {
-                                    <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/users") ? "govuk-header__navigation-item--active" : "")">
-                                        <a class="govuk-header__link" href="@LinkGenerator.Users()">Users</a>
-                                    </li>
+                                    if (FeatureProvider.IsEnabled(FeatureNames.NewUserRoles))
+                                    {
+                                        <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/users") ? "govuk-header__navigation-item--active" : "")">
+                                            <a class="govuk-header__link" href="@LinkGenerator.Users()">Add and manage users</a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/legacy-users") ? "govuk-header__navigation-item--active" : "")">
+                                            <a class="govuk-header__link" href="@LinkGenerator.LegacyUsers()">Users</a>
+                                        </li>
+                                    }
+                                }
+                                if ((await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.AdminOnly)).Succeeded)
+                                {
                                     <li class="govuk-header__navigation-item @(Context.Request.Path.StartsWithSegments("/application-users") || Context.Request.Path.StartsWithSegments("/api-keys") ? "govuk-header__navigation-item--active" : "")">
                                         <a class="govuk-header__link" href="@LinkGenerator.ApplicationUsers()">Application users</a>
                                     </li>

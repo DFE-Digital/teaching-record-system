@@ -1,18 +1,18 @@
-@page "/users/{userId}/{handler?}"
-@using TeachingRecordSystem.Core
+@page "/legacy-users/add/confirm"
+@using TeachingRecordSystem.Core;
 @using TeachingRecordSystem.Core.Legacy
-@model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
+@model TeachingRecordSystem.SupportUi.Pages.LegacyUsers.AddUser.ConfirmModel
 @{
-    ViewBag.Title = $"Edit {Model.Name}";
+    ViewBag.Title = "Add user";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@LinkGenerator.Users()" />
+    <govuk-back-link href="@LinkGenerator.LegacyAddUser()" />
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.EditUser(Model.UserId)" method="post">
+        <form action="@LinkGenerator.LegacyAddUserConfirm(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             @if (!Model.HasCrmAccount)
@@ -30,14 +30,14 @@
 
             <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" disabled />
 
-            <govuk-input asp-for="Name" label-class="govuk-label--m" disabled="@(!Model.IsActiveUser)" />
+            <govuk-input asp-for="Name" label-class="govuk-label--m" />
 
             <govuk-checkboxes asp-for="Roles">
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--m" />
                     @foreach (var role in LegacyUserRoles.All)
                     {
-                        <govuk-checkboxes-item value="@role" disabled="@(!Model.IsActiveUser)">@LegacyUserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
+                        <govuk-checkboxes-item value="@role">@LegacyUserRoles.GetDisplayNameForRole(role)</govuk-checkboxes-item>
                     }
                 </govuk-checkboxes-fieldset>
             </govuk-checkboxes>
@@ -53,17 +53,7 @@
                 </ul>
             }
 
-            @if (Model.IsActiveUser)
-            {
-                <div class="govuk-button-group">
-                    <govuk-button type="submit">Save changes</govuk-button>
-                    <govuk-button class="govuk-button--secondary" type="submit" asp-page-handler="deactivate">Deactivate</govuk-button>
-                </div>
-            }
-            else
-            {
-                <govuk-button type="submit" asp-page-handler="activate">Reactivate</govuk-button>
-            }
+            <govuk-button type="submit">Save</govuk-button>
         </form>
     </div>
 </div>

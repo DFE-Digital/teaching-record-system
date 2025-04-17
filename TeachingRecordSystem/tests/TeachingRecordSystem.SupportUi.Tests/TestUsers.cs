@@ -40,4 +40,9 @@ public class TestUsers(IDbContextFactory<TrsDbContext> dbContextFactory)
             return user;
         }
     }
+
+    public void ClearCache()
+    {
+        _users.Clear();
+    }
 }

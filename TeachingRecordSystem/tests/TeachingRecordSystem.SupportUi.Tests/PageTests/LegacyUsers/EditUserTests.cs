@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.Legacy;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.LegacyUsers;
 
 public class EditUserTests : TestBase
 {
@@ -338,5 +338,5 @@ public class EditUserTests : TestBase
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "User reactivated");
     }
 
-    private static string GetRequestPath(Guid userId) => $"/users/{userId}";
+    private static string GetRequestPath(Guid userId) => $"/legacy-users/{userId}";
 }

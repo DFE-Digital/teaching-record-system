@@ -1,12 +1,12 @@
-@page "/users/add"
-@model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.IndexModel
+@page "/legacy-users/add"
+@model TeachingRecordSystem.SupportUi.Pages.LegacyUsers.AddUser.IndexModel
 @{
     ViewBag.Title = "Add user";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <form action="@LinkGenerator.AddUser()" method="post">
+        <form action="@LinkGenerator.LegacyAddUser()" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
             <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" autocomplete="off" />
