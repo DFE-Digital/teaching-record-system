@@ -1,3 +1,5 @@
+using Parquet.Meta;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class RouteToProfessionalStatus
@@ -14,6 +16,7 @@ public class RouteToProfessionalStatus
     public static Guid ScotlandRId { get; } = new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB");
     public static Guid EarlyYearsIttGraduateEntryId { get; } = new("DBC4125B-9235-41E4-ABD2-BAABBF63F829");
     public static Guid EarlyYearsIttUndergraduateId { get; } = new("C97C0FD2-FD84-4949-97C7-B0E2422FB3C8");
+    public static Guid WelshRId { get; } = new("877ba701-fe26-4951-9f15-171f3755d50d");
 
     public required Guid RouteToProfessionalStatusId { get; init; }
     public required string Name { get; init; }
