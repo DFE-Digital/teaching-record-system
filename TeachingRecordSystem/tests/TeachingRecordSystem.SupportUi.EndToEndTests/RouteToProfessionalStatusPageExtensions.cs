@@ -10,6 +10,11 @@ public static class RouteToProfessionalStatusPageExtensions
         return checkbox.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
+    public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
+    }
+
     public static Task AssertOnRouteEditStartDatePageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/start-date");
@@ -70,11 +75,6 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/check-answers");
     }
 
-    public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
-    {
-        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
-    }
-
     public static Task AssertOnRouteAddRoutePageAsync(this IPage page)
     {
         return page.WaitForUrlPathAsync("/route/add/route");
@@ -83,5 +83,20 @@ public static class RouteToProfessionalStatusPageExtensions
     public static Task AssertOnRouteAddStatusPageAsync(this IPage page)
     {
         return page.WaitForUrlPathAsync("/route/add/status");
+    }
+
+    public static Task AssertOnRouteAddStartDatePageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/start-date");
+    }
+
+    public static Task AssertOnRouteAddEndDatePageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/end-date");
+    }
+
+    public static Task AssertOnRouteAddTrainingProviderAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/training-provider");
     }
 }
