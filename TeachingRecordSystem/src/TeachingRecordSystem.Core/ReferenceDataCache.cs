@@ -396,7 +396,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.RoutesToProfessionalStatus.AsNoTracking().ToArrayAsync();
+                return await dbContext.RoutesToProfessionalStatus.Include(r => r.InductionExemptionReason).AsNoTracking().ToArrayAsync();
             });
 
     private Task<Country[]> EnsureTrainingCountriesAsync() =>

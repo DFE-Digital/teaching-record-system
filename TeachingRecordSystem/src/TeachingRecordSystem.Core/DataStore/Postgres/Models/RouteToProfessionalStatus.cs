@@ -4,6 +4,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class RouteToProfessionalStatus
 {
+    public const string InductionExemptionReasonIdIndexName = "ix_route_to_professional_status_induction_exemption_reason_id";
+    public const string InductionExemptionReasonForeignKeyName = "fk_route_to_professional_status_induction_exemption_reason";
+
     public static Guid ApplyforQtsId { get; } = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713");
     public static Guid AssessmentOnlyRouteId { get; } = new("57B86CEF-98E2-4962-A74A-D47C7A34B838");
     public static Guid EuropeanRecognitionId { get; } = new("2B106B9D-BA39-4E2D-A42E-0CE827FDC324");
@@ -31,5 +34,6 @@ public class RouteToProfessionalStatus
     public required FieldRequirement TrainingCountryRequired { get; init; }
     public required FieldRequirement TrainingAgeSpecialismTypeRequired { get; init; }
     public required FieldRequirement TrainingSubjectsRequired { get; init; }
+    public InductionExemptionReason InductionExemptionReason { get; } = null!;
     public required Guid? InductionExemptionReasonId { get; init; }
 }
