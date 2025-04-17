@@ -19,7 +19,9 @@
     "objectid",
     "objecttypecode",
     "subject",
-    "statecode"
+    "statecode",
+    "createdby",
+    "createdon"
   ],
   "audit": [
     "action",

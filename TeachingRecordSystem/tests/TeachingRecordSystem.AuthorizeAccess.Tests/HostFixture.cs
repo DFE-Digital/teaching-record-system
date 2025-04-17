@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.AuthorizeAccess.Tests.Infrastructure.Security;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -54,6 +55,7 @@ public class HostFixture : WebApplicationFactory<Program>
 
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
+            services.AddTestScoped<IDqtNoteAttachmentStorage>(tss => tss.DqtNoteFileAttachmentStorageMock.Object);
             services.AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,

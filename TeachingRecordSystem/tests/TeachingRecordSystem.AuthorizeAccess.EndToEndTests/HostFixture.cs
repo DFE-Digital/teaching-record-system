@@ -8,6 +8,7 @@ using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -85,7 +86,7 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                         });
 
                     services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
-
+                    services.AddSingleton<IDqtNoteAttachmentStorage>(Mock.Of<IDqtNoteAttachmentStorage>());
                     services.AddSingleton<OneLoginCurrentUserProvider>();
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));

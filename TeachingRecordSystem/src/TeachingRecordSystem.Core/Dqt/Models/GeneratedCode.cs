@@ -825,6 +825,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		{
 			public const string AnnotationId = "annotationid";
 			public const string Id = "annotationid";
+			public const string CreatedBy = "createdby";
+			public const string CreatedOn = "createdon";
 			public const string DocumentBody = "documentbody";
 			public const string FileName = "filename";
 			public const string IsDocument = "isdocument";
@@ -933,6 +935,46 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			set
 			{
 				this.AnnotationId = value;
+			}
+		}
+		
+		/// <summary>
+		/// Unique identifier of the user who created the note.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdby")]
+		public Microsoft.Xrm.Sdk.EntityReference CreatedBy
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("createdby");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedBy");
+				this.SetAttributeValue("createdby", value);
+				this.OnPropertyChanged("CreatedBy");
+			}
+		}
+		
+		/// <summary>
+		/// Date and time when the note was created.
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("createdon")]
+		public System.Nullable<System.DateTime> CreatedOn
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("createdon");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("CreatedOn");
+				this.SetAttributeValue("createdon", value);
+				this.OnPropertyChanged("CreatedOn");
 			}
 		}
 		

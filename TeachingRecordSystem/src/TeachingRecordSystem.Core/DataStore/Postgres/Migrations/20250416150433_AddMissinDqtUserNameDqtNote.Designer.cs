@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250416150433_AddMissinDqtUserNameDqtNote")]
+    partial class AddMissinDqtUserNameDqtNote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4181,9 +4184,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.HasKey("RouteToProfessionalStatusId")
                         .HasName("pk_routes_to_professional_status");
-
-                    b.HasIndex("InductionExemptionReasonId")
-                        .HasDatabaseName("ix_route_to_professional_status_induction_exemption_reason_id");
 
                     b.ToTable("routes_to_professional_status", (string)null);
 
@@ -17350,16 +17350,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.DqtNote", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_dqt_notes_persons_person_id");
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.EstablishmentSource", null)
@@ -17443,16 +17433,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_qualifications_person");
 
                     b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatus", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.InductionExemptionReason", "InductionExemptionReason")
-                        .WithMany()
-                        .HasForeignKey("InductionExemptionReasonId")
-                        .HasConstraintName("fk_route_to_professional_status_induction_exemption_reason");
-
-                    b.Navigation("InductionExemptionReason");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.SupportTask", b =>

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
@@ -15,6 +16,7 @@ public class TestScopedServices
         DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
         CrmQueryDispatcherSpy = new();
+        DqtNoteFileAttachmentStorageMock = new();
 
         AccessYourTeachingQualificationsOptions = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
@@ -56,4 +58,6 @@ public class TestScopedServices
     public IOptions<AccessYourTeachingQualificationsOptions> AccessYourTeachingQualificationsOptions { get; }
 
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy { get; }
+
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; }
 }
