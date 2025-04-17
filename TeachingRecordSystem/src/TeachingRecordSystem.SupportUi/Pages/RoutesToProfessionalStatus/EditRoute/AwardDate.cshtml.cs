@@ -8,8 +8,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRo
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
 public class AwardDateModel(
-    TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+    TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -44,14 +43,14 @@ public class AwardDateModel(
         }
 
         var nextPage = JourneyInstance!.State.IsCompletingRoute ?
-            (await NextCompletingRoutePageAsync()) :
+            NextCompletingRoutePage :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
         {
-            if (await IsLastCompletingRoutePageAsync()) // if this is the last page of the data collection for the status
+            if (IsLastCompletingRoutePage()) // if this is the last page of the data collection for the status
             {
                 await JourneyInstance!.UpdateStateAsync(s => // update the main journey state with the data
                 {
@@ -62,7 +61,7 @@ public class AwardDateModel(
                     s.EditStatusState = null;
                 });
             }
-            else // there're more pages to come - store the data in the temporary journey state
+            else // there are more pages to come - store the data in the temporary journey state
             {
                 await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.AwardedDate = AwardedDate);
             }
@@ -89,17 +88,18 @@ public class AwardDateModel(
 
         var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
         RouteToProfessionalStatus = routeFeature.ProfessionalStatus.Route;
+        var inductionexemptionReason = RouteToProfessionalStatus.InductionExemptionReason;
         base.OnPageHandlerExecuting(context);
     }
 
     public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
-                PreviousCompletingRoutePage() :
+                PreviousCompletingRoutePage :
                 linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
-    private async Task<bool> IsLastCompletingRoutePageAsync()
+    private bool IsLastCompletingRoutePage()
     {
         if (JourneyInstance!.State.EditStatusState != null)
         {
@@ -111,7 +111,7 @@ public class AwardDateModel(
             else
             {
                 return RouteToProfessionalStatus.InductionExemptionReasonId.HasValue &&
-                    (await referenceDataCache.GetInductionExemptionReasonByIdAsync(RouteToProfessionalStatus.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
+                    RouteToProfessionalStatus.InductionExemptionReason.RouteImplicitExemption;
             }
         }
         else
@@ -120,17 +120,13 @@ public class AwardDateModel(
         }
     }
 
-    private async Task<string> NextCompletingRoutePageAsync()
-    {
-        return (await IsLastCompletingRoutePageAsync()) ?
+    private string NextCompletingRoutePage =>
+        IsLastCompletingRoutePage() ?
             linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
-    }
 
-    private string PreviousCompletingRoutePage()
-    {
-        return QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
+    private string PreviousCompletingRoutePage =>
+        QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
             linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
-    }
 }

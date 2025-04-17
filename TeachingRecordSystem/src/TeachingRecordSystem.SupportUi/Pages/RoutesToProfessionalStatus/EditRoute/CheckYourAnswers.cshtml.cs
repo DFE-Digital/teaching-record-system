@@ -104,9 +104,6 @@ public class CheckYourAnswersModel(
         var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         var status = JourneyInstance!.State.Status;
 
-        var hasImplicitExemption = route.InductionExemptionReasonId.HasValue &&
-            (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption;
-
         if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
         {
             context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
@@ -119,7 +116,7 @@ public class CheckYourAnswersModel(
 
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
-
+        var hasImplicitExemption = route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         RouteDetail = new RouteDetailViewModel
         {
             QualificationType = JourneyInstance!.State.QualificationType,
