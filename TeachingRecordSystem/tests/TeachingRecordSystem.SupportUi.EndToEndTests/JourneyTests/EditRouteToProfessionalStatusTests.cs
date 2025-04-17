@@ -5,6 +5,8 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class EditRouteToProfessionalStatusTests : TestBase
 {
+    private static string _countryCode = "AG";
+
     public EditRouteToProfessionalStatusTests(HostFixture hostFixture)
         : base(hostFixture)
     {
@@ -16,7 +18,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.Awarded;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setEndDate = endDate.AddDays(1);
@@ -24,7 +26,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setAwardDate = setEndDate.AddDays(1);
         var setDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("2f7a914f-f95f-421a-a55e-60ed88074cf2"));
         var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
-        var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("AG");
+        var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var setSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("015d862e-2aed-49df-9e5f-d17b0d426972"));
         //var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
         //    .RandomOne();
@@ -35,6 +37,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithTrainingCountry(setCountry)
+                    .WithAwardedDate(endDate)
+                    .WithExemptFromInduction(true)
                 ));
 
         var personId = person.PersonId;
@@ -174,6 +179,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
+        var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);
         var setEndDate = startDate.AddDays(2);
@@ -184,6 +190,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithTrainingCountry(country)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -233,6 +240,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setStartDate = startDate.AddDays(2);
+        var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -240,6 +248,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithTrainingCountry(country)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -335,6 +344,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);
+        var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var setEndDate = startDate.AddDays(2);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
@@ -343,6 +353,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithTrainingCountry(country)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -397,6 +408,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setStartDate = startDate.AddDays(2);
+        var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -404,6 +416,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithTrainingCountry(country)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -458,6 +471,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setAwardDate = endDate.AddDays(1);
+        var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -465,6 +479,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithTrainingCountry(country)
+                    .WithExemptFromInduction(false)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
