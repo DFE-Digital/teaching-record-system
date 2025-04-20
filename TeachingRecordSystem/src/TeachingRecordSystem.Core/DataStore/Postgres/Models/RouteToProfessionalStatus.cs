@@ -1,5 +1,3 @@
-using Parquet.Meta;
-
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class RouteToProfessionalStatus
@@ -34,6 +32,6 @@ public class RouteToProfessionalStatus
     public required FieldRequirement TrainingCountryRequired { get; init; }
     public required FieldRequirement TrainingAgeSpecialismTypeRequired { get; init; }
     public required FieldRequirement TrainingSubjectsRequired { get; init; }
-    public InductionExemptionReason InductionExemptionReason { get; } = null!;
+    public InductionExemptionReason? InductionExemptionReason { get; }
     public required Guid? InductionExemptionReasonId { get; init; }
 }

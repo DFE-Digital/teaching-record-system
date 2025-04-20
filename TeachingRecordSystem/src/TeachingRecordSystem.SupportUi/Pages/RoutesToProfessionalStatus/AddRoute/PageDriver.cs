@@ -13,11 +13,21 @@ public static class PageDriver
 
         foreach (var page in pagesInOrder)
         {
-            var pageRequired = page.ToFieldRequirement(route, status);
+            var pageRequired = page.FieldRequirementForPage(route, status);
 
             if (pageRequired != FieldRequirement.NotApplicable)
             {
-                return page;
+                // if the route has an implicit exemption, don't show the induction exemption page
+                if (page == AddRoutePage.InductionExemption
+                    && route.InductionExemptionReason is not null
+                    && route.InductionExemptionReason.RouteImplicitExemption)
+                {
+                    continue;
+                }
+                else
+                {
+                    return page;
+                }
             }
         }
         return null;
@@ -32,11 +42,21 @@ public static class PageDriver
 
         foreach (var page in pagesInOrder)
         {
-            var pageRequired = page.ToFieldRequirement(route, status);
+            var pageRequired = page.FieldRequirementForPage(route, status);
 
             if (pageRequired != FieldRequirement.NotApplicable)
             {
-                return page;
+                // if the route has an implicit exemption, don't show the induction exemption page
+                if (page == AddRoutePage.InductionExemption
+                    && route.InductionExemptionReason is not null
+                    && route.InductionExemptionReason.RouteImplicitExemption)
+                {
+                    continue;
+                }
+                else
+                {
+                    return page;
+                }
             }
         }
 
@@ -52,7 +72,7 @@ public static class PageDriver
         return lastPage == currentPage;
     }
 
-    public static FieldRequirement ToFieldRequirement(this AddRoutePage page, RouteToProfessionalStatus Route, ProfessionalStatusStatus Status)
+    public static FieldRequirement FieldRequirementForPage(this AddRoutePage page, RouteToProfessionalStatus Route, ProfessionalStatusStatus Status)
     {
         return page switch
         {
