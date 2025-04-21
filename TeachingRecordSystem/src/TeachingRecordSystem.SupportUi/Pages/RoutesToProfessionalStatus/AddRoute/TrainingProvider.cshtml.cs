@@ -1,5 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
+[Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class TrainingProviderModel : AddRouteCommonPageModel
 {
     public string BackLink => FromCheckAnswers ?
@@ -8,8 +9,8 @@ public class TrainingProviderModel : AddRouteCommonPageModel
 
     public TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
     {
-
     }
+
     public void OnGet()
     {
     }
