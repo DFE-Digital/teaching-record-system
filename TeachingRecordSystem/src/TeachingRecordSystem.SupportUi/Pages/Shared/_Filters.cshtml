@@ -1,0 +1,36 @@
+﻿@model FiltersViewModel
+
+<div class="moj-filter">
+    <div class="moj-filter__header">
+        <div class="moj-filter__header-title">
+            <h2 class="govuk-heading-m">Filter</h2>
+        </div>
+
+        <div class="moj-filter__header-action">
+
+        </div>
+
+    </div>
+
+    <form asp-antiforgery="false" method="get" class="moj-filter__options">
+        @foreach (var filter in Model.Filters)
+        {
+            if (filter is TextSearchFilterViewModel textSearch)
+            {
+                <partial name="_TextSearchFilter" model=textSearch />
+            }
+            else if (filter is CheckboxFilterViewModel checkbox)
+            {
+                <partial name="_CheckboxFilter" model=checkbox />
+            }
+        }
+
+        <div class="govuk-button-group">
+            <govuk-button type="submit">@Model.SubmitButtonText</govuk-button>
+
+            <div class="moj-filter__heading-action">
+                <p><a class="govuk-link govuk-link--no-visited-state" href=@Model.ClearUrl>Clear filters</a></p>
+            </div>
+        </div>
+    </form>
+</div>

@@ -9,7 +9,7 @@
 
 <div class="moj-filter-layout">
     <div class="moj-filter-layout__filter" style="width:280px!important;">
-        <partial name="_Filters" />
+        <partial name="_Filters" model=@Model.Filters />
     </div>
 
     <div class="moj-filter-layout__content">
@@ -26,7 +26,8 @@
                 }
                 else
                 {
-                    <p class="govuk-body">No users</p>
+                    <p class="govuk-body"><strong>No results found</strong></p>
+                    <p class="govuk-body">Try changing or clearing the filters.</p>
                 }
             </div>
         </div>

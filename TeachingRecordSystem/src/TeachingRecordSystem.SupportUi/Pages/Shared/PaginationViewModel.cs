@@ -1,23 +1,28 @@
-﻿namespace TeachingRecordSystem.SupportUi.Pages.Shared;
+﻿using Microsoft.Extensions.Primitives;
+using TeachingRecordSystem.SupportUi.Pages.Common;
 
-public class PaginationViewModel(int? Page, int TotalItems, int ItemsPerPage, string BaseUrl)
+namespace TeachingRecordSystem.SupportUi.Pages.Shared;
+
+public class PaginationViewModel(string name, int currentPage, int firstPage, int lastPage, IQueryCollection currentRequestQueryString)
 {
-    public int CurrentPage =>
-        Math.Clamp(Page ?? 1, 1, LastPage);
+    public int CurrentPage => currentPage;
+    public int FirstPage => firstPage;
+    public int LastPage => lastPage;
 
-    public int FirstPage => 1;
-
-    public int LastPage =>
-        (int)Math.Ceiling(TotalItems / (decimal)ItemsPerPage);
+    public bool ShowPagination =>
+        LastPage > 1;
 
     public int PreviousPage =>
         CurrentPage - 1;
 
+    public bool ShowPreviousPage =>
+        CurrentPage > FirstPage;
+
     public int NextPage =>
         CurrentPage + 1;
 
-    public bool ShowPagination =>
-        LastPage > 1;
+    public bool ShowNextPage =>
+        CurrentPage < LastPage;
 
     public bool ShowFirstPage =>
         PreviousPage > FirstPage;
@@ -25,23 +30,23 @@ public class PaginationViewModel(int? Page, int TotalItems, int ItemsPerPage, st
     public bool ShowFirstPageEllipsis =>
         PreviousPage - FirstPage > 1;
 
-    public bool ShowPreviousPage =>
-        CurrentPage > FirstPage;
-
-    public bool ShowNextPage =>
-        CurrentPage < LastPage;
+    public bool ShowLastPage =>
+        NextPage < LastPage;
 
     public bool ShowLastPageEllipsis =>
         LastPage - NextPage > 1;
 
-    public bool ShowLastPage =>
-        NextPage < LastPage;
+    public string PageLink(int page)
+    {
+        var queryString = new Dictionary<string, StringValues>(currentRequestQueryString);
 
-    public string PageLink(int page) =>
-        $"{BaseUrl}?page={page}";
+        queryString[name] = page.ToString();
 
-    public IEnumerable<T> Paginate<T>(IEnumerable<T> source) =>
-        source
-        .Skip((CurrentPage - 1) * ItemsPerPage)
-        .Take(ItemsPerPage);
+        return QueryString.Create(queryString).ToString();
+    }
+
+    public static PaginationViewModel Create(Pagination pagination, IQueryCollection currentRequestQueryString)
+    {
+        return new(pagination.Name, pagination.CurrentPage, pagination.FirstPage, pagination.LastPage, currentRequestQueryString);
+    }
 }

@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+using TeachingRecordSystem.SupportUi.Pages.Common;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
@@ -23,40 +24,57 @@ public class IndexModel : PageModel
         _linkGenerator = linkGenerator;
     }
 
-    [FromQuery(Name = "page")]
-    public int? CurrentPage { get; set; }
-
-    private User[] AllUsers { get; set; } = [];
-
-    public IEnumerable<UserViewModel> CurrentPageUsers { get; set; } = [];
-
-    public PaginationViewModel? Pagination { get; set; }
-
-    public bool HasUsers =>
-        AllUsers.Length > 0;
+    public bool HasUsers { get; private set; } = false;
+    public IEnumerable<UserViewModel> CurrentPageUsers { get; private set; } = [];
+    public PaginationViewModel? Pagination { get; private set; }
+    public FiltersViewModel? Filters { get; private set; }
 
     public async Task OnGetAsync()
     {
-        AllUsers = await _dbContext.Users
-            .Where(u => u.UserType == UserType.Person && !string.IsNullOrWhiteSpace(u.Email))
-            .OrderBy(u => u.Name)
-            .ToArrayAsync();
+        var pagination = new Pagination("page", UsersPerPage, Request.Query);
 
-        Pagination = new PaginationViewModel(CurrentPage, AllUsers.Length, UsersPerPage, "");
-        CurrentPageUsers = Pagination!
-            .Paginate(AllUsers)
-            .Select(CreateUserViewModel);
+        var filters = new FilterCollection<User>([
+            new SingleValueFilter<User>("keywords", "Search", Request.Query,
+                value => u => u.Name.ToLower().Contains(value.ToLower()) || u.Email!.ToLower().Contains(value.ToLower())),
+
+            new MultiValueFilter<User>("role", "Role", Request.Query,
+                u => u.Role,
+                [.. UserRoles.All.Select(r => new MultiValueFilterValue(r, UserRoles.GetDisplayNameForRole(r)))]),
+
+            new MultiValueFilter<User>("status", "Status", Request.Query,
+                u => u.Active ? "active" : "deactivated",
+                [
+                    new MultiValueFilterValue("active", "Active"),
+                    new MultiValueFilterValue("deactivated", "Deactivated")
+                ])
+        ]);
+
+        var baseQuery = _dbContext.Users
+            .Where(u => u.UserType == UserType.Person && !string.IsNullOrWhiteSpace(u.Email));
+
+        var filteredQuery = filters.Apply(baseQuery);
+
+        var totalUserCount = await filters.CountAsync(filteredQuery);
+
+        var paginatedUsers = await pagination.PaginateAsync(
+            filteredQuery.OrderBy(u => u.Name),
+            totalUserCount);
+
+        HasUsers = totalUserCount > 0;
+        CurrentPageUsers = paginatedUsers.Select(CreateViewModel);
+        Filters = FiltersViewModel.Create(filters, "Find user");
+        Pagination = PaginationViewModel.Create(pagination, Request.Query);
     }
 
-    private UserViewModel CreateUserViewModel(User user)
+    private UserViewModel CreateViewModel(User user)
     {
         return new()
         {
             Id = user.UserId.ToString(),
             Name = user.Name,
             EditUrl = _linkGenerator.LegacyEditUser(user.UserId),
-            EmailAddress = user.Email ?? "(No email address)",
-            Role = user.Role == null ? "(No user role assigned)" : UserRoles.GetDisplayNameForRole(user.Role),
+            EmailAddress = user.Email ?? "No email address",
+            Role = user.Role == null ? "No role assigned" : UserRoles.GetDisplayNameForRole(user.Role),
             Status = user.Active ? "Active" : "Inactive"
         };
     }
