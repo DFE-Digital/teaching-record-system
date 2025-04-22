@@ -14,6 +14,8 @@ using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -25,7 +27,8 @@ public class TrsDataSyncHelper(
 #pragma warning restore CS9113 // Parameter is unread.
     IClock clock,
     IAuditRepository auditRepository,
-    ILogger<TrsDataSyncHelper> logger)
+    ILogger<TrsDataSyncHelper> logger,
+    IDqtNoteAttachmentStorage dqtNoteAttachment)
 {
     private delegate Task SyncEntitiesHandler(IReadOnlyCollection<Entity> entities, bool ignoreInvalid, bool dryRun, CancellationToken cancellationToken);
 
@@ -37,7 +40,8 @@ public class TrsDataSyncHelper(
     {
         { ModelTypes.Person, GetModelTypeSyncInfoForPerson() },
         { ModelTypes.Event, GetModelTypeSyncInfoForEvent() },
-        { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() }
+        { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() },
+        { ModelTypes.DqtNote, GetModelTypeSyncInfoForNotes() },
     };
 
     private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
@@ -112,6 +116,27 @@ public class TrsDataSyncHelper(
 
         var audits = await GetAuditRecordsAsync(entityLogicalName, idsToSync, cancellationToken);
         await Task.WhenAll(audits.Select(async kvp => await auditRepository.SetAuditDetailAsync(entityLogicalName, kvp.Key, kvp.Value)));
+    }
+
+    private DqtNoteInfo MapNoteFromDqtAnnotation(
+        Annotation annotation)
+    {
+        return new DqtNoteInfo()
+        {
+            Id = annotation.Id,
+            PersonId = annotation!.ObjectId.Id,
+            NoteText = annotation.NoteText,
+            CreatedByDqtUserId = annotation.CreatedBy.Id,
+            CreatedByDqtUserName = annotation.CreatedBy.Name,
+            UpdatedOn = annotation.ModifiedOn,
+            CreatedOn = annotation.CreatedOn!.Value,
+            UpdatedByDqtUserId = annotation.ModifiedBy?.Id,
+            UpdatedByDqtUserName = annotation.ModifiedBy?.Name,
+            FileName = null,
+            AttachmentBytes = string.IsNullOrEmpty(annotation.FileName) ? null : Convert.FromBase64String(annotation.DocumentBody),
+            OriginalFileName = annotation.FileName,
+            MimeType = annotation.MimeType,
+        };
     }
 
     private InductionInfo? MapInductionInfoFromDqtInduction(
@@ -420,6 +445,79 @@ public class TrsDataSyncHelper(
             cancellationToken);
 
         return await SyncInductionsAsync(contacts, inductions, syncAudit, ignoreInvalid, dryRun, cancellationToken);
+    }
+
+    public async Task<int> SyncAnnotationsAsync(
+        IReadOnlyCollection<Annotation> annotations,
+        bool ignoreInvalid,
+        bool dryRun,
+        CancellationToken cancellationToken)
+    {
+        var modelTypeSyncInfo = GetModelTypeSyncInfo<DqtNoteInfo>(ModelTypes.DqtNote);
+        await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
+        var toSync = annotations.Select(x => MapNoteFromDqtAnnotation(x)).ToList();
+
+
+        //upload attachments new or remove attachment
+        foreach (var noteAttachment in toSync)
+        {
+            var fileName = noteAttachment!.Id.ToString();
+
+            //if note does not have an attachment or length is 0, attempt delete
+            if (noteAttachment!.AttachmentBytes is null || noteAttachment.AttachmentBytes!.Length == 0)
+            {
+                //not ineterested if file exists or not
+                await dqtNoteAttachment.DeleteAttachmentAsync(fileName!);
+                noteAttachment.FileName = null;
+                noteAttachment.OriginalFileName = null;
+            }
+
+            //upload new attachment
+            if (noteAttachment!.AttachmentBytes != null)
+            {
+                //incoming note attachment filename is the annotation id
+                noteAttachment.FileName = fileName;
+                var bytes = noteAttachment.AttachmentBytes;
+                await dqtNoteAttachment.CreateAttachmentAsync(bytes, fileName!, noteAttachment.MimeType);
+                noteAttachment.OriginalFileName = noteAttachment.OriginalFileName;
+            }
+        }
+
+        using var txn = await connection.BeginTransactionAsync(cancellationToken);
+
+        using (var createTempTableCommand = connection.CreateCommand())
+        {
+            createTempTableCommand.CommandText = modelTypeSyncInfo.CreateTempTableStatement;
+            createTempTableCommand.Transaction = txn;
+            await createTempTableCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        using var writer = await connection.BeginBinaryImportAsync(modelTypeSyncInfo.CopyStatement!, cancellationToken);
+
+        foreach (var i in toSync)
+        {
+            writer.StartRow();
+            modelTypeSyncInfo.WriteRecord!(writer, i!);
+        }
+
+        await writer.CompleteAsync(cancellationToken);
+        await writer.CloseAsync(cancellationToken);
+
+        using (var mergeCommand = connection.CreateCommand())
+        {
+            mergeCommand.CommandText = modelTypeSyncInfo.UpsertStatement;
+            mergeCommand.Parameters.Add(new NpgsqlParameter(NowParameterName, clock.UtcNow));
+            mergeCommand.Transaction = txn;
+            await mergeCommand.ExecuteNonQueryAsync();
+        }
+
+        if (!dryRun)
+        {
+            await txn.CommitAsync(cancellationToken);
+        }
+
+        _syncedEntitiesSubject.OnNext([.. toSync]);
+        return toSync.Count;
     }
 
     public async Task<int> SyncInductionsAsync(
@@ -993,6 +1091,113 @@ public class TrsDataSyncHelper(
         }
 
         return response.Entities.Select(e => e.ToEntity<TEntity>()).ToArray();
+    }
+
+    private static ModelTypeSyncInfo GetModelTypeSyncInfoForNotes()
+    {
+        var tempTableName = "temp_notes_import";
+        var tableName = "dqt_notes";
+
+        var columnNames = new[]
+        {
+            "id",
+            "person_id",
+            "note_text",
+            "created_on",
+            "created_by_dqt_user_id",
+            "file_name",
+            "original_file_name",
+            "created_by_dqt_user_name",
+            "updated_by_dqt_user_id",
+            "updated_by_dqt_user_name",
+            "updated_on"
+        };
+
+        var columnsToUpdate = new[] {
+            "note_text",
+            "file_name",
+            "original_file_name",
+            "updated_on",
+            "updated_by_dqt_user_id",
+            "updated_by_dqt_user_name"
+        };
+
+        var columnList = string.Join(", ", columnNames);
+
+        var createTempTableStatement =
+            $"""
+            CREATE TEMP TABLE {tempTableName}
+            (
+                id uuid NOT NULL,
+                person_id uuid NOT NULL,
+                note_text TEXT NULL,
+                created_on timestamp with time zone,
+                created_by_dqt_user_id uuid NOT NULL,
+                file_name TEXT NULL,
+                original_file_name TEXT NULL,
+                created_by_dqt_user_name TEXT,
+                updated_by_dqt_user_name text NULL,
+                updated_by_dqt_user_id uuid NULL,
+                updated_on timestamp with time zone
+            )
+            """;
+
+        var copyStatement = $"COPY {tempTableName} ({columnList}) FROM STDIN (FORMAT BINARY)";
+
+        var insertStatement =
+            $"""
+            INSERT INTO {tableName} ({columnList})
+            SELECT {columnList} FROM {tempTableName}
+            ON CONFLICT (id) DO UPDATE
+            SET {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
+            WHERE {tableName}.updated_on IS NULL OR {tableName}.updated_on < EXCLUDED.updated_on;
+            """;
+
+        //artitrary date of now-1 day because there are no rows in dqt_note
+        var getLastModifiedOnStatement = $"SELECT COALESCE(MAX(updated_on), NOW() - INTERVAL '1 day') FROM {tableName}";
+
+        var deleteStatement = $"DELETE FROM {tableName} WHERE id = ANY({IdsParameterName})";
+
+        var attributeNames = new[]
+        {
+            Annotation.PrimaryIdAttribute,
+            Annotation.Fields.FileName,
+            Annotation.Fields.DocumentBody,
+            Annotation.Fields.ObjectId,
+            Annotation.Fields.ModifiedOn,
+            Annotation.Fields.NoteText,
+            Annotation.Fields.CreatedBy,
+        };
+
+        Action<NpgsqlBinaryImporter, DqtNoteInfo> writeRecord = (writer, person) =>
+        {
+            writer.WriteValueOrNull(person.Id, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(person.NoteText, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(person.CreatedByDqtUserId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(person.FileName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(person.OriginalFileName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(person.CreatedByDqtUserName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(person.UpdatedByDqtUserId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(person.UpdatedByDqtUserName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(person.UpdatedOn ?? person.CreatedOn, NpgsqlDbType.TimestampTz); //default updated on to when it was created
+        };
+
+        return new ModelTypeSyncInfo<DqtNoteInfo>()
+        {
+            CreateTempTableStatement = createTempTableStatement,
+            CopyStatement = copyStatement,
+            UpsertStatement = insertStatement,
+            DeleteStatement = deleteStatement,
+            IgnoreDeletions = false,
+            GetLastModifiedOnStatement = getLastModifiedOnStatement,
+            EntityLogicalName = Annotation.EntityLogicalName,
+            AttributeNames = attributeNames,
+            GetSyncHandler = helper => (entities, ignoreInvalid, dryRun, ct) =>
+                helper.SyncAnnotationsAsync(entities.Select(e => e.ToEntity<Annotation>()).ToArray(), ignoreInvalid, dryRun, ct),
+            WriteRecord = writeRecord
+        };
     }
 
     private static ModelTypeSyncInfo GetModelTypeSyncInfoForPerson()
@@ -1633,6 +1838,24 @@ public class TrsDataSyncHelper(
         public required bool InductionExemptWithoutReason { get; init; }
     }
 
+    private record DqtNoteInfo
+    {
+        public required Guid? Id { get; set; }
+        public required Guid PersonId { get; set; }
+        public required string? NoteText { get; set; }
+        public required DateTime CreatedOn { get; set; }
+        public required Guid CreatedByDqtUserId { get; set; }
+        public required string? CreatedByDqtUserName { get; set; }
+        public required DateTime? UpdatedOn { get; set; }
+        public required Guid? UpdatedByDqtUserId { get; set; }
+        public required string? UpdatedByDqtUserName { get; set; }
+        public required string? FileName { get; set; }
+        public required byte[]? AttachmentBytes { get; set; }
+        public required string? OriginalFileName { get; set; }
+        public required string? MimeType { get; set; }
+
+    }
+
     private record AuditInfo<TEntity>
     {
         public required string[] AllChangedAttributes { get; init; }
@@ -1647,6 +1870,7 @@ public class TrsDataSyncHelper(
         public const string Person = "Person";
         public const string Event = "Event";
         public const string Induction = "Induction";
+        public const string DqtNote = "Annotation";
     }
 }
 
