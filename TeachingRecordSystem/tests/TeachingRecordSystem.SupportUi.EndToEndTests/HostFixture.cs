@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -72,6 +73,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
 
                     services.AddSingleton<CurrentUserProvider>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
+                    services.AddSingleton(GetMockedDqtNoteAttachment());
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
@@ -81,6 +83,11 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton(GetMockAdUserService());
                     services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
+
+                    IDqtNoteAttachmentStorage GetMockedDqtNoteAttachment()
+                    {
+                        return new Mock<IDqtNoteAttachmentStorage>().Object;
+                    }
 
                     IFileService GetMockFileService()
                     {

@@ -7,6 +7,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
@@ -65,7 +66,8 @@ builder.Services
     .AddTrsBaseServices()
     .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
     .AddWorkforceData()
-    .AddMemoryCache();
+    .AddMemoryCache()
+    .AddBlobStorageDqtNoteAttachments();
 
 var host = builder.Build();
 
