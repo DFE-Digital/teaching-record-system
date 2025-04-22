@@ -1,4 +1,4 @@
-﻿@page "/route/{qualificationId}/add/check-answers/{handler?}"
+@page "/route/add/check-answers/{handler?}"
 @model CheckYourAnswersModel
 @{
     ViewBag.Title = "Check details and edit route";
@@ -18,7 +18,7 @@
             <h2 class="govuk-heading-l">Why are you editing this route?</h2>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">Confirm and commit changes</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddCheckYourAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddCheckAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

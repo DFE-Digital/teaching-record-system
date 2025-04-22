@@ -110,7 +110,7 @@ public class AwardDateModel(
             }
             else
             {
-                return RouteToProfessionalStatus.InductionExemptionReasonId.HasValue &&
+                return RouteToProfessionalStatus.InductionExemptionReason is not null &&
                     RouteToProfessionalStatus.InductionExemptionReason.RouteImplicitExemption;
             }
         }

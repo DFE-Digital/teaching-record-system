@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-[Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
