@@ -23,4 +23,5 @@ public class TrnRequestMetadata
     public string? Postcode { get; init; }
     public string? Country { get; init; }
     public string? TrnToken { get; set; }
+    public Guid? ResolvedPersonId { get; set; }
 }

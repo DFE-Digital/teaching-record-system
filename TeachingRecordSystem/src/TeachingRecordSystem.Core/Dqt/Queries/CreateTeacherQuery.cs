@@ -4,6 +4,7 @@ namespace TeachingRecordSystem.Core.Dqt.Queries;
 
 public record CreateContactQuery : ICrmQuery<Guid>
 {
+    public required Guid ContactId { get; init; }
     public required string FirstName { get; init; }
     public required string MiddleName { get; init; }
     public required string LastName { get; init; }

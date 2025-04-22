@@ -9,7 +9,7 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
 {
     public async Task<Guid> ExecuteAsync(CreateContactQuery query, IOrganizationServiceAsync organizationService)
     {
-        var contactId = Guid.NewGuid();
+        var contactId = query.ContactId;
 
         var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
         var serializer = new MessageSerializer();
