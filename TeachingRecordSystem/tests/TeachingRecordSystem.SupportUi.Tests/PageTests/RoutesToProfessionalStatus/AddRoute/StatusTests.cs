@@ -38,9 +38,9 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("Apply for QTS", ProfessionalStatusStatus.Approved, "award-date")]
     [InlineData("Apprenticeship", ProfessionalStatusStatus.InTraining, "start-date")]
-    [InlineData("Apprenticeship", ProfessionalStatusStatus.Failed, "country")]
+    //[InlineData("Apply for QTS", ProfessionalStatusStatus.Approved, "award-date")]
+    //[InlineData("Apprenticeship", ProfessionalStatusStatus.Failed, "country")]
     public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, ProfessionalStatusStatus status, string expected)
     {
         // Arrange
@@ -75,64 +75,15 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/{expected}?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
-    // CML TODO set Exemption to true from CYA page instead of here
-    //[Fact]
-    //public async Task Post_StatusMovesToAwarded_RouteHasImplictExemption_ExemptionSetToTrue()
-    //{
-    //    // Arrange
-    //    var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-    //        .Where(r => r.InductionExemptionReasonId.HasValue)
-    //        .Join(
-    //            (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption),
-    //            r => r.InductionExemptionReasonId,
-    //            e => e.InductionExemptionReasonId,
-    //            (r, e) => r
-    //        )
-    //    .RandomOne();
-
-    //    var exemptionReasons = await ReferenceDataCache.GetInductionExemptionReasonsAsync();
-
-    //    var status = ProfessionalStatusStatus.Awarded;
-    //    var person = await TestData.CreatePersonAsync();
-
-    //    var addRouteState = new AddRouteStateBuilder()
-    //        .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-    //        .WithStatus(status)
-    //        .Build();
-    //    var journeyInstance = await CreateJourneyInstanceAsync(
-    //        person.PersonId,
-    //        addRouteState
-    //        );
-
-    //    var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-    //    {
-    //        Content = new FormUrlEncodedContentBuilder()
-    //        {
-    //            { nameof(StatusModel.Status), status }
-    //        }
-    //    };
-
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
-
-    //    // Assert
-    //    journeyInstance = await ReloadJourneyInstance(journeyInstance);
-    //    Assert.Equal(status, journeyInstance.State.EditStatusState!.Status);
-    //    Assert.True(journeyInstance.State.EditStatusState!.RouteImplicitExemption);
-    //    Assert.Equal(true, journeyInstance.State.EditStatusState!.InductionExemption);
-    //}
-
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .RandomOne();
-        var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

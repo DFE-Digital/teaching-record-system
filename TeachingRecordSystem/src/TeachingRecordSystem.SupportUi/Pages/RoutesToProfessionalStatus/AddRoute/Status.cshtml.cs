@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,6 +24,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
         public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
 
         [BindProperty]
+        [Required(ErrorMessage = "Select a status")]
+        [Display(Name = "Select the status")]
         public ProfessionalStatusStatus? Status { get; set; }
 
         public string BackLink => FromCheckAnswers ?
@@ -38,12 +41,17 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
         {
             await JourneyInstance!.UpdateStateAsync(x => x.Status = Status);
             // CML TODO needs all the logic that's in the edit, because of the ability to change the status from CYA
-            // - probably virtuall impossible to deal with if ca edit route as well - many combinations of change of fields needed
+            // - probably virtually impossible to deal with if can edit route as well - many combinations of change of fields needed
             // - could ask whether can make status and route not editable
             var nextPage = PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
             return Redirect(FromCheckAnswers ?
                 linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
                 linkGenerator.RouteAddPage(nextPage, PersonId, JourneyInstance!.InstanceId));
+        }
+        public async Task<IActionResult> OnPostCancelAsync()
+        {
+            await JourneyInstance!.DeleteAsync();
+            return Redirect(linkGenerator.PersonQualifications(PersonId));
         }
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

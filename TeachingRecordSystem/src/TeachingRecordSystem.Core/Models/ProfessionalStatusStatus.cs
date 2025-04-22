@@ -12,7 +12,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
-        country: FieldRequirement.Optional,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     InTraining = 0,
@@ -23,7 +23,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.Mandatory,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
-        country: FieldRequirement.Optional,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     Awarded = 1,
@@ -34,7 +34,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
-        country: FieldRequirement.NotApplicable,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     Deferred = 2,
@@ -45,7 +45,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
-        country: FieldRequirement.NotApplicable,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     DeferredForSkillsTest = 3,
@@ -56,7 +56,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
-        country: FieldRequirement.NotApplicable,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     Failed = 4,
@@ -67,7 +67,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
-        country: FieldRequirement.NotApplicable,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     Withdrawn = 5,
@@ -78,7 +78,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
-        country: FieldRequirement.Optional,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     UnderAssessment = 6,
@@ -89,7 +89,7 @@ public enum ProfessionalStatusStatus
         inductionExemption: FieldRequirement.Mandatory,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
-        country: FieldRequirement.Optional,
+        country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     Approved = 7

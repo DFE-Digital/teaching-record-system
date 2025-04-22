@@ -46,7 +46,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_WhenTrainingEndDateIsEntered_SavesDateAndRedirectsToNextPage()
+    public async Task Post_WhenEndDateIsEntered_SavesDateAndRedirectsToNextPage()
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -88,6 +88,53 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal($"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
+    }
+
+    [Fact]
+    public async Task Post_FromCya_WhenEndDateIsEntered_RedirectsToCya()
+    {
+        // Arrange
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = startDate.AddMonths(1);
+        var newEndDate = endDate.AddDays(1);
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync();
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithStatus(status)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/end-date?personId={person.PersonId}&FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "TrainingEndDate.Day", $"{newEndDate:%d}" },
+                { "TrainingEndDate.Month", $"{newEndDate:%M}" },
+                { "TrainingEndDate.Year", $"{newEndDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/route/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(newEndDate, journeyInstance.State.TrainingEndDate);
     }
 
     [Fact]
