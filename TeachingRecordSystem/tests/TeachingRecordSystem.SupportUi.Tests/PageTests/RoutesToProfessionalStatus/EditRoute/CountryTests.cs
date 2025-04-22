@@ -61,7 +61,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingCountryRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -102,7 +102,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingCountryRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

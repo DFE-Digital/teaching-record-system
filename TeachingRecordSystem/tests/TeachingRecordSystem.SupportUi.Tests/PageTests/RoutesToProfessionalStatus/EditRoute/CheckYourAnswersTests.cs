@@ -5,6 +5,8 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    private static string _countryCode = "AG";
+
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
@@ -18,6 +20,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithTrainingCountryId(_countryCode)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -60,6 +63,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithTrainingCountryId(_countryCode)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -213,6 +217,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStatus(ProfessionalStatusStatus.InTraining)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
+            .WithTrainingCountryId(_countryCode)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithValidChangeReasonOption()
@@ -237,7 +242,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-        doc.AssertRowContentMatches("Country of training", "Not provided");
         doc.AssertRowContentMatches("Age range", "Not provided");
         doc.AssertRowContentMatches("Subjects", "Not provided");
     }
@@ -255,6 +259,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithTrainingCountryId(_countryCode)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
