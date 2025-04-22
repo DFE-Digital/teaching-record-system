@@ -26,7 +26,7 @@ public class AddRouteCommonPageModel : PageModel
 
     public string? PersonName { get; set; }
 
-    public RouteToProfessionalStatus Route { get; set; } = null!;
+    public RouteToProfessionalStatus Route { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -35,9 +35,6 @@ public class AddRouteCommonPageModel : PageModel
         return Redirect(_linkGenerator.PersonQualifications(PersonId));
     }
 
-    // currently just uses a knowledge of page order combined with the FieldRequired method
-    // page will also need to know whether the route can have an exemption (if status is awarded/approved)
-    // and whether hasImplicitexemption - from InductionExemptionReason
     public AddRoutePage? NextPage(AddRoutePage currentPage)
     {
         return PageDriver.NextPage(Route, Status, currentPage);

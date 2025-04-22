@@ -76,6 +76,31 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_NoStatusSelected_ShowsError()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Single(r => r.Name == "Apprenticeship");
+        var person = await TestData.CreatePersonAsync();
+
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .Build();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/status?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "Status", "Select a route status");
+    }
+
+    [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
