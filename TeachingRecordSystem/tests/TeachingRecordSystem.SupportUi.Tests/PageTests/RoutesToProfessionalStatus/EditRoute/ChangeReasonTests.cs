@@ -27,7 +27,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             qualificationId,
             editRouteState
             );
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -77,7 +77,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -125,7 +125,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(
                 new EditRoutePostRequestBuilder()
@@ -143,7 +143,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
         Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/routes/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
@@ -194,7 +194,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(
                 new EditRoutePostRequestBuilder()
@@ -234,7 +234,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -274,7 +274,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/routes/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -319,7 +319,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/routes/{qualificationid}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
