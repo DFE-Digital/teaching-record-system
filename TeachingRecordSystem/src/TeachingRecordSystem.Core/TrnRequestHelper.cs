@@ -34,52 +34,70 @@ public class TrnRequestHelper(
         var dbTrnRequest = await dbContext.TrnRequests.SingleOrDefaultAsync(r => r.ClientId == applicationUserId.ToString() && r.RequestId == requestId);
         var metadata = await dbContext.TrnRequestMetadata.SingleOrDefaultAsync(r => r.ApplicationUserId == applicationUserId && r.RequestId == requestId);
 
+        Guid contactId;
+
         if (metadata is null)
         {
             return null;
         }
 
-        if (dbTrnRequest is not null)
+        if (metadata.ResolvedPersonId is Guid personId)
         {
-            var contact = await GetContactAsync(dbTrnRequest.TeacherId);
-            return new(applicationUserId, contact, metadata);
+            contactId = personId;
+        }
+        else if (dbTrnRequest is not null)
+        {
+            contactId = dbTrnRequest.TeacherId;
+        }
+        else if (await getContactByTrnRequestIdTask is Contact trnRequestContact)
+        {
+            contactId = trnRequestContact.Id;
+        }
+        else
+        {
+            return null;
         }
 
-        if (await getContactByTrnRequestIdTask is Contact trnRequestContact)
+        var contact = await crmQueryDispatcher.ExecuteQueryAsync(
+            new GetContactWithMergeResolutionQuery(
+                contactId,
+                new ColumnSet(
+                    Contact.Fields.dfeta_TRN,
+                    Contact.Fields.FirstName,
+                    Contact.Fields.MiddleName,
+                    Contact.Fields.LastName,
+                    Contact.Fields.dfeta_StatedFirstName,
+                    Contact.Fields.dfeta_StatedMiddleName,
+                    Contact.Fields.dfeta_StatedLastName,
+                    Contact.Fields.EMailAddress1,
+                    Contact.Fields.dfeta_NINumber,
+                    Contact.Fields.BirthDate,
+                    Contact.Fields.Merged,
+                    Contact.Fields.MasterId,
+                    Contact.Fields.dfeta_SlugId,
+                    Contact.Fields.dfeta_QTSDate,
+                    Contact.Fields.dfeta_TrnToken)));
+
+        var result = new GetTrnRequestResult(applicationUserId, contact, metadata);
+
+        // If the request is Completed, ensure we've got a TRN and TRN token assigned to metadata
+        if (result.IsCompleted)
         {
-            var contact = await GetContactAsync(trnRequestContact.Id);
-            return new(applicationUserId, contact, metadata);
+            if (metadata.TrnToken is null && metadata.EmailAddress is not null)
+            {
+                metadata.TrnToken = await CreateTrnTokenAsync(result.Trn, metadata.EmailAddress);
+            }
+
+            metadata.ResolvedPersonId ??= result.Contact.Id;
+
+            await dbContext.SaveChangesAsync();
         }
 
-        return null;
-
-        Task<Contact> GetContactAsync(Guid contactId) =>
-            crmQueryDispatcher.ExecuteQueryAsync(
-                new GetContactWithMergeResolutionQuery(
-                    contactId,
-                    new ColumnSet(
-                        Contact.Fields.dfeta_TRN,
-                        Contact.Fields.FirstName,
-                        Contact.Fields.MiddleName,
-                        Contact.Fields.LastName,
-                        Contact.Fields.dfeta_StatedFirstName,
-                        Contact.Fields.dfeta_StatedMiddleName,
-                        Contact.Fields.dfeta_StatedLastName,
-                        Contact.Fields.EMailAddress1,
-                        Contact.Fields.dfeta_NINumber,
-                        Contact.Fields.BirthDate,
-                        Contact.Fields.Merged,
-                        Contact.Fields.MasterId,
-                        Contact.Fields.dfeta_SlugId,
-                        Contact.Fields.dfeta_QTSDate,
-                        Contact.Fields.dfeta_TrnToken)));
+        return result;
     }
 
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
         $"{currentApplicationUserId}::{requestId}";
-
-    public Task<TrnRequestMetadata?> GetRequestMetadataAsync(Guid applicationUserId, string requestId) =>
-        dbContext.TrnRequestMetadata.SingleOrDefaultAsync(m => m.ApplicationUserId == applicationUserId && m.RequestId == requestId);
 }
 
 public record GetTrnRequestResult(Guid ApplicationUserId, Contact Contact, TrnRequestMetadata Metadata)
