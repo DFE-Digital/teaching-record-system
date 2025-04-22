@@ -134,8 +134,11 @@ If you are seeing the error `DbContext has pending changes not covered by a migr
 In order for the local `trs` database to pick up the change, the migrate recipe will need to be run:
 
 ```shell
+just build
 just cli migrate-db
 ```
+
+**Note:** `just build` needs to be run first as `just cli migrate-db` will fail if the debug `TeachingRecordSystem.Cli` dll doesn't exist.
 
 The trs_tests database for the tests should be migrated automatically when running the tests. 
 

@@ -18,6 +18,8 @@ public abstract class UserBase
 public class User : UserBase
 {
     public const int RoleMaxLength = 50;
+    public const int EmailMaxLength = 200;
+    public const int AzureAdUserIdMaxLength = 100;
 
     public required string? Email { get; set; }
     public string? AzureAdUserId { get; set; }
