@@ -34,6 +34,7 @@ public class CreateContactTests : IAsyncLifetime
 
         var query = new CreateContactQuery()
         {
+            ContactId = Guid.NewGuid(),
             TrnRequestId = null,
             FirstName = firstName,
             MiddleName = middleName,
