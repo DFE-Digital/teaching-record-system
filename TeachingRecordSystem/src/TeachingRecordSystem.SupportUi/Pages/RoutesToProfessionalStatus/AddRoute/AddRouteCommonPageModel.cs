@@ -26,7 +26,7 @@ public class AddRouteCommonPageModel : PageModel
 
     public string? PersonName { get; set; }
 
-    public RouteToProfessionalStatus Route { get; set; }
+    public RouteToProfessionalStatus Route { get; set; } = null!;
     public ProfessionalStatusStatus Status { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
