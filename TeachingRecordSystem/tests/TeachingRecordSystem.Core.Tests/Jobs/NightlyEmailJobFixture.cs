@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -30,7 +31,8 @@ public class NightlyEmailJobFixture : IAsyncLifetime
             referenceDataCache,
             Clock,
             new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>());
+            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
+            DqtNoteFileAttachmentStorageMock.Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -58,6 +60,8 @@ public class NightlyEmailJobFixture : IAsyncLifetime
     Task IAsyncLifetime.DisposeAsync() => Task.CompletedTask;
 
     Task IAsyncLifetime.InitializeAsync() => Task.CompletedTask;
+
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; } = new Mock<IDqtNoteAttachmentStorage>();
 
     private class TestCrmServiceClientProvider : ICrmServiceClientProvider
     {

@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class EditRouteToProfessionalStatusTests : TestBase
 {
-    private string _countryCode = "AG";
+    private static string _countryCode = "AG";
 
     public EditRouteToProfessionalStatusTests(HostFixture hostFixture)
         : base(hostFixture)
@@ -18,7 +18,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.Awarded;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setEndDate = endDate.AddDays(1);

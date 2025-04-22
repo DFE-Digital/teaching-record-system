@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using Xunit.Sdk;
 
@@ -12,6 +13,7 @@ public class TestScopedServices
         Clock = new();
         EventObserver = new();
         GetAnIdentityApiClient = new();
+        DqtNoteFileAttachmentStorageMock = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -32,4 +34,6 @@ public class TestScopedServices
     public CaptureEventObserver EventObserver { get; }
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
+
+    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; }
 }

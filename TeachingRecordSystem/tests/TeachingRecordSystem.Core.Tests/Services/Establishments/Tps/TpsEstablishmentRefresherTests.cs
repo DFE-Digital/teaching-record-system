@@ -2,6 +2,8 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Establishments.Tps;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.WorkforceData;
@@ -41,7 +43,8 @@ public class TpsEstablishmentRefresherTests : IAsyncLifetime
             referenceDataCache,
             Clock,
             new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>());
+            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
+            new Mock<IDqtNoteAttachmentStorage>().Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

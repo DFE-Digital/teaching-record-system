@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Establishments.Gias;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using Establishment = TeachingRecordSystem.Core.Models.Establishment;
@@ -24,7 +25,8 @@ public class EstablishmentRefresherTests
             referenceDataCache,
             Clock,
             new TestableAuditRepository(),
-            loggerFactory.CreateLogger<TrsDataSyncHelper>());
+            loggerFactory.CreateLogger<TrsDataSyncHelper>(),
+            new Mock<IDqtNoteAttachmentStorage>().Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

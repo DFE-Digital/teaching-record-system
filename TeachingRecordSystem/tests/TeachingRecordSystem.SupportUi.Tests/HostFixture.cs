@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -53,6 +54,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
             services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
             services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
+            services.AddTestScoped<IDqtNoteAttachmentStorage>(tss => tss.DqtNoteAttachmentMock.Object);
             services.AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,
