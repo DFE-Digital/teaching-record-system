@@ -1,5 +1,6 @@
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
@@ -125,6 +126,60 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
             Assert.Equal(TrnRequestStatus.Pending, success.Status);
             Assert.Null(success.Trn);
             Assert.Null(success.AccessYourTeachingQualificationsLink);
+        });
+
+    [Fact]
+    public Task HandleAsync_RequestIdNotInDbOrCrmButResolvedInMetadata_ReturnsTrnAndCompletedStatus() =>
+        WithHandler<GetTrnRequestHandler>(async handler =>
+        {
+            // Arrange
+            var requestId = Guid.NewGuid().ToString();
+            var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
+
+            var person = await TestData.CreatePersonAsync(p => p
+                .WithTrn()
+                .WithEmail(TestData.GenerateUniqueEmail()));
+
+            await base.DbFixture.WithDbContextAsync(async dbContext =>
+            {
+                dbContext.TrnRequestMetadata.Add(new TrnRequestMetadata
+                {
+                    ApplicationUserId = applicationUserId,
+                    RequestId = requestId,
+                    CreatedOn = Clock.UtcNow,
+                    IdentityVerified = null,
+                    EmailAddress = person.Email,
+                    OneLoginUserSubject = null,
+                    FirstName = person.FirstName,
+                    MiddleName = person.MiddleName,
+                    LastName = person.LastName,
+                    Name = [person.FirstName, person.MiddleName, person.LastName],
+                    DateOfBirth = person.DateOfBirth,
+                    PotentialDuplicate = false,
+                    NationalInsuranceNumber = person.NationalInsuranceNumber,
+                    Gender = null,
+                    AddressLine1 = null,
+                    AddressLine2 = null,
+                    AddressLine3 = null,
+                    City = null,
+                    Postcode = null,
+                    Country = null,
+                    TrnToken = null,
+                    ResolvedPersonId = person.PersonId
+                });
+
+                await dbContext.SaveChangesAsync();
+            });
+
+            var command = new GetTrnRequestCommand(requestId);
+
+            // Act
+            var result = await handler.HandleAsync(command);
+
+            // Assert
+            var success = result.GetSuccess();
+            Assert.Equal(TrnRequestStatus.Completed, success.Status);
+            Assert.Equal(person.Trn, success.Trn);
         });
 
     public async Task InitializeAsync()

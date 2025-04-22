@@ -31,7 +31,8 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
                 City = message.City,
                 Postcode = message.Postcode,
                 Country = message.Country,
-                TrnToken = message.TrnToken
+                TrnToken = message.TrnToken,
+                ResolvedPersonId = message.ResolvedPersonId
             });
             await dbContext.SaveChangesAsync();
         }

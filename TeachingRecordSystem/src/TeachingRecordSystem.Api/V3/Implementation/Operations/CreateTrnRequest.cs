@@ -84,7 +84,7 @@ public class CreateTrnRequestHandler(
                 MatchedOnNationalInsuranceNumberContactIds = workforceDataMatches
             })).ToList();
 
-        TrnRequestMetadataMessage CreateMetadataOutboxMessage(bool potentialDuplicate, string? trnToken) =>
+        TrnRequestMetadataMessage CreateMetadataOutboxMessage(bool potentialDuplicate, Guid? resolvedPersonId, string? trnToken) =>
             new TrnRequestMetadataMessage
             {
                 ApplicationUserId = currentApplicationUserId,
@@ -110,7 +110,8 @@ public class CreateTrnRequestHandler(
                 City = null,
                 Postcode = null,
                 Country = null,
-                TrnToken = trnToken
+                TrnToken = trnToken,
+                ResolvedPersonId = resolvedPersonId
             };
 
         // If any record has matched on NINO & DOB treat that as a definite match and return the existing record's details
@@ -126,7 +127,7 @@ public class CreateTrnRequestHandler(
             aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
 
             await crmQueryDispatcher.ExecuteQueryAsync(
-                new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false, trnToken)));
+                new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false, singleMatchOnNinoAndDob.ContactId, trnToken)));
 
             return new TrnRequestInfo()
             {
@@ -171,10 +172,16 @@ public class CreateTrnRequestHandler(
         trnToken = emailAddress is not null && trn is not null ? await trnRequestHelper.CreateTrnTokenAsync(trn, emailAddress) : null;
         aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
 
-        var metadataMessage = CreateMetadataOutboxMessage(potentialDuplicate, trnToken);
+        var contactId = Guid.NewGuid();
+
+        var metadataMessage = CreateMetadataOutboxMessage(
+            potentialDuplicate,
+            resolvedPersonId: trn is not null ? contactId : null,
+            trnToken);
 
         await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
+            ContactId = contactId,
             FirstName = firstName,
             MiddleName = middleName,
             LastName = command.LastName,
