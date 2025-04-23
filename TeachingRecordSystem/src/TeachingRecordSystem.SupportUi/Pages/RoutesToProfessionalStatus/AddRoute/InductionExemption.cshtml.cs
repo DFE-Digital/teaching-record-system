@@ -9,8 +9,8 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.InductionExemption) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+    _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.InductionExemption) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
