@@ -81,9 +81,9 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddEndDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddAwardDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+    public string RouteAddAwardedDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AwardedDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddAwardDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+    public string RouteAddAwardedDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AwardedDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddInductionExemption(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/InductionExemption", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
@@ -109,7 +109,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId),
             AddRoutePage.StartDate => RouteAddStartDate(personId, journeyInstanceId),
             AddRoutePage.EndDate => RouteAddEndDate(personId, journeyInstanceId),
-            AddRoutePage.AwardDate => RouteAddAwardDate(personId, journeyInstanceId),
+            AddRoutePage.AwardedDate => RouteAddAwardedDate(personId, journeyInstanceId),
             AddRoutePage.InductionExemption => RouteAddInductionExemption(personId, journeyInstanceId),
             AddRoutePage.TrainingProvider => RouteAddTrainingProvider(personId, journeyInstanceId),
             AddRoutePage.Country => RouteAddCountry(personId, journeyInstanceId),

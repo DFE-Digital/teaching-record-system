@@ -6,7 +6,7 @@ public enum AddRoutePage
     Status,
     StartDate,
     EndDate,
-    AwardDate,
+    AwardedDate,
     InductionExemption,
     TrainingProvider,
     DegreeType,

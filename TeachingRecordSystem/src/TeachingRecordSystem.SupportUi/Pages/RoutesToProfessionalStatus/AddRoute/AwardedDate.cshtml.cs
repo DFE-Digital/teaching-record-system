@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class AwardDateModel : AddRouteCommonPageModel
+public class AwardedDateModel : AddRouteCommonPageModel
 {
-    public AwardDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
+    public AwardedDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
     {
     }
 
@@ -18,7 +18,7 @@ public class AwardDateModel : AddRouteCommonPageModel
 
     public string BackLink => FromCheckAnswers ?
         _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AwardDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AwardedDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -35,6 +35,6 @@ public class AwardDateModel : AddRouteCommonPageModel
 
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.AwardDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.AwardedDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 }
