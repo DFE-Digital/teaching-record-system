@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -40,10 +39,5 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.InductionExemption) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
-    }
-
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }
