@@ -44,7 +44,6 @@ public partial class TestData
         return user;
     }
 
-
     public async Task<IReadOnlyCollection<User>> CreateMultipleUsersAsync(
         int userCount,
         Func<int, CreateUserSpec> createUserSpecFromIndex)
@@ -54,6 +53,37 @@ public partial class TestData
             for (var i = 0; i < userCount; i++)
             {
                 var spec = createUserSpecFromIndex(i);
+                var active = spec.Active ?? true;
+                var name = spec.Name ?? GenerateName();
+                var email = spec.Email ?? GenerateUniqueEmail();
+                var role = spec.Role ?? UserRoles.SupportOfficer;
+
+                var user = new User()
+                {
+                    Active = active,
+                    Name = name,
+                    Email = email,
+                    Role = role,
+                    UserId = Guid.NewGuid()
+                };
+
+                dbContext.Users.Add(user);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return dbContext.Users.AsReadOnly();
+        });
+
+        return users;
+    }
+
+    public async Task<IReadOnlyCollection<User>> CreateMultipleUsersAsync(params CreateUserSpec[] userSpecs)
+    {
+        var users = await WithDbContextAsync(async dbContext =>
+        {
+            foreach (var spec in userSpecs)
+            {
                 var active = spec.Active ?? true;
                 var name = spec.Name ?? GenerateName();
                 var email = spec.Email ?? GenerateUniqueEmail();

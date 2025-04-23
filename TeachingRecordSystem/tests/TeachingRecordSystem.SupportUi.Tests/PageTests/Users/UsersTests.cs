@@ -1,3 +1,6 @@
+using AngleSharp.Dom;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
 [Collection(nameof(DisableParallelization))]
@@ -7,15 +10,18 @@ public class UsersTests : TestBase, IAsyncLifetime
 
     public UsersTests(HostFixture hostFixture) : base(hostFixture)
     {
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
+    public async Task InitializeAsync()
     {
-        await WithDbContext(dbContext => dbContext.Users.ExecuteDeleteAsync());
         TestUsers.ClearCache();
+        await WithDbContext(dbContext => dbContext.Users.ExecuteDeleteAsync());
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager, name: "Zuser AccessManager");
+        SetCurrentUser(user);
     }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
@@ -66,46 +72,170 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.Contains(user.Email!, element);
     }
 
-    [Fact]
-    public async Task Get_ValidRequestAndUsersFound_PaginatesUsersAndSortsByFirstName()
+    [Theory]
+    [InlineData("?page=1", 10, "Auser", "Juser")]
+    [InlineData("?page=2", 10, "Kuser", "Tuser")]
+    // Includes current user "Zuser AccessManager"
+    [InlineData("?page=3", 2, "Uuser", "Zuser")]
+    public async Task Get_ValidRequestAndUsersFound_PaginatesUsersAndSortsByFirstName(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
-        await TestData.CreateMultipleUsersAsync(21, i => new() { Name = $"FirstName{(char)('A' + i)} {Faker.Name.Last()}" });
+        await TestData.CreateMultipleUsersAsync(21, i => new() { Name = $"{(char)('A' + i)}user {Faker.Name.Last()}" });
 
         // Act
-        var page1Request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}?page=1");
-        var page1Response = await HttpClient.SendAsync(page1Request);
-
-        var page2Request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}?page=2");
-        var page2Response = await HttpClient.SendAsync(page2Request);
-
-        var page3Request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}?page=3");
-        var page3Response = await HttpClient.SendAsync(page3Request);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status200OK, (int)page1Response.StatusCode);
-        Assert.Equal(StatusCodes.Status200OK, (int)page2Response.StatusCode);
-        Assert.Equal(StatusCodes.Status200OK, (int)page3Response.StatusCode);
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        var page1 = await AssertEx.HtmlResponseAsync(page1Response);
-        var page1Users = page1.GetElementsByClassName("trs-user");
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var users = html.GetElementsByClassName("trs-user");
 
-        var page2 = await AssertEx.HtmlResponseAsync(page2Response);
-        var page2Users = page2.GetElementsByClassName("trs-user");
+        Assert.Equal(expectedUserCount, users.Length);
+        Assert.Contains(expectedFirstUserOnPage, users[0].InnerHtml);
+        Assert.Contains(expectedLastUserOnPage, users[expectedUserCount - 1].InnerHtml);
+    }
 
-        var page3 = await AssertEx.HtmlResponseAsync(page3Response);
-        var page3Users = page3.GetElementsByClassName("trs-user");
+    [Theory]
+    [InlineData("?keywords=user%20laSTName1", new string[] { "Auser", "Buser", "Cuser", "Duser" })]
+    [InlineData("?keywords=USER%40org2", new string[] { "Duser", "Euser", "Fuser" })]
+    [InlineData("?role=Administrator", new string[] { "Auser", "Buser" })]
+    [InlineData("?role=SupportOfficer", new string[] { "Cuser", "Duser", "Euser" })]
+    [InlineData("?role=Viewer", new string[] { "Fuser", "Guser", "Huser", "Iuser" })]
+    [InlineData("?role=Administrator&role=SupportOfficer", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
+    // Includes current user "Zuser AccessManager"
+    [InlineData("?status=active", new string[] { "Auser", "Cuser", "Euser", "Guser", "Iuser", "Zuser" })]
+    [InlineData("?status=deactivated", new string[] { "Buser", "Duser", "Fuser", "Huser" })]
+    [InlineData("?role=Administrator&status=active", new string[] { "Auser" })]
+    [InlineData("?role=Viewer&status=deactivated", new string[] { "Fuser", "Huser" })]
+    [InlineData("?keywords=org1&role=Administrator&role=SupportOfficer&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
+    public async Task Get_ValidRequestAndUsersFound_FiltersUsersByKeywordsRoleAndStatus(string query, string[] expectedUserFirstNames)
+    {
+        await TestData.CreateMultipleUsersAsync(
+            new() { Name = $"Auser Lastname1", Email = "auser@org1.com", Role = UserRoles.Administrator, Active = true },
+            new() { Name = $"Buser Lastname1", Email = "buser@org1.com", Role = UserRoles.Administrator, Active = false },
+            new() { Name = $"Cuser Lastname1", Email = "cuser@org1.com", Role = UserRoles.SupportOfficer, Active = true },
+            new() { Name = $"Duser Lastname1", Email = "duser@org2.com", Role = UserRoles.SupportOfficer, Active = false },
+            new() { Name = $"Euser Lastname2", Email = "euser@org2.com", Role = UserRoles.SupportOfficer, Active = true },
+            new() { Name = $"Fuser Lastname2", Email = "fuser@org2.com", Role = UserRoles.Viewer, Active = false },
+            new() { Name = $"Guser Lastname2", Email = "guser@org3.com", Role = UserRoles.Viewer, Active = true },
+            new() { Name = $"Huser Lastname2", Email = "huser@org3.com", Role = UserRoles.Viewer, Active = false },
+            new() { Name = $"Iuser Lastname2", Email = "iuser@org3.com", Role = UserRoles.Viewer, Active = true }
+        );
 
-        Assert.Equal(10, page1Users.Length);
-        Assert.Contains("FirstNameA", page1Users[0].InnerHtml);
-        Assert.Contains("FirstNameJ", page1Users[9].InnerHtml);
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
 
-        Assert.Equal(10, page2Users.Length);
-        Assert.Contains("FirstNameK", page2Users[0].InnerHtml);
-        Assert.Contains("FirstNameT", page2Users[9].InnerHtml);
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
-        // Admin user also appears on last page
-        Assert.Equal(2, page3Users.Length);
-        Assert.Contains("FirstNameU", page3Users[0].InnerHtml);
-        Assert.Contains("Test User 1", page3Users[1].InnerHtml);
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var users = html.GetElementsByClassName("trs-user");
+
+        AssertElementsInnerTextContains(users, expectedUserFirstNames);
+    }
+
+    [Theory]
+    [InlineData("?role=Administrator&page=1", 10, "Auser", "Juser")]
+    [InlineData("?role=Administrator&page=2", 2, "Kuser", "Luser")]
+    [InlineData("?role=SupportOfficer&page=1", 10, "Muser", "Vuser")]
+    [InlineData("?role=SupportOfficer&page=2", 3, "Wuser", "Yuser")]
+    [InlineData("?role=Administrator&role=SupportOfficer&status=active&page=1", 10, "Auser", "Suser")]
+    [InlineData("?role=Administrator&role=SupportOfficer&status=active&page=2", 3, "Uuser", "Yuser")]
+    public async Task Get_ValidRequestAndUsersFound_PaginatesFilteredUsers(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
+    {
+        await TestData.CreateMultipleUsersAsync(25, i => new()
+        {
+            Name = $"{(char)('A' + i)}user {Faker.Name.Last()}",
+            Role = i < 12 ? UserRoles.Administrator : UserRoles.SupportOfficer,
+            Active = i % 2 == 0
+        });
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var users = html.GetElementsByClassName("trs-user");
+
+        Assert.Equal(expectedUserCount, users.Length);
+        Assert.Contains(expectedFirstUserOnPage, users[0].InnerHtml);
+        Assert.Contains(expectedLastUserOnPage, users[expectedUserCount - 1].InnerHtml);
+    }
+
+    [Theory]
+    [InlineData("?", new string[] {
+        "Viewer (4)",
+        "Support officer (3)",
+        "Alerts manager (TRA decisions) (0)",
+        "Alerts manager (TRA and DBS decisions) (0)",
+        // Includes current user
+        "Access manager (1)",
+        "Administrator (2)",
+    }, new string[] {
+        // Includes current user
+        "Active (6)",
+        "Deactivated (4)"
+    })]
+    [InlineData("?status=active", new string[] {
+        "Viewer (2)",
+        "Support officer (2)",
+        "Alerts manager (TRA decisions) (0)",
+        "Alerts manager (TRA and DBS decisions) (0)",
+        // Includes current user
+        "Access manager (1)",
+        "Administrator (1)",
+    }, new string[] {
+        // Includes current user
+        "Active (6)",
+        "Deactivated (0)"
+    })]
+    [InlineData("?role=Administrator&role=SupportOfficer&status=deactivated", new string[] {
+        "Viewer (0)",
+        "Support officer (1)",
+        "Alerts manager (TRA decisions) (0)",
+        "Alerts manager (TRA and DBS decisions) (0)",
+        "Access manager (0)",
+        "Administrator (1)",
+    }, new string[] {
+        "Active (0)",
+        "Deactivated (2)"
+    })]
+    public async Task Get_ValidRequestAndUsersFound_ShowsFilterCounts(string query, string[] expectedRoleLabels, string[] expectedStatusLabels)
+    {
+        await TestData.CreateMultipleUsersAsync(
+            new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = true },
+            new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = false },
+            new() { Name = $"Cuser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = true },
+            new() { Name = $"Duser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = false },
+            new() { Name = $"Euser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = true },
+            new() { Name = $"Fuser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = false },
+            new() { Name = $"Guser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = true },
+            new() { Name = $"Huser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = false },
+            new() { Name = $"Iuser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = true }
+        );
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""role""] + label");
+        var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""status""] + label");
+
+        AssertElementsInnerTextContains(roleLabels, expectedRoleLabels);
+        AssertElementsInnerTextContains(statusLabels, expectedStatusLabels);
+    }
+
+    private void AssertElementsInnerTextContains(IHtmlCollection<IElement> elements, string[] expectedValues)
+    {
+        Assert.Collection(elements, [.. expectedValues.Select(name => (Action<IElement>)(e => Assert.Contains(name, e.InnerHtml)))]);
     }
 }
