@@ -8,9 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
-public class InductionExemptionModel(
-    TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
@@ -74,10 +72,8 @@ public class InductionExemptionModel(
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        var route = context.HttpContext.GetCurrentProfessionalStatusFeature()?.ProfessionalStatus.Route;
-        if (route is not null
-            && (route.InductionExemptionRequired == FieldRequirement.NotApplicable
-                || route.InductionExemptionReason is not null && route.InductionExemptionReason.RouteImplicitExemption))
+        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
+                || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
         {
             context.Result = new BadRequestResult();
         }
