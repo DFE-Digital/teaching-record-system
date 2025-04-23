@@ -109,7 +109,7 @@ public partial class DqtReportingService : BackgroundService
         {
             try
             {
-                await _resiliencePipeline.ExecuteAsync(async ct => await ProcessTrsChangesAsync(observer: null, ct), stoppingToken);
+                await ProcessTrsChangesAsync(observer: null, stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
