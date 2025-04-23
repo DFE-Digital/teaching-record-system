@@ -105,4 +105,19 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync("/route/add/training-provider");
     }
+
+    public static Task AssertOnRouteAddAwardedDatePageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/award-date");
+    }
+
+    public static Task AssertOnRouteAddInductionExemptionPageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/induction-exemption");
+    }
+
+    public static Task AssertOnRouteAddDegreeTypePageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/degree-type");
+    }
 }

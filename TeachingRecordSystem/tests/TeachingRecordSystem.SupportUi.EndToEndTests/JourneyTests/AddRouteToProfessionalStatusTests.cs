@@ -56,6 +56,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
+        var setDegreeType = "BSc (Hons) with Intercalated PGCE";
 
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -86,5 +87,50 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+    }
+
+    [Fact]
+    public async Task Route_Add_AwardedJourney()
+    {
+        var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
+                && r.InductionExemptionReason is not null
+                && r.InductionExemptionReason.RouteImplicitExemption == false)
+            .RandomOne();
+        var status = ProfessionalStatusStatus.Awarded;
+        var awardedDate = new DateOnly(2021, 1, 1);
+
+        var person = await TestData.CreatePersonAsync();
+        var personId = person.PersonId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickButtonAsync("Add a route");
+
+        await page.AssertOnRouteAddRoutePageAsync();
+        await page.FillAsync($"label:text-is('Route type')", setRoute.Name);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddStatusPageAsync();
+        await page.SelectStatusAsync(status);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddAwardedDatePageAsync();
+        await page.FillDateInputAsync(awardedDate);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddInductionExemptionPageAsync();
     }
 }

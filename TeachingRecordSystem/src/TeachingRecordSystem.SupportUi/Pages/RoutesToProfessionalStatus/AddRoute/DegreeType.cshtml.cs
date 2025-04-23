@@ -15,7 +15,6 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
     public DegreeType[] DegreeTypes { get; set; } = [];
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a degree type")]
     [Display(Name = "Enter the degree type awarded as part of this route")]
     public Guid? DegreeTypeId { get; set; }
 
@@ -26,6 +25,10 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (DegreeTypeId is null && Route.DegreeTypeRequired == FieldRequirement.Mandatory)
+        {
+            ModelState.AddModelError("DegreeTypeId", "Select a degree type");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();

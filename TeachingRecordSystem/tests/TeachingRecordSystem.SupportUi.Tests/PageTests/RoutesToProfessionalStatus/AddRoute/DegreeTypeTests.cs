@@ -105,7 +105,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/country?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -157,19 +157,15 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status)));
-        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var person = await TestData.CreatePersonAsync();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var editRouteState = new AddRouteStateBuilder()
+        var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationId,
-            editRouteState
+            person.PersonId,
+            addRouteState
             );
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/degree-type?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -185,7 +181,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/country?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     private Task<JourneyInstance<AddRouteState>> CreateJourneyInstanceAsync(Guid personId, AddRouteState? state = null) =>
