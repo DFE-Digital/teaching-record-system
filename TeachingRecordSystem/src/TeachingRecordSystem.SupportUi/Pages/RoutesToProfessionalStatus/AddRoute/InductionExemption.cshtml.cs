@@ -9,17 +9,23 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-    _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-    _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.InductionExemption) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.InductionExemption) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
     [Required(ErrorMessage = "Select yes if this route provides an induction exemption")]
     public bool? IsExemptFromInduction { get; set; }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
+            || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
+        {
+            return BadRequest();
+        }
         IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -38,11 +44,6 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
-                || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
-        {
-            context.Result = new BadRequestResult();
-        }
         return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

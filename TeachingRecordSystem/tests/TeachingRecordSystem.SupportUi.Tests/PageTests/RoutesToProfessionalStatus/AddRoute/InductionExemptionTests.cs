@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Get_WithInvalidRoute_ThrowsException()
+    public async Task Get_WithInvalidRoute_ReturnsBadRequest()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
