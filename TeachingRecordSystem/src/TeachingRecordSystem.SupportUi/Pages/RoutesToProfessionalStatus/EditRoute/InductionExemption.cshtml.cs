@@ -68,27 +68,20 @@ public class InductionExemptionModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        if (Route.InductionExemptionReasonId is not null)
-        {
-            var exemptionReason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId!.Value);
-            if (exemptionReason.RouteImplicitExemption)
-            {
-                context.Result = new BadRequestResult();
-            }
-        }
-        else
-        {
-            context.Result = new BadRequestResult();
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        await base.OnPageHandlerExecutionAsync(context, next);
+        var route = context.HttpContext.GetCurrentProfessionalStatusFeature()?.ProfessionalStatus.Route;
+        if (route is not null
+            && (route.InductionExemptionRequired == FieldRequirement.NotApplicable
+                || route.InductionExemptionReason is not null && route.InductionExemptionReason.RouteImplicitExemption))
+        {
+            context.Result = new BadRequestResult();
+        }
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public string BackLink => FromCheckAnswers ?
