@@ -268,7 +268,7 @@ public class ConfirmTests : TestBase
         Assert.Equal(newName, user.Name);
         Assert.Equal(email, user.Email);
         Assert.Equal(userId, user.AzureAdUserId);
-        Assert.Collection(user.Roles, r => Assert.Equal(role, r));
+        Assert.Collection(user.Roles ?? [], r => Assert.Equal(role, r));
 
         EventPublisher.AssertEventsSaved(e =>
         {

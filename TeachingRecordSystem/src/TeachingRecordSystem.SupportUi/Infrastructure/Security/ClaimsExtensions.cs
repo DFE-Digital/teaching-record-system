@@ -22,7 +22,7 @@ public static class ClaimsExtensions
 
     public static IEnumerable<Claim> CreateLegacyRoleClaims(this Core.DataStore.Postgres.Models.User user)
     {
-        return user.Roles.Select(r => new Claim(ClaimTypes.Role, r));
+        return user.Roles?.Select(r => new Claim(ClaimTypes.Role, r)) ?? [];
     }
 
     public static IEnumerable<Claim> CreateRoleClaims(this Core.DataStore.Postgres.Models.User user)

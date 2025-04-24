@@ -78,7 +78,7 @@ public class EditUser(
 
         var changes = UserUpdatedEventChanges.None |
             (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
-            (!new HashSet<string>(user.Roles).SetEquals(new HashSet<string>(newRoles)) ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
+            (!new HashSet<string>(user.Roles ?? []).SetEquals(new HashSet<string>(newRoles)) ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
 
         if (changes != UserUpdatedEventChanges.None)
         {

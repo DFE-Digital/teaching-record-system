@@ -131,7 +131,7 @@ public class EditUserTests : TestBase
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", user.Name },
-                { "Roles", user.Roles }
+                { "Roles", user.Roles ?? [] }
             }
         };
 
@@ -153,7 +153,7 @@ public class EditUserTests : TestBase
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", user.Name },
-                { "Roles", user.Roles }
+                { "Roles", user.Roles ?? [] }
             }
         };
 
@@ -199,7 +199,7 @@ public class EditUserTests : TestBase
         // Arrange
         var currentUser = await TestData.CreateUserWithLegacyRolesAsync(roles: new[] { LegacyUserRoles.Helpdesk });
         var newName = changeName ? TestData.GenerateChangedName(currentUser.Name) : currentUser.Name;
-        var roles = changeRoles ? new[] { LegacyUserRoles.Administrator } : currentUser.Roles;
+        var roles = changeRoles ? [LegacyUserRoles.Administrator] : currentUser.Roles ?? [];
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(currentUser.UserId))
         {
@@ -224,7 +224,7 @@ public class EditUserTests : TestBase
         Assert.Equal(newName, updatedUser.Name);
         Assert.Equal(currentUser.Email, updatedUser.Email);
         Assert.Equal(currentUser.AzureAdUserId, updatedUser.AzureAdUserId);
-        Assert.True(updatedUser.Roles.SequenceEqual(roles));
+        Assert.True((updatedUser.Roles ?? []).SequenceEqual(roles));
 
         if (expectedEvent)
         {
