@@ -15,10 +15,8 @@ public class UsersTests : TestBase, IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        TestUsers.ClearCache();
         await WithDbContext(dbContext => dbContext.Users.ExecuteDeleteAsync());
-        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager, name: "Zuser AccessManager");
-        SetCurrentUser(user);
+        TestUsers.ClearCache();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -75,11 +73,13 @@ public class UsersTests : TestBase, IAsyncLifetime
     [Theory]
     [InlineData("?page=1", 10, "Auser", "Juser")]
     [InlineData("?page=2", 10, "Kuser", "Tuser")]
-    // Includes current user "Zuser AccessManager"
-    [InlineData("?page=3", 2, "Uuser", "Zuser")]
+    [InlineData("?page=3", 2, "Uuser", "Vuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesUsersAndSortsByFirstName(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
-        await TestData.CreateMultipleUsersAsync(21, i => new() { Name = $"{(char)('A' + i)}user {Faker.Name.Last()}" });
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(22, i =>
+            new() { Name = $"{(char)('A' + i)}user {Faker.Name.Last()}", Role = UserRoles.AccessManager });
+        SetCurrentUser(users[0]);
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
@@ -89,31 +89,31 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var html = await AssertEx.HtmlResponseAsync(response);
-        var users = html.GetElementsByClassName("trs-user");
+        var userElements = html.GetElementsByClassName("trs-user");
 
-        Assert.Equal(expectedUserCount, users.Length);
-        Assert.Contains(expectedFirstUserOnPage, users[0].InnerHtml);
-        Assert.Contains(expectedLastUserOnPage, users[expectedUserCount - 1].InnerHtml);
+        Assert.Equal(expectedUserCount, userElements.Length);
+        Assert.Contains(expectedFirstUserOnPage, userElements[0].InnerHtml);
+        Assert.Contains(expectedLastUserOnPage, userElements[expectedUserCount - 1].InnerHtml);
     }
 
     [Theory]
     [InlineData("?keywords=user%20laSTName1", new string[] { "Auser", "Buser", "Cuser", "Duser" })]
     [InlineData("?keywords=USER%40org2", new string[] { "Duser", "Euser", "Fuser" })]
-    [InlineData("?role=Administrator", new string[] { "Auser", "Buser" })]
+    [InlineData("?role=AccessManager", new string[] { "Auser", "Buser" })]
     [InlineData("?role=SupportOfficer", new string[] { "Cuser", "Duser", "Euser" })]
     [InlineData("?role=Viewer", new string[] { "Fuser", "Guser", "Huser", "Iuser" })]
-    [InlineData("?role=Administrator&role=SupportOfficer", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
-    // Includes current user "Zuser AccessManager"
-    [InlineData("?status=active", new string[] { "Auser", "Cuser", "Euser", "Guser", "Iuser", "Zuser" })]
+    [InlineData("?role=AccessManager&role=SupportOfficer", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
+    [InlineData("?status=active", new string[] { "Auser", "Cuser", "Euser", "Guser", "Iuser" })]
     [InlineData("?status=deactivated", new string[] { "Buser", "Duser", "Fuser", "Huser" })]
-    [InlineData("?role=Administrator&status=active", new string[] { "Auser" })]
+    [InlineData("?role=AccessManager&status=active", new string[] { "Auser" })]
     [InlineData("?role=Viewer&status=deactivated", new string[] { "Fuser", "Huser" })]
-    [InlineData("?keywords=org1&role=Administrator&role=SupportOfficer&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
+    [InlineData("?keywords=org1&role=AccessManager&role=SupportOfficer&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
     public async Task Get_ValidRequestAndUsersFound_FiltersUsersByKeywordsRoleAndStatus(string query, string[] expectedUserFirstNames)
     {
-        await TestData.CreateMultipleUsersAsync(
-            new() { Name = $"Auser Lastname1", Email = "auser@org1.com", Role = UserRoles.Administrator, Active = true },
-            new() { Name = $"Buser Lastname1", Email = "buser@org1.com", Role = UserRoles.Administrator, Active = false },
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(
+            new() { Name = $"Auser Lastname1", Email = "auser@org1.com", Role = UserRoles.AccessManager, Active = true },
+            new() { Name = $"Buser Lastname1", Email = "buser@org1.com", Role = UserRoles.AccessManager, Active = false },
             new() { Name = $"Cuser Lastname1", Email = "cuser@org1.com", Role = UserRoles.SupportOfficer, Active = true },
             new() { Name = $"Duser Lastname1", Email = "duser@org2.com", Role = UserRoles.SupportOfficer, Active = false },
             new() { Name = $"Euser Lastname2", Email = "euser@org2.com", Role = UserRoles.SupportOfficer, Active = true },
@@ -122,6 +122,7 @@ public class UsersTests : TestBase, IAsyncLifetime
             new() { Name = $"Huser Lastname2", Email = "huser@org3.com", Role = UserRoles.Viewer, Active = false },
             new() { Name = $"Iuser Lastname2", Email = "iuser@org3.com", Role = UserRoles.Viewer, Active = true }
         );
+        SetCurrentUser(users.First(u => u.Role == UserRoles.AccessManager && u.Active));
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
@@ -131,26 +132,28 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var html = await AssertEx.HtmlResponseAsync(response);
-        var users = html.GetElementsByClassName("trs-user");
+        var userElements = html.GetElementsByClassName("trs-user");
 
-        AssertElementsInnerTextContains(users, expectedUserFirstNames);
+        AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
     }
 
     [Theory]
-    [InlineData("?role=Administrator&page=1", 10, "Auser", "Juser")]
-    [InlineData("?role=Administrator&page=2", 2, "Kuser", "Luser")]
+    [InlineData("?role=AccessManager&page=1", 10, "Auser", "Juser")]
+    [InlineData("?role=AccessManager&page=2", 2, "Kuser", "Luser")]
     [InlineData("?role=SupportOfficer&page=1", 10, "Muser", "Vuser")]
-    [InlineData("?role=SupportOfficer&page=2", 3, "Wuser", "Yuser")]
-    [InlineData("?role=Administrator&role=SupportOfficer&status=active&page=1", 10, "Auser", "Suser")]
-    [InlineData("?role=Administrator&role=SupportOfficer&status=active&page=2", 3, "Uuser", "Yuser")]
+    [InlineData("?role=SupportOfficer&page=2", 4, "Wuser", "Zuser")]
+    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&page=1", 10, "Auser", "Suser")]
+    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&page=2", 3, "Uuser", "Yuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesFilteredUsers(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
-        await TestData.CreateMultipleUsersAsync(25, i => new()
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(26, i => new()
         {
             Name = $"{(char)('A' + i)}user {Faker.Name.Last()}",
-            Role = i < 12 ? UserRoles.Administrator : UserRoles.SupportOfficer,
+            Role = i < 12 ? UserRoles.AccessManager : UserRoles.SupportOfficer,
             Active = i % 2 == 0
         });
+        SetCurrentUser(users.First(u => u.Role == UserRoles.AccessManager && u.Active));
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
@@ -160,11 +163,11 @@ public class UsersTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
 
         var html = await AssertEx.HtmlResponseAsync(response);
-        var users = html.GetElementsByClassName("trs-user");
+        var userElements = html.GetElementsByClassName("trs-user");
 
-        Assert.Equal(expectedUserCount, users.Length);
-        Assert.Contains(expectedFirstUserOnPage, users[0].InnerHtml);
-        Assert.Contains(expectedLastUserOnPage, users[expectedUserCount - 1].InnerHtml);
+        Assert.Equal(expectedUserCount, userElements.Length);
+        Assert.Contains(expectedFirstUserOnPage, userElements[0].InnerHtml);
+        Assert.Contains(expectedLastUserOnPage, userElements[expectedUserCount - 1].InnerHtml);
     }
 
     [Theory]
@@ -173,12 +176,9 @@ public class UsersTests : TestBase, IAsyncLifetime
         "Support officer (3)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
-        // Includes current user
-        "Access manager (1)",
-        "Administrator (2)",
+        "Access manager (2)"
     }, new string[] {
-        // Includes current user
-        "Active (6)",
+        "Active (5)",
         "Deactivated (4)"
     })]
     [InlineData("?status=active", new string[] {
@@ -186,30 +186,27 @@ public class UsersTests : TestBase, IAsyncLifetime
         "Support officer (2)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
-        // Includes current user
-        "Access manager (1)",
-        "Administrator (1)",
+        "Access manager (1)"
     }, new string[] {
-        // Includes current user
-        "Active (6)",
+        "Active (5)",
         "Deactivated (0)"
     })]
-    [InlineData("?role=Administrator&role=SupportOfficer&status=deactivated", new string[] {
+    [InlineData("?role=AccessManager&role=SupportOfficer&status=deactivated", new string[] {
         "Viewer (0)",
         "Support officer (1)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
-        "Access manager (0)",
-        "Administrator (1)",
+        "Access manager (1)"
     }, new string[] {
         "Active (0)",
         "Deactivated (2)"
     })]
     public async Task Get_ValidRequestAndUsersFound_ShowsFilterCounts(string query, string[] expectedRoleLabels, string[] expectedStatusLabels)
     {
-        await TestData.CreateMultipleUsersAsync(
-            new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = true },
-            new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = false },
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(
+            new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = true },
+            new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = false },
             new() { Name = $"Cuser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = true },
             new() { Name = $"Duser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = false },
             new() { Name = $"Euser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = true },
@@ -218,6 +215,109 @@ public class UsersTests : TestBase, IAsyncLifetime
             new() { Name = $"Huser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = false },
             new() { Name = $"Iuser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = true }
         );
+        SetCurrentUser(users.First(u => u.Role == UserRoles.AccessManager && u.Active));
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var roleLabels = html.QuerySelectorAll(@".moj-filter input[name=""role""] + label");
+        var statusLabels = html.QuerySelectorAll(@".moj-filter input[name=""status""] + label");
+
+        AssertElementsInnerTextContains(roleLabels, expectedRoleLabels);
+        AssertElementsInnerTextContains(statusLabels, expectedStatusLabels);
+    }
+
+    [Theory]
+    [InlineData("?", new string[] { "Auser", "Buser", "Cuser" })]
+    [InlineData("?role=Administrator", new string[0])]
+    public async Task Get_NonAdministratorUser_DoesNotShowAdministratorUsers(string query, string[] expectedUserFirstNames)
+    {
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(6, i => new()
+        {
+            Name = $"{(char)('A' + i)}user {Faker.Name.Last()}",
+            Role = i < 3 ? UserRoles.AccessManager : UserRoles.Administrator
+        });
+        SetCurrentUser(users.First(u => u.Role == UserRoles.AccessManager && u.Active));
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var userElements = html.GetElementsByClassName("trs-user");
+
+        AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
+    }
+
+    [Theory]
+    [InlineData("?", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser", "Fuser" })]
+    [InlineData("?role=Administrator", new string[] { "Duser", "Euser", "Fuser" })]
+    public async Task Get_AdministratorUser_ShowsAdministratorUsers(string query, string[] expectedUserFirstNames)
+    {
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(6, i => new()
+        {
+            Name = $"{(char)('A' + i)}user {Faker.Name.Last()}",
+            Role = i < 3 ? UserRoles.AccessManager : UserRoles.Administrator
+        });
+        SetCurrentUser(users.First(u => u.Role == UserRoles.Administrator && u.Active));
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+
+        var html = await AssertEx.HtmlResponseAsync(response);
+        var userElements = html.GetElementsByClassName("trs-user");
+
+        AssertElementsInnerTextContains(userElements, expectedUserFirstNames);
+    }
+
+    [Theory]
+    [InlineData("?", new string[] {
+        "Viewer (0)",
+        "Support officer (0)",
+        "Alerts manager (TRA decisions) (0)",
+        "Alerts manager (TRA and DBS decisions) (0)",
+        "Access manager (2)",
+        "Administrator (3)"
+    }, new string[] {
+        "Active (3)",
+        "Deactivated (2)"
+    })]
+    [InlineData("?role=Administrator&status=active", new string[] {
+        "Viewer (0)",
+        "Support officer (0)",
+        "Alerts manager (TRA decisions) (0)",
+        "Alerts manager (TRA and DBS decisions) (0)",
+        "Access manager (0)",
+        "Administrator (2)"
+    }, new string[] {
+        "Active (2)",
+        "Deactivated (0)"
+    })]
+    public async Task Get_AdministratorUser_ShowsAdministratorFilterCounts(string query, string[] expectedRoleLabels, string[] expectedStatusLabels)
+    {
+        // Arrange
+        var users = await TestData.CreateMultipleUsersAsync(
+            new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = true },
+            new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = false },
+            new() { Name = $"Cuser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = true },
+            new() { Name = $"Duser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = false },
+            new() { Name = $"Euser {Faker.Name.Last()}", Role = UserRoles.Administrator, Active = true }
+        );
+        SetCurrentUser(users.First(u => u.Role == UserRoles.Administrator && u.Active));
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Get, $"{RequestPath}{query}");

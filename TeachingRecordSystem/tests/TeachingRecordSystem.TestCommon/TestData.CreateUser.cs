@@ -1,5 +1,3 @@
-using System.Data;
-using System;
 using Microsoft.Xrm.Sdk.Messages;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -44,7 +42,7 @@ public partial class TestData
         return user;
     }
 
-    public async Task<IReadOnlyCollection<User>> CreateMultipleUsersAsync(
+    public async Task<IReadOnlyList<User>> CreateMultipleUsersAsync(
         int userCount,
         Func<int, CreateUserSpec> createUserSpecFromIndex)
     {
@@ -72,13 +70,13 @@ public partial class TestData
 
             await dbContext.SaveChangesAsync();
 
-            return dbContext.Users.AsReadOnly();
+            return dbContext.Users.ToList();
         });
 
         return users;
     }
 
-    public async Task<IReadOnlyCollection<User>> CreateMultipleUsersAsync(params CreateUserSpec[] userSpecs)
+    public async Task<IReadOnlyList<User>> CreateMultipleUsersAsync(params CreateUserSpec[] userSpecs)
     {
         var users = await WithDbContextAsync(async dbContext =>
         {
@@ -103,7 +101,7 @@ public partial class TestData
 
             await dbContext.SaveChangesAsync();
 
-            return dbContext.Users.AsReadOnly();
+            return dbContext.Users.ToList();
         });
 
         return users;

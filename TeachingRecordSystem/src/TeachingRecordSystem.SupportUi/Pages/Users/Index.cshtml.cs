@@ -33,13 +33,16 @@ public class IndexModel : PageModel
     {
         var pagination = new Pagination("page", UsersPerPage, Request.Query);
 
+        var showAdminRole = User.IsInRole(UserRoles.Administrator);
+        var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);
+
         var filters = new FilterCollection<User>([
             new SingleValueFilter<User>("keywords", "Search", Request.Query,
                 value => u => u.Name.ToLower().Contains(value.ToLower()) || u.Email!.ToLower().Contains(value.ToLower())),
 
             new MultiValueFilter<User>("role", "Role", Request.Query,
                 u => u.Role,
-                [.. UserRoles.All.Select(r => new MultiValueFilterValue(r, UserRoles.GetDisplayNameForRole(r)))]),
+                [.. userRoles.Select(r => new MultiValueFilterValue(r, UserRoles.GetDisplayNameForRole(r)))]),
 
             new MultiValueFilter<User>("status", "Status", Request.Query,
                 u => u.Active ? "active" : "deactivated",
@@ -50,7 +53,8 @@ public class IndexModel : PageModel
         ]);
 
         var baseQuery = _dbContext.Users
-            .Where(u => u.UserType == UserType.Person && !string.IsNullOrWhiteSpace(u.Email));
+            .Where(u => u.UserType == UserType.Person && !string.IsNullOrWhiteSpace(u.Email))
+            .Where(u => showAdminRole || u.Role != UserRoles.Administrator);
 
         var filteredQuery = filters.Apply(baseQuery);
 
