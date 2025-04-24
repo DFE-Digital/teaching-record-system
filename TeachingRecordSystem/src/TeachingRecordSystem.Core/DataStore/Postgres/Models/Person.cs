@@ -19,7 +19,7 @@ public class Person
     public string? EmailAddress { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public InductionStatus InductionStatus { get; private set; }
-    public InductionStatus InductionStatusWithoutExemption { get; private set; }
+    public InductionStatus InductionStatusWithoutExemption { get; internal set; }  // internally set-able for a data fix job
     public Guid[] InductionExemptionReasonIds { get; private set; } = [];
     public bool InductionExemptWithoutReason { get; internal set; }  // internally set-able for testing
     public DateOnly? InductionStartDate { get; private set; }
