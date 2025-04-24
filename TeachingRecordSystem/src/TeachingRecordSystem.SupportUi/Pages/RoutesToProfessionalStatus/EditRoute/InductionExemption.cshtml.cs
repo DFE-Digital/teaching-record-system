@@ -26,15 +26,9 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
     [Required(ErrorMessage = "Select yes if this route provides an induction exemption")]
     public bool? IsExemptFromInduction { get; set; }
 
-    public IActionResult OnGet()
+    public void OnGet()
     {
-        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
-            || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
-        {
-            return BadRequest();
-        }
         IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
-        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -79,6 +73,12 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
         PersonId = personInfo.PersonId;
         var professionalStatusFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
         Route = professionalStatusFeature!.ProfessionalStatus.Route;
+
+        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
+        || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
+        {
+            context.Result = new BadRequestResult();
+        }
         return base.OnPageHandlerExecutionAsync(context, next);
     }
 
