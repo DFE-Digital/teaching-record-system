@@ -1,0 +1,21 @@
+@page "/users/add"
+@model TeachingRecordSystem.SupportUi.Pages.Users.AddUser.IndexModel
+@{
+    ViewBag.Title = "Add a user";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <form action="@LinkGenerator.AddUser()" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" autocomplete="off" />
+
+            <govuk-button type="submit">Add user</govuk-button>
+
+            <p class="govuk-body">
+                <a class="govuk-link govuk-link--no-visited-state" href=@LinkGenerator.Users()>Cancel and return to users</a>
+            </p>
+        </form>
+    </div>
+</div>

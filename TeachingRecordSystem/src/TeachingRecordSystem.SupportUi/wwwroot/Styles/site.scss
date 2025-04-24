@@ -209,3 +209,23 @@
     }
   }
 }
+
+.govuk-radios.trs-user-roles {
+  .govuk-radios__divider {
+    width: inherit;
+    padding-left: 60px;
+
+    @include govuk-media-query($until: tablet) {
+      overflow-x: scroll;
+    }
+  }
+
+  .govuk-table {
+    table-layout: fixed;
+    min-width: 400px;
+
+    @include govuk-media-query($from: tablet) {
+      min-width: 500px;
+    }
+  }
+}
