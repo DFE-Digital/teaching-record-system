@@ -7,30 +7,26 @@
 
 <govuk-button-link href="@LinkGenerator.LegacyAddUser()" data-testid="add-user">Add a new user</govuk-button-link>
 
-<div class="moj-filter-layout">
-    <div class="moj-filter-layout__filter" style="width:280px!important;">
+<div class="moj-filter-layout trs-filter-layout">
+    <div class="moj-filter-layout__filter">
         <partial name="_Filters" model=@Model.Filters />
     </div>
 
     <div class="moj-filter-layout__content">
-        <div class="application__listing">
-            <div class="teaching-applications__applications teaching-applications__applications--regular">
-                @if (Model.HasUsers)
+        @if (Model.HasUsers)
+        {
+            <ol class="trs-search-results">
+                @foreach (var user in Model.CurrentPageUsers)
                 {
-                    <ol class="trs-search-results">
-                        @foreach (var user in Model.CurrentPageUsers)
-                        {
-                            <partial name="_User" model=@user />
-                        }
-                    </ol>
+                    <partial name="_User" model=@user />
                 }
-                else
-                {
-                    <p class="govuk-body"><strong>No results found</strong></p>
-                    <p class="govuk-body">Try changing or clearing the filters.</p>
-                }
-            </div>
-        </div>
+            </ol>
+        }
+        else
+        {
+            <p class="govuk-body"><strong>No results found</strong></p>
+            <p class="govuk-body">Try changing or clearing the filters.</p>
+        }
 
         <partial name="_Pagination" model=@Model.Pagination />
     </div>

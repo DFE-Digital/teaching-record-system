@@ -191,3 +191,21 @@
 .trs-description-list--search-result {
   padding-bottom: 1em;
 }
+
+.trs-filter-layout {
+  .js-enabled & .moj-filter-layout__filter {
+    width: 280px;
+    overflow: inherit;
+
+    @include govuk-media-query($until: desktop) {
+      position: relative;
+      width: inherit;
+    }
+  }
+
+  .trs-search-results {
+    @include govuk-media-query($until: desktop) {
+      margin-top: 26px;
+    }
+  }
+}
