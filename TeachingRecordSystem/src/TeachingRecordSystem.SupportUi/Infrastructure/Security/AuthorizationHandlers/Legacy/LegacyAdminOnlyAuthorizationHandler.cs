@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHa
 /// <summary>
 /// AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
 /// </summary>
-public class LegacyHangFireAuthorizationHandler : AuthorizationHandler<HangFireRequirement>
+public class LegacyAdminOnlyAuthorizationHandler : AuthorizationHandler<AdminOnlyRequirement>
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, HangFireRequirement requirement)
+    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminOnlyRequirement requirement)
     {
         if (context.User.IsInRole(LegacyUserRoles.Administrator))
         {

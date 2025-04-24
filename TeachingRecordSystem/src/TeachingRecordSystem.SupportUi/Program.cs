@@ -81,7 +81,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 }
 
 builder.Services.AddAuthorizationBuilder()
-    .AddAdminAreaPolicies()
+    .AddAdminOnlyPolicies()
     .AddChangeRequestManagementPolicies()
     .AddUserManagementPolicies()
     .AddAlertPolicies()
