@@ -21,6 +21,8 @@ public class TrnRequestMetadataMessageHandler(TrsDbContext dbContext) : IMessage
                 FirstName = message.FirstName,
                 MiddleName = message.MiddleName,
                 LastName = message.LastName,
+                PreviousFirstName = message.PreviousFirstName,
+                PreviousLastName = message.PreviousLastName,
                 DateOfBirth = message.DateOfBirth,
                 PotentialDuplicate = message.PotentialDuplicate,
                 NationalInsuranceNumber = message.NationalInsuranceNumber,
