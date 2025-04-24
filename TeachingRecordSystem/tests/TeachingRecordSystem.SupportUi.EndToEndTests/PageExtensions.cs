@@ -76,10 +76,7 @@ public static class PageExtensions
         await page.GotoAsync($"/mqs/add?personId={personId}");
     }
 
-    public static async Task GoToUsersPageAsync(this IPage page)
-    {
-        await page.GotoAsync($"/users");
-    }
+    public static async Task GoToUsersPageAsync(this IPage page) => await page.GotoAsync($"/legacy-users");
 
     public static async Task GoToApplicationUsersPageAsync(this IPage page)
     {
@@ -409,22 +406,22 @@ public static class PageExtensions
 
     public static async Task AssertOnUsersPageAsync(this IPage page)
     {
-        await page.WaitForUrlPathAsync($"/users");
+        await page.WaitForUrlPathAsync($"/legacy-users");
     }
 
     public static async Task AssertOnAddUserPageAsync(this IPage page)
     {
-        await page.WaitForUrlPathAsync($"/users/add");
+        await page.WaitForUrlPathAsync($"/legacy-users/add");
     }
 
     public static async Task AssertOnAddUserConfirmPageAsync(this IPage page)
     {
-        await page.WaitForUrlPathAsync($"/users/add/confirm");
+        await page.WaitForUrlPathAsync($"/legacy-users/add/confirm");
     }
 
     public static async Task AssertOnEditUserPageAsync(this IPage page, Guid userId)
     {
-        await page.WaitForUrlPathAsync($"/users/{userId}");
+        await page.WaitForUrlPathAsync($"/legacy-users/{userId}");
     }
 
     public static async Task AssertOnApplicationUsersPageAsync(this IPage page)

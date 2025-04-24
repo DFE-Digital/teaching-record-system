@@ -7,6 +7,7 @@ public static class ClaimsExtensions
     public static IEnumerable<Claim> CreateClaims(this Core.DataStore.Postgres.Models.User user)
     {
         var claims = user.CreateLegacyRoleClaims()
+            .Concat(user.CreateRoleClaims())
             .Concat(user.CreatePermissionClaims())
             .Append(new Claim(CustomClaims.UserId, user.UserId.ToString()))
             .Append(new Claim(ClaimTypes.Name, user.Name));
@@ -21,7 +22,12 @@ public static class ClaimsExtensions
 
     public static IEnumerable<Claim> CreateLegacyRoleClaims(this Core.DataStore.Postgres.Models.User user)
     {
-        return user.Roles.Select(r => new Claim(ClaimTypes.Role, r));
+        return user.Roles?.Select(r => new Claim(ClaimTypes.Role, r)) ?? [];
+    }
+
+    public static IEnumerable<Claim> CreateRoleClaims(this Core.DataStore.Postgres.Models.User user)
+    {
+        return user.Role != null ? [new Claim(ClaimTypes.Role, user.Role)] : [];
     }
 
     public static IEnumerable<Claim> CreatePermissionClaims(this Core.DataStore.Postgres.Models.User user)

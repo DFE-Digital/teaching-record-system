@@ -14,8 +14,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None),
-        new(UserPermissionTypes.AdminArea, UserPermissionLevel.None)
+        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Support officer")]
@@ -27,8 +26,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.AdminArea, UserPermissionLevel.None)
+        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Alerts manager (TRA decisions)")]
@@ -40,8 +38,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None),
-        new(UserPermissionTypes.AdminArea, UserPermissionLevel.None)
+        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Alerts manager (TRA and DBS decisions)")]
@@ -53,8 +50,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None),
-        new(UserPermissionTypes.AdminArea, UserPermissionLevel.None)
+        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Access manager")]
@@ -66,8 +62,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.AdminArea, UserPermissionLevel.None)
+        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Administrator")]

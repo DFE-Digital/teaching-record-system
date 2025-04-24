@@ -5,20 +5,20 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
-public static class AdminAreaAuthorization
+public static class AdministratorAuthorization
 {
-    public static AuthorizationBuilder AddAdminAreaPolicies(this AuthorizationBuilder builder)
+    public static AuthorizationBuilder AddAdminOnlyPolicies(this AuthorizationBuilder builder)
     {
         builder.AddPolicy(
-            AuthorizationPolicies.Hangfire,
+            AuthorizationPolicies.AdminOnly,
             policy => policy
                 .RequireAuthenticatedUser()
-                .AddRequirements(new HangFireRequirement()));
+                .AddRequirements(new AdminOnlyRequirement()));
 
         builder.Services
-            .AddSingleton<IAuthorizationHandler, HangFireAuthorizationHandler>()
+            .AddSingleton<IAuthorizationHandler, AdminOnlyAuthorizationHandler>()
             // AuthorizationHandler for Legacy user roles, delete when existing users have been migrated to new user roles.
-            .AddSingleton<IAuthorizationHandler, LegacyHangFireAuthorizationHandler>();
+            .AddSingleton<IAuthorizationHandler, LegacyAdminOnlyAuthorizationHandler>();
 
         return builder;
     }
