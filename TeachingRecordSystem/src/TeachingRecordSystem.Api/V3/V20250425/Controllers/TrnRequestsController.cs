@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
-using TrnRequestInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.TrnRequestInfo;
+using TrnRequestInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrnRequestInfo;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
+namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 
 [Route("trn-requests")]
 [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.CreateTrn)]
