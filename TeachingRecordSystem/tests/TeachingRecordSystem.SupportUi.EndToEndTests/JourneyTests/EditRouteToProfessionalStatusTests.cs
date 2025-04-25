@@ -885,23 +885,18 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact]
+    [Fact(Skip = "Waiting for provider table to be populated")]
     public async Task EditStatusRouteWithImplicitExemption_Awarded_Continue_Cya_EditStatus_Continue_Cya()
     {
         var awardDate = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionReasonId.HasValue)
-            .Join(
-                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == true),
-                r => r.InductionExemptionReasonId,
-                e => e.InductionExemptionReasonId,
-                (r, e) => r
-            )
+            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption == true)
             .RandomOne();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.InTraining;
         var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var provider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -911,6 +906,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
                 .WithAwardedDate(new DateOnly(2021, 2, 2))
                 .WithTrainingCountry(country)
+                .WithTrainingProvider(provider)
             ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
