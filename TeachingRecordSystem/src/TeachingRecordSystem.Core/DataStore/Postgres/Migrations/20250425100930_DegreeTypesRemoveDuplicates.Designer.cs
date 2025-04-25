@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250425100930_DegreeTypesRemoveDuplicates")]
+    partial class DegreeTypesRemoveDuplicates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3416,7 +3419,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             IsActive = true,
                             Name = "Overseas Trained Teacher",
-                            RouteImplicitExemption = false
+                            RouteImplicitExemption = true
                         },
                         new
                         {
@@ -3437,7 +3440,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
                             IsActive = true,
                             Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training",
-                            RouteImplicitExemption = true
+                            RouteImplicitExemption = false
                         });
                 });
 
