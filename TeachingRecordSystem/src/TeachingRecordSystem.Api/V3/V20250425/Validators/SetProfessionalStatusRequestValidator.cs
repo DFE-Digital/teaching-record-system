@@ -1,9 +1,9 @@
 using FluentValidation;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.ProfessionalStatusStatus;
+using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.ProfessionalStatusStatus;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Validators;
+namespace TeachingRecordSystem.Api.V3.V20250425.Validators;
 
 public class SetProfessionalStatusRequestValidator : AbstractValidator<SetProfessionalStatusRequest>
 {
@@ -133,7 +133,7 @@ public class SetProfessionalStatusRequestTrainingAgeSpecialismValidator : Abstra
                 .IsInEnum()
                 .WithMessage("Invalid training age specialism type.");
 
-            When(r => r!.Type == Core.ApiSchema.V3.VNext.Dtos.TrainingAgeSpecialismType.Range, () =>
+            When(r => r!.Type == Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismType.Range, () =>
             {
                 RuleFor(r => r!.From)
                     .NotNull()

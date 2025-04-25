@@ -1,8 +1,8 @@
 using Optional;
-using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.ProfessionalStatusStatus;
-using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.TrainingAgeSpecialismType;
+using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.ProfessionalStatusStatus;
+using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismType;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20250425.Requests;
 
 public record SetProfessionalStatusRequest
 {

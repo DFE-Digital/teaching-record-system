@@ -1,6 +1,6 @@
 using TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Requests;
+namespace TeachingRecordSystem.Api.V3.V20250425.Requests;
 
 public record SetPiiRequest
 {
