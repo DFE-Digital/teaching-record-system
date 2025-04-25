@@ -1,15 +1,15 @@
 using Microsoft.Xrm.Sdk;
 using Optional;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
-using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.ProfessionalStatusStatus;
-using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.TrainingAgeSpecialismType;
+using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.ProfessionalStatusStatus;
+using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismType;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.VNext;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
 public class SetProfessionalStatusTests : TestBase
 {

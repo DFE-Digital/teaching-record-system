@@ -3,7 +3,7 @@ using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.Dqt;
 
-namespace TeachingRecordSystem.Api.IntegrationTests.V3.VNext;
+namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
 public class SetPiiTests : TestBase
 {

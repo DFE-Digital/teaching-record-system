@@ -67,17 +67,14 @@ public static class IttQualificationExtensions
             var guid when guid == Guid.Parse("d82637a0-33ed-4181-b00b-9d53e7853552") => "025", // Graduate Certificate in Mathematics and Education
             var guid when guid == Guid.Parse("b9ef569f-fb23-4f31-842e-a0d940d911be") => "024", // Graduate Certificate in Science and Education
             var guid when guid == Guid.Parse("6d07695e-5b5b-4dd4-997c-420e4424255c") => "997", // Graduate Diploma
-            var guid when guid == Guid.Parse("e0b22ab0-fa25-4c31-aa61-cab56a4e6a2b") => "110", // PGCE
             var guid when guid == Guid.Parse("54f72259-23b2-4d79-a6ca-c185084c903f") => "026", // PGCE (Articled Teachers Scheme)
             var guid when guid == Guid.Parse("2f7a914f-f95f-421a-a55e-60ed88074cf2") => "022", // Postgraduate Art Teachers Certificate
             var guid when guid == Guid.Parse("8d0440f2-f731-4ac2-b49c-927af903bf59") => "023", // Postgraduate Art Teachers Diploma
             var guid when guid == Guid.Parse("40a85dd0-8512-438e-8040-649d7d677d07") => "020", // Postgraduate Certificate in Education
-            var guid when guid == Guid.Parse("78a8d033-06c8-4beb-b415-5907f5f39207") => "020", // Postgraduate Certificate in Education
             var guid when guid == Guid.Parse("c584eb2f-1419-4870-a230-5d81ae9b5f77") => "041", // Postgraduate Certificate in Education (Further Education)
             var guid when guid == Guid.Parse("63d80489-ee3d-43af-8c4a-1d6ae0d65f68") => "021", // Postgraduate Diploma in Education
             var guid when guid == Guid.Parse("d8e267d2-ed85-4eee-8119-45d0c6cc5f6b") => "031", // Professional Graduate Certificate in Education
             var guid when guid == Guid.Parse("7c703efb-a5d3-41d3-b243-ee8974695dd8") => "050", // Professional Graduate Diploma in Education
-            var guid when guid == Guid.Parse("ae28704f-cfa3-4c6e-a47d-c4a048383018") => "113", // Professional PGCE
             var guid when guid == Guid.Parse("4ec0a016-07eb-47b4-8cdd-e276945d401e") => "049", // Qualification gained in Europe
             var guid when guid == Guid.Parse("b02914fe-3a30-4f7c-94ec-0cd87a75834d") => "043", // Teachers Certificate
             var guid when guid == Guid.Parse("7471551d-132e-4c5d-82cc-a41190f01245") => "042", // Teachers Certificate FE

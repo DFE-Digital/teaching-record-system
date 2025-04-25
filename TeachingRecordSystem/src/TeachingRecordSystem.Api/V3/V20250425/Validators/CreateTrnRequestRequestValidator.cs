@@ -1,9 +1,9 @@
 using FluentValidation;
 using TeachingRecordSystem.Api.Properties;
-using TeachingRecordSystem.Api.V3.VNext.Requests;
+using TeachingRecordSystem.Api.V3.V20250425.Requests;
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.Api.V3.VNext.Validators;
+namespace TeachingRecordSystem.Api.V3.V20250425.Validators;
 
 public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnRequestRequest>
 {
