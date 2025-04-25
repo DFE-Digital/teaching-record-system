@@ -97,7 +97,8 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var awardDate = new DateOnly(2024, 01, 01);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Single(r => r.Name == "Apply for QTS");
+            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
+            .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.AwardDateRequired == FieldRequirement.Mandatory && s.InductionExemptionRequired == FieldRequirement.Mandatory)
             .RandomOne()
@@ -128,7 +129,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(awardDate, journeyInstance.State.AwardedDate);
     }

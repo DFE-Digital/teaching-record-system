@@ -282,7 +282,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = Clock.Today;
         var awardDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.Name == "Apply for QTS")
+            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.InductionExemptionRequired == FieldRequirement.Mandatory)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250425100839_InductionExemptionReasonsModification")]
+    partial class InductionExemptionReasonsModification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2713,6 +2716,18 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         },
                         new
                         {
+                            DegreeTypeId = new Guid("e0b22ab0-fa25-4c31-aa61-cab56a4e6a2b"),
+                            IsActive = true,
+                            Name = "PGCE"
+                        },
+                        new
+                        {
+                            DegreeTypeId = new Guid("ae28704f-cfa3-4c6e-a47d-c4a048383018"),
+                            IsActive = true,
+                            Name = "Professional PGCE"
+                        },
+                        new
+                        {
                             DegreeTypeId = new Guid("311ef3a9-6aba-4314-acf8-4bba46aebe9e"),
                             IsActive = true,
                             Name = "Graduate Certificate in Education"
@@ -2756,6 +2771,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             DegreeTypeId = new Guid("40a85dd0-8512-438e-8040-649d7d677d07"),
+                            IsActive = true,
+                            Name = "Postgraduate Certificate in Education"
+                        },
+                        new
+                        {
+                            DegreeTypeId = new Guid("78a8d033-06c8-4beb-b415-5907f5f39207"),
                             IsActive = true,
                             Name = "Postgraduate Certificate in Education"
                         },
