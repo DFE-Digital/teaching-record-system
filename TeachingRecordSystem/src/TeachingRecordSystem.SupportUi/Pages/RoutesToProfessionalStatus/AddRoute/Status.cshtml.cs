@@ -60,8 +60,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
+            if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
+            {
+                context.Result = BadRequest();
+                return;
+            }
+
             Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
-            Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId!.Value);
+            Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
             var personInfo = context.HttpContext.GetCurrentPersonFeature();
             PersonName = personInfo.Name;
             PersonId = personInfo.PersonId;

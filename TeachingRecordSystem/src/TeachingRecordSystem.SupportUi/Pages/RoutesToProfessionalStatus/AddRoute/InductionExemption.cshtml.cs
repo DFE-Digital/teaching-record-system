@@ -42,13 +42,16 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
         if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
         {
             context.Result = BadRequest();
+            return;
         }
-        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId!.Value);
+
+        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
             || (Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption))
         {
             context.Result = BadRequest();
         }
+
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
