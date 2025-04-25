@@ -11,9 +11,6 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
     {
         var contactId = query.ContactId;
 
-        var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
-        var serializer = new MessageSerializer();
-
         var contact = new Contact()
         {
             Id = contactId,
@@ -38,28 +35,6 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             contact.Attributes.Remove(Contact.Fields.dfeta_TRN);
         }
 
-        requestBuilder.AddRequest(new CreateRequest() { Target = contact });
-
-        foreach (var reviewTask in query.ReviewTasks)
-        {
-            var task = new CrmTask()
-            {
-                RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_potentialduplicateid = reviewTask.PotentialDuplicateContactId.ToEntityReference(Contact.EntityLogicalName),
-                Category = reviewTask.Category,
-                Subject = reviewTask.Subject,
-                Description = reviewTask.Description
-            };
-
-            requestBuilder.AddRequest(new CreateRequest() { Target = task });
-        }
-
-        requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(query.TrnRequestMetadataMessage) });
-
-        await requestBuilder.ExecuteAsync();
-
-        return contactId;
-
-
+        return await organizationService.CreateAsync(contact);
     }
 }

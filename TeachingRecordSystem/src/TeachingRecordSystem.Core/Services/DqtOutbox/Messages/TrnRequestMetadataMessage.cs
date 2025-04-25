@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 public record TrnRequestMetadataMessage
@@ -26,4 +28,32 @@ public record TrnRequestMetadataMessage
     public string? Country { get; init; }
     public string? TrnToken { get; init; }
     public Guid? ResolvedPersonId { get; set; }
+
+    // public static TrnRequestMetadataMessage FromModel(TrnRequestMetadata model) => new()
+    // {
+    //     ApplicationUserId = model.ApplicationUserId,
+    //     RequestId = model.RequestId,
+    //     CreatedOn = model.CreatedOn,
+    //     IdentityVerified = model.IdentityVerified,
+    //     EmailAddress = model.EmailAddress,
+    //     OneLoginUserSubject = model.OneLoginUserSubject,
+    //     Name = model.Name,
+    //     FirstName = model.FirstName,
+    //     MiddleName = model.MiddleName,
+    //     LastName = model.LastName,
+    //     PreviousFirstName = model.PreviousFirstName,
+    //     PreviousLastName = model.PreviousLastName,
+    //     DateOfBirth = model.DateOfBirth,
+    //     PotentialDuplicate = model.PotentialDuplicate,
+    //     NationalInsuranceNumber = model.NationalInsuranceNumber,
+    //     Gender = model.Gender,
+    //     AddressLine1 = model.AddressLine1,
+    //     AddressLine2 = model.AddressLine2,
+    //     AddressLine3 = model.AddressLine3,
+    //     City = model.City,
+    //     Postcode = model.Postcode,
+    //     Country = model.Country,
+    //     TrnToken = model.TrnToken,
+    //     ResolvedPersonId = model.ResolvedPersonId
+    // };
 }

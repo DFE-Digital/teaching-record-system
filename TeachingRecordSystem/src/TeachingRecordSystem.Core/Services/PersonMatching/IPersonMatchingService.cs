@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Services.PersonMatching;
 public interface IPersonMatchingService
 {
     Task<OneLoginMatchResult?> MatchOneLoginUserAsync(OneLoginUserMatchRequest request);
-    Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedOneLoginUserMatchesAsync(GetSuggestedOneLoginUserMatchesRequest request);
-    Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedOneLoginUserMatchesRequest request, Guid personId);
-    Task<IReadOnlyCollection<TrnRequestMatchResult>> MatchFromTrnRequestAsync(TrnRequestMetadata request);
+    Task<IReadOnlyList<SuggestedMatch>> GetSuggestedOneLoginUserMatchesAsync(GetSuggestedOneLoginUserMatchesRequest request);
+    Task<IReadOnlyList<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedOneLoginUserMatchesRequest request, Guid personId);
+    Task<IReadOnlyList<TrnRequestMatchResult>> MatchFromTrnRequestAsync(TrnRequestMetadata request);
 }

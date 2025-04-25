@@ -61,7 +61,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         };
     }
 
-    public async Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedOneLoginUserMatchesAsync(GetSuggestedOneLoginUserMatchesRequest request)
+    public async Task<IReadOnlyList<SuggestedMatch>> GetSuggestedOneLoginUserMatchesAsync(GetSuggestedOneLoginUserMatchesRequest request)
     {
         // Return any record that matches on last name and DOB OR NINO OR TRN.
         // Results should be ordered such that matches on TRN are returned before matches on NINO with matches on last name + DOB last.
@@ -139,10 +139,10 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 r.last_name,
                 r.date_of_birth,
                 r.national_insurance_number))
-            .AsReadOnly();
+            .ToArray();
     }
 
-    public async Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedOneLoginUserMatchesRequest request, Guid personId)
+    public async Task<IReadOnlyList<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedOneLoginUserMatchesRequest request, Guid personId)
     {
         var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
@@ -183,10 +183,10 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .Select(r => KeyValuePair.Create(Enum.Parse<OneLoginUserMatchedAttribute>(r.attribute_type), r.attribute_value))
             .OrderBy(r => (int)r.Key)
             .ThenBy(r => r.Value)
-            .AsReadOnly();
+            .ToArray();
     }
 
-    public async Task<IReadOnlyCollection<TrnRequestMatchResult>> MatchFromTrnRequestAsync(TrnRequestMetadata request)
+    public async Task<IReadOnlyList<TrnRequestMatchResult>> MatchFromTrnRequestAsync(TrnRequestMetadata request)
     {
         // Find all Active records with a TRN that match on:
         // - at least three of first name, middle name, last name, DOB, email address, NINO *OR*
@@ -262,7 +262,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .OrderByDescending(t => t.Score)
             .ThenBy(t => t.Result.Trn)
             .Select(t => t.Result)
-            .AsReadOnly();
+            .ToArray();
     }
 
     private static IReadOnlyCollection<KeyValuePair<TAttr, string>> MapMatchedAttrs<TAttr>(JsonDocument doc) where TAttr : struct =>

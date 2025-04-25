@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
-
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
 public class CreateContactTests : IAsyncLifetime
@@ -47,37 +45,7 @@ public class CreateContactTests : IAsyncLifetime
             DateOfBirth = dateOfBirth,
             Gender = gender,
             Trn = trn,
-            ReviewTasks = [],
             ApplicationUserName = "Tests",
-            TrnRequestMetadataMessage = new TrnRequestMetadataMessage
-            {
-                ApplicationUserId = Guid.NewGuid(),
-                RequestId = Guid.NewGuid().ToString(),
-                CreatedOn = DateTime.UtcNow,
-                IdentityVerified = null,
-                EmailAddress = email,
-                OneLoginUserSubject = null,
-                Name = new string[]
-                {
-                    firstName,
-                    middleName,
-                    lastName
-                },
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                PotentialDuplicate = false,
-                NationalInsuranceNumber = nino,
-                Gender = null,
-                AddressLine1 = null,
-                AddressLine2 = null,
-                AddressLine3 = null,
-                City = null,
-                Postcode = null,
-                Country = null,
-                TrnToken = null
-            },
             AllowPiiUpdates = true
         };
 

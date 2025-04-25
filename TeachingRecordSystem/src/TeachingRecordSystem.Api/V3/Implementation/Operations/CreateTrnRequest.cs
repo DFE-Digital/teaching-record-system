@@ -1,17 +1,14 @@
-using System.Text;
-using Microsoft.Extensions.Options;
+#pragma warning disable TRS0001
+using System.Transactions;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
-using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
-using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
-#pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -30,14 +27,12 @@ public record CreateTrnRequestCommand
 }
 
 public class CreateTrnRequestHandler(
-    TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
+    IDbContextFactory<TrsDbContext> dbContextFactory, 
+    IBackgroundJobScheduler backgroundJobScheduler,
+    IPersonMatchingService personMatchingService,
     TrnRequestHelper trnRequestHelper,
     ICurrentUserProvider currentUserProvider,
     ITrnGenerator trnGenerationApiClient,
-#pragma warning disable CS9113 // Parameter is unread.
-    INameSynonymProvider nameSynonymProvider,
-#pragma warning restore CS9113 // Parameter is unread.
     IClock clock,
     IConfiguration configuration)
 {
@@ -51,154 +46,98 @@ public class CreateTrnRequestHandler(
             return ApiError.TrnRequestAlreadyCreated(command.RequestId);
         }
 
-        // Normalize names; DQT matching process requires a single-word first name :-|
-        var firstAndMiddleNames = $"{command.FirstName} {command.MiddleName}".Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var firstName = firstAndMiddleNames.First();
-        var middleName = string.Join(' ', firstAndMiddleNames.Skip(1));
-
-        //var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
-        var firstNameSynonyms = Array.Empty<string>();  // Disabled temporarily
-
-        var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
-        string? trnToken;
-        string? aytqLink;
+        
+        var trnRequestMetadata = new PostgresModels.TrnRequestMetadata
+        {
+            ApplicationUserId = currentApplicationUserId,
+            RequestId = command.RequestId,
+            CreatedOn = clock.UtcNow,
+            IdentityVerified = command.IdentityVerified,
+            OneLoginUserSubject = command.OneLoginUserSubject,
+            Name = GetNonEmptyValues(
+                command.FirstName,
+                command.MiddleName,
+                command.LastName),
+            FirstName = command.FirstName,
+            MiddleName = command.MiddleName,
+            LastName = command.LastName,
+            DateOfBirth = command.DateOfBirth,
+            EmailAddress = emailAddress,
+            NationalInsuranceNumber = command.NationalInsuranceNumber,
+            Gender = (int?)command.Gender
+        };
 
-        // Check workforce data for NINO matches
-        var workforceDataMatches = normalizedNino is not null ?
-            await dbContext.TpsEmployments
-                .Where(e => e.NationalInsuranceNumber == normalizedNino)
-                .Join(dbContext.Persons, e => e.PersonId, p => p.PersonId, (e, p) => p.DqtContactId!.Value)
-                .ToArrayAsync() :
-            [];
+        var matches = await personMatchingService.MatchFromTrnRequestAsync(trnRequestMetadata);
 
-        var potentialDuplicates = (await crmQueryDispatcher.ExecuteQueryAsync(
-            new FindPotentialDuplicateContactsQuery()
-            {
-                FirstNames = firstNameSynonyms.Append(firstName),
-                MiddleName = middleName,
-                LastName = command.LastName,
-                DateOfBirth = command.DateOfBirth,
-                EmailAddresses = command.EmailAddresses,
-                NationalInsuranceNumber = normalizedNino,
-                MatchedOnNationalInsuranceNumberContactIds = workforceDataMatches
-            })).ToList();
-
-        TrnRequestMetadataMessage CreateMetadataOutboxMessage(bool potentialDuplicate, Guid? resolvedPersonId, string? trnToken) =>
-            new TrnRequestMetadataMessage
-            {
-                ApplicationUserId = currentApplicationUserId,
-                RequestId = command.RequestId,
-                CreatedOn = clock.UtcNow,
-                IdentityVerified = command.IdentityVerified,
-                OneLoginUserSubject = command.OneLoginUserSubject,
-                Name = GetNonEmptyValues(
-                    command.FirstName,
-                    command.MiddleName,
-                    command.LastName),
-                FirstName = command.FirstName,
-                MiddleName = command.MiddleName,
-                LastName = command.LastName,
-                DateOfBirth = command.DateOfBirth,
-                PotentialDuplicate = potentialDuplicate,
-                EmailAddress = emailAddress,
-                NationalInsuranceNumber = command.NationalInsuranceNumber,
-                Gender = (int?)command.Gender,
-                AddressLine1 = null,
-                AddressLine2 = null,
-                AddressLine3 = null,
-                City = null,
-                Postcode = null,
-                Country = null,
-                TrnToken = trnToken,
-                ResolvedPersonId = resolvedPersonId
-            };
-
-        // If any record has matched on NINO & DOB treat that as a definite match and return the existing record's details
-        var matchedOnNinoAndDob = potentialDuplicates
-            .Where(d => d.MatchedAttributes.Contains(Contact.Fields.dfeta_NINumber) && d.MatchedAttributes.Contains(Contact.Fields.BirthDate))
-            .ToArray();
-
-        if (matchedOnNinoAndDob is [var singleMatchOnNinoAndDob])
+        Guid? resolvedPersonId = null;
+        string? trn = null;
+        
+        if (matches is [{ DefiniteMatch: true } definiteMatch])
         {
             // FUTURE: consider whether we should be updating any missing attributes here
+            // TODO Consider alerts, QTS, EYTS etc.
 
-            trnToken = emailAddress is not null ? await trnRequestHelper.CreateTrnTokenAsync(singleMatchOnNinoAndDob.Trn, emailAddress) : null;
-            aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
-
-            await crmQueryDispatcher.ExecuteQueryAsync(
-                new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false, singleMatchOnNinoAndDob.ContactId, trnToken)));
-
-            return new TrnRequestInfo()
-            {
-                RequestId = command.RequestId,
-                Person = new TrnRequestInfoPerson()
-                {
-                    FirstName = command.FirstName,
-                    MiddleName = command.MiddleName,
-                    LastName = command.LastName,
-                    EmailAddress = emailAddress,
-                    DateOfBirth = command.DateOfBirth,
-                    NationalInsuranceNumber = command.NationalInsuranceNumber
-                },
-                Trn = singleMatchOnNinoAndDob.Trn,
-                Status = TrnRequestStatus.Completed,
-                PotentialDuplicate = false,
-                AccessYourTeachingQualificationsLink = aytqLink
-            };
+            resolvedPersonId = definiteMatch.PersonId;
+            trn = definiteMatch.Trn;
         }
-
-        string? trn = null;
-        var potentialDuplicate = potentialDuplicates.Count > 0;
-        if (!potentialDuplicate)
-        {
-            trn = await trnGenerationApiClient.GenerateTrnAsync();
-        }
-
-        var potentialDuplicatePersonIds = potentialDuplicates.Select(d => d.ContactId).ToList();
-        var resultsWithActiveAlerts = await dbContext.Alerts
-            .Where(a => potentialDuplicatePersonIds.Contains(a.PersonId) && a.IsOpen)
-            .Select(a => a.PersonId)
-            .Distinct()
-            .ToArrayAsync();
-
-        var reviewTasks = potentialDuplicates
-            .Select(d => (Duplicate: d, HasActiveAlert: resultsWithActiveAlerts.Contains(d.ContactId)))
-            .Select(d => CreateDuplicateReviewTaskEntity(currentApplicationUserName, d.Duplicate, d.HasActiveAlert))
-            .ToArray();
-
-        var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
-
-        trnToken = emailAddress is not null && trn is not null ? await trnRequestHelper.CreateTrnTokenAsync(trn, emailAddress) : null;
-        aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
-
+        
+        var potentialDuplicate = resolvedPersonId is null && matches.Count > 0;
+        var createRecord = resolvedPersonId is null && !potentialDuplicate;
         var contactId = Guid.NewGuid();
 
-        var metadataMessage = CreateMetadataOutboxMessage(
-            potentialDuplicate,
-            resolvedPersonId: trn is not null ? contactId : null,
-            trnToken);
-
-        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
+        if (createRecord && !potentialDuplicate)
         {
-            ContactId = contactId,
-            FirstName = firstName,
-            MiddleName = middleName,
-            LastName = command.LastName,
-            StatedFirstName = command.FirstName,
-            StatedMiddleName = command.MiddleName ?? "",
-            StatedLastName = command.LastName,
-            DateOfBirth = command.DateOfBirth,
-            Gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable,
-            EmailAddress = emailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
-            ReviewTasks = reviewTasks,
-            ApplicationUserName = currentApplicationUserName,
-            Trn = trn,
-            TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
-            TrnRequestMetadataMessage = metadataMessage,
-            AllowPiiUpdates = allowContactPiiUpdatesFromUserIds.Contains(currentApplicationUserId.ToString())
-        });
+            trn = await trnGenerationApiClient.GenerateTrnAsync();
+            resolvedPersonId = contactId;
+        }
+
+        var trnToken = emailAddress is not null && trn is not null ? await trnRequestHelper.CreateTrnTokenAsync(trn, emailAddress) : null;
+        var aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
+        
+        trnRequestMetadata.PotentialDuplicate = potentialDuplicate;
+        trnRequestMetadata.TrnToken = trnToken;
+        trnRequestMetadata.ResolvedPersonId = resolvedPersonId;
+
+        // Create a TransactionScope so that enqueued Hangfire jobs are in the transaction as our DB additions
+        using var txn = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync();
+        
+        dbContext.TrnRequestMetadata.Add(trnRequestMetadata);
+        
+        if (createRecord)
+        {
+            var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
+            var gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable;
+            
+            // TODO Move this into TrnRequestHelper
+            await backgroundJobScheduler.EnqueueAsync<ICrmQueryDispatcher>(crmQueryDispatcher =>
+                crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
+                {
+                    ContactId = contactId,
+                    FirstName = command.FirstName,
+                    MiddleName = command.MiddleName ?? "",
+                    LastName = command.LastName,
+                    StatedFirstName = command.FirstName,
+                    StatedMiddleName = command.MiddleName ?? "",
+                    StatedLastName = command.LastName,
+                    DateOfBirth = command.DateOfBirth,
+                    Gender = gender,
+                    EmailAddress = emailAddress,
+                    NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
+                    ApplicationUserName = currentApplicationUserName,
+                    Trn = trn,
+                    TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
+                    AllowPiiUpdates = allowContactPiiUpdatesFromUserIds.Contains(currentApplicationUserId.ToString())
+                }));
+        }
+        else if (potentialDuplicate)
+        {
+            // TODO Create support task    
+        }
+        
+        await dbContext.SaveChangesAsync();
+        txn.Complete();
 
         var status = trn is not null ? TrnRequestStatus.Completed : TrnRequestStatus.Pending;
 
@@ -233,70 +172,6 @@ public class CreateTrnRequestHandler(
             }
 
             return result.ToArray();
-        }
-    }
-
-    private CreateContactQueryDuplicateReviewTask CreateDuplicateReviewTaskEntity(
-        string applicationUserName,
-        FindPotentialDuplicateContactsResult duplicate,
-        bool hasActiveAlert)
-    {
-        var description = GetDescription();
-
-        var category = $"TRN request from {applicationUserName}";
-
-        return new CreateContactQueryDuplicateReviewTask()
-        {
-            PotentialDuplicateContactId = duplicate.ContactId,
-            Category = category,
-            Subject = "Notification for QTS Unit Team",
-            Description = description
-        };
-
-        string GetDescription()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("Potential duplicate");
-            sb.AppendLine("Matched on");
-
-            foreach (var matchedAttribute in duplicate.MatchedAttributes)
-            {
-                sb.AppendLine(matchedAttribute switch
-                {
-                    Contact.Fields.FirstName => $"  - First name: '{duplicate.FirstName}'",
-                    Contact.Fields.MiddleName => $"  - Middle name: '{duplicate.MiddleName}'",
-                    Contact.Fields.LastName => $"  - Last name: '{duplicate.LastName}'",
-                    Contact.Fields.dfeta_PreviousLastName => $"  - Previous last name: '{duplicate.PreviousLastName}'",
-                    Contact.Fields.BirthDate => $"  - Date of birth: '{duplicate.DateOfBirth:dd/MM/yyyy}'",
-                    Contact.Fields.dfeta_NINumber => $"  - National Insurance number: '{duplicate.NationalInsuranceNumber}'",
-                    Contact.Fields.EMailAddress1 => $"  - Email address: '{duplicate.EmailAddress}'",
-                    _ => throw new Exception($"Unknown matched field: '{matchedAttribute}'.")
-                });
-            }
-
-            var additionalFlags = new List<string>();
-
-            if (hasActiveAlert)
-            {
-                additionalFlags.Add("active sanctions");
-            }
-
-            if (duplicate.HasQtsDate)
-            {
-                additionalFlags.Add("QTS date");
-            }
-
-            if (duplicate.HasEytsDate)
-            {
-                additionalFlags.Add("EYTS date");
-            }
-
-            if (additionalFlags.Count > 0)
-            {
-                sb.AppendLine($"Matched record has {string.Join(" & ", additionalFlags)}");
-            }
-
-            return sb.ToString();
         }
     }
 }
