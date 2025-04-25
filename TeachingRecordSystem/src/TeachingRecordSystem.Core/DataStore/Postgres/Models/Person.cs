@@ -32,6 +32,8 @@ public class Person
     /// This is different to <see cref="CpdInductionModifiedOn"/> (which is our timestamp).
     /// </summary>
     public DateTime? CpdInductionCpdModifiedOn { get; private set; }
+    public DateOnly? QtsDate { get; set; }
+    public DateOnly? EytsDate { get; set; }
     public ICollection<Qualification> Qualifications { get; } = new List<Qualification>();
     public ICollection<Alert> Alerts { get; } = new List<Alert>();
 

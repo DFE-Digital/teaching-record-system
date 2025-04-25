@@ -4,6 +4,7 @@
 @import "../lib/ministryofjustice/frontend/moj/objects/all";
 @import "../lib/ministryofjustice/frontend/moj/utilities/all";
 /* If needing more components then add them individually .. unfortunately the cookie-banner component references node_modules in the @import so we can't just import components/all !!  */
+@import "../lib/ministryofjustice/frontend/moj/components/filter/_filter";
 @import "../lib/ministryofjustice/frontend/moj/components/password-reveal/_password-reveal";
 @import "../lib/ministryofjustice/frontend/moj/components/search/search";
 @import "../lib/ministryofjustice/frontend/moj/components/sub-navigation/sub-navigation";
@@ -86,4 +87,125 @@
 
 .trs-checkboxes__divider--heading-s:not(:first-of-type) {
   margin-top: 2.5rem;
+}
+
+.trs-search-results {
+  border-top: 1px solid #b1b4b6;
+  padding-top: 15px;
+  padding-left: 0;
+  margin: 0;
+
+  @include govuk-media-query($from: tablet) {
+    padding-top: 20px;
+  }
+
+  .trs-search-results__item {
+    display: block;
+    border-bottom: 1px solid #b1b4b6;
+    margin-bottom: 15px;
+
+    @include govuk-media-query($from: tablet) {
+      margin-bottom: 20px;
+    }
+
+    .trs-search-results__item-title {
+      font-family: GDS Transport, arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-weight: 700;
+      font-size: 1.125rem;
+      line-height: 1.1111111111;
+      margin-top: 0;
+      margin-bottom: 15px;
+
+      @include govuk-media-query($from: tablet) {
+        font-size: 1.5rem;
+        line-height: 1.25;
+        margin-bottom: 20px;
+      }
+
+      @media print {
+        font-family: sans-serif;
+        font-size: 18pt;
+        line-height: 1.15;
+      }
+
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.trs-description-list {
+  margin-top: 0;
+
+  &:after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+
+  & > dt, & > dd {
+    font-family: GDS Transport, arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 1rem;
+    line-height: 1.25;
+    vertical-align: top;
+
+    @include govuk-media-query($from: tablet) {
+      font-size: 1.1875rem;
+      line-height: 1.3157894737;
+    }
+
+    @media print {
+      font-family: sans-serif;
+      font-size: 14pt;
+      line-height: 1.15;
+    }
+  }
+
+  & > dt {
+    font-weight: 700;
+
+    @include govuk-media-query($from: desktop) {
+      clear: left;
+      float: left;
+      margin-bottom: 5px;
+      width: 35%;
+    }
+  }
+
+  & > dd {
+    margin: 0 0 10px;
+
+    @include govuk-media-query($from: desktop) {
+      float: left;
+      margin-bottom: 5px;
+      width: 65%;
+    }
+  }
+}
+
+.trs-description-list--search-result {
+  padding-bottom: 1em;
+}
+
+.trs-filter-layout {
+  .js-enabled & .moj-filter-layout__filter {
+    width: 280px;
+    overflow: inherit;
+
+    @include govuk-media-query($until: desktop) {
+      position: relative;
+      width: inherit;
+    }
+  }
+
+  .trs-search-results {
+    @include govuk-media-query($until: desktop) {
+      margin-top: 26px;
+    }
+  }
 }
