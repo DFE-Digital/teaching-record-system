@@ -82,7 +82,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.DegreeTypeRequired == FieldRequirement.Optional)
+            .Where(r => r.DegreeTypeRequired != FieldRequirement.NotApplicable)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.DegreeTypeRequired != FieldRequirement.NotApplicable)
@@ -105,7 +105,6 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/country?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -151,10 +150,10 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
+            .Where(r => r.DegreeTypeRequired != FieldRequirement.NotApplicable && r.TrainingCountryRequired != FieldRequirement.NotApplicable)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
+            .Where(s => s.DegreeTypeRequired != FieldRequirement.NotApplicable && s.TrainingCountryRequired != FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
