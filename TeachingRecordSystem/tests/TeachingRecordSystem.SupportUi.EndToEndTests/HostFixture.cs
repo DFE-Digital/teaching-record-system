@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -83,7 +84,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton(GetMockAdUserService());
                     services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
-
+                    services.AddStartupTask<SeedLookupData>();
                     IDqtNoteAttachmentStorage GetMockedDqtNoteAttachment()
                     {
                         return new Mock<IDqtNoteAttachmentStorage>().Object;

@@ -885,7 +885,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact(Skip = "Waiting for provider table to be populated")]
+    [Fact]
     public async Task EditStatusRouteWithImplicitExemption_Awarded_Continue_Cya_EditStatus_Continue_Cya()
     {
         var awardDate = new DateOnly(2021, 1, 1);
