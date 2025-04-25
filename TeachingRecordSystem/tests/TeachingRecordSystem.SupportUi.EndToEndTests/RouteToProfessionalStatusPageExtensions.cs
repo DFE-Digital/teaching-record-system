@@ -120,4 +120,9 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync("/route/add/degree-type");
     }
+
+    public static Task AssertOnRouteAddCountryAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/country");
+    }
 }
