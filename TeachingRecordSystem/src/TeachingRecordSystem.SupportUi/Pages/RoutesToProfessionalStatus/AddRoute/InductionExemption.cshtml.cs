@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -18,11 +19,6 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public IActionResult OnGet()
     {
-        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
-            || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
-        {
-            return BadRequest();
-        }
         IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
         return Page();
     }
@@ -39,5 +35,20 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.InductionExemption) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
+        {
+            context.Result = BadRequest();
+        }
+        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId!.Value);
+        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
+            || (Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption))
+        {
+            context.Result = BadRequest();
+        }
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
