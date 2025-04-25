@@ -97,6 +97,7 @@
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v2.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v3.sql" />
+    <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_person_search_attributes_v4.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Procedures\p_refresh_tps_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_delete_person_employments_person_search_attributes_v1.sql" />
     <EmbeddedResource Include="DataStore\Postgres\Triggers\trg_delete_tps_employments_person_search_attributes_v1.sql" />
@@ -161,6 +162,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0051_TpsEmploymentsPersonEmailAndEmployerPostcode.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0052_TrsQualificationsExemptFromInduction.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0054_QtsAndEytsDates.sql" />
   </ItemGroup>
 
   <ItemGroup>
