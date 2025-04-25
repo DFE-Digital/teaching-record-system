@@ -71,7 +71,7 @@ public class MyRolesModel(TrsDbContext dbContext) : PageModel
         _dbRoles = (await dbContext.Users.SingleAsync(u => u.UserId == User.GetUserId())).Roles;
 
         // Only make Administrator available to actual admins
-        AvailableRoles = (_dbRoles.Contains(LegacyUserRoles.Administrator) ?
+        AvailableRoles = (_dbRoles != null && _dbRoles.Contains(LegacyUserRoles.Administrator) ?
             LegacyUserRoles.All :
             LegacyUserRoles.All.Except([LegacyUserRoles.Administrator])).ToArray();
 

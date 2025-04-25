@@ -1,0 +1,46 @@
+﻿@model PaginationViewModel
+
+@if (Model.ShowPagination)
+{
+    <govuk-pagination>
+        @if (Model.ShowPreviousPage)
+        {
+            <govuk-pagination-previous href="@Html.Raw(@Model.PageLink(Model.PreviousPage))" />
+        }
+
+        @if (Model.ShowFirstPage)
+        {
+            <govuk-pagination-item href="@Html.Raw(@Model.PageLink(Model.FirstPage))">@Model.FirstPage</govuk-pagination-item>
+            if (Model.ShowFirstPageEllipsis)
+            {
+                <govuk-pagination-ellipsis />
+            }
+        }
+
+        @if (Model.ShowPreviousPage)
+        {
+            <govuk-pagination-item href="@Html.Raw(@Model.PageLink(Model.PreviousPage))">@Model.PreviousPage</govuk-pagination-item>
+        }
+
+        <govuk-pagination-item href="@Html.Raw(@Model.PageLink(Model.CurrentPage))" is-current="true">@Model.CurrentPage</govuk-pagination-item>
+
+        @if (Model.ShowNextPage)
+        {
+            <govuk-pagination-item href="@Html.Raw(@Model.PageLink(Model.NextPage))">@Model.NextPage</govuk-pagination-item>
+        }
+
+        @if (Model.ShowLastPage)
+        {
+            if (Model.ShowLastPageEllipsis)
+            {
+                <govuk-pagination-ellipsis />
+            }
+            <govuk-pagination-item href="@Html.Raw(@Model.PageLink(Model.LastPage))">@Model.LastPage</govuk-pagination-item>
+        }
+
+        @if (Model.ShowNextPage)
+        {
+            <govuk-pagination-next href="@Html.Raw(@Model.PageLink(Model.NextPage))" />
+        }
+    </govuk-pagination>
+}

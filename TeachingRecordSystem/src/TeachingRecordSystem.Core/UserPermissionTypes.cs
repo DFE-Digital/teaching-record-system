@@ -23,9 +23,6 @@ public static class UserPermissionTypes
     [Display(Name = "Support tasks", Description = "Access to the Support tasks area of the console")]
     public const string SuppportTasks = "SupportTasks";
 
-    [Display(Name = "Admin area")]
-    public const string AdminArea = "AdminArea";
-
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
         PersonData,
@@ -34,7 +31,6 @@ public static class UserPermissionTypes
         DbsAlerts,
         ManageUsers,
         SuppportTasks,
-        AdminArea
     };
 
     public static string GetDisplayNameForPermissionType(string permissionType)

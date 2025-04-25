@@ -81,7 +81,7 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 }
 
 builder.Services.AddAuthorizationBuilder()
-    .AddAdminAreaPolicies()
+    .AddAdminOnlyPolicies()
     .AddChangeRequestManagementPolicies()
     .AddUserManagementPolicies()
     .AddAlertPolicies()
@@ -220,7 +220,7 @@ app.MapControllers();
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
-    app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.Hangfire, "/_hangfire");
+    app.MapHangfireDashboardWithAuthorizationPolicy(AuthorizationPolicies.AdminOnly, "/_hangfire");
 }
 
 app.Run();

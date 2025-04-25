@@ -1,40 +1,33 @@
 @page "/users"
 @model TeachingRecordSystem.SupportUi.Pages.Users.IndexModel
 @{
-    ViewBag.Title = "Users";
+    ViewBag.Title = "Add and manage users";
 }
-
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-<table class="govuk-table">
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Name</th>
-            <th scope="col" class="govuk-table__header">Email</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        @if (Model.AllUsers!.Length > 0)
+<govuk-button-link href="@LinkGenerator.LegacyAddUser()" data-testid="add-user">Add a new user</govuk-button-link>
+
+<div class="moj-filter-layout trs-filter-layout">
+    <div class="moj-filter-layout__filter">
+        <partial name="_Filters" model=@Model.Filters />
+    </div>
+
+    <div class="moj-filter-layout__content">
+        @if (Model.HasUsers)
         {
-            @foreach (var user in Model.AllUsers)
-            {
-                <tr class="govuk-table__row" data-testid="user-@user.UserId">
-                    <td class="govuk-table__cell">
-                        <a href="@LinkGenerator.EditUser(user.UserId)" class="govuk-link" data-testid="edit-user-@user.UserId">@user.Name</a>
-                    </td>
-                    <td class="govuk-table__cell">@user.Email</td>
-                </tr>
-            }
+            <ol class="trs-search-results">
+                @foreach (var user in Model.CurrentPageUsers)
+                {
+                    <partial name="_User" model=@user />
+                }
+            </ol>
         }
         else
         {
-            <tr class="govuk-table__row" data-testid="no-users">
-                <td class="govuk-table__cell">
-                    <div class="govuk-caption-m">No users</div>
-                </td>
-            </tr>
+            <p class="govuk-body"><strong>No results found</strong></p>
+            <p class="govuk-body">Try changing or clearing the filters.</p>
         }
-    </tbody>
-</table>
 
-<govuk-button-link href="@LinkGenerator.AddUser()" class="govuk-button--secondary" data-testid="add-user">Add user</govuk-button-link>
+        <partial name="_Pagination" model=@Model.Pagination />
+    </div>
+</div>
