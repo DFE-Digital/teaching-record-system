@@ -1223,7 +1223,9 @@ public class TrsDataSyncHelper(
             "dqt_modified_on",
             "dqt_first_name",
             "dqt_middle_name",
-            "dqt_last_name"
+            "dqt_last_name",
+            "qts_date",
+            "eyts_date"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -1267,6 +1269,7 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
             Contact.Fields.dfeta_QTSDate,
+            Contact.Fields.dfeta_EYTSDate
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -1288,6 +1291,8 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtFirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtMiddleName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
+            writer.WriteValueOrNull(person.QtsDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull(person.EytsDate, NpgsqlDbType.Date);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -1534,6 +1539,8 @@ public class TrsDataSyncHelper(
             DateOfBirth = c.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             EmailAddress = c.EMailAddress1.NormalizeString(),
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
+            QtsDate = c.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+            EytsDate = c.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             DqtContactId = c.Id,
             DqtState = (int)c.StateCode!,
             DqtCreatedOn = c.CreatedOn!.Value,
@@ -1817,6 +1824,8 @@ public class TrsDataSyncHelper(
         public required DateOnly? DateOfBirth { get; init; }
         public required string? EmailAddress { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
+        public required DateOnly? QtsDate { get; init; }
+        public required DateOnly? EytsDate { get; init; }
         public required Guid? DqtContactId { get; init; }
         public required int? DqtState { get; init; }
         public required DateTime? DqtCreatedOn { get; init; }
