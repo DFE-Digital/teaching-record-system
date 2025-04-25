@@ -33,7 +33,7 @@ public class DegreeTypeMapping : IEntityTypeConfiguration<DegreeType>
             new DegreeType { DegreeTypeId = new("b44e02b1-7257-4609-a9e5-46ed72c91b98"), Name = "Certificate in Education", IsActive = true },
             new DegreeType { DegreeTypeId = new("4c0578b6-e9af-4c98-a3bc-038343b1436a"), Name = "Certificate in Education (FE)", IsActive = true },
             new DegreeType { DegreeTypeId = new("fc85c7e2-7fd7-4585-8c37-c29852e6027f"), Name = "Degree", IsActive = true },
-            new DegreeType { DegreeTypeId = new("bc6c1f17-26a5-4987-9d50-2615e138e281"), Name = "Degree Equivalent (this will include foreign qualifications)", IsActive = true },            
+            new DegreeType { DegreeTypeId = new("bc6c1f17-26a5-4987-9d50-2615e138e281"), Name = "Degree Equivalent (this will include foreign qualifications)", IsActive = true },
             new DegreeType { DegreeTypeId = new("311ef3a9-6aba-4314-acf8-4bba46aebe9e"), Name = "Graduate Certificate in Education", IsActive = true },
             new DegreeType { DegreeTypeId = new("d82637a0-33ed-4181-b00b-9d53e7853552"), Name = "Graduate Certificate in Mathematics and Education", IsActive = true },
             new DegreeType { DegreeTypeId = new("b9ef569f-fb23-4f31-842e-a0d940d911be"), Name = "Graduate Certificate in Science and Education", IsActive = true },
