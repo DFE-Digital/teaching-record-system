@@ -9,7 +9,14 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteAddTrainingProvider(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
-
+            <govuk-select asp-for="TrainingProviderId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var trainingProvider in Model.TrainingProviders)
+                {
+                    <govuk-select-item value="@trainingProvider.TrainingProviderId" selected="@Model.TrainingProviderId==trainingProvider.TrainingProviderId">@trainingProvider.Name</govuk-select-item>
+                }
+            </govuk-select>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
