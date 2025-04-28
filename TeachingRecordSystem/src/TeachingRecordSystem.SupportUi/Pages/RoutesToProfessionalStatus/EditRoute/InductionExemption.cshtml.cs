@@ -8,9 +8,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
-public class InductionExemptionModel(
-    TrsLinkGenerator linkGenerator,
-    ReferenceDataCache referenceDataCache) : PageModel
+public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
@@ -68,27 +66,20 @@ public class InductionExemptionModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
-    public async override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
-        if (Route.InductionExemptionReasonId is not null)
-        {
-            var exemptionReason = await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId!.Value);
-            if (exemptionReason.RouteImplicitExemption)
-            {
-                context.Result = new BadRequestResult();
-            }
-        }
-        else
-        {
-            context.Result = new BadRequestResult();
-        }
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+        var professionalStatusFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
+        Route = professionalStatusFeature!.ProfessionalStatus.Route;
 
-        await base.OnPageHandlerExecutionAsync(context, next);
+        if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
+        || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
+        {
+            context.Result = new BadRequestResult();
+        }
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 
     public string BackLink => FromCheckAnswers ?
