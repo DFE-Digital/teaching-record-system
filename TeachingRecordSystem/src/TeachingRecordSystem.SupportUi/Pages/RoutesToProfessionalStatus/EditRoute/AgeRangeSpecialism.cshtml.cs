@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -22,17 +23,15 @@ public class AgeRangeSpecialismModel(
     public Guid PersonId { get; set; }
 
     [BindProperty]
+    [AgeRangeRequiredValidation("Select an age range")]
     [Display(Name = "Edit age range specialism")]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
     public void OnGet()
     {
-        TrainingAgeSpecialism = new AgeRange
-        {
-            AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom,
-            AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
-            AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType
-        };
+        TrainingAgeSpecialism.AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom;
+        TrainingAgeSpecialism.AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo;
+        TrainingAgeSpecialism.AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType;
     }
 
     public async Task<IActionResult> OnPostAsync()
