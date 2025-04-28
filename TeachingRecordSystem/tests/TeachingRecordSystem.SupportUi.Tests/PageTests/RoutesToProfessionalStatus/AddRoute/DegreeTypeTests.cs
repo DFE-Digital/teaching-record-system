@@ -82,10 +82,10 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.DegreeTypeRequired != FieldRequirement.NotApplicable)
+            .Where(r => r.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired != FieldRequirement.NotApplicable)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
