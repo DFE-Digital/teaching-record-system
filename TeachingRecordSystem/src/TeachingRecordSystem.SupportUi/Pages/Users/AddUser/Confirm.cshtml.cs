@@ -56,6 +56,12 @@ public class ConfirmModel(
             return BadRequest();
         }
 
+        // Only admins can create new admins
+        if (!User.IsInRole(UserRoles.Administrator) && Role == UserRoles.Administrator)
+        {
+            return BadRequest();
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -104,7 +110,10 @@ public class ConfirmModel(
         Email = _user.Email;
         AzureAdUserId = _user.UserId;
 
-        RoleOptions = UserRoles.All.Select(r => new UserRoleViewModel
+        var showAdminRole = User.IsInRole(UserRoles.Administrator);
+        var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);
+
+        RoleOptions = userRoles.Select(r => new UserRoleViewModel
         {
             Name = r,
             DisplayName = UserRoles.GetDisplayNameForRole(r),

@@ -28,7 +28,7 @@ public static partial class AssertEx
         Assert.Equal(expectedMessage, errorMessage);
     }
 
-    public static void HtmlDocumentHasFlashSuccess(IHtmlDocument doc, string expectedMessage)
+    public static void HtmlDocumentHasFlashSuccess(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {
         var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
 
@@ -37,9 +37,19 @@ public static partial class AssertEx
             throw new XunitException("No notification banner found.");
         }
 
-        var message = banner.GetElementsByClassName("govuk-notification-banner__heading").SingleOrDefault();
+        if (expectedHeading != null)
+        {
+            var heading = banner.GetElementsByClassName("govuk-notification-banner__heading").SingleOrDefault();
 
-        Assert.Equal(expectedMessage, message?.TextContent?.Trim());
+            Assert.Equal(expectedHeading, heading?.TextContent?.Trim());
+        }
+
+        if (expectedMessage != null)
+        {
+            var message = string.Join("\n", banner.QuerySelectorAll(".govuk-notification-banner p").Select(e => e.TextContent.Trim()));
+
+            Assert.Equal(expectedMessage, message);
+        }
     }
 
     public static async Task HtmlResponseHasErrorAsync(

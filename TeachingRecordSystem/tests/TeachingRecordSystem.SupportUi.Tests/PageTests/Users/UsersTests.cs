@@ -1,5 +1,4 @@
 using AngleSharp.Dom;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
 
@@ -19,7 +18,11 @@ public class UsersTests : TestBase, IAsyncLifetime
         TestUsers.ClearCache();
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewUserRoles);
+        return Task.CompletedTask;
+    }
 
     [Fact]
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
@@ -55,6 +58,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     {
         // Arrange
         var user = await TestData.CreateUserAsync();
+        SetCurrentUser(user);
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);
