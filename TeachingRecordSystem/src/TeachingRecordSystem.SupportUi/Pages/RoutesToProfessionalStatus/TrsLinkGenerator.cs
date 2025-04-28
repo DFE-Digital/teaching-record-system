@@ -105,10 +105,6 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddSubjectSpecialismsCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddDegreeType(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddDegreeTypeCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string RouteAddPage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId) =>
         page switch

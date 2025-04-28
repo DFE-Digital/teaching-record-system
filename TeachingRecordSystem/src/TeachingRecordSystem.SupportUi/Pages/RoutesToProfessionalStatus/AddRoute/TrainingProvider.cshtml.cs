@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-=======
-using Microsoft.AspNetCore.Mvc;
->>>>>>> 173fe6bb0332cd59af21f7d5d76b245dfdc1ac04
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -46,13 +42,6 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
     {
         TrainingProviders = await _referenceDataCache.GetTrainingProvidersAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
-    }
-
-    public IActionResult OnPost()
-    {
-        return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 
 }
