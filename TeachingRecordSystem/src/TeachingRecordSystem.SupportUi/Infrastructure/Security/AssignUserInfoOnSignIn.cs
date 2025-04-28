@@ -36,7 +36,7 @@ public class AssignUserInfoOnSignIn(string name) : IConfigureNamedOptions<OpenId
                 // We couldn't find a user by principal, but we may find them via email
                 // (the CLI commmand to add a user creates a record *without* the AD subject).
 
-                user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Active == true && u.AzureAdUserId == null);
+                user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email != null && u.Email.ToLower() == email.ToLower() && u.Active == true && u.AzureAdUserId == null);
 
                 if (user is not null)
                 {

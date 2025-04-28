@@ -2713,18 +2713,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         },
                         new
                         {
-                            DegreeTypeId = new Guid("e0b22ab0-fa25-4c31-aa61-cab56a4e6a2b"),
-                            IsActive = true,
-                            Name = "PGCE"
-                        },
-                        new
-                        {
-                            DegreeTypeId = new Guid("ae28704f-cfa3-4c6e-a47d-c4a048383018"),
-                            IsActive = true,
-                            Name = "Professional PGCE"
-                        },
-                        new
-                        {
                             DegreeTypeId = new Guid("311ef3a9-6aba-4314-acf8-4bba46aebe9e"),
                             IsActive = true,
                             Name = "Graduate Certificate in Education"
@@ -2768,12 +2756,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             DegreeTypeId = new Guid("40a85dd0-8512-438e-8040-649d7d677d07"),
-                            IsActive = true,
-                            Name = "Postgraduate Certificate in Education"
-                        },
-                        new
-                        {
-                            DegreeTypeId = new Guid("78a8d033-06c8-4beb-b415-5907f5f39207"),
                             IsActive = true,
                             Name = "Postgraduate Certificate in Education"
                         },
@@ -3434,7 +3416,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             IsActive = true,
                             Name = "Overseas Trained Teacher",
-                            RouteImplicitExemption = true
+                            RouteImplicitExemption = false
                         },
                         new
                         {
@@ -3455,7 +3437,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
                             IsActive = true,
                             Name = "Exempt through QTLS status provided they maintain membership of The Society of Education and Training",
-                            RouteImplicitExemption = false
+                            RouteImplicitExemption = true
                         });
                 });
 
@@ -3878,6 +3860,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("email_address")
                         .UseCollation("case_insensitive");
 
+                    b.Property<DateOnly?>("EytsDate")
+                        .HasColumnType("date")
+                        .HasColumnName("eyts_date");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3935,6 +3921,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character(9)")
                         .HasColumnName("national_insurance_number")
                         .IsFixedLength();
+
+                    b.Property<DateOnly?>("QtsDate")
+                        .HasColumnType("date")
+                        .HasColumnName("qts_date");
 
                     b.Property<string>("Trn")
                         .HasMaxLength(7)
@@ -5244,6 +5234,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<int>("SupportTaskType")
                         .HasColumnType("integer")
                         .HasColumnName("support_task_type");
+
+                    b.Property<Guid?>("TrnRequestApplicationUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("trn_request_application_user_id");
+
+                    b.Property<string>("TrnRequestId")
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("trn_request_id");
 
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
@@ -16848,6 +16846,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("potential_duplicate");
 
+                    b.Property<string>("PreviousFirstName")
+                        .HasColumnType("text")
+                        .HasColumnName("previous_first_name");
+
+                    b.Property<string>("PreviousLastName")
+                        .HasColumnType("text")
+                        .HasColumnName("previous_last_name");
+
                     b.Property<Guid?>("ResolvedPersonId")
                         .HasColumnType("uuid")
                         .HasColumnName("resolved_person_id");
@@ -17262,8 +17268,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
-                        .HasColumnName("email")
-                        .UseCollation("case_insensitive");
+                        .HasColumnName("email");
 
                     b.Property<string>("Role")
                         .HasMaxLength(50)
@@ -17271,7 +17276,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("role");
 
                     b.Property<string[]>("Roles")
-                        .IsRequired()
                         .HasColumnType("varchar[]")
                         .HasColumnName("roles");
 
@@ -17470,6 +17474,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .HasConstraintName("fk_support_tasks_person");
+
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata", null)
+                        .WithMany()
+                        .HasForeignKey("TrnRequestApplicationUserId", "TrnRequestId")
+                        .HasConstraintName("fk_support_tasks_trn_request_metadata_trn_request_application_");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TpsCsvExtractItem", b =>

@@ -9,6 +9,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
             .Single(r => r.Name == "Apprenticeship");
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
+        var endDate = startDate.AddMonths(1);
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
 
@@ -34,6 +35,13 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddEndDatePageAsync();
+        await page.FillDateInputAsync(endDate);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddEndDatePageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddStartDatePageAsync();
@@ -56,6 +64,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
+        var setDegreeType = "BSc (Hons) with Intercalated PGCE";
 
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -86,6 +95,14 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteAddCountryAsync();
     }
 
     [Fact]
@@ -124,5 +141,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddInductionExemptionPageAsync();
+        await page.SetCheckedAsync($"label:text-is('Yes')", true);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
     }
 }

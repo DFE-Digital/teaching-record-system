@@ -104,6 +104,8 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.BirthDate?.ToDateOnlyWithDqtBstFix(isLocalTime: false), person.DateOfBirth);
             Assert.Equal(entity.EMailAddress1, person.EmailAddress);
             Assert.Equal(entity.dfeta_NINumber, person.NationalInsuranceNumber);
+            Assert.Equal(entity.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true), person.QtsDate);
+            Assert.Equal(entity.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true), person.EytsDate);
             Assert.Equal((int)entity.StateCode!, person.DqtState);
             Assert.Equal(entity.CreatedOn, person.DqtCreatedOn);
             Assert.Equal(entity.ModifiedOn, person.DqtModifiedOn);
@@ -126,6 +128,8 @@ public partial class TrsDataSyncHelperTests
         var dateOfBirth = Faker.Identification.DateOfBirth();
         var email = Faker.Internet.Email();
         var nino = Faker.Identification.UkNationalInsuranceNumber();
+        var qtsDate = Clock.Today.AddDays(-40);
+        var eytsDate = Clock.Today.AddDays(-30);
 
         var newContact = existingContact?.Clone<Contact>() ?? new()
         {
@@ -143,6 +147,8 @@ public partial class TrsDataSyncHelperTests
         newContact.BirthDate = dateOfBirth;
         newContact.EMailAddress1 = email;
         newContact.dfeta_NINumber = nino;
+        newContact.dfeta_QTSDate = qtsDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
+        newContact.dfeta_EYTSDate = eytsDate.ToDateTimeWithDqtBstFix(isLocalTime: true);
 
         return newContact;
     }

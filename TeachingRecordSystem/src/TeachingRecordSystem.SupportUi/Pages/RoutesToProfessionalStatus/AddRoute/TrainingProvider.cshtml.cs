@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
@@ -14,4 +16,12 @@ public class TrainingProviderModel : AddRouteCommonPageModel
     public void OnGet()
     {
     }
+
+    public IActionResult OnPost()
+    {
+        return Redirect(FromCheckAnswers ?
+            _linkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+    }
+
 }

@@ -88,6 +88,10 @@ watch-authz:
 watch-ui:
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch
 
+# Watch for file changes and compile any SASS files that have changed
+watch-ui-sass:
+  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch msbuild /t:CompileSass
+
 # Run the Worker project in Development mode and watch for file changes
 watch-worker:
   @cd {{solution-root / "src" / "TeachingRecordSystem.Worker"}} && dotnet watch

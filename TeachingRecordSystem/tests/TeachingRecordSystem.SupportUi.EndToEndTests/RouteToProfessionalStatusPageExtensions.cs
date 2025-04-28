@@ -115,4 +115,14 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync("/route/add/induction-exemption");
     }
+
+    public static Task AssertOnRouteAddDegreeTypePageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/degree-type");
+    }
+
+    public static Task AssertOnRouteAddCountryAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/country");
+    }
 }

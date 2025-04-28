@@ -11,6 +11,8 @@ public class TrnRequestMetadata
     public required string? FirstName { get; init; }
     public required string? MiddleName { get; init; }
     public required string? LastName { get; init; }
+    public string? PreviousFirstName { get; init; }
+    public string? PreviousLastName { get; init; }
     public required string[] Name { get; init; }
     public required DateOnly DateOfBirth { get; init; }
     public bool? PotentialDuplicate { get; init; }

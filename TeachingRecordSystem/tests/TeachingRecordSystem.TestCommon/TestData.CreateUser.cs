@@ -42,6 +42,70 @@ public partial class TestData
         return user;
     }
 
+    public async Task<IReadOnlyList<User>> CreateMultipleUsersAsync(
+        int userCount,
+        Func<int, CreateUserSpec> createUserSpecFromIndex)
+    {
+        var users = await WithDbContextAsync(async dbContext =>
+        {
+            for (var i = 0; i < userCount; i++)
+            {
+                var spec = createUserSpecFromIndex(i);
+                var active = spec.Active ?? true;
+                var name = spec.Name ?? GenerateName();
+                var email = spec.Email ?? GenerateUniqueEmail();
+                var role = spec.Role ?? UserRoles.SupportOfficer;
+
+                var user = new User()
+                {
+                    Active = active,
+                    Name = name,
+                    Email = email,
+                    Role = role,
+                    UserId = Guid.NewGuid()
+                };
+
+                dbContext.Users.Add(user);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return dbContext.Users.ToList();
+        });
+
+        return users;
+    }
+
+    public async Task<IReadOnlyList<User>> CreateMultipleUsersAsync(params CreateUserSpec[] userSpecs)
+    {
+        var users = await WithDbContextAsync(async dbContext =>
+        {
+            foreach (var spec in userSpecs)
+            {
+                var active = spec.Active ?? true;
+                var name = spec.Name ?? GenerateName();
+                var email = spec.Email ?? GenerateUniqueEmail();
+                var role = spec.Role ?? UserRoles.SupportOfficer;
+
+                var user = new User()
+                {
+                    Active = active,
+                    Name = name,
+                    Email = email,
+                    Role = role,
+                    UserId = Guid.NewGuid()
+                };
+
+                dbContext.Users.Add(user);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return dbContext.Users.ToList();
+        });
+
+        return users;
+    }
 
     public async Task<User> CreateUserWithLegacyRolesAsync(
         bool? active = null,
@@ -121,5 +185,13 @@ public partial class TestData
         }
 
         await txnRequestBuilder.ExecuteAsync();
+    }
+
+    public class CreateUserSpec
+    {
+        public bool? Active { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Role { get; set; }
     }
 }
