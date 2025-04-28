@@ -1,5 +1,25 @@
 ﻿@page "/route/add/training-provider/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.TrainingProviderModel
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@{
+    ViewBag.Title = "Add training provider";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            accessibleAutocomplete.enhanceSelectElement({
+                defaultValue: '',
+                selectElement: document.querySelector('#@nameof(Model.TrainingProviderId)')
+            })
+        }
+    </script>
+}
 
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
