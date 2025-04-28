@@ -12,7 +12,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
          _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AgeRangeSpecialism) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     [BindProperty]
-    [Display(Name = "Edit age range specialism")]
+    [Display(Name = "Add age range specialism")]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
     public void OnGet()

@@ -119,6 +119,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.Country => RouteAddCountry(personId, journeyInstanceId),
             AddRoutePage.AgeRangeSpecialism => RouteAddAgeRangeSpecialism(personId, journeyInstanceId),
             AddRoutePage.CheckYourAnswers => RouteAddCheckYourAnswers(personId, journeyInstanceId),
+            AddRoutePage.SubjectSpecialisms => RouteAddSubjectSpecialisms(personId, journeyInstanceId),
             _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };
 }

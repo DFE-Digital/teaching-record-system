@@ -12,10 +12,6 @@ public class AgeRangeValidationAttribute(string errorMessage) : ValidationAttrib
         {
             throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be applied to {nameof(AgeRange)} types.");
         }
-        if (ageRange.AgeRangeType is null)
-        {
-            return new ValidationResult("Select an age range", new List<string> { nameof(ageRange.AgeRangeType) });
-        }
         else if (ageRange.AgeRangeType == TrainingAgeSpecialismType.None)
         {
             if (ageRange.AgeRangeFrom == null && ageRange.AgeRangeTo == null)
@@ -41,6 +37,7 @@ public class AgeRangeValidationAttribute(string errorMessage) : ValidationAttrib
             ageRange.AgeRangeFrom = null;
             ageRange.AgeRangeTo = null;
         }
+
         return ValidationResult.Success;
     }
 }
