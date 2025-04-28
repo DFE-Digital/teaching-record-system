@@ -76,7 +76,11 @@ public static class PageExtensions
         await page.GotoAsync($"/mqs/add?personId={personId}");
     }
 
-    public static async Task GoToUsersPageAsync(this IPage page) => await page.GotoAsync($"/legacy-users");
+    public static async Task GoToLegacyUsersPageAsync(this IPage page) =>
+        await page.GotoAsync($"/legacy-users");
+
+    public static async Task GoToUsersPageAsync(this IPage page) =>
+        await page.GotoAsync($"/users");
 
     public static async Task GoToApplicationUsersPageAsync(this IPage page)
     {
@@ -404,24 +408,44 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/mqs/{qualificationId}/delete/confirm");
     }
 
-    public static async Task AssertOnUsersPageAsync(this IPage page)
+    public static async Task AssertOnLegacyUsersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/legacy-users");
     }
 
-    public static async Task AssertOnAddUserPageAsync(this IPage page)
+    public static async Task AssertOnAddLegacyUserPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/legacy-users/add");
     }
 
-    public static async Task AssertOnAddUserConfirmPageAsync(this IPage page)
+    public static async Task AssertOnLegacyAddUserConfirmPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/legacy-users/add/confirm");
     }
 
-    public static async Task AssertOnEditUserPageAsync(this IPage page, Guid userId)
+    public static async Task AssertOnLegacyEditUserPageAsync(this IPage page, Guid userId)
     {
         await page.WaitForUrlPathAsync($"/legacy-users/{userId}");
+    }
+
+    public static async Task AssertOnUsersPageAsync(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/users");
+    }
+
+    public static async Task AssertOnAddUserPageAsync(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/users/add");
+    }
+
+    public static async Task AssertOnAddUserConfirmPageAsync(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/users/add/confirm");
+    }
+
+    public static async Task AssertOnEditUserPageAsync(this IPage page, Guid userId)
+    {
+        await page.WaitForUrlPathAsync($"/users/{userId}");
     }
 
     public static async Task AssertOnApplicationUsersPageAsync(this IPage page)
@@ -449,9 +473,16 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/api-keys/{apiKeyId}");
     }
 
-    public static async Task AssertFlashMessageAsync(this IPage page, string expectedHeader)
+    public static async Task AssertFlashMessageAsync(this IPage page, string? expectedHeader = null, string? expectedMessage = null)
     {
-        Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
+        if (expectedHeader != null)
+        {
+            Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
+        }
+        if (expectedMessage != null)
+        {
+            Assert.Equal(expectedMessage, await page.InnerTextAsync($".govuk-notification-banner p:text-is('{expectedMessage}')"));
+        }
     }
 
     public static void AssertErrorSummary(this IPage page)

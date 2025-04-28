@@ -1,7 +1,7 @@
 ﻿@model TeachingRecordSystem.SupportUi.Pages.Users.UserViewModel
 
 <li class="trs-search-results__item trs-user" data-testid="user-@Model.Id">
-    <h2 class="trs-search-results__item-title"><a class="govuk-link--no-visited-state" href="@Model.EditUrl">@Model.Name</a> </h2>
+    <h2 class="trs-search-results__item-title"><a class="govuk-link--no-visited-state" href="@Model.EditUrl" data-testid="edit-user-@Model.Id">@Model.Name</a> </h2>
 
     <dl class="trs-description-list trs-description-list--search-result">
         <dt class="trs-description-list__label">Email address</dt>

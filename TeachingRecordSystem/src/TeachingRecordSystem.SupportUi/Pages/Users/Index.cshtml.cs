@@ -76,7 +76,7 @@ public class IndexModel : PageModel
         {
             Id = user.UserId.ToString(),
             Name = user.Name,
-            EditUrl = _linkGenerator.LegacyEditUser(user.UserId),
+            EditUrl = _linkGenerator.EditUser(user.UserId),
             EmailAddress = user.Email ?? "No email address",
             Role = user.Role == null ? "No role assigned" : UserRoles.GetDisplayNameForRole(user.Role),
             Status = user.Active ? "Active" : "Inactive"

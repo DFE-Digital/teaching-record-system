@@ -85,6 +85,7 @@ public class IndexTests : TestBase, IAsyncLifetime
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "Enter an email address");
     }
 
@@ -112,6 +113,7 @@ public class IndexTests : TestBase, IAsyncLifetime
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         await AssertEx.HtmlResponseHasErrorAsync(response, "Email", "User does not exist");
     }
 
@@ -205,7 +207,7 @@ public class IndexTests : TestBase, IAsyncLifetime
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/legacy-users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
     }
 
 

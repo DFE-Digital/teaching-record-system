@@ -13,4 +13,7 @@ public class CaptureEventObserver : IEventObserver
 
     public void AssertEventsSaved(params Action<EventBase>[] eventInspectors) =>
         Assert.Collection(_events, eventInspectors);
+
+    public void AssertNoEventsSaved() =>
+        Assert.Empty(_events);
 }
