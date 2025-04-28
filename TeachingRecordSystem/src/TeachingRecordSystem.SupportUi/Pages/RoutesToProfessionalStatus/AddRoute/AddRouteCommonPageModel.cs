@@ -55,14 +55,15 @@ public class AddRouteCommonPageModel : PageModel
         if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
         {
             context.Result = new BadRequestResult();
+            return;
         }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId!.Value);
+        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
-        await base.OnPageHandlerExecutionAsync(context, next);
+        await next();
     }
 }

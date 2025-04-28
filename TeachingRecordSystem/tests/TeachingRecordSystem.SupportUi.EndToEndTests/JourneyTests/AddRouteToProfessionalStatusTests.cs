@@ -141,5 +141,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddInductionExemptionPageAsync();
+        await page.SetCheckedAsync($"label:text-is('Yes')", true);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
     }
 }
