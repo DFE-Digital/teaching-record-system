@@ -35,6 +35,7 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int UnableToChangeRouteType => 10054;
         public static int UnableToChangeFailProfessionalStatusStatus => 10055;
         public static int UnableToChangeWithdrawnProfessionalStatusStatus => 10056;
+        public static int PiiUpdatesForbiddenPersonHasEyts => 10057;
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -134,6 +135,9 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
 
     public static ApiError UnableToChangeWithdrawnProfessionalStatusStatus() =>
         new(ErrorCodes.UnableToChangeWithdrawnProfessionalStatusStatus, "Unable to change withdrawn professional status status.", "");
+
+    public static ApiError PiiUpdatesForbiddenPersonHasEyts() =>
+    new(ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, "Updates to PII data is not permitted. Person has EYTS.", "");
 
     public IActionResult ToActionResult(int statusCode = 400)
     {
