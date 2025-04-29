@@ -55,8 +55,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingCountryRequired == FieldRequirement.Mandatory
-                && s.DegreeTypeRequired == FieldRequirement.NotApplicable /* CML TODO - temporary whilst degree type page is in another PR */)
+            .Where(s => s.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();

@@ -50,10 +50,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
         Subjects = await _referenceDataCache.GetTrainingSubjectsAsync();
-        PersonId = personInfo.PersonId;
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
