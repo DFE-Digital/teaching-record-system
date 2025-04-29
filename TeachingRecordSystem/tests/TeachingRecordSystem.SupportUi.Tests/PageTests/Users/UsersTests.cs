@@ -57,7 +57,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     public async Task Get_ValidRequestAndUsersFound_RendersUsers()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
         // Act
