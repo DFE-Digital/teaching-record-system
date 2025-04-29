@@ -14,7 +14,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None)
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Support officer")]
@@ -26,7 +26,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit)
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Alerts manager (TRA decisions)")]
@@ -38,7 +38,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None)
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Alerts manager (TRA and DBS decisions)")]
@@ -50,7 +50,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.None)
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Access manager")]
@@ -62,7 +62,7 @@ public static class UserRoles
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit)
+        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
     ];
 
     [Display(Name = "Administrator")]
@@ -80,7 +80,7 @@ public static class UserRoles
 
     public static string GetDisplayNameForRole(string role)
     {
-        var member = typeof(UserRoles).GetField(role) ?? throw new ArgumentException("Invalid role.", nameof(role));
+        var member = typeof(UserRoles).GetField(role) ?? throw new ArgumentException($@"Invalid role: ""{role}"".", nameof(role));
         return member.GetCustomAttribute<DisplayAttribute>()?.Name ?? member.Name;
     }
 
@@ -96,7 +96,7 @@ public static class UserRoles
             return UserPermissionTypes.All.Select(p => new UserPermission(p, UserPermissionLevel.Edit));
         }
 
-        var member = typeof(UserRoles).GetField($"{role}Permissions") ?? throw new ArgumentException("Invalid role.", nameof(role));
+        var member = typeof(UserRoles).GetField($"{role}Permissions") ?? throw new ArgumentException($@"Invalid role: ""{role}"".", nameof(role));
 
         if (member.GetValue(null) is IEnumerable<UserPermission> rolePermissions)
         {
