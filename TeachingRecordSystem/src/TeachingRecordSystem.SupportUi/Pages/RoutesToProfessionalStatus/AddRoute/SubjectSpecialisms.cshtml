@@ -1,5 +1,41 @@
 ﻿@page "/route/add/subjects/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.SubjectSpecialismsModel
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+
+@section Styles {
+    <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            const selectIds = [
+                '@nameof(Model.SubjectId1)',
+                '@nameof(Model.SubjectId2)',
+                '@nameof(Model.SubjectId3)'
+            ];
+            selectIds.forEach(id => {
+                const selectElement = document.querySelector(`#${id}`);
+                accessibleAutocomplete.enhanceSelectElement({
+                    selectElement: selectElement,
+                    defaultValue: '',
+                    selectElement: document.querySelector(`#${id}`)
+                });
+
+                // Get the newly created input element
+                const inputElement = selectElement.parentElement.querySelector("input");
+
+                // Clear the select element when the input is cleared
+                inputElement.addEventListener("input", function () {
+                    if (inputElement.value === "") {
+                        selectElement.value = "";
+                    }
+                });
+            });
+        }
+    </script>
+}
 
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
@@ -9,8 +45,33 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteAddSubjectSpecialisms(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
-
-
+            <govuk-select asp-for="SubjectId1" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var subject in Model.Subjects)
+                {
+                    <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId1==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                }
+            </govuk-select>
+            <govuk-details>
+                <govuk-details-summary>Add additional subjects</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-select asp-for="SubjectId2" label-class="govuk-label--m">
+                        <govuk-select-item value=""></govuk-select-item>
+                        @foreach (var subject in Model.Subjects)
+                        {
+                            <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId2==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                        }
+                    </govuk-select>
+                    <govuk-select asp-for="SubjectId3" label-class="govuk-label--m">
+                        <govuk-select-item value=""></govuk-select-item>
+                        @foreach (var subject in Model.Subjects)
+                        {
+                            <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId3==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                        }
+                    </govuk-select>
+                </govuk-details-text>
+            </govuk-details>
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
                 <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddSubjectSpecialismsCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>

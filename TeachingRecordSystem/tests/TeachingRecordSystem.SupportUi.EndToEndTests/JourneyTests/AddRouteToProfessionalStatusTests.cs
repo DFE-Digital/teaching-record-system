@@ -10,6 +10,14 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
+        var setDegreeType = "BSc (Hons) with Intercalated PGCE";
+        var setProviderName = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync(true))
+            .RandomOne()
+            .Name;
+        var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
+            .RandomOne()
+            .Name;
+
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
 
@@ -39,6 +47,36 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.FillAsync($"label:text-is('Enter the training provider for this route')", setProviderName);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteAddCountryAsync();
+        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddAgeRangeAsync();
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddSubjectsPageAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddAgeRangeAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddCountryAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddTrainingProviderAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddEndDatePageAsync();
@@ -66,6 +104,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var setProviderName = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync(true))
+            .RandomOne()
+            .Name;
+        var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne()
             .Name;
         var person = await TestData.CreatePersonAsync();
@@ -107,6 +148,14 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteAddCountryAsync();
+        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddAgeRangeAsync();
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddSubjectsPageAsync();
     }
 
     [Fact]
@@ -115,10 +164,16 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionReason is not null
-                && r.InductionExemptionReason.RouteImplicitExemption == false)
+                && r.InductionExemptionReason.RouteImplicitExemption == false
+                && r.TrainingProviderRequired == FieldRequirement.NotApplicable
+                && r.DegreeTypeRequired == FieldRequirement.NotApplicable
+                && r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatus.Awarded;
         var awardedDate = new DateOnly(2021, 1, 1);
+        var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
+            .RandomOne()
+            .Name;
 
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
@@ -148,5 +203,14 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.SetCheckedAsync($"label:text-is('Yes')", true);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteAddCountryAsync();
+        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddAgeRangeAsync();
+        await page.ClickButtonAsync("Continue");
+
     }
 }
