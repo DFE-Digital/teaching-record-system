@@ -93,6 +93,10 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddTrainingProviderCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddDegreeType(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+    GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddDegreeTypeCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddCountry(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Country", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddCountryCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
@@ -101,10 +105,7 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddSubjectSpecialismsCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddDegreeType(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddDegreeTypeCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string RouteAddAgeRangeSpecialism(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AgeRangeSpecialism", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddAgeRangeSpecialismCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>

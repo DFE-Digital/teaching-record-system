@@ -1,5 +1,25 @@
 ﻿@page "/route/add/training-provider/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.TrainingProviderModel
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@{
+    ViewBag.Title = "Add training provider";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script asp-add-nonce="true">
+        window.onload = function () {
+            accessibleAutocomplete.enhanceSelectElement({
+                defaultValue: '',
+                selectElement: document.querySelector('#@nameof(Model.TrainingProviderId)')
+            })
+        }
+    </script>
+}
 
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
@@ -9,7 +29,14 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.RouteAddTrainingProvider(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
-
+            <govuk-select asp-for="TrainingProviderId" label-class="govuk-label--l">
+                <govuk-select-label is-page-heading="true" />
+                <govuk-select-item value=""></govuk-select-item>
+                @foreach (var trainingProvider in Model.TrainingProviders)
+                {
+                    <govuk-select-item value="@trainingProvider.TrainingProviderId" selected="@Model.TrainingProviderId==trainingProvider.TrainingProviderId">@trainingProvider.Name</govuk-select-item>
+                }
+            </govuk-select>
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>

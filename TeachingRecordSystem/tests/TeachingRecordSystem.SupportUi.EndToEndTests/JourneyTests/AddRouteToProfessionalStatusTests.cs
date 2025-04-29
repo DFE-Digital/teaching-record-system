@@ -65,7 +65,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
-
+        var setProviderName = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync(true))
+            .RandomOne()
+            .Name;
         var person = await TestData.CreatePersonAsync();
         var personId = person.PersonId;
 
@@ -95,6 +97,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.FillAsync($"label:text-is('Enter the training provider for this route')", setProviderName);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddDegreeTypePageAsync();
