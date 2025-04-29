@@ -27,7 +27,8 @@ public class SetPiiHandler(ICrmQueryDispatcher crmQueryDispatcher)
                 command.Trn,
                 new ColumnSet(
                     Contact.Fields.dfeta_QTSDate,
-                    Contact.Fields.dfeta_AllowPiiUpdatesFromRegister)));
+                    Contact.Fields.dfeta_AllowPiiUpdatesFromRegister,
+                    Contact.Fields.dfeta_EYTSDate)));
 
         if (contact is null)
         {
@@ -49,6 +50,11 @@ public class SetPiiHandler(ICrmQueryDispatcher crmQueryDispatcher)
         if (contact.dfeta_QTSDate.HasValue)
         {
             return ApiError.PiiUpdatesForbiddenPersonHasQts();
+        }
+
+        if (contact.dfeta_EYTSDate.HasValue)
+        {
+            return ApiError.PiiUpdatesForbiddenPersonHasEyts();
         }
 
         await crmQueryDispatcher.ExecuteQueryAsync(new UpdateContactPiiQuery(
