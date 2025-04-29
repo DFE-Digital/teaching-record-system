@@ -122,6 +122,32 @@ public class SetPiiTests : TestBase
     }
 
     [Fact]
+    public async Task Put_PersontHasEyts_ReturnsError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithTrn()
+            .WithEyts(new DateOnly(2000, 01, 10), "222"));
+
+        var content = CreateJsonContent(new
+        {
+            firstName = Faker.Name.First(),
+            middleName = Faker.Name.Middle(),
+            lastName = Faker.Name.Last(),
+            dateOfBirth = Faker.Identification.DateOfBirth().ToDateOnlyWithDqtBstFix(isLocalTime: false),
+            emailAddress = Faker.Internet.Email(),
+            nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber(),
+            gender = Gender.Male
+        });
+
+        // Act
+        var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}", content);
+
+        // Assert
+        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, StatusCodes.Status400BadRequest);
+    }
+
+    [Fact]
     public async Task Put_ValidRequest_ReturnsNoContent()
     {
         // Arrange
