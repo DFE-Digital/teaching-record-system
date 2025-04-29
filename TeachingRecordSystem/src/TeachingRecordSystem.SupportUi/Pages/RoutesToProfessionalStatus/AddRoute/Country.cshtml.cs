@@ -41,7 +41,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        TrainingCountries = await referenceDataCache.GetTrainingCountriesAsync();
+        TrainingCountries = await _referenceDataCache.GetTrainingCountriesAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
