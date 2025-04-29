@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
@@ -36,5 +37,11 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
         return Redirect(FromCheckAnswers ?
             _linkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        TrainingCountries = await referenceDataCache.GetTrainingCountriesAsync();
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

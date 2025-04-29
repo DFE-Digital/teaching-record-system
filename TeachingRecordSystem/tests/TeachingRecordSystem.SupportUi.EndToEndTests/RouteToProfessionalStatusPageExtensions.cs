@@ -16,6 +16,12 @@ public static class RouteToProfessionalStatusPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
+    public static Task SelectAgeRangeAsync(this IPage page, TrainingAgeSpecialismType ageRangeType)
+    {
+        var radioButton = page.Locator($"input[type='radio'][value='{ageRangeType.ToString()}']");
+        return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+    }
+
     public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
@@ -124,5 +130,15 @@ public static class RouteToProfessionalStatusPageExtensions
     public static Task AssertOnRouteAddCountryAsync(this IPage page)
     {
         return page.WaitForUrlPathAsync("/route/add/country");
+    }
+
+    public static Task AssertOnRouteAddAgeRangeAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/age-range");
+    }
+
+    public static Task AssertOnRouteAddSubjectsPageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/subjects");
     }
 }
