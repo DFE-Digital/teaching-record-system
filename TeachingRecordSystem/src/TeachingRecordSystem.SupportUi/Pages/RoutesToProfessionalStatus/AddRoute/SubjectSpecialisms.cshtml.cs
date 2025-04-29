@@ -1,3 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
@@ -5,10 +10,50 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-    _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-    _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+
+    public TrainingSubject[] Subjects { get; set; } = [];
+
+    [BindProperty]
+    [Display(Name = "Enter the subject they specialise in teaching")]
+    public Guid? SubjectId1 { get; set; }
+    [BindProperty]
+    [Display(Name = "Second subject (optional)")]
+    public Guid? SubjectId2 { get; set; }
+    [BindProperty]
+    [Display(Name = "Third subject (optional)")]
+    public Guid? SubjectId3 { get; set; }
 
     public void OnGet()
     {
+        SubjectId1 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(0);
+        SubjectId2 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(1);
+        SubjectId3 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(2);
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+
+        Guid[] subjects = new Guid?[] { SubjectId1, SubjectId2, SubjectId3 }.Where(s => s.HasValue).Select(s => s!.Value).ToArray();
+
+        await JourneyInstance!.UpdateStateAsync(s => s.TrainingSubjectIds = subjects);
+
+        return Redirect(FromCheckAnswers ?
+            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+    }
+
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonName = personInfo.Name;
+        Subjects = await _referenceDataCache.GetTrainingSubjectsAsync();
+        PersonId = personInfo.PersonId;
+        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
