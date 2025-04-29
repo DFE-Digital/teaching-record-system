@@ -21,7 +21,7 @@ public static class UserPermissionTypes
     public const string ManageUsers = "ManageUsers";
 
     [Display(Name = "Support tasks", Description = "Access to the Support tasks area of the console")]
-    public const string SuppportTasks = "SupportTasks";
+    public const string SupportTasks = "SupportTasks";
 
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
@@ -30,18 +30,18 @@ public static class UserPermissionTypes
         NonDbsAlerts,
         DbsAlerts,
         ManageUsers,
-        SuppportTasks,
+        SupportTasks,
     };
 
     public static string GetDisplayNameForPermissionType(string permissionType)
     {
-        var member = typeof(UserPermissionTypes).GetField(permissionType) ?? throw new ArgumentException("Invalid permission type.", nameof(permissionType));
+        var member = typeof(UserPermissionTypes).GetField(permissionType) ?? throw new ArgumentException($@"Invalid permission type: ""{permissionType}"".", nameof(permissionType));
         return member.GetCustomAttribute<DisplayAttribute>()?.Name ?? member.Name;
     }
 
     public static string GetDisplayDescriptionForPermissionType(string permissionType)
     {
-        var member = typeof(UserPermissionTypes).GetField(permissionType) ?? throw new ArgumentException("Invalid permission type.", nameof(permissionType));
+        var member = typeof(UserPermissionTypes).GetField(permissionType) ?? throw new ArgumentException($@"Invalid permission type: ""{permissionType}"".", nameof(permissionType));
         return member.GetCustomAttribute<DisplayAttribute>()?.Description ?? string.Empty;
     }
 }

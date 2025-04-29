@@ -7,7 +7,7 @@ public class ChangeManagementAuthorizationHandler : AuthorizationHandler<ChangeM
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ChangeManagementRequirement requirement)
     {
-        if (context.User.HasMinimumPermission(new(UserPermissionTypes.SuppportTasks, UserPermissionLevel.Edit)))
+        if (context.User.HasMinimumPermission(new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)))
         {
             context.Succeed(requirement);
         }
