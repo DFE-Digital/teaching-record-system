@@ -10,6 +10,8 @@ public enum SupportTaskType
     ChangeNameRequest = 2,
     [SupportTaskTypeInfo("change date of birth request", SupportTaskCategory.ChangeRequests)]
     ChangeDateOfBirthRequest = 3,
+    [SupportTaskTypeInfo("TRN request from API", SupportTaskCategory.TrnRequests)]
+    ApiTrnRequest = 4,
 }
 
 public static class SupportTaskTypeRegistry

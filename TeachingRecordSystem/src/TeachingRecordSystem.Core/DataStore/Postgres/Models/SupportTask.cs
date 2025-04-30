@@ -21,6 +21,7 @@ public class SupportTask
     public Guid? PersonId { get; init; }
     public Guid? TrnRequestApplicationUserId { get; init; }
     public string? TrnRequestId { get; init; }
+    public TrnRequestMetadata? TrnRequestMetadata { get; set; }
 
     public required object Data
     {
@@ -80,6 +81,7 @@ public class SupportTask
     internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch
     {
         SupportTaskType.ConnectOneLoginUser => typeof(ConnectOneLoginUserData),
+        SupportTaskType.ApiTrnRequest => typeof(ApiTrnRequestData),
         _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: {supportTaskType}'.")
     };
 

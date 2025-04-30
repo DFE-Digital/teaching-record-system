@@ -17,6 +17,6 @@ public class SupportTaskMapping : IEntityTypeConfiguration<SupportTask>
         builder.HasIndex(t => t.PersonId);
         builder.Property<JsonDocument>("_data").HasColumnName("data").IsRequired();
         builder.Ignore(t => t.Data);
-        builder.HasOne<TrnRequestMetadata>().WithMany().HasForeignKey(p => new { p.TrnRequestApplicationUserId, p.TrnRequestId });
+        builder.HasOne(t => t.TrnRequestMetadata).WithMany().HasForeignKey(p => new { p.TrnRequestApplicationUserId, p.TrnRequestId });
     }
 }
