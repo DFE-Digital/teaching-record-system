@@ -7,7 +7,7 @@ public class UserTests : TestBase
     {
     }
 
-    [Fact(Skip = "Timing out at page.AssertOnLegacyAddUserConfirmPageAsync() - needs looking into")]
+    [Fact]
     public async Task AddUser()
     {
         var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
