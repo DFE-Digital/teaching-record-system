@@ -382,6 +382,9 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 
+    public string ApiTrnRequests(string? search = null) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search });
+
     public string ConnectOneLoginUserSupportTask(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Index", routeValues: new { supportTaskReference });
 

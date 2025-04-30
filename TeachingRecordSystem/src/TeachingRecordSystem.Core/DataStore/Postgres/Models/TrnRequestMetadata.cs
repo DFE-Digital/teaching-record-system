@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 public class TrnRequestMetadata
 {
     public required Guid ApplicationUserId { get; init; }
+    public ApplicationUser ApplicationUser { get; } = null!;
     public required string RequestId { get; init; }
     public required DateTime CreatedOn { get; init; }
     public required bool? IdentityVerified { get; init; }
