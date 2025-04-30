@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.WorkforceData;
 
@@ -28,7 +27,7 @@ public class TpsCsvExtractProcessorTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            new Mock<IDqtNoteAttachmentStorage>().Object);
+            new Mock<IFileService>().Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),

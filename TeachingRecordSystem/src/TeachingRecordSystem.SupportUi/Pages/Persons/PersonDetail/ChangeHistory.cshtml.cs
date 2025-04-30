@@ -14,7 +14,8 @@ public class ChangeHistoryModel(
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
     IAuthorizationService authorizationService,
-    TrsLinkGenerator linkGenerator) : PageModel
+    TrsLinkGenerator linkGenerator,
+    IFeatureProvider featureProvider) : PageModel
 {
     private const int PageSize = 10;
 
@@ -137,6 +138,14 @@ public class ChangeHistoryModel(
             .Concat(eventsWithUser.Select(MapTimelineEvent))
             .OrderByDescending(i => i.Timestamp)
             .ToArray();
+
+        //exclude all crm annotations if dqtnote is enabled.
+        //
+        //NOTE: When the backfilling of dqtnotes has been ran, adding annotations can be removed entirely from this page.
+        if (featureProvider.IsEnabled(FeatureNames.DqtNotes))
+        {
+            allResults = allResults.Where(x => x.ItemType != TimelineItemType.Annotation).ToArray();
+        }
 
         TimelineItems = allResults
             .Skip((PageNumber!.Value - 1) * PageSize)

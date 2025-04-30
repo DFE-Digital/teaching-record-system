@@ -7,10 +7,10 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Configuration;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtReporting;
 using TeachingRecordSystem.Core.Services.Establishments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.Notify;
@@ -67,7 +67,7 @@ builder.Services
     .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
     .AddWorkforceData()
     .AddMemoryCache()
-    .AddBlobStorageDqtNoteAttachments();
+    .AddFileService();
 
 var host = builder.Build();
 

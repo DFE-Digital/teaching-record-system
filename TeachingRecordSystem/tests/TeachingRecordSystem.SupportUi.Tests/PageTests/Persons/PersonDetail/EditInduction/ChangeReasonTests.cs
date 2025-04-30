@@ -277,7 +277,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         mockFileService.Verify(
-            s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>()), Times.Once);
+            s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<Guid?>()), Times.Once);
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>

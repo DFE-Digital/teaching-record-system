@@ -138,4 +138,22 @@ public class IndexTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Null(doc.GetElementByTestId("OpenAlertNotification"));
     }
+
+    [Fact]
+    public async Task Get_DqtNotesTab_IsRendered()
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.DqtNotes);
+        var person = await TestData.CreatePersonAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var noMandatoryQualifications = doc.GetElementByTestId("dqtnotes-tab");
+        Assert.NotNull(noMandatoryQualifications);
+    }
 }

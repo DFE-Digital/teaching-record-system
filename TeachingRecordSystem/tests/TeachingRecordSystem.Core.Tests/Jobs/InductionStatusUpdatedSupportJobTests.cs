@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Jobs;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -33,7 +33,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
             Clock,
             new TestableAuditRepository(),
             loggerFactory.CreateLogger<TrsDataSyncHelper>(),
-            DqtNoteFileAttachmentStorageMock.Object);
+            BlobStorageFileService.Object);
 
         TestData = new TestData(
             dbFixture.GetDbContextFactory(),
@@ -77,7 +77,7 @@ public class InductionStatusUpdatedSupportJobTests : IAsyncLifetime
 
     public IOrganizationServiceAsync2 OrganizationService { get; }
 
-    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; } = new Mock<IDqtNoteAttachmentStorage>();
+    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 
     [Theory]
     [InlineData(InductionStatus.Exempt, InductionStatus.None)]

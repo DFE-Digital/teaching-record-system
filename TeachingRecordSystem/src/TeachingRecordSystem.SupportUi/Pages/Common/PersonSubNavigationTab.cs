@@ -6,5 +6,6 @@ public enum PersonSubNavigationTab
     Qualifications,
     Induction,
     ChangeHistory,
-    Alerts
+    Alerts,
+    Notes
 }

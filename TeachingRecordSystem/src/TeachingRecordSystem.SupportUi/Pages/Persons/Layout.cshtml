@@ -52,6 +52,13 @@
                 <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator.PersonChangeHistory(personId)">Change history</a>
                 </li>
+
+                @if (FeatureProvider.IsEnabled(FeatureNames.DqtNotes))
+                {
+                    <li class="moj-sub-navigation__item" data-testid="dqtnotes-tab">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonSubNavigationTab.Notes ? "page" : null)" href="@LinkGenerator.PersonNotes(personId)">Notes</a>
+                    </li>
+                }
             </ul>
         </nav>
         @RenderBody()

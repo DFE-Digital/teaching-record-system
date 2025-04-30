@@ -8,10 +8,10 @@ using Microsoft.Playwright;
 using OpenIddict.Server.AspNetCore;
 using TeachingRecordSystem.AuthorizeAccess.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.UiTestCommon.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
@@ -86,7 +86,6 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                         });
 
                     services.Configure<OpenIddictServerAspNetCoreOptions>(options => options.DisableTransportSecurityRequirement = true);
-                    services.AddSingleton<IDqtNoteAttachmentStorage>(Mock.Of<IDqtNoteAttachmentStorage>());
                     services.AddSingleton<OneLoginCurrentUserProvider>();
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
@@ -97,12 +96,13 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                     services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
+                    services.AddStartupTask<SeedLookupData>();
 
                     IFileService GetMockFileService()
                     {
                         var fileService = new Mock<IFileService>();
                         fileService
-                            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>()))
+                            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
                             .ReturnsAsync(Guid.NewGuid());
                         fileService
                             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
