@@ -221,6 +221,12 @@ public class ReferenceDataCache(
         return ittQualifications.First(s => s.dfeta_Value == value, $"Could not find ITT qualification with value: '{value}'.");
     }
 
+    public async Task<dfeta_ittqualification> GetIttQualificationByIdAsync(Guid ittQualificationId)
+    {
+        var ittQualifications = await EnsureIttQualificationsAsync();
+        return ittQualifications.Single(q => q.Id == ittQualificationId, $"Could not find ITT qualification with ID: '{ittQualificationId}'.");
+    }
+
     public async Task<Account?> GetIttProviderByUkPrnAsync(string ukPrn)
     {
         var ittProviders = await EnsureIttProvidersAsync();
