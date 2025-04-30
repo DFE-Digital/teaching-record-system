@@ -81,6 +81,10 @@
             {
                 <govuk-button type="submit">Save changes</govuk-button>
             }
+            else
+            {
+                <govuk-button type="submit" asp-page-handler="activate">Reactivate user</govuk-button>
+            }
 
             <p class="govuk-body">
                 <a class="govuk-link govuk-link--no-visited-state" href=@LinkGenerator.Users()>Cancel and return to users</a>

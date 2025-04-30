@@ -105,6 +105,37 @@ public class EditUser(
         return Redirect(linkGenerator.Users());
     }
 
+    public async Task<IActionResult> OnPostActivateAsync()
+    {
+        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
+
+        if (user.Active)
+        {
+            return BadRequest();
+        }
+
+        // Only admins can reactivate admins
+        if (!User.IsInRole(UserRoles.Administrator) && user.Role == UserRoles.Administrator)
+        {
+            return BadRequest();
+        }
+
+        user.Active = true;
+
+        await dbContext.AddEventAndBroadcastAsync(new UserActivatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            User = Core.Events.Models.User.FromModel(user),
+            RaisedBy = User.GetUserId(),
+            CreatedUtc = clock.UtcNow
+        });
+
+        await dbContext.SaveChangesAsync();
+
+        TempData.SetFlashSuccess(message: $"{user.Name} has been reactivated.");
+        return Redirect(linkGenerator.Users());
+    }
+
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);

@@ -63,4 +63,28 @@ public class UserTests : TestBase
 
         await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been changed to a support officer.");
     }
+
+    [Fact]
+    public async Task ReactivateUser()
+    {
+        var azAdUserId = Guid.NewGuid();
+        var user = await TestData.CreateUserAsync(active: false, azureAdUserId: azAdUserId, role: UserRoles.AccessManager);
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToUsersPageAsync();
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.ClickLinkForElementWithTestIdAsync($"edit-user-{user.UserId}");
+
+        await page.AssertOnEditUserPageAsync(user.UserId);
+
+        await page.ClickButtonAsync("Reactivate user");
+
+        await page.AssertOnUsersPageAsync();
+
+        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been reactivated.");
+    }
 }

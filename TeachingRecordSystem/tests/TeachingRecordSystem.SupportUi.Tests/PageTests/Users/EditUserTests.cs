@@ -341,5 +341,93 @@ public class EditUserTests : TestBase, IAsyncLifetime
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{newName} {expectedFlashMessage}");
     }
 
+    [Fact]
+    public async Task PostActivate_UserExistsButIsAlreadyActive_ReturnsBadRequest()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostActivate_UserWithoutAdministratorRole_ActivatingUserWithAdministratorRole_ReturnsBadRequest()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync(active: false, role: UserRoles.Administrator);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostActivate_UserWithAdministratorRole_ActivatingUserWithAdministratorRole_ReturnsFound()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.Administrator);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync(active: false, role: UserRoles.Administrator);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostActivate_ValidRequest_ActivatesUsersEmitsEventAndRedirectsWithFlashMessage()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync(active: false);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedUser = await WithDbContext(dbContext =>
+            dbContext.Users.SingleOrDefaultAsync(u => u.UserId == existingUser.UserId));
+        Assert.NotNull(updatedUser);
+
+        Assert.True(updatedUser.Active);
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var userCreatedEvent = Assert.IsType<UserActivatedEvent>(e);
+            Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
+            Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
+        });
+
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name} has been reactivated.");
+    }
+
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";
 }
