@@ -7,10 +7,10 @@ public class LegacyUserTests : TestBase
     {
     }
 
-    [Fact(Skip = "Timing out at page.AssertOnLegacyAddUserConfirmPageAsync() - needs looking into")]
+    [Fact]
     public async Task AddUser()
     {
-        var testAzAdUser = TestUsers.TestAzureActiveDirectoryUser;
+        var testAzAdUser = TestUsers.TestLegacyAzureActiveDirectoryUser;
         await TestData.CreateCrmUserAsync(azureAdUserId: Guid.Parse(testAzAdUser.UserId), dqtRoles: ["CRM Helpdesk"]);
 
         await using var context = await HostFixture.CreateBrowserContext();

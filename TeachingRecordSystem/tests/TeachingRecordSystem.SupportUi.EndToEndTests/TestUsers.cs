@@ -22,6 +22,13 @@ public static class TestUsers
         Name = "Test AZ AD User"
     };
 
+    public static AzAdUser TestLegacyAzureActiveDirectoryUser { get; } = new()
+    {
+        UserId = Guid.NewGuid().ToString(),
+        Email = Faker.Internet.Email(),
+        Name = "Test Legacy AZ AD User"
+    };
+
     public class CreateUsersStartupTask(TrsDbContext trsDbContext) : IStartupTask
     {
         public Task ExecuteAsync()

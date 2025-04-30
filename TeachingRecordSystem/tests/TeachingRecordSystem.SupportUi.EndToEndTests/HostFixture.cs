@@ -100,10 +100,16 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     {
                         var userService = new Mock<IAadUserService>();
                         userService
-                            .Setup(s => s.GetUserByEmailAsync(It.IsAny<string>()))
+                            .Setup(s => s.GetUserByEmailAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.Email))
+                            .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
+                        userService
+                            .Setup(s => s.GetUserByEmailAsync(TestUsers.TestAzureActiveDirectoryUser.Email))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         userService
-                            .Setup(s => s.GetUserByIdAsync(It.IsAny<string>()))
+                            .Setup(s => s.GetUserByIdAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.UserId))
+                            .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
+                        userService
+                            .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         return userService.Object;
                     }
