@@ -49,7 +49,7 @@ public class IndexModel(
         var existingUser = await dbContext.Users.SingleOrDefaultAsync(u => u.AzureAdUserId == user.UserId);
         if (existingUser is not null)
         {
-            return Redirect(trsLinkGenerator.LegacyEditUser(existingUser.UserId));
+            return Redirect(trsLinkGenerator.EditUser(existingUser.UserId));
         }
 
         return Redirect(trsLinkGenerator.AddUserConfirm(user.UserId));

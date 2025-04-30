@@ -362,6 +362,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string AddUserConfirm(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", routeValues: new { userId });
 
+    public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", routeValues: new { userId });
+
     public string ApplicationUsers() => GetRequiredPathByPage("/ApplicationUsers/Index");
 
     public string AddApplicationUser() => GetRequiredPathByPage("/ApplicationUsers/AddApplicationUser");

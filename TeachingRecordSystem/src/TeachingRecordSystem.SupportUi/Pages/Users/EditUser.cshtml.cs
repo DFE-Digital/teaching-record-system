@@ -4,24 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
-using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
+using TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
+namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-[RequireFeatureEnabledFilterFactory(FeatureNames.NewUserRoles)]
-public class ConfirmModel(
+public class EditUser(
     TrsDbContext dbContext,
-    IAadUserService userService,
     IClock clock,
     TrsLinkGenerator linkGenerator) : PageModel
 {
-    private Services.AzureActiveDirectory.User? _user;
+    private Core.DataStore.Postgres.Models.User? _user;
 
-    [BindProperty(SupportsGet = true)]
-    public string? UserId { get; set; }
+    [FromRoute]
+    public Guid UserId { get; set; }
 
     [Display(Name = "Email address")]
     public string? Email { get; set; }
@@ -37,20 +34,22 @@ public class ConfirmModel(
     [Required(ErrorMessage = "Select a role")]
     public string? Role { get; set; }
 
-    public string? AzureAdUserId { get; set; }
+    public bool IsActiveUser { get; set; }
 
     public IEnumerable<UserRoleViewModel> RoleOptions { get; set; } = [];
 
-    public IActionResult OnGet()
+    public Task OnGetAsync()
     {
         Name = _user!.Name;
+        IsActiveUser = _user.Active;
+        Role = _user.Role;
 
-        return Page();
+        return Task.CompletedTask;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // Ensure submitted role is valid
+        // Ensure submitted roles is valid
         if (!string.IsNullOrWhiteSpace(Role) && !UserRoles.All.Contains(Role))
         {
             return BadRequest();
@@ -67,39 +66,48 @@ public class ConfirmModel(
             return this.PageWithErrors();
         }
 
-        var newUser = new Core.DataStore.Postgres.Models.User()
+        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
+
+        var changes = UserUpdatedEventChanges.None |
+            (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
+            (user.Role != Role ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
+
+        if (changes != UserUpdatedEventChanges.None)
         {
-            Active = true,
-            AzureAdUserId = AzureAdUserId,
-            Email = _user!.Email,
-            Name = Name!,
-            Role = Role,
-            UserId = Guid.NewGuid()
-        };
+            user.Role = Role;
+            user.Name = Name!;
 
-        dbContext.Users.Add(newUser);
+            await dbContext.AddEventAndBroadcastAsync(new UserUpdatedEvent
+            {
+                EventId = Guid.NewGuid(),
+                User = Core.Events.Models.User.FromModel(user),
+                RaisedBy = User.GetUserId(),
+                CreatedUtc = clock.UtcNow,
+                Changes = changes
+            });
 
-        await dbContext.AddEventAndBroadcastAsync(new UserAddedEvent()
+            await dbContext.SaveChangesAsync();
+        }
+
+        if ((changes & UserUpdatedEventChanges.Roles) != UserUpdatedEventChanges.None)
         {
-            EventId = Guid.NewGuid(),
-            User = Core.Events.Models.User.FromModel(newUser),
-            RaisedBy = User.GetUserId(),
-            CreatedUtc = clock.UtcNow
-        });
+            var roleText = UserRoles.GetDisplayNameForRole(Role!)
+                .ToLowerInvariantFirstLetter()
+                .WithIndefiniteArticle();
 
-        await dbContext.SaveChangesAsync();
+            TempData.SetFlashSuccess(message: $"{Name} has been changed to {roleText}.");
+        }
+        else
+        {
+            TempData.SetFlashSuccess(message: $"{Name} has been updated.");
+        }
 
-        var roleText = UserRoles.GetDisplayNameForRole(Role!)
-            .ToLowerInvariantFirstLetter()
-            .WithIndefiniteArticle();
-
-        TempData.SetFlashSuccess(message: $"{Name} has been added as {roleText}.");
         return Redirect(linkGenerator.Users());
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        _user = await userService.GetUserByIdAsync(UserId!);
+        _user = await dbContext.Users.SingleOrDefaultAsync(u => u.UserId == UserId);
 
         if (_user is null)
         {
@@ -108,7 +116,6 @@ public class ConfirmModel(
         }
 
         Email = _user.Email;
-        AzureAdUserId = _user.UserId;
 
         var showAdminRole = User.IsInRole(UserRoles.Administrator);
         var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);

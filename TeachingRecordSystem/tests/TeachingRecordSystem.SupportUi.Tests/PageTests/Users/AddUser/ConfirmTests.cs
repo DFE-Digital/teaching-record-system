@@ -90,6 +90,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response);
         var roleNames = html.QuerySelectorAll(".trs-user-roles input[type=radio]").Select(e => e.Attributes["value"]!.Value);
 
@@ -120,6 +121,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response);
         var roleNames = html.QuerySelectorAll(".trs-user-roles input[type=radio]").Select(e => e.Attributes["value"]!.Value);
 
@@ -221,6 +223,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         await AssertEx.HtmlResponseHasErrorAsync(response, "Name", "Enter a name");
     }
 
@@ -254,6 +257,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         await AssertEx.HtmlResponseHasErrorAsync(response, "Role", "Select a role");
     }
 
