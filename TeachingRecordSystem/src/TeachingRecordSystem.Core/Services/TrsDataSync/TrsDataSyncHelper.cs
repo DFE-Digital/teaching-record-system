@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
@@ -117,9 +118,160 @@ public class TrsDataSyncHelper(
         await Task.WhenAll(audits.Select(async kvp => await auditRepository.SetAuditDetailAsync(entityLogicalName, kvp.Key, kvp.Value)));
     }
 
-    private DqtNoteInfo MapNoteFromDqtAnnotation(
+    private DqtNoteInfo? MapNoteFromDqtAnnotation(
         Annotation annotation)
     {
+        List<string> GetIgnoreNotesContainingTerms()
+        {
+            var lst = new List<string>();
+
+            lst.Add(".");
+            lst.Add("ITT result updated to pass or approved as a part of TQ data query exercise. The result was one of 102668 results corrected by a data fix run on 09 January 2009");
+            lst.Add("ManPay1205 letter suppressed");
+            lst.Add("Name amended in error by TP Update, name corrected to previous entry held by GTC");
+            lst.Add("£");
+            lst.Add("0 day letter");
+            lst.Add("anomoly");
+            lst.Add("Apology as Previous letter had an incorrect details due to file creation error");
+            lst.Add("AutoRegd NQT Reminder");
+            lst.Add("bulk dereg");
+            lst.Add("cancel fee");
+            lst.Add("cancellation of fees");
+            lst.Add("Card details taken");
+            lst.Add("CC details taken");
+            lst.Add("CC received");
+            lst.Add("contacted regarding requirements for OTTs and Instructors to be provisionally registered");
+            lst.Add("CurrFees Only) Letter Issued");
+            lst.Add("curryrfees");
+            lst.Add("DD Cancelled");
+            lst.Add("DD claim");
+            lst.Add("DD conf");
+            lst.Add("DD DConfirmation");
+            lst.Add("dd details");
+            lst.Add("DD end");
+            lst.Add("DD failed");
+            lst.Add("DD failure");
+            lst.Add("DD fee notice");
+            lst.Add("DD incorrect");
+            lst.Add("DD letter");
+            lst.Add("DD mandate");
+            lst.Add("DD notification");
+            lst.Add("DD pilot");
+            lst.Add("DD rec`d");
+            lst.Add("DD Rejected");
+            lst.Add("DD RET");
+            lst.Add("DD returned");
+            lst.Add("DD run");
+            lst.Add("dereg action");
+            lst.Add("dereg form");
+            lst.Add("de - reg form");
+            lst.Add("dereg, action");
+            lst.Add("dereg,action");
+            lst.Add("dereg.");
+            lst.Add("deregistered");
+            lst.Add("Deregistration confirmation");
+            lst.Add("De - Registration date manually changed");
+            lst.Add("de - regn");
+            lst.Add("DEREGREM");
+            lst.Add("details extracted on");
+            lst.Add("did not claim the teacher");
+            lst.Add("direct debit");
+            lst.Add("Dual registered - info from Wales");
+            lst.Add("Due to an administrative error this unregistered teacher did not have their deregistration date changed");
+            lst.Add("EDC 2005 / 06 Teachers working at relationship updated");
+            lst.Add("EDC Put Out Of Service");
+            lst.Add("Email address hard bounce");
+            lst.Add("Email address irresolvable hard bounce back");
+            lst.Add("employer data collection");
+            lst.Add("employment at school");
+            lst.Add("Employment update letter and COD form sent");
+            lst.Add("employment updated");
+            lst.Add("fee cancellation");
+            lst.Add("fee chase");
+            lst.Add("Fee Notice");
+            lst.Add("fee notification");
+            lst.Add("fee notin");
+            lst.Add("fee paid");
+            lst.Add("fee receipt");
+            lst.Add("fee reciept");
+            lst.Add("fee remind");
+            lst.Add("fee waiver");
+            lst.Add("fee year");
+            lst.Add("finance");
+            lst.Add("FTF - Achieve - 20060606 - RaceEqualityAndYourSchool - Leeds");
+            lst.Add("FTF - Achieve - 20060606 - RaceEqualityAndYourSchool - Leeds");
+            lst.Add("FTF - Achieve - 20060607 - RaceEqualityAndYourSchool - Leeds");
+            lst.Add("future dereg request");
+            lst.Add("General query - Role & Remit info sheet sent in response");
+            lst.Add("GTC / IoE conference");
+            lst.Add("In Service(IS) updated from EDC");
+            lst.Add("Inappropriate contact address removed and site usages for School address recalculated");
+            lst.Add("intention to dereg");
+            lst.Add("Intention to register updated following receipt of a Suitability Declaration form - ITT exit");
+            lst.Add("invalid email address removed");
+            lst.Add("LA address removed as no mail should be sent to LA");
+            lst.Add("letter sent to update employment details");
+            lst.Add("Loaded home contact address as active post migration");
+            lst.Add("manually reregistered");
+            lst.Add("more info for deregistration");
+            lst.Add("more info to dereg");
+            lst.Add("More information for deregistration requested");
+            lst.Add("more information requested for deregistration");
+            lst.Add("new card");
+            lst.Add("newregcard");
+            lst.Add("No address email sent to");
+            lst.Add("Not enough info to dereg teacher so letter and dereg form sent");
+            lst.Add("not registered");
+            lst.Add("nqtfee");
+            lst.Add("paid by dd");
+            lst.Add("part yr fees");
+            lst.Add("paydereg");
+            lst.Add("payment");
+            lst.Add("possible dereg");
+            lst.Add("provisional registration");
+            lst.Add("pryrfees");
+            lst.Add("re deregistration");
+            lst.Add("re scaled fees");
+            lst.Add("Record has been temporarily inactivated, consult Data Governance team before amending these records");
+            lst.Add("Refer to Payer");
+            lst.Add("refund issued");
+            lst.Add("refund request");
+            lst.Add("Regable45s letter issued and attached");
+            lst.Add("Registration has now been removed");
+            lst.Add("Registration Status manually amended from Ineligible for Full Registration to Ineligible");
+            lst.Add("replacement card");
+            lst.Add("replacement registration card");
+            lst.Add("replacementcard");
+            lst.Add("request refund");
+            lst.Add("requested more information to deregister");
+            lst.Add("School address in home address field removed by REG");
+            lst.Add("SD fees");
+            lst.Add("Sent application to register");
+            lst.Add("supply(nonLA) employment closed");
+            lst.Add("Teacher not registered.Sent a reminder that in error refers to them as being registered");
+            lst.Add("Teacher put out of service and then back in service at the same school to correct site usage");
+            lst.Add("teacher removed from service at organisation");
+            lst.Add("Teacher taken out of service at Welsh school");
+            lst.Add("Teacher was recorded either as Teacher Supply Agency or Unattached Supply Teaching and is now recorded as Supply (Non LA)");
+            lst.Add("Teacher was sent a confirmation letter confirming that they were provisionally? registered. The letter incorrectly referred to them as an OTT and they will receive another letter");
+            lst.Add("This record was inactive with an active address.The the address has been inactivated  with an end date of the day it was closed");
+            lst.Add("total amount due");
+            lst.Add("total to be paid");
+            lst.Add("unregistered teacher had an incorrect deregistration date");
+            lst.Add("updated employment");
+            lst.Add("Updated from EDC");
+            lst.Add("WithPrYrFees) Letter Issued to");
+
+            return lst.Select(s => s.ToLowerInvariant()).ToList();
+        }
+
+        var ignoredTerms = GetIgnoreNotesContainingTerms();
+        var lowerInput = annotation.NoteText.ToLowerInvariant();
+        if (ignoredTerms.Any(term => lowerInput.Contains(term)))
+        {
+            return null;
+        }
+
         return new DqtNoteInfo()
         {
             Id = annotation.Id,
@@ -454,8 +606,7 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<DqtNoteInfo>(ModelTypes.DqtNote);
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        var toSync = annotations.Select(x => MapNoteFromDqtAnnotation(x)).ToList();
-
+        var toSync = annotations.Select(x => MapNoteFromDqtAnnotation(x)).Where(x => x != null).Select(x => x!).ToList();
 
         //upload attachments new or remove attachment
         foreach (var noteAttachment in toSync)
