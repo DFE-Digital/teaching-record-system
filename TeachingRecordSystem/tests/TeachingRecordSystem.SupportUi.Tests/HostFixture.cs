@@ -63,19 +63,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<FakeTrnGenerator>();
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-            services.AddSingleton(GetMockFileService());
-
-            IFileService GetMockFileService()
-            {
-                var fileService = new Mock<IFileService>();
-                fileService
-                    .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
-                    .ReturnsAsync(Guid.NewGuid());
-                fileService
-                    .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
-                    .ReturnsAsync("https://fake.blob.core.windows.net/fake");
-                return fileService.Object;
-            }
+            services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
         });
     }
 

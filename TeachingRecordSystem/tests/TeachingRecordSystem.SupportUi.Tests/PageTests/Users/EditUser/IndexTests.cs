@@ -1,9 +1,9 @@
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
 [Collection(nameof(DisableParallelization))]
-public class EditUserTests : TestBase, IAsyncLifetime
+public class IndexTests : TestBase, IAsyncLifetime
 {
-    public EditUserTests(HostFixture hostFixture) : base(hostFixture)
+    public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
     }
@@ -24,7 +24,8 @@ public class EditUserTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        SetCurrentUser(user);
 
         var userId = Guid.NewGuid();
 
@@ -104,11 +105,12 @@ public class EditUserTests : TestBase, IAsyncLifetime
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        SetCurrentUser(user);
 
-        var user = await TestData.CreateUserAsync();
+        var existingUser = await TestData.CreateUserAsync();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(user.UserId))
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
@@ -128,14 +130,15 @@ public class EditUserTests : TestBase, IAsyncLifetime
     public async Task Post_UserIdDoesNotExist_ReturnsNotFound()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync();
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(Guid.NewGuid()))
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Name", user.Name },
-                { "Role", user.Role! }
+                { "Name", "Some Name" },
+                { "Role", UserRoles.SupportOfficer }
             }
         };
 
@@ -342,6 +345,41 @@ public class EditUserTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
+    public async Task PostActivate_UserWithoutAccessManagerRole_ReturnsForbidden()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        SetCurrentUser(user);
+
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+
+        Assert.Equal(StatusCodes.Status403Forbidden, (int)response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PostActivate_UserIdDoesNotExist_ReturnsNotFound()
+    {
+        // Arrange
+        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
+        SetCurrentUser(user);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(Guid.NewGuid())}/activate");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
+    }
+
+    [Fact]
     public async Task PostActivate_UserExistsButIsAlreadyActive_ReturnsBadRequest()
     {
         // Arrange
@@ -426,7 +464,7 @@ public class EditUserTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name} has been reactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}’s account has been reactivated.");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";

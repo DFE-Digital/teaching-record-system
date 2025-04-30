@@ -1,7 +1,6 @@
 @page "/users/{userId}/{handler?}"
 @using TeachingRecordSystem.Core
-@using TeachingRecordSystem.Core.Legacy
-@model TeachingRecordSystem.SupportUi.Pages.Users.EditUser
+@model TeachingRecordSystem.SupportUi.Pages.Users.EditUser.IndexModel
 @{
     ViewBag.Title = $"Change {Model.Name}\u2019s role";
 }
@@ -79,7 +78,10 @@
 
             @if (Model.IsActiveUser)
             {
-                <govuk-button type="submit">Save changes</govuk-button>
+                <div class="govuk-button-group">
+                    <govuk-button type="submit">Save changes</govuk-button>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.EditUserDeactivate(Model.UserId)>Deactivate user</govuk-button-link>
+                </div>
             }
             else
             {

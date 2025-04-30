@@ -1,0 +1,105 @@
+﻿@page "/users/{userId}/deactivate/{handler?}"
+@using TeachingRecordSystem.Core
+@using TeachingRecordSystem.SupportUi.Pages.EditUser
+@model TeachingRecordSystem.SupportUi.Pages.Users.EditUser.DeactivateModel
+@{
+    ViewBag.Title = "Why are you deactivating this user?";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.EditUser(Model.UserId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <form method="post" enctype="multipart/form-data">
+            <govuk-radios asp-for="HasAdditionalReason">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
+                    <govuk-radios-item value="@false">
+                        They no longer need access
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@true">
+                        Another reason
+
+                        <govuk-radios-item-conditional>
+                            <govuk-textarea textarea-class="govuk-!-width-one-half" 
+                                            label-class="govuk-label--s" 
+                                            asp-for="AdditionalReasonDetail" 
+                                            rows="DeactivateDefaults.DetailTextAreaMinimumRows" />
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            
+            <h2 class="govuk-heading-m">Do you want to provide more details?</h2>
+            
+            <govuk-radios asp-for="HasMoreInformation">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
+                    <govuk-radios-item value="@true">
+                        Yes
+
+                        <govuk-radios-item-conditional>
+                            <govuk-textarea textarea-class="govuk-!-width-one-half" 
+                                            label-class="govuk-label--s" 
+                                            asp-for="MoreInformationDetail" 
+                                            rows="DeactivateDefaults.DetailTextAreaMinimumRows" />
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+            
+            <h2 class="govuk-heading-m">Do you want to upload evidence?</h2>
+
+            <govuk-radios asp-for="UploadEvidence">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-visually-hidden" />
+                    <govuk-radios-item value="@true">
+                        Yes
+
+                        <govuk-radios-item-conditional>
+                            @if (Model.EvidenceFileId is not null)
+                            {
+                                <span class="govuk-caption-m">Currently uploaded file</span>
+                                <p class="govuk-body">
+                                    <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
+                                </p>
+                                <input type="hidden" asp-for="EvidenceFileId" />
+                                <input type="hidden" asp-for="EvidenceFileName" />
+                                <input type="hidden" asp-for="EvidenceFileSizeDescription" />
+                                <input type="hidden" asp-for="UploadedEvidenceFileUrl" />
+                            }
+                            <govuk-file-upload asp-for="EvidenceFile" 
+                                               label-class="govuk-label--m"
+                                               input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
+                                <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
+                                <govuk-file-upload-hint>Must be smaller than 100MB</govuk-file-upload-hint>
+                            </govuk-file-upload>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+                Continue
+            </button>
+        </form>
+
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" 
+             data-testid="cancel-link"
+             asp-page-handler="cancel"
+             asp-route-userid=@Model.UserId 
+             asp-route-evidencefileid=@Model.EvidenceFileId>Cancel and return to user</a>
+        </p>
+    </div>
+</div>
