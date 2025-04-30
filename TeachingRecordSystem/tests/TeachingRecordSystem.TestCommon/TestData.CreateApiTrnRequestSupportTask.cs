@@ -1,4 +1,5 @@
 using Optional;
+using Optional.Unsafe;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 
@@ -8,15 +9,14 @@ public partial class TestData
 {
     public Task<SupportTask> CreateApiTrnRequestSupportTaskAsync(
         Guid applicationUserId,
-        bool potentialDuplicate = false,
         Action<CreateApiTrnRequestSupportTaskBuilder>? configure = null)
     {
-        var builder = new CreateApiTrnRequestSupportTaskBuilder(applicationUserId, potentialDuplicate);
+        var builder = new CreateApiTrnRequestSupportTaskBuilder(applicationUserId);
         configure?.Invoke(builder);
         return builder.ExecuteAsync(this);
     }
 
-    public class CreateApiTrnRequestSupportTaskBuilder(Guid applicationUserId, bool potentialDuplicate)
+    public class CreateApiTrnRequestSupportTaskBuilder(Guid applicationUserId)
     {
         private Option<string> _requestId;
         private Option<string?> _emailAddress;
@@ -25,6 +25,8 @@ public partial class TestData
         private Option<string> _lastName;
         private Option<DateOnly> _dateOfBirth;
         private Option<string?> _nationalInsuranceNumber;
+        private Option<TrnRequestMatchedRecord[]> _matchedRecords;
+        private Option<SupportTaskStatus> _status;
 
         public CreateApiTrnRequestSupportTaskBuilder WithFirstName(string firstName)
         {
@@ -50,6 +52,19 @@ public partial class TestData
             return this;
         }
 
+        public CreateApiTrnRequestSupportTaskBuilder WithMatchedRecords(params Guid[] personIds)
+        {
+            _matchedRecords = Option.Some(personIds.Select(id => new TrnRequestMatchedRecord() { PersonId = id }).ToArray());
+
+            return this;
+        }
+
+        public CreateApiTrnRequestSupportTaskBuilder WithStatus(SupportTaskStatus status)
+        {
+            _status = Option.Some(status);
+            return this;
+        }
+
         public async Task<SupportTask> ExecuteAsync(TestData testData)
         {
             var trnRequestId = _requestId.ValueOr(Guid.NewGuid().ToString);
@@ -59,6 +74,40 @@ public partial class TestData
             var lastName = _lastName.ValueOr(testData.GenerateLastName);
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
+
+            var matchedRecords = _matchedRecords.ValueOrDefault();
+
+            if (matchedRecords is null)
+            {
+                // Matches wasn't explicitly specified; create two person records that match details in this request
+
+                matchedRecords = await Enumerable.Range(1, 2)
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async _ =>
+                    {
+                        var person = await testData.CreatePersonAsync(p =>
+                        {
+                            p
+                                .WithFirstName(firstName)
+                                .WithMiddleName(middleName)
+                                .WithLastName(lastName)
+                                .WithDateOfBirth(dateOfBirth)
+                                .WithEmail(emailAddress);
+
+                            if (nationalInsuranceNumber is not null)
+                            {
+                                p.WithNationalInsuranceNumber(nationalInsuranceNumber);
+                            }
+                        });
+
+                        return new TrnRequestMatchedRecord() { PersonId = person.PersonId };
+                    })
+                    .ToArrayAsync();
+            }
+
+            var matches = new TrnRequestMatches() { MatchedRecords = matchedRecords };
+
+            var potentialDuplicate = matchedRecords.Length > 0;
 
             var metadata = new TrnRequestMetadata
             {
@@ -85,8 +134,11 @@ public partial class TestData
                 Postcode = null,
                 Country = null,
                 TrnToken = null,
-                ResolvedPersonId = null
+                ResolvedPersonId = null,
+                Matches = matches
             };
+
+            var status = _status.ValueOr(() => SupportTaskStatus.Open);
 
             var task = new SupportTask
             {
@@ -94,7 +146,7 @@ public partial class TestData
                 CreatedOn = testData.Clock.UtcNow,
                 UpdatedOn = testData.Clock.UtcNow,
                 SupportTaskType = SupportTaskType.ApiTrnRequest,
-                Status = SupportTaskStatus.Open,
+                Status = status,
                 Data = new ApiTrnRequestData(),
                 TrnRequestApplicationUserId = applicationUserId,
                 TrnRequestId = trnRequestId,

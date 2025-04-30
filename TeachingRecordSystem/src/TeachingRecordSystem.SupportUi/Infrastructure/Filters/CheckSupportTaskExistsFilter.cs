@@ -4,7 +4,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly, SupportTaskType? supportTaskType) : IAsyncResourceFilter
+public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly, SupportTaskType supportTaskType) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -14,12 +14,20 @@ public class CheckSupportTaskExistsFilter(TrsDbContext dbContext, bool openOnly,
             return;
         }
 
-        var currentSupportTask = await dbContext.SupportTasks
-            .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update")  // https://github.com/dotnet/efcore/issues/26042
-            .SingleOrDefaultAsync();
+        var currentSupportTaskQuery = dbContext.SupportTasks
+            .FromSql($"select * from support_tasks where support_task_reference = {supportTaskReference} for update");  // https://github.com/dotnet/efcore/issues/26042
+
+        if (supportTaskType is SupportTaskType.ApiTrnRequest)
+        {
+            currentSupportTaskQuery = currentSupportTaskQuery
+                .Include(t => t.TrnRequestMetadata)
+                .ThenInclude(m => m!.ApplicationUser);
+        }
+
+        var currentSupportTask = await currentSupportTaskQuery.SingleOrDefaultAsync();
 
         if (currentSupportTask is null ||
-            (supportTaskType is SupportTaskType type && currentSupportTask.SupportTaskType != type) ||
+            currentSupportTask.SupportTaskType != supportTaskType ||
             (openOnly && currentSupportTask.Status != SupportTaskStatus.Open))
         {
             context.Result = new NotFoundResult();

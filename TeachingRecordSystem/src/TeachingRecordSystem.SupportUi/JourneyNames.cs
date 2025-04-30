@@ -21,4 +21,5 @@ public static class JourneyNames
     public const string EditInduction = nameof(EditInduction);
     public const string EditRouteToProfessionalStatus = nameof(EditRouteToProfessionalStatus);
     public const string AddRouteToProfessionalStatus = nameof(AddRouteToProfessionalStatus);
+    public const string ResolveApiTrnRequest = nameof(ResolveApiTrnRequest);
 }
