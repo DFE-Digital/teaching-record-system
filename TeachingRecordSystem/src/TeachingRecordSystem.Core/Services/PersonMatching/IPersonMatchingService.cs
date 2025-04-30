@@ -1,8 +1,11 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.Core.Services.PersonMatching;
 
 public interface IPersonMatchingService
 {
-    Task<MatchResult?> MatchAsync(MatchRequest request);
-    Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatchesAsync(GetSuggestedMatchesRequest request);
-    Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedMatchesRequest request, Guid personId);
+    Task<OneLoginMatchResult?> MatchOneLoginUserAsync(OneLoginUserMatchRequest request);
+    Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedOneLoginUserMatchesAsync(GetSuggestedOneLoginUserMatchesRequest request);
+    Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedOneLoginUserMatchesRequest request, Guid personId);
+    Task<IReadOnlyCollection<TrnRequestMatchResult>> MatchFromTrnRequestAsync(TrnRequestMetadata request);
 }
