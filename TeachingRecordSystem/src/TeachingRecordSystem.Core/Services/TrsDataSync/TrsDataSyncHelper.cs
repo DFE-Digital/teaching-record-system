@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
@@ -117,9 +118,157 @@ public class TrsDataSyncHelper(
         await Task.WhenAll(audits.Select(async kvp => await auditRepository.SetAuditDetailAsync(entityLogicalName, kvp.Key, kvp.Value)));
     }
 
-    private DqtNoteInfo MapNoteFromDqtAnnotation(
+    private static List<string> GetIgnoreNotesContainingTerms() => new List<string>
+    {
+        ".",
+        "itt result updated to pass or approved as a part of tq data query exercise. the result was one of 102668 results corrected by a data fix run on 09 january 2009",
+        "manpay1205 letter suppressed",
+        "name amended in error by tp update, name corrected to previous entry held by gtc",
+        "£",
+        "0 day letter",
+        "anomoly",
+        "apology as previous letter had an incorrect details due to file creation error",
+        "autoregd nqt reminder",
+        "bulk dereg",
+        "cancel fee",
+        "cancellation of fees",
+        "card details taken",
+        "cc details taken",
+        "cc received",
+        "contacted regarding requirements for otts and instructors to be provisionally registered",
+        "currfees only) letter issued",
+        "curryrfees",
+        "dd cancelled",
+        "dd claim",
+        "dd conf",
+        "dd dconfirmation",
+        "dd details",
+        "dd end",
+        "dd failed",
+        "dd failure",
+        "dd fee notice",
+        "dd incorrect",
+        "dd letter",
+        "dd mandate",
+        "dd notification",
+        "dd pilot",
+        "dd rec`d",
+        "dd rejected",
+        "dd ret",
+        "dd returned",
+        "dd run",
+        "dereg action",
+        "dereg form",
+        "de - reg form",
+        "dereg, action",
+        "dereg,action",
+        "dereg.",
+        "deregistered",
+        "deregistration confirmation",
+        "de - registration date manually changed",
+        "de - regn",
+        "deregrem",
+        "details extracted on",
+        "did not claim the teacher",
+        "direct debit",
+        "dual registered - info from wales",
+        "due to an administrative error this unregistered teacher did not have their deregistration date changed",
+        "edc 2005 / 06 teachers working at relationship updated",
+        "edc put out of service",
+        "email address hard bounce",
+        "email address irresolvable hard bounce back",
+        "employer data collection",
+        "employment at school",
+        "employment update letter and cod form sent",
+        "employment updated",
+        "fee cancellation",
+        "fee chase",
+        "fee notice",
+        "fee notification",
+        "fee notin",
+        "fee paid",
+        "fee receipt",
+        "fee reciept",
+        "fee remind",
+        "fee waiver",
+        "fee year",
+        "finance",
+        "ftf - achieve - 20060606 - raceequalityandyourschool - leeds",
+        "ftf - achieve - 20060607 - raceequalityandyourschool - leeds",
+        "future dereg request",
+        "general query - role & remit info sheet sent in response",
+        "gtc / ioe conference",
+        "in service(is) updated from edc",
+        "inappropriate contact address removed and site usages for school address recalculated",
+        "intention to dereg",
+        "intention to register updated following receipt of a suitability declaration form - itt exit",
+        "invalid email address removed",
+        "la address removed as no mail should be sent to la",
+        "letter sent to update employment details",
+        "loaded home contact address as active post migration",
+        "manually reregistered",
+        "more info for deregistration",
+        "more info to dereg",
+        "more information for deregistration requested",
+        "more information requested for deregistration",
+        "new card",
+        "newregcard",
+        "no address email sent to",
+        "not enough info to dereg teacher so letter and dereg form sent",
+        "not registered",
+        "nqtfee",
+        "paid by dd",
+        "part yr fees",
+        "paydereg",
+        "payment",
+        "possible dereg",
+        "provisional registration",
+        "pryrfees",
+        "re deregistration",
+        "re scaled fees",
+        "record has been temporarily inactivated, consult data governance team before amending these records",
+        "refer to payer",
+        "refund issued",
+        "refund request",
+        "regable45s letter issued and attached",
+        "registration has now been removed",
+        "registration status manually amended from ineligible for full registration to ineligible",
+        "replacement card",
+        "replacement registration card",
+        "replacementcard",
+        "request refund",
+        "requested more information to deregister",
+        "school address in home address field removed by reg",
+        "sd fees",
+        "sent application to register",
+        "supply(nonla) employment closed",
+        "teacher not registered.sent a reminder that in error refers to them as being registered",
+        "teacher put out of service and then back in service at the same school to correct site usage",
+        "teacher removed from service at organisation",
+        "teacher taken out of service at welsh school",
+        "teacher was recorded either as teacher supply agency or unattached supply teaching and is now recorded as supply (non la)",
+        "teacher was sent a confirmation letter confirming that they were provisionally? registered. the letter incorrectly referred to them as an ott and they will receive another letter",
+        "this record was inactive with an active address.the the address has been inactivated  with an end date of the day it was closed",
+        "total amount due",
+        "total to be paid",
+        "unregistered teacher had an incorrect deregistration date",
+        "updated employment",
+        "updated from edc",
+        "withpryrfees) letter issued to"
+    }
+    .Select(s => s.ToLowerInvariant())
+    .ToList();
+
+    private DqtNoteInfo? MapNoteFromDqtAnnotation(
         Annotation annotation)
     {
+        var ignoredTerms = GetIgnoreNotesContainingTerms();
+        var lowerInput = annotation.NoteText.ToLowerInvariant();
+        if (ignoredTerms.Any(term => lowerInput.Contains(term)))
+        {
+            return null;
+        }
+
         return new DqtNoteInfo()
         {
             Id = annotation.Id,
@@ -454,8 +603,7 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<DqtNoteInfo>(ModelTypes.DqtNote);
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        var toSync = annotations.Select(x => MapNoteFromDqtAnnotation(x)).ToList();
-
+        var toSync = annotations.Select(x => MapNoteFromDqtAnnotation(x)).Where(x => x != null).Select(x => x!).ToList();
 
         //upload attachments new or remove attachment
         foreach (var noteAttachment in toSync)
@@ -465,7 +613,7 @@ public class TrsDataSyncHelper(
             //if note does not have an attachment or length is 0, attempt delete
             if (noteAttachment!.AttachmentBytes is null || noteAttachment.AttachmentBytes!.Length == 0)
             {
-                //not ineterested if file exists or not
+                //not interested if file exists or not
                 await fileService.DeleteFileAsync(fileId!.Value);
                 noteAttachment.FileName = null;
                 noteAttachment.OriginalFileName = null;
