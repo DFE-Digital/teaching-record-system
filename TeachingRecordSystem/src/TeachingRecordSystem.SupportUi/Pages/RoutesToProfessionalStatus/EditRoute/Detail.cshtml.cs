@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -64,7 +63,6 @@ public class DetailModel(
         RouteDetail = new RouteDetailViewModel()
         {
             RouteToProfessionalStatus = route,
-            QualificationType = JourneyInstance!.State.QualificationType,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
@@ -79,7 +77,7 @@ public class DetailModel(
             QualificationId = QualificationId,
             DegreeTypeId = JourneyInstance!.State.DegreeTypeId,
             HasImplicitExemption = hasImplicitExemption,
-            JourneyInstance = JourneyInstance,
+            JourneyInstanceId = JourneyInstance.InstanceId
         };
 
         await next();

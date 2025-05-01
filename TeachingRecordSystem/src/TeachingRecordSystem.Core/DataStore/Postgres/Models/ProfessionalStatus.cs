@@ -9,7 +9,6 @@ public class ProfessionalStatus : Qualification
         QualificationType = QualificationType.ProfessionalStatus;
     }
 
-    public required ProfessionalStatusType ProfessionalStatusType { get; set; }
     public required Guid RouteToProfessionalStatusId { get; set; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }
@@ -35,6 +34,59 @@ public class ProfessionalStatus : Qualification
     public string? DqtEarlyYearsStatusValue { get; init; }
     public Guid? DqtInitialTeacherTrainingId { get; init; }
     public Guid? DqtQtsRegistrationId { get; init; }
+
+    public static ProfessionalStatus Create(
+        Guid PersonId,
+        Guid RouteToProfessionalStatusId,
+        ProfessionalStatusStatus Status,
+        DateOnly? AwardedDate,
+        DateOnly? TrainingStartDate,
+        DateOnly? TrainingEndDate,
+        Guid[]? TrainingSubjectIds,
+        TrainingAgeSpecialismType? TrainingAgeSpecialismType,
+        int? TrainingAgeSpecialismRangeFrom,
+        int? TrainingAgeSpecialismRangeTo,
+        string? TrainingCountryId,
+        Guid? TrainingProviderId,
+        Guid? DegreeTypeId,
+        bool? IsExemptFromInduction,
+        EventModels.RaisedByUserInfo createdBy,
+        DateTime now,
+        out ProfessionalStatusCreatedEvent? @event)
+    {
+        var qualificationId = Guid.NewGuid();
+
+        var professionalStatus = new ProfessionalStatus()
+        {
+            QualificationId = qualificationId,
+            CreatedOn = now,
+            UpdatedOn = now,
+            PersonId = PersonId,
+            RouteToProfessionalStatusId = RouteToProfessionalStatusId,
+            Status = Status,
+            DegreeTypeId = DegreeTypeId,
+            ExemptFromInduction = IsExemptFromInduction,
+            TrainingStartDate = TrainingStartDate,
+            TrainingEndDate = TrainingEndDate,
+            TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = TrainingAgeSpecialismRangeTo,
+            TrainingAgeSpecialismType = TrainingAgeSpecialismType,
+            TrainingCountryId = TrainingCountryId,
+            TrainingProviderId = TrainingProviderId,
+            TrainingSubjectIds = TrainingSubjectIds ?? [],
+            AwardedDate = AwardedDate
+        };
+        @event = new ProfessionalStatusCreatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            PersonId = PersonId,
+            RaisedBy = createdBy,
+            ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(professionalStatus)
+        };
+
+        return professionalStatus;
+    }
 
     public void Update(
         Action<ProfessionalStatus> updateAction,

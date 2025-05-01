@@ -353,24 +353,24 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualInductionUpdatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
+            var actualUpdatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, actualInductionUpdatedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, actualInductionUpdatedEvent.PersonId);
-            Assert.Equal(journeyInstance.State.Status, actualInductionUpdatedEvent.ProfessionalStatus.Status);
-            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualInductionUpdatedEvent.ProfessionalStatus.RouteToProfessionalStatusId);
-            Assert.Equal(journeyInstance.State.TrainingStartDate, actualInductionUpdatedEvent.ProfessionalStatus.TrainingStartDate);
-            Assert.Equal(journeyInstance.State.TrainingEndDate, actualInductionUpdatedEvent.ProfessionalStatus.TrainingEndDate);
-            Assert.Equal(journeyInstance.State.AwardedDate, actualInductionUpdatedEvent.ProfessionalStatus.AwardedDate);
-            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismType);
-            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom);
-            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualInductionUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo);
-            Assert.Equal(journeyInstance.State.TrainingSubjectIds, actualInductionUpdatedEvent.ProfessionalStatus.TrainingSubjectIds);
-            Assert.Equal(journeyInstance.State.IsExemptFromInduction, actualInductionUpdatedEvent.ProfessionalStatus.ExemptFromInduction);
-            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), actualInductionUpdatedEvent.ChangeReason);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, actualInductionUpdatedEvent.ChangeReasonDetail);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, actualInductionUpdatedEvent.EvidenceFile?.FileId);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualInductionUpdatedEvent.EvidenceFile?.Name);
+            Assert.Equal(Clock.UtcNow, actualUpdatedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, actualUpdatedEvent.PersonId);
+            Assert.Equal(journeyInstance.State.Status, actualUpdatedEvent.ProfessionalStatus.Status);
+            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualUpdatedEvent.ProfessionalStatus.RouteToProfessionalStatusId);
+            Assert.Equal(journeyInstance.State.TrainingStartDate, actualUpdatedEvent.ProfessionalStatus.TrainingStartDate);
+            Assert.Equal(journeyInstance.State.TrainingEndDate, actualUpdatedEvent.ProfessionalStatus.TrainingEndDate);
+            Assert.Equal(journeyInstance.State.AwardedDate, actualUpdatedEvent.ProfessionalStatus.AwardedDate);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismType);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo);
+            Assert.Equal(journeyInstance.State.TrainingSubjectIds, actualUpdatedEvent.ProfessionalStatus.TrainingSubjectIds);
+            Assert.Equal(journeyInstance.State.IsExemptFromInduction, actualUpdatedEvent.ProfessionalStatus.ExemptFromInduction);
+            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), actualUpdatedEvent.ChangeReason);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, actualUpdatedEvent.ChangeReasonDetail);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, actualUpdatedEvent.EvidenceFile?.FileId);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualUpdatedEvent.EvidenceFile?.Name);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
