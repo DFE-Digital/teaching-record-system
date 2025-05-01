@@ -3,6 +3,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 public class TrnRequestMetadata
 {
     public required Guid ApplicationUserId { get; init; }
+    public ApplicationUser ApplicationUser { get; } = null!;
     public required string RequestId { get; init; }
     public required DateTime CreatedOn { get; init; }
     public required bool? IdentityVerified { get; init; }
@@ -26,4 +27,15 @@ public class TrnRequestMetadata
     public string? Country { get; init; }
     public string? TrnToken { get; set; }
     public Guid? ResolvedPersonId { get; set; }
+    public TrnRequestMatches? Matches { get; set; }
+}
+
+public record TrnRequestMatches
+{
+    public required IReadOnlyList<TrnRequestMatchedRecord> MatchedRecords { get; init; }
+}
+
+public record TrnRequestMatchedRecord
+{
+    public required Guid PersonId { get; init; }
 }

@@ -14,7 +14,6 @@ using Microsoft.Identity.Web;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem;
 using TeachingRecordSystem.Core.Infrastructure;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
@@ -163,8 +162,7 @@ builder.Services
     .AddTransient<RequireOpenAlertFilter>()
     .AddSingleton<ReferenceDataCache>()
     .AddSingleton<SanctionTextLookup>()
-    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
-    .AddBlobStorageDqtNoteAttachments();
+    .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>();
 
 var app = builder.Build();
 

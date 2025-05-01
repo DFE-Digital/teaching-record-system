@@ -17471,10 +17471,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasForeignKey("PersonId")
                         .HasConstraintName("fk_support_tasks_person");
 
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata", null)
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata", "TrnRequestMetadata")
                         .WithMany()
                         .HasForeignKey("TrnRequestApplicationUserId", "TrnRequestId")
                         .HasConstraintName("fk_support_tasks_trn_request_metadata_trn_request_application_");
+
+                    b.Navigation("TrnRequestMetadata");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TpsCsvExtractItem", b =>
@@ -17519,6 +17521,67 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_tps_employments_person_id");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_trn_request_metadata_application_users_application_user_id");
+
+                    b.OwnsOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches", "Matches", b1 =>
+                        {
+                            b1.Property<Guid>("TrnRequestMetadataApplicationUserId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("TrnRequestMetadataRequestId")
+                                .HasColumnType("character varying(100)");
+
+                            b1.HasKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId");
+
+                            b1.ToTable("trn_request_metadata");
+
+                            b1.ToJson("matches");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
+                                .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
+
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
+                                {
+                                    b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<string>("TrnRequestMatchesTrnRequestMetadataRequestId")
+                                        .HasColumnType("character varying(100)");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    b2.Property<Guid>("PersonId")
+                                        .HasColumnType("uuid");
+
+                                    b2.HasKey("TrnRequestMatchesTrnRequestMetadataApplicationUserId", "TrnRequestMatchesTrnRequestMetadataRequestId", "Id");
+
+                                    b2.ToTable("trn_request_metadata");
+
+                                    b2.ToJson("matches");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("TrnRequestMatchesTrnRequestMetadataApplicationUserId", "TrnRequestMatchesTrnRequestMetadataRequestId")
+                                        .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_trn_request_matches");
+                                });
+
+                            b1.Navigation("MatchedRecords");
+                        });
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Matches");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.WebhookEndpoint", b =>

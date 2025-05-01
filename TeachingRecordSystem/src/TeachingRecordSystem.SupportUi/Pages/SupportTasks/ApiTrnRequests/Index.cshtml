@@ -1,0 +1,50 @@
+@page "/support-tasks/api-trn-requests"
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Index
+@{
+    ViewBag.Title = "Potential duplicate records from APIs";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Support tasks</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+        <form action="@LinkGenerator.ApiTrnRequests()" method="get" asp-antiforgery="false">
+            <govuk-input asp-for="Search" label-class="govuk-label--s" autocomplete="off" />
+            @* TODO move this inside input when GFA library is updated *@
+            <govuk-button type="submit">Search</govuk-button>
+        </form>
+    </div>
+    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Name</th>
+                    <th scope="col" class="govuk-table__header">Email</th>
+                    <th scope="col" class="govuk-table__header">Requested on</th>
+                    <th scope="col" class="govuk-table__header">Source</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.Results!.Length == 0)
+                {
+                    <tr class="govuk-table__row" data-testid="no-tasks-message">
+                        <td class="govuk-table__cell" colspan="4">No open support tasks</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var result in Model.Results)
+                    {
+                        <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
+                            <th scope="row" class="govuk-table__header" data-testid="name">@result.FirstName @result.LastName</th>
+                            <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
+                            <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
+                            <td class="govuk-table__cell" data-testid="source"><colored-tag>@result.SourceApplicationName</colored-tag></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

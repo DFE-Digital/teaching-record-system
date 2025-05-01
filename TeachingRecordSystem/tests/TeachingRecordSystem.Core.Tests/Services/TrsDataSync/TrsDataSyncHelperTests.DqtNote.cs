@@ -54,8 +54,8 @@ public partial class TrsDataSyncHelperTests
             Assert.Null(dqtNote.UpdatedByDqtUserId);
             Assert.Null(dqtNote.UpdatedByDqtUserName);
             Assert.Null(dqtNote.OriginalFileName);
-            DqtNoteFileAttachment.Verify(x => x.CreateAttachmentAsync(It.IsAny<byte[]>(), note.Id.ToString(), It.IsAny<string>()), Times.Never());
-            DqtNoteFileAttachment.Verify(x => x.DeleteAttachmentAsync(note.Id.ToString()), Times.Once());
+            BlobStorageFileService.Verify(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), note.Id), Times.Never());
+            BlobStorageFileService.Verify(x => x.DeleteFileAsync(note.Id), Times.Once());
         });
     }
 
@@ -250,8 +250,8 @@ public partial class TrsDataSyncHelperTests
             Assert.NotNull(dqtNote.OriginalFileName);
             Assert.Equal(attachmentFileName, dqtNote.OriginalFileName);
             Assert.Equal(createdByDqtUserName, dqtNote.CreatedByDqtUserName);
-            DqtNoteFileAttachment.Verify(x => x.CreateAttachmentAsync(It.IsAny<byte[]>(), note.Id.ToString(), It.IsAny<string>()), Times.Once());
-            DqtNoteFileAttachment.Verify(x => x.DeleteAttachmentAsync(note.Id.ToString()), Times.Never());
+            BlobStorageFileService.Verify(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), note.Id), Times.Once());
+            BlobStorageFileService.Verify(x => x.DeleteFileAsync(note.Id), Times.Never());
         });
     }
 
@@ -310,8 +310,8 @@ public partial class TrsDataSyncHelperTests
             Assert.Null(dqtNote.FileName);
             Assert.Equal(createdByDqtUserName, dqtNote.CreatedByDqtUserName);
             Assert.Equal(updatedByDqtUserName, dqtNote.UpdatedByDqtUserName);
-            DqtNoteFileAttachment.Verify(x => x.CreateAttachmentAsync(It.IsAny<byte[]>(), note.Id.ToString(), It.IsAny<string>()), Times.Once());
-            DqtNoteFileAttachment.Verify(x => x.DeleteAttachmentAsync(note.Id.ToString()), Times.Once());
+            BlobStorageFileService.Verify(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), note.Id), Times.Once());
+            BlobStorageFileService.Verify(x => x.DeleteFileAsync(note.Id), Times.Once());
         });
     }
 
@@ -342,6 +342,64 @@ public partial class TrsDataSyncHelperTests
             ModifiedOn = updatedOn
         };
         return newAnnoation;
+    }
+
+    [Theory]
+    [InlineData(".")]
+    [InlineData("ManPay1205 letter suppressed")]
+    [InlineData("Name amended in error by TP Update, name corrected to previous entry held by GTC")]
+    [InlineData("£")]
+    [InlineData("CC received")]
+    [InlineData("DD mandate")]
+    [InlineData("dereg, action")]
+    [InlineData("fee paid")]
+    [InlineData("PAYMENT")]
+    [InlineData("ReQUESt ReFUnD")]
+    [InlineData("THIS WILL MATCH ON ReQUESt ReFUnD")]
+    public async Task SyncNoteAsync_NoteTextContainsIgnoredTerm_DoesNotInsertNote(string noteText)
+    {
+        // Arrange
+        var ct = new CancellationTokenSource();
+        var createdByDqtUserName = Faker.Name.First();
+        var updatedByDqtUserName = Faker.Name.First();
+        var createdBy = Core.DataStore.Postgres.Models.SystemUser.SystemUserId;
+        var createdOn = Clock.UtcNow;
+        var updatedBy = Guid.NewGuid();
+        var updatedOn = Clock.UtcNow.AddDays(1);
+        var annotationId = Guid.NewGuid();
+        var attachmentFileName = "2x2.png";
+        var mimeType = "image/png";
+        var attachmentbase64 = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFUlEQVQI12NgYGBg+M+ABBgAEJ8C/lL9enUAAAAASUVORK5CYII="; //2x2 red pixel image base64
+        var createPersonResult = await TestData.CreatePersonAsync();
+        var note = CreateAnnotationEntity(
+            annotationId,
+            createPersonResult.PersonId,
+            noteText,
+            attachmentFileName,
+            mimeType,
+            createdBy,
+            createdOn,
+            null,
+            null,
+            createdByDqtUserName,
+            updatedByDqtUserName);
+        note.DocumentBody = attachmentbase64;
+        await Helper.SyncAnnotationsAsync(new[] { note }, ignoreInvalid: true, dryRun: false, ct.Token);
+        note.DocumentBody = null;
+        note.MimeType = null;
+        note.FileName = null;
+        note.ModifiedBy = GetUserReference(updatedBy, updatedByDqtUserName);
+        note.ModifiedOn = note.CreatedOn!.Value.AddHours(1);
+
+        // Act
+        await Helper.SyncAnnotationsAsync(new[] { note }, ignoreInvalid: true, dryRun: false, ct.Token);
+
+        // Assert
+        await DbFixture.WithDbContextAsync(async dbContext =>
+        {
+            var dqtNote = await dbContext.DqtNotes.AsNoTracking().SingleOrDefaultAsync(p => p.Id == note.Id);
+            Assert.Null(dqtNote);
+        });
     }
 
     private EntityReference? GetUserReference(Guid? id, string? username)

@@ -25,8 +25,8 @@ using TeachingRecordSystem.Api.Validation;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Infrastructure.Json;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
@@ -171,7 +171,6 @@ public class Program
         services.AddSingleton<ICurrentUserProvider, ClaimsPrincipalCurrentUserProvider>();
         services.AddMemoryCache();
         services.AddSingleton<AddTrnToSentryScopeResourceFilter>();
-        services.AddBlobStorageDqtNoteAttachments();
 
         builder.Services.AddOptions<EvidenceFilesOptions>()
             .Bind(builder.Configuration.GetSection("EvidenceFiles"))
@@ -197,6 +196,7 @@ public class Program
 
         services.AddAccessYourTeachingQualificationsOptions(configuration, env);
         services.AddTrsBaseServices();
+        services.AddFileService();
 
         if (!env.IsUnitTests())
         {

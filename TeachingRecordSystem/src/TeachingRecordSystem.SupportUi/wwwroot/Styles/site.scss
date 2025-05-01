@@ -211,21 +211,22 @@
 }
 
 .govuk-radios.trs-user-roles {
+  --trs-user-permission-columns: 6;
+  overflow-x: auto;
+
   .govuk-radios__divider {
     width: inherit;
     padding-left: 60px;
 
-    @include govuk-media-query($until: tablet) {
-      overflow-x: scroll;
+
+    .govuk-table {
+      table-layout: fixed;
+      max-width: calc(130px * var(--trs-user-permission-columns));
+      min-width: calc(90px * var(--trs-user-permission-columns));
     }
   }
 
-  .govuk-table {
-    table-layout: fixed;
-    min-width: 400px;
-
-    @include govuk-media-query($from: tablet) {
-      min-width: 500px;
-    }
+  .govuk-radios__item:has(input[disabled]) + .govuk-radios__divider {
+    opacity: 0.5;
   }
 }

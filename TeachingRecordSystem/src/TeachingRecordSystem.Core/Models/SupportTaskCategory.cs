@@ -8,6 +8,8 @@ public enum SupportTaskCategory
     OneLogin = 1,
     [SupportTaskCategoryInfo("change requests")]
     ChangeRequests = 2,
+    [SupportTaskCategoryInfo("TRN requests")]
+    TrnRequests = 3,
 }
 
 public static class SupportTaskCategoryRegistry

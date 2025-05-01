@@ -11,7 +11,7 @@
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-full">
         <form action="@LinkGenerator.AddUserConfirm(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
@@ -19,7 +19,7 @@
 
             <govuk-input asp-for="Name" input-class="govuk-!-width-two-thirds" />
 
-            <govuk-radios asp-for="@Model.Role" radios-class="trs-user-roles">
+            <govuk-radios asp-for="@Model.Role" radios-class="trs-user-roles" radios-style="--trs-user-permission-columns: @UserPermissionTypes.All.Count">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
 

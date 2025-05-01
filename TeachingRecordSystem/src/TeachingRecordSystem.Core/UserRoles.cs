@@ -11,10 +11,7 @@ public static class UserRoles
     public static readonly IReadOnlyCollection<UserPermission> ViewerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.View),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View),
-        new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
-        new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Support officer")]
@@ -23,9 +20,7 @@ public static class UserRoles
     public static readonly IReadOnlyCollection<UserPermission> SupportOfficerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
-        new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
         new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
     ];
 
@@ -37,8 +32,6 @@ public static class UserRoles
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View),
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Alerts manager (TRA and DBS decisions)")]
@@ -49,8 +42,6 @@ public static class UserRoles
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.View),
         new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.ManageUsers, UserPermissionLevel.None),
-        new(UserPermissionTypes.SupportTasks, UserPermissionLevel.None)
     ];
 
     [Display(Name = "Access manager")]
@@ -59,7 +50,6 @@ public static class UserRoles
     public static readonly IReadOnlyCollection<UserPermission> AccessManagerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit),
-        new(UserPermissionTypes.DbsAlerts, UserPermissionLevel.None),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
         new(UserPermissionTypes.ManageUsers, UserPermissionLevel.Edit),
         new(UserPermissionTypes.SupportTasks, UserPermissionLevel.Edit)
@@ -97,12 +87,11 @@ public static class UserRoles
         }
 
         var member = typeof(UserRoles).GetField($"{role}Permissions") ?? throw new ArgumentException($@"Invalid role: ""{role}"".", nameof(role));
+        var actualPermissions = member.GetValue(null) is IEnumerable<UserPermission> rolePermissions
+            ? rolePermissions
+            : [];
 
-        if (member.GetValue(null) is IEnumerable<UserPermission> rolePermissions)
-        {
-            return rolePermissions;
-        }
-
-        return [];
+        return UserPermissionTypes.All.Select(t => actualPermissions.FirstOrDefault(p => p.Type == t)
+            ?? new UserPermission(t, UserPermissionLevel.None));
     }
 }

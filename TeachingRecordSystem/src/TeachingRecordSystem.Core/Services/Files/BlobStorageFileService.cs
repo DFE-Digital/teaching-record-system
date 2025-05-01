@@ -15,9 +15,9 @@ public class BlobStorageFileService : IFileService
         _blobServiceClient = blobServiceClient;
     }
 
-    public async Task<Guid> UploadFileAsync(Stream stream, string? contentType)
+    public async Task<Guid> UploadFileAsync(Stream stream, string? contentType, Guid? fileIdOverride = null)
     {
-        var fileId = Guid.NewGuid();
+        var fileId = fileIdOverride ?? Guid.NewGuid();
         var blobClient = await GetBlobClientAsync(fileId);
 
         await blobClient.UploadAsync(stream, httpHeaders: !string.IsNullOrEmpty(contentType) ? new BlobHttpHeaders { ContentType = contentType } : null);
@@ -47,10 +47,11 @@ public class BlobStorageFileService : IFileService
         return stream;
     }
 
-    public async Task DeleteFileAsync(Guid fileId)
+    public async Task<bool> DeleteFileAsync(Guid fileId)
     {
         var blobClient = await GetBlobClientAsync(fileId);
-        await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots);
+        var deleted = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+        return deleted;
     }
 
     private async Task<BlobClient> GetBlobClientAsync(Guid fileId)

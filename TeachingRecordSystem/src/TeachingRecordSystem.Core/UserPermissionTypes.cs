@@ -30,7 +30,7 @@ public static class UserPermissionTypes
         NonDbsAlerts,
         DbsAlerts,
         ManageUsers,
-        SupportTasks,
+        SupportTasks
     };
 
     public static string GetDisplayNameForPermissionType(string permissionType)

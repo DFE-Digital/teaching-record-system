@@ -1,6 +1,5 @@
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using Xunit.Sdk;
 
 namespace TeachingRecordSystem.AuthorizeAccess.Tests;
 
@@ -13,7 +12,7 @@ public class TestScopedServices
         Clock = new();
         EventObserver = new();
         GetAnIdentityApiClient = new();
-        DqtNoteFileAttachmentStorageMock = new();
+        BlobStorageFileService = new();
     }
 
     public static TestScopedServices GetCurrent() =>
@@ -35,5 +34,5 @@ public class TestScopedServices
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClient { get; }
 
-    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachmentStorageMock { get; }
+    public Mock<IFileService> BlobStorageFileService { get; }
 }

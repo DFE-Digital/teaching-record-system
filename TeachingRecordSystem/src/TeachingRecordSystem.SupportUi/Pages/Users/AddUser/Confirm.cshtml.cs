@@ -50,7 +50,7 @@ public class ConfirmModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        // Ensure submitted roles are valid
+        // Ensure submitted role is valid
         if (!string.IsNullOrWhiteSpace(Role) && !UserRoles.All.Contains(Role))
         {
             return BadRequest();
@@ -89,11 +89,11 @@ public class ConfirmModel(
 
         await dbContext.SaveChangesAsync();
 
-        var roleName = UserRoles.GetDisplayNameForRole(Role!);
-        roleName = roleName.Substring(0, 1).ToLowerInvariant() + roleName.Substring(1);
-        var article = new[] { 'a', 'e', 'i', 'o', 'u' }.Any(vowel => roleName.StartsWith(vowel)) ? "an" : "a";
+        var roleText = UserRoles.GetDisplayNameForRole(Role!)
+            .ToLowerInvariantFirstLetter()
+            .WithIndefiniteArticle();
 
-        TempData.SetFlashSuccess(message: $"{Name} has been added as {article} {roleName}.");
+        TempData.SetFlashSuccess(message: $"{Name} has been added as {roleText}.");
         return Redirect(linkGenerator.Users());
     }
 

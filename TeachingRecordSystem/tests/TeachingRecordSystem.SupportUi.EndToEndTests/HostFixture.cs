@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -74,7 +73,6 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
 
                     services.AddSingleton<CurrentUserProvider>();
                     services.AddStartupTask<TestUsers.CreateUsersStartupTask>();
-                    services.AddSingleton(GetMockedDqtNoteAttachment());
                     services.AddSingleton<TestData>(
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
@@ -85,16 +83,12 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton(GetMockAdUserService());
                     services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
                     services.AddStartupTask<SeedLookupData>();
-                    IDqtNoteAttachmentStorage GetMockedDqtNoteAttachment()
-                    {
-                        return new Mock<IDqtNoteAttachmentStorage>().Object;
-                    }
 
                     IFileService GetMockFileService()
                     {
                         var fileService = new Mock<IFileService>();
                         fileService
-                            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>()))
+                            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
                             .ReturnsAsync(Guid.NewGuid());
                         fileService
                             .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
@@ -106,10 +100,16 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     {
                         var userService = new Mock<IAadUserService>();
                         userService
-                            .Setup(s => s.GetUserByEmailAsync(It.IsAny<string>()))
+                            .Setup(s => s.GetUserByEmailAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.Email))
+                            .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
+                        userService
+                            .Setup(s => s.GetUserByEmailAsync(TestUsers.TestAzureActiveDirectoryUser.Email))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         userService
-                            .Setup(s => s.GetUserByIdAsync(It.IsAny<string>()))
+                            .Setup(s => s.GetUserByIdAsync(TestUsers.TestLegacyAzureActiveDirectoryUser.UserId))
+                            .ReturnsAsync(TestUsers.TestLegacyAzureActiveDirectoryUser);
+                        userService
+                            .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         return userService.Object;
                     }

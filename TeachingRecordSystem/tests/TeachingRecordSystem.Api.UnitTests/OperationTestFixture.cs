@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using TeachingRecordSystem.Api.Infrastructure.Security;
-using TeachingRecordSystem.Core.Services.DqtNoteAttachments;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
 namespace TeachingRecordSystem.Api.UnitTests;
@@ -29,7 +29,7 @@ public class OperationTestFixture
             Clock,
             new TestableAuditRepository(),
             new NullLogger<TrsDataSyncHelper>(),
-            DqtNoteFileAttachment.Object);
+            BlobStorageFileService.Object);
 
         TestData = new(
             DbFixture.GetDbContextFactory(),
@@ -54,5 +54,5 @@ public class OperationTestFixture
 
     public TestData TestData { get; }
 
-    public Mock<IDqtNoteAttachmentStorage> DqtNoteFileAttachment { get; } = new Mock<IDqtNoteAttachmentStorage>();
+    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
 }

@@ -66,7 +66,6 @@ public static class IttQualificationExtensions
             var guid when guid == Guid.Parse("311ef3a9-6aba-4314-acf8-4bba46aebe9e") => "033", // Graduate Certificate in Education
             var guid when guid == Guid.Parse("d82637a0-33ed-4181-b00b-9d53e7853552") => "025", // Graduate Certificate in Mathematics and Education
             var guid when guid == Guid.Parse("b9ef569f-fb23-4f31-842e-a0d940d911be") => "024", // Graduate Certificate in Science and Education
-            var guid when guid == Guid.Parse("6d07695e-5b5b-4dd4-997c-420e4424255c") => "997", // Graduate Diploma
             var guid when guid == Guid.Parse("54f72259-23b2-4d79-a6ca-c185084c903f") => "026", // PGCE (Articled Teachers Scheme)
             var guid when guid == Guid.Parse("2f7a914f-f95f-421a-a55e-60ed88074cf2") => "022", // Postgraduate Art Teachers Certificate
             var guid when guid == Guid.Parse("8d0440f2-f731-4ac2-b49c-927af903bf59") => "023", // Postgraduate Art Teachers Diploma

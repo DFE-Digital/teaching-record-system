@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Mappings;
 
@@ -12,5 +13,7 @@ public class TrnRequestMetadataMapping : IEntityTypeConfiguration<TrnRequestMeta
         builder.Property(r => r.OneLoginUserSubject).HasMaxLength(255);
         builder.HasIndex(r => r.OneLoginUserSubject);
         builder.HasIndex(r => r.EmailAddress);
+        builder.HasOne(r => r.ApplicationUser).WithMany().HasForeignKey(r => r.ApplicationUserId);
+        builder.OwnsOne(r => r.Matches, m => m.ToJson().OwnsMany(m => m.MatchedRecords));
     }
 }
