@@ -7,9 +7,6 @@
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="add-status-link" href="@LinkGenerator.RouteAddStatus(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="status">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
     </govuk-summary-list-row>
 
     <govuk-summary-list-row>
