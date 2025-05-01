@@ -14,7 +14,7 @@
 
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
             <govuk-summary-list-row-action data-testid="edit-start-date-link" href="@LinkGenerator.RouteEditStartDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
@@ -22,7 +22,7 @@
 
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
             <govuk-summary-list-row-action data-testid="edit-end-date-link" href="@LinkGenerator.RouteEditEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
@@ -32,7 +32,7 @@
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Award date</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value>@Model.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
                 <govuk-summary-list-row-action data-testid="edit-award-date-link" href="@LinkGenerator.RouteEditAwardDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="award date">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
