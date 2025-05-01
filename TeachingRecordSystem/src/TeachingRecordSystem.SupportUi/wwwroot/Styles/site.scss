@@ -230,3 +230,28 @@
     opacity: 0.5;
   }
 }
+
+// From https://github.com/UKHomeOffice/design-system/blob/6ed7b2a6ae6c3c16fc770d5f0c6c2d0f4d8ab2f2/components/highlight/assets/Highlight.scss
+.hods-highlight {
+  background-color: #FFE5CC;
+  border-bottom: 2px solid #FFB266;
+
+  &::before,
+  &::after {
+    clip-path: inset(100%);
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  &::before {
+    content: " [highlight start] ";
+  }
+
+  &::after {
+    content: " [highlight end] ";
+  }
+}

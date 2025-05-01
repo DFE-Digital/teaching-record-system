@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.Core.Models;
 
-public enum OneLoginUserMatchedAttribute
+public enum PersonMatchedAttribute
 {
     FullName = 1,
     LastName = 2,
@@ -8,4 +8,6 @@ public enum OneLoginUserMatchedAttribute
     NationalInsuranceNumber = 4,
     Trn = 5,
     FirstName = 6,
+    MiddleName = 7,
+    EmailAddress = 8
 }

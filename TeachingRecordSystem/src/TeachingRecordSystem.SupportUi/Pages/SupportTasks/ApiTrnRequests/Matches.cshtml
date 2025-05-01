@@ -15,7 +15,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-half-from-desktop">
             <govuk-inset-text class="govuk-!-margin-top-0">
-                Differences are highlighted in the existing record
+                Differences are <highlight>highlighted</highlight> in the existing record
             </govuk-inset-text>
             
             <govuk-summary-card data-testid="request">
@@ -34,10 +34,6 @@
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.LastName</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value use-empty-fallback>@Model.RequestData!.MiddleName</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
@@ -63,6 +59,27 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <h2 class="govuk-heading-m">Potential matches</h2>
+            
+            @functions {
+#pragma warning disable CS1998
+                private async Task RenderWithHighlightIfNotMatched(string? value, bool matched)
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        value = UiDefaults.EmptyDisplayContent;
+                    }
+
+                    if (!matched)
+                    {
+                        <highlight>@value</highlight>
+                    }
+                    else
+                    {
+                        @value
+                    }
+                }
+#pragma warning restore CS1998
+            }
 
             @foreach (var match in Model.PotentialDuplicates!)
             {
@@ -70,6 +87,9 @@
                     <govuk-summary-card-title>
                         Record @match.Identifier
                     </govuk-summary-card-title>
+                    <govuk-summary-card-actions>
+                        <govuk-summary-card-action href="@LinkGenerator.PersonDetail(match.PersonId)">View record</govuk-summary-card-action>    
+                    </govuk-summary-card-actions>
                     <govuk-summary-list>
                         @{
                             var tags = new List<string>();
@@ -104,31 +124,39 @@
 
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.FirstName</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfNotMatched(match.FirstName, match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName)); }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.MiddleName</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfNotMatched(match.MiddleName, match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName)); }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.LastName</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.MiddleName</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfNotMatched(match.LastName, match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)); }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfNotMatched(match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)); }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.EmailAddress</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfNotMatched(match.EmailAddress, match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)); }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value use-empty-fallback>@match.NationalInsuranceNumber</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-value>
+                                @{ await RenderWithHighlightIfNotMatched(match.NationalInsuranceNumber, match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)); }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         @* <govuk-summary-list-row> *@
                         @*     <govuk-summary-list-row-key>Gender</govuk-summary-list-row-key> *@
