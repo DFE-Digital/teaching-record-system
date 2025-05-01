@@ -59,10 +59,10 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             _ => null
         };
 
-        static IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>> MapMatchedAttrs(JsonDocument doc) =>
+        static IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>> MapMatchedAttrs(JsonDocument doc) =>
             doc.Deserialize<MatchedAttribute[]>()!
-                .Select(a => new KeyValuePair<OneLoginUserMatchedAttribute, string>(
-                    Enum.Parse<OneLoginUserMatchedAttribute>(a.attribute_type),
+                .Select(a => new KeyValuePair<PersonMatchedAttribute, string>(
+                    Enum.Parse<PersonMatchedAttribute>(a.attribute_type),
                     a.attribute_value))
                 .AsReadOnly();
     }
@@ -148,7 +148,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedMatchesRequest request, Guid personId)
+    public async Task<IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedMatchesRequest request, Guid personId)
     {
         var fullNames = request.Names.Where(parts => parts.Length > 1).Select(parts => $"{parts.First()} {parts.Last()}").ToArray();
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
@@ -186,7 +186,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
             ).ToArrayAsync();
 
         return results
-            .Select(r => KeyValuePair.Create(Enum.Parse<OneLoginUserMatchedAttribute>(r.attribute_type), r.attribute_value))
+            .Select(r => KeyValuePair.Create(Enum.Parse<PersonMatchedAttribute>(r.attribute_type), r.attribute_value))
             .OrderBy(r => (int)r.Key)
             .ThenBy(r => r.Value)
             .AsReadOnly();

@@ -58,7 +58,7 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             NationalInsuranceNumberArgumentOption nationalInsuranceNumberOption,
             TrnArgumentOption trnOption,
             bool expectMatch,
-            IEnumerable<OneLoginUserMatchedAttribute>? expectedMatchedAttributes) =>
+            IEnumerable<PersonMatchedAttribute>? expectedMatchedAttributes) =>
         DbFixture.WithDbContextAsync(async dbContext =>
         {
             // Arrange
@@ -264,43 +264,43 @@ public class PersonMatchingServiceTests : IAsyncLifetime
             // Assert
             Assert.Collection(
                 result,
-                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.FullName, $"{firstName} {lastName}", m),
-                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.LastName, lastName, m),
-                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
-                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),
-                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.Trn, person.Trn!, m),
-                m => AssertAttributeMatch(OneLoginUserMatchedAttribute.FirstName, firstName, m));
+                m => AssertAttributeMatch(PersonMatchedAttribute.FullName, $"{firstName} {lastName}", m),
+                m => AssertAttributeMatch(PersonMatchedAttribute.LastName, lastName, m),
+                m => AssertAttributeMatch(PersonMatchedAttribute.DateOfBirth, dateOfBirth.ToString("yyyy-MM-dd"), m),
+                m => AssertAttributeMatch(PersonMatchedAttribute.NationalInsuranceNumber, nationalInsuranceNumber, m),
+                m => AssertAttributeMatch(PersonMatchedAttribute.Trn, person.Trn!, m),
+                m => AssertAttributeMatch(PersonMatchedAttribute.FirstName, firstName, m));
 
-            static void AssertAttributeMatch(OneLoginUserMatchedAttribute expectedAttribute, string expectedValue, KeyValuePair<OneLoginUserMatchedAttribute, string> actual)
+            static void AssertAttributeMatch(PersonMatchedAttribute expectedAttribute, string expectedValue, KeyValuePair<PersonMatchedAttribute, string> actual)
             {
                 Assert.Equal(expectedAttribute, actual.Key);
                 Assert.Equal(expectedValue, actual.Value);
             }
         });
 
-    private static readonly OneLoginUserMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
+    private static readonly PersonMatchedAttribute[] _matchNameDobNinoAndTrnAttributes =
     [
-        OneLoginUserMatchedAttribute.FullName,
-        OneLoginUserMatchedAttribute.DateOfBirth,
-        OneLoginUserMatchedAttribute.NationalInsuranceNumber,
-        OneLoginUserMatchedAttribute.Trn
+        PersonMatchedAttribute.FullName,
+        PersonMatchedAttribute.DateOfBirth,
+        PersonMatchedAttribute.NationalInsuranceNumber,
+        PersonMatchedAttribute.Trn
     ];
 
-    private static readonly OneLoginUserMatchedAttribute[] _matchNameDobAndNinoAttributes =
+    private static readonly PersonMatchedAttribute[] _matchNameDobAndNinoAttributes =
     [
-        OneLoginUserMatchedAttribute.FullName,
-        OneLoginUserMatchedAttribute.DateOfBirth,
-        OneLoginUserMatchedAttribute.NationalInsuranceNumber
+        PersonMatchedAttribute.FullName,
+        PersonMatchedAttribute.DateOfBirth,
+        PersonMatchedAttribute.NationalInsuranceNumber
     ];
 
-    private static readonly OneLoginUserMatchedAttribute[] _matchNameDobAndTrnAttributes =
+    private static readonly PersonMatchedAttribute[] _matchNameDobAndTrnAttributes =
     [
-        OneLoginUserMatchedAttribute.FullName,
-        OneLoginUserMatchedAttribute.DateOfBirth,
-        OneLoginUserMatchedAttribute.Trn
+        PersonMatchedAttribute.FullName,
+        PersonMatchedAttribute.DateOfBirth,
+        PersonMatchedAttribute.Trn
     ];
 
-    public static TheoryData<NameArgumentOption, DateOfBirthArgumentOption, NationalInsuranceNumberArgumentOption, TrnArgumentOption, bool, IEnumerable<OneLoginUserMatchedAttribute>?> MatchData { get; } = new()
+    public static TheoryData<NameArgumentOption, DateOfBirthArgumentOption, NationalInsuranceNumberArgumentOption, TrnArgumentOption, bool, IEnumerable<PersonMatchedAttribute>?> MatchData { get; } = new()
     {
         // *** Match cases ***
 

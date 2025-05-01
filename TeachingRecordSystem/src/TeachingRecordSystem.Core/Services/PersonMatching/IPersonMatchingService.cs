@@ -4,5 +4,5 @@ public interface IPersonMatchingService
 {
     Task<MatchResult?> MatchAsync(MatchRequest request);
     Task<IReadOnlyCollection<SuggestedMatch>> GetSuggestedMatchesAsync(GetSuggestedMatchesRequest request);
-    Task<IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedMatchesRequest request, Guid personId);
+    Task<IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>> GetMatchedAttributesAsync(GetSuggestedMatchesRequest request, Guid personId);
 }
