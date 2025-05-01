@@ -46,9 +46,21 @@ public partial class TestData
             return this;
         }
 
+        public CreateApiTrnRequestSupportTaskBuilder WithDateOfBirth(DateOnly dateOfBirth)
+        {
+            _dateOfBirth = Option.Some(dateOfBirth);
+            return this;
+        }
+
         public CreateApiTrnRequestSupportTaskBuilder WithEmailAddress(string? emailAddress)
         {
             _emailAddress = Option.Some(emailAddress);
+            return this;
+        }
+
+        public CreateApiTrnRequestSupportTaskBuilder WithNationalInsuranceNumber(string? nationalInsuranceNumber)
+        {
+            _nationalInsuranceNumber = Option.Some(nationalInsuranceNumber);
             return this;
         }
 
@@ -88,6 +100,7 @@ public partial class TestData
                         var person = await testData.CreatePersonAsync(p =>
                         {
                             p
+                                .WithTrn()
                                 .WithFirstName(firstName)
                                 .WithMiddleName(middleName)
                                 .WithLastName(lastName)

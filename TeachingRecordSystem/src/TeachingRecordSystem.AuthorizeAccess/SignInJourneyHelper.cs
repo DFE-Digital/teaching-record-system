@@ -250,10 +250,10 @@ public class SignInJourneyHelper(
             {
                 return new(getAnIdentityPerson.PersonId, getAnIdentityPerson.Trn!, MatchRoute: null, MatchedAttributes: null);
             }
-            var matchedAttributes = new Dictionary<OneLoginUserMatchedAttribute, string>()
+            var matchedAttributes = new Dictionary<PersonMatchedAttribute, string>()
             {
-                { OneLoginUserMatchedAttribute.LastName, matchedLastName },
-                { OneLoginUserMatchedAttribute.DateOfBirth, matchedDateOfBirth.ToString("yyyy-MM-dd") }
+                { PersonMatchedAttribute.LastName, matchedLastName },
+                { PersonMatchedAttribute.DateOfBirth, matchedDateOfBirth.ToString("yyyy-MM-dd") }
             };
 
             if (trnTokenModel is not null)
@@ -437,7 +437,7 @@ public class SignInJourneyHelper(
         Guid PersonId,
         string Trn,
         OneLoginUserMatchRoute? MatchRoute,
-        IReadOnlyCollection<KeyValuePair<OneLoginUserMatchedAttribute, string>>? MatchedAttributes);
+        IReadOnlyCollection<KeyValuePair<PersonMatchedAttribute, string>>? MatchedAttributes);
 
     private record TryMatchToTrnRequestResult(string Trn);
 }

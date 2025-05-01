@@ -106,7 +106,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithAlert());
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithAlert());
         var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
             t => t.WithMatchedRecords(matchedPerson.PersonId));
@@ -234,6 +234,91 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             doc.GetElementsByName("PersonId")
                 .Single(e => e.GetAttribute("value") == ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel.ToString())
                 .IsChecked());
+    }
+
+    public static TheoryData<PersonMatchedAttribute[]> HighlightedDifferencesData { get; } = new()
+    {
+        // We could go nuts creating loads of combinations here, but checking every attribute once seems sufficient
+        new[] { PersonMatchedAttribute.FirstName },
+        new[] { PersonMatchedAttribute.MiddleName },
+        new[] { PersonMatchedAttribute.LastName },
+        new[] { PersonMatchedAttribute.DateOfBirth },
+        new[] { PersonMatchedAttribute.EmailAddress },
+        new[] { PersonMatchedAttribute.NationalInsuranceNumber }
+    };
+
+    [Theory]
+    [MemberData(nameof(HighlightedDifferencesData))]
+    public async Task Get_HighlightsDifferencesBetweenMatchAndTrnRequest(IReadOnlyCollection<PersonMatchedAttribute> matchedAttributes)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t
+                .WithMatchedRecords(matchedPerson.PersonId)
+                .WithFirstName(
+                    matchedAttributes.Contains(PersonMatchedAttribute.FirstName)
+                        ? matchedPerson.FirstName
+                        : TestData.GenerateChangedFirstName(matchedPerson.FirstName))
+                .WithMiddleName(
+                    matchedAttributes.Contains(PersonMatchedAttribute.MiddleName)
+                        ? matchedPerson.MiddleName
+                        : TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
+                .WithLastName(
+                    matchedAttributes.Contains(PersonMatchedAttribute.LastName)
+                        ? matchedPerson.LastName
+                        : TestData.GenerateChangedLastName(matchedPerson.LastName))
+                .WithDateOfBirth(
+                    matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)
+                        ? matchedPerson.DateOfBirth
+                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
+                .WithEmailAddress(
+                    matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)
+                        ? matchedPerson.Email
+                        : TestData.GenerateUniqueEmail())
+                .WithNationalInsuranceNumber(
+                    matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)
+                        ? matchedPerson.NationalInsuranceNumber
+                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await response.GetDocumentAsync();
+        var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
+        Assert.NotNull(firstMatchDetails);
+        AssertMatchRowHasExpectedHighlight("First name", !matchedAttributes.Contains(PersonMatchedAttribute.FirstName));
+        AssertMatchRowHasExpectedHighlight("Middle name", !matchedAttributes.Contains(PersonMatchedAttribute.MiddleName));
+        AssertMatchRowHasExpectedHighlight("Last name", !matchedAttributes.Contains(PersonMatchedAttribute.LastName));
+        AssertMatchRowHasExpectedHighlight("Date of birth", !matchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth));
+        AssertMatchRowHasExpectedHighlight("Email", !matchedAttributes.Contains(PersonMatchedAttribute.EmailAddress));
+        AssertMatchRowHasExpectedHighlight("National Insurance number", !matchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+
+        void AssertMatchRowHasExpectedHighlight(string summaryListKey, bool expectHighlight)
+        {
+            var valueElement = firstMatchDetails.GetSummaryListValueElementForKey(summaryListKey);
+            Assert.NotNull(valueElement);
+            var highlightElement = valueElement.GetElementsByClassName("hods-highlight").SingleOrDefault();
+
+            if (expectHighlight)
+            {
+                Assert.NotNull(highlightElement);
+            }
+            else
+            {
+                Assert.Null(highlightElement);
+            }
+        }
     }
 
     [Fact]
@@ -382,4 +467,3 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
             state ?? new(),
             new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
 }
-

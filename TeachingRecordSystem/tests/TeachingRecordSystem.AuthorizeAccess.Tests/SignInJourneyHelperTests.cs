@@ -1220,10 +1220,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 .ReturnsAsync(new MatchResult(
                     person.PersonId,
                     person.Trn!,
-                    new Dictionary<OneLoginUserMatchedAttribute, string>()
+                    new Dictionary<PersonMatchedAttribute, string>()
                     {
-                        { OneLoginUserMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
-                        { OneLoginUserMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
+                        { PersonMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
+                        { PersonMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
                     }));
 
             // Act
@@ -1279,10 +1279,10 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 .ReturnsAsync(new MatchResult(
                     person.PersonId,
                     person.Trn!,
-                    new Dictionary<OneLoginUserMatchedAttribute, string>()
+                    new Dictionary<PersonMatchedAttribute, string>()
                     {
-                        { OneLoginUserMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
-                        { OneLoginUserMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
+                        { PersonMatchedAttribute.FullName, $"{person.FirstName} {person.LastName}" },
+                        { PersonMatchedAttribute.NationalInsuranceNumber, person.NationalInsuranceNumber! },
                     }));
 
             // Act
