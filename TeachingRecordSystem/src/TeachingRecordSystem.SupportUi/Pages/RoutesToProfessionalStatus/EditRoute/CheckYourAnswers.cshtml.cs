@@ -6,7 +6,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
-using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -119,7 +118,6 @@ public class CheckYourAnswersModel(
         var hasImplicitExemption = route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         RouteDetail = new RouteDetailViewModel
         {
-            QualificationType = JourneyInstance!.State.QualificationType,
             RouteToProfessionalStatus = route,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,
@@ -136,7 +134,7 @@ public class CheckYourAnswersModel(
             HasImplicitExemption = hasImplicitExemption,
             IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction,
             FromCheckAnswers = true,
-            JourneyInstance = JourneyInstance
+            JourneyInstanceId = JourneyInstance.InstanceId
         };
 
         await next();

@@ -1,13 +1,10 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
-using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
-public class RouteDetailViewModel()
+public class RouteDetailModel()
 {
-    public Guid QualificationId { get; set; }
-    public QualificationType? QualificationType { get; set; }
     public required RouteToProfessionalStatus RouteToProfessionalStatus { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
@@ -27,7 +24,7 @@ public class RouteDetailViewModel()
     public string? TrainingProvider { get; set; }
     public string? TrainingCountry { get; set; }
     public string[]? TrainingSubjects { get; set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+    public JourneyInstanceId JourneyInstanceId { get; set; }
 
     public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingStartDateRequired, Status.GetStartDateRequirement());
     public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingEndDateRequired, Status.GetEndDateRequirement());

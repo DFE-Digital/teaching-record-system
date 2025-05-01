@@ -18,7 +18,7 @@ public record ProfessionalStatus
 
     public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model) => new()
     {
-        RouteToProfessionalStatusId = model.Route.RouteToProfessionalStatusId,
+        RouteToProfessionalStatusId = model.RouteToProfessionalStatusId,
         Status = model.Status,
         AwardedDate = model.AwardedDate,
         TrainingStartDate = model.TrainingStartDate,
