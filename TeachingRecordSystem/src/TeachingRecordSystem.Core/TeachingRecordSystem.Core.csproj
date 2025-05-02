@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -163,6 +163,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0052_TrsQualificationsExemptFromInduction.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0054_QtsAndEytsDates.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0055_TrsQualificationsRemoveProfessionalStatusType.sql" />
   </ItemGroup>
 
   <ItemGroup>

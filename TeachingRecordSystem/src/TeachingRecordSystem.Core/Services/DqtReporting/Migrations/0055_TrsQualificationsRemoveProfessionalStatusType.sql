@@ -1,0 +1,1 @@
+alter table trs_qualifications drop column professional_status_type
