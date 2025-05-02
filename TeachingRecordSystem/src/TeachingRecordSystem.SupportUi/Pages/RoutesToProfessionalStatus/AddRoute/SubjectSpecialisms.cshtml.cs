@@ -10,8 +10,8 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public TrainingSubject[] Subjects { get; set; } = [];
 
@@ -44,13 +44,13 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingSubjectIds = subjects);
 
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Subjects = await _referenceDataCache.GetTrainingSubjectsAsync();
+        Subjects = await ReferenceDataCache.GetTrainingSubjectsAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

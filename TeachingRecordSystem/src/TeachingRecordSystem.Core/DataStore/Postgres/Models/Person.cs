@@ -32,8 +32,10 @@ public class Person
     /// This is different to <see cref="CpdInductionModifiedOn"/> (which is our timestamp).
     /// </summary>
     public DateTime? CpdInductionCpdModifiedOn { get; private set; }
-    public DateOnly? QtsDate { get; set; }
-    public DateOnly? EytsDate { get; set; }
+    public DateOnly? QtsDate { get; internal set; }
+    public DateOnly? EytsDate { get; internal set; }
+    public bool HasEyps { get; internal set; }
+    public DateOnly? PqtsDate { get; internal set; }
     public ICollection<Qualification>? Qualifications { get; }
     public ICollection<Alert>? Alerts { get; }
 
@@ -392,6 +394,56 @@ public class Person
     {
         var sevenYearsAgo = now.AddYears(-7);
         return (CpdInductionModifiedOn is not null && (InductionCompletedDate is null || InductionCompletedDate > sevenYearsAgo));
+    }
+
+    public bool RefreshProfessionalStatusAttributes(
+        ProfessionalStatusType professionalStatusType,
+        IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
+        IEnumerable<ProfessionalStatus>? professionalStatusesHint = null)
+    {
+        var professionalStatuses = professionalStatusesHint ??
+            Qualifications?.OfType<ProfessionalStatus>() ??
+            throw new InvalidOperationException("No professional statuses.");
+
+        var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusId, r => r.ProfessionalStatusType);
+
+        var awardedOrApproved = professionalStatuses
+            .Where(ps => professionalStatusTypeByRouteId[ps.RouteToProfessionalStatusId] == professionalStatusType &&
+                ps.Status is ProfessionalStatusStatus.Approved or ProfessionalStatusStatus.Awarded)
+            .ToArray();
+
+        // We don't have awarded dates for EYPS
+        if (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
+        {
+            var awarded = awardedOrApproved.Any();
+
+            var changed = HasEyps != awarded;
+            HasEyps = awarded;
+            return changed;
+        }
+
+        Debug.Assert(awardedOrApproved.All(ps => ps.AwardedDate is not null));
+        var awardedDate = awardedOrApproved.Length > 0 ? awardedOrApproved.Min(ps => ps.AwardedDate) : null;
+
+        if (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus)
+        {
+            var changed = QtsDate != awardedDate;
+            QtsDate = awardedDate;
+            return changed;
+        }
+        else if (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus)
+        {
+            var changed = EytsDate != awardedDate;
+            EytsDate = awardedDate;
+            return changed;
+        }
+        else
+        {
+            Debug.Assert(professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus);
+            var changed = PqtsDate != awardedDate;
+            PqtsDate = awardedDate;
+            return changed;
+        }
     }
 
     private static void AssertInductionChangeIsValid(

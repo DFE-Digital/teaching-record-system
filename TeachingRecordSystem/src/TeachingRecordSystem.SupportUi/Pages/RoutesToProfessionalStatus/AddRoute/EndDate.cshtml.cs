@@ -17,8 +17,8 @@ public class EndDateModel : AddRouteCommonPageModel
     }
 
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.EndDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.EndDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -40,7 +40,7 @@ public class EndDateModel : AddRouteCommonPageModel
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
 
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.EndDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.EndDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 }

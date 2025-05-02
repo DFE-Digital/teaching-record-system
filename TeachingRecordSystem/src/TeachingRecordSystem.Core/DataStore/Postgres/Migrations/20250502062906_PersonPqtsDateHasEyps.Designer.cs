@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250502062906_PersonPqtsDateHasEyps")]
+    partial class PersonPqtsDateHasEyps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4307,7 +4310,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Assessment Only",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 1,
@@ -4323,7 +4326,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Graduate Employment Based",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
                             TrainingEndDateRequired = 1,
@@ -4339,7 +4342,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Graduate Entry",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
                             TrainingEndDateRequired = 1,
@@ -4355,7 +4358,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT School Direct",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 1,
@@ -4371,7 +4374,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Undergraduate",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 1,
@@ -4419,7 +4422,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "European Recognition - PQTS",
-                            ProfessionalStatusType = 3,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4435,7 +4438,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "EYPS",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4451,7 +4454,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "EYPS ITT Migrated",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4467,7 +4470,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "EYTS ITT Migrated",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -17633,7 +17636,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasForeignKey("DegreeTypeId")
                         .HasConstraintName("fk_qualifications_degree_types_degree_type_id");
 
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatus", "RouteToProfessionalStatus")
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatus", "Route")
                         .WithMany()
                         .HasForeignKey("RouteToProfessionalStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -17657,7 +17660,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.Navigation("DegreeType");
 
-                    b.Navigation("RouteToProfessionalStatus");
+                    b.Navigation("Route");
 
                     b.Navigation("TrainingCountry");
 

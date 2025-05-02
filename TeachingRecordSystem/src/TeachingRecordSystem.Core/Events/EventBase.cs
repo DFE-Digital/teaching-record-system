@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using Optional.Unsafe;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Infrastructure.Json;
 
@@ -58,9 +59,9 @@ public abstract record EventBase
             return true;
         }
 
-        if (this is IEventWithOptionalPersonId { PersonId: { } eventOptionalPersonId })
+        if (this is IEventWithOptionalPersonId { PersonId: { HasValue: true } eventOptionalPersonId })
         {
-            personId = eventOptionalPersonId;
+            personId = eventOptionalPersonId.ValueOrFailure();
             return true;
         }
 

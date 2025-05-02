@@ -87,7 +87,7 @@ public class AwardDateModel(
         PersonId = personInfo.PersonId;
 
         var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteToProfessionalStatus = routeFeature.ProfessionalStatus.Route;
+        RouteToProfessionalStatus = routeFeature.ProfessionalStatus.RouteToProfessionalStatus;
         var inductionexemptionReason = RouteToProfessionalStatus!.InductionExemptionReason;
         base.OnPageHandlerExecuting(context);
     }

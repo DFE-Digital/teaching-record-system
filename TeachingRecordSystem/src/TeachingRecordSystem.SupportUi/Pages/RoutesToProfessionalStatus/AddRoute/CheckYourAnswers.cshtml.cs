@@ -7,32 +7,41 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
-        TrsDbContext dbContext,
-        ReferenceDataCache referenceDataCache,
-        IClock clock) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+    TrsDbContext dbContext,
+    ReferenceDataCache referenceDataCache,
+    IClock clock) :
+    AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
 
     public string BackLink =>
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.CheckYourAnswers) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.CheckYourAnswers) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {
         RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
-        RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await _referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
-        RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await _referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
-        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await _referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
+        RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await ReferenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
+        RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await ReferenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
+        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await ReferenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
         RouteDetail.TrainingSubjects = RouteDetail.TrainingSubjectIds is not null ?
-        RouteDetail.TrainingSubjectIds
-                .Join((await _referenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
+            RouteDetail.TrainingSubjectIds
+                .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
                 .OrderByDescending(name => name)
                 .ToArray() : null;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var person = await dbContext.Persons
+            .Where(p => p.PersonId == PersonId)
+            .Include(p => p.Qualifications)
+            .SingleAsync();
+
+        var allRoutes = await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+
         var professionalStatus = ProfessionalStatus.Create(
-            PersonId,
+            person,
+            allRoutes,
             Route.RouteToProfessionalStatusId,
             Status,
             JourneyInstance!.State.AwardedDate,
@@ -48,21 +57,17 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             JourneyInstance!.State.IsExemptFromInduction,
             User.GetUserId(),
             clock.UtcNow,
-            out var addEvent);
+            out var @event);
 
-        dbContext.ProfessionalStatuses.Add(professionalStatus);
-
-        if (addEvent is not null)
-        {
-            await dbContext.AddEventAndBroadcastAsync(addEvent);
-        }
+        dbContext.Qualifications.Add(professionalStatus);
+        await dbContext.AddEventAndBroadcastAsync(@event);
         await dbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
 
         TempData.SetFlashSuccess("Route to professional status added");
 
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(LinkGenerator.PersonQualifications(PersonId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -77,7 +82,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        Route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
 
         var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;

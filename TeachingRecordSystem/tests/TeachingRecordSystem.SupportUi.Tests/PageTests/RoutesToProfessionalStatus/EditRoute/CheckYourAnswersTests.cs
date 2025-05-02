@@ -1,4 +1,7 @@
+using System.Diagnostics;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -285,6 +288,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [Fact]
     public async Task Post_Confirm_UpdatesProfessionalStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
+        // Arrange
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
@@ -297,7 +301,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
@@ -315,11 +319,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -333,7 +337,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         await WithDbContext(async dbContext =>
         {
-            var updatedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.QualificationId == qualificationid);
+            var updatedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.QualificationId == qualificationId);
             Assert.Equal(journeyInstance.State.IsExemptFromInduction, updatedProfessionalStatusRecord!.ExemptFromInduction);
             Assert.Equal(journeyInstance.State.Status, updatedProfessionalStatusRecord!.Status);
             Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, updatedProfessionalStatusRecord!.RouteToProfessionalStatusId);
@@ -377,9 +381,129 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.True(journeyInstance.Completed);
     }
 
+    [Fact]
+    public async Task Post_Confirm_WithAwardedQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithAwardedProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
+
+        var qualification = person.ProfessionalStatuses.First();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/route/{qualification.QualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        Assert.Equal(journeyInstance.State.AwardedDate, updatedPerson.QtsDate);
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var actualCreatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
+
+            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.QtsDate);
+            Assert.Null(actualCreatedEvent.OldPersonAttributes.QtsDate);
+        });
+    }
+
+    [Fact]
+    public async Task Post_Confirm_WithAwardedEytsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithAwardedProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+
+        var qualification = person.ProfessionalStatuses.First();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/route/{qualification.QualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        Assert.Equal(journeyInstance.State.AwardedDate, updatedPerson.EytsDate);
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var actualCreatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
+
+            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.EytsDate);
+            Assert.Null(actualCreatedEvent.OldPersonAttributes.EytsDate);
+        });
+    }
+
+    // N.B. There's no test for EYPS since our one EYPS route has to have an award date
+    // (so there's no edit that can be made through this journey that can affect Person.HasEyps)
+
+    [Fact]
+    public async Task Post_Confirm_WithAwardedPqtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithAwardedProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
+
+        var qualification = person.ProfessionalStatuses.First();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/route/{qualification.QualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        Assert.Equal(journeyInstance.State.AwardedDate, updatedPerson.PqtsDate);
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var actualCreatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
+
+            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.PqtsDate);
+            Assert.Null(actualCreatedEvent.OldPersonAttributes.PqtsDate);
+        });
+    }
+
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
         CreateJourneyInstance(
             JourneyNames.EditRouteToProfessionalStatus,
             state ?? new EditRouteState(),
             new KeyValuePair<string, object>("qualificationId", qualificationId));
+
+    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(ProfessionalStatus qualification)
+    {
+        var editRouteState = new EditRouteState();
+        editRouteState.EnsureInitialized(qualification);
+        editRouteState.ChangeReason = ChangeReasonOption.AnotherReason;
+        editRouteState.ChangeReasonDetail = new ChangeReasonDetailsState()
+        {
+            HasAdditionalReasonDetail = false,
+            ChangeReasonDetail = null,
+            UploadEvidence = false,
+            EvidenceFileId = null,
+            EvidenceFileName = null,
+            EvidenceFileSizeDescription = null
+        };
+
+        return CreateJourneyInstanceAsync(qualification.QualificationId, editRouteState);
+    }
 }

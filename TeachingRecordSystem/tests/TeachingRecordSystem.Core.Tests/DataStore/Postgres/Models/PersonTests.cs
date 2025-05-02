@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Tests.DataStore.Postgres.Models;
 
 public class PersonTests
 {
-    public TestableClock Clock { get; } = new();
+    public TestableClock Clock { get; } = new TestableClock();
 
     [Fact]
     public void SetInductionStatus_None_UpdatesStatus()
@@ -62,7 +62,7 @@ public class PersonTests
         // Act
         person.SetInductionStatus(
             InductionStatus.InProgress,
-            startDate: new(2024, 1, 1),
+            startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
             exemptionReasonIds: [],
             changeReason: null,
@@ -85,8 +85,8 @@ public class PersonTests
         // Act
         person.SetInductionStatus(
             InductionStatus.Passed,
-            startDate: new(2024, 1, 1),
-            completedDate: new(2025, 1, 1),
+            startDate: new DateOnly(2024, 1, 1),
+            completedDate: new DateOnly(2025, 1, 1),
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -108,8 +108,8 @@ public class PersonTests
         // Act
         person.SetInductionStatus(
             InductionStatus.Failed,
-            startDate: new(2024, 1, 1),
-            completedDate: new(2025, 1, 1),
+            startDate: new DateOnly(2024, 1, 1),
+            completedDate: new DateOnly(2025, 1, 1),
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -154,8 +154,8 @@ public class PersonTests
         // Act
         person.SetInductionStatus(
             InductionStatus.FailedInWales,
-            startDate: new(2024, 1, 1),
-            completedDate: new(2025, 1, 1),
+            startDate: new DateOnly(2024, 1, 1),
+            completedDate: new DateOnly(2025, 1, 1),
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -180,8 +180,8 @@ public class PersonTests
         // Act
         person.SetCpdInductionStatus(
             status,
-            startDate: status != InductionStatus.RequiredToComplete ? new(2024, 1, 1) : null,
-            completedDate: status == InductionStatus.Passed ? new(2024, 10, 1) : null,
+            startDate: status != InductionStatus.RequiredToComplete ? new DateOnly(2024, 1, 1) : null,
+            completedDate: status == InductionStatus.Passed ? new DateOnly(2024, 10, 1) : null,
             cpdModifiedOn: Clock.UtcNow,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
@@ -218,8 +218,8 @@ public class PersonTests
         // Act
         person.SetCpdInductionStatus(
             InductionStatus.Passed,
-            startDate: new(2024, 1, 1),
-            completedDate: new(2024, 10, 1),
+            startDate: new DateOnly(2024, 1, 1),
+            completedDate: new DateOnly(2024, 10, 1),
             cpdModifiedOn: Clock.UtcNow,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
@@ -258,7 +258,7 @@ public class PersonTests
         // Act
         person.SetCpdInductionStatus(
             status,
-            startDate: status == InductionStatus.InProgress ? new(2024, 1, 1) : null,
+            startDate: status == InductionStatus.InProgress ? new DateOnly(2024, 1, 1) : null,
             completedDate: null,
             cpdModifiedOn: Clock.UtcNow,
             updatedBy: SystemUser.SystemUserId,
@@ -286,8 +286,8 @@ public class PersonTests
 
         person.SetInductionStatus(
             currentStatus,
-            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
-            completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
+            startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2024, 10, 1) : null,
             exemptionReasonIds: currentStatus is InductionStatus.Exempt ? new[] { InductionExemptionReason.QtlsId } : Array.Empty<Guid>(),
             changeReason: null,
             changeReasonDetail: null,
@@ -301,8 +301,8 @@ public class PersonTests
         // Act
         person.TrySetWelshInductionStatus(
             passed,
-            startDate: !passed ? new(2024, 1, 1) : null,
-            completedDate: !passed ? new(2024, 10, 1) : null,
+            startDate: !passed ? new DateOnly(2024, 1, 1) : null,
+            completedDate: !passed ? new DateOnly(2024, 10, 1) : null,
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -321,8 +321,8 @@ public class PersonTests
 
         person.SetInductionStatus(
             currentStatus,
-            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
-            completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
+            startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2024, 10, 1) : null,
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -356,8 +356,8 @@ public class PersonTests
 
         person.SetInductionStatus(
             currentStatus,
-            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
-            completedDate: currentStatus.RequiresCompletedDate() ? new(2024, 10, 1) : null,
+            startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2024, 10, 1) : null,
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -371,8 +371,8 @@ public class PersonTests
         // Act
         person.TrySetWelshInductionStatus(
             passed: false,
-            startDate: new(2024, 1, 1),
-            completedDate: new(2024, 10, 1),
+            startDate: new DateOnly(2024, 1, 1),
+            completedDate: new DateOnly(2024, 10, 1),
             updatedBy: SystemUser.SystemUserId,
             Clock.UtcNow,
             out _);
@@ -390,7 +390,7 @@ public class PersonTests
 
         person.SetCpdInductionStatus(
             status: InductionStatus.InProgress,
-            startDate: new(2024, 1, 1),
+            startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
             cpdModifiedOn: Clock.UtcNow,
             SystemUser.SystemUserId,
@@ -485,8 +485,8 @@ public class PersonTests
 
         person.SetInductionStatus(
             currentStatus,
-            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
-            completedDate: currentStatus.RequiresCompletedDate() ? new(2025, 1, 1) : null,
+            startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null,
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -516,8 +516,8 @@ public class PersonTests
 
         person.SetInductionStatus(
             currentStatus,
-            startDate: currentStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
-            completedDate: currentStatus.RequiresCompletedDate() ? new(2025, 1, 1) : null,
+            startDate: currentStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
+            completedDate: currentStatus.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null,
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -549,8 +549,8 @@ public class PersonTests
 
         person.SetInductionStatus(
             initialStatus,
-            startDate: initialStatus.RequiresStartDate() ? new(2024, 1, 1) : null,
-            completedDate: initialStatus.RequiresCompletedDate() ? new(2025, 1, 1) : null,
+            startDate: initialStatus.RequiresStartDate() ? new DateOnly(2024, 1, 1) : null,
+            completedDate: initialStatus.RequiresCompletedDate() ? new DateOnly(2025, 1, 1) : null,
             exemptionReasonIds: [],
             changeReason: null,
             changeReasonDetail: null,
@@ -588,7 +588,7 @@ public class PersonTests
 
         person.SetInductionStatus(
             currentStatus,
-            startDate: new(2024, 1, 1),
+            startDate: new DateOnly(2024, 1, 1),
             completedDate: null,
             exemptionReasonIds: [],
             changeReason: null,
@@ -648,6 +648,170 @@ public class PersonTests
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
     }
 
+    [Theory]
+    [MemberData(nameof(GetRefreshProfessionalStatusAttributesData))]
+    public void RefreshProfessionalStatusAttributes(RefreshProfessionalStatusAttributesTestCaseData testCaseData)
+    {
+        // Arrange
+        var person = CreatePerson();
+
+        var allRoutes = new List<RouteToProfessionalStatus>();
+        var professionalStatuses = new List<ProfessionalStatus>();
+
+        DateOnly? existingRouteAwarded = Clock.Today.AddDays(-10);
+        ProfessionalStatusStatus existingRouteStatus =
+            testCaseData.ExistingRouteIsAwardedOrApproved ? ProfessionalStatusStatus.Awarded : ProfessionalStatusStatus.InTraining;
+        DateOnly? newRouteAwardedDate = testCaseData.NewAwardedDateIsAfterExistingAwardedDate ? Clock.Today.AddDays(-1) : Clock.Today.AddDays(-20);
+        ProfessionalStatusStatus newRouteStatus =
+            testCaseData.NewRouteIsAwardedOrApproved ? ProfessionalStatusStatus.Awarded : ProfessionalStatusStatus.InTraining;
+
+        if (testCaseData.HaveExistingRouteForStatus)
+        {
+            var anotherRoute = CreateRouteForProfessionalStatusType(testCaseData.ProfessionalStatusType);
+            allRoutes.Add(anotherRoute);
+
+            var existingProfessionalStatus = CreateProfessionalStatus(
+                anotherRoute,
+                status: existingRouteStatus,
+                awardedDate: testCaseData.ExistingRouteIsAwardedOrApproved && testCaseData.ProfessionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus ? existingRouteAwarded : null);
+            professionalStatuses.Add(existingProfessionalStatus);
+
+            if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus)
+            {
+                person.QtsDate = existingProfessionalStatus.AwardedDate;
+            }
+            else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus)
+            {
+                person.EytsDate = existingProfessionalStatus.AwardedDate;
+            }
+            else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus)
+            {
+                person.PqtsDate = existingProfessionalStatus.AwardedDate;
+            }
+            else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
+            {
+                person.HasEyps = existingProfessionalStatus.Status is ProfessionalStatusStatus.Approved or ProfessionalStatusStatus.Awarded;
+            }
+        }
+
+        if (testCaseData.HaveNewRouteForStatus)
+        {
+            var route = CreateRouteForProfessionalStatusType(testCaseData.ProfessionalStatusType);
+            allRoutes.Add(route);
+
+            var newProfessionalStatus = CreateProfessionalStatus(
+                route,
+                status: newRouteStatus,
+                awardedDate: testCaseData.NewRouteIsAwardedOrApproved && testCaseData.ProfessionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus ? newRouteAwardedDate : null);
+            professionalStatuses.Add(newProfessionalStatus);
+        }
+
+        // Act
+        var result = person.RefreshProfessionalStatusAttributes(
+            testCaseData.ProfessionalStatusType,
+            allRoutes,
+            professionalStatuses);
+
+        // Assert
+        Assert.Equal(testCaseData.ExpectedResult, result);
+
+        if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus)
+        {
+            Assert.Equal(
+                testCaseData.ExpectedAttributeValue switch
+                {
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteAwardedDate,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteAwarded,
+                    _ => null
+                },
+                person.QtsDate);
+        }
+        else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus)
+        {
+            Assert.Equal(
+                testCaseData.ExpectedAttributeValue switch
+                {
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteAwardedDate,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteAwarded,
+                    _ => null
+                },
+                person.EytsDate);
+        }
+        else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
+        {
+            Assert.Equal(
+                testCaseData.ExpectedAttributeValue switch
+                {
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteStatus is ProfessionalStatusStatus.Awarded or ProfessionalStatusStatus.Approved,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteStatus is ProfessionalStatusStatus.Awarded or ProfessionalStatusStatus.Approved,
+                    _ => false
+                },
+                person.HasEyps);
+        }
+        else
+        {
+            Debug.Assert(testCaseData.ProfessionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus);
+            Assert.Equal(
+                testCaseData.ExpectedAttributeValue switch
+                {
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteAwardedDate,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteAwarded,
+                    _ => null
+                },
+                person.PqtsDate);
+        }
+
+        static RouteToProfessionalStatus CreateRouteForProfessionalStatusType(ProfessionalStatusType professionalStatusType) =>
+            new RouteToProfessionalStatus()
+            {
+                RouteToProfessionalStatusId = Guid.NewGuid(),
+                Name = $"A {professionalStatusType} route",
+                ProfessionalStatusType = professionalStatusType,
+                IsActive = true,
+                TrainingStartDateRequired = FieldRequirement.Optional,
+                TrainingEndDateRequired = FieldRequirement.Optional,
+                AwardDateRequired = FieldRequirement.Optional,
+                InductionExemptionRequired = FieldRequirement.Optional,
+                TrainingProviderRequired = FieldRequirement.Optional,
+                DegreeTypeRequired = FieldRequirement.Optional,
+                TrainingCountryRequired = FieldRequirement.Optional,
+                TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional,
+                TrainingSubjectsRequired = FieldRequirement.Optional,
+                InductionExemptionReasonId = null
+            };
+
+        ProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatus route, ProfessionalStatusStatus status, DateOnly? awardedDate) =>
+            new ProfessionalStatus()
+            {
+                QualificationId = Guid.NewGuid(),
+                CreatedOn = Clock.UtcNow,
+                UpdatedOn = Clock.UtcNow,
+                DeletedOn = null,
+                PersonId = person.PersonId,
+                RouteToProfessionalStatusId = route.RouteToProfessionalStatusId,
+                SourceApplicationUserId = null,
+                SourceApplicationReference = null,
+                Status = status,
+                AwardedDate = awardedDate,
+                TrainingStartDate = null,
+                TrainingEndDate = null,
+                TrainingSubjectIds = [],
+                TrainingAgeSpecialismType = null,
+                TrainingAgeSpecialismRangeFrom = null,
+                TrainingAgeSpecialismRangeTo = null,
+                TrainingCountryId = null,
+                TrainingProviderId = null,
+                ExemptFromInduction = null,
+                DegreeTypeId = null,
+                DqtTeacherStatusName = null,
+                DqtTeacherStatusValue = null,
+                DqtEarlyYearsStatusName = null,
+                DqtEarlyYearsStatusValue = null,
+                DqtInitialTeacherTrainingId = null,
+                DqtQtsRegistrationId = null
+            };
+    }
+
     private Person CreatePerson() => new Person
     {
         PersonId = Guid.NewGuid(),
@@ -657,6 +821,116 @@ public class PersonTests
         FirstName = "Joe",
         MiddleName = "",
         LastName = "Bloggs",
-        DateOfBirth = new(1990, 1, 1),
+        DateOfBirth = new DateOnly(1990, 1, 1),
     };
+
+    public static TheoryData<RefreshProfessionalStatusAttributesTestCaseData> GetRefreshProfessionalStatusAttributesData()
+    {
+        var data = new TheoryData<RefreshProfessionalStatusAttributesTestCaseData>();
+
+        var allProfessionalStatusTypes = new[]
+        {
+            ProfessionalStatusType.QualifiedTeacherStatus,
+            ProfessionalStatusType.EarlyYearsTeacherStatus,
+            ProfessionalStatusType.EarlyYearsProfessionalStatus,
+            ProfessionalStatusType.PartialQualifiedTeacherStatus
+        };
+
+        foreach (var professionalStatusType in allProfessionalStatusTypes)
+        {
+            // No existing routes, no route added
+            data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                professionalStatusType,
+                HaveExistingRouteForStatus: false,
+                ExistingRouteIsAwardedOrApproved: false,
+                HaveNewRouteForStatus: false,
+                NewRouteIsAwardedOrApproved: false,
+                NewAwardedDateIsAfterExistingAwardedDate: false,
+                ExpectedAttributeValue: ExpectedAttributeValue.Null,
+                ExpectedResult: false));
+
+            // No existing routes, new route added but not awarded or approved status
+            data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                professionalStatusType,
+                HaveExistingRouteForStatus: false,
+                ExistingRouteIsAwardedOrApproved: false,
+                HaveNewRouteForStatus: true,
+                NewRouteIsAwardedOrApproved: false,
+                NewAwardedDateIsAfterExistingAwardedDate: false,
+                ExpectedAttributeValue: ExpectedAttributeValue.Null,
+                ExpectedResult: false));
+
+            // Existing route but not awarded or approved, new route added but not awarded or approved status
+            data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                professionalStatusType,
+                HaveExistingRouteForStatus: true,
+                ExistingRouteIsAwardedOrApproved: false,
+                HaveNewRouteForStatus: true,
+                NewRouteIsAwardedOrApproved: false,
+                NewAwardedDateIsAfterExistingAwardedDate: false,
+                ExpectedAttributeValue: ExpectedAttributeValue.Null,
+                ExpectedResult: false));
+
+            // Existing route but not awarded or approved, new route added at awarded or approved status
+            data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                professionalStatusType,
+                HaveExistingRouteForStatus: true,
+                ExistingRouteIsAwardedOrApproved: false,
+                HaveNewRouteForStatus: true,
+                NewRouteIsAwardedOrApproved: true,
+                NewAwardedDateIsAfterExistingAwardedDate: false,
+                ExpectedAttributeValue: ExpectedAttributeValue.NewRouteAwarded,
+                ExpectedResult: true));
+
+            // Existing route at awarded or approved, new route added but not awarded or approved status
+            data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                professionalStatusType,
+                HaveExistingRouteForStatus: true,
+                ExistingRouteIsAwardedOrApproved: true,
+                HaveNewRouteForStatus: true,
+                NewRouteIsAwardedOrApproved: false,
+                NewAwardedDateIsAfterExistingAwardedDate: false,
+                ExpectedAttributeValue: ExpectedAttributeValue.ExistingRouteAwarded,
+                ExpectedResult: false));
+
+            if (professionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus)
+            {
+                // Existing route at awarded or approved with awarded date before new route, new route added at awarded or approved status
+                data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                    professionalStatusType,
+                    HaveExistingRouteForStatus: true,
+                    ExistingRouteIsAwardedOrApproved: true,
+                    HaveNewRouteForStatus: true,
+                    NewRouteIsAwardedOrApproved: true,
+                    NewAwardedDateIsAfterExistingAwardedDate: true,
+                    ExpectedAttributeValue: ExpectedAttributeValue.ExistingRouteAwarded,
+                    ExpectedResult: false));
+
+                // Existing route at awarded or approved with after date before new route, new route added at awarded or approved status
+                data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
+                    professionalStatusType,
+                    HaveExistingRouteForStatus: true,
+                    ExistingRouteIsAwardedOrApproved: true,
+                    HaveNewRouteForStatus: true,
+                    NewRouteIsAwardedOrApproved: true,
+                    NewAwardedDateIsAfterExistingAwardedDate: false,
+                    ExpectedAttributeValue: ExpectedAttributeValue.NewRouteAwarded,
+                    ExpectedResult: true));
+            }
+        }
+
+        return data;
+    }
+
+    public enum ExpectedAttributeValue { Null, ExistingRouteAwarded, NewRouteAwarded }
+
+    public record RefreshProfessionalStatusAttributesTestCaseData(
+        ProfessionalStatusType ProfessionalStatusType,
+        bool HaveExistingRouteForStatus,
+        bool ExistingRouteIsAwardedOrApproved,
+        bool HaveNewRouteForStatus,
+        bool NewRouteIsAwardedOrApproved,
+        bool NewAwardedDateIsAfterExistingAwardedDate,
+        ExpectedAttributeValue ExpectedAttributeValue,
+        bool ExpectedResult);
 }
