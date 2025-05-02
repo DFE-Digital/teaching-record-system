@@ -13,12 +13,6 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         appendUniqueKey: true);
 
     public Guid? PersonId { get; set; }
-    public string? FirstName { get; set; }
-    public string? MiddleName { get; set; }
-    public string? LastName { get; set; }
-    public DateOnly? DateOfBirth { get; set; }
-    public string? EmailAddress { get; set; }
-    public string? NationalInsuranceNumber { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
     public PersonAttributeSource? MiddleNameSource { get; set; }
     public PersonAttributeSource? LastNameSource { get; set; }

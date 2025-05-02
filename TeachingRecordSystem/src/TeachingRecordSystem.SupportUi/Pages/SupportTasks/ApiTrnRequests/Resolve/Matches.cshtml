@@ -8,6 +8,27 @@
     <govuk-back-link href="@LinkGenerator.ApiTrnRequests()"/>
 }
 
+@functions {
+#pragma warning disable CS1998
+    private async Task RenderWithHighlightIfDifferent(string? value, bool different)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            value = UiDefaults.EmptyDisplayContent;
+        }
+
+        if (different)
+        {
+            <highlight>@value</highlight>
+        }
+        else
+        {
+            @value
+        }
+    }
+#pragma warning restore CS1998
+}
+
 <form action="@LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds-from-desktop">
@@ -64,27 +85,6 @@
         <div class="govuk-grid-column-two-thirds-from-desktop">
             <h2 class="govuk-heading-m">Potential matches</h2>
             
-            @functions {
-#pragma warning disable CS1998
-                private async Task RenderWithHighlightIfNotMatched(string? value, bool matched)
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        value = UiDefaults.EmptyDisplayContent;
-                    }
-
-                    if (!matched)
-                    {
-                        <highlight>@value</highlight>
-                    }
-                    else
-                    {
-                        @value
-                    }
-                }
-#pragma warning restore CS1998
-            }
-
             @foreach (var match in Model.PotentialDuplicates!)
             {
                 <govuk-summary-card data-testid="match">
@@ -131,37 +131,37 @@
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>First name</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @{ await RenderWithHighlightIfNotMatched(match.FirstName, match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName)); }
+                                @{ await RenderWithHighlightIfDifferent(match.FirstName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.FirstName)); }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Middle name</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @{ await RenderWithHighlightIfNotMatched(match.MiddleName, match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName)); }
+                                @{ await RenderWithHighlightIfDifferent(match.MiddleName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.MiddleName)); }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Last name</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @{ await RenderWithHighlightIfNotMatched(match.LastName, match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)); }
+                                @{ await RenderWithHighlightIfDifferent(match.LastName, !match.MatchedAttributes.Contains(PersonMatchedAttribute.LastName)); }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @{ await RenderWithHighlightIfNotMatched(match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)); }
+                                @{ await RenderWithHighlightIfDifferent(match.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), !match.MatchedAttributes.Contains(PersonMatchedAttribute.DateOfBirth)); }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @{ await RenderWithHighlightIfNotMatched(match.EmailAddress, match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)); }
+                                @{ await RenderWithHighlightIfDifferent(match.EmailAddress, !match.MatchedAttributes.Contains(PersonMatchedAttribute.EmailAddress)); }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value>
-                                @{ await RenderWithHighlightIfNotMatched(match.NationalInsuranceNumber, match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)); }
+                                @{ await RenderWithHighlightIfDifferent(match.NationalInsuranceNumber, !match.MatchedAttributes.Contains(PersonMatchedAttribute.NationalInsuranceNumber)); }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                         @* <govuk-summary-list-row> *@
