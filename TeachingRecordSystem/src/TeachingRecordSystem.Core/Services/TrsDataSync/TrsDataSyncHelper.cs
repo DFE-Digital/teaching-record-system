@@ -265,7 +265,7 @@ public class TrsDataSyncHelper(
         var ignoredTerms = GetIgnoreNotesContainingTerms();
         var lowerInput = string.IsNullOrEmpty(annotation.NoteText) ? string.Empty : annotation.NoteText.ToLowerInvariant();
         if (ignoredTerms.Any(term => lowerInput.Contains(term)) &&
-            (!string.IsNullOrEmpty(annotation.Subject) && !annotation.Subject.Contains("Entered by REG", StringComparison.InvariantCultureIgnoreCase)))
+            (!string.IsNullOrEmpty(annotation.Subject) && annotation.Subject.Contains("Entered by REG", StringComparison.InvariantCultureIgnoreCase)))
         {
             return null;
         }
