@@ -54,6 +54,7 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
                 builder.Services.AddTransient<InductionStatusUpdatedSupportJob>();
                 builder.Services.AddTransient<CpdInductionImporterJob>();
+                builder.Services.AddTransient<BackfillDqtNotesJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
