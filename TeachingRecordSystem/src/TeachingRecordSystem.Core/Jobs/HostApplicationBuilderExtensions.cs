@@ -162,6 +162,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     InductionStatusUpdatedSupportJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<BackfillDqtNotesJob>(
+                    nameof(BackfillDqtNotesJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
