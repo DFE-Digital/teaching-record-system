@@ -10,8 +10,8 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public Country[] TrainingCountries { get; set; } = [];
 
@@ -35,13 +35,13 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
 
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        TrainingCountries = await _referenceDataCache.GetTrainingCountriesAsync();
+        TrainingCountries = await ReferenceDataCache.GetTrainingCountriesAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
