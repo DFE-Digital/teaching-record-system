@@ -1,7 +1,11 @@
 @page "/support-tasks/api-trn-requests/{supportTaskReference}/matches/{handler?}"
-@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Matches
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.Matches
 @{
     ViewBag.Title = "Compare potential duplicates records";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.ApiTrnRequests()"/>
 }
 
 <form action="@LinkGenerator.ApiTrnRequestMatches(Model.SupportTaskReference!, Model.JourneyInstance!.InstanceId)" method="post">
@@ -88,7 +92,9 @@
                         Record @match.Identifier
                     </govuk-summary-card-title>
                     <govuk-summary-card-actions>
-                        <govuk-summary-card-action href="@LinkGenerator.PersonDetail(match.PersonId)">View record</govuk-summary-card-action>    
+                        <govuk-summary-card-action href="@LinkGenerator.PersonDetail(match.PersonId)" target="_blank">
+                            View record (opens in a new tab)
+                        </govuk-summary-card-action>    
                     </govuk-summary-card-actions>
                     <govuk-summary-list>
                         @{

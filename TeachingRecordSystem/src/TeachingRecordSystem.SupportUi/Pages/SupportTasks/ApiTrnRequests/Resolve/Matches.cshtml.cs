@@ -6,7 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance, ActivatesJourney]
 public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
@@ -44,7 +44,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
         {
             return this.PageWithErrors();
         }
-
+        
         await JourneyInstance!.UpdateStateAsync(state => state.PersonId = PersonId);
 
         return Redirect(linkGenerator.ApiTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
@@ -93,7 +93,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
             .Select((r, i) => r with
             {
                 Identifier = (char)('A' + i),
-                MatchedAttributes = GetMatchedAttributes(
+                MatchedAttributes = ResolveApiTrnRequestState.GetPersonAttributeDifferences(
                     RequestData,
                     r.FirstName,
                     r.MiddleName,
@@ -105,51 +105,6 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
             .ToArray();
 
         await base.OnPageHandlerExecutionAsync(context, next);
-    }
-
-    private static IReadOnlyCollection<PersonMatchedAttribute> GetMatchedAttributes(
-        TrnRequestMetadata requestMetadata,
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        string? emailAddress,
-        string? nationalInsuranceNumber)
-    {
-        return Impl().AsReadOnly();
-
-        IEnumerable<PersonMatchedAttribute> Impl()
-        {
-            if (firstName == requestMetadata.FirstName)
-            {
-                yield return PersonMatchedAttribute.FirstName;
-            }
-
-            if (middleName == requestMetadata.MiddleName)
-            {
-                yield return PersonMatchedAttribute.MiddleName;
-            }
-
-            if (lastName == requestMetadata.LastName)
-            {
-                yield return PersonMatchedAttribute.LastName;
-            }
-
-            if (dateOfBirth == requestMetadata.DateOfBirth)
-            {
-                yield return PersonMatchedAttribute.DateOfBirth;
-            }
-
-            if (emailAddress == requestMetadata.EmailAddress)
-            {
-                yield return PersonMatchedAttribute.EmailAddress;
-            }
-
-            if (nationalInsuranceNumber == requestMetadata.NationalInsuranceNumber)
-            {
-                yield return PersonMatchedAttribute.NationalInsuranceNumber;
-            }
-        }
     }
 
     public record PotentialDuplicate

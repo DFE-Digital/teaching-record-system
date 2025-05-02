@@ -1,8 +1,8 @@
 using AngleSharp.Dom;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
 public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
 {

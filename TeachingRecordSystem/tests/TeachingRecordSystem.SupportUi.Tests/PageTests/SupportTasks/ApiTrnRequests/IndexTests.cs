@@ -52,7 +52,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         {
             var column = resultRow.GetElementByTestId(testId);
             Assert.NotNull(column);
-            Assert.Equal(expectedText, column.TextContent);
+            Assert.Equal(expectedText, column.TextContent.Trim());
         }
     }
 
