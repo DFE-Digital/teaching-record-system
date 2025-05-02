@@ -38,6 +38,8 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncService.CrmClient
                 PageNumber = 1
             }
         };
+        query.Criteria.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.NotNull);
+        query.Criteria.AddCondition(Annotation.Fields.ObjectTypeCode, ConditionOperator.Equal, Contact.EntityLogicalName);
 
         var fetched = 0;
 
