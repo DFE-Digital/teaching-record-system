@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
+namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
 public class Merge : PageModel

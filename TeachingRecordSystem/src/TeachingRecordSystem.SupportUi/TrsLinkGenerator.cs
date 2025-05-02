@@ -392,13 +392,13 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search });
 
     public string ApiTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
     public string ApiTrnRequestMatchesCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string ApiTrnRequestMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
     public string ConnectOneLoginUserSupportTask(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Index", routeValues: new { supportTaskReference });
