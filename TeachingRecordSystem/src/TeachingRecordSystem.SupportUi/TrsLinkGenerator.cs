@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -384,8 +385,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 
-    public string ApiTrnRequests(string? search = null) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search });
+    public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection });
 
     public string ApiTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
