@@ -340,14 +340,6 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
-    public string PersonEditName(Guid personId, JourneyInstanceId? journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string PersonEditNameConfirm(Guid personId, JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Confirm", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string PersonEditDateOfBirth(Guid personId, JourneyInstanceId? journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditDateOfBirth/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string PersonEditDateOfBirthConfirm(Guid personId, JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditDateOfBirth/Confirm", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
     public string LegacyUsers() => GetRequiredPathByPage("/LegacyUsers/Index");
 
     public string LegacyAddUser() => GetRequiredPathByPage("/LegacyUsers/AddUser/Index");
