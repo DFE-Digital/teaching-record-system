@@ -605,7 +605,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}’s account has been deactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been deactivated.");
     }
 
     [Fact]
@@ -654,7 +654,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}’s account has been deactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been deactivated.");
     }
 
     [Fact]
@@ -702,7 +702,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}’s account has been deactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been deactivated.");
     }
 
     [Fact]
@@ -752,7 +752,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}’s account has been deactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been deactivated.");
     }
 
     private async Task<Guid> AssertFileWasUploadedAsync()

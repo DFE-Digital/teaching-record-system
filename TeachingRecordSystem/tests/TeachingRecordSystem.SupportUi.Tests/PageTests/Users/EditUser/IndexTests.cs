@@ -434,7 +434,7 @@ public class IndexTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task PostActivate_ValidRequest_ActivatesUsersEmitsEventAndRedirectsWithFlashMessage()
+    public async Task PostActivate_ValidRequest_ActivatesUserEmitsEventAndRedirectsWithFlashMessage()
     {
         // Arrange
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
@@ -464,7 +464,7 @@ public class IndexTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}’s account has been reactivated.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been reactivated.");
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}";
