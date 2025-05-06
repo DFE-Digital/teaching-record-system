@@ -452,11 +452,95 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal(
-            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}",
             response.Headers.Location?.OriginalString);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(personId, journeyInstance.State.PersonId);
+    }
+
+    [Fact]
+    public async Task Post_PersonIdChangedFromState_ClearsPersonAttributes()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var selectedPersonId = ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel;
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                FirstNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                MiddleNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                LastNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder() { { "PersonId", selectedPersonId } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.FirstNameSource);
+        Assert.Null(journeyInstance.State.MiddleNameSource);
+        Assert.Null(journeyInstance.State.LastNameSource);
+        Assert.Null(journeyInstance.State.DateOfBirthSource);
+        Assert.Null(journeyInstance.State.EmailAddressSource);
+        Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
+    }
+
+    [Fact]
+    public async Task Post_PersonIdNotChangedFromState_DoesNotClearPersonAttributes()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var selectedPersonId = ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel;
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState
+            {
+                PersonId = selectedPersonId,
+                FirstNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                MiddleNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                LastNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                DateOfBirthSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                EmailAddressSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder() { { "PersonId", selectedPersonId } }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.NotNull(journeyInstance.State.FirstNameSource);
+        Assert.NotNull(journeyInstance.State.MiddleNameSource);
+        Assert.NotNull(journeyInstance.State.LastNameSource);
+        Assert.NotNull(journeyInstance.State.DateOfBirthSource);
+        Assert.NotNull(journeyInstance.State.EmailAddressSource);
+        Assert.NotNull(journeyInstance.State.NationalInsuranceNumberSource);
     }
 
     private Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(

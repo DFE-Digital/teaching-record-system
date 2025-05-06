@@ -44,10 +44,27 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
         {
             return this.PageWithErrors();
         }
-        
-        await JourneyInstance!.UpdateStateAsync(state => state.PersonId = PersonId);
 
-        return Redirect(linkGenerator.ApiTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            var oldPersonId = state.PersonId;
+            state.PersonId = PersonId;
+
+            if (oldPersonId != PersonId)
+            {
+                state.FirstNameSource = null;
+                state.MiddleNameSource = null;
+                state.LastNameSource = null;
+                state.DateOfBirthSource = null;
+                state.EmailAddressSource = null;
+                state.NationalInsuranceNumberSource = null;
+            }
+        });
+
+        return Redirect(
+            PersonId == ResolveApiTrnRequestState.CreateNewRecordPersonIdSentinel ?
+                linkGenerator.ApiTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId) :
+                linkGenerator.ApiTrnRequestMerge(SupportTaskReference!, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -90,6 +107,8 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
                     HasActiveAlerts = p.Alerts.Any(a => a.IsOpen)
                 })
                 .ToArrayAsync())
+            // matchedPersonIds is ordered by best match first; ensure we maintain that order
+            .OrderBy(p => Array.IndexOf(matchedPersonIds, p.PersonId))
             .Select((r, i) => r with
             {
                 Identifier = (char)('A' + i),
