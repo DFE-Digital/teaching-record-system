@@ -59,10 +59,10 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var form = doc.GetElementByTestId("submit-form") as IHtmlFormElement;
         Assert.NotNull(form);
         Assert.Contains($"/persons/{person.PersonId}/edit-induction/status", form.Action);
-        var buttons = form.GetElementsByTagName("button").Select(button => button as IHtmlButtonElement);
+        var buttons = form.GetElementsByTagName("button").Select(button => (IHtmlButtonElement)button).ToArray();
         Assert.Equal(2, buttons.Count());
-        Assert.Equal("Continue", buttons.ElementAt(0)!.TextContent);
-        Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TextContent);
+        Assert.Equal("Continue", buttons.ElementAt(0).TextContent.Trim());
+        Assert.Equal("Cancel and return to record", buttons.ElementAt(1).TextContent.Trim());
     }
 
     [Fact]

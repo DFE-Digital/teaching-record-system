@@ -124,7 +124,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TextContent) ?? [];
+        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TextContent.Trim()) ?? [];
         Assert.Contains("Alerts", tags);
     }
 
@@ -151,7 +151,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TextContent) ?? [];
+        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TextContent.Trim()) ?? [];
         Assert.Contains("QTS", tags);
     }
 
@@ -178,7 +178,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await response.GetDocumentAsync();
         var firstMatchDetails = doc.GetAllElementsByTestId("match").First();
         Assert.NotNull(firstMatchDetails);
-        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TextContent) ?? [];
+        var tags = firstMatchDetails.GetSummaryListValueElementForKey("Status")?.GetElementsByClassName("govuk-tag").Select(e => e.TextContent.Trim()) ?? [];
         Assert.Contains("EYTS", tags);
     }
 

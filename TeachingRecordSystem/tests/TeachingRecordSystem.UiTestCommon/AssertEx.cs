@@ -24,7 +24,7 @@ public static partial class AssertEx
         }
 
         var vht = errorElement.GetElementsByTagName("span")[0];
-        var errorMessage = errorElement.InnerHtml[vht.OuterHtml.Length..];
+        var errorMessage = errorElement.InnerHtml.Replace(vht.OuterHtml, "").Trim();
         Assert.Equal(expectedMessage, errorMessage);
     }
 
