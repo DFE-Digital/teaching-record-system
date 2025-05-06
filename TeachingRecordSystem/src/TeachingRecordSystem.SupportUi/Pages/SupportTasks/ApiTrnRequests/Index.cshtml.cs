@@ -51,6 +51,7 @@ public class Index(TrsDbContext dbContext) : PageModel
             .Select(t => new Result(
                 t.SupportTaskReference,
                 t.TrnRequestMetadata!.FirstName!,
+                t.TrnRequestMetadata!.MiddleName ?? "",
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
@@ -69,6 +70,7 @@ public class Index(TrsDbContext dbContext) : PageModel
     public record Result(
         string SupportTaskReference,
         string FirstName,
+        string MiddleName,
         string LastName,
         string? EmailAddress,
         DateTime CreatedOn,
