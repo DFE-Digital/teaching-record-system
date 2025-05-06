@@ -1,10 +1,10 @@
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
-public class GetAllActiveIttQualificationsTests
+public class GetAllIttQualificationsTests
 {
     private readonly CrmQueryDispatcher _crmQueryDispatcher;
 
-    public GetAllActiveIttQualificationsTests(CrmClientFixture crmClientFixture)
+    public GetAllIttQualificationsTests(CrmClientFixture crmClientFixture)
     {
         _crmQueryDispatcher = crmClientFixture.CreateQueryDispatcher();
     }
@@ -13,7 +13,7 @@ public class GetAllActiveIttQualificationsTests
     public async Task QueryExecutesSuccessfully()
     {
         // Arrange
-        var query = new GetAllActiveIttQualificationsQuery();
+        var query = new GetAllIttQualificationsQuery();
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQueryAsync(query);

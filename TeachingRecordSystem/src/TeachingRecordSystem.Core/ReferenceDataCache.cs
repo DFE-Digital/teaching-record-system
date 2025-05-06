@@ -208,10 +208,10 @@ public class ReferenceDataCache(
         return ittSubjects.FirstOrDefault(at => at.dfeta_Value == subjectCode);
     }
 
-    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync()
+    public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync(bool activeOnly = true)
     {
         var ittQualifications = await EnsureIttQualificationsAsync();
-        return ittQualifications.ToArray();
+        return ittQualifications.Where(q => !activeOnly || q.StateCode == dfeta_ittqualificationState.Active).ToArray();
     }
 
     public async Task<dfeta_ittqualification> GetIttQualificationByValueAsync(string value)
@@ -380,7 +380,7 @@ public class ReferenceDataCache(
     private Task<dfeta_ittqualification[]> EnsureIttQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttQualificationsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttQualificationsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttQualificationsQuery()));
 
     private Task<Account[]> EnsureIttProvidersAsync() =>
         LazyInitializer.EnsureInitialized(

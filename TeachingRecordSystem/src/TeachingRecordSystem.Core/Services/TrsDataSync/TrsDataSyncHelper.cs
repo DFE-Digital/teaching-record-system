@@ -162,7 +162,7 @@ public class TrsDataSyncHelper(
         { "33", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
         { "25", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
         { "24", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
-        { "997", null },
+        { "997", null }, // there is only one of these in prod and it is an inactive ITT qual
         { "100", new("34222549-ED59-4C4A-811D-C0894E78D4C3") },
         { "401", null },
         { "55", new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1") },
@@ -2081,6 +2081,7 @@ public class TrsDataSyncHelper(
     }
 
     public async Task<IttQtsMapResult[]> MapIttAndQtsRegistrationsAsync(
+        IEnumerable<Contact> contacts,
         IEnumerable<dfeta_qtsregistration> qts,
         IEnumerable<dfeta_initialteachertraining> itt,
         //IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
@@ -2093,20 +2094,18 @@ public class TrsDataSyncHelper(
         var ittByContact = itt.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
         var qtsByContact = qts.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());        
 
-        var result = new List<IttQtsMapResult>();
+        var result = new List<IttQtsMapResult>();        
 
-        // TODO Consider QTLS (although QTLS is stored against Contact and is not associated with ITT / QTS, there might still be those records present for the same ContactId)
-
-        if (ittByContact.Count == 0 && qtsByContact.Count == 0)
+        if (!contacts.Any())
         {
             return [];
         }
 
-        foreach (var contactId in ittByContact.Keys.Concat(qtsByContact.Keys).Distinct())
+        foreach (var contact in contacts)
         {
             try
             {
-                var ps = await MapContactIttAndQtsAsync(contactId);
+                var ps = await MapContactIttAndQtsAsync(contact);
                 result.AddRange(ps.Select(IttQtsMapResult.Succeeded));
             }
             catch (IttQtsMapException ex)
@@ -2117,13 +2116,33 @@ public class TrsDataSyncHelper(
 
         return result.ToArray();
 
-        async Task<IEnumerable<ProfessionalStatus>> MapContactIttAndQtsAsync(Guid contactId)
+        async Task<IEnumerable<ProfessionalStatus>> MapContactIttAndQtsAsync(Contact contact)
         {
+            var contactId = contact.Id;
             var contactItt = ittByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
             var contactQts = qtsByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
 
             var hasMatchedIttQtsCombo = false;
             var mapped = new List<ProfessionalStatus>();
+
+            // QTLS is stored directly on Contact record
+            if (contact.dfeta_qtlsdate is not null)
+            {
+                mapped.Add(
+                    CreateProfessionalStatus(
+                        clock,
+                        allRoutes,
+                        contactId,
+                        RouteToProfessionalStatus.QtlsAndSetMembershipId,
+                        ProfessionalStatusStatus.Awarded,
+                        InductionExemptionReason.QtlsId,
+                        contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        qts: null,
+                        itt: null,
+                        ittQualification: null,
+                        teacherStatus: null,
+                        eyStatus: null));
+            }
 
             foreach (var qts in contactQts)
             {
@@ -2248,6 +2267,7 @@ public class TrsDataSyncHelper(
                             ittQualification,
                             ittQualificationDerivedRouteId,
                             hasMatchedIttQtsCombo,
+                            isEy,
                             out var derivedRouteId))
                         {
                             derivedRouteIds = [ derivedRouteId!.Value ];
@@ -2261,18 +2281,29 @@ public class TrsDataSyncHelper(
                                     qts.Id,
                                     itt?.Id,
                                     ittQualification?.Id));
-                        }                        
+                        }
                     }
-                    else if (itt is not null)
+
+                    var routeId = derivedRouteIds.Single();
+                    if (!isEy)
                     {
                         hasMatchedIttQtsCombo = true;
                     }
 
-                    var routeId = derivedRouteIds.Single();
-
                     mapped.Add(
                         CreateProfessionalStatus(
-                            allRoutes, contactId, routeId, status, inductionExemptionReasonId, awardedDate, qts, itt, ittQualification, teacherStatus, eyStatus));
+                            clock, 
+                            allRoutes,
+                            contactId,
+                            routeId,
+                            status,
+                            inductionExemptionReasonId,
+                            awardedDate,
+                            qts,
+                            itt,
+                            ittQualification,
+                            teacherStatus,
+                            eyStatus));
                 }
             }
 
@@ -2292,20 +2323,53 @@ public class TrsDataSyncHelper(
 
                 var status = MapStatus(itt, qts: null, ittQualification);
 
-                // TODO do we need to consider ITT qualification here? - ask JK tomorrow
-                if (itt!.dfeta_ProgrammeType is null || !_programmeTypeRouteMapping.TryGetValue(itt.dfeta_ProgrammeType.Value, out var routeId))
+                var ittQualificationDerivedRouteId = ittQualification is not null
+                        ? (_ittQualificationRouteIdMapping.TryGetValue(ittQualification.dfeta_Value, out var id) ? id : null)
+                        : (Guid?)null;
+
+                var programmeTypeDerivedRouteId = itt?.dfeta_ProgrammeType is dfeta_ITTProgrammeType pt
+                    ? (_programmeTypeRouteMapping.TryGetValue(pt, out var id2) ? id2 : null)
+                    : (Guid?)null;
+
+                var isEy = itt?.dfeta_ProgrammeType?.IsEarlyYears() ?? false;
+
+                var derivedRouteIds = new[] { programmeTypeDerivedRouteId, ittQualificationDerivedRouteId }
+                        .Where(s => s is not null)
+                        .Distinct()
+                        .Cast<Guid>()
+                        .ToArray();
+                if (derivedRouteIds.Length != 1)
                 {
-                    throw new IttQtsMapException(
-                        IttQtsMapResult.Failed(
-                            contactId,
-                            IttQtsMapResultFailedReason.CannotDeriveRoute,
-                            qtsRegistrationId: null,
-                            itt.Id,
-                            ittQualification?.Id));
-                }
+                    if (TryDeriveRouteId(
+                        null,
+                        null,
+                        itt?.dfeta_ProgrammeType,
+                        programmeTypeDerivedRouteId,
+                        ittQualification,
+                        ittQualificationDerivedRouteId,
+                        hasMatchedIttQtsCombo,
+                        isEy,
+                        out var derivedRouteId))
+                    {
+                        derivedRouteIds = [derivedRouteId!.Value];
+                    }
+                    else
+                    {
+                        throw new IttQtsMapException(
+                            IttQtsMapResult.Failed(
+                                contactId,
+                                IttQtsMapResultFailedReason.CannotDeriveRoute,
+                                qtsRegistrationId: null,
+                                itt?.Id,
+                                ittQualification?.Id));
+                    }
+                }                
+
+                var routeId = derivedRouteIds.Single();
                 
                 mapped.Add(
                     CreateProfessionalStatus(
+                        clock,
                         allRoutes,
                         contactId,
                         routeId,
@@ -2329,18 +2393,24 @@ public class TrsDataSyncHelper(
                 dfeta_ittqualification? ittQualification,
                 Guid? ittQualificationDerivedRouteId,
                 bool hasMatchedIttQtsCombo,
+                bool isEarlyYears,
                 out Guid? routeId)
             {
-                // Based on rules defined in spreadsheet try and derive which routeId to map to where there are conflicts from mapping from ITT, QTS and ITT Qualification                
-                if (_hardcodedRouteIdMapping.TryGetValue((teacherStatus?.dfeta_Value, ittProgrammeType, ittQualification?.dfeta_Value), out routeId))
-                {
-                    return true;
-                }
+                // Based on rules defined in spreadsheet try and derive which routeId to map to where there are conflicts from mapping from ITT, QTS and ITT Qualification 
+                RouteMappingPrecendence[] defaultPrecendenceOrder = [RouteMappingPrecendence.TeachingStatus, RouteMappingPrecendence.ProgrammeType, RouteMappingPrecendence.IttQualification];
+                RouteMappingPrecendence[] precendenceOrder = defaultPrecendenceOrder;
 
-                var defaultPrecendenceOrder = new[] { RouteMappingPrecendence.TeachingStatus, RouteMappingPrecendence.ProgrammeType, RouteMappingPrecendence.IttQualification };
-                var precendenceOrder = TryDeriveRouteMappingPrecedence(teacherStatus, ittProgrammeType, ittQualification, hasMatchedIttQtsCombo, out var derivedPrecendenceOrder) 
-                    ? derivedPrecendenceOrder
-                    : defaultPrecendenceOrder;
+                if (!isEarlyYears)
+                {
+                    if (_hardcodedRouteIdMapping.TryGetValue((teacherStatus?.dfeta_Value, ittProgrammeType, ittQualification?.dfeta_Value), out routeId))
+                    {
+                        return true;
+                    }
+
+                    precendenceOrder = TryDeriveRouteMappingPrecedence(teacherStatus, ittProgrammeType, ittQualification, hasMatchedIttQtsCombo, out var derivedPrecendenceOrder)
+                        ? derivedPrecendenceOrder
+                        : defaultPrecendenceOrder;
+                }
 
                 foreach (var precendence in precendenceOrder)
                 {
@@ -2430,7 +2500,7 @@ public class TrsDataSyncHelper(
                    return true;
                 }
 
-                precendenceOrder = new RouteMappingPrecendence[] { };
+                precendenceOrder = [];
                 return false;
             }
 
@@ -2460,6 +2530,7 @@ public class TrsDataSyncHelper(
             };
 
             static ProfessionalStatus CreateProfessionalStatus(
+                IClock clock,
                 RouteToProfessionalStatus[] allRoutes,
                 Guid personId,
                 Guid routeId,
@@ -2477,15 +2548,17 @@ public class TrsDataSyncHelper(
 
                 return new ProfessionalStatus
                 {
-                    QualificationId = (qts?.Id ?? itt?.Id)!.Value,
+                    QualificationId = (qts?.Id ?? itt?.Id ?? personId), // allows for QTLS which is not linked to QTS or ITT
                     ProfessionalStatusType = professionalStatusType,
                     // TODO Should these dates be Clock.Now instead?
                     CreatedOn = MinDate(
                         qts?.GetAttributeValue<DateTime>("createdon"),
-                        itt?.GetAttributeValue<DateTime>("createdon")),
+                        itt?.GetAttributeValue<DateTime>("createdon"),
+                        clock.UtcNow),
                     UpdatedOn = MaxDate(
                         qts?.GetAttributeValue<DateTime>("createdon"),
-                        itt?.GetAttributeValue<DateTime>("createdon")),
+                        itt?.GetAttributeValue<DateTime>("createdon"),
+                        clock.UtcNow),
                     DeletedOn = null,
                     PersonId = personId,
                     RouteToProfessionalStatusId = routeId,

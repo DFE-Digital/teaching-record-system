@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllActiveIttQualificationsHandler : ICrmQueryHandler<GetAllActiveIttQualificationsQuery, dfeta_ittqualification[]>
+public class GetAllIttQualificationsHandler : ICrmQueryHandler<GetAllIttQualificationsQuery, dfeta_ittqualification[]>
 {
-    public async Task<dfeta_ittqualification[]> ExecuteAsync(GetAllActiveIttQualificationsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_ittqualification[]> ExecuteAsync(GetAllIttQualificationsQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {
@@ -16,8 +16,6 @@ public class GetAllActiveIttQualificationsHandler : ICrmQueryHandler<GetAllActiv
                 dfeta_ittqualification.Fields.dfeta_name,
                 dfeta_ittqualification.Fields.dfeta_Value)
         };
-
-        queryExpression.Criteria.AddCondition(dfeta_ittqualification.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_ittqualificationState.Active);
 
         var request = new RetrieveMultipleRequest()
         {

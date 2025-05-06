@@ -68,7 +68,7 @@ var helper = sp.GetRequiredService<TrsDataSyncHelper>();
 var serviceClient = sp.GetRequiredKeyedService<IOrganizationServiceAsync2>(TrsDataSyncService.CrmClientName);
 
 var mapped = Map();
-await WriteResults(mapped);
+await WriteResultsAsync(mapped);
 
 async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> Map()
 {
@@ -139,6 +139,9 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> Map()
             entities = entities.Where(e => e.Id != lastContactId).ToList();
         }
 
+        var contacts = entities
+            .Select(e => e.ToEntity<Contact>());
+
         var qts = entities
             .Select(e => e.Extract<dfeta_qtsregistration>())
             .Where(qts => qts is not null)
@@ -149,7 +152,7 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> Map()
             .Where(itt => itt is not null)
             .DistinctBy(itt => itt.Id);
 
-        yield return await helper.MapIttAndQtsRegistrationsAsync(qts, itt, createMigratedEvent: false);
+        yield return await helper.MapIttAndQtsRegistrationsAsync(contacts, qts, itt, createMigratedEvent: false);
 
         if (result.MoreRecords)
         {
@@ -164,7 +167,7 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> Map()
     }
 }
 
-async Task WriteResults(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> results)
+async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> results)
 {
     if (File.Exists(filePath))
     {
