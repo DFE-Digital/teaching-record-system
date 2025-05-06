@@ -89,17 +89,15 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
-                Continue
-            </button>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button type="submit"
+                              data-testid="cancel-button"
+                              formaction=@LinkGenerator.EditUserDeactivateCancel(Model.UserId)
+                              class="govuk-button--secondary">
+                    Cancel and return to user
+                </govuk-button>
+            </div>
         </form>
-
-        <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" 
-             data-testid="cancel-link"
-             asp-page-handler="cancel"
-             asp-route-userid=@Model.UserId 
-             asp-route-evidencefileid=@Model.EvidenceFileId>Cancel and return to user</a>
-        </p>
     </div>
 </div>

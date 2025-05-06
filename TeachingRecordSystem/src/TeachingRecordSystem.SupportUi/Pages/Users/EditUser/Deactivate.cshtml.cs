@@ -70,12 +70,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (_user is null)
-            {
-                return base.NotFound();
-            }
-
-            if (!_user.Active)
+            if (!_user!.Active)
             {
                 return BadRequest();
             }
@@ -138,8 +133,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
                 User = EventModels.User.FromModel(_user),
                 RaisedBy = User.GetUserId(),
                 CreatedUtc = clock.UtcNow,
-                AdditionalReason = (HasAdditionalReason ?? false) ? AdditionalReasonDetail : null,
-                MoreInformation = (HasMoreInformation ?? false) ? MoreInformationDetail : null,
+                DeactivatedReason = (HasAdditionalReason ?? false) ? AdditionalReasonDetail : null,
+                DeactivatedReasonDetail = (HasMoreInformation ?? false) ? MoreInformationDetail : null,
                 EvidenceFileId = EvidenceFileId,
             });
 
@@ -162,16 +157,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
             await next();
         }
 
-        public async Task<IActionResult> OnGetCancelAsync(Guid? evidenceFileId)
+        public async Task<IActionResult> OnPostCancelAsync()
         {
             // If the user cancels after having uploaded a file but before submitting,
             // we want to delete the file to clean up after ourselves.
-            // I've made it a GET rather than a POST as yes it does delete a file, but
-            // the file isn't used by anything any more, and it's not the specific resource
-            // logically corresponding to the URL that's being deleted (i.e. the user) - SS
-            if (evidenceFileId.HasValue)
+            if (EvidenceFileId.HasValue)
             {
-                await fileService.DeleteFileAsync(evidenceFileId.Value);
+                await fileService.DeleteFileAsync(EvidenceFileId.Value);
             }
 
             return Redirect(linkGenerator.EditUser(UserId));

@@ -81,16 +81,16 @@
                 <div class="govuk-button-group">
                     <govuk-button type="submit">Save changes</govuk-button>
                     <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.EditUserDeactivate(Model.UserId)>Deactivate user</govuk-button-link>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users()>Cancel and return to users</govuk-button-link>
                 </div>
             }
             else
             {
-                <govuk-button type="submit" asp-page-handler="activate">Reactivate user</govuk-button>
+                <div class="govuk-button-group">
+                    <govuk-button type="submit" asp-page-handler="activate">Reactivate user</govuk-button>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users()>Cancel and return to users</govuk-button-link>
+                </div>
             }
-
-            <p class="govuk-body">
-                <a class="govuk-link govuk-link--no-visited-state" href=@LinkGenerator.Users()>Cancel and return to users</a>
-            </p>
 
         </form>
     </div>

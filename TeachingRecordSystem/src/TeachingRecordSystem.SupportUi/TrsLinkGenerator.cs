@@ -366,6 +366,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string EditUserDeactivate(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Deactivate", routeValues: new { userId });
 
+    public string EditUserDeactivateCancel(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Deactivate", "cancel", routeValues: new { userId });
+
     public string ApplicationUsers() => GetRequiredPathByPage("/ApplicationUsers/Index");
 
     public string AddApplicationUser() => GetRequiredPathByPage("/ApplicationUsers/AddApplicationUser");

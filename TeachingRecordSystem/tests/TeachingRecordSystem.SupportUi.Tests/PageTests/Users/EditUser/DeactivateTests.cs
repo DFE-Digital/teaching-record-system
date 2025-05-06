@@ -400,7 +400,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response, 400);
 
-        var evidenceFileId = AssertFileWasUploadedAsync();
+        var evidenceFileId = await AssertFileWasUploadedAsync();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
@@ -515,7 +515,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Post_EvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_CancelLinkContainsEvidenceFileId()
+    public async Task PostCancel_RedirectsToEditUserPage()
     {
         // Arrange
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
@@ -524,38 +524,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var existingUser = await TestData.CreateUserAsync();
         var evidenceFileId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
-        {
-            Content = new MultipartFormDataContentBuilder
-            {
-                { "HasMoreInformation", false },
-                { "UploadEvidence", false },
-                { "EvidenceFileId", evidenceFileId },
-            }
-        };
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-        var html = await AssertEx.HtmlResponseAsync(response, 400);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-
-        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("cancel-link"));
-        Assert.EndsWith($"/users/{existingUser.UserId}/deactivate/cancel?evidencefileid={evidenceFileId}", link.Href);
-    }
-
-    [Fact]
-    public async Task GetCancel_RedirectsToEditUserPage()
-    {
-        // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
-        SetCurrentUser(user);
-
-        var existingUser = await TestData.CreateUserAsync();
-        var evidenceFileId = Guid.NewGuid();
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{GetRequestPath(existingUser.UserId)}/cancel");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/cancel");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -566,7 +535,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetCancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFileAndRedirectsToEditUserPage()
+    public async Task PostCancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFileAndRedirectsToEditUserPage()
     {
         // Arrange
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
@@ -575,7 +544,14 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var existingUser = await TestData.CreateUserAsync();
         var evidenceFileId = Guid.NewGuid();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{GetRequestPath(existingUser.UserId)}/cancel?evidencefileid={evidenceFileId}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/cancel")
+        {
+            Content = new MultipartFormDataContentBuilder
+            {
+                { "EvidenceFileId", evidenceFileId }
+            }
+        };
+
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -622,8 +598,8 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Null(userCreatedEvent.AdditionalReason);
-            Assert.Null(userCreatedEvent.MoreInformation);
+            Assert.Null(userCreatedEvent.DeactivatedReason);
+            Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
             Assert.Null(userCreatedEvent.EvidenceFileId);
         });
 
@@ -671,8 +647,8 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Equal("Some additional reason", userCreatedEvent.AdditionalReason);
-            Assert.Equal("Some more information", userCreatedEvent.MoreInformation);
+            Assert.Equal("Some additional reason", userCreatedEvent.DeactivatedReason);
+            Assert.Equal("Some more information", userCreatedEvent.DeactivatedReasonDetail);
             Assert.Equal(evidenceFileId, userCreatedEvent.EvidenceFileId);
         });
 
@@ -719,8 +695,8 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Null(userCreatedEvent.AdditionalReason);
-            Assert.Null(userCreatedEvent.MoreInformation);
+            Assert.Null(userCreatedEvent.DeactivatedReason);
+            Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
             Assert.Equal(evidenceFileId, userCreatedEvent.EvidenceFileId);
         });
 
@@ -769,8 +745,8 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             var userCreatedEvent = Assert.IsType<UserDeactivatedEvent>(e);
             Assert.Equal(Clock.UtcNow, userCreatedEvent.CreatedUtc);
             Assert.Equal(userCreatedEvent.RaisedBy.UserId, GetCurrentUserId());
-            Assert.Null(userCreatedEvent.AdditionalReason);
-            Assert.Null(userCreatedEvent.MoreInformation);
+            Assert.Null(userCreatedEvent.DeactivatedReason);
+            Assert.Null(userCreatedEvent.DeactivatedReasonDetail);
             Assert.Null(userCreatedEvent.EvidenceFileId);
         });
 

@@ -48,11 +48,6 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (_user is null)
-        {
-            return NotFound();
-        }
-
         // Ensure submitted roles is valid
         if (!string.IsNullOrWhiteSpace(Role) && !UserRoles.All.Contains(Role))
         {
@@ -71,7 +66,7 @@ public class IndexModel(
         }
 
         var changes = UserUpdatedEventChanges.None |
-            (_user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
+            (_user!.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
             (_user.Role != Role ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
 
         if (changes != UserUpdatedEventChanges.None)
@@ -109,12 +104,7 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostActivateAsync()
     {
-        if (_user is null)
-        {
-            return NotFound();
-        }
-
-        if (_user.Active)
+        if (_user!.Active)
         {
             return BadRequest();
         }
