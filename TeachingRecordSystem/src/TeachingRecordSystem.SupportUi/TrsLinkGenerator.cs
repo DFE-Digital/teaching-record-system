@@ -362,7 +362,11 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string AddUserConfirm(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", routeValues: new { userId });
 
-    public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", routeValues: new { userId });
+    public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Index", routeValues: new { userId });
+
+    public string EditUserDeactivate(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Deactivate", routeValues: new { userId });
+
+    public string EditUserDeactivateCancel(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Deactivate", "cancel", routeValues: new { userId });
 
     public string ApplicationUsers() => GetRequiredPathByPage("/ApplicationUsers/Index");
 

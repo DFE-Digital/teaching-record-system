@@ -7,6 +7,8 @@ namespace TeachingRecordSystem.SupportUi.Tests;
 
 public class TestScopedServices
 {
+    public const string FakeBlobStorageFileUrlBase = "https://fake.blob.core.windows.net/";
+
     private static readonly AsyncLocal<TestScopedServices> _current = new();
 
     public TestScopedServices(IServiceProvider serviceProvider)
@@ -17,6 +19,12 @@ public class TestScopedServices
         EventObserver = new();
         FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
         BlobStorageFileServiceMock = new();
+        BlobStorageFileServiceMock
+            .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
+            .ReturnsAsync(Guid.NewGuid());
+        BlobStorageFileServiceMock
+            .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
+            .ReturnsAsync((Guid id, TimeSpan time) => $"{FakeBlobStorageFileUrlBase}{id}");
     }
 
     public static TestScopedServices GetCurrent() =>

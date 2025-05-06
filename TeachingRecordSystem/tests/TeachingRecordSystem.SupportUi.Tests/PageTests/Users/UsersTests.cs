@@ -28,7 +28,8 @@ public class UsersTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        SetCurrentUser(user);
 
         // Act
         var request = new HttpRequestMessage(HttpMethod.Get, RequestPath);

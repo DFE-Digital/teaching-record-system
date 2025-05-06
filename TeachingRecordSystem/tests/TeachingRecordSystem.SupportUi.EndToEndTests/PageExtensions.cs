@@ -448,6 +448,11 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/users/{userId}");
     }
 
+    public static async Task AssertOnEditUserDeactivatePageAsync(this IPage page, Guid userId)
+    {
+        await page.WaitForUrlPathAsync($"/users/{userId}/deactivate");
+    }
+
     public static async Task AssertOnApplicationUsersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/application-users");
