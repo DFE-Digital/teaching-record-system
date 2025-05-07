@@ -66,16 +66,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             response.Headers.Location?.OriginalString);
     }
 
-    public static TheoryData<PersonMatchedAttribute, string, Func<TrnRequestMetadata, object?>, Func<TestData.CreatePersonResult, object?>> AttributesAndSummaryListRowKeysData { get; } = new()
-    {
-        { PersonMatchedAttribute.FirstName, "FirstName", m => m.FirstName, p => p.FirstName },
-        { PersonMatchedAttribute.MiddleName, "MiddleName", m => m.MiddleName, p => p.MiddleName },
-        { PersonMatchedAttribute.LastName, "LastName", m => m.LastName, p => p.LastName },
-        { PersonMatchedAttribute.DateOfBirth, "DateOfBirth", m => m.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), p => p.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat) },
-        { PersonMatchedAttribute.EmailAddress, "EmailAddress", m => m.EmailAddress, p => p.Email },
-        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumber", m => m.NationalInsuranceNumber, p => p.NationalInsuranceNumber }
-    };
-
     [Theory]
     [MemberData(nameof(PersonAttributeInfoData))]
     public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)

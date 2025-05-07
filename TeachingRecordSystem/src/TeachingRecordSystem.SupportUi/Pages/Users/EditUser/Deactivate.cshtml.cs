@@ -139,7 +139,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
             });
 
             await dbContext.SaveChangesAsync();
-            TempData.SetFlashSuccess(message: $"{_user.Name}\u2019s account has been deactivated.");
+            TempData.SetFlashSuccess(messageText: $"{_user.Name}\u2019s account has been deactivated.");
 
             return Redirect(linkGenerator.Users());
         }

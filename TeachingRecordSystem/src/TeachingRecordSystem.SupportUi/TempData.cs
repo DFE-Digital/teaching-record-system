@@ -14,12 +14,12 @@ public static class TempDataExtensions
     public static void SetFlashSuccess(
         this ITempDataDictionary tempData,
         string? heading = null,
-        string? message = null,
+        string? messageText = null,
         string? messageHtml = null)
     {
-        if (message is not null && messageHtml is not null)
+        if (messageText is not null && messageHtml is not null)
         {
-            throw new ArgumentException($"Cannot set both {nameof(message)} and {nameof(messageHtml)}.");
+            throw new ArgumentException($"Cannot set both {nameof(messageText)} and {nameof(messageHtml)}.");
         }
 
         tempData.Add(
@@ -27,7 +27,7 @@ public static class TempDataExtensions
             new FlashSuccessData()
             {
                 Heading = heading,
-                Message = message,
+                Message = messageText,
                 MessageHtml = messageHtml
             }.Serialize());
     }
