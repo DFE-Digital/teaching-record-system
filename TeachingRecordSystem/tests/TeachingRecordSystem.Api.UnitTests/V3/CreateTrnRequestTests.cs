@@ -550,9 +550,11 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
 
     private void AssertMetadataMessageMatchesCommand(
         CreateTrnRequestCommand command,
-        TrnRequestMetadataMessage message,
+        TrnRequestMetadataMessage? message,
         bool expectedPotentialDuplicate)
     {
+        Assert.NotNull(message);
+
         var expectedApplicationUserId = CurrentUserProvider.GetCurrentApplicationUser().UserId;
         var expectedEmailAddress = command.EmailAddresses.FirstOrDefault();
 
