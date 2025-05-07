@@ -27,6 +27,7 @@ public partial class TestData
         private Option<string?> _nationalInsuranceNumber;
         private Option<TrnRequestMatchedRecord[]> _matchedRecords;
         private Option<SupportTaskStatus> _status;
+        public Option<DateTime> _createdOn;
 
         public CreateApiTrnRequestSupportTaskBuilder WithFirstName(string firstName)
         {
@@ -77,6 +78,12 @@ public partial class TestData
             return this;
         }
 
+        public CreateApiTrnRequestSupportTaskBuilder WithCreatedOn(DateTime created)
+        {
+            _createdOn = Option.Some(DateTime.SpecifyKind(created, DateTimeKind.Utc));
+            return this;
+        }
+
         public async Task<SupportTask> ExecuteAsync(TestData testData)
         {
             var trnRequestId = _requestId.ValueOr(Guid.NewGuid().ToString);
@@ -86,6 +93,7 @@ public partial class TestData
             var lastName = _lastName.ValueOr(testData.GenerateLastName);
             var dateOfBirth = _dateOfBirth.ValueOr(testData.GenerateDateOfBirth);
             var nationalInsuranceNumber = _nationalInsuranceNumber.ValueOr(testData.GenerateNationalInsuranceNumber);
+            var createdOn = _createdOn.ValueOr(testData.Clock.UtcNow);
 
             var matchedRecords = _matchedRecords.ValueOrDefault();
 
@@ -126,7 +134,7 @@ public partial class TestData
             {
                 ApplicationUserId = applicationUserId,
                 RequestId = trnRequestId,
-                CreatedOn = testData.Clock.UtcNow,
+                CreatedOn = createdOn,
                 IdentityVerified = null,
                 EmailAddress = emailAddress,
                 OneLoginUserSubject = null,
@@ -156,8 +164,8 @@ public partial class TestData
             var task = new SupportTask
             {
                 SupportTaskReference = SupportTask.GenerateSupportTaskReference(),
-                CreatedOn = testData.Clock.UtcNow,
-                UpdatedOn = testData.Clock.UtcNow,
+                CreatedOn = createdOn,
+                UpdatedOn = createdOn,
                 SupportTaskType = SupportTaskType.ApiTrnRequest,
                 Status = status,
                 Data = new ApiTrnRequestData(),

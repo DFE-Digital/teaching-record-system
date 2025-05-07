@@ -12,10 +12,21 @@ public class Index(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public string? Search { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public ApiTrnRequestsSortByOption? SortBy { get; set; }
+
     public Result[]? Results { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
+        var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
+        var sortBy = SortBy ?? ApiTrnRequestsSortByOption.Name;
+
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
 
@@ -43,6 +54,26 @@ public class Index(TrsDbContext dbContext) : PageModel
             {
                 tasks = tasks.Where(t => nameParts.All(n => t.TrnRequestMetadata!.Name.Select(m => m.ToLower()).Contains(n)));
             }
+        }
+
+        if (sortBy == ApiTrnRequestsSortByOption.Name)
+        {
+            tasks = tasks
+                .OrderBy(sortDirection, t => t.TrnRequestMetadata!.FirstName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.MiddleName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.LastName);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.Email)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.EmailAddress);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.RequestedOn)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.CreatedOn);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.Source)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.ApplicationUser.Name);
         }
 
         Results = await tasks
