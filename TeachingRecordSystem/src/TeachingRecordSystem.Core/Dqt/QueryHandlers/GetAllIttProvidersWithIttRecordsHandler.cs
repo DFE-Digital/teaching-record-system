@@ -1,22 +1,19 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHandler<MyDummyQuery, Account[]>
+public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHandler<GetAllIttProvidersWithCorrespondingIttRecordsQuery, Account[]>
 {
-    public async Task<Account[]> ExecuteAsync(MyDummyQuery _, IOrganizationServiceAsync organizationService)
+    public async Task<Account[]> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsQuery _, IOrganizationServiceAsync organizationService)
     {
-        var filter = new FilterExpression(LogicalOperator.And);
-        filter.AddCondition(Account.Fields.dfeta_TrainingProvider, ConditionOperator.Equal, true); // only get organisations that are a training provider
-
         var queryExpression = new QueryExpression(Account.EntityLogicalName)
         {
             ColumnSet = new(
                 Account.Fields.Name,
                 Account.Fields.dfeta_UKPRN),
-            Criteria = filter,
             LinkEntities =
             {
                 new LinkEntity // define the join
@@ -28,7 +25,7 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
                     JoinOperator = JoinOperator.Inner
                 }
             },
-            Distinct = true, // return each record just once (like sql distinct)
+            Distinct = true, // return each record just once (based on both values)
             Orders =
             {
                 new OrderExpression(Account.Fields.Name, OrderType.Ascending)
