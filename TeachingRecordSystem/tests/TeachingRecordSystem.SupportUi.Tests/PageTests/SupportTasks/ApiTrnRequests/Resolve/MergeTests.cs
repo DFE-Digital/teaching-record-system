@@ -6,7 +6,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
-public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
@@ -102,11 +102,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await CreateSupportWithSingleDifferenceToMatch(applicationUser.UserId, attribute);
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(applicationUser.UserId, attribute);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId);
+            matchedPerson.PersonId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -142,7 +142,7 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+        var (supportTask, _) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
@@ -180,13 +180,13 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState
             {
-                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonId = matchedPerson.PersonId,
                 FirstNameSource = PersonAttributeSource.ExistingRecord,
                 MiddleNameSource = PersonAttributeSource.ExistingRecord,
                 LastNameSource = PersonAttributeSource.ExistingRecord,
@@ -312,11 +312,11 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
-        var supportTask = await CreateSupportWithSingleDifferenceToMatch(applicationUser.UserId, differentAttribute);
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(applicationUser.UserId, differentAttribute);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId);
+            matchedPerson.PersonId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -363,13 +363,12 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
 
-        var supportTask = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithAllDifferences(applicationUser.UserId);
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
-            supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId);
+            matchedPerson.PersonId);
 
         var firstNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
         var middleNameSelection = Enum.GetValues<PersonAttributeSource>().RandomOne();
@@ -420,56 +419,6 @@ public class MergeTests(HostFixture hostFixture) : TestBase(hostFixture)
         { PersonMatchedAttribute.EmailAddress, "EmailAddressSource" },
         { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumberSource" }
     };
-
-    private async Task<SupportTask> CreateSupportTaskWithAllDifferences(Guid applicationUserId)
-    {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
-
-        return await TestData.CreateApiTrnRequestSupportTaskAsync(
-            applicationUserId,
-            t => t
-                .WithMatchedRecords(matchedPerson.PersonId)
-                .WithFirstName(TestData.GenerateChangedFirstName(matchedPerson.FirstName))
-                .WithMiddleName(TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
-                .WithLastName(TestData.GenerateChangedLastName(matchedPerson.LastName))
-                .WithDateOfBirth(TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
-                .WithEmailAddress(TestData.GenerateUniqueEmail())
-                .WithNationalInsuranceNumber(TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
-    }
-
-    private async Task<SupportTask> CreateSupportWithSingleDifferenceToMatch(Guid applicationUserId, PersonMatchedAttribute differentAttribute)
-    {
-        var matchedPerson = await TestData.CreatePersonAsync(p => p.WithTrn().WithNationalInsuranceNumber());
-
-        return await TestData.CreateApiTrnRequestSupportTaskAsync(
-            applicationUserId,
-            t => t
-                .WithMatchedRecords(matchedPerson.PersonId)
-                .WithFirstName(
-                    differentAttribute != PersonMatchedAttribute.FirstName
-                        ? matchedPerson.FirstName
-                        : TestData.GenerateChangedFirstName(matchedPerson.FirstName))
-                .WithMiddleName(
-                    differentAttribute != PersonMatchedAttribute.MiddleName
-                        ? matchedPerson.MiddleName
-                        : TestData.GenerateChangedMiddleName(matchedPerson.MiddleName))
-                .WithLastName(
-                    differentAttribute != PersonMatchedAttribute.LastName
-                        ? matchedPerson.LastName
-                        : TestData.GenerateChangedLastName(matchedPerson.LastName))
-                .WithDateOfBirth(
-                    differentAttribute != PersonMatchedAttribute.DateOfBirth
-                        ? matchedPerson.DateOfBirth
-                        : TestData.GenerateChangedDateOfBirth(matchedPerson.DateOfBirth))
-                .WithEmailAddress(
-                    differentAttribute != PersonMatchedAttribute.EmailAddress
-                        ? matchedPerson.Email
-                        : TestData.GenerateUniqueEmail())
-                .WithNationalInsuranceNumber(
-                    differentAttribute != PersonMatchedAttribute.NationalInsuranceNumber
-                        ? matchedPerson.NationalInsuranceNumber
-                        : TestData.GenerateChangedNationalInsuranceNumber(matchedPerson.NationalInsuranceNumber!)));
-    }
 
     private Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
             string supportTaskReference,

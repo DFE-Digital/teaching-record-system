@@ -58,6 +58,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
                 state.DateOfBirthSource = null;
                 state.EmailAddressSource = null;
                 state.NationalInsuranceNumberSource = null;
+                state.PersonAttributeSourcesSet = false;
             }
         });
 

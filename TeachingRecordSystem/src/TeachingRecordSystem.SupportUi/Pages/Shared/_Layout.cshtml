@@ -90,19 +90,23 @@
     @RenderSection("BeforeContent", required: false)
 }
 
-@if (TempData.TryGetFlashSuccess(out (string? Heading, string? Message)? flashSuccess))
+@if (TempData.TryGetFlashSuccess(out var flashSuccess))
 {
     <govuk-notification-banner type="Success">
-        @if (flashSuccess.Value.Heading is not null)
+        @if (flashSuccess.Value.Heading is string heading)
         {
-            <h3 class="govuk-notification-banner__heading">@flashSuccess.Value.Heading</h3>
+            <h3 class="govuk-notification-banner__heading">@heading</h3>
         }
-        @if (flashSuccess.Value.Message is not null)
+        @if (flashSuccess.Value.MessageText is string messageText)
         {
-            @foreach (var line in flashSuccess.Value.Message.Split("\n", StringSplitOptions.RemoveEmptyEntries))
+            @foreach (var line in messageText.Split("\n", StringSplitOptions.RemoveEmptyEntries))
             {
                 <p class="govuk-body">@line</p>
             }
+        }
+        else if (flashSuccess.Value.MessageHtml is string messageHtml)
+        {
+            @Html.Raw(messageHtml)
         }
     </govuk-notification-banner>
 }

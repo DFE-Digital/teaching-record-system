@@ -1,0 +1,577 @@
+using FakeItEasy;
+using FakeXrmEasy.Extensions;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
+using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
+
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
+
+public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
+{
+    [Fact]
+    public async Task Get_NoPersonIdSelected_RedirectsToMatches()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState() { PersonId = null });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Get_NoAttributesSourcesSet_RedirectsToMerge()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonAttributeSourcesSet = false
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
+
+    public static TheoryData<PersonMatchedAttribute, string, Func<TrnRequestMetadata, object?>, Func<TestData.CreatePersonResult, object?>> AttributesAndSummaryListRowKeysData { get; } = new()
+    {
+        { PersonMatchedAttribute.FirstName, "FirstName", m => m.FirstName, p => p.FirstName },
+        { PersonMatchedAttribute.MiddleName, "MiddleName", m => m.MiddleName, p => p.MiddleName },
+        { PersonMatchedAttribute.LastName, "LastName", m => m.LastName, p => p.LastName },
+        { PersonMatchedAttribute.DateOfBirth, "DateOfBirth", m => m.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), p => p.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat) },
+        { PersonMatchedAttribute.EmailAddress, "EmailAddress", m => m.EmailAddress, p => p.Email },
+        { PersonMatchedAttribute.NationalInsuranceNumber, "NationalInsuranceNumber", m => m.NationalInsuranceNumber, p => p.NationalInsuranceNumber }
+    };
+
+    [Theory]
+    [MemberData(nameof(PersonAttributeInfoData))]
+    public async Task Get_AttributeSourceIsTrnRequest_RendersChosenAttributeValues(PersonAttributeInfo sourcedFromRequestDataAttribute)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            sourcedFromRequestDataAttribute.Attribute);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        var state = new ResolveApiTrnRequestState()
+        {
+            PersonId = matchedPerson.PersonId,
+            PersonAttributeSourcesSet = true
+        };
+        SetPersonAttributeSourceToTrnRequest(state, sourcedFromRequestDataAttribute.Attribute);
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var allSummaryListRowValues = doc.GetElementsByClassName("govuk-summary-list__row")
+            .ToDictionary(
+                row => row.GetElementsByClassName("govuk-summary-list__key").Single().TextContent.Trim(),
+                row => row.GetElementsByClassName("govuk-summary-list__value").Single().TextContent.Trim());
+
+        foreach (var kvp in allSummaryListRowValues)
+        {
+            var attributeInfo = PersonAttributeInfos.SingleOrDefault(i => i.SummaryListRowKey == kvp.Key);
+            if (attributeInfo is null)
+            {
+                continue;
+            }
+
+            static object? FormatValue(object? value) =>
+                value is DateOnly dateOnly ? dateOnly.ToString(UiDefaults.DateOnlyDisplayFormat) : value;
+
+            if (sourcedFromRequestDataAttribute.SummaryListRowKey == kvp.Key)
+            {
+                var requestDataValue = FormatValue(sourcedFromRequestDataAttribute.GetValueFromRequestData(requestData));
+                Assert.Equal(requestDataValue, kvp.Value);
+            }
+            else
+            {
+                var existingRecordValue = FormatValue(
+                    PersonAttributeInfos.Single(i => i.SummaryListRowKey == kvp.Key, kvp.Key).GetValueFromPerson(matchedPerson));
+                Assert.Equal(existingRecordValue, kvp.Value);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Get_CreatingNewRecord_DoesNotShowTrnRow()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Null(doc.GetSummaryListValueElementForKey("TRN"));
+    }
+
+    [Fact]
+    public async Task Get_UpdatingExistingRecord_DoesShowTrnRow()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonAttributeSourcesSet = true
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.NotNull(doc.GetSummaryListValueElementForKey("TRN"));
+    }
+
+    [Fact]
+    public async Task Get_ShowsComments()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var comments = Faker.Lorem.Paragraph();
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonAttributeSourcesSet = true,
+                Comments = comments
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(comments, doc.GetSummaryListValueElementForKey("Comments")?.TextContent.Trim());
+    }
+
+    [Fact]
+    public async Task Get_CreatingNewRecord_HasBackAndChangeLinksToMatchesPage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel
+            });
+
+        var expectedBackLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+        Assert.Equal(expectedBackLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Get_UpdatingExistingRecord_HasBackAndChangeLinksToMergePage()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonAttributeSourcesSet = true
+            });
+
+        var expectedBackLink = $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}";
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(expectedBackLink, doc.GetElementsByClassName("govuk-back-link").Single().GetAttribute("href"));
+        Assert.Equal(expectedBackLink, doc.GetElementByTestId("change-link")?.GetAttribute("href"));
+    }
+
+    [Fact]
+    public async Task Post_NoPersonIdSelected_RedirectsToMatches()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState() { PersonId = null });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_NoAttributesSourcesSet_RedirectsToMerge()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId);
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = supportTask.TrnRequestMetadata!.Matches!.MatchedRecords.First().PersonId,
+                PersonAttributeSourcesSet = false
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal(
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge?{journeyInstance.GetUniqueIdQueryParameter()}",
+            response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_CreatingNewRecord_CreatesNewRecordInCrmUpdatesSupportTaskStatusAndRedirects()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            PersonMatchedAttribute.MiddleName);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = CreateNewRecordPersonIdSentinel
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
+
+        var expectedCrmRequestId = TrnRequestHelper.GetCrmTrnRequestId(applicationUser.UserId, requestData.RequestId);
+        var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.dfeta_TrnRequestID == expectedCrmRequestId);
+        Assert.NotEqual(matchedPerson.ContactId, crmContact.Id);
+        Assert.Equal(requestData.FirstName, crmContact.FirstName);
+        Assert.Equal(requestData.MiddleName, crmContact.MiddleName);
+        Assert.Equal(requestData.LastName, crmContact.LastName);
+        Assert.Equal(requestData.FirstName, crmContact.dfeta_StatedFirstName);
+        Assert.Equal(requestData.MiddleName, crmContact.dfeta_StatedMiddleName);
+        Assert.Equal(requestData.LastName, crmContact.dfeta_StatedLastName);
+        Assert.Equal(requestData.DateOfBirth, crmContact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
+        Assert.Equal(requestData.EmailAddress, crmContact.EMailAddress1);
+        Assert.Equal(requestData.NationalInsuranceNumber, crmContact.dfeta_NINumber);
+        Assert.NotNull(crmContact.dfeta_TRN);
+
+        var updatedSupportTask = await WithDbContext(dbContext => dbContext
+            .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(
+            nextPageDoc,
+            $"Records merged successfully for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+    }
+
+    [Fact]
+    public async Task Post_UpdatingExistingRecord_UpdatesRecordInCrmUpdatesSupportTaskStatusAndRedirects()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            PersonMatchedAttribute.MiddleName);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        var journeyInstance = await CreateJourneyInstance(
+            supportTask.SupportTaskReference,
+            new ResolveApiTrnRequestState()
+            {
+                PersonId = matchedPerson.PersonId,
+                PersonAttributeSourcesSet = true,
+                MiddleNameSource = PersonAttributeSource.TrnRequest
+            });
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
+
+        var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
+        Assert.Equal(requestData.MiddleName, crmContact.MiddleName);
+
+        var updatedSupportTask = await WithDbContext(dbContext => dbContext
+            .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
+        Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+
+        var nextPage = await response.FollowRedirectAsync(HttpClient);
+        var nextPageDoc = await nextPage.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(
+            nextPageDoc,
+            $"Records merged successfully for {requestData.FirstName} {requestData.MiddleName} {requestData.LastName}");
+    }
+
+    [Theory]
+    [MemberData(nameof(PersonAttributeInfoData))]
+    public async Task Post_UpdatingExistingRecord_OnlyUpdatesAttributesSourcedFromRequestData(PersonAttributeInfo attributeSourcedFromRequestData)
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var (supportTask, matchedPerson) = await CreateSupportTaskWithSingleDifferenceToMatch(
+            applicationUser.UserId,
+            attributeSourcedFromRequestData.Attribute);
+        var requestData = supportTask.TrnRequestMetadata!;
+
+        var state = new ResolveApiTrnRequestState()
+        {
+            PersonId = matchedPerson.PersonId,
+            PersonAttributeSourcesSet = true
+        };
+        SetPersonAttributeSourceToTrnRequest(state, attributeSourcedFromRequestData.Attribute);
+
+        var journeyInstance = await CreateJourneyInstance(supportTask.SupportTaskReference, state);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        var matchedCrmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId).Clone();
+
+        // Act
+        await HttpClient.SendAsync(request);
+
+        // Assert
+        var updatedContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
+
+        static object? FormatValue(object? value) =>
+            value is DateOnly dateOnly ? dateOnly.ToDateTimeWithDqtBstFix(isLocalTime: false) : value;
+
+        var allAttributes = PersonAttributeInfos.SelectMany(i => i.CrmAttributes);
+        foreach (var attr in allAttributes)
+        {
+            if (attributeSourcedFromRequestData.CrmAttributes.Contains(attr))
+            {
+                Assert.Equal(
+                    FormatValue(attributeSourcedFromRequestData.GetValueFromRequestData(requestData)),
+                    updatedContact.Attributes[attr]);
+            }
+            else
+            {
+                Assert.Equal(matchedCrmContact.Attributes[attr], updatedContact.Attributes[attr]);
+            }
+        }
+    }
+
+    private Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
+        string supportTaskReference,
+        ResolveApiTrnRequestState state) =>
+        CreateJourneyInstance(
+            JourneyNames.ResolveApiTrnRequest,
+            state,
+            new KeyValuePair<string, object>("supportTaskReference", supportTaskReference));
+
+    private static void SetPersonAttributeSourceToTrnRequest(ResolveApiTrnRequestState state, PersonMatchedAttribute attribute)
+    {
+        state.FirstNameSource = attribute is PersonMatchedAttribute.FirstName ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+        state.MiddleNameSource = attribute is PersonMatchedAttribute.MiddleName ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+        state.LastNameSource = attribute is PersonMatchedAttribute.LastName ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+        state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+        state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+        state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+    }
+
+    public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
+    [
+        new(
+            PersonMatchedAttribute.FirstName,
+            "FirstName",
+            "First name",
+            [Contact.Fields.FirstName, Contact.Fields.dfeta_StatedFirstName],
+            d => d.FirstName,
+            p => p.FirstName
+        ),
+        new(
+            PersonMatchedAttribute.MiddleName,
+            "MiddleName",
+            "Middle name",
+            [Contact.Fields.MiddleName, Contact.Fields.dfeta_StatedMiddleName],
+            d => d.MiddleName,
+            p => p.MiddleName
+        ),
+        new(
+            PersonMatchedAttribute.LastName,
+            "LastName",
+            "Last name",
+            [Contact.Fields.LastName, Contact.Fields.dfeta_StatedLastName],
+            d => d.LastName,
+            p => p.LastName
+        ),
+        new(
+            PersonMatchedAttribute.DateOfBirth,
+            "DateOfBirth",
+            "Date of birth",
+            [Contact.Fields.BirthDate],
+            d => d.DateOfBirth,
+            p => p.DateOfBirth,
+            value => ((DateOnly?)value)?.ToString(UiDefaults.DateOnlyDisplayFormat)
+        ),
+        new(
+            PersonMatchedAttribute.EmailAddress,
+            "EmailAddress",
+            "Email address",
+            [Contact.Fields.EMailAddress1],
+            d => d.EmailAddress,
+            p => p.Email
+        ),
+        new(
+            PersonMatchedAttribute.NationalInsuranceNumber,
+            "NationalInsuranceNumber",
+            "National Insurance number",
+            [Contact.Fields.dfeta_NINumber],
+            d => d.NationalInsuranceNumber,
+            p => p.NationalInsuranceNumber
+        )
+    ];
+
+    public static IEnumerable<object[]> PersonAttributeInfoData { get; } = PersonAttributeInfos.Select(i => new object[] { i });
+
+    public record PersonAttributeInfo(
+        PersonMatchedAttribute Attribute,
+        string FieldName,
+        string SummaryListRowKey,
+        string[] CrmAttributes,
+        Func<TrnRequestMetadata, object?> GetValueFromRequestData,
+        Func<TestData.CreatePersonResult, object?> GetValueFromPerson,
+        Func<object?, object?>? MapValueToSummaryListRowValue = null);
+}

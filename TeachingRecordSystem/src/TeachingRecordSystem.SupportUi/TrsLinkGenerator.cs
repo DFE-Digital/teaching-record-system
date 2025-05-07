@@ -403,6 +403,9 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string ApiTrnRequestCheckAnswers(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
+    public string ApiTrnRequestCheckAnswersCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
     public string ConnectOneLoginUserSupportTask(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Index", routeValues: new { supportTaskReference });
 

@@ -11,17 +11,35 @@ public static class TempDataKeys
 
 public static class TempDataExtensions
 {
-    public static void SetFlashSuccess(this ITempDataDictionary tempData, string? heading = null, string? message = null)
+    public static void SetFlashSuccess(
+        this ITempDataDictionary tempData,
+        string? heading = null,
+        string? message = null,
+        string? messageHtml = null)
     {
-        tempData.Add(TempDataKeys.FlashSuccess, new FlashSuccessData() { Heading = heading, Message = message }.Serialize());
+        if (message is not null && messageHtml is not null)
+        {
+            throw new ArgumentException($"Cannot set both {nameof(message)} and {nameof(messageHtml)}.");
+        }
+
+        tempData.Add(
+            TempDataKeys.FlashSuccess,
+            new FlashSuccessData()
+            {
+                Heading = heading,
+                Message = message,
+                MessageHtml = messageHtml
+            }.Serialize());
     }
 
-    public static bool TryGetFlashSuccess(this ITempDataDictionary tempData, [NotNullWhen(true)] out (string? Heading, string? Message)? result)
+    public static bool TryGetFlashSuccess(
+        this ITempDataDictionary tempData,
+        [NotNullWhen(true)] out (string? Heading, string? MessageText, string? MessageHtml)? result)
     {
         if (tempData.TryGetValue(TempDataKeys.FlashSuccess, out object? flashSuccessObject) && flashSuccessObject is string flashSuccessString)
         {
             var data = FlashSuccessData.Deserialize(flashSuccessString);
-            result = (data.Heading, data.Message);
+            result = (data.Heading, MessageText: data.Message, data.MessageHtml);
             return true;
         }
         else
@@ -35,6 +53,7 @@ public static class TempDataExtensions
     {
         public required string? Heading { get; init; }
         public required string? Message { get; init; }
+        public required string? MessageHtml { get; init; }
 
         public string Serialize() => JsonSerializer.Serialize(this);
 

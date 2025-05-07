@@ -17,6 +17,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
@@ -46,7 +47,11 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IDistributedCache, DevelopmentFileDistributedCache>();
 }
 
-builder.Services.AddGovUkFrontend();
+builder.Services.AddGovUkFrontend(options =>
+{
+    options.DefaultButtonPreventDoubleClick = true;
+});
+
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
@@ -114,6 +119,8 @@ builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
+    builder.Services.AddApiTrnGeneration(builder.Configuration);
+
     var crmConnectionString = $"""
         AuthType=ClientSecret;
         Url={builder.Configuration.GetRequiredValue("CrmUrl")};

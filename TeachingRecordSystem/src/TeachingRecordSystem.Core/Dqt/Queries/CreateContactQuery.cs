@@ -19,7 +19,7 @@ public record CreateContactQuery : ICrmQuery<Guid>
     public required string ApplicationUserName { get; init; }
     public required string? Trn { get; init; }
     public required string? TrnRequestId { get; init; }
-    public required TrnRequestMetadataMessage TrnRequestMetadataMessage { get; init; }
+    public required TrnRequestMetadataMessage? TrnRequestMetadataMessage { get; init; }
     public required bool AllowPiiUpdates { get; init; }
 }
 
