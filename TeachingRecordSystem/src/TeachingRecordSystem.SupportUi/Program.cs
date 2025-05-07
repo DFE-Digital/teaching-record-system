@@ -46,7 +46,11 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IDistributedCache, DevelopmentFileDistributedCache>();
 }
 
-builder.Services.AddGovUkFrontend();
+builder.Services.AddGovUkFrontend(options =>
+{
+    options.DefaultFileUploadJavaScriptEnhancements = true;
+});
+
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
