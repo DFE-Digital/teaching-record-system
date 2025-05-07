@@ -234,7 +234,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             await dbContext.SaveChangesAsync();
         }
 
-        TempData.SetFlashSuccess("Application user updated", message: flashMessage);
+        TempData.SetFlashSuccess("Application user updated", messageText: flashMessage);
         return Redirect(linkGenerator.ApplicationUsers());
     }
 

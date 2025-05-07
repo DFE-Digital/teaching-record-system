@@ -13,6 +13,7 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         appendUniqueKey: true);
 
     public Guid? PersonId { get; set; }
+    public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
     public PersonAttributeSource? MiddleNameSource { get; set; }
     public PersonAttributeSource? LastNameSource { get; set; }
@@ -66,5 +67,9 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         }
     }
 
-    public enum PersonAttributeSource { TrnRequest, ExistingRecord }
+    public enum PersonAttributeSource
+    {
+        ExistingRecord = 0,
+        TrnRequest = 1
+    }
 }

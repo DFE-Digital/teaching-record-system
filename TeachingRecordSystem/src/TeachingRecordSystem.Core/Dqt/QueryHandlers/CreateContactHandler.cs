@@ -54,7 +54,10 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             requestBuilder.AddRequest(new CreateRequest() { Target = task });
         }
 
-        requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(query.TrnRequestMetadataMessage) });
+        if (query.TrnRequestMetadataMessage is not null)
+        {
+            requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(query.TrnRequestMetadataMessage) });
+        }
 
         await requestBuilder.ExecuteAsync();
 

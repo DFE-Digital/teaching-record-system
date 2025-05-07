@@ -52,7 +52,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
 
         TempData.SetFlashSuccess(
             heading: "Teaching record connected",
-            message: $"{PersonDetail.Name} will get an email to say they can sign in.");
+            messageText: $"{PersonDetail.Name} will get an email to say they can sign in.");
 
         return Redirect(linkGenerator.SupportTasks());
     }

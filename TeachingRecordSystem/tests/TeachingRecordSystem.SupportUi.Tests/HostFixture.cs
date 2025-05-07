@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
@@ -61,6 +62,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddFakeXrm();
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
             services.AddSingleton<FakeTrnGenerator>();
+            services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);

@@ -113,6 +113,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
             state.DateOfBirthSource = DateOfBirthSource;
             state.EmailAddressSource = EmailAddressSource;
             state.NationalInsuranceNumberSource = NationalInsuranceNumberSource;
+            state.PersonAttributeSourcesSet = true;
             state.Comments = Comments;
         });
 
@@ -130,14 +131,15 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
     {
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var requestData = supportTask.TrnRequestMetadata!;
+        var state = JourneyInstance!.State;
 
-        if (JourneyInstance!.State.PersonId is not Guid personId)
+        if (state.PersonId is not Guid personId)
         {
             context.Result = Redirect(linkGenerator.ApiTrnRequestMatches(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;
         }
 
-        if (JourneyInstance.State.PersonId == CreateNewRecordPersonIdSentinel)
+        if (state.PersonId == CreateNewRecordPersonIdSentinel)
         {
             context.Result = Redirect(linkGenerator.ApiTrnRequestCheckAnswers(SupportTaskReference!, JourneyInstance!.InstanceId));
             return;

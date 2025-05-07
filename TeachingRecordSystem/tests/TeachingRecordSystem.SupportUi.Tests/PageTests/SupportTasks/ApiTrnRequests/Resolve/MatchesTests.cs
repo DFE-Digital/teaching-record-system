@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
-public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
 {
     [Fact]
     public async Task Get_TaskDoesNotExist_ReturnsNotFound()
@@ -478,7 +478,8 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 LastNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
                 DateOfBirthSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord
+                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                PersonAttributeSourcesSet = true
             });
 
         var request = new HttpRequestMessage(
@@ -499,6 +500,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(journeyInstance.State.DateOfBirthSource);
         Assert.Null(journeyInstance.State.EmailAddressSource);
         Assert.Null(journeyInstance.State.NationalInsuranceNumberSource);
+        Assert.False(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
     [Fact]
@@ -520,7 +522,8 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
                 LastNameSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
                 DateOfBirthSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
                 EmailAddressSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
-                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord
+                NationalInsuranceNumberSource = ResolveApiTrnRequestState.PersonAttributeSource.ExistingRecord,
+                PersonAttributeSourcesSet = true
             });
 
         var request = new HttpRequestMessage(
@@ -541,6 +544,7 @@ public class MatchesTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(journeyInstance.State.DateOfBirthSource);
         Assert.NotNull(journeyInstance.State.EmailAddressSource);
         Assert.NotNull(journeyInstance.State.NationalInsuranceNumberSource);
+        Assert.True(journeyInstance.State.PersonAttributeSourcesSet);
     }
 
     private Task<JourneyInstance<ResolveApiTrnRequestState>> CreateJourneyInstance(
