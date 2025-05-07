@@ -140,7 +140,8 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> Map()
         }
 
         var contacts = entities
-            .Select(e => e.ToEntity<Contact>());
+            .Select(e => e.ToEntity<Contact>())
+            .DistinctBy(c => c.Id);
 
         var qts = entities
             .Select(e => e.Extract<dfeta_qtsregistration>())
