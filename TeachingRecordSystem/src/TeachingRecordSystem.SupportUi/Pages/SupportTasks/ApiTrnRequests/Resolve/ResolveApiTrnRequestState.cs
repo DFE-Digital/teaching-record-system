@@ -67,6 +67,49 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         }
     }
 
+    public IReadOnlyCollection<PersonMatchedAttribute> GetAttributesToUpdate()
+    {
+        if (!PersonAttributeSourcesSet)
+        {
+            throw new InvalidOperationException("Attribute sources not set.");
+        }
+
+        return Impl().AsReadOnly();
+
+        IEnumerable<PersonMatchedAttribute> Impl()
+        {
+            if (FirstNameSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.FirstName;
+            }
+
+            if (MiddleNameSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.MiddleName;
+            }
+
+            if (LastNameSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.LastName;
+            }
+
+            if (DateOfBirthSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.DateOfBirth;
+            }
+
+            if (EmailAddressSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.EmailAddress;
+            }
+
+            if (NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest)
+            {
+                yield return PersonMatchedAttribute.NationalInsuranceNumber;
+            }
+        }
+    }
+
     public enum PersonAttributeSource
     {
         ExistingRecord = 0,

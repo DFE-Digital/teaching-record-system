@@ -1,5 +1,7 @@
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Messages;
+using Optional;
+using Optional.Unsafe;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 
@@ -20,17 +22,27 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             FirstName = query.FirstName,
             MiddleName = query.MiddleName,
             LastName = query.LastName,
-            dfeta_StatedFirstName = query.StatedFirstName,
-            dfeta_StatedMiddleName = query.StatedMiddleName,
-            dfeta_StatedLastName = query.StatedLastName,
             BirthDate = query.DateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false),
             GenderCode = query.Gender,
             dfeta_NINumber = query.NationalInsuranceNumber,
             EMailAddress1 = query.EmailAddress,
             dfeta_AllowPiiUpdatesFromRegister = query.AllowPiiUpdates,
             dfeta_TrnRequestID = query.TrnRequestId,
-            dfeta_TRN = query.Trn,
+            dfeta_TRN = query.Trn
         };
+
+        void SetAttributeIfSpecified<T>(Option<T> value, string attributeName)
+        {
+            if (value.HasValue)
+            {
+                object? attributeValue = value.ValueOrFailure();
+                contact.Attributes.Add(attributeName, attributeValue);
+            }
+        }
+
+        SetAttributeIfSpecified(query.StatedFirstName, Contact.Fields.dfeta_StatedFirstName);
+        SetAttributeIfSpecified(query.StatedMiddleName, Contact.Fields.dfeta_StatedMiddleName);
+        SetAttributeIfSpecified(query.StatedLastName, Contact.Fields.dfeta_StatedLastName);
 
         if (query.Trn is null)
         {

@@ -365,9 +365,6 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         Assert.Equal(requestData.FirstName, crmContact.FirstName);
         Assert.Equal(requestData.MiddleName, crmContact.MiddleName);
         Assert.Equal(requestData.LastName, crmContact.LastName);
-        Assert.Equal(requestData.FirstName, crmContact.dfeta_StatedFirstName);
-        Assert.Equal(requestData.MiddleName, crmContact.dfeta_StatedMiddleName);
-        Assert.Equal(requestData.LastName, crmContact.dfeta_StatedLastName);
         Assert.Equal(requestData.DateOfBirth, crmContact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
         Assert.Equal(requestData.EmailAddress, crmContact.EMailAddress1);
         Assert.Equal(requestData.NationalInsuranceNumber, crmContact.dfeta_NINumber);
@@ -507,7 +504,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             PersonMatchedAttribute.FirstName,
             "FirstName",
             "First name",
-            [Contact.Fields.FirstName, Contact.Fields.dfeta_StatedFirstName],
+            [Contact.Fields.FirstName],
             d => d.FirstName,
             p => p.FirstName
         ),
@@ -515,7 +512,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             PersonMatchedAttribute.MiddleName,
             "MiddleName",
             "Middle name",
-            [Contact.Fields.MiddleName, Contact.Fields.dfeta_StatedMiddleName],
+            [Contact.Fields.MiddleName],
             d => d.MiddleName,
             p => p.MiddleName
         ),
@@ -523,7 +520,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             PersonMatchedAttribute.LastName,
             "LastName",
             "Last name",
-            [Contact.Fields.LastName, Contact.Fields.dfeta_StatedLastName],
+            [Contact.Fields.LastName],
             d => d.LastName,
             p => p.LastName
         ),

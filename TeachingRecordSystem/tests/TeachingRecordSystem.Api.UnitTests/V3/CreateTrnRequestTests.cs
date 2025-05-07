@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Optional.Unsafe;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -62,9 +63,9 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
             // Assert
             var (createContactQuery, _) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
             Assert.Equal(firstName1, createContactQuery.FirstName);
-            Assert.Equal(firstName, createContactQuery.StatedFirstName);
+            Assert.Equal(firstName, createContactQuery.StatedFirstName.ValueOrFailure());
             Assert.Equal($"{firstName2} {middleName}", createContactQuery.MiddleName);
-            Assert.Equal(middleName, createContactQuery.StatedMiddleName);
+            Assert.Equal(middleName, createContactQuery.StatedMiddleName.ValueOrFailure());
         });
 
     [Fact]
@@ -530,9 +531,9 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
     {
         var (applicationUserId, _) = CurrentUserProvider.GetCurrentApplicationUser();
 
-        Assert.Equal(command.FirstName, query.StatedFirstName);
-        Assert.Equal(command.MiddleName, query.StatedMiddleName);
-        Assert.Equal(command.LastName, query.StatedLastName);
+        Assert.Equal(command.FirstName, query.StatedFirstName.ValueOrFailure());
+        Assert.Equal(command.MiddleName, query.StatedMiddleName.ValueOrFailure());
+        Assert.Equal(command.LastName, query.StatedLastName.ValueOrFailure());
         Assert.Equal(command.DateOfBirth, query.DateOfBirth);
         Assert.Equal(command.Gender?.ConvertToContact_GenderCode(), query.Gender);
         Assert.Equal(command.NationalInsuranceNumber, query.NationalInsuranceNumber);
