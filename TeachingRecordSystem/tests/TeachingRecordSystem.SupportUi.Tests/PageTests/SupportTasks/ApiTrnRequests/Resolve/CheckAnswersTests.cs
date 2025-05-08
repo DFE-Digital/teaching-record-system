@@ -3,6 +3,7 @@ using FakeXrmEasy.Extensions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -374,6 +375,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+        var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
+        AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
+        Assert.Null(supportTaskData.SelectedPersonAttributes);
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
@@ -383,7 +387,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
     }
 
     [Fact]
-    public async Task Post_UpdatingExistingRecord_UpdatesRecordInCrmUpdatesSupportTaskStatusAndRedirects()
+    public async Task Post_UpdatingExistingRecord_UpdatesRecordInCrmUpdatesSupportTaskAndRedirects()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
@@ -401,6 +405,8 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
                 PersonAttributeSourcesSet = true,
                 MiddleNameSource = PersonAttributeSource.TrnRequest
             });
+
+        var originalContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -420,6 +426,9 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+        var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
+        AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
+        AssertPersonAttributesMatchContact(supportTaskData.SelectedPersonAttributes, originalContact);
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
@@ -496,6 +505,19 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
         state.DateOfBirthSource = attribute is PersonMatchedAttribute.DateOfBirth ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.EmailAddressSource = attribute is PersonMatchedAttribute.EmailAddress ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
         state.NationalInsuranceNumberSource = attribute is PersonMatchedAttribute.NationalInsuranceNumber ? PersonAttributeSource.TrnRequest : PersonAttributeSource.ExistingRecord;
+    }
+
+    private void AssertPersonAttributesMatchContact(
+        ApiTrnRequestDataPersonAttributes? personAttributes,
+        Contact contact)
+    {
+        Assert.NotNull(personAttributes);
+        Assert.Equal(personAttributes.FirstName, contact.FirstName);
+        Assert.Equal(personAttributes.MiddleName, contact.MiddleName);
+        Assert.Equal(personAttributes.LastName, contact.LastName);
+        Assert.Equal(personAttributes.DateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
+        Assert.Equal(personAttributes.EmailAddress, contact.EMailAddress1);
+        Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
     }
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
