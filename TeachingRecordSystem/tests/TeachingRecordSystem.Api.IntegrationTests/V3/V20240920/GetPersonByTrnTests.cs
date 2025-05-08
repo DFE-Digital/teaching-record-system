@@ -258,6 +258,21 @@ public class GetPersonByTrnTests : TestBase
             responseItt);
     }
 
+    [Fact]
+    public async Task ValidRequest_ForInactiveContact_ReturnsNotFound()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithContactState(ContactState.Inactive));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}");
+
+        // Act
+        var response = await GetHttpClientWithApiKey().SendAsync(request);
+
+        // Assert
+        await AssertEx.JsonResponseIsErrorAsync(response, ApiError.ErrorCodes.PersonInactive, StatusCodes.Status404NotFound);
+    }
+
     private static dfeta_initialteachertraining CreateIttEntity(Guid contactId, string ittProviderUkprn, string ittProviderName)
     {
         var ittStartDate = new DateOnly(2021, 9, 7);

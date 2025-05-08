@@ -40,6 +40,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
 
         return result.ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.PersonInactive, StatusCodes.Status404NotFound)
             .MapErrorCode(ApiError.ErrorCodes.ForbiddenForAppropriateBody, StatusCodes.Status403Forbidden);
     }
 

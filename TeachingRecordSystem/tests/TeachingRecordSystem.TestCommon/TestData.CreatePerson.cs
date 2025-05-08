@@ -50,6 +50,7 @@ public partial class TestData
         private string? _slugId;
         private int? _loginFailedCounter;
         private CreatePersonInductionBuilder? _inductionBuilder;
+        private ContactState? _contactState;
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -299,6 +300,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithContactState(ContactState contactState)
+        {
+            _contactState = contactState;
+            return this;
+        }
+
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
@@ -509,6 +516,16 @@ public partial class TestData
                         }
                     });
                 }
+            }
+
+            if (_contactState is ContactState.Inactive)
+            {
+                txnRequestBuilder.AddRequest<SetStateResponse>(new SetStateRequest()
+                {
+                    EntityMoniker = PersonId.ToEntityReference(Contact.EntityLogicalName),
+                    State = new OptionSetValue((int)TaskState.Completed),
+                    Status = new OptionSetValue((int)Task_StatusCode.Completed)
+                });
             }
 
             var retrieveContactHandle = txnRequestBuilder.AddRequest<RetrieveResponse>(new RetrieveRequest()

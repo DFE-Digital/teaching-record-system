@@ -35,6 +35,7 @@ public class TeacherController(IMapper mapper) : ControllerBase
         var result = await handler.HandleAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden)
             .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status403Forbidden);
     }
 }

@@ -178,7 +178,7 @@ public class GetPersonHandler(
         }
 
         var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveContactDetailByTrnQuery(
+            new GetContactDetailByTrnQuery(
                 command.Trn,
                 new ColumnSet(
                     Contact.Fields.FirstName,
@@ -201,6 +201,11 @@ public class GetPersonHandler(
         if (contactDetail is null)
         {
             return ApiError.PersonNotFound(command.Trn);
+        }
+
+        if (contactDetail.Contact.StateCode is ContactState.Inactive)
+        {
+            return ApiError.PersonInactive(command.Trn);
         }
 
         // If a DateOfBirth or NationalInsuranceNumber was provided, ensure the record we've retrieved with the TRN matches

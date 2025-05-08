@@ -36,7 +36,8 @@ public class TeachersController(IMapper mapper) : ControllerBase
         var result = await handler.HandleAsync(command);
 
         return result.ToActionResult(r => Ok(mapper.Map<GetTeacherResponse>(r)))
-            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.PersonInactive, StatusCodes.Status404NotFound);
     }
 
     [HttpPost("name-changes")]
