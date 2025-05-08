@@ -87,7 +87,7 @@ public class CheckAnswersModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        AlertTypeName = alertInfo.Alert.AlertType.Name;
+        AlertTypeName = alertInfo.Alert.AlertType!.Name;
         Details = alertInfo.Alert.Details;
         Link = alertInfo.Alert.ExternalLink;
         LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;

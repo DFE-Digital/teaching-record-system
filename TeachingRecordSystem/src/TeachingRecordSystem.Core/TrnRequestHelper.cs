@@ -125,7 +125,7 @@ public class TrnRequestHelper(
             EmailAddress = requestData.EmailAddress,
             NationalInsuranceNumber = requestData.NationalInsuranceNumber,
             ReviewTasks = [],
-            ApplicationUserName = requestData.ApplicationUser.Name,
+            ApplicationUserName = requestData.ApplicationUser!.Name,
             Trn = trn,
             TrnRequestId = GetCrmTrnRequestId(requestData.ApplicationUserId, requestData.RequestId),
             TrnRequestMetadataMessage = null,

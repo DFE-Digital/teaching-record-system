@@ -30,7 +30,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
         var currentAlert = await dbContext.Alerts
             .FromSql($"select * from alerts where alert_id = {alertId} for update")  // https://github.com/dotnet/efcore/issues/26042
             .Include(a => a.AlertType)
-            .ThenInclude(at => at.AlertCategory)
+            .ThenInclude(at => at!.AlertCategory)
             .Include(a => a.Person)
             .SingleOrDefaultAsync();
 
@@ -52,7 +52,7 @@ public class CheckAlertExistsFilter(Permissions.Alerts requiredPermissionType, T
         }
 
         context.HttpContext.SetCurrentAlertFeature(new(currentAlert));
-        context.HttpContext.SetCurrentPersonFeature(currentAlert.Person);
+        context.HttpContext.SetCurrentPersonFeature(currentAlert.Person!);
 
         await next();
     }

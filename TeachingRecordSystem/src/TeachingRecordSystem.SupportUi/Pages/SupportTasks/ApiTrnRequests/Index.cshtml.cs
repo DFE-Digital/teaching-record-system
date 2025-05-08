@@ -73,7 +73,7 @@ public class Index(TrsDbContext dbContext) : PageModel
         }
         else if (sortBy == ApiTrnRequestsSortByOption.Source)
         {
-            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.ApplicationUser.Name);
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.ApplicationUser!.Name);
         }
 
         Results = await tasks
@@ -86,7 +86,7 @@ public class Index(TrsDbContext dbContext) : PageModel
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser.Name))
+                t.TrnRequestMetadata.ApplicationUser!.Name))
             .ToArrayAsync();
 
         return Page();

@@ -28,7 +28,7 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
             .Include(ps => ps.Person)
             .Include(ps => ps.TrainingProvider)
             .Include(ps => ps.TrainingCountry)
-            .Include(ps => ps.Route)
+            .Include(ps => ps.Route!)
                 .ThenInclude(r => r.InductionExemptionReason)
             .Include(ps => ps.DegreeType);
 
@@ -42,7 +42,7 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
         }
 
         context.HttpContext.SetCurrentProfessionalStatusFeature(new(currentProfessionalStatus));
-        context.HttpContext.SetCurrentPersonFeature(currentProfessionalStatus.Person);
+        context.HttpContext.SetCurrentPersonFeature(currentProfessionalStatus.Person!);
         await next();
     }
 }

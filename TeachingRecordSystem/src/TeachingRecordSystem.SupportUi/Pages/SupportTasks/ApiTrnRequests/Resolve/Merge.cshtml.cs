@@ -144,7 +144,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
 
         var personAttributes = await GetPersonAttributesAsync(personId);
 
-        SourceApplicationUserName = requestData.ApplicationUser.Name;
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;
 
         var attributeMatches = GetPersonAttributeMatches(
             personAttributes.FirstName,

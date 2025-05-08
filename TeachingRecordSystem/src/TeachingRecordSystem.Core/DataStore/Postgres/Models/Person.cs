@@ -34,8 +34,8 @@ public class Person
     public DateTime? CpdInductionCpdModifiedOn { get; private set; }
     public DateOnly? QtsDate { get; set; }
     public DateOnly? EytsDate { get; set; }
-    public ICollection<Qualification> Qualifications { get; } = new List<Qualification>();
-    public ICollection<Alert> Alerts { get; } = new List<Alert>();
+    public ICollection<Qualification>? Qualifications { get; }
+    public ICollection<Alert>? Alerts { get; }
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }

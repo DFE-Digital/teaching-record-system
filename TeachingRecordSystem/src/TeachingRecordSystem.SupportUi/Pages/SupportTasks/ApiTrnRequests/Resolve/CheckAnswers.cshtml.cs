@@ -161,7 +161,7 @@ public class CheckAnswers(
         }
 
         Comments = state.Comments;
-        SourceApplicationUserName = requestData.ApplicationUser.Name;
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

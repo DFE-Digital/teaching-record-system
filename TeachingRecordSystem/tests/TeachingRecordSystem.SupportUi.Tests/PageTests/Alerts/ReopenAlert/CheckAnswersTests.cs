@@ -93,7 +93,7 @@ public class CheckAnswersTests : ReopenAlertTestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(alert.AlertType.Name, doc.GetSummaryListValueForKey("Alert type"));
+        Assert.Equal(alert.AlertType!.Name, doc.GetSummaryListValueForKey("Alert type"));
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
         Assert.Equal(populateOptional ? $"{alert.ExternalLink} (opens in new tab)" : UiDefaults.EmptyDisplayContent, doc.GetSummaryListValueForKey("Link"));
         Assert.Equal(alert.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));

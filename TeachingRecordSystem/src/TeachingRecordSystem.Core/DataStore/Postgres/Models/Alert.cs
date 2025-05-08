@@ -10,10 +10,10 @@ public class Alert
     public const string PersonForeignKeyName = "fk_alerts_person";
 
     public required Guid AlertId { get; init; }
-    public AlertType AlertType { get; } = null!;
+    public AlertType? AlertType { get; }
     public required Guid AlertTypeId { get; init; }
     public required Guid PersonId { get; init; }
-    public Person Person { get; } = null!;
+    public Person? Person { get; }
     public required string? Details { get; set; }
     public required string? ExternalLink { get; set; }
     public required DateOnly? StartDate { get; set; }

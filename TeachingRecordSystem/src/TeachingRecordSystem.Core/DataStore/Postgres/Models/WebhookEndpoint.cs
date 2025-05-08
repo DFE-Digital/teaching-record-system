@@ -4,7 +4,7 @@ public class WebhookEndpoint
 {
     public required Guid WebhookEndpointId { get; init; }
     public required Guid ApplicationUserId { get; init; }
-    public virtual ApplicationUser ApplicationUser { get; } = null!;
+    public ApplicationUser? ApplicationUser { get; }
     public required string Address { get; set; }
     public required string ApiVersion { get; set; }
     public required List<string> CloudEventTypes { get; set; }
