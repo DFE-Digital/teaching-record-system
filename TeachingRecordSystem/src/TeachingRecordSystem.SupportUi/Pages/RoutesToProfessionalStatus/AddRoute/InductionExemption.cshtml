@@ -1,6 +1,10 @@
 ﻿@page "/route/add/induction-exemption/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.InductionExemptionModel
 
+@{
+    ViewBag.Title = "Add induction exemption";
+}
+
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
 }
