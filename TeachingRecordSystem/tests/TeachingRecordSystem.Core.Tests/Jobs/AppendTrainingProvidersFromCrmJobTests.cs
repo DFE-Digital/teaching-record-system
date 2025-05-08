@@ -56,4 +56,43 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
         var appendedProviderList = _trsContext.TrainingProviders?.AsEnumerable();
         Assert.Equal(account.Name, appendedProviderList!.Single(p => p.Ukprn == account.dfeta_UKPRN).Name);
     }
+
+    [Fact]
+    public async Task Execute_WithTrainingProviderInCrm_IgnoresMatchingUkprns()
+    {
+        // arrange
+        var accounts = new List<Account>()
+        {
+            new Account()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Provider2",
+                AccountNumber = "123",
+                dfeta_UKPRN = "12345672"
+            },
+            new Account()
+            {
+                Id = Guid.NewGuid(),
+                Name = "A provider with same Ukprn as in TrsDB",
+                AccountNumber = "123",
+                dfeta_UKPRN = "12345671"
+            }
+        };
+        _crmQueryDispatcherMock
+            .Setup(x => x.ExecuteQueryAsync(It.IsAny<ICrmQuery<Account[]>>()))
+            .ReturnsAsync(accounts.ToArray());
+
+        // training provider data into Trs
+        var provider = _trsContext.TrainingProviders.Add(new TrainingProvider() { IsActive = true, Name = "Provider1", Ukprn = "12345671", TrainingProviderId = Guid.NewGuid() });
+        _trsContext.SaveChanges();
+
+        var JobUnderTest = new AppendTrainingProvidersFromCrmJob(_trsContext, _crmQueryDispatcherMock.Object);
+
+        // act
+        await JobUnderTest.ExecuteAsync(new CancellationToken());
+
+        // assert
+        var appendedProviderList = _trsContext.TrainingProviders?.AsEnumerable();
+        Assert.Equal(2, appendedProviderList!.Count());
+    }
 }
