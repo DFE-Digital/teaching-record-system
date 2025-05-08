@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.WebCommon;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -13,12 +13,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 public class CheckAnswers(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
-    TrsLinkGenerator linkGenerator) : PageModel
+    TrsLinkGenerator linkGenerator) :
+    ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
-
-    public JourneyInstance<ResolveApiTrnRequestState>? JourneyInstance { get; set; }
 
     public string? SourceApplicationUserName { get; set; }
 
@@ -49,6 +48,9 @@ public class CheckAnswers(
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
+        var supportTaskData = supportTask.GetData<ApiTrnRequestData>();
+
+        ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
 
         if (CreatingNewRecord)
         {
@@ -57,13 +59,15 @@ public class CheckAnswers(
 
             await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
                 trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId));
+            selectedPersonAttributes = null;
         }
         else
         {
             Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
             requestData.ResolvedPersonId = existingContactId;
-            var attributesToUpdate = state.GetAttributesToUpdate();
+            selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
+            var attributesToUpdate = GetAttributesToUpdate();
 
             await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
                 trnRequestHelper => trnRequestHelper.UpdateContactFromTrnRequestAsync(
@@ -72,11 +76,15 @@ public class CheckAnswers(
         }
 
         supportTask.Status = SupportTaskStatus.Closed;
+        supportTask.UpdateData<ApiTrnRequestData>(data => data with
+        {
+            ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),
+            SelectedPersonAttributes = selectedPersonAttributes
+        });
 
         //TODO event
-        //TODO stash the chosen attributes on the SupportTask's data
 
-        await dbContext.SaveChangesAsync();
+        await DbContext.SaveChangesAsync();
 
         // This is a little ugly but pushing this into a partial and executing it here is tricky
         var flashMessageHtml =
@@ -100,8 +108,7 @@ public class CheckAnswers(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var requestData = supportTask.TrnRequestMetadata!;
+        var requestData = GetRequestData();
         var state = JourneyInstance!.State;
 
         if (state.PersonId is not Guid personId)
@@ -129,7 +136,7 @@ public class CheckAnswers(
         }
         else
         {
-            var selectedPerson = await dbContext.Persons
+            var selectedPerson = await DbContext.Persons
                 .Where(p => p.PersonId == state.PersonId)
                 .Select(p => new
                 {

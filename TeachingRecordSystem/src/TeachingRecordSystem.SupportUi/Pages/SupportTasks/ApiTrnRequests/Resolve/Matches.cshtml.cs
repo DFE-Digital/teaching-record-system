@@ -9,10 +9,8 @@ using TeachingRecordSystem.Core.Dqt.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance, ActivatesJourney]
-public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveApiTrnRequestPageModel(dbContext)
 {
-    public JourneyInstance<ResolveApiTrnRequestState>? JourneyInstance { get; set; }
-
     [FromRoute]
     public string? SupportTaskReference { get; set; }
 
@@ -77,8 +75,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        RequestData = supportTask.TrnRequestMetadata!;
+        RequestData = GetRequestData();
 
         if (RequestData.PotentialDuplicate != true ||
             RequestData.Matches is not { MatchedRecords.Count: >= 1 })
@@ -89,7 +86,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
 
         var matchedPersonIds = RequestData.Matches.MatchedRecords.Select(m => m.PersonId).ToArray();
 
-        PotentialDuplicates = (await dbContext.Persons
+        PotentialDuplicates = (await DbContext.Persons
                 .Where(p => matchedPersonIds.Contains(p.PersonId) && p.DqtState == (int)ContactState.Active)
                 .Select(p => new PotentialDuplicate
                 {
@@ -113,8 +110,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : P
             .Select((r, i) => r with
             {
                 Identifier = (char)('A' + i),
-                MatchedAttributes = ResolveApiTrnRequestState.GetPersonAttributeDifferences(
-                    RequestData,
+                MatchedAttributes = GetPersonAttributeMatches(
                     r.FirstName,
                     r.MiddleName,
                     r.LastName,

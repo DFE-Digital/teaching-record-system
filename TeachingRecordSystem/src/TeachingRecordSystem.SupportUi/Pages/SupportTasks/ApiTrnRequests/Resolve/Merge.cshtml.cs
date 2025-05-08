@@ -8,12 +8,10 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Re
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
-public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
+public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]
     public string? SupportTaskReference { get; set; }
-
-    public JourneyInstance<ResolveApiTrnRequestState>? JourneyInstance { get; set; }
 
     public string? SourceApplicationUserName { get; set; }
 
@@ -129,8 +127,7 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
-        var requestData = supportTask.TrnRequestMetadata!;
+        var requestData = GetRequestData();
         var state = JourneyInstance!.State;
 
         if (state.PersonId is not Guid personId)
@@ -145,23 +142,11 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
             return;
         }
 
-        var personAttributes = await dbContext.Persons
-            .Where(p => p.PersonId == personId)
-            .Select(p => new
-            {
-                p.FirstName,
-                p.MiddleName,
-                p.LastName,
-                p.DateOfBirth,
-                p.NationalInsuranceNumber,
-                p.EmailAddress
-            })
-            .SingleAsync();
+        var personAttributes = await GetPersonAttributesAsync(personId);
 
         SourceApplicationUserName = requestData.ApplicationUser.Name;
 
-        var attributeDifferences = GetPersonAttributeDifferences(
-            requestData,
+        var attributeMatches = GetPersonAttributeMatches(
             personAttributes.FirstName,
             personAttributes.MiddleName,
             personAttributes.LastName,
@@ -172,32 +157,32 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Pag
         FirstName = new PersonAttribute<string?>(
             personAttributes.FirstName,
             requestData.FirstName,
-            Different: !attributeDifferences.Contains(PersonMatchedAttribute.FirstName));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.FirstName));
 
         MiddleName = new PersonAttribute<string?>(
             personAttributes.MiddleName,
             requestData.MiddleName,
-            Different: !attributeDifferences.Contains(PersonMatchedAttribute.MiddleName));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.MiddleName));
 
         LastName = new PersonAttribute<string?>(
             personAttributes.LastName,
             requestData.LastName,
-            Different: !attributeDifferences.Contains(PersonMatchedAttribute.LastName));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.LastName));
 
         DateOfBirth = new PersonAttribute<DateOnly?>(
             personAttributes.DateOfBirth,
             requestData.DateOfBirth,
-            Different: !attributeDifferences.Contains(PersonMatchedAttribute.DateOfBirth));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.DateOfBirth));
 
         EmailAddress = new PersonAttribute<string?>(
             personAttributes.EmailAddress,
             requestData.EmailAddress,
-            Different: !attributeDifferences.Contains(PersonMatchedAttribute.EmailAddress));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.EmailAddress));
 
         NationalInsuranceNumber = new PersonAttribute<string?>(
             personAttributes.NationalInsuranceNumber,
             requestData.NationalInsuranceNumber,
-            Different: !attributeDifferences.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
+            Different: !attributeMatches.Contains(PersonMatchedAttribute.NationalInsuranceNumber));
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }
