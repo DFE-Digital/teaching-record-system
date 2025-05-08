@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.WebCommon;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
-[Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
+[Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance, TransactionScope]
 public class CheckAnswers(
     TrsDbContext dbContext,
-    TrnRequestHelper trnRequestHelper,
+    IBackgroundJobScheduler backgroundJobScheduler,
     TrsLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
@@ -50,17 +52,23 @@ public class CheckAnswers(
 
         if (CreatingNewRecord)
         {
-            requestData.ResolvedPersonId = await trnRequestHelper.CreateContactFromTrnRequestAsync(requestData);
+            var newContactId = Guid.NewGuid();
+            requestData.ResolvedPersonId = newContactId;
+
+            await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
+                trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId));
         }
         else
         {
             Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
             requestData.ResolvedPersonId = existingContactId;
+            var attributesToUpdate = state.GetAttributesToUpdate();
 
-            await trnRequestHelper.UpdateContactFromTrnRequestAsync(
-                requestData,
-                state.GetAttributesToUpdate());
+            await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
+                trnRequestHelper => trnRequestHelper.UpdateContactFromTrnRequestAsync(
+                    requestData,
+                    attributesToUpdate));
         }
 
         supportTask.Status = SupportTaskStatus.Closed;

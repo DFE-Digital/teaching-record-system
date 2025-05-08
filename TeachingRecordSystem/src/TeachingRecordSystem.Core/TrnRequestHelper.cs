@@ -99,10 +99,20 @@ public class TrnRequestHelper(
         return result;
     }
 
-    public async Task<Guid> CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData)
+    public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId)
+    {
+        var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
+        if (result is null)
+        {
+            throw new ArgumentException("TRN request does not exist.");
+        }
+
+        await CreateContactFromTrnRequestAsync(result.Metadata, newContactId);
+    }
+
+    public async Task CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData, Guid newContactId)
     {
         var trn = await trnGenerator.GenerateTrnAsync();
-        var newContactId = Guid.NewGuid();
 
         await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
@@ -121,11 +131,23 @@ public class TrnRequestHelper(
             TrnRequestMetadataMessage = null,
             AllowPiiUpdates = false
         });
-
-        return newContactId;
     }
 
     public async Task UpdateContactFromTrnRequestAsync(
+        Guid applicationUserId,
+        string requestId,
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate)
+    {
+        var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
+        if (result is null)
+        {
+            throw new ArgumentException("TRN request does not exist.");
+        }
+
+        await UpdateContactFromTrnRequestAsync(result.Metadata, attributesToUpdate);
+    }
+
+    public Task UpdateContactFromTrnRequestAsync(
         TrnRequestMetadata requestData,
         IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate)
     {
@@ -160,7 +182,7 @@ public class TrnRequestHelper(
             };
         }
 
-        await crmQueryDispatcher.ExecuteQueryAsync(query);
+        return crmQueryDispatcher.ExecuteQueryAsync(query);
     }
 
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
