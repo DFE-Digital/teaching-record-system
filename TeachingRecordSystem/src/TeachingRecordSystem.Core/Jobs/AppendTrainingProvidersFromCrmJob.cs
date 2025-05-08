@@ -20,6 +20,8 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
             .Where(p =>
                 !providersInTrs.Any(t => t.Ukprn == p.dfeta_UKPRN) &&
                 !providersInTrs.Any(t => string.IsNullOrEmpty(p.dfeta_UKPRN) && string.Equals(t.Name, p.Name, StringComparison.OrdinalIgnoreCase)))
+            .GroupBy(p => p.dfeta_UKPRN)
+            .Select(g => g.First())
             .Select(s => new DataStore.Postgres.Models.TrainingProvider()
             {
                 IsActive = false,

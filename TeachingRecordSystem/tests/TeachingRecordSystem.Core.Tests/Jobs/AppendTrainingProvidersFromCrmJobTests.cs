@@ -32,35 +32,6 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
     public async Task Execute_WithTrainingProviderInCrm_UpdatesDb()
     {
         // arrange
-        var account = new Account()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Provider2",
-            AccountNumber = "123",
-            dfeta_UKPRN = "12345672"
-        };
-        _crmQueryDispatcherMock
-            .Setup(x => x.ExecuteQueryAsync(It.IsAny<ICrmQuery<Account[]>>()))
-            .ReturnsAsync(new List<Account>() { account }.ToArray());
-
-        // training provider data into Trs
-        var provider = _trsContext.TrainingProviders.Add(new TrainingProvider() { IsActive = true, Name = "Provider1", Ukprn = "12345671", TrainingProviderId = Guid.NewGuid() });
-        _trsContext.SaveChanges();
-
-        var JobUnderTest = new AppendTrainingProvidersFromCrmJob(_trsContext, _crmQueryDispatcherMock.Object);
-
-        // act
-        await JobUnderTest.ExecuteAsync(new CancellationToken());
-
-        // assert
-        var appendedProviderList = _trsContext.TrainingProviders?.AsEnumerable();
-        Assert.Equal(account.Name, appendedProviderList!.Single(p => p.Ukprn == account.dfeta_UKPRN).Name);
-    }
-
-    [Fact]
-    public async Task Execute_WithTrainingProviderInCrm_IgnoresMatchingUkprns()
-    {
-        // arrange
         var accounts = new List<Account>()
         {
             new Account()
@@ -73,11 +44,19 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
             new Account()
             {
                 Id = Guid.NewGuid(),
+                Name = "A provider with same Ukprn as above but a different name",
+                AccountNumber = "123",
+                dfeta_UKPRN = "12345672"
+            },
+            new Account()
+            {
+                Id = Guid.NewGuid(),
                 Name = "A provider with same Ukprn as in TrsDB",
                 AccountNumber = "123",
                 dfeta_UKPRN = "12345671"
             }
         };
+
         _crmQueryDispatcherMock
             .Setup(x => x.ExecuteQueryAsync(It.IsAny<ICrmQuery<Account[]>>()))
             .ReturnsAsync(accounts.ToArray());
@@ -94,5 +73,6 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
         // assert
         var appendedProviderList = _trsContext.TrainingProviders?.AsEnumerable();
         Assert.Equal(2, appendedProviderList!.Count());
+        Assert.NotNull(appendedProviderList!.Single(p => p.Ukprn == "12345672").Name);
     }
 }
