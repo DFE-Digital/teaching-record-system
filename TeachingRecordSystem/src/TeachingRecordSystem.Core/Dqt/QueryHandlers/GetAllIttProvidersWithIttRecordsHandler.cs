@@ -22,7 +22,14 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
                     LinkFromAttributeName = Account.PrimaryIdAttribute,
                     LinkToEntityName = dfeta_initialteachertraining.EntityLogicalName,
                     LinkToAttributeName = dfeta_initialteachertraining.Fields.dfeta_EstablishmentId,
-                    JoinOperator = JoinOperator.Inner
+                    JoinOperator = JoinOperator.Inner,
+                    LinkCriteria = new FilterExpression
+                    {
+                        Conditions =
+                        {
+                            new ConditionExpression(dfeta_initialteachertraining.Fields.StateCode, ConditionOperator.Equal, 0)
+                        }
+                    }
                 }
             },
             Distinct = true, // return each record just once (based on both values)
