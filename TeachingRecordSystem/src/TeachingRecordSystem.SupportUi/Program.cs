@@ -31,6 +31,7 @@ using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Filters;
+using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
 
@@ -92,7 +93,10 @@ builder.Services.AddAuthorizationBuilder()
     .AddInductionPolicies();
 
 builder.Services
-    .AddRazorPages()
+    .AddRazorPages(options =>
+    {
+        options.Conventions.Add(new TransactionScopeEndpointConventions());
+    })
     .AddMvcOptions(options =>
     {
         var policy = new AuthorizationPolicyBuilder()
@@ -219,6 +223,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<TransactionScopeMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();
