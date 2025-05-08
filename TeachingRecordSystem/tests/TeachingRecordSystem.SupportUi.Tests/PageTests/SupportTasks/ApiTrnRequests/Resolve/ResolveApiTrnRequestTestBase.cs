@@ -63,4 +63,3 @@ public abstract class ResolveApiTrnRequestTestBase(HostFixture hostFixture) : Te
         return (supportTask, matchedPerson);
     }
 }
-

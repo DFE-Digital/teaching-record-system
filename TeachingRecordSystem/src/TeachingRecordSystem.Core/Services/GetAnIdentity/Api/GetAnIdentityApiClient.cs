@@ -60,4 +60,3 @@ public class GetAnIdentityApiClient : IGetAnIdentityApiClient
         public required string Trn { get; set; }
     }
 }
-

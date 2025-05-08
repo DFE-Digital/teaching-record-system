@@ -31,12 +31,12 @@ indent_size = 4
 #### Core EditorConfig Options ####
 
 # Indentation and spacing
-indent_size = 4
+insert_final_newline = true
 indent_style = space
+indent_size = 4
 tab_width = 4
-
-# New line preferences
-insert_final_newline = false
+trim_trailing_whitespace = true
+end_of_line = crlf
 
 #### .NET Coding Conventions ####
 

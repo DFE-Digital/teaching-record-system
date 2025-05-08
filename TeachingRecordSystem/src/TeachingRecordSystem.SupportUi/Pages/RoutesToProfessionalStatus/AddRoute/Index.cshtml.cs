@@ -13,4 +13,3 @@ public class IndexModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public IActionResult OnGet() => Redirect(linkGenerator.RouteAddRoute(PersonId, JourneyInstance!.InstanceId));
 }
-

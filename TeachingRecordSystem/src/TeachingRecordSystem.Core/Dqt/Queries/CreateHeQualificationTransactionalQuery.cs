@@ -14,4 +14,3 @@ public record CreateHeQualificationTransactionalQuery : ICrmTransactionalQuery<G
     public required Guid? HESubject3id { get; init; }
     public required dfeta_qualification_dfeta_Type? Type { get; init; }
 }
-

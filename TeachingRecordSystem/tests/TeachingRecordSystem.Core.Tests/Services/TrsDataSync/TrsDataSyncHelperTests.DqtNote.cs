@@ -348,7 +348,7 @@ public partial class TrsDataSyncHelperTests
     [InlineData(".")]
     [InlineData("ManPay1205 letter suppressed")]
     [InlineData("Name amended in error by TP Update, name corrected to previous entry held by GTC")]
-    [InlineData("£")]
+    [InlineData("Â£")]
     [InlineData("CC received")]
     [InlineData("DD mandate")]
     [InlineData("dereg, action")]

@@ -201,4 +201,3 @@ public class GetTrnRequestTests(OperationTestFixture operationTestFixture) : Ope
 
     public Task DisposeAsync() => Task.CompletedTask;
 }
-

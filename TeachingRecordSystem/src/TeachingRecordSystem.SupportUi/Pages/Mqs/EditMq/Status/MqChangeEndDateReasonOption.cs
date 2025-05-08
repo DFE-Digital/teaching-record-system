@@ -13,4 +13,3 @@ public enum MqChangeEndDateReasonOption
     [Display(Name = "Another reason")]
     AnotherReason
 }
-
