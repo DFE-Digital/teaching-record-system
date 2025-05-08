@@ -27,6 +27,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Filters;
@@ -192,7 +193,8 @@ builder.Services
     .AddSingleton<ITagHelperInitializer<FormTagHelper>, FormTagHelperInitializer>()
     .AddFileService()
     .AddPersonMatching()
-    .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment);
+    .AddAccessYourTeachingQualificationsOptions(builder.Configuration, builder.Environment)
+    .AddApiTrnGeneration(builder.Configuration);
 
 builder.Services.AddOptions<AuthorizeAccessOptions>()
     .Bind(builder.Configuration)
