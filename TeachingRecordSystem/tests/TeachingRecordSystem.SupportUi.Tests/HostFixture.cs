@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
@@ -51,6 +53,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver());
             services.AddTestScoped<IClock>(tss => tss.Clock);
             services.AddTestScoped<IDataverseAdapter>(tss => tss.DataverseAdapterMock.Object);
+            services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
             services.AddTestScoped<IAadUserService>(tss => tss.AzureActiveDirectoryUserServiceMock.Object);
             services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
             services.AddSingleton<TestData>(
@@ -61,21 +64,10 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddFakeXrm();
             services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
             services.AddSingleton<FakeTrnGenerator>();
+            services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
-            services.AddSingleton(GetMockFileService());
-
-            IFileService GetMockFileService()
-            {
-                var fileService = new Mock<IFileService>();
-                fileService
-                    .Setup(s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null))
-                    .ReturnsAsync(Guid.NewGuid());
-                fileService
-                    .Setup(s => s.GetFileUrlAsync(It.IsAny<Guid>(), It.IsAny<TimeSpan>()))
-                    .ReturnsAsync("https://fake.blob.core.windows.net/fake");
-                return fileService.Object;
-            }
+            services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
         });
     }
 

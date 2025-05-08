@@ -7,12 +7,6 @@
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
             <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
-            @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowChangeLinks))
-            {
-                <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action href="@LinkGenerator.PersonEditName(Model.PersonId, journeyInstanceId: null)" visually-hidden-text="name">Change</govuk-summary-list-row-action>
-                </govuk-summary-list-row-actions>
-            }
         </govuk-summary-list-row>
         @if (Model.PreviousNames.Length > 0)
         {
@@ -31,12 +25,6 @@
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-            @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowChangeLinks))
-            {
-                <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action href="@LinkGenerator.PersonEditDateOfBirth(Model.PersonId, journeyInstanceId: null)" visually-hidden-text="date of birth">Change</govuk-summary-list-row-action>
-                </govuk-summary-list-row-actions>
-            }
         </govuk-summary-list-row>
         @if (Model.Options.HasFlag(PersonDetailViewModelOptions.ShowGender))
         {

@@ -7,6 +7,7 @@
 @import "../lib/ministryofjustice/frontend/moj/components/filter/_filter";
 @import "../lib/ministryofjustice/frontend/moj/components/password-reveal/_password-reveal";
 @import "../lib/ministryofjustice/frontend/moj/components/search/search";
+@import "../lib/ministryofjustice/frontend/moj/components/sortable-table/sortable-table";
 @import "../lib/ministryofjustice/frontend/moj/components/sub-navigation/sub-navigation";
 @import "../lib/ministryofjustice/frontend/moj/components/timeline/timeline";
 
@@ -253,5 +254,20 @@
 
   &::after {
     content: " [highlight end] ";
+  }
+}
+
+.trs-radios--inline-two-column {
+  @extend .govuk-radios--inline;
+  
+  .govuk-radios__item {
+    @extend .govuk-\!-width-one-half;
+    @extend .govuk-\!-margin-right-0;
+  }
+  
+  // When there's an error there's 15px left padding applied;
+  // account for that to keep the two items at exactly 50%
+  .govuk-form-group--error & .govuk-radios__item:nth-of-type(1) {
+    margin-right: -15px !important;
   }
 }

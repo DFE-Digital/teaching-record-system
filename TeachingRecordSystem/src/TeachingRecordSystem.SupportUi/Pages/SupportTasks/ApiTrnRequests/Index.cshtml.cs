@@ -12,10 +12,21 @@ public class Index(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public string? Search { get; set; }
 
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public ApiTrnRequestsSortByOption? SortBy { get; set; }
+
     public Result[]? Results { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
+        var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
+        var sortBy = SortBy ?? ApiTrnRequestsSortByOption.Name;
+
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
 
@@ -45,12 +56,33 @@ public class Index(TrsDbContext dbContext) : PageModel
             }
         }
 
+        if (sortBy == ApiTrnRequestsSortByOption.Name)
+        {
+            tasks = tasks
+                .OrderBy(sortDirection, t => t.TrnRequestMetadata!.FirstName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.MiddleName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.LastName);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.Email)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.EmailAddress);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.RequestedOn)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.CreatedOn);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.Source)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.ApplicationUser.Name);
+        }
+
         Results = await tasks
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
             .Select(t => new Result(
                 t.SupportTaskReference,
                 t.TrnRequestMetadata!.FirstName!,
+                t.TrnRequestMetadata!.MiddleName ?? "",
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
@@ -69,6 +101,7 @@ public class Index(TrsDbContext dbContext) : PageModel
     public record Result(
         string SupportTaskReference,
         string FirstName,
+        string MiddleName,
         string LastName,
         string? EmailAddress,
         DateTime CreatedOn,

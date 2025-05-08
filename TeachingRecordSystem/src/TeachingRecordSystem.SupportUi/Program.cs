@@ -17,6 +17,7 @@ using TeachingRecordSystem.Core.Infrastructure;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi;
 using TeachingRecordSystem.SupportUi.Infrastructure;
@@ -30,6 +31,7 @@ using TeachingRecordSystem.SupportUi.Services;
 using TeachingRecordSystem.SupportUi.TagHelpers;
 using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Filters;
+using TeachingRecordSystem.WebCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.Infrastructure.Logging;
 using TeachingRecordSystem.WebCommon.Middleware;
 
@@ -46,7 +48,11 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IDistributedCache, DevelopmentFileDistributedCache>();
 }
 
-builder.Services.AddGovUkFrontend();
+builder.Services.AddGovUkFrontend(options =>
+{
+    options.DefaultButtonPreventDoubleClick = true;
+});
+
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
@@ -87,7 +93,10 @@ builder.Services.AddAuthorizationBuilder()
     .AddInductionPolicies();
 
 builder.Services
-    .AddRazorPages()
+    .AddRazorPages(options =>
+    {
+        options.Conventions.Add(new TransactionScopeEndpointConventions());
+    })
     .AddMvcOptions(options =>
     {
         var policy = new AuthorizationPolicyBuilder()
@@ -114,6 +123,8 @@ builder.Services.AddRedis(builder.Environment, builder.Configuration);
 
 if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests())
 {
+    builder.Services.AddApiTrnGeneration(builder.Configuration);
+
     var crmConnectionString = $"""
         AuthType=ClientSecret;
         Url={builder.Configuration.GetRequiredValue("CrmUrl")};
@@ -212,6 +223,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<TransactionScopeMiddleware>();
 
 app.MapRazorPages();
 app.MapControllers();

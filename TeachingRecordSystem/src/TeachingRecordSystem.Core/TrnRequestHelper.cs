@@ -1,17 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk.Query;
+using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 
 namespace TeachingRecordSystem.Core;
 
 public class TrnRequestHelper(
     TrsDbContext dbContext,
+    ITrnGenerator trnGenerator,
     ICrmQueryDispatcher crmQueryDispatcher,
     IGetAnIdentityApiClient idApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor)
@@ -94,6 +97,92 @@ public class TrnRequestHelper(
         }
 
         return result;
+    }
+
+    public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId)
+    {
+        var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
+        if (result is null)
+        {
+            throw new ArgumentException("TRN request does not exist.");
+        }
+
+        await CreateContactFromTrnRequestAsync(result.Metadata, newContactId);
+    }
+
+    public async Task CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData, Guid newContactId)
+    {
+        var trn = await trnGenerator.GenerateTrnAsync();
+
+        await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
+        {
+            ContactId = newContactId,
+            FirstName = requestData.FirstName!,
+            MiddleName = requestData.MiddleName ?? string.Empty,
+            LastName = requestData.LastName!,
+            DateOfBirth = requestData.DateOfBirth,
+            Gender = Contact_GenderCode.Notprovided, // TODO when we've sorted gender
+            EmailAddress = requestData.EmailAddress,
+            NationalInsuranceNumber = requestData.NationalInsuranceNumber,
+            ReviewTasks = [],
+            ApplicationUserName = requestData.ApplicationUser.Name,
+            Trn = trn,
+            TrnRequestId = GetCrmTrnRequestId(requestData.ApplicationUserId, requestData.RequestId),
+            TrnRequestMetadataMessage = null,
+            AllowPiiUpdates = false
+        });
+    }
+
+    public async Task UpdateContactFromTrnRequestAsync(
+        Guid applicationUserId,
+        string requestId,
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate)
+    {
+        var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
+        if (result is null)
+        {
+            throw new ArgumentException("TRN request does not exist.");
+        }
+
+        await UpdateContactFromTrnRequestAsync(result.Metadata, attributesToUpdate);
+    }
+
+    public Task UpdateContactFromTrnRequestAsync(
+        TrnRequestMetadata requestData,
+        IReadOnlyCollection<PersonMatchedAttribute> attributesToUpdate)
+    {
+        if (requestData.ResolvedPersonId is not Guid contactId)
+        {
+            throw new InvalidOperationException("TRN request is not resolved.");
+        }
+
+        var query = new UpdateContactQuery()
+        {
+            ContactId = contactId,
+            FirstName = default,
+            MiddleName = default,
+            LastName = default,
+            DateOfBirth = default,
+            Gender = default,
+            EmailAddress = default,
+            NationalInsuranceNumber = default
+        };
+
+        foreach (var attribute in attributesToUpdate)
+        {
+            query = attribute switch
+            {
+                PersonMatchedAttribute.FirstName => query with { FirstName = Option.Some(requestData.FirstName!) },
+                PersonMatchedAttribute.MiddleName => query with { MiddleName = Option.Some(requestData.MiddleName!) },
+                PersonMatchedAttribute.LastName => query with { LastName = Option.Some(requestData.LastName!) },
+                PersonMatchedAttribute.DateOfBirth => query with { DateOfBirth = Option.Some(requestData.DateOfBirth!) },
+                PersonMatchedAttribute.EmailAddress => query with { EmailAddress = Option.Some(requestData.EmailAddress) },
+                PersonMatchedAttribute.NationalInsuranceNumber => query with { NationalInsuranceNumber = Option.Some(requestData.NationalInsuranceNumber) },
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        return crmQueryDispatcher.ExecuteQueryAsync(query);
     }
 
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>

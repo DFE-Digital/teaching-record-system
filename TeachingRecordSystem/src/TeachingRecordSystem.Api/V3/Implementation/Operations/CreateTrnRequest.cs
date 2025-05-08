@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.Extensions.Options;
+using Optional;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -185,9 +186,9 @@ public class CreateTrnRequestHandler(
             FirstName = firstName,
             MiddleName = middleName,
             LastName = command.LastName,
-            StatedFirstName = command.FirstName,
-            StatedMiddleName = command.MiddleName ?? "",
-            StatedLastName = command.LastName,
+            StatedFirstName = Option.Some(command.FirstName),
+            StatedMiddleName = Option.Some(command.MiddleName ?? ""),
+            StatedLastName = Option.Some(command.LastName),
             DateOfBirth = command.DateOfBirth,
             Gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,

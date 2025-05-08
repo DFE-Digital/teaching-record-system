@@ -897,5 +897,9 @@
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\govuk-prototype-kit.config.json" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\package.json" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\govuk-frontend\README.md" />
+    <_ContentIncludedByDefault Remove="Pages\Persons\PersonDetail\EditDateOfBirth\Confirm.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Persons\PersonDetail\EditDateOfBirth\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Persons\PersonDetail\EditName\Confirm.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Persons\PersonDetail\EditName\Index.cshtml" />
   </ItemGroup>
 </Project>

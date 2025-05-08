@@ -29,17 +29,16 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var data = (ConnectOneLoginUserData)_supportTask!.Data;
-        _supportTask.Data = data with
+        var data = _supportTask!.UpdateData<ConnectOneLoginUserData>(data => data with
         {
             PersonId = PersonDetail!.PersonId
-        };
+        });
         _supportTask.Status = SupportTaskStatus.Closed;
 
         var matchedAttributes = (await personMatchingService
             .GetMatchedAttributesAsync(
                 new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn),
-                PersonDetail.PersonId))
+                PersonDetail!.PersonId))
             .ToArray();
 
         var oneLoginUser = await dbContext.OneLoginUsers.SingleAsync(u => u.Subject == data.OneLoginUserSubject);
@@ -52,7 +51,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
 
         TempData.SetFlashSuccess(
             heading: "Teaching record connected",
-            message: $"{PersonDetail.Name} will get an email to say they can sign in.");
+            messageText: $"{PersonDetail.Name} will get an email to say they can sign in.");
 
         return Redirect(linkGenerator.SupportTasks());
     }

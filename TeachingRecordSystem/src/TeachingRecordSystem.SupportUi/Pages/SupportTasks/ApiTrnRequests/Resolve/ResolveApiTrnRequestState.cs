@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
 public class ResolveApiTrnRequestState : IRegisterJourney
@@ -13,12 +11,7 @@ public class ResolveApiTrnRequestState : IRegisterJourney
         appendUniqueKey: true);
 
     public Guid? PersonId { get; set; }
-    public string? FirstName { get; set; }
-    public string? MiddleName { get; set; }
-    public string? LastName { get; set; }
-    public DateOnly? DateOfBirth { get; set; }
-    public string? EmailAddress { get; set; }
-    public string? NationalInsuranceNumber { get; set; }
+    public bool PersonAttributeSourcesSet { get; set; }
     public PersonAttributeSource? FirstNameSource { get; set; }
     public PersonAttributeSource? MiddleNameSource { get; set; }
     public PersonAttributeSource? LastNameSource { get; set; }
@@ -27,50 +20,9 @@ public class ResolveApiTrnRequestState : IRegisterJourney
     public PersonAttributeSource? NationalInsuranceNumberSource { get; set; }
     public string? Comments { get; set; }
 
-    public static IReadOnlyCollection<PersonMatchedAttribute> GetPersonAttributeDifferences(
-        TrnRequestMetadata requestMetadata,
-        string firstName,
-        string middleName,
-        string lastName,
-        DateOnly? dateOfBirth,
-        string? emailAddress,
-        string? nationalInsuranceNumber)
+    public enum PersonAttributeSource
     {
-        return Impl().AsReadOnly();
-
-        IEnumerable<PersonMatchedAttribute> Impl()
-        {
-            if (firstName == requestMetadata.FirstName)
-            {
-                yield return PersonMatchedAttribute.FirstName;
-            }
-
-            if (middleName == requestMetadata.MiddleName)
-            {
-                yield return PersonMatchedAttribute.MiddleName;
-            }
-
-            if (lastName == requestMetadata.LastName)
-            {
-                yield return PersonMatchedAttribute.LastName;
-            }
-
-            if (dateOfBirth == requestMetadata.DateOfBirth)
-            {
-                yield return PersonMatchedAttribute.DateOfBirth;
-            }
-
-            if (emailAddress == requestMetadata.EmailAddress)
-            {
-                yield return PersonMatchedAttribute.EmailAddress;
-            }
-
-            if (nationalInsuranceNumber == requestMetadata.NationalInsuranceNumber)
-            {
-                yield return PersonMatchedAttribute.NationalInsuranceNumber;
-            }
-        }
+        ExistingRecord = 0,
+        TrnRequest = 1
     }
-
-    public enum PersonAttributeSource { TrnRequest, ExistingRecord }
 }

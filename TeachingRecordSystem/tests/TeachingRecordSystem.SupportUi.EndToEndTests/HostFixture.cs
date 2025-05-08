@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -77,6 +78,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
+                    services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
                     services.AddSingleton<TrsDataSyncHelper>();
                     services.AddSingleton<IAuditRepository, TestableAuditRepository>();
                     services.AddSingleton(GetMockFileService());

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
@@ -61,6 +62,8 @@ public abstract class TestBase : IDisposable
     public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 
     public ReferenceDataCache ReferenceDataCache => HostFixture.Services.GetRequiredService<ReferenceDataCache>();
+
+    public Mock<IFileService> FileServiceMock => _testServices.BlobStorageFileServiceMock;
 
     public async Task<JourneyInstance<TState>> CreateJourneyInstance<TState>(
             string journeyName,

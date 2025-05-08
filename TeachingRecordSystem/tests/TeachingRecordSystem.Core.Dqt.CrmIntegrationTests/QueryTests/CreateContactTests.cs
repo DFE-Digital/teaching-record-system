@@ -1,3 +1,4 @@
+using Optional;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
@@ -39,9 +40,9 @@ public class CreateContactTests : IAsyncLifetime
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
-            StatedFirstName = firstName,
-            StatedMiddleName = middleName,
-            StatedLastName = lastName,
+            StatedFirstName = Option.Some(firstName),
+            StatedMiddleName = Option.Some(middleName),
+            StatedLastName = Option.Some(lastName),
             EmailAddress = email,
             NationalInsuranceNumber = nino,
             DateOfBirth = dateOfBirth,

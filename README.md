@@ -85,7 +85,26 @@ just restore
 ### Blob storage emulator
 
 The Support UI uses Azure Blob Storage for storing files. For local development, you can use the Azure Storage Emulator - Azurite. If you
-use Visual Studio 2022 you probably have it installed already otherwise you can install it from [here](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite). Run it before starting the Support UI.
+use Visual Studio 2022 you probably have it installed already otherwise you can install it from [here](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite).
+
+The connection string to Blob Storage will need to be set up to point to the storage emulator:
+
+```shell
+just set-secret StorageConnectionString "UseDevelopmentStorage=true"
+```
+
+The containers it needs are listed in the [storage terraform script](teaching-record-system/blob/main/terraform/aks/storage.tf), you will need to create them manually.
+
+You will need to start Azurite before running the Support UI:
+```shell
+azurite --silent --location c:\azurite --debug c:\azurite\debug.log
+```
+
+Git bash:
+
+```shell
+azurite --silent --location /c/azurite --debug /c/azurite/debug.log
+```
 
 ### Install Playwright
 
@@ -204,12 +223,14 @@ The secrets you will need to set are as follows:
 ```shell
 # local settings
 just set-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+just set-secret TrsSyncService:CrmConnectionString "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
 just set-secret CrmClientId "<REDACTED>"
 just set-secret CrmClientSecret "<REDACTED>"
 just set-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"
 
 # test settings
 just set-tests-secret ConnectionStrings:Crm "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
+just set-tests-secret TrsSyncService:CrmConnectionString "AuthType=ClientSecret;Url=https://ent-dqt-build.crm4.dynamics.com;ClientId=<REDACTED>;ClientSecret=<REDACTED>;RequireNewInstance=true"
 just set-tests-secret CrmClientId "<REDACTED>"
 just set-tests-secret CrmClientSecret "<REDACTED>"
 just set-tests-secret CrmUrl "https://ent-dqt-build.crm4.dynamics.com"

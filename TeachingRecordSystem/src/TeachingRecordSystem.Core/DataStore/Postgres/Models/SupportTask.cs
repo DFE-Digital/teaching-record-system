@@ -26,7 +26,7 @@ public class SupportTask
     public required object Data
     {
         get => JsonSerializer.Deserialize(_data, GetDataType(), SerializerOptions)!;
-        set => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
+        init => _data = JsonSerializer.SerializeToDocument(value, GetDataType(), SerializerOptions);
     }
 
     public static string GenerateSupportTaskReference()
@@ -76,6 +76,16 @@ public class SupportTask
 
             return _validReferenceChars[checkCodePoint];
         }
+    }
+
+    public T GetData<T>() => (T)Data;
+
+    public T UpdateData<T>(Func<T, T> update)
+    {
+        var currentValue = GetData<T>();
+        var newValue = update(currentValue);
+        _data = JsonSerializer.SerializeToDocument(newValue, GetDataType(), SerializerOptions);
+        return newValue;
     }
 
     internal static Type GetDataType(SupportTaskType supportTaskType) => supportTaskType switch

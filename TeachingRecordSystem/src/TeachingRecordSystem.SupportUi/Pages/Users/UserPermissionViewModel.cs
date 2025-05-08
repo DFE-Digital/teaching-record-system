@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
+﻿namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
 public class UserPermissionViewModel
 {

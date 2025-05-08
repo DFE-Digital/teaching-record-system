@@ -5,12 +5,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
-using TeachingRecordSystem.SupportUi.Pages.Users.AddUser;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Users;
+namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
-public class EditUser(
+public class IndexModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator) : PageModel
@@ -66,21 +65,19 @@ public class EditUser(
             return this.PageWithErrors();
         }
 
-        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
-
         var changes = UserUpdatedEventChanges.None |
-            (user.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
-            (user.Role != Role ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
+            (_user!.Name != Name ? UserUpdatedEventChanges.Name : UserUpdatedEventChanges.None) |
+            (_user.Role != Role ? UserUpdatedEventChanges.Roles : UserUpdatedEventChanges.None);
 
         if (changes != UserUpdatedEventChanges.None)
         {
-            user.Role = Role;
-            user.Name = Name!;
+            _user.Role = Role;
+            _user.Name = Name!;
 
             await dbContext.AddEventAndBroadcastAsync(new UserUpdatedEvent
             {
                 EventId = Guid.NewGuid(),
-                User = Core.Events.Models.User.FromModel(user),
+                User = EventModels.User.FromModel(_user),
                 RaisedBy = User.GetUserId(),
                 CreatedUtc = clock.UtcNow,
                 Changes = changes
@@ -95,11 +92,11 @@ public class EditUser(
                 .ToLowerInvariantFirstLetter()
                 .WithIndefiniteArticle();
 
-            TempData.SetFlashSuccess(message: $"{Name} has been changed to {roleText}.");
+            TempData.SetFlashSuccess(messageText: $"{Name} has been changed to {roleText}.");
         }
         else
         {
-            TempData.SetFlashSuccess(message: $"{Name} has been updated.");
+            TempData.SetFlashSuccess(messageText: $"{Name} has been updated.");
         }
 
         return Redirect(linkGenerator.Users());
@@ -107,32 +104,30 @@ public class EditUser(
 
     public async Task<IActionResult> OnPostActivateAsync()
     {
-        var user = await dbContext.Users.SingleAsync(u => u.UserId == UserId);
-
-        if (user.Active)
+        if (_user!.Active)
         {
             return BadRequest();
         }
 
         // Only admins can reactivate admins
-        if (!User.IsInRole(UserRoles.Administrator) && user.Role == UserRoles.Administrator)
+        if (!User.IsInRole(UserRoles.Administrator) && _user.Role == UserRoles.Administrator)
         {
             return BadRequest();
         }
 
-        user.Active = true;
+        _user.Active = true;
 
         await dbContext.AddEventAndBroadcastAsync(new UserActivatedEvent
         {
             EventId = Guid.NewGuid(),
-            User = Core.Events.Models.User.FromModel(user),
+            User = EventModels.User.FromModel(_user),
             RaisedBy = User.GetUserId(),
             CreatedUtc = clock.UtcNow
         });
 
         await dbContext.SaveChangesAsync();
+        TempData.SetFlashSuccess(messageText: $"{_user.Name}\u2019s account has been reactivated.");
 
-        TempData.SetFlashSuccess(message: $"{user.Name} has been reactivated.");
         return Redirect(linkGenerator.Users());
     }
 
