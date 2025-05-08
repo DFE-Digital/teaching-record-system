@@ -22,7 +22,7 @@ public class DetailsModel(TrsLinkGenerator linkGenerator) : PageModel
 
     [BindProperty]
     [Display(Description = "For example, include any restrictions it places on a teacher.")]
-    [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Details must be 4000 characters or less")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Details {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? Details { get; set; }
 
     public void OnGet()
