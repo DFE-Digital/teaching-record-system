@@ -5,6 +5,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Person
 {
+    public const int FirstNameMaxLength = 100;
+    public const int MiddleNameMaxLength = 100;
+    public const int LastNameMaxLength = 100;
+    public const int EmailAddressMaxLength = 100;
+    public const int NationalInsuranceNumberMaxLength = 9;
+    public const int MobileNumberMaxLength = 15;
+
     public static DateOnly EarliestInductionStartDate => new(1999, 5, 7);
 
     public required Guid PersonId { get; init; }
@@ -13,10 +20,11 @@ public class Person
     public DateTime? DeletedOn { get; set; }
     public required string? Trn { get; set; }
     public required string FirstName { get; set; }
-    public required string MiddleName { get; set; }
+    public required string? MiddleName { get; set; }
     public required string LastName { get; set; }
     public required DateOnly? DateOfBirth { get; set; }  // A few DQT records in prod have a null DOB
     public string? EmailAddress { get; set; }
+    public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
     public InductionStatus InductionStatus { get; private set; }
     public InductionStatus InductionStatusWithoutExemption { get; private set; }
@@ -50,6 +58,63 @@ public class Person
     public string? DqtLastName { get; set; }
     public DateTime? DqtInductionLastSync { get; set; }
     public DateTime? DqtInductionModifiedOn { get; set; }
+
+    public void UpdateDetails(
+        string firstName,
+        string? middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        string? emailAddress,
+        string? mobileNumber,
+        string? nationalInsuranceNumber,
+        string changeReason,
+        string changeReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now,
+        out PersonDetailsUpdatedEvent? @event)
+    {
+        var oldDetails = EventModels.PersonDetails.FromModel(this);
+
+        FirstName = firstName;
+        MiddleName = middleName;
+        LastName = lastName;
+        DateOfBirth = dateOfBirth;
+        MobileNumber = mobileNumber;
+        EmailAddress = emailAddress;
+        NationalInsuranceNumber = nationalInsuranceNumber;
+
+        var changes = PersonDetailsUpdatedEventChanges.None |
+            (FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
+            (MiddleName != oldDetails.MiddleName ? PersonDetailsUpdatedEventChanges.MiddleName : 0) |
+            (LastName != oldDetails.LastName ? PersonDetailsUpdatedEventChanges.LastName : 0) |
+            (DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
+            (EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
+            (MobileNumber != oldDetails.MobileNumber ? PersonDetailsUpdatedEventChanges.MobileNumber : 0) |
+        (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0);
+
+        if (changes == PersonDetailsUpdatedEventChanges.None)
+        {
+            @event = null;
+            return;
+        }
+
+        InductionModifiedOn = now;
+
+        @event = new PersonDetailsUpdatedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = updatedBy,
+            PersonId = PersonId,
+            Details = EventModels.PersonDetails.FromModel(this),
+            OldDetails = oldDetails,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            EvidenceFile = evidenceFile,
+            Changes = changes
+        };
+    }
 
     public void SetCpdInductionStatus(
         InductionStatus status,

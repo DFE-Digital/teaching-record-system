@@ -1,4 +1,6 @@
 using System.Reactive.Linq;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
@@ -167,5 +169,63 @@ public abstract class TestBase : IDisposable
         var byteArrayContent = new ByteArrayContent(content ?? []);
         byteArrayContent.Headers.Add("Content-Type", "application/octet-stream");
         return byteArrayContent;
+    }
+
+    protected T GetChildElementOfTestId<T>(IHtmlDocument doc, string testId, string childSelector) where T : IElement
+    {
+        var parent = doc.GetElementByTestId(testId);
+        Assert.NotNull(parent);
+        var child = parent.QuerySelector(childSelector);
+        Assert.NotNull(child);
+        Assert.IsAssignableFrom<T>(child);
+        return (T)child;
+    }
+
+    protected IEnumerable<T> GetChildElementsOfTestId<T>(IHtmlDocument doc, string testId, string childSelector) where T : IElement
+    {
+        var parent = doc.GetElementByTestId(testId);
+        Assert.NotNull(parent);
+        var children = parent.QuerySelectorAll(childSelector);
+        Assert.All(children, c => Assert.IsAssignableFrom<T>(c));
+        return children.Cast<T>();
+    }
+
+    protected async Task<Guid> AssertFileWasUploadedAsync()
+    {
+        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null));
+        return await Assert.IsType<Task<Guid>>(FileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
+    }
+
+    protected void AssertFileWasNotUploaded()
+    {
+        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
+    }
+
+    protected void AssertFileWasDeleted(Guid fileId)
+    {
+        FileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
+    }
+
+    protected string GetHiddenInputValue(IHtmlDocument html, string name)
+    {
+        var element = html.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
+        var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
+
+        return input.Value;
+    }
+
+    protected void AssertSummaryListValue(IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
+    {
+        AssertSummaryListValue<IElement>(doc, keyContent, valueAssertion);
+    }
+
+    protected void AssertSummaryListValue<T>(IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        Assert.NotNull(label);
+        var element = label.NextElementSibling;
+        Assert.NotNull(element);
+        var value = Assert.IsAssignableFrom<T>(element);
+        valueAssertion(value);
     }
 }

@@ -17,7 +17,7 @@ public static class HttpContextExtensions
             new CurrentPersonFeature(
                 person.PersonId,
                 person.FirstName,
-                person.MiddleName,
+                person.MiddleName ?? string.Empty,
                 person.LastName));
 
     public static CurrentMandatoryQualificationFeature GetCurrentMandatoryQualificationFeature(this HttpContext context) =>

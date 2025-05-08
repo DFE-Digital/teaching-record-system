@@ -1,33 +1,62 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace TeachingRecordSystem.Core;
 
 /// <summary>
 /// Represents a valid email address (code ported from Notify).
 /// </summary>
-[DebuggerDisplay("{_normalizedValue}")]
-public sealed class EmailAddress : IEquatable<EmailAddress>, IParsable<EmailAddress>
+[DebuggerDisplay("{NormalizedValue}")]
+public sealed partial class EmailAddress : IEquatable<EmailAddress>, IParsable<EmailAddress>
 {
     public const int EmailAddressMaxLength = 200;
 
     private const string ValidLocalChars = @"a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\-";
-    private const string EmailRegexPattern = @"^[" + ValidLocalChars + @"]+@([^.@][^@\s]+)$";
+    private const string EmailRegexPattern = @$"^[{ValidLocalChars}]+@([^.@][^@\s]+)$";
+    private const string HostnamePartRegexPattern = @"^(xn|[a-z0-9]+)(-?-[a-z0-9]+)*$";
+    private const string TldPartRegexPattern = @"^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$";
 
     private const string ObscureZeroWidthWhitespace = "\u180E\u200B\u200C\u200D\u2060\uFEFF";
     private const string ObscureFullWidthWhitespace = "\u00A0\u202F";
 
-    private static readonly Regex _hostnamePartRegex = new Regex(@"^(xn|[a-z0-9]+)(-?-[a-z0-9]+)*$", RegexOptions.IgnoreCase);
-    private static readonly Regex _tldPartRegex = new Regex(@"^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$", RegexOptions.IgnoreCase);
+    [JsonInclude]
+    private string NormalizedValue { get; }
 
-    private readonly string _normalizedValue;
-
+    [JsonConstructor]
     private EmailAddress(string normalizedValue)
     {
-        _normalizedValue = normalizedValue;
+        NormalizedValue = normalizedValue;
     }
+
+    public string ToDisplayString() => NormalizedValue;
+
+    public override string ToString() => NormalizedValue;
+
+    public bool Equals(EmailAddress? other) =>
+        other is not null && NormalizedValue.Equals(other.NormalizedValue);
+
+    public override bool Equals([NotNullWhen(true)] object? obj) =>
+        obj is EmailAddress other && Equals(other);
+
+    public override int GetHashCode() =>
+        NormalizedValue.GetHashCode();
+
+    public static bool operator ==(EmailAddress left, EmailAddress right) =>
+        (left is null && right is null) ||
+        (left is not null && right is not null && left.Equals(right));
+
+    public static bool operator !=(EmailAddress left, EmailAddress right) =>
+        !(left == right);
+
+    public static explicit operator EmailAddress?(string? value) =>
+        value is null ? null : Parse(value);
+
+    public static explicit operator string?(EmailAddress? value) =>
+        value is null ? null : value.ToString();
 
     public static EmailAddress Parse(string? emailAddress)
     {
@@ -71,7 +100,7 @@ public sealed class EmailAddress : IEquatable<EmailAddress>, IParsable<EmailAddr
         }
 
         var normalizedEmailAddress = StripAndRemoveObscureWhitespace(emailAddress);
-        Match match = Regex.Match(normalizedEmailAddress, EmailRegexPattern);
+        Match match = ValidEmailPattern().Match(normalizedEmailAddress);
 
         if (normalizedEmailAddress.Length > 320)
         {
@@ -114,7 +143,7 @@ public sealed class EmailAddress : IEquatable<EmailAddress>, IParsable<EmailAddr
 
         foreach (string part in parts)
         {
-            if (string.IsNullOrEmpty(part) || part.Length > 63 || !_hostnamePartRegex.IsMatch(part))
+            if (string.IsNullOrEmpty(part) || part.Length > 63 || !HostNamePartPattern().IsMatch(part))
             {
                 error = new FormatException("Invalid hostname.");
                 result = default;
@@ -123,7 +152,7 @@ public sealed class EmailAddress : IEquatable<EmailAddress>, IParsable<EmailAddr
         }
 
         // if the part after the last . is not a valid TLD then bail out
-        if (!_tldPartRegex.IsMatch(parts[^1]))
+        if (!TldPartPattern().IsMatch(parts[^1]))
         {
             error = new FormatException("Invalid top level domain");
             result = default;
@@ -150,17 +179,20 @@ public sealed class EmailAddress : IEquatable<EmailAddress>, IParsable<EmailAddr
         }
     }
 
-    public bool Equals(EmailAddress? other) => other is not null && _normalizedValue.Equals(other._normalizedValue);
+    [GeneratedRegex(EmailRegexPattern)]
+    private static partial Regex ValidEmailPattern();
 
-    public override bool Equals([NotNullWhen(true)] object? obj) => obj is EmailAddress other && Equals(other);
+    [GeneratedRegex(HostnamePartRegexPattern, RegexOptions.IgnoreCase)]
+    private static partial Regex HostNamePartPattern();
 
-    public override int GetHashCode() => _normalizedValue.GetHashCode();
+    [GeneratedRegex(TldPartRegexPattern, RegexOptions.IgnoreCase)]
+    private static partial Regex TldPartPattern();
+}
 
-    public override string ToString() => _normalizedValue;
-
-    public static bool operator ==(EmailAddress left, EmailAddress right) =>
-        (left is null && right is null) ||
-        (left is not null && right is not null && left.Equals(right));
-
-    public static bool operator !=(EmailAddress left, EmailAddress right) => !(left == right);
+public class EmailAddressConverter : ValueConverter<EmailAddress, string>
+{
+    public EmailAddressConverter()
+        : base(v => v.ToString(), v => EmailAddress.Parse(v))
+    {
+    }
 }

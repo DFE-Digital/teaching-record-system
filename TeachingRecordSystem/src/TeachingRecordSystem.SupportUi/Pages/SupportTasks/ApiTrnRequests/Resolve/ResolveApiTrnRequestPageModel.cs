@@ -128,11 +128,11 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
         return new ApiTrnRequestDataPersonAttributes()
         {
             FirstName = personAttributes.FirstName,
-            MiddleName = personAttributes.MiddleName,
+            MiddleName = personAttributes.MiddleName ?? string.Empty,
             LastName = personAttributes.LastName,
             DateOfBirth = personAttributes.DateOfBirth,
             EmailAddress = personAttributes.EmailAddress,
-            NationalInsuranceNumber = personAttributes.NationalInsuranceNumber
+            NationalInsuranceNumber = (string?)personAttributes.NationalInsuranceNumber
         };
     }
 

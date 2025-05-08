@@ -3912,11 +3912,15 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .UseCollation("case_insensitive");
 
                     b.Property<string>("MiddleName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("middle_name")
                         .UseCollation("case_insensitive");
+
+                    b.Property<string>("MobileNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("mobile_number");
 
                     b.Property<string>("NationalInsuranceNumber")
                         .HasMaxLength(9)

@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
@@ -8,6 +9,8 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     public DeactivateTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
+        var mockFileService = Mock.Get(HostFixture.Services.GetRequiredService<IFileService>());
+        mockFileService.Invocations.Clear();
     }
 
     public async Task InitializeAsync()
@@ -552,7 +555,6 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             }
         };
 
-
         // Act
         var response = await HttpClient.SendAsync(request);
 
@@ -753,30 +755,6 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been deactivated.");
-    }
-
-    private async Task<Guid> AssertFileWasUploadedAsync()
-    {
-        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null));
-        return await Assert.IsType<Task<Guid>>(FileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
-    }
-
-    private void AssertFileWasNotUploaded()
-    {
-        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
-    }
-
-    private void AssertFileWasDeleted(Guid fileId)
-    {
-        FileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
-    }
-
-    private string GetHiddenInputValue(IHtmlDocument html, string name)
-    {
-        var element = html.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
-        var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
-
-        return input.Value;
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}/deactivate";

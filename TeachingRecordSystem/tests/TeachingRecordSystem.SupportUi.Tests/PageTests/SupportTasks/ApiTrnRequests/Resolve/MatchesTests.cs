@@ -97,7 +97,7 @@ public class MatchesTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBas
         Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Last name"), firstMatch.LastName);
         Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Date of birth"), firstMatch.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat));
         Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("Email"), firstMatch.EmailAddress);
-        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("National Insurance number"), firstMatch.NationalInsuranceNumber);
+        Assert.Equal(firstMatchDetails.GetSummaryListValueForKey("National Insurance number"), firstMatch.NationalInsuranceNumber?.ToString());
         // TODO Gender
     }
 

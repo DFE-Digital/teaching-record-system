@@ -94,11 +94,11 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                     MatchedAttributes = Array.Empty<PersonMatchedAttribute>(),  // ditto
                     PersonId = p.PersonId,
                     FirstName = p.FirstName,
-                    MiddleName = p.MiddleName,
+                    MiddleName = p.MiddleName ?? string.Empty,
                     LastName = p.LastName,
                     DateOfBirth = p.DateOfBirth,
                     EmailAddress = p.EmailAddress,
-                    NationalInsuranceNumber = p.NationalInsuranceNumber,
+                    NationalInsuranceNumber = (string?)p.NationalInsuranceNumber,
                     Trn = p.Trn!,
                     HasQts = p.QtsDate != null,
                     HasEyts = p.EytsDate != null,
