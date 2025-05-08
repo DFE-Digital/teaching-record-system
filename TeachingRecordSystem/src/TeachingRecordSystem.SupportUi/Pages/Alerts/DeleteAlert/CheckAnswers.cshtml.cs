@@ -96,7 +96,7 @@ public class CheckAnswersModel(
         DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
 
         await next();
