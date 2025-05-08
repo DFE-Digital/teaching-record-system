@@ -90,7 +90,8 @@ builder.Services.AddAuthorizationBuilder()
     .AddChangeRequestManagementPolicies()
     .AddUserManagementPolicies()
     .AddAlertPolicies()
-    .AddInductionPolicies();
+    .AddInductionPolicies()
+    .AddPersonDataPolicies();
 
 builder.Services
     .AddRazorPages(options =>
