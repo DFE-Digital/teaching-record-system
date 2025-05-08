@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -37,6 +38,12 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator)
     [Required(ErrorMessage = "Enter the person\u2019s date of birth")]
     public DateOnly? DateOfBirth { get; set; }
 
+    public string BackLink =>
+        FromCheckAnswers ? GetPageLink(EditDetailsJourneyPage.CheckAnswers) : LinkGenerator.PersonDetail(PersonId);
+
+    public EditDetailsJourneyPage NextPage =>
+        FromCheckAnswers ? EditDetailsJourneyPage.CheckAnswers : EditDetailsJourneyPage.ChangeReason;
+
     public IActionResult OnGet()
     {
         FirstName = JourneyInstance!.State.FirstName;
@@ -62,12 +69,12 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator)
             state.DateOfBirth = DateOfBirth;
         });
 
-        return Redirect(GetPageLink(EditDetailsJourneyPage.ChangeReason));
+        return Redirect(GetPageLink(NextPage));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await base.OnPageHandlerExecutionAsync(context, next);
+        await base.OnPageHandlerExecutingAsync(context);
 
         _person = await DbContext.Persons.SingleOrDefaultAsync(u => u.PersonId == PersonId);
 
@@ -76,7 +83,5 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator)
             context.Result = NotFound();
             return;
         }
-
-        await next();
     }
 }

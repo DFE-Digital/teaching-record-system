@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[Journey(JourneyNames.EditInduction), RequireJourneyInstance]
+[Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class ChangeReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
@@ -44,7 +43,11 @@ public class ChangeReasonModel(
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string BackLink => GetPageLink(EditDetailsJourneyPage.Index);
+    public string BackLink =>
+        GetPageLink(FromCheckAnswers ? EditDetailsJourneyPage.CheckAnswers : EditDetailsJourneyPage.Index);
+
+    public EditDetailsJourneyPage NextPage =>
+        EditDetailsJourneyPage.CheckAnswers;
 
     public async Task OnGetAsync()
     {
@@ -62,14 +65,17 @@ public class ChangeReasonModel(
         {
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter a reason");
         }
+
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
+
         if (UploadEvidence == true)
         {
             if (EvidenceFile is not null)
@@ -110,17 +116,12 @@ public class ChangeReasonModel(
         return Redirect(GetPageLink(EditDetailsJourneyPage.CheckAnswers));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(DbContext, PersonId, EditDetailsJourneyPage.Index);
+        await base.OnPageHandlerExecutingAsync(context);
 
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-
-        await next();
     }
 }
