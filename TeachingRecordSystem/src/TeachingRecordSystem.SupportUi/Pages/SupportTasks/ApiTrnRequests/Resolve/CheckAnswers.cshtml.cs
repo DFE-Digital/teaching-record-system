@@ -2,11 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Optional;
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
@@ -14,8 +10,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 [Journey(JourneyNames.ResolveApiTrnRequest), RequireJourneyInstance]
 public class CheckAnswers(
     TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
-    ITrnGenerator trnGenerator,
+    TrnRequestHelper trnRequestHelper,
     TrsLinkGenerator linkGenerator) : PageModel
 {
     [FromRoute]
@@ -55,31 +50,7 @@ public class CheckAnswers(
 
         if (CreatingNewRecord)
         {
-            var newContactId = Guid.NewGuid();
-            requestData.ResolvedPersonId = newContactId;
-            var trn = await trnGenerator.GenerateTrnAsync();
-
-            await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
-            {
-                ContactId = newContactId,
-                // These three name fields need normalizing; we'll cover that when moving this into a background job
-                FirstName = requestData.FirstName!,
-                MiddleName = requestData.MiddleName ?? string.Empty,
-                LastName = requestData.LastName!,
-                StatedFirstName = requestData.FirstName!,
-                StatedMiddleName = requestData.MiddleName ?? string.Empty,
-                StatedLastName = requestData.LastName!,
-                DateOfBirth = requestData.DateOfBirth,
-                Gender = Contact_GenderCode.Notprovided, // TODO when we've sorted gender
-                EmailAddress = requestData.EmailAddress,
-                NationalInsuranceNumber = requestData.NationalInsuranceNumber,
-                ReviewTasks = [],
-                ApplicationUserName = requestData.ApplicationUser.Name,
-                Trn = trn,
-                TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(requestData.ApplicationUserId, requestData.RequestId),
-                TrnRequestMetadataMessage = null, // We don't need to pass this as we've always got metadata in our DB
-                AllowPiiUpdates = false
-            });
+            requestData.ResolvedPersonId = await trnRequestHelper.CreateContactFromTrnRequestAsync(requestData);
         }
         else
         {
@@ -87,21 +58,9 @@ public class CheckAnswers(
             var existingContactId = state.PersonId!.Value;
             requestData.ResolvedPersonId = existingContactId;
 
-            await crmQueryDispatcher.ExecuteQueryAsync(new UpdateContactQuery()
-            {
-                ContactId = existingContactId,
-                // These three name fields need normalizing; we'll cover that when moving this into a background job
-                FirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.FirstName!) : default,
-                MiddleName = state.MiddleNameSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.MiddleName ?? string.Empty) : default,
-                LastName = state.LastNameSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.LastName!) : default,
-                StatedFirstName = state.FirstNameSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.FirstName!) : default,
-                StatedMiddleName = state.MiddleNameSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.MiddleName ?? string.Empty) : default,
-                StatedLastName = state.LastNameSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.LastName!) : default,
-                DateOfBirth = state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.DateOfBirth) : default,
-                Gender = default, // TODO when we've sorted gender
-                EmailAddress = state.EmailAddressSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.EmailAddress) : default,
-                NationalInsuranceNumber = state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? Option.Some(requestData.NationalInsuranceNumber) : default
-            });
+            await trnRequestHelper.UpdateContactFromTrnRequestAsync(
+                requestData,
+                state.GetAttributesToUpdate());
         }
 
         supportTask.Status = SupportTaskStatus.Closed;
