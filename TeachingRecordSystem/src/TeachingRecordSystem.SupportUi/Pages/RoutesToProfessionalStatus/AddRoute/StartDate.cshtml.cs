@@ -41,4 +41,3 @@ public class StartDateModel : AddRouteCommonPageModel
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.StartDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 }
-

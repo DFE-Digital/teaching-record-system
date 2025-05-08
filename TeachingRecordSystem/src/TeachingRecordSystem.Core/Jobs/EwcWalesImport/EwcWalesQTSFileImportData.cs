@@ -94,4 +94,3 @@ public class EwcWalesQtsFileImportData
     [Name("PQ Subject Code 3")]
     public required string PqSubjectCode3 { get; set; }
 }
-

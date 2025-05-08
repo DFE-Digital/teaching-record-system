@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.SupportUi.Pages.Common;
+using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 

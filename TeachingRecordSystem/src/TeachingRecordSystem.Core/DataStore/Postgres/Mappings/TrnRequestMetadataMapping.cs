@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Infrastructure.EntityFramework;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Mappings;
 

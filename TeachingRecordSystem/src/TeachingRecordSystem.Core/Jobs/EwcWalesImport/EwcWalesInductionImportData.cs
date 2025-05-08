@@ -34,5 +34,3 @@ public record EwcWalesInductionImportData
     [Name("IND_STATUS_NAME")]
     public required string InductionStatusName { get; set; }
 }
-
-

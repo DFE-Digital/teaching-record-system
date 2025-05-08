@@ -265,4 +265,3 @@ public class CheckAnswersTests : CloseAlertTestBase
         Assert.Null(journeyInstance);
     }
 }
-

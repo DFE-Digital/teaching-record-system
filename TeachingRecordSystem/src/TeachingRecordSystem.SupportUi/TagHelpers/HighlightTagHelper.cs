@@ -22,4 +22,3 @@ public class HighlightTagHelper : TagHelper
         output.Content.SetHtmlContent(wrapper);
     }
 }
-

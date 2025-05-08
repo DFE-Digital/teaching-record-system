@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Primitives;
 using TeachingRecordSystem.SupportUi.Pages.Common;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Shared;

@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Pages.Common;
+namespace TeachingRecordSystem.SupportUi.Pages.Common;
 
 public class Pagination(string name, int itemsPerPage, IQueryCollection currentRequestQueryString)
 {

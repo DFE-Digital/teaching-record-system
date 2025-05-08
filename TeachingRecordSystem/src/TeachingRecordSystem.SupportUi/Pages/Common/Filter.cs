@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Pages.Common;
+namespace TeachingRecordSystem.SupportUi.Pages.Common;
 
 public abstract class Filter<T>(string name, string displayName)
 {

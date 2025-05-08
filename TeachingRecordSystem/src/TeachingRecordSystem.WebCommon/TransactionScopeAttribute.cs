@@ -4,4 +4,3 @@ namespace TeachingRecordSystem.WebCommon;
 public sealed class TransactionScopeAttribute : Attribute
 {
 }
-

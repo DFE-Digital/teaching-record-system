@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class NotesTests : TestBase
 {

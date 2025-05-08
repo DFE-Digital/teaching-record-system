@@ -38,4 +38,3 @@ public class ColoredTagHelper : TagHelper
         output.AddClass(colorClass, HtmlEncoder.Default);
     }
 }
-

@@ -18,4 +18,3 @@ public class EmailInUseModel(AuthorizeAccessLinkGenerator linkGenerator) : PageM
         }
     }
 }
-

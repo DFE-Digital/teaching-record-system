@@ -39,4 +39,3 @@ public class SetQtlsHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQuery
         };
     }
 }
-
