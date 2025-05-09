@@ -47,7 +47,7 @@ public class DetailModel(
     {
         if (!JourneyInstance!.State.Initialized)
         {
-            await JourneyInstance.UpdateStateAsync(state => state.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature()));
+            await JourneyInstance.UpdateStateAsync(state => state.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus));
         }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();

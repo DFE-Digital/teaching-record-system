@@ -5,16 +5,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
-public class AddRouteCommonPageModel : PageModel
+public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : PageModel
 {
-    public AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
-    {
-        _linkGenerator = linkGenerator;
-        _referenceDataCache = referenceDataCache;
-    }
+    protected TrsLinkGenerator LinkGenerator => linkGenerator;
 
-    protected TrsLinkGenerator _linkGenerator;
-    protected ReferenceDataCache _referenceDataCache;
+    protected ReferenceDataCache ReferenceDataCache => referenceDataCache;
 
     public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
 
@@ -32,7 +27,7 @@ public class AddRouteCommonPageModel : PageModel
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();
-        return Redirect(_linkGenerator.PersonQualifications(PersonId));
+        return Redirect(LinkGenerator.PersonQualifications(PersonId));
     }
 
     public AddRoutePage? NextPage(AddRoutePage currentPage)
@@ -62,7 +57,7 @@ public class AddRouteCommonPageModel : PageModel
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Route = await _referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        Route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
         await next();
     }

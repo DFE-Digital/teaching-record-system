@@ -29,7 +29,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
         ProfessionalStatuses = await dbContext.ProfessionalStatuses
             .Include(q => q.TrainingProvider)
             .Include(q => q.TrainingCountry)
-            .Include(q => q.Route)
+            .Include(q => q.RouteToProfessionalStatus)
             .Include(q => q.DegreeType)
             .Where(x => x.PersonId == PersonId)
             .OrderBy(x => x.CreatedOn)
