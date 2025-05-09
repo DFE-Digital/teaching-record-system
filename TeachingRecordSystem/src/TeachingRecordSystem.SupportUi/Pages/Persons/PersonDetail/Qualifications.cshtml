@@ -26,6 +26,7 @@
                 <govuk-summary-card-title></govuk-summary-card-title>
                 <govuk-summary-card-actions>
                     <govuk-summary-card-action href="@LinkGenerator.RouteDetail(professionalStatus.QualificationId, null)" visually-hidden-text="edit route" data-testid="edit-route-link-@professionalStatus.QualificationId">Edit route</govuk-summary-card-action>
+                    <govuk-summary-card-action href="@LinkGenerator.DeleteRouteChangeReason(professionalStatus.QualificationId, null)" visually-hidden-text="delete route" data-testid="delete-route-link-@professionalStatus.QualificationId">Delete route</govuk-summary-card-action>
                 </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>

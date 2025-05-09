@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
-using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
@@ -33,6 +32,14 @@ public class CheckYourAnswersModel(
 
     public async Task OnGetAsync()
     {
+        RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await referenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
+        RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await referenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
+        RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await referenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
+        RouteDetail.TrainingSubjects = RouteDetail.TrainingSubjectIds is not null ?
+            RouteDetail.TrainingSubjectIds
+                .Join((await referenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
+                .OrderByDescending(name => name)
+                .ToArray() : null;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -70,6 +77,25 @@ public class CheckYourAnswersModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+
+        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
+        RouteDetail = new RouteDetailViewModel()
+        {
+            RouteToProfessionalStatus = routeInfo.ProfessionalStatus.Route,
+            AwardedDate = routeInfo.ProfessionalStatus.AwardedDate,
+            DegreeTypeId = routeInfo.ProfessionalStatus.DegreeTypeId,
+            IsExemptFromInduction = routeInfo.ProfessionalStatus.ExemptFromInduction,
+            Status = routeInfo.ProfessionalStatus.Status,
+            QualificationId = routeInfo.ProfessionalStatus.QualificationId,
+            TrainingAgeSpecialismType = routeInfo.ProfessionalStatus.TrainingAgeSpecialismType,
+            TrainingAgeSpecialismRangeFrom = routeInfo.ProfessionalStatus.TrainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = routeInfo.ProfessionalStatus.TrainingAgeSpecialismRangeTo,
+            TrainingCountryId = routeInfo.ProfessionalStatus.TrainingCountryId,
+            TrainingEndDate = routeInfo.ProfessionalStatus.TrainingEndDate,
+            TrainingProviderId = routeInfo.ProfessionalStatus.TrainingProviderId,
+            TrainingStartDate = routeInfo.ProfessionalStatus.TrainingStartDate,
+            TrainingSubjectIds = routeInfo.ProfessionalStatus.TrainingSubjectIds
+        };
 
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
