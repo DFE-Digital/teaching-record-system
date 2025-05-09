@@ -49,4 +49,22 @@ public abstract record EventBase
 
         return (EventBase)JsonSerializer.Deserialize(payload, eventType, JsonSerializerOptions)!;
     }
+
+    public bool TryGetPersonId(out Guid personId)
+    {
+        if (this is IEventWithPersonId { PersonId: var eventPersonId })
+        {
+            personId = eventPersonId;
+            return true;
+        }
+
+        if (this is IEventWithOptionalPersonId { PersonId: { } eventOptionalPersonId })
+        {
+            personId = eventOptionalPersonId;
+            return true;
+        }
+
+        personId = Guid.Empty;
+        return false;
+    }
 }
