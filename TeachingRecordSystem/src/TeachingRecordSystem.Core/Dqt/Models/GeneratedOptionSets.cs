@@ -3790,6 +3790,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum SystemUser_SystemManagedUserType
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("C2 User", 1)]
+		C2User = 1,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Entra User", 0)]
+		EntraUser = 0,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
 	public enum Task_PriorityCode
 	{
 		
@@ -3833,6 +3846,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Waiting on someone else", 2)]
 		Waitingonsomeoneelse = 4,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum aiinsightcard_Surface
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Table", 0, "#0000ff")]
+		Table = 0,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Record", 1, "#0000ff")]
+		Record = 1,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3880,6 +3906,10 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("DesktopScript", 1, null, "authorize this credential in power automate for desktop script", "DesktopScript")]
 		DesktopScript = 280920001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Network", 2, null, "authorize this credential in power automate for network", "Network")]
+		Network = 280920002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
@@ -3931,6 +3961,19 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		[System.Runtime.Serialization.EnumMemberAttribute()]
 		[OptionSetMetadataAttribute("Link article and send article content", 3, "#0000ff")]
 		Linkarticleandsendarticlecontent = 3,
+	}
+	
+	[System.Runtime.Serialization.DataContractAttribute()]
+	public enum msdyn_msdyn_liveworkstream_msdyn_BlockCapacityforConsult
+	{
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Chat consult", 0, "#0000ff", "Chat consult")]
+		Chatconsult = 192350001,
+		
+		[System.Runtime.Serialization.EnumMemberAttribute()]
+		[OptionSetMetadataAttribute("Voice consult", 1, "#0000ff", "Voice consult")]
+		Voiceconsult = 192350002,
 	}
 	
 	[System.Runtime.Serialization.DataContractAttribute()]
