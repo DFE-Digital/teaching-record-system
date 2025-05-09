@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250630212354_IntegrationTransactionRecordNullablePerson2")]
+    partial class IntegrationTransactionRecordNullablePerson2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3176,9 +3179,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_eyts_awarded_emails_job_items_trn");
-
                     b.ToTable("eyts_awarded_emails_job_items", (string)null);
                 });
 
@@ -3245,9 +3245,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_induction_completed_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
-
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_induction_completed_emails_job_items_trn");
 
                     b.ToTable("induction_completed_emails_job_items", (string)null);
                 });
@@ -3490,10 +3487,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(3000)")
                         .HasColumnName("failure_message");
 
-                    b.Property<bool?>("HasActiveAlert")
-                        .HasColumnType("boolean")
-                        .HasColumnName("has_active_alert");
-
                     b.Property<long?>("IntegrationTransactionId")
                         .HasColumnType("bigint")
                         .HasColumnName("integration_transaction_id");
@@ -3580,9 +3573,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_international_qts_awarded_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
-
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_international_qts_awarded_emails_job_items_trn");
 
                     b.ToTable("international_qts_awarded_emails_job_items", (string)null);
                 });
@@ -4003,10 +3993,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("first_name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<int?>("Gender")
-                        .HasColumnType("integer")
-                        .HasColumnName("gender");
-
                     b.Property<bool>("HasEyps")
                         .HasColumnType("boolean")
                         .HasColumnName("has_eyps");
@@ -4284,9 +4270,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_qts_awarded_emails_job_items_trn");
-
                     b.ToTable("qts_awarded_emails_job_items", (string)null);
                 });
 
@@ -4328,352 +4311,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.HasDiscriminator<int>("QualificationType");
 
                     b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteMigrationReportItem", b =>
-                {
-                    b.Property<Guid>("RouteMigrationReportItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("route_migration_report_item_id");
-
-                    b.Property<int>("ContactIttRowCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("contact_itt_row_count");
-
-                    b.Property<int>("ContactQtsRowCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("contact_qts_row_count");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
-
-                    b.Property<Guid?>("DegreeTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("degree_type_id");
-
-                    b.Property<string>("DegreeTypeName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("degree_type_name");
-
-                    b.Property<string>("DqtAgeRangeFrom")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_age_range_from");
-
-                    b.Property<string>("DqtAgeRangeTo")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_age_range_to");
-
-                    b.Property<string>("DqtEarlyYearsStatusName")
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)")
-                        .HasColumnName("dqt_early_years_status_name");
-
-                    b.Property<string>("DqtEarlyYearsStatusValue")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_early_years_status_value");
-
-                    b.Property<DateOnly?>("DqtEytsDate")
-                        .HasColumnType("date")
-                        .HasColumnName("dqt_eyts_date");
-
-                    b.Property<Guid?>("DqtInitialTeacherTrainingId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dqt_initial_teacher_training_id");
-
-                    b.Property<string>("DqtIttCountryName")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("dqt_itt_country_name");
-
-                    b.Property<string>("DqtIttCountryValue")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_itt_country_value");
-
-                    b.Property<DateOnly?>("DqtIttProgrammeEndDate")
-                        .HasColumnType("date")
-                        .HasColumnName("dqt_itt_programme_end_date");
-
-                    b.Property<DateOnly?>("DqtIttProgrammeStartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("dqt_itt_programme_start_date");
-
-                    b.Property<string>("DqtIttProgrammeType")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("dqt_itt_programme_type");
-
-                    b.Property<Guid?>("DqtIttProviderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dqt_itt_provider_id");
-
-                    b.Property<string>("DqtIttProviderName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("dqt_itt_provider_name");
-
-                    b.Property<string>("DqtIttProviderUkprn")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_itt_provider_ukprn");
-
-                    b.Property<string>("DqtIttQualificationName")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("dqt_itt_qualification_name");
-
-                    b.Property<string>("DqtIttQualificationValue")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_itt_qualification_value");
-
-                    b.Property<string>("DqtIttResult")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("dqt_itt_result");
-
-                    b.Property<string>("DqtIttSlugId")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("dqt_itt_slug_id");
-
-                    b.Property<string>("DqtIttSubject1Name")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("dqt_itt_subject1_name");
-
-                    b.Property<string>("DqtIttSubject1Value")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_itt_subject1_value");
-
-                    b.Property<string>("DqtIttSubject2Name")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("dqt_itt_subject2_name");
-
-                    b.Property<string>("DqtIttSubject2Value")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_itt_subject2_value");
-
-                    b.Property<string>("DqtIttSubject3Name")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)")
-                        .HasColumnName("dqt_itt_subject3_name");
-
-                    b.Property<string>("DqtIttSubject3Value")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_itt_subject3_value");
-
-                    b.Property<DateOnly?>("DqtPartialRecognitionDate")
-                        .HasColumnType("date")
-                        .HasColumnName("dqt_partial_recognition_date");
-
-                    b.Property<DateOnly?>("DqtQtlsDate")
-                        .HasColumnType("date")
-                        .HasColumnName("dqt_qtls_date");
-
-                    b.Property<bool?>("DqtQtlsDateHasBeenSet")
-                        .HasColumnType("boolean")
-                        .HasColumnName("dqt_qtls_date_has_been_set");
-
-                    b.Property<DateOnly?>("DqtQtsDate")
-                        .HasColumnType("date")
-                        .HasColumnName("dqt_qts_date");
-
-                    b.Property<Guid?>("DqtQtsRegistrationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dqt_qts_registration_id");
-
-                    b.Property<string>("DqtTeacherStatusName")
-                        .HasMaxLength(450)
-                        .HasColumnType("character varying(450)")
-                        .HasColumnName("dqt_teacher_status_name");
-
-                    b.Property<string>("DqtTeacherStatusValue")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("dqt_teacher_status_value");
-
-                    b.Property<bool?>("ExemptFromInduction")
-                        .HasColumnType("boolean")
-                        .HasColumnName("exempt_from_induction");
-
-                    b.Property<bool?>("ExemptFromInductionDueToQtsDate")
-                        .HasColumnType("boolean")
-                        .HasColumnName("exempt_from_induction_due_to_qts_date");
-
-                    b.Property<DateOnly?>("HoldsFrom")
-                        .HasColumnType("date")
-                        .HasColumnName("holds_from");
-
-                    b.Property<Guid[]>("InductionExemptionReasonIdsMovedFromPerson")
-                        .HasColumnType("uuid[]")
-                        .HasColumnName("induction_exemption_reason_ids_moved_from_person");
-
-                    b.Property<Guid?>("IttQualificationDerivedRouteToProfessionalStatusTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("itt_qualification_derived_route_to_professional_status_type_id");
-
-                    b.Property<string>("IttQualificationDerivedRouteToProfessionalStatusTypeName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("itt_qualification_derived_route_to_professional_status_type_name");
-
-                    b.Property<bool>("Migrated")
-                        .HasColumnType("boolean")
-                        .HasColumnName("migrated");
-
-                    b.Property<Guid[]>("MultiplePotentialCompatibleIttRecords")
-                        .HasColumnType("uuid[]")
-                        .HasColumnName("multiple_potential_compatible_itt_records");
-
-                    b.Property<string>("NotMigratedReason")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("not_migrated_reason");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("person_id");
-
-                    b.Property<Guid?>("ProgrammeTypeDerivedRouteToProfessionalStatusTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("programme_type_derived_route_to_professional_status_type_id");
-
-                    b.Property<string>("ProgrammeTypeDerivedRouteToProfessionalStatusTypeName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("programme_type_derived_route_to_professional_status_type_name");
-
-                    b.Property<Guid?>("RouteToProfessionalStatusTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("route_to_professional_status_type_id");
-
-                    b.Property<string>("RouteToProfessionalStatusTypeName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("route_to_professional_status_type_name");
-
-                    b.Property<string>("SourceApplicationReference")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("source_application_reference");
-
-                    b.Property<Guid?>("SourceApplicationUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("source_application_user_id");
-
-                    b.Property<string>("SourceApplicationUserShortName")
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)")
-                        .HasColumnName("source_application_user_short_name");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)")
-                        .HasColumnName("status");
-
-                    b.Property<Guid?>("StatusDerivedRouteToProfessionalStatusTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("status_derived_route_to_professional_status_type_id");
-
-                    b.Property<string>("StatusDerivedRouteToProfessionalStatusTypeName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("status_derived_route_to_professional_status_type_name");
-
-                    b.Property<int?>("TrainingAgeSpecialismRangeFrom")
-                        .HasColumnType("integer")
-                        .HasColumnName("training_age_specialism_range_from");
-
-                    b.Property<int?>("TrainingAgeSpecialismRangeTo")
-                        .HasColumnType("integer")
-                        .HasColumnName("training_age_specialism_range_to");
-
-                    b.Property<string>("TrainingAgeSpecialismType")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("training_age_specialism_type");
-
-                    b.Property<string>("TrainingCountryId")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("training_country_id");
-
-                    b.Property<string>("TrainingCountryName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("training_country_name");
-
-                    b.Property<DateOnly?>("TrainingEndDate")
-                        .HasColumnType("date")
-                        .HasColumnName("training_end_date");
-
-                    b.Property<Guid?>("TrainingProviderId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("training_provider_id");
-
-                    b.Property<string>("TrainingProviderName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("training_provider_name");
-
-                    b.Property<string>("TrainingProviderUkprn")
-                        .HasMaxLength(8)
-                        .HasColumnType("character(8)")
-                        .HasColumnName("training_provider_ukprn")
-                        .IsFixedLength();
-
-                    b.Property<DateOnly?>("TrainingStartDate")
-                        .HasColumnType("date")
-                        .HasColumnName("training_start_date");
-
-                    b.Property<string>("TrainingSubject1Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("training_subject1_name");
-
-                    b.Property<string>("TrainingSubject1Reference")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("training_subject1_reference");
-
-                    b.Property<string>("TrainingSubject2Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("training_subject2_name");
-
-                    b.Property<string>("TrainingSubject2Reference")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("training_subject2_reference");
-
-                    b.Property<string>("TrainingSubject3Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("training_subject3_name");
-
-                    b.Property<string>("TrainingSubject3Reference")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasColumnName("training_subject3_reference");
-
-                    b.HasKey("RouteMigrationReportItemId")
-                        .HasName("pk_route_migration_report_items");
-
-                    b.HasIndex("PersonId")
-                        .HasDatabaseName("ix_route_migration_report_items_person_id");
-
-                    b.ToTable("route_migration_report_items", (string)null);
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatusType", b =>
@@ -4753,7 +4390,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
-                            Name = "Apply for Qualified Teacher Status in England",
+                            Name = "Apply for QTS",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
@@ -4769,13 +4406,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "Postgraduate Teaching Apprenticeship",
+                            Name = "Apprenticeship",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4785,13 +4422,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "Assessment Only",
+                            Name = "Assessment Only Route",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4817,7 +4454,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = false,
-                            Name = "Core",
+                            Name = "Core - Core Programme Type",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
@@ -4869,9 +4506,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4885,9 +4522,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4901,9 +4538,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4917,9 +4554,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -4933,9 +4570,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 1,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5061,9 +4698,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5077,9 +4714,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5121,13 +4758,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "HEI",
+                            Name = "HEI - HEI Programme Type",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5157,9 +4794,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5173,9 +4810,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5330,7 +4967,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
-                            Name = "Northern Irish Recognition",
+                            Name = "NI R",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
@@ -5446,9 +5083,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5462,9 +5099,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5478,9 +5115,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5526,9 +5163,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5542,9 +5179,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5560,7 +5197,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 2,
-                            TrainingProviderRequired = 0,
+                            TrainingProviderRequired = 1,
                             TrainingStartDateRequired = 2,
                             TrainingSubjectsRequired = 0
                         },
@@ -5607,9 +5244,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5623,9 +5260,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5639,9 +5276,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5652,7 +5289,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionReasonId = new Guid("a112e691-1694-46a7-8f33-5ec5b845c181"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
-                            Name = "Scottish Recognition",
+                            Name = "Scotland R",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
@@ -5704,9 +5341,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5752,9 +5389,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
-                            TrainingEndDateRequired = 0,
+                            TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
-                            TrainingStartDateRequired = 0,
+                            TrainingStartDateRequired = 1,
                             TrainingSubjectsRequired = 0
                         },
                         new
@@ -5764,7 +5401,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
-                            Name = "Welsh Recognition",
+                            Name = "Welsh R",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
@@ -5772,38 +5409,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             TrainingProviderRequired = 2,
                             TrainingStartDateRequired = 2,
                             TrainingSubjectsRequired = 0
-                        },
-                        new
-                        {
-                            RouteToProfessionalStatusTypeId = new Guid("11b66de5-4670-4c82-86aa-20e42df723b7"),
-                            DegreeTypeRequired = 1,
-                            HoldsFromRequired = 1,
-                            InductionExemptionRequired = 2,
-                            IsActive = true,
-                            Name = "Early Years Teacher Degree Apprenticeship",
-                            ProfessionalStatusType = 1,
-                            TrainingAgeSpecialismTypeRequired = 1,
-                            TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
-                            TrainingProviderRequired = 0,
-                            TrainingStartDateRequired = 0,
-                            TrainingSubjectsRequired = 1
-                        },
-                        new
-                        {
-                            RouteToProfessionalStatusTypeId = new Guid("5d4c01c1-0841-4306-b49c-48ad6499fdc0"),
-                            DegreeTypeRequired = 1,
-                            HoldsFromRequired = 1,
-                            InductionExemptionRequired = 2,
-                            IsActive = true,
-                            Name = "Teacher Degree Apprenticeship",
-                            ProfessionalStatusType = 0,
-                            TrainingAgeSpecialismTypeRequired = 1,
-                            TrainingCountryRequired = 1,
-                            TrainingEndDateRequired = 0,
-                            TrainingProviderRequired = 0,
-                            TrainingStartDateRequired = 0,
-                            TrainingSubjectsRequired = 1
                         });
                 });
 
@@ -18894,21 +18499,21 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             TrainingSubjectId = new Guid("9caa584a-bb89-450d-8d8d-16ba0e84e28e"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Citizenship",
                             Reference = "999001"
                         },
                         new
                         {
                             TrainingSubjectId = new Guid("649d7736-d301-4c42-873a-b24486fd35d7"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Physical Education",
                             Reference = "999002"
                         },
                         new
                         {
                             TrainingSubjectId = new Guid("f3e91599-2a2e-4f81-b4e0-9098a1ce8ec7"),
-                            IsActive = true,
+                            IsActive = false,
                             Name = "Design and technology",
                             Reference = "999003"
                         },
@@ -19502,9 +19107,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid[]")
                         .HasColumnName("training_subject_ids");
 
-                    b.HasIndex("PersonId", "SourceApplicationUserId", "SourceApplicationReference")
+                    b.HasIndex("SourceApplicationUserId", "SourceApplicationReference")
                         .IsUnique()
-                        .HasDatabaseName("ix_qualifications_person_id_source_application_user_id_source_")
+                        .HasDatabaseName("ix_qualifications_source_application_user_id_source_applicatio")
                         .HasFilter("source_application_user_id is not null and source_application_reference is not null");
 
                     b.HasDiscriminator().HasValue(1);

@@ -147,7 +147,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
         doc.AssertResultsContainsIntegrationTransactionRecord(itr1.IntegrationTransactionRecordId);
         var rowItrId = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:id");
-        var rowContact = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:contactid");
+        var rowContact = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:personid");
         var rowDuplicate = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:duplicate");
         var rowStatus = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:status");
         Assert.NotNull(rowItrId);
@@ -156,6 +156,56 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(rowStatus);
         var statusElement = rowStatus.Children.FirstOrDefault(child => child.ClassList.Contains(expectedCssClass));
         Assert.NotNull(statusElement);
+    }
+
+    [Fact]
+    public async Task Get_RowForUnknownPerson_RendersCorrectPersonText()
+    {
+        // Arrange
+        var person1 = await TestData.CreatePersonAsync();
+        var totalCount1 = 0;
+        var successCount1 = 0;
+        var failureCount1 = 1;
+        var duplicateCount1 = 0;
+        var fileName1 = "FileName.csv";
+        var importStatus1 = IntegrationTransactionImportStatus.Success;
+        var interfaceType1 = IntegrationTransactionInterfaceType.EwcWales;
+        var createdOn1 = Clock.UtcNow;
+        var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
+        {
+            p.WithTotalCount(totalCount1);
+            p.WithSuccesCount(successCount1);
+            p.WithFailureCount(failureCount1);
+            p.WithDuplicateCount(duplicateCount1);
+            p.WithFileName(fileName1);
+            p.WithImportStatus(importStatus1);
+            p.WithInterfaceType(interfaceType1);
+            p.WithCreatedOn(createdOn1);
+            p.WithRow(x =>
+            {
+                x.WithRowData("some,random,csv,data");
+                x.WithFailureMessage("Some failure message");
+                x.WithStatus(IntegrationTransactionRecordStatus.Failure);
+            });
+        });
+        var itr1 = integrationTransaction1.Records.First();
+        var id = integrationTransaction1.IntegrationTransactionId;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/integration-transactions/{id}/detail?");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var unknownPerson = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:personid");
+        Assert.NotNull(unknownPerson);
+        Assert.Contains("Unknown", unknownPerson.TextContent);
+        var rowStatus = doc.GetElementByTestId($"integration-transaction-record:{itr1.IntegrationTransactionRecordId}:status");
+        Assert.NotNull(rowStatus);
+        var statusElement = rowStatus.Children.FirstOrDefault(child => child.ClassList.Contains("govuk-tag--red"));
+        Assert.NotNull(statusElement);
+        Assert.Contains("Failure", statusElement.TextContent);
     }
 
     [Fact]

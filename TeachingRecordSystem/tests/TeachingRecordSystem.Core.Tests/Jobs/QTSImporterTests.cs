@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -41,7 +42,7 @@ public class QtsImporterTests : IAsyncLifetime
             trnGenerator,
             TestDataSyncConfiguration.Sync(Helper));
         var blobServiceClient = new Mock<BlobServiceClient>();
-        Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider);
+        Importer = ActivatorUtilities.CreateInstance<QtsImporter>(provider, Clock);
     }
 
     private DbFixture DbFixture { get; }
@@ -77,29 +78,6 @@ public class QtsImporterTests : IAsyncLifetime
 
         // Assert
         Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.QtsRefNo} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_ExistingTeacherWithQTS_ReturnsErrorMessage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(x =>
-        {
-            x.WithQts();
-        });
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(errors, item => item.Contains($"Teacher with TRN {row.QtsRefNo} has QTS already."));
     }
 
     [Fact]
@@ -186,120 +164,6 @@ public class QtsImporterTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Validate_MultipleMatchingOrganisations_ReturnsErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "12345";
-        var account1 = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("test");
-            x.WithAccountNumber(accountNumber);
-        });
-        var account2 = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("test2");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = accountNumber;
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(failures, item => item.Contains($"Multiple organisations with ITT Establishment Code {row.IttEstabCode} found."));
-    }
-
-    [Fact]
-    public async Task Validate_NoMatchingOrganisations_ReturnsErrorMessage()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = "SomeInvalidOrg";
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(failures, item => item.Contains($"Organisation with ITT Establishment Code {row.IttEstabCode} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_NoPqSubjects_ReturnsErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
-            x.PqSubjectCode1 = "3333333";
-            x.PqSubjectCode2 = "5555555";
-            x.PqSubjectCode3 = "6666666";
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(failures, item => item.Contains($"Subject with PQ Subject Code {row.PqSubjectCode1} was not found."));
-        Assert.Contains(failures, item => item.Contains($"Subject with PQ Subject Code {row.PqSubjectCode2} was not found."));
-        Assert.Contains(failures, item => item.Contains($"Subject with PQ Subject Code {row.PqSubjectCode3} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_ValidPqSubjects_DoesNotReturnsErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.DoesNotContain(failures, item => item.Contains($"Subject with PQ Subject Code {row.PqSubjectCode1} was not found."));
-        Assert.DoesNotContain(failures, item => item.Contains($"Subject with PQ Subject Code {row.PqSubjectCode2} was not found."));
-        Assert.DoesNotContain(failures, item => item.Contains($"Subject with PQ Subject Code {row.PqSubjectCode3} was not found."));
-    }
-
-    [Fact]
     public async Task Validate_ValidCountry_ReturnsErrorMessage()
     {
         // Arrange
@@ -327,22 +191,30 @@ public class QtsImporterTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Validate_InvalidCountry_ReturnsErrorMessage()
+    public async Task Validate_MatchesExistingWelshR_ReturnsErrorMessage()
     {
         // Arrange
+        var holdsDate = Clock.Today.AddDays(-10);
         var accountNumber = "1357";
         var account = await TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x =>
+        {
+            x.WithTrn();
+            x.WithRouteToProfessionalStatus(s => s
+                .WithRouteType(RouteToProfessionalStatusType.WelshRId)
+                .WithHoldsFrom(holdsDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds));
+        });
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
-            x.Country = "INVALID";
+            x.QtsDate = holdsDate.ToString("dd/MM/yyyy");
             return x;
         });
         var lookups = await Importer.GetLookupDataAsync(row);
@@ -351,25 +223,35 @@ public class QtsImporterTests : IAsyncLifetime
         var (failures, errors) = Importer.Validate(row, lookups);
 
         // Assert
-        Assert.Contains(failures, item => item.Contains($"Country with PQ Country Code {row.Country} was not found."));
+        Assert.Contains(errors, item => item.Contains($"{person.Trn} already holds welshr route with holdsfrom {holdsDate}"));
     }
 
     [Fact]
-    public async Task Validate_ValidITTSubjetCodes_DoesNotReturnErrorMessage()
+    public async Task Validate_ExistingWelshR_ReturnsNoErrors()
     {
         // Arrange
+        var holdsDate = Clock.Today.AddDays(-10);
         var accountNumber = "1357";
         var account = await TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var person = await TestData.CreatePersonAsync(x =>
+        {
+            x.WithTrn();
+            x.WithRouteToProfessionalStatus(s => s
+                .WithRouteType(RouteToProfessionalStatusType.WelshRId)
+                .WithHoldsFrom(holdsDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds));
+        });
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
             x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
             x.IttEstabCode = account.AccountNumber;
+            x.QtsDate = holdsDate.AddDays(1).ToString("dd/MM/yyyy");
+            x.QtsStatus = "71";
             return x;
         });
         var lookups = await Importer.GetLookupDataAsync(row);
@@ -378,120 +260,8 @@ public class QtsImporterTests : IAsyncLifetime
         var (failures, errors) = Importer.Validate(row, lookups);
 
         // Assert
-        Assert.DoesNotContain(failures, item => item.Contains($"ITT subject with code {row.IttSubjectCode1} was not found."));
-        Assert.DoesNotContain(failures, item => item.Contains($"ITT subject with code {row.IttSubjectCode2} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_InvalidITTSubjetCodes_ReturnsErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
-            x.IttSubjectCode1 = "Invalid1";
-            x.IttSubjectCode2 = "Invalid2";
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(failures, item => item.Contains($"ITT subject with code {row.IttSubjectCode1} was not found."));
-        Assert.Contains(failures, item => item.Contains($"ITT subject with code {row.IttSubjectCode2} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_InvalidITTQualification_ReturnsErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
-            x.IttQualCode = "InvalidIttQualCode";
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(failures, item => item.Contains($"TT qualification with code {row.IttQualCode} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_ValidITTQualification_DoesNotReturnErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttEstabCode = account.AccountNumber;
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.DoesNotContain(failures, item => item.Contains($"ITT qualification with code {row.IttQualCode} was not found."));
-    }
-
-    [Fact]
-    public async Task Validate_InvalidPqEstabCode_ReturnErrorMessage()
-    {
-        // Arrange
-        var accountNumber = "13571";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqEstabCode = "InvalidOrg";
-            return x;
-        });
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Act
-        var (failures, errors) = Importer.Validate(row, lookups);
-
-        // Assert
-        Assert.Contains(failures, item => item.Contains($"Organisation with PQ Establishment Code {row.PqEstabCode} was not found."));
+        Assert.DoesNotContain(errors, item => item.Contains($"{person.Trn} already holds welshr route with holdsfrom {holdsDate}"));
+        Assert.Empty(errors);
     }
 
     [Fact]
@@ -520,7 +290,36 @@ public class QtsImporterTests : IAsyncLifetime
         var (failures, errors) = Importer.Validate(row, lookups);
 
         // Assert
-        Assert.Contains(errors, item => item.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023"));
+        Assert.Contains(errors, item => item.Contains("Qts Status can only be 71 or 49 when qts date is on or past 01/02/2023"));
+    }
+
+    [Fact]
+    public async Task Validate_QtsDateInTheFuture_ReturnErrorMessage()
+    {
+        // Arrange
+        var accountNumber = "13571";
+        var account = await TestData.CreateAccountAsync(x =>
+        {
+            x.WithName("SomeName");
+            x.WithAccountNumber(accountNumber);
+        });
+        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        var row = GetDefaultRow(x =>
+        {
+            x.QtsRefNo = person.Trn!;
+            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
+            x.PqEstabCode = "InvalidOrg";
+            x.QtsStatus = "67";
+            x.QtsDate = Clock.UtcNow.AddDays(1).ToString("dd/MM/yyyy");
+            return x;
+        });
+        var lookups = await Importer.GetLookupDataAsync(row);
+
+        // Act
+        var (failures, errors) = Importer.Validate(row, lookups);
+
+        // Assert
+        Assert.Contains(errors, item => item.Contains("Qts date cannot be set in the future"));
     }
 
     [Fact]
@@ -605,244 +404,7 @@ public class QtsImporterTests : IAsyncLifetime
 
         // Assert
         Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PersonMatchStatus);
-        Assert.Null(lookups.PersonId);
-    }
-
-    [Fact]
-    public async Task GetLookupData_IttEstabCodeDoesNotExist_ReturnsNoMatch()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = "Invalid";
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqEstabCode = account.AccountNumber;
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.IttEstabCodeMatchStatus);
-        Assert.Null(lookups.IttEstabCodeId);
-    }
-
-    [Fact]
-    public async Task GetLookupData_IttEstabCodeMultipleMatching_ReturnsMultipleMatchesFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account1 = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var account2 = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName2");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.MultipleMatchesFound, lookups.IttEstabCodeMatchStatus);
-        Assert.Null(lookups.IttEstabCodeId);
-    }
-
-    [Fact]
-    public async Task GetLookupData_IttQualificationDoesNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttQualCode = "InvalidQual Code";
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.IttQualificationMatchStatus);
-        Assert.Null(lookups.IttQualificationId);
-    }
-
-    [Fact]
-    public async Task GetLookupData_IttSubjectsDoNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.IttSubjectCode1 = "Invalid Subject1";
-            x.IttSubjectCode2 = "Invalid Subject2";
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.IttSubject1MatchStatus);
-        Assert.Null(lookups.IttSubject1Id);
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.IttSubject2MatchStatus);
-        Assert.Null(lookups.IttSubject2Id);
-    }
-
-    [Fact]
-    public async Task GetLookupData_PqSubjectCodesDoNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqSubjectCode1 = "InvalidSubject1";
-            x.PqSubjectCode2 = "InvalidSubject2";
-            x.PqSubjectCode3 = "InvalidSubject3";
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PQSubject1MatchStatus);
-        Assert.Null(lookups.PQSubject1Id);
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PQSubject2MatchStatus);
-        Assert.Null(lookups.PQSubject2Id);
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PQSubject3MatchStatus);
-        Assert.Null(lookups.PQSubject3Id);
-    }
-
-    [Fact]
-    public async Task GetLookupData_PqEstablishmentIdDoesNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqEstabCode = "Invalid Org number";
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PqEstablishmentMatchStatus);
-        Assert.Null(lookups.PqEstablishmentId);
-    }
-
-    [Fact]
-    public async Task GetLookupData_PQCountryDoesNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.Country = "Invalid";
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PQCountryMatchStatus);
-        Assert.Null(lookups.PQCountryId);
-    }
-
-    [Fact]
-    public async Task GetLookupData_PQHEQualificationNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        var accountNumber = "1357";
-        var account = await TestData.CreateAccountAsync(x =>
-        {
-            x.WithName("SomeName");
-            x.WithAccountNumber(accountNumber);
-        });
-        var person = await TestData.CreatePersonAsync(x => x.WithTrn());
-        var row = GetDefaultRow(x =>
-        {
-            x.QtsRefNo = person.Trn!;
-            x.IttEstabCode = accountNumber;
-            x.DateOfBirth = person.DateOfBirth.ToString("dd/MM/yyyy")!;
-            x.PqQualCode = "Invalid Qualification Code";
-            return x;
-        });
-
-        // Act
-        var lookups = await Importer.GetLookupDataAsync(row);
-
-        // Assert
-        Assert.Equal(EwcWalesMatchStatus.NoMatch, lookups.PQHEQualificationMatchStatus);
-        Assert.Null(lookups.PQHEQualificationId);
+        Assert.Null(lookups.Person);
     }
 
     [Theory]
@@ -928,7 +490,7 @@ public class QtsImporterTests : IAsyncLifetime
         var json = Importer.ConvertToCsvString(row);
 
         // Assert
-        Assert.Equal(json, expectedJson);
+        Assert.Contains(expectedJson, json);
     }
 
     [Fact]
@@ -966,12 +528,18 @@ public class QtsImporterTests : IAsyncLifetime
     {
         // Arrange
         var accountNumber = "1357111";
+        var awardDate = new DateOnly(2011, 01, 1);
         var account = await TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithQts(new DateOnly(2024, 01, 01)));
+        var person1AwardedDate = new DateOnly(2011, 01, 04);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithRouteToProfessionalStatus(s => s
+                .WithRouteType(RouteToProfessionalStatusType.WelshRId)
+                .WithHoldsFrom(Clock.Today.AddDays(-10))
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)));
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -985,31 +553,9 @@ public class QtsImporterTests : IAsyncLifetime
         var lookups = await Importer.GetLookupDataAsync(row);
 
         // Assert
-        Assert.NotNull(lookups.PersonId);
+        Assert.NotNull(lookups.Person);
         Assert.Equal(EwcWalesMatchStatus.TeacherHasQts, lookups.PersonMatchStatus);
-        Assert.NotNull(lookups.IttEstabCodeId);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.IttEstabCodeMatchStatus);
-        Assert.NotNull(lookups.IttQualificationId);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.IttQualificationMatchStatus);
-        Assert.NotNull(lookups.IttSubject1Id);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.IttSubject1MatchStatus);
-        Assert.NotNull(lookups.IttSubject2Id);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.IttSubject2MatchStatus);
-        Assert.NotNull(lookups.PqEstablishmentId);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.PqEstablishmentMatchStatus);
-        Assert.NotNull(lookups.PQCountryId);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.PQCountryMatchStatus);
-        Assert.NotNull(lookups.PQHEQualificationId);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.PQHEQualificationMatchStatus);
-        Assert.NotNull(lookups.PQSubject1Id);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.PQSubject1MatchStatus);
-        Assert.NotNull(lookups.PQSubject2Id);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.PQSubject2MatchStatus);
-        Assert.NotNull(lookups.PQSubject3Id);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.PQSubject3MatchStatus);
         Assert.NotNull(lookups.TeacherStatusId);
-        Assert.Equal(EwcWalesMatchStatus.OneMatch, lookups.TeacherStatusMatchStatus);
-        Assert.NotNull(lookups.ClassDivision);
     }
 
     private EwcWalesQtsFileImportData GetDefaultRow(Func<EwcWalesQtsFileImportData, EwcWalesQtsFileImportData>? configurator = null)

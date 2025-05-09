@@ -101,14 +101,11 @@
     <None Remove="Services\DqtReporting\Migrations\0065_TrsPersonMergedWith.sql" />
     <None Remove="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
     <None Remove="Services\DqtReporting\Migrations\0067_TrsRoutesModelChanges.sql" />
-    <None Remove="Services\DqtReporting\Migrations\0068_TrsQualificationsTrainingCountryId.sql" />
-    <None Remove="Services\DqtReporting\Migrations\0069_TrsQualificationsDegreeTypeId.sql" />
-    <None Remove="Services\DqtReporting\Migrations\0070_TrsQualificationsExemptFromInductionDueToQtsDate.sql" />
-    <None Remove="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />
     <None Remove="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
     <None Remove="Services\DqtReporting\Migrations\0073_TrsPersonsGender.sql" />
     <None Remove="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
     <None Remove="Services\DqtReporting\Migrations\0075_TrsRouteMigrationReportItemStatusLength.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0077_TrsIntegrationTranactionFKCorrection.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -211,11 +208,12 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0068_TrsQualificationsTrainingCountryId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0069_TrsQualificationsDegreeTypeId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0070_TrsQualificationsExemptFromInductionDueToQtsDate.sql" />
-    <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />  
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0072_TrsQualificationsDqtAgeRange.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0073_TrsPersonsGender.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0074_TrsRouteMigrationReportItem.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0075_TrsRouteMigrationReportItemStatusLength.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0077_TrsIntegrationTranactionFKCorrection.sql" />
   </ItemGroup>
 
   <ItemGroup>

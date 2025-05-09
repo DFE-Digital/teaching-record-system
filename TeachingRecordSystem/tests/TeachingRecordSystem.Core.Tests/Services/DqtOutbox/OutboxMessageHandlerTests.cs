@@ -34,6 +34,8 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
 
     public TestData TestData => Fixture.TestData;
 
+    public ReferenceDataCache ReferenceDataCache => Fixture.ReferenceDataCache;
+
     private async Task WithDbContextAsync(Func<TrsDbContext, Task> action)
     {
         await using var dbContext = await Fixture.ServiceProvider.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContextAsync();
@@ -256,6 +258,7 @@ public class OutboxMessageHandlerFixture
             .AddMemoryCache()
             .AddSingleton(testDataSyncHelper);
 
+        ReferenceDataCache = referenceDataCache;
         ServiceProvider = services.BuildServiceProvider();
     }
 
@@ -266,4 +269,6 @@ public class OutboxMessageHandlerFixture
     public IServiceProvider ServiceProvider { get; }
 
     public TestData TestData { get; private set; }
+
+    public ReferenceDataCache ReferenceDataCache { get; }
 }
