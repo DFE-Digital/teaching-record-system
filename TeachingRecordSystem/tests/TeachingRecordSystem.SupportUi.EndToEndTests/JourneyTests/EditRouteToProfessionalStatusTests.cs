@@ -28,8 +28,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
         var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var setSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("015d862e-2aed-49df-9e5f-d17b0d426972"));
-        //var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
-        //    .RandomOne();
+        var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
+            .RandomOne();
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -106,13 +106,13 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
-        //await page.AssertOnRouteDetailPageAsync(qualificationId);
-        //await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
+        await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
-        //await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
-        //await page.FillAsync("label:text-is('Enter the training provider for this route')", setTrainingProvider.Name);
-        //await page.FocusAsync("button:text-is('Continue')");
-        //await page.ClickContinueButtonAsync();
+        await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
+        await page.FillAsync("label:text-is('Enter the training provider for this route')", setTrainingProvider.Name);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickContinueButtonAsync();
@@ -130,7 +130,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertContentEquals(setAgeRange.GetDisplayName()!, "Age range");
         await page.AssertContentContains(setCountry.Name, "Country of training");
         await page.AssertContentContains(setSubject.Name, "Subjects");
-        //await page.AssertContentContains(setTrainingProvider.Name, "Training provider");
+        await page.AssertContentContains(setTrainingProvider.Name, "Training provider");
         await page.ClickButtonAsync("Confirm and commit changes");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
@@ -664,7 +664,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
     }
 
-    [Fact(Skip = "Waiting for training_provider table to be populated")]
+    [Fact]
     public async Task EditTrainingProvider_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
@@ -692,13 +692,13 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
-        await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
+        await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
         await page.ClickBackLink();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
-        await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
+        await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
         await page.FillAsync($"label:text-is('Enter the training provider for this route')", newTrainingProvider.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
@@ -838,13 +838,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     {
         var awardDate = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionReasonId.HasValue)
-            .Join(
-                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
-                r => r.InductionExemptionReasonId,
-                e => e.InductionExemptionReasonId,
-                (r, e) => r
-            )
+            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption == false)
             .RandomOne();
 
         var status = ProfessionalStatusStatus.InTraining;

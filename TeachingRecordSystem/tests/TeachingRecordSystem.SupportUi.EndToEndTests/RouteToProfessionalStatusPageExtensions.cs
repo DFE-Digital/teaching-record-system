@@ -141,4 +141,9 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync("/route/add/subjects");
     }
+
+    public static Task AssertOnRouteAddCheckYourAnswersPage(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/check-answers");
+    }
 }

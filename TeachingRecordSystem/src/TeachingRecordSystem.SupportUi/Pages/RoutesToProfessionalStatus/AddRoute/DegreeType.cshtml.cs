@@ -37,7 +37,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
         await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.DegreeType) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 

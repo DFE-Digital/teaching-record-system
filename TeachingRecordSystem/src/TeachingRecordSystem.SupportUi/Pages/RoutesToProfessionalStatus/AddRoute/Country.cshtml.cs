@@ -35,7 +35,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
 
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             _linkGenerator.RouteAddPage(NextPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId));
     }
 
