@@ -5,6 +5,12 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 public class Person
 {
+    public const int FirstNameMaxLength = 100;
+    public const int MiddleNameMaxLength = 100;
+    public const int LastNameMaxLength = 100;
+    public const int EmailAddressMaxLength = 100;
+    public const int NationalInsuranceNumberMaxLength = 9;
+
     public static DateOnly EarliestInductionStartDate => new(1999, 5, 7);
 
     public required Guid PersonId { get; init; }
