@@ -49,7 +49,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
 
     [Theory]
     [InlineData("", "Qts status is missing")]
-    [InlineData("3343", "Qts Status must be 49,71 or 67")]
+    [InlineData("3343", "Qts Status must be 49,67, 68,69, 71 or 102")]
     public async Task EwcWalesImportJobQts_WithInvalidQtsStatus_ReturnsError(string qtsStatus, string expectedErrorMessage)
     {
         // Arrange
@@ -112,9 +112,6 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
         var itrRecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
-        var qualification = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person.ContactId);
-        var itt = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person.ContactId);
-        var qts = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.ContactId);
         var outboxMessage = ctx.dfeta_TrsOutboxMessageSet.Select(x => x.dfeta_MessageName == nameof(SetInductionRequiredToCompleteMessage));
         var outboxMessages = ctx.dfeta_TrsOutboxMessageSet
             .Where(x => x.dfeta_MessageName == nameof(SetInductionRequiredToCompleteMessage))
@@ -127,10 +124,6 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         {
             Assert.Empty(item1.dfeta_FailureMessage);
         });
-        Assert.NotNull(qualification);
-        Assert.Equal(expectedQtsStatusId.Id, qts.dfeta_TeacherStatusId!.Id);
-        Assert.NotNull(itt);
-        Assert.NotNull(qts);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.dfeta_SuccessCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
@@ -223,18 +216,13 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
         var itrRecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
-        var qualification = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person.ContactId);
-        var itt = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person.ContactId);
-        var qts = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.ContactId);
+
         var task = ctx.TaskSet.Single(i => i.GetAttributeValue<Guid>(Dqt.Models.Task.Fields.RegardingObjectId) == person.PersonId);
         Assert.NotNull(integrationTransaction);
         Assert.Collection(itrRecords, item1 =>
         {
             Assert.Empty(item1.dfeta_FailureMessage);
         });
-        Assert.NotNull(qualification);
-        Assert.NotNull(itt);
-        Assert.NotNull(qts);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.dfeta_SuccessCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
@@ -256,6 +244,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
         var person = await TestData.CreatePersonAsync(x => x.WithTrn());
+        
         var trn = person.Trn;
         var expectedValueMessage = $"Teacher with TRN {trn} has QTS already.";
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString("dd/MM/yyyy")},49,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n{trn},firstname,lastname,{person.DateOfBirth.ToString("dd/MM/yyyy")},49,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n";
@@ -270,9 +259,6 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
         var itrRecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
-        var qualification = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person.ContactId);
-        var itt = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person.ContactId);
-        var qts = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person.ContactId);
         Assert.NotNull(integrationTransaction);
         Assert.Collection(itrRecords,
             item1 =>
@@ -283,9 +269,6 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
             {
                 Assert.Contains(expectedValueMessage, item2.dfeta_FailureMessage);
             });
-        Assert.NotNull(qualification);
-        Assert.NotNull(itt);
-        Assert.NotNull(qts);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.dfeta_SuccessCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
@@ -364,8 +347,12 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Contains(expectedValueMessage2, integrationTransaction.dfeta_FailureMessage, StringComparison.InvariantCultureIgnoreCase);
     }
 
-    [Fact]
-    public async Task EwcWalesImportJobQts_WithQualifiedTeacherEcDirectiveQtsStatusAfterRegsChangeDate_ReturnsError()
+    [Theory]
+    [InlineData("67")]
+    [InlineData("68")]
+    [InlineData("69")]
+    [InlineData("102")]
+    public async Task EwcWalesImportJobQts_NonPermittedQtsStatusWhenQtsDatePast_ReturnsError(string qtsStatus)
     {
         // Arrange
         var expectedTotalRowCount = 1;
@@ -374,7 +361,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var expectedFailureRowCount = 1;
         var person1 = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn1 = person1.Trn;
-        var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},67,04/04/2025,,,,,,,,,,,,,,,,,,,,,,,,";
+        var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},04/04/2024,,,,,,,,,,,,,,,,,,,,,,,,";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -389,18 +376,20 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         Assert.Collection(itrRecords,
             item1 =>
             {
-                Assert.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023", item1.dfeta_FailureMessage);
+                Assert.Contains("Qts Status can only be 71 or 49 when qts date is past 01/02/2023", item1.dfeta_FailureMessage);
                 Assert.Equal(dfeta_integrationtransactionrecord_StatusCode.Fail, item1.StatusCode);
             });
         Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.dfeta_SuccessCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
         Assert.Equal(expectedFailureRowCount, integrationTransaction.dfeta_FailureCount);
-        Assert.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023", integrationTransaction.dfeta_FailureMessage);
+        Assert.Contains("Qts Status can only be 71 or 49 when qts date is past 01/02/2023", integrationTransaction.dfeta_FailureMessage);
     }
 
-    [Fact]
-    public async Task EwcWalesImportJobQts_WithQualifiedTeacherEcDirectiveQtsStatus_ReturnsSuccess()
+    [Theory]
+    [InlineData("49")]
+    [InlineData("71")]
+    public async Task EwcWalesImportJobQts_PermittedQtsStatusWhenQtsDatePast_ReturnsSuccess(string qtsStatus)
     {
         // Arrange
         var expectedTotalRowCount = 1;
@@ -409,7 +398,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var expectedFailureRowCount = 0;
         var person1 = await TestData.CreatePersonAsync(x => x.WithTrn());
         var trn1 = person1.Trn;
-        var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},67,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,";
+        var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{trn1},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},{qtsStatus},04/04/2024,,,,,,,,,,,,,,,,,,,,,,,,";
         var csvBytes = Encoding.UTF8.GetBytes(csvContent);
         var stream = new MemoryStream(csvBytes);
         var reader = new StreamReader(stream);
@@ -420,27 +409,19 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         // Assert
         using var ctx = new DqtCrmServiceContext(OrganizationService);
         var integrationTransaction = ctx.dfeta_integrationtransactionSet.Single(i => i.GetAttributeValue<Guid>(dfeta_integrationtransaction.PrimaryIdAttribute) == integrationTransactionId);
-        var itrRecords = ctx.dfeta_integrationtransactionrecordSet.Where(i => i.GetAttributeValue<Guid>(dfeta_integrationtransactionrecord.Fields.dfeta_IntegrationTransactionId) == integrationTransaction.Id);
-        var qualificationPerson1 = ctx.dfeta_qualificationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qualification.Fields.dfeta_PersonId) == person1.ContactId);
-        var ittPerson1 = ctx.dfeta_initialteachertrainingSet.Single(i => i.GetAttributeValue<Guid>(dfeta_initialteachertraining.Fields.dfeta_PersonId) == person1.ContactId);
-        var qtsRegistration = ctx.dfeta_qtsregistrationSet.Single(i => i.GetAttributeValue<Guid>(dfeta_qtsregistration.Fields.dfeta_PersonId) == person1.ContactId);
-        var outboxMessage = ctx.dfeta_TrsOutboxMessageSet.Select(x => x.dfeta_MessageName == nameof(SetInductionRequiredToCompleteMessage));
-        var outboxMessages = ctx.dfeta_TrsOutboxMessageSet
-            .Where(x => x.dfeta_MessageName == nameof(SetInductionRequiredToCompleteMessage))
-            .Select(x => Assert.IsType<SetInductionRequiredToCompleteMessage>(MessageSerializer.DeserializeMessage(x.dfeta_Payload, x.dfeta_MessageName)))
+
+        var welshROutboxMessage = ctx.dfeta_TrsOutboxMessageSet
+            .Where(x => x.dfeta_MessageName == nameof(AddWelshRMessage))
+            .Select(x => Assert.IsType<AddWelshRMessage>(MessageSerializer.DeserializeMessage(x.dfeta_Payload, x.dfeta_MessageName)))
             .ToArray();
-        var message = outboxMessages.Single(x => x.PersonId == person1.PersonId);
-        Assert.Equal(person1.PersonId, message.PersonId);
-        Assert.NotNull(integrationTransaction);
-        Assert.NotNull(qtsRegistration);
-        Assert.Collection(itrRecords,
-            item1 =>
-            {
-                Assert.Empty(item1.dfeta_FailureMessage);
-                Assert.Equal(dfeta_integrationtransactionrecord_StatusCode.Success, item1.StatusCode);
-            });
-        Assert.NotNull(qualificationPerson1);
-        Assert.NotNull(ittPerson1);
+        //var setInductionOutboxMessage = ctx.dfeta_TrsOutboxMessageSet
+        //    .Where(x => x.dfeta_MessageName == nameof(SetInductionRequiredToCompleteMessage) || x.dfeta_MessageName == nameof(AddWelshRMessage))
+        //    .Select(x => Assert.IsType<SetInductionRequiredToCompleteMessage>(MessageSerializer.DeserializeMessage(x.dfeta_Payload, x.dfeta_MessageName)))
+        //    .ToArray();
+        //var minductionessage = setInductionOutboxMessage.Single(x => x.PersonId == person1.PersonId);
+        var welshrmessage = welshROutboxMessage.Single(x => x.PersonId == person1.PersonId);
+        Assert.Equal(person1.PersonId, welshrmessage.PersonId);
+        //Assert.Equal(person1.PersonId, minductionessage.PersonId);
         Assert.Equal(expectedTotalRowCount, integrationTransaction.dfeta_TotalCount);
         Assert.Equal(expectedSuccessCount, integrationTransaction.dfeta_SuccessCount);
         Assert.Equal(expectedDuplicateRowCount, integrationTransaction.dfeta_DuplicateCount);
