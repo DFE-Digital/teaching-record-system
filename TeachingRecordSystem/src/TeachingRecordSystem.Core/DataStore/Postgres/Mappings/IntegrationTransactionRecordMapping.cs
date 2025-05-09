@@ -13,7 +13,7 @@ public class IntegrationTransactionRecordMapping : IEntityTypeConfiguration<Inte
         builder.Property(p => p.FailureMessage).HasMaxLength(3000);
         builder.Property(p => p.RowData).HasMaxLength(3000);
         builder.Property(p => p.CreatedDate).IsRequired();
-        builder.Property(p => p.PersonId).IsRequired();
+        builder.Property(p => p.PersonId);
         builder.HasOne(p => p.Person)
             .WithMany()
             .HasForeignKey(p => p.PersonId);
@@ -22,6 +22,7 @@ public class IntegrationTransactionRecordMapping : IEntityTypeConfiguration<Inte
             .WithMany(t => t.IntegrationTransactionRecords)
             .HasForeignKey(p => p.IntegrationTransactionId)
             .HasConstraintName("fk_integrationtransactionrecord_integrationtransaction");
+        builder.Property(p => p.HasActiveAlert);
     }
 }
 

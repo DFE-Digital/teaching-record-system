@@ -3,29 +3,30 @@ using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
 namespace TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 
 public class QtsImporter
 {
-    private const string DATE_FORMAT = "dd/MM/yyyy";
+    public const string DATE_FORMAT = "dd/MM/yyyy";
     private readonly ICrmQueryDispatcher _crmQueryDispatcher;
     private readonly ILogger<InductionImporter> _logger;
     private readonly TrsDbContext _dbContext;
     private readonly ReferenceDataCache _cache;
     public DateOnly _ecDirectiveQualifiedTeacherRegsChangeDate => new DateOnly(2023, 02, 01);
+    private readonly IClock _clock;
 
-    public QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache)
+    public QtsImporter(ICrmQueryDispatcher crmQueryDispatcher, ILogger<InductionImporter> logger, TrsDbContext dbContext, ReferenceDataCache cache, IClock clock)
     {
         _crmQueryDispatcher = crmQueryDispatcher;
         _dbContext = dbContext;
         _logger = logger;
         _cache = cache;
+        _clock = clock;
     }
 
     public async Task<QtsImportResult> ImportAsync(StreamReader csvReaderStream, string fileName)
@@ -56,20 +57,27 @@ public class QtsImporter
         var failureRowCount = 0;
         var failureMessage = new StringBuilder();
 
-        var integrationJob = new CreateIntegrationTransactionQuery()
+        await using var txn = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        var integrationJob = new IntegrationTransaction()
         {
-            StartDate = DateTime.Now,
-            TypeId = (int)dfeta_IntegrationInterface.GTCWalesImport,
-            FileName = fileName
+            IntegrationTransactionId = 0,
+            InterfaceType = IntegrationTransactionInterfaceType.EwcWales,
+            ImportStatus = IntegrationTransactionImportStatus.InProgress,
+            TotalCount = 0,
+            SuccessCount = 0,
+            FailureCount = 0,
+            DuplicateCount = 0,
+            FileName = fileName,
+            CreatedDate = _clock.UtcNow,
+            IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
         };
-        var integrationId = await _crmQueryDispatcher.ExecuteQueryAsync(integrationJob);
+        _dbContext.IntegrationTransactions.Add(integrationJob);
+        await _dbContext.SaveChangesAsync();
+        var integrationId = integrationJob.IntegrationTransactionId;
 
         foreach (var row in records)
         {
             totalRowCount++;
-            var qualificationId = default(Guid?);
-            Guid? ittId = null;
-            var qtsRegistrationId = default(Guid?);
             var itrFailureMessage = new StringBuilder();
             using var rowTransaction = _crmQueryDispatcher.CreateTransactionRequestBuilder();
 
@@ -90,47 +98,53 @@ public class QtsImporter
                 }
                 else
                 {
-                    ittId = Guid.NewGuid();
-                    qualificationId = Guid.NewGuid();
-                    qtsRegistrationId = Guid.NewGuid();
-
-                    //Create ITT
-                    var ittQuery = new CreateInitialTeacherTrainingTransactionalQuery()
+                    DateOnly? awardedDate = null;
+                    if (DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedQtsDate))
                     {
-                        Id = ittId.Value,
-                        ContactId = lookupData.PersonId!.Value,
-                        ITTQualificationId = lookupData.IttQualificationId,
-                        CountryId = lookupData.PQCountryId.HasValue ? lookupData.PQCountryId : null,
-                        Result = dfeta_ITTResult.Pass // by definition of GTCW everybody should have passed training
-                    };
-                    rowTransaction.AppendQuery(ittQuery);
+                        awardedDate = parsedQtsDate;
+                    }
+                    List<Guid?> Subjects = new List<Guid?>() { lookupData.IttSubject1Id, lookupData.IttSubject2Id };
 
-                    //Create Qualification
-                    var qualificationQuery = new CreateHeQualificationTransactionalQuery()
+                    var routeToProfessionalStatusTypeId = RouteToProfessionalStatusType.WelshRId;
+                    if (awardedDate < _ecDirectiveQualifiedTeacherRegsChangeDate && row.QtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        Id = qualificationId.Value,
-                        ContactId = lookupData.PersonId.Value,
-                        HECountryId = lookupData.PQCountryId,
-                        HECourseLength = row.PqCourseLength,
-                        HEEstablishmentId = lookupData.PqEstablishmentId,
-                        HEQualificationId = lookupData.PQHEQualificationId,
-                        HEClassDivision = lookupData.ClassDivision,
-                        HESubject1id = lookupData.PQSubject1Id,
-                        HESubject2id = lookupData.PQSubject2Id,
-                        HESubject3id = lookupData.PQSubject3Id,
-                        Type = dfeta_qualification_dfeta_Type.HigherEducation
-                    };
-                    var getQualificationQueryResponse = rowTransaction.AppendQuery(qualificationQuery);
+                        routeToProfessionalStatusTypeId = RouteToProfessionalStatusType.ECDirective;
+                    }
 
-                    //Qts
-                    var qtsQuery = new CreateQtsRegistrationTransactionalQuery()
+                    //create route for teacher
+                    if (lookupData.PersonId.HasValue)
                     {
-                        Id = qtsRegistrationId.Value,
-                        ContactId = lookupData.PersonId.Value,
-                        TeacherStatusId = lookupData.TeacherStatusId!.Value,
-                        QtsDate = DateTime.ParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None)
-                    };
-                    rowTransaction.AppendQuery(qtsQuery);
+                        var person = _dbContext.Persons.Include(x => x.Qualifications).Single(x => x.PersonId == lookupData.PersonId);
+                        var allRoutes = await _cache.GetRouteToProfessionalStatusTypesAsync();
+                        var route = RouteToProfessionalStatus.Create(
+                           person: person,
+                           allRouteTypes: allRoutes,
+                           routeToProfessionalStatusTypeId: routeToProfessionalStatusTypeId,
+                           sourceApplicationUserId: null,
+                           sourceApplicationReference: null,
+                           status: RouteToProfessionalStatusStatus.Holds,
+                           holdsFrom: awardedDate,
+                           trainingStartDate: null,
+                           trainingEndDate: null,
+                           trainingSubjectIds: null,
+                           trainingAgeSpecialismType: null,
+                           trainingAgeSpecialismRangeFrom: null,
+                           trainingAgeSpecialismRangeTo: null,
+                           trainingCountryId: null,
+                           trainingProviderId: null,
+                           degreeTypeId: null,
+                           isExemptFromInduction: null,
+                           createdBy: DataStore.Postgres.Models.SystemUser.SystemUserId,
+                           now: _clock.UtcNow,
+                           changeReason: null,
+                           changeReasonDetail: null,
+                           evidenceFile: null,
+                           out var routeevent);
+
+                        await _dbContext.AddEventAndBroadcastAsync(routeevent);
+
+                        _dbContext.RouteToProfessionalStatuses.Add(route);
+                    }
 
                     //soft validation errors can be appended to the IntegrationTransactionRecord Failure message
                     foreach (var validationMessage in validationFailures.ValidationFailures)
@@ -138,72 +152,28 @@ public class QtsImporter
                         itrFailureMessage.AppendLine(validationMessage);
                         failureMessage.AppendLine(validationMessage);
                     }
-
-                    // Set Induction status to 'Required to complete' if
-                    //  Qts status is Qualified teacher: under the EC Directive (67)  with qts date before regs changed, set induction status to
-                    //  Qts status is Qualified teacher: Following at least one term's service on the Graduate Teacher Programme (49)
-                    //  Qts status is Qualified teacher (trained) (71)
-                    if (row.QtsStatus == "67" &&
-                        DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate) &&
-                        qtsDate < _ecDirectiveQualifiedTeacherRegsChangeDate ||
-                        row.QtsStatus == "71" ||
-                        row.QtsStatus == "49")
-                    {
-                        rowTransaction.AppendQuery(new CreateDqtOutboxMessageTransactionalQuery(new SetInductionRequiredToCompleteMessage()
-                        {
-                            PersonId = lookupData.PersonId.Value,
-                            TrsUserId = DataStore.Postgres.Models.SystemUser.SystemUserId
-                        }));
-                    }
-
-                    if (lookupData.HasActiveAlerts)
-                    {
-                        var query = new CreateTaskTransactionalQuery()
-                        {
-                            ContactId = lookupData.PersonId.Value,
-                            Category = "GTC Wales Import",
-                            Description = "QTS/Induction update with Active Sanction",
-                            Subject = "Notification for QTS Unit Team",
-                            ScheduledEnd = DateTime.Now
-                        };
-                        rowTransaction.AppendQuery(query);
-                    }
                 }
 
                 //create ITR row with status of import row
-                var createIntegrationTransactionRecord = new CreateIntegrationTransactionRecordTransactionalQuery()
+                integrationJob.IntegrationTransactionRecords.Add(new IntegrationTransactionRecord()
                 {
-                    IntegrationTransactionId = integrationId,
-                    Reference = totalRowCount.ToString(),
-                    ContactId = lookupData.PersonId,
-                    InitialTeacherTrainingId = ittId,
-                    QualificationId = qualificationId,
-                    InductionId = null,
-                    InductionPeriodId = null,
-                    DuplicateStatus = null,
-                    FailureMessage = itrFailureMessage.ToString(),
-                    StatusCode = validationFailures.Errors.Count == 0 ? dfeta_integrationtransactionrecord_StatusCode.Success : dfeta_integrationtransactionrecord_StatusCode.Fail,
+                    IntegrationTransactionRecordId = 0,
+                    CreatedDate = _clock.UtcNow,
                     RowData = ConvertToCsvString(row),
-                    FileName = fileName
-                };
-                rowTransaction.AppendQuery(createIntegrationTransactionRecord);
+                    Status = validationFailures.Errors.Count == 0 ? IntegrationTransactionRecordStatus.Success : IntegrationTransactionRecordStatus.Failure,
+                    PersonId = lookupData.PersonId != null ? lookupData.PersonId : null,
+                    FailureMessage = itrFailureMessage.ToString(),
+                    Duplicate = null,
+                    HasActiveAlert = lookupData.HasActiveAlerts
+                });
 
                 //update IntegrationTransaction so that it's always up to date with
                 //counts of rows
-                var updateIntegrationTransactionQuery = new UpdateIntegrationTransactionTransactionalQuery()
-                {
-                    IntegrationTransactionId = integrationId,
-                    EndDate = null,
-                    TotalCount = totalRowCount,
-                    SuccessCount = successCount,
-                    DuplicateCount = 0,
-                    FailureCount = failureRowCount,
-                    FailureMessage = itrFailureMessage.ToString()
-                };
-                rowTransaction.AppendQuery(updateIntegrationTransactionQuery);
-
-
-                await rowTransaction.ExecuteAsync();
+                integrationJob.TotalCount = totalRowCount;
+                integrationJob.FailureCount = failureRowCount;
+                integrationJob.SuccessCount = successCount;
+                integrationJob.DuplicateCount = duplicateRowCount;
+                await _dbContext.SaveChangesAsync();
 
                 //increase failurecount if row is processable or if there are validation failures
                 //else increase success counter
@@ -223,21 +193,14 @@ public class QtsImporter
             }
         }
 
-        var updateIntTrxQuery = new UpdateIntegrationTransactionTransactionalQuery()
-        {
-            IntegrationTransactionId = integrationId,
-            EndDate = DateTime.Now,
-            TotalCount = totalRowCount,
-            SuccessCount = successCount,
-            DuplicateCount = duplicateRowCount,
-            FailureCount = failureRowCount,
-            FailureMessage = failureMessage.ToString()
-        };
-
-        using var txn = _crmQueryDispatcher.CreateTransactionRequestBuilder();
-        txn.AppendQuery(updateIntTrxQuery);
-        await txn.ExecuteAsync();
-
+        //update integration transaction counts as job has finished
+        integrationJob.TotalCount = totalRowCount;
+        integrationJob.SuccessCount = successCount;
+        integrationJob.FailureCount = failureRowCount;
+        integrationJob.DuplicateCount = duplicateRowCount;
+        integrationJob.ImportStatus = IntegrationTransactionImportStatus.Success;
+        await _dbContext.SaveChangesAsync();
+        await txn.CommitAsync();
 
         return new QtsImportResult(totalRowCount, successCount, duplicateRowCount, failureRowCount, failureMessage.ToString(), integrationId);
     }
@@ -247,6 +210,8 @@ public class QtsImporter
         using (var writer = new StringWriter())
         using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
+            csv.WriteHeader<EwcWalesQtsFileImportData>();
+            csv.NextRecord();
             csv.WriteRecord(row);
             csv.NextRecord();
             return writer.ToString();
@@ -338,7 +303,7 @@ public class QtsImporter
 
         if (lookups.TeacherStatusMatchStatus == EwcWalesMatchStatus.NoMatch)
         {
-            errors.Add("Qts Status must be 49,71 or 67");
+            errors.Add("Qts Status must be 49,67, 68,69, 71 or 102 ");
         }
 
         //QTS Date
@@ -351,13 +316,25 @@ public class QtsImporter
             errors.Add($"Validation Failed: Invalid QTS Date {row.QtsDate}");
         }
         else if (!string.IsNullOrEmpty(row.QtsStatus) &&
-            row.QtsStatus.Equals("67", StringComparison.InvariantCultureIgnoreCase) &&
-            DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate) &&
-            qtsDate >= _ecDirectiveQualifiedTeacherRegsChangeDate)
+            DateOnly.TryParseExact(row.QtsDate, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly qtsDate)
+        )
         {
-            // if a qts status of 67 (Qualified Teacher: under the EC Directive) then the date cannot be passed
-            // 01/02/2023 because of change of regulations.
-            errors.Add("Qualified Teacher: under the EC Directive must be before 01/02/2023");
+            if (qtsDate >= _ecDirectiveQualifiedTeacherRegsChangeDate)
+            {
+                var validStatuses = new List<string>() { "49", "71" };
+                if (!validStatuses.Any(val => string.Equals(val, row.QtsStatus, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    errors.Add($"Qts Status can only be 71 or 49 when qts date is on or past {_ecDirectiveQualifiedTeacherRegsChangeDate.ToString(DATE_FORMAT)}");
+                }
+            }
+            else
+            {
+                var validStatuses = new List<string>() { "67", "68", "69", "71", "102", "49", "71" };
+                if (!validStatuses.Any(val => string.Equals(val, row.QtsStatus, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    errors.Add($"Qts Status can only be 67, 68, 69, 71, 102, 49 or 71 when qts date is on or before 31/01/2023");
+                }
+            }
         }
 
         switch (lookups.PersonMatchStatus)
@@ -586,6 +563,17 @@ public class QtsImporter
             var status = results.Single(x => x.dfeta_Value == "213"); //213 - Qualified Teacher: QTS awarded in Wales
             return (EwcWalesMatchStatus.OneMatch, status.Id);
         }
+        else if (qtsStatus != null && (qtsStatus.Equals("68", StringComparison.InvariantCultureIgnoreCase)))
+        {
+            var status = results.Single(x => x.dfeta_Value == qtsStatus); //68 - Qualified Teacher: Teachers trained/registered in Scotland
+            return (EwcWalesMatchStatus.OneMatch, status.Id);
+        }
+        else if (qtsStatus != null && (qtsStatus.Equals("69", StringComparison.InvariantCultureIgnoreCase)))
+        {
+            var status = results.Single(x => x.dfeta_Value == qtsStatus); //69 - Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
+            return (EwcWalesMatchStatus.OneMatch, status.Id);
+        }
+
         else
         {
             return (EwcWalesMatchStatus.NoMatch, null);
@@ -686,42 +674,27 @@ public class QtsImporter
 
     public async Task<(EwcWalesMatchStatus, Guid? PersonId)> FindMatchingTeacherRecordAsync(EwcWalesQtsFileImportData item)
     {
-        var contact = await _crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveContactByTrnQuery(item.QtsRefNo,
-                new ColumnSet(
-                    Contact.Fields.dfeta_TRN,
-                    Contact.Fields.BirthDate,
-                    Contact.Fields.dfeta_QTSDate,
-                    Contact.Fields.dfeta_qtlsdate)));
+        var person = await _dbContext.Persons.FirstOrDefaultAsync(x => x.Trn == item.QtsRefNo && x.Status == PersonStatus.Active);
 
-        if (contact == null)
+        if (person == null)
         {
             return (EwcWalesMatchStatus.NoMatch, null);
         }
 
         if ((DateOnly.TryParseExact(item.DateOfBirth, DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dob)) &&
-            contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false) != dob)
+            person.DateOfBirth != dob)
         {
             return (EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed, null);
         }
 
-        var qtsRegistrations = await _crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveQtsRegistrationsByContactIdsQuery(
-                new[] { contact.ContactId!.Value },
-                new ColumnSet(
-                    dfeta_qtsregistration.Fields.dfeta_PersonId,
-                    dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId)
-                )
-            );
-
-        if (qtsRegistrations[contact.Id].Length > 0)
+        var personQtsDate = person.QtsDate;
+        if (personQtsDate.HasValue)
         {
-            return (EwcWalesMatchStatus.TeacherHasQts, contact.ContactId!);
+            return (EwcWalesMatchStatus.TeacherHasQts, person.PersonId!);
         }
         else
         {
-            return (EwcWalesMatchStatus.NoAssociatedQts, contact.ContactId!);
+            return (EwcWalesMatchStatus.NoAssociatedQts, person.PersonId!);
         }
     }
 

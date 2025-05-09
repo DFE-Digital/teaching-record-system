@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250701182754_ReportingSyncIntegrationTransactions")]
+    partial class ReportingSyncIntegrationTransactions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3176,9 +3179,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
 
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_eyts_awarded_emails_job_items_trn");
-
                     b.ToTable("eyts_awarded_emails_job_items", (string)null);
                 });
 
@@ -3245,9 +3245,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_induction_completed_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
-
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_induction_completed_emails_job_items_trn");
 
                     b.ToTable("induction_completed_emails_job_items", (string)null);
                 });
@@ -3580,9 +3577,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_international_qts_awarded_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
-
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_international_qts_awarded_emails_job_items_trn");
 
                     b.ToTable("international_qts_awarded_emails_job_items", (string)null);
                 });
@@ -4003,10 +3997,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("first_name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<int?>("Gender")
-                        .HasColumnType("integer")
-                        .HasColumnName("gender");
-
                     b.Property<bool>("HasEyps")
                         .HasColumnType("boolean")
                         .HasColumnName("has_eyps");
@@ -4283,9 +4273,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_qts_awarded_emails_job_items_personalization");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Personalization"), "gin");
-
-                    b.HasIndex("Trn")
-                        .HasDatabaseName("ix_qts_awarded_emails_job_items_trn");
 
                     b.ToTable("qts_awarded_emails_job_items", (string)null);
                 });
@@ -19124,9 +19111,9 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid[]")
                         .HasColumnName("training_subject_ids");
 
-                    b.HasIndex("PersonId", "SourceApplicationUserId", "SourceApplicationReference")
+                    b.HasIndex("SourceApplicationUserId", "SourceApplicationReference")
                         .IsUnique()
-                        .HasDatabaseName("ix_qualifications_person_id_source_application_user_id_source_")
+                        .HasDatabaseName("ix_qualifications_source_application_user_id_source_applicatio")
                         .HasFilter("source_application_user_id is not null and source_application_reference is not null");
 
                     b.HasDiscriminator().HasValue(1);

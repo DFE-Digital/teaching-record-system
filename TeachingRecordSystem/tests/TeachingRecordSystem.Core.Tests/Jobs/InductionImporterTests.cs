@@ -41,7 +41,7 @@ public class InductionImporterTests : IAsyncLifetime
             trnGenerator,
             TestDataSyncConfiguration.Sync(Helper));
         var blobServiceClient = new Mock<BlobServiceClient>();
-        Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider);
+        Importer = ActivatorUtilities.CreateInstance<InductionImporter>(provider, Clock);
     }
     private DbFixture DbFixture { get; }
 
