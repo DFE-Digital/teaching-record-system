@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Jobs.EwcWalesImport;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
@@ -83,10 +84,13 @@ public class QtsImporterTests : IAsyncLifetime
     public async Task Validate_ExistingTeacherWithQTS_ReturnsErrorMessage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(x =>
-        {
-            x.WithQts();
-        });
+        var person1AwardedDate = new DateOnly(2011, 01, 04);
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .First(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -520,7 +524,7 @@ public class QtsImporterTests : IAsyncLifetime
         var (failures, errors) = Importer.Validate(row, lookups);
 
         // Assert
-        Assert.Contains(errors, item => item.Contains("Qualified Teacher: under the EC Directive must be before 01/02/2023"));
+        Assert.Contains(errors, item => item.Contains("Qts Status can only be 71 or 49 when qts date is on or past 01/02/2023"));
     }
 
     [Fact]
@@ -966,12 +970,20 @@ public class QtsImporterTests : IAsyncLifetime
     {
         // Arrange
         var accountNumber = "1357111";
+        var awardDate = new DateOnly(2011, 01, 1);
         var account = await TestData.CreateAccountAsync(x =>
         {
             x.WithName("SomeName");
             x.WithAccountNumber(accountNumber);
         });
-        var person = await TestData.CreatePersonAsync(x => x.WithQts(new DateOnly(2024, 01, 01)));
+        var person1AwardedDate = new DateOnly(2011, 01, 04);
+        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId)
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;

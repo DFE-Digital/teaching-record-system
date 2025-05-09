@@ -26,6 +26,10 @@ public class OutboxMessageHandler(MessageSerializer messageSerializer, IServiceP
         {
             await HandleMessageAsync<SetInductionRequiredToCompleteMessage, SetInductionRequiredToCompleteMessageHandler>(setInductionRequiredToCompleteMessage);
         }
+        else if (message is AddWelshRMessage WelshRMessage)
+        {
+            await HandleMessageAsync<AddWelshRMessage, AddWelshRMessageHandler>(WelshRMessage);
+        }
         else
         {
             throw new ArgumentException($"Unknown message type: '{outboxMessage.dfeta_MessageName}'.", nameof(outboxMessage.dfeta_MessageName));
