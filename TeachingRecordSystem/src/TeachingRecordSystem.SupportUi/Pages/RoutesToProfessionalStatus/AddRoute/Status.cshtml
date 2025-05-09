@@ -1,6 +1,10 @@
 @page "/route/add/status/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.StatusModel
 
+@{
+    ViewBag.Title = "Add status";
+}
+
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
 }
