@@ -1,0 +1,61 @@
+﻿@page "/route/{qualificationId}/delete/check-answers/{handler?}"
+@model CheckYourAnswersModel
+@{
+    ViewBag.Title = "Check details and delete route";
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+            <partial name="_RouteDetail" model="@Model.RouteDetail" />
+
+            <h2 class="govuk-heading-l">Why are you deleting this route?</h2>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.ChangeReason?.GetDisplayName()</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.RouteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Additional information</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.ChangeReasonDetail.ChangeReasonDetail</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.RouteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="evidence">
+                        @if (Model.ChangeReasonDetail.EvidenceFileId is not null)
+                        {
+                            <a href="@Model.GetEvidenceFileUrlAsync()" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.ChangeReasonDetail.EvidenceFileName} (opens in new tab)")</a>
+                        }
+                        else
+                        {
+                            <span use-empty-fallback></span>
+                        }
+                    </govuk-summary-list-row-value>
+                    <govuk-summary-list-row-actions>
+                        <govuk-summary-list-row-action href="@LinkGenerator.RouteChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: true)"
+                                                       visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
+                    </govuk-summary-list-row-actions>
+
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="confirm-button">Confirm and commit changes</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteCheckYourAnswersCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
