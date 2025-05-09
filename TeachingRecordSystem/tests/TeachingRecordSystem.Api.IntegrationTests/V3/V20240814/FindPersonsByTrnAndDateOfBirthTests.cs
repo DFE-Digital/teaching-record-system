@@ -168,7 +168,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person.Alerts.Single().AlertType.DqtSanctionCode,
+                                code = person.Alerts.Single().AlertType!.DqtSanctionCode,
                                 startDate = person.Alerts.Single().StartDate
                             }
                         },

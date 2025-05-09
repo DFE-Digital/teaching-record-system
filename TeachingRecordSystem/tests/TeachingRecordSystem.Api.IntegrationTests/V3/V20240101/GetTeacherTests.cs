@@ -347,7 +347,7 @@ public class GetTeacherTests : GetTeacherTestBase
             {
                 new
                 {
-                    code = alert.AlertType.DqtSanctionCode,
+                    code = alert.AlertType!.DqtSanctionCode,
                     startDate = alert.StartDate
                 }
             },
@@ -383,7 +383,7 @@ public class GetTeacherTests : GetTeacherTestBase
                 new
                 {
                     alertType = "Prohibition",
-                    dqtSanctionCode = alert.AlertType.DqtSanctionCode,
+                    dqtSanctionCode = alert.AlertType!.DqtSanctionCode,
                     startDate = alert.StartDate,
                     endDate = alert.EndDate
                 }

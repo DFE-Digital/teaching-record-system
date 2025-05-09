@@ -258,7 +258,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
             {
                 new
                 {
-                    code = alert.AlertType.DqtSanctionCode,
+                    code = alert.AlertType!.DqtSanctionCode,
                     startDate = alert.StartDate
                 }
             },
@@ -294,7 +294,7 @@ public class GetPersonByTrnTests : GetPersonTestBase
                 new
                 {
                     alertType = "Prohibition",
-                    dqtSanctionCode = alert.AlertType.DqtSanctionCode,
+                    dqtSanctionCode = alert.AlertType!.DqtSanctionCode,
                     startDate = alert.StartDate,
                     endDate = alert.EndDate
                 }

@@ -19,7 +19,7 @@ public partial class Commands
             {
                 e.WebhookEndpointId,
                 e.ApplicationUserId,
-                ApplicationUserName = e.ApplicationUser.Name,
+                ApplicationUserName = e.ApplicationUser!.Name,
                 e.ApiVersion,
                 e.Address,
                 e.CloudEventTypes,
@@ -226,7 +226,7 @@ public partial class Commands
                     await using var dbContext = TrsDbContext.Create(connectionString);
 
                     var endpoints = await dbContext.WebhookEndpoints
-                        .Where(e => e.ApplicationUser.Active)
+                        .Where(e => e.ApplicationUser!.Active)
                         .OrderBy(e => e.CreatedOn)
                         .Select(getEndpointOutputForDisplay)
                         .ToListAsync();

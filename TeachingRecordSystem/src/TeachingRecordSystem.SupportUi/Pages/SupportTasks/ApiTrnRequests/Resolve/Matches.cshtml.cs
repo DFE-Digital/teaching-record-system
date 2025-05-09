@@ -16,7 +16,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
 
     public TrnRequestMetadata? RequestData { get; set; }
 
-    public string SourceApplicationUserName => RequestData!.ApplicationUser.Name;
+    public string SourceApplicationUserName => RequestData!.ApplicationUser!.Name;
 
     public PotentialDuplicate[]? PotentialDuplicates { get; set; }
 
@@ -102,7 +102,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                     Trn = p.Trn!,
                     HasQts = p.QtsDate != null,
                     HasEyts = p.EytsDate != null,
-                    HasActiveAlerts = p.Alerts.Any(a => a.IsOpen)
+                    HasActiveAlerts = p.Alerts!.Any(a => a.IsOpen)
                 })
                 .ToArrayAsync())
             // matchedPersonIds is ordered by best match first; ensure we maintain that order

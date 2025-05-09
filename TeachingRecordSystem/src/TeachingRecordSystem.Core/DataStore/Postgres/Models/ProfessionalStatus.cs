@@ -12,7 +12,7 @@ public class ProfessionalStatus : Qualification
     public required Guid RouteToProfessionalStatusId { get; set; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }
-    public RouteToProfessionalStatus Route { get; } = null!;
+    public RouteToProfessionalStatus? Route { get; }
     public required ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public required DateOnly? TrainingStartDate { get; set; }
@@ -102,7 +102,7 @@ public class ProfessionalStatus : Qualification
         updateAction(this);
 
         var changes = ProfessionalStatusUpdatedEventChanges.None |
-            (Route.RouteToProfessionalStatusId != oldEventModel.RouteToProfessionalStatusId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
+            (Route!.RouteToProfessionalStatusId != oldEventModel.RouteToProfessionalStatusId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
             (Status != oldEventModel.Status ? ProfessionalStatusUpdatedEventChanges.Status : ProfessionalStatusUpdatedEventChanges.None) |
             (AwardedDate != oldEventModel.AwardedDate ? ProfessionalStatusUpdatedEventChanges.AwardedDate : ProfessionalStatusUpdatedEventChanges.None) |
             (TrainingStartDate != oldEventModel.TrainingStartDate ? ProfessionalStatusUpdatedEventChanges.StartDate : ProfessionalStatusUpdatedEventChanges.None) |

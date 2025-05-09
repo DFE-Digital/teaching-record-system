@@ -12,7 +12,7 @@ public class AlertType
 
     public required Guid AlertTypeId { get; init; }
     public required Guid AlertCategoryId { get; init; }
-    public AlertCategory AlertCategory { get; } = null!;
+    public AlertCategory? AlertCategory { get; }
     public required string Name { get; init; }
     public required string? DqtSanctionCode { get; init; }
     public required ProhibitionLevel ProhibitionLevel { get; init; }

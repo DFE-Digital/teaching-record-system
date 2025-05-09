@@ -552,9 +552,9 @@ public partial class TestData
                 await dbContext.SaveChangesAsync();
 
                 person = await dbContext.Persons
-                    .Include(p => p.Alerts)
+                    .Include(p => p.Alerts!)
                     .ThenInclude(a => a.AlertType)
-                    .ThenInclude(at => at.AlertCategory)
+                    .ThenInclude(at => at!.AlertCategory)
                     .AsSplitQuery()
                     .SingleAsync(p => p.PersonId == contact.Id);
 
@@ -571,7 +571,7 @@ public partial class TestData
 
                 // Get MQs and Alerts that we've added *in the same order they were specified*.
                 var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
-                var alerts = alertIds.Select(id => person.Alerts.Single(a => a.AlertId == id)).AsReadOnly();
+                var alerts = alertIds.Select(id => person.Alerts!.Single(a => a.AlertId == id)).AsReadOnly();
                 var routesToProfessionalStatus = routeIds.Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id)).AsReadOnly();
 
                 return (mqs, alerts, person, routesToProfessionalStatus);
