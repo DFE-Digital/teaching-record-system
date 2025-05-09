@@ -13,7 +13,8 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
         {
             ColumnSet = new(
                 Account.Fields.Name,
-                Account.Fields.dfeta_UKPRN),
+                Account.Fields.dfeta_UKPRN,
+                Account.Fields.AccountId),
             LinkEntities =
             {
                 new LinkEntity // define the join
@@ -32,7 +33,7 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
                     }
                 }
             },
-            Distinct = true, // return each record just once (based on both values)
+            Distinct = true, // return each account record just once
             Orders =
             {
                 new OrderExpression(Account.Fields.Name, OrderType.Ascending)

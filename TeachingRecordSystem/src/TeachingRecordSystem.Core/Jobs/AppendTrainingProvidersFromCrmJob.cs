@@ -15,24 +15,34 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
         // get the provider records from Trs
         var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
 
-        // find providers from crm that aren't in Trs
-        var providersToAdd = providersInCrm
+        var emptyUkprnProvidersToAdd = providersInCrm
+            .Where(p => string.IsNullOrEmpty(p.dfeta_UKPRN) && !providersInTrs.Any(t => t.TrainingProviderId == p.Id));
+        var uniqueUnmatchedUkprnProviders = providersInCrm
             .Where(p =>
-                !providersInTrs.Any(t => t.Ukprn == p.dfeta_UKPRN) &&
-                !providersInTrs.Any(t => string.IsNullOrEmpty(p.dfeta_UKPRN) && string.Equals(t.Name, p.Name, StringComparison.OrdinalIgnoreCase)))
+                !string.IsNullOrEmpty(p.dfeta_UKPRN) &&
+                !providersInTrs.Any(t => t.Ukprn == p.dfeta_UKPRN))
             .GroupBy(p => p.dfeta_UKPRN)
-            .Select(g => g.First())
+            .Select(g => g.First());
+
+        // add to Trs
+        dbContext.TrainingProviders.AddRange(emptyUkprnProvidersToAdd
             .Select(s => new DataStore.Postgres.Models.TrainingProvider()
             {
                 IsActive = false,
                 Name = s.Name,
-                TrainingProviderId = Guid.NewGuid(),
+                TrainingProviderId = s.Id,
                 Ukprn = s.dfeta_UKPRN
             })
-            .ToList();
-
-        // add to Trs
-        dbContext.TrainingProviders.AddRange(providersToAdd);
+            .ToList());
+        dbContext.TrainingProviders.AddRange(uniqueUnmatchedUkprnProviders
+            .Select(s => new DataStore.Postgres.Models.TrainingProvider()
+            {
+                IsActive = false,
+                Name = s.Name,
+                TrainingProviderId = s.Id,
+                Ukprn = s.dfeta_UKPRN
+            })
+            .ToList());
 
         if (dbContext.ChangeTracker.HasChanges())
         {

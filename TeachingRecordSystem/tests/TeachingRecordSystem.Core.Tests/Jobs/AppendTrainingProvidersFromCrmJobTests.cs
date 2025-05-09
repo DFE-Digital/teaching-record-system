@@ -32,28 +32,44 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
     public async Task Execute_WithTrainingProviderInCrm_UpdatesDb()
     {
         // arrange
+        var guidAlreadyInTrs = Guid.NewGuid();
         var accounts = new List<Account>()
         {
             new Account()
             {
                 Id = Guid.NewGuid(),
                 Name = "Provider2",
-                AccountNumber = "123",
                 dfeta_UKPRN = "12345672"
             },
             new Account()
             {
                 Id = Guid.NewGuid(),
                 Name = "A provider with same Ukprn as above but a different name",
-                AccountNumber = "123",
                 dfeta_UKPRN = "12345672"
             },
             new Account()
             {
                 Id = Guid.NewGuid(),
                 Name = "A provider with same Ukprn as in TrsDB",
-                AccountNumber = "123",
                 dfeta_UKPRN = "12345671"
+            },
+            new Account()
+            {
+                Id = Guid.NewGuid(),
+                Name = "provider 1 with null ukprn",
+                dfeta_UKPRN = null
+            },
+            new Account()
+            {
+                Id = Guid.NewGuid(),
+                Name = "provider 2 with null ukprn",
+                dfeta_UKPRN = null
+            },
+            new Account()
+            {
+                Id = guidAlreadyInTrs,
+                Name = "provider 3 with null ukprn alreadt in Trs",
+                dfeta_UKPRN = null
             }
         };
 
@@ -62,7 +78,8 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
             .ReturnsAsync(accounts.ToArray());
 
         // training provider data into Trs
-        var provider = _trsContext.TrainingProviders.Add(new TrainingProvider() { IsActive = true, Name = "Provider1", Ukprn = "12345671", TrainingProviderId = Guid.NewGuid() });
+        _trsContext.TrainingProviders.Add(new TrainingProvider() { IsActive = true, Name = "Provider1", Ukprn = "12345671", TrainingProviderId = Guid.NewGuid() });
+        _trsContext.TrainingProviders.Add(new TrainingProvider() { IsActive = true, Name = "Provider2", Ukprn = "12345673", TrainingProviderId = guidAlreadyInTrs });
         _trsContext.SaveChanges();
 
         var JobUnderTest = new AppendTrainingProvidersFromCrmJob(_trsContext, _crmQueryDispatcherMock.Object);
@@ -72,7 +89,9 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
 
         // assert
         var appendedProviderList = _trsContext.TrainingProviders?.AsEnumerable();
-        Assert.Equal(2, appendedProviderList!.Count());
-        Assert.NotNull(appendedProviderList!.Single(p => p.Ukprn == "12345672").Name);
+        Assert.Single(appendedProviderList!.Where(p => p.Ukprn == "12345672"));
+        Assert.Single(appendedProviderList!.Where(p => p.Name == "provider 1 with null ukprn"));
+        Assert.Single(appendedProviderList!.Where(p => p.Name == "provider 2 with null ukprn"));
+        Assert.Single(appendedProviderList!.Where(p => p.Ukprn == "12345671"));
     }
 }
