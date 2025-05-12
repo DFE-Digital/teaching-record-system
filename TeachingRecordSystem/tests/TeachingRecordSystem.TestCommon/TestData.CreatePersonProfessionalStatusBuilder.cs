@@ -1,5 +1,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Migrations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -119,7 +121,7 @@ public partial class TestData
             return this;
         }
 
-        internal async Task<Guid> ExecuteAsync(
+        internal Task<Guid> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
@@ -152,9 +154,9 @@ public partial class TestData
                 UpdatedOn = DateTime.UtcNow
             };
 
-            await dbContext.ProfessionalStatuses.AddAsync(professionalStatus);
+            dbContext.ProfessionalStatuses.Add(professionalStatus);
 
-            return professionalStatus.QualificationId;
+            return Task.FromResult(professionalStatus.QualificationId);
         }
     }
 }
