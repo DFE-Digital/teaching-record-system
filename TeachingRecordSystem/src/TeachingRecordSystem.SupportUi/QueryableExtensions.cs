@@ -21,29 +21,13 @@ public static class QueryableExtensions
         return direction == SortDirection.Ascending ? source.ThenBy(keySelector) : source.ThenByDescending(keySelector);
     }
 
-    public static async Task<ResultPage<T>> GetPageAsync<T>(
+    public static Task<ResultPage<T>> GetPageAsync<T>(
         this IQueryable<T> source,
         int? currentPage,
-        int itemsPerPage)
+        int itemsPerPage,
+        int? total = null)
     {
-        var page = Math.Max(currentPage ?? 1, 1);
-
-        var total = await source.CountAsync();
-
-        var lastPage = ResultPage.GetLastPage(total, itemsPerPage);
-
-        // Is the page requested out of bounds?
-        if (page > lastPage)
-        {
-            page = lastPage;
-        }
-
-        var items = await source
-            .Skip((page - 1) * itemsPerPage)
-            .Take(itemsPerPage)
-            .ToArrayAsync();
-
-        return new ResultPage<T>(items.AsReadOnly(), page, total, itemsPerPage);
+        return ResultPage.CreateFromQueryAsync<T>(source, currentPage, itemsPerPage, total);
     }
 }
 
@@ -68,4 +52,23 @@ public static class ResultPage
 {
     public static int GetLastPage(int totalItems, int itemsPerPage) =>
         Math.Max(1, (int)Math.Ceiling(totalItems / (decimal)itemsPerPage));
+
+    public static async Task<ResultPage<T>> CreateFromQueryAsync<T>(
+        this IQueryable<T> source,
+        int? currentPage,
+        int itemsPerPage,
+        int? total = null)
+    {
+        total ??= await source.CountAsync();
+
+        var lastPage = GetLastPage(total.Value, itemsPerPage);
+        var page = Math.Clamp(currentPage ?? 1, 1, lastPage);
+
+        var items = await source
+            .Skip((page - 1) * itemsPerPage)
+            .Take(itemsPerPage)
+            .ToArrayAsync();
+
+        return new ResultPage<T>(items.AsReadOnly(), page, total.Value, itemsPerPage);
+    }
 }

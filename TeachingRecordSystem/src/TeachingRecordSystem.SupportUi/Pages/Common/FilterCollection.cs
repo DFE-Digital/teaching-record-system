@@ -35,7 +35,7 @@ public class FilterCollection<T> : IReadOnlyCollection<Filter<T>>
         return filteredQuery;
     }
 
-    public async Task<int> CountAsync(IQueryable<T> query)
+    public async Task<int> CalculateFilterCountsAsync(IQueryable<T> query)
     {
         // Groups entities by a string array of filter values:
         // First element in the array is a value of the first multi-value filter, second element is a value of the second multi-value filter etc.

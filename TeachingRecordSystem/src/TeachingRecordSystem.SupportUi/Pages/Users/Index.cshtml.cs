@@ -17,7 +17,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
     private const int UsersPerPage = 10;
 
     [FromQuery(Name = "page")]
-    [BindProperty]
+    [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
     public bool HasUsers { get; private set; } = false;
@@ -52,11 +52,11 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         var filteredQuery = filters.Apply(baseQuery);
 
+        var totalUserCount = await filters.CalculateFilterCountsAsync(filteredQuery);
+
         var paginatedUsers = await filteredQuery
             .OrderBy(u => u.Name)
-            .GetPageAsync(PageNumber, UsersPerPage);
-
-        var totalUserCount = paginatedUsers.TotalItems;
+            .GetPageAsync(PageNumber, UsersPerPage, totalUserCount);
 
         HasUsers = totalUserCount > 0;
         CurrentPageUsers = paginatedUsers.Select(CreateViewModel);
