@@ -146,7 +146,7 @@ public class ProfessionalStatus : Qualification
             throw new NotSupportedException($"Cannot change the {nameof(ProfessionalStatusType)} for an existing {nameof(ProfessionalStatus)}.");
         }
 
-        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributesForUpdate(professionalStatusType, allRoutes);
 
         var changes = ProfessionalStatusUpdatedEventChanges.None |
             (RouteToProfessionalStatus!.RouteToProfessionalStatusId != oldEventModel.RouteToProfessionalStatusId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
@@ -193,6 +193,7 @@ public class ProfessionalStatus : Qualification
     }
 
     public void Delete(
+        IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
         string? deletionReason,
         string? deletionReasonDetail,
         EventModels.File? evidenceFile,
@@ -208,6 +209,15 @@ public class ProfessionalStatus : Qualification
         DeletedOn = now;
         UpdatedOn = now;
 
+        var oldEventModel = EventModels.ProfessionalStatus.FromModel(this);
+        var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
+        var oldRoute = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
+        var oldProfessionalStatusType = oldRoute.ProfessionalStatusType;
+
+        var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
+        var professionalStatusType = route.ProfessionalStatusType;
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributesForDelete(professionalStatusType, allRoutes, this);
+
         @event = new ProfessionalStatusDeletedEvent()
         {
             EventId = Guid.NewGuid(),
@@ -215,6 +225,8 @@ public class ProfessionalStatus : Qualification
             RaisedBy = deletedBy,
             PersonId = PersonId,
             ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(this),
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
+            OldPersonAttributes = oldPersonAttributes,
             DeletionReason = deletionReason,
             DeletionReasonDetail = deletionReasonDetail,
             EvidenceFile = evidenceFile,

@@ -44,16 +44,19 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!JourneyInstance!.Completed)
+        if (!JourneyInstance!.State.Completed)
         {
-            Redirect(linkGenerator.DeleteRouteChangeReason(QualificationId, JourneyInstance!.InstanceId, fromCheckAnswers: true));
+            return Redirect(linkGenerator.DeleteRouteChangeReason(QualificationId, JourneyInstance!.InstanceId, fromCheckAnswers: true));
         }
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
+        var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
 
+        // ... or adapt the current all-in-one method
         professionalStatus.Delete(
-            this.ChangeReason!.GetDisplayName(),
-            this.ChangeReasonDetail.ChangeReasonDetail,
-            this.ChangeReasonDetail.EvidenceFileId is Guid fileId
+            allRoutes,
+            ChangeReason!.GetDisplayName(),
+            ChangeReasonDetail.ChangeReasonDetail,
+            ChangeReasonDetail.EvidenceFileId is Guid fileId
                 ? new EventModels.File()
                 {
                     FileId = fileId,
@@ -97,7 +100,7 @@ public class CheckYourAnswersModel(
         var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
         RouteDetail = new RouteDetailViewModel()
         {
-            RouteToProfessionalStatus = routeInfo.ProfessionalStatus.Route,
+            RouteToProfessionalStatus = routeInfo.ProfessionalStatus.RouteToProfessionalStatus!,
             AwardedDate = routeInfo.ProfessionalStatus.AwardedDate,
             DegreeTypeId = routeInfo.ProfessionalStatus.DegreeTypeId,
             IsExemptFromInduction = routeInfo.ProfessionalStatus.ExemptFromInduction,

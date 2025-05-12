@@ -11,4 +11,6 @@ public record class ProfessionalStatusDeletedEvent : EventBase, IEventWithPerson
     public required string? DeletionReason { get; init; }
     public required string? DeletionReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
+    public required ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
+    public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }
 }

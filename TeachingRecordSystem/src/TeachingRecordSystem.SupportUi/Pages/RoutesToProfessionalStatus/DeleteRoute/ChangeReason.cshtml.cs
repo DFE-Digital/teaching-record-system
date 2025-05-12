@@ -60,7 +60,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string BackLink => FromCheckAnswers == true
         ? linkGenerator.DeleteRouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+        : linkGenerator.PersonQualifications(PersonId);
 
     public async Task OnGetAsync()
     {

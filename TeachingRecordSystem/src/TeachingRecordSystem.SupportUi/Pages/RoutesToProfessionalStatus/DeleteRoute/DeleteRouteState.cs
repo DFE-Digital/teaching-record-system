@@ -12,7 +12,7 @@ public class DeleteRouteState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
-    bool Completed => ChangeReason is not null &&
+    public bool Completed => ChangeReason is not null &&
         ChangeReasonDetail.IsComplete;
 
     public ChangeReasonOption? ChangeReason { get; set; }

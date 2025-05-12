@@ -60,7 +60,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string BackLink => FromCheckAnswers == true
         ? linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+        : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {

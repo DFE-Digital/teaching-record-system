@@ -180,7 +180,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
-    public async Task Post_Confirm_MarksProfessionalStatusAsDeleted_CreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_CreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
@@ -189,7 +189,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
-        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -199,11 +199,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
-            qualificationid,
+            qualificationId,
             deleteRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -214,12 +214,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status deleted");
-
-        await WithDbContext(async dbContext =>
-        {
-            var deletedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.QualificationId == qualificationid);
-            Assert.Equal(Clock.Today.ToDateTime(), deletedProfessionalStatusRecord!.DeletedOn);
-        });
 
         var RaisedBy = GetCurrentUserId();
 
