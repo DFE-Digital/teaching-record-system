@@ -58,7 +58,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
             card =>
             {
                 var title = card.GetElementsByClassName("govuk-summary-card__title").SingleOrDefault();
-                Assert.Equal(alert.AlertType.Name, title?.TextContent);
+                Assert.Equal(alert.AlertType!.Name, title?.TextContent);
 
                 Assert.Equal(alert.Details, card.GetSummaryListValueForKey("Details"));
                 Assert.Equal(alert.ExternalLink, card.GetSummaryListValueElementForKey("Link")?.GetElementsByTagName("a").FirstOrDefault()?.TextContent);
@@ -108,7 +108,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
             closedAlertsTable.GetElementsByTagName("tbody").Single().GetElementsByTagName("tr"),
             row => Assert.Collection(
                 row.GetElementsByTagName("td"),
-                column => Assert.Equal(alert.AlertType.Name, column.TextContent),
+                column => Assert.Equal(alert.AlertType!.Name, column.TextContent),
                 column => Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TextContent),
                 column => Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TextContent),
                 column => { }));

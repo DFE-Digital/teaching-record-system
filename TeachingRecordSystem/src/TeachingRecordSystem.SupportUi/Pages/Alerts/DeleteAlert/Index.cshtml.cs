@@ -135,7 +135,7 @@ public class IndexModel(TrsLinkGenerator linkGenerator, IFileService fileService
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        AlertTypeName = alertInfo.Alert.AlertType.Name;
+        AlertTypeName = alertInfo.Alert.AlertType!.Name;
         EndDate = alertInfo.Alert.EndDate;
         EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;

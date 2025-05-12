@@ -44,6 +44,7 @@ public partial class TestData
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private readonly List<CreatePersonProfessionalStatusBuilder> _professionalStatusBuilders = [];
+        private readonly List<ProfessionalStatusType> _awardedProfessionalStatuses = [];
         private DateOnly? _qtlsDate;
         private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
         private string? _trnToken;
@@ -142,6 +143,13 @@ public partial class TestData
             configure?.Invoke(builder);
             _professionalStatusBuilders.Add(builder);
 
+            return this;
+        }
+
+        public CreatePersonBuilder WithAwardedProfessionalStatus(ProfessionalStatusType professionalStatusType)
+        {
+            EnsureTrn();
+            _awardedProfessionalStatuses.Add(professionalStatusType);
             return this;
         }
 
@@ -547,14 +555,15 @@ public partial class TestData
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
-                var routeIds = await AddProfessionalStatusRoutesAsync();
+                var professionalStatusIds = await AddProfessionalStatusRoutesAsync();
+                var awardedProfessionalStatusIds = await AddAwardedProfessionalStatusRoutesAsync();
 
                 await dbContext.SaveChangesAsync();
 
                 person = await dbContext.Persons
-                    .Include(p => p.Alerts)
+                    .Include(p => p.Alerts!)
                     .ThenInclude(a => a.AlertType)
-                    .ThenInclude(at => at.AlertCategory)
+                    .ThenInclude(at => at!.AlertCategory)
                     .AsSplitQuery()
                     .SingleAsync(p => p.PersonId == contact.Id);
 
@@ -569,10 +578,12 @@ public partial class TestData
                     .Where(p => p.PersonId == PersonId)
                     .ToArrayAsync();
 
-                // Get MQs and Alerts that we've added *in the same order they were specified*.
+                // Get MQs, Alerts and Professional Statuses that we've added *in the same order they were specified*.
                 var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
-                var alerts = alertIds.Select(id => person.Alerts.Single(a => a.AlertId == id)).AsReadOnly();
-                var routesToProfessionalStatus = routeIds.Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id)).AsReadOnly();
+                var alerts = alertIds.Select(id => person.Alerts!.Single(a => a.AlertId == id)).AsReadOnly();
+                var routesToProfessionalStatus = professionalStatusIds.Concat(awardedProfessionalStatusIds)
+                    .Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id))
+                    .AsReadOnly();
 
                 return (mqs, alerts, person, routesToProfessionalStatus);
 
@@ -601,6 +612,50 @@ public partial class TestData
                     }
 
                     return routeIds;
+                }
+
+                async Task<IReadOnlyCollection<Guid>> AddAwardedProfessionalStatusRoutesAsync()
+                {
+                    var allRoutes = await testData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+                    var allSubjects = await testData.ReferenceDataCache.GetTrainingSubjectsAsync();
+                    var allCountries = await testData.ReferenceDataCache.GetTrainingCountriesAsync();
+                    var allProviders = await testData.ReferenceDataCache.GetTrainingProvidersAsync();
+                    var allDegreeTypes = await testData.ReferenceDataCache.GetDegreeTypesAsync();
+
+                    var createdProfessionalStatusIds = new List<Guid>();
+
+                    foreach (var professionalStatusType in _awardedProfessionalStatuses)
+                    {
+                        var route = allRoutes.Where(r => r.ProfessionalStatusType == professionalStatusType).RandomOne();
+
+                        var professionalStatus = new ProfessionalStatus
+                        {
+                            RouteToProfessionalStatusId = route.RouteToProfessionalStatusId,
+                            Status = ProfessionalStatusStatus.Awarded,
+                            TrainingStartDate = route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
+                            TrainingEndDate = route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
+                            TrainingSubjectIds = route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
+                                new[] { allSubjects.RandomOne().TrainingSubjectId } :
+                                [],
+                            TrainingAgeSpecialismType = route.TrainingAgeSpecialismTypeRequired is not FieldRequirement.NotApplicable ? TrainingAgeSpecialismType.FoundationStage : null,
+                            TrainingAgeSpecialismRangeFrom = null,
+                            TrainingAgeSpecialismRangeTo = null,
+                            TrainingCountryId = route.TrainingCountryRequired is not FieldRequirement.NotApplicable ? allCountries.RandomOne().CountryId : null,
+                            TrainingProviderId = allProviders.RandomOne().TrainingProviderId,
+                            ExemptFromInduction = route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
+                            DegreeTypeId = route.DegreeTypeRequired is not FieldRequirement.NotApplicable ? allDegreeTypes.RandomOne().DegreeTypeId : null,
+                            QualificationId = Guid.NewGuid(),
+                            CreatedOn = testData.Clock.UtcNow,
+                            UpdatedOn = testData.Clock.UtcNow,
+                            PersonId = PersonId,
+                            AwardedDate = testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1))
+                        };
+
+                        dbContext.ProfessionalStatuses.Add(professionalStatus);
+                        createdProfessionalStatusIds.Add(professionalStatus.QualificationId);
+                    }
+
+                    return createdProfessionalStatusIds;
                 }
 
                 async Task<IReadOnlyCollection<Guid>> AddAlertsAsync()

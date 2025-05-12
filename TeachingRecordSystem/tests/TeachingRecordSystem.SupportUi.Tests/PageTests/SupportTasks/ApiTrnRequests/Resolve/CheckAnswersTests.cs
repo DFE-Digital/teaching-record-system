@@ -1,16 +1,29 @@
-using FakeItEasy;
 using FakeXrmEasy.Extensions;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
-public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(hostFixture)
+public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 {
+    public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        GetAnIdentityApiClientMock
+            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+            {
+                Email = req.Email,
+                ExpiresUtc = Clock.UtcNow.AddDays(1),
+                Trn = req.Trn,
+                TrnToken = Guid.NewGuid().ToString()
+            });
+    }
+
     [Fact]
     public async Task Get_NoPersonIdSelected_RedirectsToMatches()
     {
@@ -375,6 +388,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+        Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
         AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
         Assert.Null(supportTaskData.SelectedPersonAttributes);
@@ -426,6 +440,7 @@ public class CheckAnswersTests(HostFixture hostFixture) : ResolveApiTrnRequestTe
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
+        Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
         AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
         AssertPersonAttributesMatchContact(supportTaskData.SelectedPersonAttributes, originalContact);

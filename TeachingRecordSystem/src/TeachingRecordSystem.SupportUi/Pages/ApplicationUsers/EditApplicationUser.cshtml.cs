@@ -250,7 +250,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             return;
         }
 
-        ApiKeys = _user.ApiKeys
+        ApiKeys = _user.ApiKeys!
             .OrderBy(k => k.CreatedOn)
             .Select(k => new ApiKeyInfo(k.ApiKeyId, k.Key, k.Expires)).ToArray();
 

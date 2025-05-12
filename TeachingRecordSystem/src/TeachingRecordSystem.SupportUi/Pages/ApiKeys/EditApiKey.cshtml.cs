@@ -69,7 +69,7 @@ public class EditApiKeyModel(TrsDbContext dbContext, TrsLinkGenerator linkGenera
         }
 
         ApplicationUserId = _apiKey.ApplicationUserId;
-        ApplicationUserName = _apiKey.ApplicationUser.Name;
+        ApplicationUserName = _apiKey.ApplicationUser!.Name;
         Expires = _apiKey.Expires;
         Key = _apiKey.Key;
 

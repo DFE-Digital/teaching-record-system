@@ -36,7 +36,7 @@
         @foreach (var (alert, externalLinkUri, canWrite) in Model.OpenAlerts)
         {
             <govuk-summary-card data-testid="open-alert">
-                <govuk-summary-card-title heading-level="3">@alert.AlertType.Name</govuk-summary-card-title>
+                <govuk-summary-card-title heading-level="3">@alert.AlertType!.Name</govuk-summary-card-title>
                 @if (canWrite)
                 {
                     <govuk-summary-card-actions>
@@ -137,7 +137,7 @@
                 @foreach (var (alert, externalLinkUri, canWrite) in Model.ClosedAlerts!)
                 {
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType.Name</a></td>
+                        <td class="govuk-table__cell"><a href="@LinkGenerator.AlertDetail(alert.AlertId)" class="govuk-link">@alert.AlertType!.Name</a></td>
                         <td class="govuk-table__cell">@alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell">@alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
                         <td class="govuk-table__cell">

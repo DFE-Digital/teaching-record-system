@@ -65,9 +65,9 @@ public abstract class FindPersonsHandlerBase(
         var contactsById = matched.ToDictionary(r => r.Id, r => r);
 
         var getPersonsTask = dbContext.Persons
-            .Include(p => p.Alerts)
+            .Include(p => p.Alerts!)
             .ThenInclude(a => a.AlertType)
-            .ThenInclude(at => at.AlertCategory)
+            .ThenInclude(at => at!.AlertCategory)
             .AsSplitQuery()
             .Where(p => contactsById.Keys.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, p => p);
@@ -100,25 +100,25 @@ public abstract class FindPersonsHandlerBase(
                 FirstName = r.ResolveFirstName(),
                 MiddleName = r.ResolveMiddleName(),
                 LastName = r.ResolveLastName(),
-                Sanctions = persons[r.Id].Alerts
-                    .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType.DqtSanctionCode) && a.IsOpen)
+                Sanctions = persons[r.Id].Alerts!
+                    .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType!.DqtSanctionCode) && a.IsOpen)
                     .Select(a => new SanctionInfo()
                     {
-                        Code = a.AlertType.DqtSanctionCode!,
+                        Code = a.AlertType!.DqtSanctionCode!,
                         StartDate = a.StartDate
                     })
                     .AsReadOnly(),
-                Alerts = persons[r.Id].Alerts
-                    .Where(a => !a.AlertType.InternalOnly)
+                Alerts = persons[r.Id].Alerts!
+                    .Where(a => !a.AlertType!.InternalOnly)
                     .Select(a => new Alert()
                     {
                         AlertId = a.AlertId,
                         AlertType = new()
                         {
-                            AlertTypeId = a.AlertType.AlertTypeId,
+                            AlertTypeId = a.AlertType!.AlertTypeId,
                             AlertCategory = new()
                             {
-                                AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
+                                AlertCategoryId = a.AlertType.AlertCategory!.AlertCategoryId,
                                 Name = a.AlertType.AlertCategory.Name
                             },
                             Name = a.AlertType.Name,

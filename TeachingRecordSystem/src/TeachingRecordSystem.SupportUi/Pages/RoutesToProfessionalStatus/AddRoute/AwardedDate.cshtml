@@ -1,6 +1,10 @@
 ﻿@page "/route/add/award-date/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.AwardDateModel
 
+@{
+    ViewBag.Title = "Add award date";
+}
+
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
 }

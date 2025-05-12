@@ -28,7 +28,8 @@ public class TransactionScopeMiddleware(RequestDelegate next)
     {
         if (context.GetEndpoint()?.Metadata.GetMetadata<TransactionScopeEndpointMetadataMarker>() is not null)
         {
-            using var scope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
+            var txOptions = new TransactionOptions() { IsolationLevel = IsolationLevel.ReadCommitted };
+            using var scope = new TransactionScope(TransactionScopeOption.RequiresNew, txOptions, TransactionScopeAsyncFlowOption.Enabled);
             await next(context);
             scope.Complete();
         }

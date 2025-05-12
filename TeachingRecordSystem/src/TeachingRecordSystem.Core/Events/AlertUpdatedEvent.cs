@@ -3,7 +3,7 @@ using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.Core.Events;
 
-public record class AlertUpdatedEvent : EventBase, IEventWithPersonId, IEventWithAlert, IEventWithKey
+public record AlertUpdatedEvent : EventBase, IEventWithPersonId, IEventWithAlert, IEventWithKey
 {
     public string? Key { get; init; }
     public required Guid PersonId { get; init; }
