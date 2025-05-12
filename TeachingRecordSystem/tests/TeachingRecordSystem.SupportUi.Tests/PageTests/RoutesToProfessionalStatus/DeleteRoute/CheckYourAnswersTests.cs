@@ -5,8 +5,6 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
-    private static string _countryCode = "AG";
-
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
@@ -100,11 +98,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)
+                .WithStatus(status)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
                 .WithAwardedDate(awardedDate)
-                .WithTrainingProvider(trainingProvider)
+                .WithTrainingProviderId(trainingProvider.TrainingProviderId)
                 .WithTrainingCountryId(country.CountryId)
                 .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
                 .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
@@ -112,28 +110,20 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithInductionExemption(true)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(status)
-            .WithTrainingStartDate(startDate)
-            .WithTrainingEndDate(endDate)
-            .WithAwardedDate(awardedDate)
-            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-            .WithTrainingCountryId(country.CountryId)
-            .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
-            .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
-            .WithDegreeTypeId(degreeType.DegreeTypeId)
-            .WithInductionExemption(true)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
-            .Build();
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
-            editRouteState
+            deleteRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -153,238 +143,101 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
     }
 
-    //[Fact]
-    //public async Task Get_ShowsExemptionAnswer_AsExpected()
-    //{
-    //    // Arrange
-    //    var startDate = Clock.Today.AddYears(-1);
-    //    var endDate = Clock.Today;
-    //    var country = (await ReferenceDataCache.GetTrainingCountriesAsync())
-    //        .RandomOne();
-    //    var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-    //        .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.NotApplicable)
-    //        .RandomOne();
-    //    var status = ProfessionalStatusStatusRegistry.All
-    //        .Where(s => s.Value.GetInductionExemptionRequirement() == FieldRequirement.Mandatory)
-    //        .RandomOne();
-    //    var exemptionReason = (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).RandomOne();
+    [Fact]
+    public async Task Get_ShowsChangeReasonAnswers_AsExpected()
+    {
+        // Arrange
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Deferred)));
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
 
-    //    var person = await TestData.CreatePersonAsync(p => p
-    //        .WithProfessionalStatus(r => r
-    //            .WithRoute(route.RouteToProfessionalStatusId)
-    //            .WithStatus(status.Value)));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            deleteRouteState
+            );
 
-    //    var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-    //    var editRouteState = new EditRouteStateBuilder()
-    //        .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-    //        .WithStatus(status.Value)
-    //        .WithTrainingStartDate(startDate)
-    //        .WithTrainingEndDate(endDate)
-    //        .WithAwardedDate(endDate)
-    //        .WithTrainingCountryId(country.CountryId)
-    //        .WithInductionExemption(true)
-    //        .WithValidChangeReasonOption()
-    //        .WithDefaultChangeReasonNoUploadFileDetail()
-    //        .Build();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-    //    var journeyInstance = await CreateJourneyInstanceAsync(
-    //        qualificationid,
-    //        editRouteState
-    //        );
+        // Act
+        var response = await HttpClient.SendAsync(request);
 
-    //    var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
 
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
+        doc.AssertRowContentMatches("Reason for change", deleteRouteState.ChangeReason!.GetDisplayName()!);
+        doc.AssertRowContentMatches("Additional information", deleteRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
+        doc.AssertRowContentMatches("Evidence", "Not provided");
+    }
 
-    //    // Assert
-    //    var doc = await AssertEx.HtmlResponseAsync(response);
+    [Fact]
+    public async Task Post_Confirm_MarksProfessionalStatusAsDeleted_CreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    {
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
 
-    //    doc.AssertRowContentMatches("Award date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-    //    doc.AssertRowContentMatches("Has exemption", "Yes");
-    //}
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Deferred)));
+        var qualificationid = person.ProfessionalStatuses.First().QualificationId;
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
 
-    //[Fact]
-    //public async Task Get_ShowsOptionalAnswersNotPopulated_AsExpected()
-    //{
-    //    // Arrange
-    //    var startDate = Clock.Today.AddYears(-1);
-    //    var endDate = Clock.Today;
-    //    var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
-    //    var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync())
-    //        .RandomOne();
-    //    var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync())
-    //        .RandomOne();
-    //    var person = await TestData.CreatePersonAsync(p => p
-    //        .WithProfessionalStatus(r => r
-    //            .WithRoute(route.RouteToProfessionalStatusId)
-    //            .WithStatus(ProfessionalStatusStatus.InTraining)));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationid,
+            deleteRouteState
+            );
 
-    //    var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-    //    var editRouteState = new EditRouteStateBuilder()
-    //        .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-    //        .WithStatus(ProfessionalStatusStatus.InTraining)
-    //        .WithTrainingStartDate(startDate)
-    //        .WithTrainingEndDate(endDate)
-    //        .WithTrainingCountryId(_countryCode)
-    //        .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-    //        .WithDegreeTypeId(degreeType.DegreeTypeId)
-    //        .WithValidChangeReasonOption()
-    //        .WithDefaultChangeReasonNoUploadFileDetail()
-    //        .Build();
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
 
-    //    var journeyInstance = await CreateJourneyInstanceAsync(
-    //        qualificationid,
-    //        editRouteState
-    //        );
+        // Act
+        var response = await HttpClient.SendAsync(request);
 
-    //    var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status deleted");
 
-    //    // Assert
-    //    var doc = await AssertEx.HtmlResponseAsync(response);
+        await WithDbContext(async dbContext =>
+        {
+            var deletedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.QualificationId == qualificationid);
+            Assert.Equal(Clock.Today.ToDateTime(), deletedProfessionalStatusRecord!.DeletedOn);
+        });
 
-    //    doc.AssertRowContentMatches("Route", route.Name);
-    //    doc.AssertRowContentMatches("Status", "In training");
-    //    doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-    //    doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-    //    doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
-    //    doc.AssertRowContentMatches("Age range", "Not provided");
-    //    doc.AssertRowContentMatches("Subjects", "Not provided");
-    //}
+        var RaisedBy = GetCurrentUserId();
 
-    //[Fact]
-    //public async Task Get_ShowsChangeReasonAnswers_AsExpected()
-    //{
-    //    // Arrange
-    //    var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
-    //    var person = await TestData.CreatePersonAsync(p => p
-    //        .WithProfessionalStatus(r => r
-    //            .WithRoute(route.RouteToProfessionalStatusId)
-    //            .WithStatus(ProfessionalStatusStatus.Deferred)));
-    //    var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-    //    var editRouteState = new EditRouteStateBuilder()
-    //        .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-    //        .WithStatus(ProfessionalStatusStatus.Deferred)
-    //        .WithTrainingCountryId(_countryCode)
-    //        .WithValidChangeReasonOption()
-    //        .WithDefaultChangeReasonNoUploadFileDetail()
-    //        .Build();
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var deletedUpdatedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
 
-    //    var journeyInstance = await CreateJourneyInstanceAsync(
-    //        qualificationid,
-    //        editRouteState
-    //        );
+            Assert.Equal(Clock.UtcNow, deletedUpdatedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, deletedUpdatedEvent.PersonId);
+            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), deletedUpdatedEvent.DeletionReason);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedUpdatedEvent.DeletionReasonDetail);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, deletedUpdatedEvent.EvidenceFile?.FileId);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, deletedUpdatedEvent.EvidenceFile?.Name);
+        });
 
-    //    var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
-
-    //    // Assert
-    //    var doc = await AssertEx.HtmlResponseAsync(response);
-
-    //    doc.AssertRowContentMatches("Reason for change", editRouteState.ChangeReason!.GetDisplayName()!);
-    //    doc.AssertRowContentMatches("Additional information", editRouteState.ChangeReasonDetail!.ChangeReasonDetail!);
-    //    doc.AssertRowContentMatches("Evidence", "Not provided");
-    //}
-
-    //[Fact]
-    //public async Task Post_Confirm_UpdatesProfessionalStatusCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
-    //{
-    //    var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-    //    var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
-    //    var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
-    //    var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
-    //    var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
-    //    var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-    //    var ageRange = TrainingAgeSpecialismType.KeyStage3;
-
-    //    var person = await TestData.CreatePersonAsync(p => p
-    //        .WithProfessionalStatus(r => r
-    //            .WithRoute(route.RouteToProfessionalStatusId)
-    //            .WithStatus(ProfessionalStatusStatus.Deferred)));
-    //    var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-    //    var editRouteState = new EditRouteStateBuilder()
-    //        .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-    //        .WithStatus(status)
-    //        .WithAwardedStatusFields(Clock)
-    //        .WithTrainingProviderId(trainingProvider.TrainingProviderId)
-    //        .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
-    //        .WithTrainingCountryId(country.CountryId)
-    //        .WithTrainingAgeSpecialismType(ageRange)
-    //        .WithInductionExemption(true)
-    //        .WithValidChangeReasonOption()
-    //        .WithDefaultChangeReasonNoUploadFileDetail()
-    //        .WithDegreeTypeId(degreeType.DegreeTypeId)
-    //        .WithValidChangeReasonOption()
-    //        .WithDefaultChangeReasonNoUploadFileDetail()
-    //        .Build();
-
-    //    var journeyInstance = await CreateJourneyInstanceAsync(
-    //        qualificationid,
-    //        editRouteState
-    //        );
-
-    //    var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
-
-    //    // Act
-    //    var response = await HttpClient.SendAsync(request);
-
-    //    // Assert
-    //    Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-
-    //    var redirectResponse = await response.FollowRedirectAsync(HttpClient);
-    //    var redirectDoc = await redirectResponse.GetDocumentAsync();
-    //    AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status updated");
-
-    //    await WithDbContext(async dbContext =>
-    //    {
-    //        var updatedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(q => q.QualificationId == qualificationid);
-    //        Assert.Equal(journeyInstance.State.IsExemptFromInduction, updatedProfessionalStatusRecord!.ExemptFromInduction);
-    //        Assert.Equal(journeyInstance.State.Status, updatedProfessionalStatusRecord!.Status);
-    //        Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, updatedProfessionalStatusRecord!.RouteToProfessionalStatusId);
-    //        Assert.Equal(journeyInstance.State.TrainingStartDate, updatedProfessionalStatusRecord!.TrainingStartDate);
-    //        Assert.Equal(journeyInstance.State.TrainingEndDate, updatedProfessionalStatusRecord!.TrainingEndDate);
-    //        Assert.Equal(journeyInstance.State.AwardedDate, updatedProfessionalStatusRecord!.AwardedDate);
-    //        Assert.Equal(journeyInstance.State.TrainingProviderId, updatedProfessionalStatusRecord!.TrainingProviderId);
-    //        Assert.Equal(journeyInstance.State.TrainingCountryId, updatedProfessionalStatusRecord!.TrainingCountryId);
-    //        Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, updatedProfessionalStatusRecord!.TrainingAgeSpecialismType);
-    //        Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, updatedProfessionalStatusRecord!.TrainingAgeSpecialismRangeFrom);
-    //        Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, updatedProfessionalStatusRecord!.TrainingAgeSpecialismRangeTo);
-    //        Assert.Equal(journeyInstance.State.TrainingSubjectIds, updatedProfessionalStatusRecord!.TrainingSubjectIds);
-    //        Assert.Equal(journeyInstance.State.DegreeTypeId, updatedProfessionalStatusRecord!.DegreeTypeId);
-    //    });
-
-    //    var RaisedBy = GetCurrentUserId();
-
-    //    EventPublisher.AssertEventsSaved(e =>
-    //    {
-    //        var actualUpdatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
-
-    //        Assert.Equal(Clock.UtcNow, actualUpdatedEvent.CreatedUtc);
-    //        Assert.Equal(person.PersonId, actualUpdatedEvent.PersonId);
-    //        Assert.Equal(journeyInstance.State.Status, actualUpdatedEvent.ProfessionalStatus.Status);
-    //        Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualUpdatedEvent.ProfessionalStatus.RouteToProfessionalStatusId);
-    //        Assert.Equal(journeyInstance.State.TrainingStartDate, actualUpdatedEvent.ProfessionalStatus.TrainingStartDate);
-    //        Assert.Equal(journeyInstance.State.TrainingEndDate, actualUpdatedEvent.ProfessionalStatus.TrainingEndDate);
-    //        Assert.Equal(journeyInstance.State.AwardedDate, actualUpdatedEvent.ProfessionalStatus.AwardedDate);
-    //        Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismType);
-    //        Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom);
-    //        Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualUpdatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo);
-    //        Assert.Equal(journeyInstance.State.TrainingSubjectIds, actualUpdatedEvent.ProfessionalStatus.TrainingSubjectIds);
-    //        Assert.Equal(journeyInstance.State.IsExemptFromInduction, actualUpdatedEvent.ProfessionalStatus.ExemptFromInduction);
-    //        Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), actualUpdatedEvent.ChangeReason);
-    //        Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, actualUpdatedEvent.ChangeReasonDetail);
-    //        Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, actualUpdatedEvent.EvidenceFile?.FileId);
-    //        Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, actualUpdatedEvent.EvidenceFile?.Name);
-    //    });
-
-    //    journeyInstance = await ReloadJourneyInstance(journeyInstance);
-    //    Assert.True(journeyInstance.Completed);
-    //}
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
+    }
 
     private Task<JourneyInstance<DeleteRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteRouteState? state = null) =>
         CreateJourneyInstance(

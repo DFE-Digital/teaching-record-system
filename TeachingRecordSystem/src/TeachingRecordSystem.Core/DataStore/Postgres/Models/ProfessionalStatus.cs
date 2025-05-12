@@ -138,4 +138,34 @@ public class ProfessionalStatus : Qualification
             ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(this)
         };
     }
+
+    public void Delete(
+        string? deletionReason,
+        string? deletionReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo deletedBy,
+        DateTime now,
+        out ProfessionalStatusDeletedEvent @event)
+    {
+        if (DeletedOn is not null)
+        {
+            throw new InvalidOperationException("Professional status is already deleted.");
+        }
+
+        DeletedOn = now;
+        UpdatedOn = now;
+
+        @event = new ProfessionalStatusDeletedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = deletedBy,
+            PersonId = PersonId,
+            ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(this),
+            DeletionReason = deletionReason,
+            DeletionReasonDetail = deletionReasonDetail,
+            EvidenceFile = evidenceFile,
+        };
+    }
+
 }

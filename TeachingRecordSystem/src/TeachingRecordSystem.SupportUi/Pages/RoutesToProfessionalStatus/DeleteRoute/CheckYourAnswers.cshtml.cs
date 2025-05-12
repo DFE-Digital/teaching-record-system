@@ -44,14 +44,30 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!JourneyInstance!.Completed)
+        {
+            Redirect(linkGenerator.DeleteRouteChangeReason(QualificationId, JourneyInstance!.InstanceId, fromCheckAnswers: true));
+        }
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
 
-
-        //if (deletedEvent is not null)
-        //{
-        //    await dbContext.AddEventAndBroadcastAsync(deletedEvent);
-        //    await dbContext.SaveChangesAsync();
-        //}
+        professionalStatus.Delete(
+            this.ChangeReason!.GetDisplayName(),
+            this.ChangeReasonDetail.ChangeReasonDetail,
+            this.ChangeReasonDetail.EvidenceFileId is Guid fileId
+                ? new EventModels.File()
+                {
+                    FileId = fileId,
+                    Name = ChangeReasonDetail.EvidenceFileName!
+                }
+                : null,
+            User.GetUserId(),
+            clock.UtcNow,
+            out var deletedEvent);
+        if (deletedEvent is not null)
+        {
+            await dbContext.AddEventAndBroadcastAsync(deletedEvent);
+            await dbContext.SaveChangesAsync();
+        }
 
         await JourneyInstance!.CompleteAsync();
 
