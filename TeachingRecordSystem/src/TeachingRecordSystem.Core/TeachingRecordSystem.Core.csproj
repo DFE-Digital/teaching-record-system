@@ -164,6 +164,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0054_QtsAndEytsDates.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0055_TrsQualificationsRemoveProfessionalStatusType.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0056_PqtsAndHasEyps.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0057_TrsQualificationsProfessionalStatusTypeAndExemptFromInduction.sql" />
   </ItemGroup>
 
