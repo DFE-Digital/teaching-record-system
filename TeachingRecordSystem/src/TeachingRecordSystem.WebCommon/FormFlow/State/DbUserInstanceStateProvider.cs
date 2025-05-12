@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Transactions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -81,7 +82,10 @@ public class DbWithHttpContextTransactionUserInstanceStateProvider(
         dbContext = await dbContextFactory.CreateDbContextAsync();
         httpContext.Items.Add(HttpContextItemsDbContextKey, dbContext);
 
-        await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        if (Transaction.Current is null)
+        {
+            await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted);
+        }
 
         return dbContext;
     }
