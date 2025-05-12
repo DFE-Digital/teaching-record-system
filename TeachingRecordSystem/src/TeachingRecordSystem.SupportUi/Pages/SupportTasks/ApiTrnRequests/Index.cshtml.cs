@@ -2,11 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Pages.Common;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
-public class Index(TrsDbContext dbContext) : PageModel
+public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
+    private const int TasksPerPage = 20;
+
     [Display(Name = "Search", Description = "By name, email or request date, for example 4/3/1975")]
     [BindProperty(SupportsGet = true)]
     [FromQuery]
@@ -20,12 +24,18 @@ public class Index(TrsDbContext dbContext) : PageModel
     [FromQuery]
     public ApiTrnRequestsSortByOption? SortBy { get; set; }
 
-    public Result[]? Results { get; set; }
+    [BindProperty(SupportsGet = true)]
+    [FromQuery(Name = "page")]
+    public int? PageNumber { get; set; }
+
+    public ResultPage<Result>? Results { get; set; }
+
+    public PaginationViewModel? Pagination { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var sortDirection = SortDirection ?? SupportUi.SortDirection.Ascending;
-        var sortBy = SortBy ?? ApiTrnRequestsSortByOption.Name;
+        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
+        var sortBy = SortBy ??= ApiTrnRequestsSortByOption.Name;
 
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
@@ -87,7 +97,11 @@ public class Index(TrsDbContext dbContext) : PageModel
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
                 t.TrnRequestMetadata.ApplicationUser!.Name))
-            .ToArrayAsync();
+            .GetPageAsync(PageNumber, TasksPerPage);
+
+        Pagination = PaginationViewModel.Create(
+            Results,
+            page => linkGenerator.ApiTrnRequests(Search, SortBy, SortDirection, page));
 
         return Page();
 

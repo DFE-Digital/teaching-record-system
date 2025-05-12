@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -11,18 +12,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users;
 
 [Authorize(Policy = AuthorizationPolicies.UserManagement)]
 [RequireFeatureEnabledFilterFactory(FeatureNames.NewUserRoles)]
-public class IndexModel : PageModel
+public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : PageModel
 {
     private const int UsersPerPage = 10;
 
-    private readonly TrsDbContext _dbContext;
-    private readonly TrsLinkGenerator _linkGenerator;
-
-    public IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator)
-    {
-        _dbContext = dbContext;
-        _linkGenerator = linkGenerator;
-    }
+    [FromQuery(Name = "page")]
+    [BindProperty(SupportsGet = true)]
+    public int? PageNumber { get; set; }
 
     public bool HasUsers { get; private set; } = false;
     public IEnumerable<UserViewModel> CurrentPageUsers { get; private set; } = [];
@@ -31,8 +27,6 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var pagination = new Pagination("page", UsersPerPage, Request.Query);
-
         var showAdminRole = User.IsInRole(UserRoles.Administrator);
         var userRoles = UserRoles.All.Where(r => showAdminRole || r != UserRoles.Administrator);
 
@@ -52,22 +46,22 @@ public class IndexModel : PageModel
                 ])
         ]);
 
-        var baseQuery = _dbContext.Users
+        var baseQuery = dbContext.Users
             .Where(u => u.UserType == UserType.Person && !string.IsNullOrWhiteSpace(u.Email))
             .Where(u => showAdminRole || u.Role != UserRoles.Administrator);
 
         var filteredQuery = filters.Apply(baseQuery);
 
-        var totalUserCount = await filters.CountAsync(filteredQuery);
+        var totalUserCount = await filters.CalculateFilterCountsAsync(filteredQuery);
 
-        var paginatedUsers = await pagination.PaginateAsync(
-            filteredQuery.OrderBy(u => u.Name),
-            totalUserCount);
+        var paginatedUsers = await filteredQuery
+            .OrderBy(u => u.Name)
+            .GetPageAsync(PageNumber, UsersPerPage, totalUserCount);
 
         HasUsers = totalUserCount > 0;
         CurrentPageUsers = paginatedUsers.Select(CreateViewModel);
         Filters = FiltersViewModel.Create(filters, "Find user");
-        Pagination = PaginationViewModel.Create(pagination, Request.Query);
+        Pagination = PaginationViewModel.Create(paginatedUsers, page => linkGenerator.Users(page));
     }
 
     private UserViewModel CreateViewModel(User user)
@@ -76,7 +70,7 @@ public class IndexModel : PageModel
         {
             Id = user.UserId.ToString(),
             Name = user.Name,
-            EditUrl = _linkGenerator.EditUser(user.UserId),
+            EditUrl = linkGenerator.EditUser(user.UserId),
             EmailAddress = user.Email ?? "No email address",
             Role = user.Role == null ? "No role assigned" : UserRoles.GetDisplayNameForRole(user.Role),
             Status = user.Active ? "Active" : "Inactive"
