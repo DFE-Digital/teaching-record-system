@@ -14,7 +14,6 @@ namespace TeachingRecordSystem.Core;
 
 public class TrnRequestHelper(
     TrsDbContext dbContext,
-    ITrnGenerator trnGenerator,
     ICrmQueryDispatcher crmQueryDispatcher,
     IGetAnIdentityApiClient idApiClient,
     IOptions<AccessYourTeachingQualificationsOptions> aytqOptionsAccessor)
@@ -99,7 +98,7 @@ public class TrnRequestHelper(
         return result;
     }
 
-    public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId)
+    public async Task CreateContactFromTrnRequestAsync(Guid applicationUserId, string requestId, Guid newContactId, string trn)
     {
         var result = await GetTrnRequestInfoAsync(applicationUserId, requestId);
         if (result is null)
@@ -107,13 +106,11 @@ public class TrnRequestHelper(
             throw new ArgumentException("TRN request does not exist.");
         }
 
-        await CreateContactFromTrnRequestAsync(result.Metadata, newContactId);
+        await CreateContactFromTrnRequestAsync(result.Metadata, newContactId, trn);
     }
 
-    public async Task CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData, Guid newContactId)
+    public async Task CreateContactFromTrnRequestAsync(TrnRequestMetadata requestData, Guid newContactId, string trn)
     {
-        var trn = await trnGenerator.GenerateTrnAsync();
-
         await crmQueryDispatcher.ExecuteQueryAsync(new CreateContactQuery()
         {
             ContactId = newContactId,
