@@ -10,7 +10,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
-        // TODO Create a Closed task when we can set them up
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/api-trn-requests/");
 
@@ -441,6 +442,33 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             GetResultTaskReferences(doc),
             result => Assert.Equal(supportTask1.SupportTaskReference, result),
             result => Assert.Equal(supportTask2.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_ShowsPageOfResults()
+    {
+        // Arrange
+        var pageSize = 20;
+        var page = 2;
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        // Create enough tasks to create 3 pages
+        var tasks = await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .SelectAwait(async _ => await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId))
+            .ToArrayAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?page={page}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
     public Task InitializeAsync() => WithDbContext(dbContext =>

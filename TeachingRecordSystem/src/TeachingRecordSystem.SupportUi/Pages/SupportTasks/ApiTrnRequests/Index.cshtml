@@ -42,10 +42,10 @@
                 </tr>
             </thead>
             <tbody class="govuk-table__body">
-                @if (Model.Results!.Length == 0)
+                @if (Model.Results!.Count == 0)
                 {
                     <tr class="govuk-table__row" data-testid="no-tasks-message">
-                        <td class="govuk-table__cell" colspan="4">No open support tasks</td>
+                        <td class="govuk-table__cell" colspan="4">No potential duplicate records from APIs</td>
                     </tr>
                 }
                 else
@@ -64,5 +64,7 @@
                 }
             </tbody>
         </table>
+        
+        <partial name="_Pagination" model=@Model.Pagination />
     </div>
 </div>

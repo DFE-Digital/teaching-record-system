@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Primitives;
-using TeachingRecordSystem.SupportUi.Pages.Common;
+﻿namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Shared;
-
-public class PaginationViewModel(string name, int currentPage, int firstPage, int lastPage, IQueryCollection currentRequestQueryString)
+public class PaginationViewModel(int currentPage, int lastPage, Func<int, string> getPageLink)
 {
     public int CurrentPage => currentPage;
-    public int FirstPage => firstPage;
+    public int FirstPage => 1;
     public int LastPage => lastPage;
 
     public bool ShowPagination =>
@@ -36,17 +33,10 @@ public class PaginationViewModel(string name, int currentPage, int firstPage, in
     public bool ShowLastPageEllipsis =>
         LastPage - NextPage > 1;
 
-    public string PageLink(int page)
+    public string GetPageLink(int page) => getPageLink(page);
+
+    public static PaginationViewModel Create<T>(ResultPage<T> result, Func<int, string> getPageLink)
     {
-        var queryString = new Dictionary<string, StringValues>(currentRequestQueryString);
-
-        queryString[name] = page.ToString();
-
-        return QueryString.Create(queryString).ToString();
-    }
-
-    public static PaginationViewModel Create(Pagination pagination, IQueryCollection currentRequestQueryString)
-    {
-        return new(pagination.Name, pagination.CurrentPage, pagination.FirstPage, pagination.LastPage, currentRequestQueryString);
+        return new(result.CurrentPage, result.LastPage, getPageLink);
     }
 }
