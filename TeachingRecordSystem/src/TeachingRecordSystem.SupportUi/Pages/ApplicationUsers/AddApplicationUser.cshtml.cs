@@ -17,6 +17,11 @@ public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator li
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Short name")]
+    [MaxLength(ApplicationUser.ShortNameMaxLength, ErrorMessage = "Short name must be 25 characters or less")]
+    public string? ShortName { get; set; }
+
     public void OnGet()
     {
     }
@@ -33,6 +38,7 @@ public class AddApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator li
             ApiRoles = [],
             Name = Name!,
             UserId = Guid.NewGuid(),
+            ShortName = ShortName
         };
 
         dbContext.ApplicationUsers.Add(newUser);
