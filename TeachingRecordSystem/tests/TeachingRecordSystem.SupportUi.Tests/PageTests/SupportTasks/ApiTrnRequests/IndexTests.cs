@@ -192,20 +192,22 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     }
 
     [Fact]
-    public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByNameAscending()
+    public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByRequestedOnAscending()
     {
         // Arrange
         var applicationUser = await TestData.CreateApplicationUserAsync();
 
         var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithFirstName("Zavier"));
+            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
 
         var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
             applicationUser.UserId,
-            t => t.WithFirstName("Aaron"));
+            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/api-trn-requests/");
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/");
 
         // Act
         var response = await HttpClient.SendAsync(request);

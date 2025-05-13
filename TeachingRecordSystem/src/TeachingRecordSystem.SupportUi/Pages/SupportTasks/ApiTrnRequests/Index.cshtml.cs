@@ -48,7 +48,7 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
         }
 
         var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
-        var sortBy = SortBy ??= ApiTrnRequestsSortByOption.Name;
+        var sortBy = SortBy ??= ApiTrnRequestsSortByOption.RequestedOn;
 
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
