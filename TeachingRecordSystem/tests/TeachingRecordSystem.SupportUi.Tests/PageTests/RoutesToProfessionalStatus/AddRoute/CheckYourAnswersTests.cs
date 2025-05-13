@@ -80,7 +80,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var endDate = Clock.Today.AddDays(-1);
         var awardedDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
+        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
@@ -218,7 +218,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
+        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();

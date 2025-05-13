@@ -90,7 +90,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var endDate = Clock.Today.AddDays(-1);
         var awardedDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
+        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
@@ -180,15 +180,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
-    public async Task Post_Confirm_CreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    public async Task Post_Confirm_DeletesRecordCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All.RandomOne().Value;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
@@ -215,6 +215,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, "Route to professional status deleted");
 
+        await WithDbContext(async dbContext => Assert.Null(await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(p => p.QualificationId == qualificationId)));
+
         var RaisedBy = GetCurrentUserId();
 
         EventPublisher.AssertEventsSaved(e =>
@@ -227,6 +229,113 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedUpdatedEvent.DeletionReasonDetail);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, deletedUpdatedEvent.EvidenceFile?.FileId);
             Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, deletedUpdatedEvent.EvidenceFile?.Name);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
+    public async Task Post_Confirm_WithAwardedQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
+    {
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .RandomOne();
+        var status = ProfessionalStatusStatus.Awarded;
+        var qtsDate = Clock.Today.AddYears(-1);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts(qtsDate)
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(status)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            deleteRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        Assert.Null(updatedPerson.QtsDate);
+
+        var RaisedByUserId = GetCurrentUserId();
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var deletedUpdatedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+            Assert.Equal(RaisedByUserId, deletedUpdatedEvent.RaisedBy.UserId);
+            Assert.Equal(Clock.UtcNow, deletedUpdatedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, deletedUpdatedEvent.PersonId);
+            Assert.Equal(qtsDate, deletedUpdatedEvent.OldPersonAttributes.QtsDate);
+            Assert.Null(deletedUpdatedEvent.PersonAttributes.QtsDate);
+        });
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
+    public async Task Post_Confirm_WithAwardedQtsRouteType_UpdatesPersonQtsDateWithOlderRouteDateAndHasChangesInEvent()
+    {
+        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .RandomOne();
+        var awardedDateEarliest = Clock.Today.AddYears(-1);
+        var awardedDateLatest = awardedDateEarliest.AddMonths(1);
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts(awardedDateEarliest)
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDateEarliest))
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDateLatest)));
+        var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.AwardedDate == awardedDateEarliest).QualificationId;
+        var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.AwardedDate == awardedDateLatest).QualificationId;
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationIdEarliestDate,
+            deleteRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationIdEarliestDate}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
+        Assert.Equal(awardedDateLatest, updatedPerson.QtsDate);
+
+        EventPublisher.AssertEventsSaved(e =>
+        {
+            var deletedUpdatedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+            Assert.Equal(Clock.UtcNow, deletedUpdatedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, deletedUpdatedEvent.PersonId);
+            Assert.Equal(awardedDateEarliest, deletedUpdatedEvent.OldPersonAttributes.QtsDate);
+            Assert.Equal(awardedDateLatest, deletedUpdatedEvent.PersonAttributes.QtsDate);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

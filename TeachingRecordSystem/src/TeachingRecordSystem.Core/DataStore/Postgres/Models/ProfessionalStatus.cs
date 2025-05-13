@@ -205,6 +205,10 @@ public class ProfessionalStatus : Qualification
         {
             throw new InvalidOperationException("Professional status is already deleted.");
         }
+        if (Person is null)
+        {
+            throw new InvalidOperationException("Professional status is not linked to a person and cannot be deleted");
+        }
 
         DeletedOn = now;
         UpdatedOn = now;
@@ -232,5 +236,4 @@ public class ProfessionalStatus : Qualification
             EvidenceFile = evidenceFile,
         };
     }
-
 }

@@ -399,7 +399,7 @@ public class Person
     public bool RefreshProfessionalStatusAttributes(
         ProfessionalStatusType professionalStatusType,
         IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
-        IEnumerable<ProfessionalStatus?> professionalStatuses)
+        IEnumerable<ProfessionalStatus> professionalStatuses)
     {
         var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusId, r => r.ProfessionalStatusType);
 
