@@ -7,12 +7,14 @@ public partial class TestData
 {
     public async Task<ApplicationUser> CreateApplicationUserAsync(
         string? name = null,
+        string? shortName = null,
         string[]? apiRoles = null,
         bool? isOidcClient = false)
     {
         var user = await WithDbContextAsync(async dbContext =>
         {
             name ??= GenerateApplicationUserName();
+            shortName ??= GenerateApplicationUserShortName();
             apiRoles ??= [];
             isOidcClient ??= false;
             string? clientId = null;
@@ -41,6 +43,7 @@ public partial class TestData
             var user = new ApplicationUser()
             {
                 Name = name,
+                ShortName = shortName,
                 UserId = Guid.NewGuid(),
                 ApiRoles = apiRoles,
                 IsOidcClient = isOidcClient.Value,
