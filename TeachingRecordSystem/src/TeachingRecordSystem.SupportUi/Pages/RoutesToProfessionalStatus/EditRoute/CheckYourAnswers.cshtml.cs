@@ -48,7 +48,6 @@ public class CheckYourAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        //var professionalStatus = await dbContext.ProfessionalStatuses.Where(p => p.RouteToProfessionalStatusId == QualificationId).SingleAsync();
         var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
 
         professionalStatus.Update(
