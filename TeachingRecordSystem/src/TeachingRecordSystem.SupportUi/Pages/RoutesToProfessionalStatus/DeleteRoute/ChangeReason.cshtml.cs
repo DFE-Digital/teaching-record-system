@@ -30,7 +30,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     [BindProperty]
     [Display(Name = "Do you want to provide more information?")]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re deleting this route")]
+    [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re deleting this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
