@@ -109,7 +109,8 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser!.Name))
+                t.TrnRequestMetadata.ApplicationUser!.Name,
+                t.TrnRequestMetadata.ApplicationUser.ShortName))
             .GetPageAsync(PageNumber, TasksPerPage);
 
         Pagination = PaginationViewModel.Create(
@@ -132,5 +133,9 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
         string LastName,
         string? EmailAddress,
         DateTime CreatedOn,
-        string SourceApplicationName);
+        string SourceApplicationName,
+        string? SourceApplicationShortName)
+    {
+        public string Source => !string.IsNullOrEmpty(SourceApplicationShortName) ? SourceApplicationShortName : SourceApplicationName;
+    }
 }

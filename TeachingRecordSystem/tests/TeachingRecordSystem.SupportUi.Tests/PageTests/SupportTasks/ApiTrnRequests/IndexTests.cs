@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
@@ -473,16 +474,53 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
     }
 
+    [Fact]
+    public async Task Get_UsesApplicationShortNameIfSetOtherwiseApplicationName()
+    {
+        // Arrange
+        var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(shortName: TestData.GenerateApplicationUserShortName());
+        Clock.Advance();
+        var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(shortName: "");
+
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithShortName.UserId);
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithoutShortName.UserId);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.RequestedOn}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var resultRows = GetResultRows(doc);
+        Assert.Collection(
+            resultRows,
+            row => AssertSourceColumnEquals(row, applicationUserWithShortName.ShortName!),
+            row => AssertSourceColumnEquals(row, applicationUserWithoutShortName.Name));
+
+        static void AssertSourceColumnEquals(IElement row, string expectedSource)
+        {
+            var source = row.Children[3];
+            Assert.Equal(expectedSource, source.TextContent.Trim());
+        }
+    }
+
     public Task InitializeAsync() => WithDbContext(dbContext =>
         dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
+    private static IElement[] GetResultRows(IHtmlDocument doc) =>
         doc
             .GetElementsByTagName("tbody")
             .Single()
             .GetElementsByClassName("govuk-table__row")
+            .ToArray();
+
+    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
+        GetResultRows(doc)
             .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
             .ToArray();
 }
