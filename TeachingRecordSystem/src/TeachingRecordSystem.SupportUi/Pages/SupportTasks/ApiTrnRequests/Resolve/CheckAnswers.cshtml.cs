@@ -16,7 +16,8 @@ public class CheckAnswers(
     IBackgroundJobScheduler backgroundJobScheduler,
     TrnRequestHelper trnRequestHelper,
     ITrnGenerator trnGenerator,
-    TrsLinkGenerator linkGenerator) :
+    TrsLinkGenerator linkGenerator,
+    IClock clock) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]
@@ -97,6 +98,7 @@ public class CheckAnswers(
         }
 
         supportTask.Status = SupportTaskStatus.Closed;
+        supportTask.UpdatedOn = clock.UtcNow;
         supportTask.UpdateData<ApiTrnRequestData>(data => data with
         {
             ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),

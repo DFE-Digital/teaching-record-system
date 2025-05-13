@@ -355,6 +355,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
+        Clock.Advance();
+
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
@@ -387,6 +389,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
@@ -410,6 +413,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             applicationUser.UserId,
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
+
+        Clock.Advance();
 
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
@@ -439,6 +444,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
