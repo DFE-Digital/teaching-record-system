@@ -87,7 +87,7 @@ public class QtsImporterTests : IAsyncLifetime
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .First(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId);
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
