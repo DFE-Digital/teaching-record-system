@@ -371,7 +371,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
+        Assert.StartsWith("/support-tasks/api-trn-requests?waitForJobId=", response.Headers.Location?.OriginalString);
 
         var expectedCrmRequestId = TrnRequestHelper.GetCrmTrnRequestId(applicationUser.UserId, requestData.RequestId);
         var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.dfeta_TrnRequestID == expectedCrmRequestId);
@@ -431,7 +431,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal("/support-tasks/api-trn-requests", response.Headers.Location?.OriginalString);
+        Assert.StartsWith("/support-tasks/api-trn-requests?waitForJobId=", response.Headers.Location?.OriginalString);
 
         var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
         Assert.Equal(requestData.MiddleName, crmContact.MiddleName);
