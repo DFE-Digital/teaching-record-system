@@ -218,28 +218,10 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
         var awardedDate = Clock.UtcNow.AddDays(-100).ToDateOnlyWithDqtBstFix(isLocalTime: true);
-        var countries = await ReferenceDataCache.GetTrainingCountriesAsync();
-        var countryId = countries.FirstOrDefault()?.CountryId;
-        var specialism = TrainingAgeSpecialismType.KeyStage3;
-        var trainingStartDate = new DateOnly(2011, 04, 05);
-        var trainingEndDate = new DateOnly(2014, 02, 05);
-        var subjects = await ReferenceDataCache.GetTrainingSubjectsAsync();
-        var subject1 = subjects.RandomOne().TrainingSubjectId;
-        var ageRangeFrom = 15;
-        var ageRangeTo = 21;
-
         var message = new AddWelshRMessage()
         {
             PersonId = person.PersonId,
             AwardedDate = awardedDate,
-            Subjects = new List<Guid>() { subject1 },
-            TrainingProviderId = null,
-            TrainingStartDate = trainingStartDate,
-            TrainingEndDate = trainingEndDate,
-            TrainingCountryId = countryId,
-            TrainingAgeSpecialismRangeFrom = ageRangeFrom,
-            TrainingAgeSpecialismRangeTo = ageRangeTo,
-            TrainingAgeSpecialismType = specialism
         };
 
         var outboxMessage = new dfeta_TrsOutboxMessage()
@@ -257,18 +239,7 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
             var professionalStatus = await dbContext.ProfessionalStatuses.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.NotNull(professionalStatus);
             Assert.Equal(awardedDate, professionalStatus.AwardedDate);
-            Assert.Equal(countryId, professionalStatus.TrainingCountryId);
-            Assert.Equal(specialism, professionalStatus.TrainingAgeSpecialismType);
-            Assert.Equal(trainingStartDate, professionalStatus.TrainingStartDate);
-            Assert.Equal(trainingEndDate, professionalStatus.TrainingEndDate);
-            Assert.Collection(professionalStatus.TrainingSubjectIds,
-                sub1 =>
-                {
-                    Assert.Equal(subject1, sub1);
-                });
             Assert.Null(professionalStatus.TrainingProviderId);
-            Assert.Equal(ageRangeFrom, professionalStatus.TrainingAgeSpecialismRangeFrom);
-            Assert.Equal(ageRangeTo, professionalStatus.TrainingAgeSpecialismRangeTo);
         });
     }
 }

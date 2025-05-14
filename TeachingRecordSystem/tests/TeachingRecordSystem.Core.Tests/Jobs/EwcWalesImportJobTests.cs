@@ -128,13 +128,6 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
             .ToArray();
         var addWelshROutboxMessage = welshROutboxMessages.Single(x => x.PersonId == person.PersonId);
         Assert.Equal(person.PersonId, addWelshROutboxMessage.PersonId);
-        Assert.Null(addWelshROutboxMessage.TrainingStartDate);
-        Assert.Null(addWelshROutboxMessage.TrainingEndDate);
-        Assert.Null(addWelshROutboxMessage.TrainingCountryId);
-        Assert.Null(addWelshROutboxMessage.TrainingAgeSpecialismRangeFrom);
-        Assert.Null(addWelshROutboxMessage.TrainingAgeSpecialismRangeTo);
-        Assert.Null(addWelshROutboxMessage.TrainingAgeSpecialismType);
-        Assert.Null(addWelshROutboxMessage.TrainingProviderId);
         Assert.Equal(awardedDate.ToString(QtsImporter.DATE_FORMAT), addWelshROutboxMessage.AwardedDate?.ToString(QtsImporter.DATE_FORMAT));
         Assert.NotNull(integrationTransaction);
         Assert.Collection(itrRecords, item1 =>
@@ -189,12 +182,6 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
             .ToArray();
         var addWelshROutboxMessage = welshROutboxMessages.Single(x => x.PersonId == person.PersonId);
         Assert.Equal(person.PersonId, addWelshROutboxMessage.PersonId);
-        Assert.Null(addWelshROutboxMessage.TrainingStartDate);
-        Assert.Null(addWelshROutboxMessage.TrainingEndDate);
-        Assert.Null(addWelshROutboxMessage.TrainingCountryId);
-        Assert.Null(addWelshROutboxMessage.TrainingAgeSpecialismRangeFrom);
-        Assert.Null(addWelshROutboxMessage.TrainingAgeSpecialismRangeTo);
-        Assert.Null(addWelshROutboxMessage.TrainingAgeSpecialismType);
         Assert.Equal(awardedDate, addWelshROutboxMessage.AwardedDate);
         Assert.NotNull(integrationTransaction);
         Assert.Collection(itrRecords, item1 =>
@@ -275,6 +262,7 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
             .RandomOne()
             .Value;
         var person1 = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
