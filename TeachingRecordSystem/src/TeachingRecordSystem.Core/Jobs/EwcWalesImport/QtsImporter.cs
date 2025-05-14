@@ -349,7 +349,6 @@ public class QtsImporter
                     errors.Add($"Qts Status can only be 67, 68, 69, 71, 102, 49 or 71 when qts date is on or before 31/01/2023");
                 }
             }
-
         }
 
         switch (lookups.PersonMatchStatus)
@@ -588,11 +587,6 @@ public class QtsImporter
             var status = results.Single(x => x.dfeta_Value == qtsStatus); //69 - Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
             return (EwcWalesMatchStatus.OneMatch, status.Id);
         }
-        //else if (qtsStatus != null && (qtsStatus.Equals("102", StringComparison.InvariantCultureIgnoreCase)))
-        //{
-        //    var status = results.Single(x => x.dfeta_Value == qtsStatus); //102 (NOT IN CRM)
-        //    return (EwcWalesMatchStatus.OneMatch, status.Id);
-        //}
 
         else
         {
@@ -713,13 +707,8 @@ public class QtsImporter
             return (EwcWalesMatchStatus.TrnAndDateOfBirthMatchFailed, null);
         }
 
-        var professionalStatsues = _dbContext.ProfessionalStatuses.Where(x => x.PersonId == contact.Id &&
-            x.QualificationType == QualificationType.ProfessionalStatus &&
-            x.RouteToProfessionalStatus != null &&
-            x.RouteToProfessionalStatus.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
-            x.AwardedDate != null).ToArray();
-
-        if (professionalStatsues.Length > 0)
+        var personQtsDate = _dbContext.Persons.Single(x => x.PersonId == contact.Id).QtsDate;
+        if (personQtsDate.HasValue)
         {
             return (EwcWalesMatchStatus.TeacherHasQts, contact.ContactId!);
         }

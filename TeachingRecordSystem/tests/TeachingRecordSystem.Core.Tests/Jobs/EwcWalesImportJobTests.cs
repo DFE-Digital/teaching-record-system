@@ -324,11 +324,11 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
             .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
-        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn()
+        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person2AwardedDate)));
