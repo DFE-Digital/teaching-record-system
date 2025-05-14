@@ -97,15 +97,7 @@ public class QtsImporter
                     rowTransaction.AppendQuery(new CreateDqtOutboxMessageTransactionalQuery(new AddWelshRMessage
                     {
                         PersonId = lookupData.PersonId!.Value,
-                        AwardedDate = awardedDate,
-                        TrainingCountryId = null,
-                        Subjects = Subjects.Where(x => x.HasValue).Select(y => y!.Value).ToList(),
-                        TrainingProviderId = lookupData.IttEstabCodeId,
-                        TrainingAgeSpecialismRangeFrom = null,
-                        TrainingAgeSpecialismRangeTo = null,
-                        TrainingEndDate = null,
-                        TrainingStartDate = null,
-                        TrainingAgeSpecialismType = null
+                        AwardedDate = awardedDate
                     }));
 
 
