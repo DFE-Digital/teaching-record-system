@@ -10,7 +10,6 @@ public class AddWelshRMessageHandler(TrsDbContext dbContext, IClock clock) : IMe
     {
         var person = await dbContext.Persons.Include(i => i.Qualifications).SingleAsync(p => p.PersonId == message.PersonId);
         var allRoutes = await dbContext.RoutesToProfessionalStatus.ToArrayAsync();
-        var route = await dbContext.RoutesToProfessionalStatus.SingleAsync(p => p.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId);
 
         dbContext.ProfessionalStatuses.Add(ProfessionalStatus.Create(
             person: person,
