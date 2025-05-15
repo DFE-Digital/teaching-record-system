@@ -339,7 +339,8 @@ public partial class TrsDataSyncHelperTests
             CreatedBy = GetUserReference(createdByDqtUserId, createdByDqtUserName),
             CreatedOn = createdOn,
             ModifiedBy = GetUserReference(updatedByDqtUserId, updatedByDqtUserName),
-            ModifiedOn = updatedOn
+            ModifiedOn = updatedOn,
+            Subject = "Entered by REG"
         };
         return newAnnoation;
     }

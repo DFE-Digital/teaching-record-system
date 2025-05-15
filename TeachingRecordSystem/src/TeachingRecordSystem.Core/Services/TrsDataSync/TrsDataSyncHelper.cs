@@ -263,8 +263,9 @@ public class TrsDataSyncHelper(
         Annotation annotation)
     {
         var ignoredTerms = GetIgnoreNotesContainingTerms();
-        var lowerInput = annotation.NoteText.ToLowerInvariant();
-        if (ignoredTerms.Any(term => lowerInput.Contains(term)))
+        var lowerInput = string.IsNullOrEmpty(annotation.NoteText) ? string.Empty : annotation.NoteText.ToLowerInvariant();
+        if (ignoredTerms.Any(term => lowerInput.Contains(term)) &&
+            (!string.IsNullOrEmpty(annotation.Subject) && annotation.Subject.Contains("Entered by REG", StringComparison.InvariantCultureIgnoreCase)))
         {
             return null;
         }
@@ -1326,7 +1327,7 @@ public class TrsDataSyncHelper(
         {
             writer.WriteValueOrNull(person.Id, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(person.NoteText, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(person.NoteText ?? string.Empty, NpgsqlDbType.Text);
             writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.CreatedByDqtUserId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.FileName, NpgsqlDbType.Text);
