@@ -5,16 +5,23 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHandler<GetAllIttProvidersWithCorrespondingIttRecordsQuery, Account[]>
+public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHandler<GetAllIttProvidersWithCorrespondingIttRecordsQuery, PagedProviderResults>
 {
-    public async Task<Account[]> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsQuery _, IOrganizationServiceAsync organizationService)
+    public async Task<PagedProviderResults> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsQuery query, IOrganizationServiceAsync organizationService)
     {
+        int pageSize = 100;
         var queryExpression = new QueryExpression(Account.EntityLogicalName)
         {
             ColumnSet = new(
                 Account.Fields.Name,
                 Account.Fields.dfeta_UKPRN,
                 Account.Fields.AccountId),
+            PageInfo = new PagingInfo()
+            {
+                Count = pageSize,
+                PageNumber = query.pageNumber,
+                PagingCookie = query.pagingCookie
+            },
             LinkEntities =
             {
                 new LinkEntity // define the join
@@ -46,6 +53,9 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
         };
 
         var response = await organizationService.RetrieveMultipleAsync(queryExpression);
-        return response.Entities.Select(x => x.ToEntity<Account>()).ToArray();
+        return new PagedProviderResults(
+            Providers: response.Entities.Select(x => x.ToEntity<Account>()).ToArray(),
+            MoreRecords: response.MoreRecords,
+            PagingCookie: response.PagingCookie);
     }
 }

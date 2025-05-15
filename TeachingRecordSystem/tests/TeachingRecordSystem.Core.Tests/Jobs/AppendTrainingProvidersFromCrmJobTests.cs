@@ -68,14 +68,23 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
             new Account()
             {
                 Id = guidAlreadyInTrs,
-                Name = "provider 3 with null ukprn alreadt in Trs",
+                Name = "provider 3 with null ukprn already in Trs",
                 dfeta_UKPRN = null
+            },
+            new Account()
+            {
+                Id = Guid.NewGuid(),
+                Name = "provider with invalid ukprn",
+                dfeta_UKPRN = "1234"
             }
         };
 
         _crmQueryDispatcherMock
-            .Setup(x => x.ExecuteQueryAsync(It.IsAny<ICrmQuery<Account[]>>()))
-            .ReturnsAsync(accounts.ToArray());
+            .Setup(x => x.ExecuteQueryAsync(It.IsAny<ICrmQuery<PagedProviderResults>>()))
+            .ReturnsAsync(new PagedProviderResults(
+                Providers: accounts.ToArray(),
+                MoreRecords: false,
+                PagingCookie: null));
 
         // training provider data into Trs
         _trsContext.TrainingProviders.Add(new TrainingProvider() { IsActive = true, Name = "Provider1", Ukprn = "12345671", TrainingProviderId = Guid.NewGuid() });
@@ -93,5 +102,6 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
         Assert.Single(appendedProviderList!.Where(p => p.Name == "provider 1 with null ukprn"));
         Assert.Single(appendedProviderList!.Where(p => p.Name == "provider 2 with null ukprn"));
         Assert.Single(appendedProviderList!.Where(p => p.Ukprn == "12345671"));
+        Assert.Null(appendedProviderList!.Single(p => p.Name == "provider with invalid ukprn").Ukprn);
     }
 }

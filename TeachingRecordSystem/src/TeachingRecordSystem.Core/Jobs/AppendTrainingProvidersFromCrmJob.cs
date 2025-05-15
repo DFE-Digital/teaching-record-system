@@ -1,4 +1,6 @@
+using System.Text.RegularExpressions;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 
@@ -6,15 +8,10 @@ namespace TeachingRecordSystem.Core.Jobs;
 
 public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
 {
-    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    private const string ukprnRegex = @"^\d{8}$";
+
+    private void ProcessPagedResult(Account[] providersInCrm, List<TrainingProvider> providersInTrs)
     {
-        /// get the providers from the CRM that have associated teacher records
-        var providersInCrm = await crmQueryDispatcher.ExecuteQueryAsync(
-                new GetAllIttProvidersWithCorrespondingIttRecordsQuery());
-
-        // get the provider records from Trs
-        var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
-
         var emptyUkprnProvidersToAdd = providersInCrm
             .Where(p => string.IsNullOrEmpty(p.dfeta_UKPRN) && !providersInTrs.Any(t => t.TrainingProviderId == p.Id));
         var uniqueUnmatchedUkprnProviders = providersInCrm
@@ -40,9 +37,26 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
                 IsActive = false,
                 Name = s.Name,
                 TrainingProviderId = s.Id,
-                Ukprn = s.dfeta_UKPRN
+                Ukprn = Regex.IsMatch(s.dfeta_UKPRN, ukprnRegex) ? s.dfeta_UKPRN : null
             })
             .ToList());
+    }
+
+    public async Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        // get the provider records from Trs
+        var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
+
+        /// get the providers from the CRM that have associated teacher records
+        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsQuery(pageNumber: 1);
+        var result = (await crmQueryDispatcher.ExecuteQueryAsync(crmQuery));
+
+        ProcessPagedResult(result.Providers, providersInTrs);
+
+        while (result.MoreRecords)
+        {
+            result = (await crmQueryDispatcher.ExecuteQueryAsync(crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie }));
+        }
 
         if (dbContext.ChangeTracker.HasChanges())
         {
