@@ -55,7 +55,8 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
         while (result.MoreRecords)
         {
-            result = (await crmQueryDispatcher.ExecuteQueryAsync(crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie }));
+            crmQuery = crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie };
+            result = (await crmQueryDispatcher.ExecuteQueryAsync(crmQuery));
         }
 
         if (dbContext.ChangeTracker.HasChanges())

@@ -9,7 +9,7 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
 {
     public async Task<PagedProviderResults> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsQuery query, IOrganizationServiceAsync organizationService)
     {
-        int pageSize = 100;
+        int pageSize = 1000;
         var queryExpression = new QueryExpression(Account.EntityLogicalName)
         {
             ColumnSet = new(
