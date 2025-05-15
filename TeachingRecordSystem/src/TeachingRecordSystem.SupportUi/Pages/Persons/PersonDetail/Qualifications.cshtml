@@ -63,7 +63,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-agespecialism-@professionalStatus.QualificationId">@(professionalStatus.TrainingAgeSpecialismType.HasValue ? professionalStatus.TrainingAgeSpecialismType.ToString() : "None")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="training-agespecialism-@professionalStatus.QualificationId">@(professionalStatus.TrainingAgeSpecialismType.HasValue ? professionalStatus.TrainingAgeSpecialismType.GetDisplayName() : "None")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
