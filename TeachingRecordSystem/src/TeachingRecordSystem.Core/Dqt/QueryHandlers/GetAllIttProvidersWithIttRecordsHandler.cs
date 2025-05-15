@@ -5,9 +5,9 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHandler<GetAllIttProvidersWithCorrespondingIttRecordsQuery, PagedProviderResults>
+public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHandler<GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery, PagedProviderResults>
 {
-    public async Task<PagedProviderResults> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<PagedProviderResults> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery query, IOrganizationServiceAsync organizationService)
     {
         int pageSize = 1000;
         var queryExpression = new QueryExpression(Account.EntityLogicalName)
@@ -40,7 +40,7 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
                     }
                 }
             },
-            Distinct = true, // return each account record just once
+            Distinct = true,
             Orders =
             {
                 new OrderExpression(Account.Fields.Name, OrderType.Ascending)

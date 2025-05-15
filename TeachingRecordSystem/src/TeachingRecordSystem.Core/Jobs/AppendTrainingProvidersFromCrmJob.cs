@@ -1,4 +1,6 @@
+using System.ServiceModel;
 using System.Text.RegularExpressions;
+using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -44,24 +46,40 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        // get the provider records from Trs
+        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1);
         var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
 
-        /// get the providers from the CRM that have associated teacher records
-        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsQuery(pageNumber: 1);
-        var result = (await crmQueryDispatcher.ExecuteQueryAsync(crmQuery));
-
-        ProcessPagedResult(result.Providers, providersInTrs);
-
-        while (result.MoreRecords)
+        while (true)
         {
-            crmQuery = crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie };
-            result = (await crmQueryDispatcher.ExecuteQueryAsync(crmQuery));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            PagedProviderResults result;
+            try
+            {
+                result = await crmQueryDispatcher.ExecuteQueryAsync(crmQuery);
+            }
+            catch (FaultException<OrganizationServiceFault> e) when (e.IsCrmRateLimitException(out var retryAfter))
+            {
+                await Task.Delay(retryAfter, cancellationToken);
+                continue;
+            }
+
+            ProcessPagedResult(result.Providers, providersInTrs);
+
+            if (result.MoreRecords)
+            {
+                crmQuery = crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie };
+                providersInTrs = dbContext.TrainingProviders.Local.ToList();
+            }
+            else
+            {
+                if (dbContext.ChangeTracker.HasChanges())
+                {
+                    await dbContext.SaveChangesAsync();
+                }
+                break;
+            }
         }
 
-        if (dbContext.ChangeTracker.HasChanges())
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
     }
 }
