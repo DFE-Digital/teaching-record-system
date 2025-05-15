@@ -355,12 +355,16 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
+        Clock.Advance();
+
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
             {
                 PersonId = CreateNewRecordPersonIdSentinel
             });
+
+        EventPublisher.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -387,11 +391,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
         AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
         Assert.Null(supportTaskData.SelectedPersonAttributes);
+
+        EventPublisher.AssertEventsSaved(@event =>
+        {
+            var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
+            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: false, expectedPersonId: crmContact.Id);
+        });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
@@ -411,6 +422,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             PersonMatchedAttribute.MiddleName);
         var requestData = supportTask.TrnRequestMetadata!;
 
+        Clock.Advance();
+
         var journeyInstance = await CreateJourneyInstance(
             supportTask.SupportTaskReference,
             new ResolveApiTrnRequestState()
@@ -421,6 +434,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
             });
 
         var originalContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
+
+        EventPublisher.Clear();
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -439,11 +454,18 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var updatedSupportTask = await WithDbContext(dbContext => dbContext
             .SupportTasks.Include(st => st.TrnRequestMetadata).SingleAsync(t => t.SupportTaskReference == supportTask.SupportTaskReference));
         Assert.Equal(SupportTaskStatus.Closed, updatedSupportTask.Status);
+        Assert.Equal(Clock.UtcNow, updatedSupportTask.UpdatedOn);
         Assert.Equal(crmContact.Id, updatedSupportTask.TrnRequestMetadata!.ResolvedPersonId);
         Assert.NotNull(updatedSupportTask.TrnRequestMetadata.TrnToken);
         var supportTaskData = updatedSupportTask.GetData<ApiTrnRequestData>();
         AssertPersonAttributesMatchContact(supportTaskData.ResolvedAttributes, crmContact);
         AssertPersonAttributesMatchContact(supportTaskData.SelectedPersonAttributes, originalContact);
+
+        EventPublisher.AssertEventsSaved(@event =>
+        {
+            var apiTrnRequestSupportTaskUpdatedEvent = Assert.IsType<ApiTrnRequestSupportTaskUpdatedEvent>(@event);
+            AssertEventIsExpected(apiTrnRequestSupportTaskUpdatedEvent, expectOldPersonAttributes: true, expectedPersonId: originalContact.Id);
+        });
 
         var nextPage = await response.FollowRedirectAsync(HttpClient);
         var nextPageDoc = await nextPage.GetDocumentAsync();
@@ -533,6 +555,41 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(personAttributes.DateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
         Assert.Equal(personAttributes.EmailAddress, contact.EMailAddress1);
         Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
+    }
+
+    private void AssertEventPersonAttributesMatchContact(
+        EventModels.TrnRequestPersonAttributes? personAttributes,
+        Contact contact)
+    {
+        Assert.NotNull(personAttributes);
+        Assert.Equal(personAttributes.FirstName, contact.FirstName);
+        Assert.Equal(personAttributes.MiddleName, contact.MiddleName);
+        Assert.Equal(personAttributes.LastName, contact.LastName);
+        Assert.Equal(personAttributes.DateOfBirth, contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
+        Assert.Equal(personAttributes.EmailAddress, contact.EMailAddress1);
+        Assert.Equal(personAttributes.NationalInsuranceNumber, contact.dfeta_NINumber);
+    }
+
+    private void AssertEventIsExpected(
+        ApiTrnRequestSupportTaskUpdatedEvent @event,
+        bool expectOldPersonAttributes,
+        Guid expectedPersonId)
+    {
+        Assert.Equal(expectedPersonId, @event.PersonId);
+        Assert.Equal(Clock.UtcNow, @event.CreatedUtc);
+        Assert.True(@event.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.Status));
+
+        Assert.Equal(SupportTaskStatus.Open, @event.OldSupportTask.Status);
+        Assert.Equal(SupportTaskStatus.Closed, @event.SupportTask.Status);
+
+        if (expectOldPersonAttributes)
+        {
+            Assert.NotNull(@event.OldPersonAttributes);
+        }
+        else
+        {
+            Assert.Null(@event.OldPersonAttributes);
+        }
     }
 
     public static PersonAttributeInfo[] PersonAttributeInfos { get; } =
