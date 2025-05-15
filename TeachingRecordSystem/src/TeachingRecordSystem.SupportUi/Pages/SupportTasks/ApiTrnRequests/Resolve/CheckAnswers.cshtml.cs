@@ -64,6 +64,7 @@ public class CheckAnswers(
             return await trnRequestHelper.CreateTrnTokenAsync(trn, requestData.EmailAddress);
         }
 
+        string jobId;
         if (CreatingNewRecord)
         {
             var newContactId = Guid.NewGuid();
@@ -73,7 +74,7 @@ public class CheckAnswers(
             var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
             requestData.TrnToken = trnToken;
 
-            await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
+            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
                 trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
             selectedPersonAttributes = null;
         }
@@ -89,7 +90,7 @@ public class CheckAnswers(
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
+            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
                 trnRequestHelper => trnRequestHelper.UpdateContactFromTrnRequestAsync(
                     requestData,
                     attributesToUpdate));
@@ -116,7 +117,7 @@ public class CheckAnswers(
             $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
             messageHtml: flashMessageHtml);
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.ApiTrnRequests(waitForJobId: jobId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
