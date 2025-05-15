@@ -146,7 +146,7 @@ public class ProfessionalStatus : Qualification
             throw new NotSupportedException($"Cannot change the {nameof(ProfessionalStatusType)} for an existing {nameof(ProfessionalStatus)}.");
         }
 
-        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributesForUpdate(professionalStatusType, allRoutes);
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
 
         var changes = ProfessionalStatusUpdatedEventChanges.None |
             (RouteToProfessionalStatus!.RouteToProfessionalStatusId != oldEventModel.RouteToProfessionalStatusId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
@@ -220,7 +220,22 @@ public class ProfessionalStatus : Qualification
 
         var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
         var professionalStatusType = route.ProfessionalStatusType;
-        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributesForDelete(professionalStatusType, allRoutes, this);
+
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+
+        var changes = ProfessionalStatusDeletedEventChanges.None |
+            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonQtsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonEytsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonHasEyps
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonPqtsDate
+                : 0);
 
         @event = new ProfessionalStatusDeletedEvent()
         {
@@ -234,6 +249,7 @@ public class ProfessionalStatus : Qualification
             DeletionReason = deletionReason,
             DeletionReasonDetail = deletionReasonDetail,
             EvidenceFile = evidenceFile,
+            Changes = changes
         };
     }
 }

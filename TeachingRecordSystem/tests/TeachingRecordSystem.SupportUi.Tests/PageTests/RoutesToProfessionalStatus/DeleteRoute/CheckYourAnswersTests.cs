@@ -183,12 +183,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_Confirm_DeletesRecordCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All.RandomOne().Value;
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status)));
+                .WithStatus(ProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
@@ -221,14 +220,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var deletedUpdatedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+            var deletedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
 
-            Assert.Equal(Clock.UtcNow, deletedUpdatedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, deletedUpdatedEvent.PersonId);
-            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), deletedUpdatedEvent.DeletionReason);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedUpdatedEvent.DeletionReasonDetail);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, deletedUpdatedEvent.EvidenceFile?.FileId);
-            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, deletedUpdatedEvent.EvidenceFile?.Name);
+            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, deletedEvent.PersonId);
+            Assert.Equal(journeyInstance.State.ChangeReason!.GetDisplayName(), deletedEvent.DeletionReason);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail, deletedEvent.DeletionReasonDetail);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileId, deletedEvent.EvidenceFile?.FileId);
+            Assert.Equal(journeyInstance.State.ChangeReasonDetail.EvidenceFileName, deletedEvent.EvidenceFile?.Name);
+            Assert.Equal(ProfessionalStatusDeletedEventChanges.None, deletedEvent.Changes);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -275,12 +275,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var deletedUpdatedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(RaisedByUserId, deletedUpdatedEvent.RaisedBy.UserId);
-            Assert.Equal(Clock.UtcNow, deletedUpdatedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, deletedUpdatedEvent.PersonId);
-            Assert.Equal(qtsDate, deletedUpdatedEvent.OldPersonAttributes.QtsDate);
-            Assert.Null(deletedUpdatedEvent.PersonAttributes.QtsDate);
+            var deletedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+            Assert.Equal(RaisedByUserId, deletedEvent.RaisedBy.UserId);
+            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, deletedEvent.PersonId);
+            Assert.Equal(qtsDate, deletedEvent.OldPersonAttributes.QtsDate);
+            Assert.Null(deletedEvent.PersonAttributes.QtsDate);
+            Assert.Equal(ProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -331,11 +332,12 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var deletedUpdatedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
-            Assert.Equal(Clock.UtcNow, deletedUpdatedEvent.CreatedUtc);
-            Assert.Equal(person.PersonId, deletedUpdatedEvent.PersonId);
-            Assert.Equal(awardedDateEarliest, deletedUpdatedEvent.OldPersonAttributes.QtsDate);
-            Assert.Equal(awardedDateLatest, deletedUpdatedEvent.PersonAttributes.QtsDate);
+            var deletedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+            Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
+            Assert.Equal(person.PersonId, deletedEvent.PersonId);
+            Assert.Equal(awardedDateEarliest, deletedEvent.OldPersonAttributes.QtsDate);
+            Assert.Equal(awardedDateLatest, deletedEvent.PersonAttributes.QtsDate);
+            Assert.Equal(ProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

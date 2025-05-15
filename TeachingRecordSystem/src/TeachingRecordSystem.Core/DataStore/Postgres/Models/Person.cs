@@ -399,8 +399,14 @@ public class Person
     public bool RefreshProfessionalStatusAttributes(
         ProfessionalStatusType professionalStatusType,
         IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
-        IEnumerable<ProfessionalStatus> professionalStatuses)
+        IEnumerable<ProfessionalStatus>? professionalStatusesHint = null)
     {
+        var professionalStatuses = professionalStatusesHint ??
+            Qualifications?
+                .OfType<ProfessionalStatus>()?
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("No professional statuses.");
+
         var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusId, r => r.ProfessionalStatusType);
 
         var awardedOrApproved = professionalStatuses
@@ -440,29 +446,6 @@ public class Person
             PqtsDate = awardedDate;
             return changed;
         }
-    }
-
-    public bool RefreshProfessionalStatusAttributesForUpdate(
-        ProfessionalStatusType professionalStatusType,
-        IReadOnlyCollection<RouteToProfessionalStatus> allRoutes)
-    {
-        var professionalStatuses =
-            Qualifications?.OfType<ProfessionalStatus>() ??
-            throw new InvalidOperationException("No professional statuses.");
-
-        return RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes, professionalStatuses);
-    }
-
-    public bool RefreshProfessionalStatusAttributesForDelete(
-    ProfessionalStatusType professionalStatusType,
-    IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
-    ProfessionalStatus professionalStatusDeleted)
-    {
-        var professionalStatuses =
-            Qualifications?.OfType<ProfessionalStatus>()?.Where(ps => ps.QualificationId != professionalStatusDeleted.QualificationId) ??
-            throw new InvalidOperationException("No professional statuses.");
-
-        return RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes, professionalStatuses);
     }
 
     private static void AssertInductionChangeIsValid(
