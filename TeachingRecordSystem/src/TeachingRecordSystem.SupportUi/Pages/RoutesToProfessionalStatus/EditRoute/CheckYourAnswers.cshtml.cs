@@ -107,7 +107,7 @@ public class CheckYourAnswersModel(
 
         if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
         {
-            context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 

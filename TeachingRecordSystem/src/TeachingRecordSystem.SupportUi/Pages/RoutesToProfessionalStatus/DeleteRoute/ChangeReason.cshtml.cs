@@ -7,15 +7,15 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.DeleteRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
 public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
 {
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
-    public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
+    public JourneyInstance<DeleteRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
     public bool? FromCheckAnswers { get; set; }
@@ -25,12 +25,12 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
-    [Display(Name = "Why are you editing this route?")]
+    [Display(Name = "Why are you deleting this route?")]
     public ChangeReasonOption? ChangeReason { get; set; }
 
     [BindProperty]
     [Display(Name = "Do you want to provide more information?")]
-    [Required(ErrorMessage = "Select yes if you want to add more information about why you’re editing this route")]
+    [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re deleting this route")]
     public bool? HasAdditionalReasonDetail { get; set; }
 
     [BindProperty]
@@ -56,11 +56,11 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string NextPage => linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
+    public string NextPage => linkGenerator.DeleteRouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
 
     public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
+        ? linkGenerator.DeleteRouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
+        : linkGenerator.PersonQualifications(PersonId);
 
     public async Task OnGetAsync()
     {
@@ -137,8 +137,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus);
-
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;

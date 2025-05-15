@@ -191,4 +191,65 @@ public class ProfessionalStatus : Qualification
             Changes = changes,
         };
     }
+
+    public void Delete(
+        IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
+        string? deletionReason,
+        string? deletionReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo deletedBy,
+        DateTime now,
+        out ProfessionalStatusDeletedEvent @event)
+    {
+        if (DeletedOn is not null)
+        {
+            throw new InvalidOperationException("Professional status is already deleted.");
+        }
+        if (Person is null)
+        {
+            throw new InvalidOperationException("Professional status is not linked to a person and cannot be deleted");
+        }
+
+        DeletedOn = now;
+        UpdatedOn = now;
+
+        var oldEventModel = EventModels.ProfessionalStatus.FromModel(this);
+        var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
+        var oldRoute = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
+        var oldProfessionalStatusType = oldRoute.ProfessionalStatusType;
+
+        var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
+        var professionalStatusType = route.ProfessionalStatusType;
+
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+
+        var changes = ProfessionalStatusDeletedEventChanges.None |
+            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonQtsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonEytsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonHasEyps
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonPqtsDate
+                : 0);
+
+        @event = new ProfessionalStatusDeletedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = deletedBy,
+            PersonId = PersonId,
+            ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(this),
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
+            OldPersonAttributes = oldPersonAttributes,
+            DeletionReason = deletionReason,
+            DeletionReasonDetail = deletionReasonDetail,
+            EvidenceFile = evidenceFile,
+            Changes = changes
+        };
+    }
 }

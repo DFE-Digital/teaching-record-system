@@ -1,8 +1,8 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
-namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
+namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.DeleteRoute;
 
 public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
@@ -16,17 +16,19 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
-            .Build();
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -37,7 +39,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var reasonChoiceSelection = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Single(i => i.IsChecked == true).Value;
-        Assert.Equal(editRouteState.ChangeReason.ToString(), reasonChoiceSelection);
+        Assert.Equal(deleteRouteState.ChangeReason.ToString(), reasonChoiceSelection);
 
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
@@ -50,7 +52,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(false.ToString(), uploadEvidenceChoices);
 
         var additionalDetailTextArea = doc.GetElementByTestId("additional-detail")!.GetElementsByTagName("textarea").Single() as IHtmlTextAreaElement;
-        Assert.Equal(editRouteState.ChangeReasonDetail.ChangeReasonDetail, additionalDetailTextArea!.Value);
+        Assert.Equal(deleteRouteState.ChangeReasonDetail.ChangeReasonDetail, additionalDetailTextArea!.Value);
     }
 
     [Fact]
@@ -65,18 +67,20 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .WithValidChangeReasonOption()
-            .WithDefaultChangeReasonNoUploadFileDetail()
-            .Build();
+        var deleteRouteState = new DeleteRouteState()
+        {
+            ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
+            ChangeReasonDetail = new ChangeReasonStateBuilder()
+                .WithValidChangeReasonDetail()
+                .Build()
+        };
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -85,7 +89,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("reason-options-legend");
-        Assert.Equal("Why are you editing this route?", reasonChoicesLegend!.TextContent);
+        Assert.Equal("Why are you deleting this route?", reasonChoicesLegend!.TextContent);
         var reasonChoices = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
              .Select(i => i.Value);
@@ -106,8 +110,8 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidChangeReasonDetails_PersistsDetailsAndRedirects()
     {
         // Arrange
-        var changeReason = ChangeReasonOption.NewInformation;
-        var changeReasonDetails = "A description about why the change typed into the box";
+        var changeReason = ChangeReasonOption.CreatedInError;
+        var changeReasonDetails = "A description about why the deletion typed into the box";
 
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
@@ -115,23 +119,20 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .Build();
+        var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditRoutePostRequestBuilder()
-                    .WithChangeReason(changeReason)
-                    .WithChangeReasonDetailSelections(true, changeReasonDetails)
-                    .WithNoFileUploadSelection()
-                    .Build())
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", changeReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("ChangeReasonDetail", changeReasonDetails)
+                .Add("UploadEvidence", false)
+                .Build()
         };
 
         // Act
@@ -142,7 +143,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
         Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail.ChangeReasonDetail);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/route/{qualificationId}/delete/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -155,51 +156,46 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .Build();
+        var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re editing this route");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HasAdditionalReasonDetail", "Select yes if you want to add more information about why you’re deleting this route");
         await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
     }
 
     [Fact]
     public async Task Post_AdditionalDetailYes_NoDetailAdded_ReturnsError()
     {
+        var changeReason = ChangeReasonOption.CreatedInError;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .Build();
+        var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditRoutePostRequestBuilder()
-                    .WithChangeReason(ChangeReasonOption.AnotherReason)
-                    .WithChangeReasonDetailSelections(true, null)
-                    .Build())
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", changeReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("UploadEvidence", false)
+                .Build()
         };
 
         // Act
@@ -213,8 +209,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
-        var changeReason = ChangeReasonOption.NewInformation;
-        var changeReasonDetails = "A description about why the change typed into the box";
+        var changeReason = ChangeReasonOption.RemovedQtlsStatus;
 
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
@@ -222,18 +217,13 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .WithChangeReasonOption(changeReason)
-            .WithChangeReasonDetail(detail: changeReasonDetails, fileUpload: false)
-            .Build();
+        var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -253,8 +243,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
-        var changeReason = ChangeReasonOption.NewInformation;
-        var changeReasonDetails = "A description about why the change typed into the box";
+        var changeReason = ChangeReasonOption.RemovedQtlsStatus;
         var evidenceFileName = "evidence.pdf";
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
@@ -262,18 +251,13 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .WithChangeReasonOption(changeReason)
-            .WithChangeReasonDetail(detail: changeReasonDetails, fileUpload: false)
-            .Build();
+        var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,
-            editRouteState
+            deleteRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -308,17 +292,14 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
-        var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
-            .Build();
+        var deleteRouteState = new DeleteRouteState();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationid,
-            editRouteState
+            deleteRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/edit/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationid}/delete/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -338,9 +319,9 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(await ReloadJourneyInstance(journeyInstance));
     }
 
-    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
+    private Task<JourneyInstance<DeleteRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, DeleteRouteState? state = null) =>
         CreateJourneyInstance(
-            JourneyNames.EditRouteToProfessionalStatus,
-            state ?? new EditRouteState(),
+            JourneyNames.DeleteRouteToProfessionalStatus,
+            state ?? new DeleteRouteState(),
             new KeyValuePair<string, object>("qualificationId", qualificationId));
 }

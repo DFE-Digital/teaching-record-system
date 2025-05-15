@@ -59,7 +59,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

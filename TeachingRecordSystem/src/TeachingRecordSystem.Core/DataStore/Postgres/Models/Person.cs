@@ -402,7 +402,9 @@ public class Person
         IEnumerable<ProfessionalStatus>? professionalStatusesHint = null)
     {
         var professionalStatuses = professionalStatusesHint ??
-            Qualifications?.OfType<ProfessionalStatus>() ??
+            Qualifications?
+                .OfType<ProfessionalStatus>()?
+                .Where(p => p.DeletedOn is null) ??
             throw new InvalidOperationException("No professional statuses.");
 
         var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusId, r => r.ProfessionalStatusType);
