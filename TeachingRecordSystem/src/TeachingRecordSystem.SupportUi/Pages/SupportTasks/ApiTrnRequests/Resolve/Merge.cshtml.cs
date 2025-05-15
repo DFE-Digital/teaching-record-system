@@ -142,9 +142,14 @@ public class Merge(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : Res
             return;
         }
 
+        if (Request.Method == HttpMethod.Get.Method)
+        {
+            await this.TrySyncPersonAsync(personId);
+        }
+
         var personAttributes = await GetPersonAttributesAsync(personId);
 
-        SourceApplicationUserName = requestData.ApplicationUser.Name;
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;
 
         var attributeMatches = GetPersonAttributeMatches(
             personAttributes.FirstName,

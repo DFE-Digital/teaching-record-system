@@ -24,4 +24,5 @@ public enum ApplicationUserUpdatedEventChanges
     ClientSecret = 1 << 9,
     RedirectUris = 1 << 10,
     PostLogoutRedirectUris = 1 << 11,
+    ShortName = 1 << 12
 }

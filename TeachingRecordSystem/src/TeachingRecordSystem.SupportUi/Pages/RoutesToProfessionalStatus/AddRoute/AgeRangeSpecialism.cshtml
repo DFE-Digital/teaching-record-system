@@ -1,5 +1,10 @@
 ﻿@page "/route/add/age-range/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.AgeRangeSpecialismModel
+
+@{
+    ViewBag.Title = "Add age range specialism";
+}
+
 @section BeforeContent {
     <govuk-back-link href=@(Model.BackLink)>Back</govuk-back-link>
 }

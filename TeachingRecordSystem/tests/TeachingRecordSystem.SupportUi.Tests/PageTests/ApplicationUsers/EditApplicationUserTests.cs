@@ -215,9 +215,10 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Post_ValidRequest_UpdatesNameAndRolesAndOneLoginSettingsAndCreatesEventAndRedirectsWithFlashMessage()
     {
         // Arrange
-        var applicationUser = await TestData.CreateApplicationUserAsync(apiRoles: [], isOidcClient: false);
+        var applicationUser = await TestData.CreateApplicationUserAsync(shortName: "", apiRoles: [], isOidcClient: false);
         var originalName = applicationUser.Name;
         var newName = TestData.GenerateChangedApplicationUserName(originalName);
+        var newShortName = TestData.GenerateApplicationUserShortName();
         var newRoles = new[] { ApiRoles.GetPerson, ApiRoles.UpdatePerson };
         var clientId = "client-id";
         var clientSecret = "Secret0123456789";
@@ -234,6 +235,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", newName },
+                { "ShortName", newShortName },
                 { "ApiRoles", newRoles },
                 { "IsOidcClient", bool.TrueString },
                 { "ClientId", clientId },
@@ -271,6 +273,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 Assert.Equal(GetCurrentUserId(), applicationUserUpdatedEvent.RaisedBy.UserId);
                 Assert.Equal(originalName, applicationUserUpdatedEvent.OldApplicationUser.Name);
                 Assert.Equal(newName, applicationUserUpdatedEvent.ApplicationUser.Name);
+                Assert.Equal(newShortName, applicationUserUpdatedEvent.ApplicationUser.ShortName);
                 Assert.True((applicationUserUpdatedEvent.ApplicationUser.ApiRoles ?? []).SequenceEqual(newRoles));
                 Assert.Empty(applicationUserUpdatedEvent.OldApplicationUser.ApiRoles ?? []);
                 Assert.False(applicationUserUpdatedEvent.OldApplicationUser.IsOidcClient);
@@ -296,6 +299,7 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
                 Assert.Equal(
                     ApplicationUserUpdatedEventChanges.ApiRoles |
                         ApplicationUserUpdatedEventChanges.Name |
+                        ApplicationUserUpdatedEventChanges.ShortName |
                         ApplicationUserUpdatedEventChanges.IsOidcClient |
                         ApplicationUserUpdatedEventChanges.ClientId |
                         ApplicationUserUpdatedEventChanges.ClientSecret |

@@ -24,7 +24,7 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
     {
         var alerts = await dbContext.Alerts
             .Include(a => a.AlertType)
-            .ThenInclude(at => at.AlertCategory)
+            .ThenInclude(at => at!.AlertCategory)
             .Where(a => a.PersonId == PersonId)
             .ToArrayAsync();
 
@@ -42,13 +42,14 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
         var authorizedAlerts = alerts
             .Where(a => alertTypePermissions[a.AlertTypeId].CanRead)
             .Select(a =>
-                {
-                    TrsUriHelper.TryCreateWebsiteUri(a.ExternalLink, out var externalLinkUri);
-                    return new AlertWithPermissions(a, externalLinkUri, alertTypePermissions[a.AlertTypeId].CanWrite);
-                });
+            {
+                TrsUriHelper.TryCreateWebsiteUri(a.ExternalLink, out var externalLinkUri);
+                return new AlertWithPermissions(a, externalLinkUri, alertTypePermissions[a.AlertTypeId].CanWrite);
+            })
+            .ToArray();
 
-        OpenAlerts = authorizedAlerts.Where(a => a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
-        ClosedAlerts = authorizedAlerts.Where(a => !a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.EndDate).ThenBy(a => a.Alert.AlertType.Name).ToArray();
+        OpenAlerts = authorizedAlerts.Where(a => a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.AlertType!.Name).ToArray();
+        ClosedAlerts = authorizedAlerts.Where(a => !a.Alert.IsOpen).OrderBy(a => a.Alert.StartDate).ThenBy(a => a.Alert.EndDate).ThenBy(a => a.Alert.AlertType!.Name).ToArray();
 
         CanAddAlert = await referenceDataCache.GetAlertTypesAsync(activeOnly: true)
             .ToAsyncEnumerableAsync()

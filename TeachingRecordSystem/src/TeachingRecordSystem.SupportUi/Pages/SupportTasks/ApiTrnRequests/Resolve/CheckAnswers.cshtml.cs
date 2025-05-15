@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.WebCommon;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -13,6 +14,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 public class CheckAnswers(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
+    TrnRequestHelper trnRequestHelper,
+    ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
@@ -48,17 +51,31 @@ public class CheckAnswers(
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
-        var supportTaskData = supportTask.GetData<ApiTrnRequestData>();
 
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
 
+        async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
+        {
+            if (string.IsNullOrEmpty(requestData.EmailAddress))
+            {
+                return null;
+            }
+
+            return await trnRequestHelper.CreateTrnTokenAsync(trn, requestData.EmailAddress);
+        }
+
+        string jobId;
         if (CreatingNewRecord)
         {
             var newContactId = Guid.NewGuid();
             requestData.ResolvedPersonId = newContactId;
 
-            await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
-                trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId));
+            var trn = await trnGenerator.GenerateTrnAsync();
+            var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
+            requestData.TrnToken = trnToken;
+
+            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
+                trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
             selectedPersonAttributes = null;
         }
         else
@@ -66,10 +83,14 @@ public class CheckAnswers(
             Debug.Assert(state.PersonId is not null);
             var existingContactId = state.PersonId!.Value;
             requestData.ResolvedPersonId = existingContactId;
+
+            Debug.Assert(Trn is not null);
+            requestData.TrnToken = await GenerateTrnTokenIfHaveEmailAsync(Trn!);
+
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
+            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
                 trnRequestHelper => trnRequestHelper.UpdateContactFromTrnRequestAsync(
                     requestData,
                     attributesToUpdate));
@@ -96,7 +117,7 @@ public class CheckAnswers(
             $"Records merged successfully for {FirstName} {MiddleName} {LastName}",
             messageHtml: flashMessageHtml);
 
-        return Redirect(linkGenerator.ApiTrnRequests());
+        return Redirect(linkGenerator.ApiTrnRequests(waitForJobId: jobId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -136,6 +157,13 @@ public class CheckAnswers(
         }
         else
         {
+            Debug.Assert(state.PersonId is not null);
+
+            if (Request.Method == HttpMethod.Get.Method)
+            {
+                await this.TrySyncPersonAsync(personId);
+            }
+
             var selectedPerson = await DbContext.Persons
                 .Where(p => p.PersonId == state.PersonId)
                 .Select(p => new
@@ -161,7 +189,7 @@ public class CheckAnswers(
         }
 
         Comments = state.Comments;
-        SourceApplicationUserName = requestData.ApplicationUser.Name;
+        SourceApplicationUserName = requestData.ApplicationUser!.Name;
 
         await base.OnPageHandlerExecutionAsync(context, next);
     }

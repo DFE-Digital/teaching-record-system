@@ -57,11 +57,11 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
                     alertId = alert.AlertId,
                     alertType = new
                     {
-                        alertTypeId = alert.AlertType.AlertTypeId,
+                        alertTypeId = alert.AlertType!.AlertTypeId,
                         name = alert.AlertType.Name,
                         alertCategory = new
                         {
-                            alertCategoryId = alert.AlertType.AlertCategory.AlertCategoryId,
+                            alertCategoryId = alert.AlertType.AlertCategory!.AlertCategoryId,
                             name = alert.AlertType.AlertCategory.Name
                         }
                     },

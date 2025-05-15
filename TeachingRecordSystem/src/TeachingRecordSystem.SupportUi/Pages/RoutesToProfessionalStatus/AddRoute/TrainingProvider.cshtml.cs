@@ -9,8 +9,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
@@ -34,13 +34,13 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
 
         return Redirect(FromCheckAnswers ?
-            _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            _linkGenerator.RouteAddPage(NextPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.TrainingProvider) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        TrainingProviders = await _referenceDataCache.GetTrainingProvidersAsync();
+        TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 

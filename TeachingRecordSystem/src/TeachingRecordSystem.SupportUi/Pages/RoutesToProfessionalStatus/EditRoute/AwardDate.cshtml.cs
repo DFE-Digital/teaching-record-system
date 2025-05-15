@@ -46,7 +46,7 @@ public class AwardDateModel(
             NextCompletingRoutePage :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
         {
@@ -87,8 +87,8 @@ public class AwardDateModel(
         PersonId = personInfo.PersonId;
 
         var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteToProfessionalStatus = routeFeature.ProfessionalStatus.Route;
-        var inductionexemptionReason = RouteToProfessionalStatus.InductionExemptionReason;
+        RouteToProfessionalStatus = routeFeature.ProfessionalStatus.RouteToProfessionalStatus;
+        var inductionexemptionReason = RouteToProfessionalStatus!.InductionExemptionReason;
         base.OnPageHandlerExecuting(context);
     }
 
@@ -96,7 +96,7 @@ public class AwardDateModel(
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
                 PreviousCompletingRoutePage :
-                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
     private bool IsLastCompletingRoutePage()
@@ -122,7 +122,7 @@ public class AwardDateModel(
 
     private string NextCompletingRoutePage =>
         IsLastCompletingRoutePage() ?
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
 
     private string PreviousCompletingRoutePage =>

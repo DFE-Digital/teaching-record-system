@@ -130,7 +130,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person1.Alerts.First().AlertType.DqtSanctionCode,
+                                code = person1.Alerts.First().AlertType!.DqtSanctionCode,
                                 startDate = person1.Alerts.First().StartDate
                             }
                         },
@@ -147,7 +147,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
                         {
                             new
                             {
-                                code = person2.Alerts.First().AlertType.DqtSanctionCode,
+                                code = person2.Alerts.First().AlertType!.DqtSanctionCode,
                                 startDate = person2.Alerts.First().StartDate
                             }
                         },

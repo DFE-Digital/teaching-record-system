@@ -43,9 +43,9 @@ public class AlertDeletedNotificationMapperTests(EventMapperFixture fixture) : E
             Assert.Equal(person.Trn, notification.Trn);
             Assert.Equal(alert.AlertId, notification.Alert.AlertId);
             Assert.Equal(alert.AlertTypeId, notification.Alert.AlertType.AlertTypeId);
-            Assert.Equal(alert.AlertType.Name, notification.Alert.AlertType.Name);
+            Assert.Equal(alert.AlertType!.Name, notification.Alert.AlertType.Name);
             Assert.Equal(alert.AlertType.AlertCategoryId, notification.Alert.AlertType.AlertCategory.AlertCategoryId);
-            Assert.Equal(alert.AlertType.AlertCategory.Name, notification.Alert.AlertType.AlertCategory.Name);
+            Assert.Equal(alert.AlertType!.AlertCategory!.Name, notification.Alert.AlertType.AlertCategory.Name);
             Assert.Equal(alert.Details, notification.Alert.Details);
             Assert.Equal(alert.StartDate, notification.Alert.StartDate);
             Assert.Equal(alert.EndDate, notification.Alert.EndDate);

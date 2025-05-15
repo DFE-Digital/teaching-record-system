@@ -120,11 +120,11 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 r.WithStatus(status);
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);
-                r.WithTrainingProvider(trainingProvider);
+                r.WithTrainingProviderId(trainingProvider.TrainingProviderId);
                 r.WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray());
-                r.WithTrainingCountry(country);
+                r.WithTrainingCountryId(country.CountryId);
                 r.WithTrainingAgeSpecialismType(ageRange);
-                r.WithDegreeType(degreeType);
+                r.WithDegreeTypeId(degreeType.DegreeTypeId);
                 r.WithAwardedDate(awardedDate);
             })
         );
@@ -172,7 +172,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);
                 r.WithAwardedDate(awardedDate);
-                r.WithExemptFromInduction(isExempt);
+                r.WithInductionExemption(isExempt);
             })
         );
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;

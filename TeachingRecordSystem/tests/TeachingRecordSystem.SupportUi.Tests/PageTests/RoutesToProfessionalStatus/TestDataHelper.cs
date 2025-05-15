@@ -4,7 +4,9 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public static class TestDataHelper
 {
-    public static async Task<RouteToProfessionalStatus> GetRouteWhereAllFieldsApplyAsync(this ReferenceDataCache referenceDataCache)
+    public static async Task<RouteToProfessionalStatus> GetRouteWhereAllFieldsApplyAsync(
+        this ReferenceDataCache referenceDataCache,
+        ProfessionalStatusType? professionalStatusType = null)
     {
         return (await referenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
@@ -16,6 +18,7 @@ public static class TestDataHelper
                 && r.TrainingStartDateRequired != FieldRequirement.NotApplicable
                 && r.TrainingEndDateRequired != FieldRequirement.NotApplicable
                 && r.AwardDateRequired != FieldRequirement.NotApplicable)
+            .Where(r => professionalStatusType is null || professionalStatusType == r.ProfessionalStatusType)
             .RandomOne();
     }
 
@@ -33,7 +36,7 @@ public static class TestDataHelper
             .RandomOne();
     }
 
-    public static ProfessionalStatusStatus GetRouteStatusWhereAllFieldsApply(this ReferenceDataCache referenceDataCache)
+    public static ProfessionalStatusStatus GetRouteStatusWhereAllFieldsApply()
     {
         return ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable

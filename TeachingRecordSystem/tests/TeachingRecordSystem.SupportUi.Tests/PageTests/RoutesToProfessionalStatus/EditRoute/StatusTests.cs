@@ -135,7 +135,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
-                .WithExemptFromInduction(true)));
+                .WithInductionExemption(true)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)

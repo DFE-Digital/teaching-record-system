@@ -8,7 +8,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
-using TeachingRecordSystem.SupportUi.Pages.EditUser;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 {
@@ -49,7 +48,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
 
         [BindProperty]
         [EvidenceFile]
-        [FileSize(DeactivateDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 100MB")]
+        [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
         public IFormFile? EvidenceFile { get; set; }
 
         [BindProperty]
@@ -115,7 +114,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
                     var fileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
                     EvidenceFileName = EvidenceFile?.FileName;
                     EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                    UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(fileId, DeactivateDefaults.FileUrlExpiry);
+                    UploadedEvidenceFileUrl = await fileService.GetFileUrlAsync(fileId, FileUploadDefaults.FileUrlExpiry);
                     EvidenceFileId = fileId;
                 }
             }

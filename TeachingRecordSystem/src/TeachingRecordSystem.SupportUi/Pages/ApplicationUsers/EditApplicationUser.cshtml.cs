@@ -31,6 +31,11 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
     [MaxLength(UserBase.NameMaxLength, ErrorMessage = "Name must be 200 characters or less")]
     public string? Name { get; set; }
 
+    [BindProperty]
+    [Display(Name = "Short name")]
+    [MaxLength(ApplicationUser.ShortNameMaxLength, ErrorMessage = "Short name must be 25 characters or less")]
+    public string? ShortName { get; set; }
+
     [Display(Name = "API roles")]
     public string[]? ApiRoles { get; set; }
 
@@ -98,6 +103,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
         OneLoginPrivateKeyPem = _user.OneLoginPrivateKeyPem;
         OneLoginRedirectUriPath = _user.OneLoginRedirectUriPath;
         OneLoginPostLogoutRedirectUriPath = _user.OneLoginPostLogoutRedirectUriPath;
+        ShortName = _user.ShortName;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -173,6 +179,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
 
         var changes = ApplicationUserUpdatedEventChanges.None |
             (Name != _user!.Name ? ApplicationUserUpdatedEventChanges.Name : 0) |
+            (ShortName != _user!.ShortName ? ApplicationUserUpdatedEventChanges.ShortName : 0) |
             (!new HashSet<string>(_user.ApiRoles ?? []).SetEquals(new HashSet<string>(newApiRoles)) ? ApplicationUserUpdatedEventChanges.ApiRoles : 0) |
             (IsOidcClient != _user.IsOidcClient ? ApplicationUserUpdatedEventChanges.IsOidcClient : 0);
 
@@ -203,6 +210,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             var oldApplicationUser = EventModels.ApplicationUser.FromModel(_user);
 
             _user.Name = Name!;
+            _user.ShortName = ShortName;
             _user.ApiRoles = newApiRoles;
             _user.IsOidcClient = IsOidcClient;
 
@@ -250,7 +258,7 @@ public class EditApplicationUserModel(TrsDbContext dbContext, TrsLinkGenerator l
             return;
         }
 
-        ApiKeys = _user.ApiKeys
+        ApiKeys = _user.ApiKeys!
             .OrderBy(k => k.CreatedOn)
             .Select(k => new ApiKeyInfo(k.ApiKeyId, k.Key, k.Expires)).ToArray();
 

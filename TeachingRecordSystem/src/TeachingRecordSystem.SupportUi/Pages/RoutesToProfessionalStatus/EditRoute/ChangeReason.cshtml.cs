@@ -10,7 +10,6 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
-
 public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     IFileService fileService) : PageModel
 {
@@ -36,7 +35,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     [BindProperty]
     [Display(Name = "Add more information")]
-    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -46,7 +45,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -61,7 +60,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string BackLink => FromCheckAnswers == true
         ? linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
-        : linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+        : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {
@@ -138,7 +137,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature());
+        JourneyInstance!.State.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus);
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonId = personInfo.PersonId;

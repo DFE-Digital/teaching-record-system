@@ -68,7 +68,7 @@ public class ApiKeyAuthenticationHandler(
             return AuthenticateResult.Fail($"API key is expired.");
         }
 
-        var applicationUser = apiKey.ApplicationUser;
+        var applicationUser = apiKey.ApplicationUser!;
 
         var principal = CreatePrincipal(applicationUser.UserId, applicationUser.Name, applicationUser.ApiRoles ?? []);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);

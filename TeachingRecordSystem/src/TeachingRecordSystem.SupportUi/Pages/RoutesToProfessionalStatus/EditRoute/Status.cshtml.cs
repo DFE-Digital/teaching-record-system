@@ -80,7 +80,7 @@ public class StatusModel(
             NextCompletingRoutePage(Status) :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-                linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -103,7 +103,7 @@ public class StatusModel(
     public string BackLink =>
          FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
     private string NextCompletingRoutePage(ProfessionalStatusStatus status)
     {

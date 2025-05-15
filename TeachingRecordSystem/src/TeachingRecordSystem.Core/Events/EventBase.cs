@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using Optional.Unsafe;
 using TeachingRecordSystem.Core.Events.Models;
 using TeachingRecordSystem.Core.Infrastructure.Json;
 
@@ -48,5 +49,23 @@ public abstract record EventBase
             throw new Exception($"Could not find event type '{eventTypeName}'.");
 
         return (EventBase)JsonSerializer.Deserialize(payload, eventType, JsonSerializerOptions)!;
+    }
+
+    public bool TryGetPersonId(out Guid personId)
+    {
+        if (this is IEventWithPersonId { PersonId: var eventPersonId })
+        {
+            personId = eventPersonId;
+            return true;
+        }
+
+        if (this is IEventWithOptionalPersonId { PersonId: { HasValue: true } eventOptionalPersonId })
+        {
+            personId = eventOptionalPersonId.ValueOrFailure();
+            return true;
+        }
+
+        personId = Guid.Empty;
+        return false;
     }
 }

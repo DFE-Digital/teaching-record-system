@@ -35,7 +35,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     [BindProperty]
     [Display(Name = "Add additional detail")]
-    [MaxLength(AlertDefaults.DetailMaxCharacterCount, ErrorMessage = "Additional detail must be 4000 characters or less")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
@@ -45,7 +45,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
 
     [BindProperty]
     [EvidenceFile]
-    [FileSize(AlertDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = "The selected file must be smaller than 50MB")]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
     public Guid? EvidenceFileId { get; set; }
@@ -63,7 +63,7 @@ public class ReasonModel(TrsLinkGenerator linkGenerator, IFileService fileServic
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, AlertDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
     }
 

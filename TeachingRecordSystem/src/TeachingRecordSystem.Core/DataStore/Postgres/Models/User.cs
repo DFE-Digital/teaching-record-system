@@ -38,12 +38,13 @@ public class ApplicationUser : UserBase
     public const int ClientSecretMaxLength = 200;
     public const int ClientSecretMinLength = 16;
     public const int OneLoginClientIdMaxLength = 50;
+    public const int ShortNameMaxLength = 25;
     public const string NameUniqueIndexName = "ix_users_application_user_name";
     public const string ClientIdUniqueIndexName = "ix_users_client_id";
     public const string OneLoginAuthenticationSchemeNameUniqueIndexName = "ix_users_one_login_authentication_scheme_name";
 
     public string[]? ApiRoles { get; set; }
-    public ICollection<ApiKey> ApiKeys { get; } = null!;
+    public ICollection<ApiKey>? ApiKeys { get; }
     public bool IsOidcClient { get; set; }
     public string? ClientId { get; set; }
     public string? ClientSecret { get; set; }
@@ -54,6 +55,7 @@ public class ApplicationUser : UserBase
     public string? OneLoginAuthenticationSchemeName { get; set; }
     public string? OneLoginRedirectUriPath { get; set; }
     public string? OneLoginPostLogoutRedirectUriPath { get; set; }
+    public string? ShortName { get; set; }
 
     [MemberNotNull(
         nameof(OneLoginClientId),

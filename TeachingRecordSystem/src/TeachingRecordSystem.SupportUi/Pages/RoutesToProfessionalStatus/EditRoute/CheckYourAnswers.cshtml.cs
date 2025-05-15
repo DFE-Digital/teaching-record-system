@@ -48,8 +48,10 @@ public class CheckYourAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        var professionalStatusType = (await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteDetail.RouteToProfessionalStatus.RouteToProfessionalStatusId)).ProfessionalStatusType;
+        var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+
         professionalStatus.Update(
+            allRoutes,
             s =>
             {
                 s.Status = RouteDetail.Status;
@@ -105,7 +107,7 @@ public class CheckYourAnswersModel(
 
         if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
         {
-            context.Result = Redirect(linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 
