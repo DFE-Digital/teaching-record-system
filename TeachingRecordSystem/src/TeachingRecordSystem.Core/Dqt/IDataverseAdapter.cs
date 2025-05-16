@@ -4,8 +4,6 @@ namespace TeachingRecordSystem.Core.Dqt;
 
 public interface IDataverseAdapter
 {
-    Task<CreateTeacherResult> CreateTeacherAsync(CreateTeacherCommand command);
-
     Task<Account[]> GetIttProvidersAsync(bool activeOnly);
 
     Task<Contact[]> FindTeachersAsync(FindTeachersByTrnBirthDateAndNinoQuery query);
@@ -45,8 +43,6 @@ public interface IDataverseAdapter
 
     Task<Contact[]> FindTeachersStrictAsync(FindTeachersQuery query);
 
-    Task<UpdateTeacherResult> UpdateTeacherAsync(UpdateTeacherCommand command);
-
     Task UpdateTeacherIdentityInfoAsync(UpdateTeacherIdentityInfoCommand command);
 
     Task<Account[]> GetIttProviderOrganizationsByNameAsync(string ukprn, string[] columnNames, bool activeOnly);
@@ -59,21 +55,11 @@ public interface IDataverseAdapter
 
     Task<CrmTask[]> GetCrmTasksForTeacherAsync(Guid teacherId, string[] columnNames);
 
-    Task<SetIttResultForTeacherResult> SetIttResultForTeacherAsync(
-        Guid teacherId,
-        string ittProviderUkprn,
-        dfeta_ITTResult result,
-        DateOnly? assessmentDate,
-        Guid trsUserId,
-        string slugId = null);
-
     Task SetTsPersonIdAsync(Guid teacherId, string tsPersonId);
 
     Task<dfeta_teacherstatus> GetTeacherStatusAsync(string value, RequestBuilder requestBuilder);
 
     Task<bool> UnlockTeacherRecordAsync(Guid teacherId);
-
-    Task<SetNpqQualificationResult> SetNpqQualificationAsync(SetNpqQualificationCommand command);
 
     Task<Contact[]> GetTeachersByHusIdAsync(string husId, string[] columnNames);
 
