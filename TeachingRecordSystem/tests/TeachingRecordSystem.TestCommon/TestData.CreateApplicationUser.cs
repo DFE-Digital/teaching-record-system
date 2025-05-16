@@ -14,7 +14,6 @@ public partial class TestData
         var user = await WithDbContextAsync(async dbContext =>
         {
             name ??= GenerateApplicationUserName();
-            shortName ??= GenerateApplicationUserShortName();
             apiRoles ??= [];
             isOidcClient ??= false;
             string? clientId = null;
