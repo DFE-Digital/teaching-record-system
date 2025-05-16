@@ -1,0 +1,89 @@
+﻿@using TeachingRecordSystem.Core.Events
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<ProfessionalStatusCreatedEvent>>
+@{
+    var createdEvent = Model.ItemModel.Event;
+    var professionalStatus = createdEvent.ProfessionalStatus;
+    var routeType = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(professionalStatus.RouteToProfessionalStatusId);
+    var trainingProvider = professionalStatus.TrainingProviderId.HasValue ? await ReferenceDataCache.GetTrainingProviderByIdAsync(professionalStatus.TrainingProviderId.Value) : null;
+    var country = !string.IsNullOrEmpty(professionalStatus.TrainingCountryId) ? await ReferenceDataCache.GetTrainingCountryByIdAsync(professionalStatus.TrainingCountryId) : null;
+    var degreeType = professionalStatus.DegreeTypeId.HasValue ? await ReferenceDataCache.GetDegreeTypeByIdAsync(professionalStatus.DegreeTypeId.Value) : null;
+    var ageRangeType = professionalStatus.TrainingAgeSpecialismType;
+    var ageRangeFromTo = (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeTo is not null) ?
+        $"From {professionalStatus.TrainingAgeSpecialismRangeFrom} to {professionalStatus.TrainingAgeSpecialismRangeTo}" : null;
+    var subjects = professionalStatus.TrainingSubjectIds is not null ?
+            professionalStatus.TrainingSubjectIds
+                .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
+                .OrderByDescending(name => name)
+                .ToArray() : null;
+}
+
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-route-created-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Route added</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="route" use-empty-fallback>@routeType.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row show-if=false>
+                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Professional Status award date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Country</govuk-summary-list-row-key>
+                <govuk-summary-list-row-value data-testid="country" use-empty-fallback>@country?.Name</govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+                @if (ageRangeFromTo is not null)
+                {
+                    <govuk-summary-list-row-value data-testid="age-range" use-empty-fallback>@ageRangeFromTo</govuk-summary-list-row-value>
+                }
+                else
+                {
+                    <govuk-summary-list-row-value data-testid="age-range-type" use-empty-fallback>@ageRangeType?.GetDisplayName()</govuk-summary-list-row-value>
+                }
+            </govuk-summary-list-row>
+
+            <govuk-summary-list-row>
+                <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
+                <govuk-summary-list-row-value><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
+            </govuk-summary-list-row>
+        </govuk-summary-list>
+@*         <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text></govuk-details-text>
+        </govuk-details> *@
+    </div>
+</div>
