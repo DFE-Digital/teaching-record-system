@@ -13,4 +13,5 @@ public static class AuthorizationPolicies
     public const string NonDbsAlertWrite = "NonDbsAlertWrite";
     public const string AlertWrite = "AlertWrite";
     public const string InductionReadWrite = "InductionReadWrite";
+    public const string PersonDataEdit = "PersonDataEdit";
 }

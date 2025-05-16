@@ -2,8 +2,6 @@ namespace TeachingRecordSystem.SupportUi;
 
 public static class JourneyNames
 {
-    public const string EditName = nameof(EditName);
-    public const string EditDateOfBirth = nameof(EditDateOfBirth);
     public const string AddMq = nameof(AddMq);
     public const string EditMqProvider = nameof(EditMqProvider);
     public const string EditMqSpecialism = nameof(EditMqSpecialism);
@@ -23,4 +21,5 @@ public static class JourneyNames
     public const string AddRouteToProfessionalStatus = nameof(AddRouteToProfessionalStatus);
     public const string DeleteRouteToProfessionalStatus = nameof(DeleteRouteToProfessionalStatus);
     public const string ResolveApiTrnRequest = nameof(ResolveApiTrnRequest);
+    public const string EditDetails = nameof(EditDetails);
 }
