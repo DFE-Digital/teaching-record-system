@@ -234,7 +234,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     }
 
     [Fact]
-    public async Task Route_Add_AwardedJourneyToCyaPageAndBack()
+    public async Task Route_AddAwardedJourneyToCyaPageAndBack()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
