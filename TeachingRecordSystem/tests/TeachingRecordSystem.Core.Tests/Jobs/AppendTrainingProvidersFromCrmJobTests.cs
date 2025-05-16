@@ -3,7 +3,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Jobs;
-using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
 
@@ -15,7 +14,6 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
         DbFixture = dbFixture!;
     }
 
-    public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
     private TrsDbContext _trsContext = null!;
 
     private Mock<ICrmQueryDispatcher> _crmQueryDispatcherMock = new Mock<ICrmQueryDispatcher>();

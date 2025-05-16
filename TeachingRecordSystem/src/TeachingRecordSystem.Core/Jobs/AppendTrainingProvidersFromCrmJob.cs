@@ -80,6 +80,5 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
                 break;
             }
         }
-
     }
 }
