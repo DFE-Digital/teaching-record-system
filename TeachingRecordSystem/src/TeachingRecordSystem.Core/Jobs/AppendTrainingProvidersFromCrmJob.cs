@@ -12,8 +12,9 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 {
     private const string ukprnRegex = @"^\d{8}$";
 
-    private void ProcessPagedResult(Account[] providersInCrm, List<TrainingProvider> providersInTrs)
+    private async Task ProcessPagedResultAsync(Account[] providersInCrm)
     {
+        var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
         var emptyUkprnProvidersToAdd = providersInCrm
             .Where(p => string.IsNullOrEmpty(p.dfeta_UKPRN) && !providersInTrs.Any(t => t.TrainingProviderId == p.Id));
         var uniqueUnmatchedUkprnProviders = providersInCrm
@@ -25,7 +26,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
         // add to Trs
         dbContext.TrainingProviders.AddRange(emptyUkprnProvidersToAdd
-            .Select(s => new DataStore.Postgres.Models.TrainingProvider()
+            .Select(s => new TrainingProvider()
             {
                 IsActive = false,
                 Name = s.Name,
@@ -34,7 +35,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
             })
             .ToList());
         dbContext.TrainingProviders.AddRange(uniqueUnmatchedUkprnProviders
-            .Select(s => new DataStore.Postgres.Models.TrainingProvider()
+            .Select(s => new TrainingProvider()
             {
                 IsActive = false,
                 Name = s.Name,
@@ -42,12 +43,16 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
                 Ukprn = Regex.IsMatch(s.dfeta_UKPRN, ukprnRegex) ? s.dfeta_UKPRN : null
             })
             .ToList());
+
+        if (dbContext.ChangeTracker.HasChanges())
+        {
+            await dbContext.SaveChangesAsync();
+        }
     }
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1);
-        var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
 
         while (true)
         {
@@ -64,19 +69,14 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
                 continue;
             }
 
-            ProcessPagedResult(result.Providers, providersInTrs);
+            await ProcessPagedResultAsync(result.Providers);
 
             if (result.MoreRecords)
             {
                 crmQuery = crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie };
-                providersInTrs = dbContext.TrainingProviders.Local.ToList();
             }
             else
             {
-                if (dbContext.ChangeTracker.HasChanges())
-                {
-                    await dbContext.SaveChangesAsync();
-                }
                 break;
             }
         }
