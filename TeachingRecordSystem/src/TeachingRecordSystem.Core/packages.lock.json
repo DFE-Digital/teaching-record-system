@@ -121,20 +121,20 @@
       },
       "Hangfire.Core": {
         "type": "Direct",
-        "requested": "[1.8.14, )",
-        "resolved": "1.8.14",
-        "contentHash": "tj/+J8/UdaxydFX6VQr5IEyBtVbAOvkQ8X8tIQKwY9zlpmK83hP4iHEQQQ26zzGUpcE1HlPc6PBUv0NgUDXS3A==",
+        "requested": "[1.8.17, )",
+        "resolved": "1.8.17",
+        "contentHash": "PJbESth45US95kcFn3P2xd//l5C34YPskcU9q/mdIutVcYbd2kvsZDBFmz0/HYxa0nrocdjSpO6MGwPU4kE8Pw==",
         "dependencies": {
           "Newtonsoft.Json": "11.0.1"
         }
       },
       "Hangfire.NetCore": {
         "type": "Direct",
-        "requested": "[1.8.14, )",
-        "resolved": "1.8.14",
-        "contentHash": "fBLdsxWYFdrQuenvVHEj/z8nOXoOTqpWIl4qYoinBAUCVmp4qlxfFsY3Aq3VVbwket0wBH472aG2LAmYm6hjxw==",
+        "requested": "[1.8.17, )",
+        "resolved": "1.8.17",
+        "contentHash": "COFpdp1JOMj9gd76NObq0ejZv0UAfpa6d3uKdtc96+NT/PhjXVOT5im2Mff3jqBdwEcQodw2xS8oFUs863clvw==",
         "dependencies": {
-          "Hangfire.Core": "[1.8.14]",
+          "Hangfire.Core": "[1.8.17]",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "3.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "3.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "3.0.0"
