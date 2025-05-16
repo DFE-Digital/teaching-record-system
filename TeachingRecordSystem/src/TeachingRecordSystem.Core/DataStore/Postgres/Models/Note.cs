@@ -5,15 +5,15 @@ using AngleSharp.Html.Dom;
 
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-public class DqtNote
+public class Note
 {
-    public required Guid Id { get; set; }
+    public required Guid NoteId { get; set; }
     public required Guid PersonId { get; set; }
-    public required string NoteText { get; set; }
+    public required string ContentHtml { get; set; }
     public required DateTime? UpdatedOn { get; set; }
     public required DateTime CreatedOn { get; set; }
-    public required Guid CreatedByDqtUserId { get; set; }
-    public required string CreatedByDqtUserName { get; set; }
+    public required Guid? CreatedByDqtUserId { get; set; }
+    public required string? CreatedByDqtUserName { get; set; }
     public required Guid? UpdatedByDqtUserId { get; set; }
     public required string? UpdatedByDqtUserName { get; set; }
     public required string? FileName { get; set; }
@@ -21,7 +21,7 @@ public class DqtNote
 
     public async Task<string> GetNoteTextWithoutHtmlAsync()
     {
-        var text = NoteText;
+        var text = ContentHtml;
 
         if (string.IsNullOrEmpty(text))
         {

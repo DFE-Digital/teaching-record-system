@@ -121,7 +121,7 @@ public class TrsDbContext : DbContext
 
     public DbSet<DegreeType> DegreeTypes => Set<DegreeType>();
 
-    public DbSet<DqtNote> DqtNotes => Set<DqtNote>();
+    public DbSet<Note> Notes => Set<Note>();
 
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {

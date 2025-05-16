@@ -40,11 +40,11 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtNote = await dbContext.DqtNotes.SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
             Assert.Null(dqtNote.FileName);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
-            Assert.Equal(noteText, dqtNote.NoteText);
+            Assert.Equal(noteText, dqtNote.ContentHtml);
             Assert.Equal(createdOn, dqtNote.CreatedOn);
             Assert.Equal(createdOn, dqtNote.UpdatedOn);
 
@@ -98,11 +98,11 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtNote = await dbContext.DqtNotes.SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
             Assert.Null(dqtNote.FileName);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
-            Assert.Equal(updatedNoteText, dqtNote.NoteText);
+            Assert.Equal(updatedNoteText, dqtNote.ContentHtml);
             Assert.Equal(updatedDate, dqtNote.UpdatedOn);
             Assert.Equal(note.CreatedBy.Id, dqtNote.CreatedByDqtUserId);
             Assert.Equal(createdByDqtUserName, dqtNote.CreatedByDqtUserName);
@@ -149,12 +149,12 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtNote = await dbContext.DqtNotes.SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
             Assert.Null(dqtNote.FileName);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
             Assert.Equal(createdOn, dqtNote.CreatedOn);
-            Assert.Equal(noteText, dqtNote.NoteText);
+            Assert.Equal(noteText, dqtNote.ContentHtml);
             Assert.Equal(createdOn, dqtNote.UpdatedOn);
             Assert.Equal(note.CreatedBy.Id, dqtNote.CreatedByDqtUserId);
             Assert.Equal(createdByDqtUserName, dqtNote.CreatedByDqtUserName);
@@ -197,7 +197,7 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtnote = await dbContext.DqtNotes.SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtnote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.Null(dqtnote);
         });
     }
@@ -238,11 +238,11 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtNote = await dbContext.DqtNotes.SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtNote = await dbContext.Notes.SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
             Assert.NotNull(dqtNote.FileName);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
-            Assert.Equal(noteText, dqtNote.NoteText);
+            Assert.Equal(noteText, dqtNote.ContentHtml);
             //updatedon defaults to createdon
             Assert.Equal(note.CreatedOn, dqtNote.UpdatedOn);
             Assert.Equal(note.CreatedOn, dqtNote.CreatedOn);
@@ -298,10 +298,10 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtNote = await dbContext.DqtNotes.AsNoTracking().SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtNote = await dbContext.Notes.AsNoTracking().SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.NotNull(dqtNote);
             Assert.Equal(createPersonResult.PersonId, dqtNote.PersonId);
-            Assert.Equal(noteText, dqtNote.NoteText);
+            Assert.Equal(noteText, dqtNote.ContentHtml);
             Assert.Equal(note.ModifiedOn, dqtNote.UpdatedOn);
             Assert.Equal(note.CreatedOn, dqtNote.CreatedOn);
             Assert.Equal(note.CreatedBy.Id, dqtNote.CreatedByDqtUserId);
@@ -397,7 +397,7 @@ public partial class TrsDataSyncHelperTests
         // Assert
         await DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var dqtNote = await dbContext.DqtNotes.AsNoTracking().SingleOrDefaultAsync(p => p.Id == note.Id);
+            var dqtNote = await dbContext.Notes.AsNoTracking().SingleOrDefaultAsync(p => p.NoteId == note.Id);
             Assert.Null(dqtNote);
         });
     }
