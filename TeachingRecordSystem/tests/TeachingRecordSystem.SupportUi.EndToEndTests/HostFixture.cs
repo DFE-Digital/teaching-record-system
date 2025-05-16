@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
@@ -77,11 +79,12 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                         sp => ActivatorUtilities.CreateInstance<TestData>(sp, TestDataSyncConfiguration.Sync(sp.GetRequiredService<TrsDataSyncHelper>())));
                     services.AddFakeXrm();
                     services.AddSingleton<FakeTrnGenerator>();
+                    services.AddSingleton<ITrnGenerator>(sp => sp.GetRequiredService<FakeTrnGenerator>());
                     services.AddSingleton<TrsDataSyncHelper>();
                     services.AddSingleton<IAuditRepository, TestableAuditRepository>();
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton(GetMockAdUserService());
-                    services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
+                    services.AddSingleton(GetMockGetAnIdentityApiClient());
                     services.AddStartupTask<SeedLookupData>();
 
                     IFileService GetMockFileService()
@@ -112,6 +115,23 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                             .Setup(s => s.GetUserByIdAsync(TestUsers.TestAzureActiveDirectoryUser.UserId))
                             .ReturnsAsync(TestUsers.TestAzureActiveDirectoryUser);
                         return userService.Object;
+                    }
+
+                    IGetAnIdentityApiClient GetMockGetAnIdentityApiClient()
+                    {
+                        var getAnIdentityApiClient = new Mock<IGetAnIdentityApiClient>();
+
+                        getAnIdentityApiClient
+                            .Setup(mock => mock.CreateTrnTokenAsync(It.IsAny<CreateTrnTokenRequest>()))
+                            .ReturnsAsync((CreateTrnTokenRequest req) => new CreateTrnTokenResponse()
+                            {
+                                Email = req.Email,
+                                ExpiresUtc = DateTime.UtcNow.AddYears(1),
+                                Trn = req.Trn,
+                                TrnToken = Guid.NewGuid().ToString()
+                            });
+
+                        return getAnIdentityApiClient.Object;
                     }
                 });
             });

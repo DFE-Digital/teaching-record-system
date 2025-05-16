@@ -2,20 +2,54 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
+using TeachingRecordSystem.SupportUi.Pages.Common;
+using TeachingRecordSystem.SupportUi.Pages.Shared;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
-public class Index(TrsDbContext dbContext) : PageModel
+public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBackgroundJobScheduler backgroundJobScheduler) : PageModel
 {
+    private const int TasksPerPage = 20;
+
     [Display(Name = "Search", Description = "By name, email or request date, for example 4/3/1975")]
     [BindProperty(SupportsGet = true)]
     [FromQuery]
     public string? Search { get; set; }
 
-    public Result[]? Results { get; set; }
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public SortDirection? SortDirection { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public ApiTrnRequestsSortByOption? SortBy { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery(Name = "page")]
+    public int? PageNumber { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    [FromQuery]
+    public string? WaitForJobId { get; set; }
+
+    public ResultPage<Result>? Results { get; set; }
+
+    public PaginationViewModel? Pagination { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
+        if (WaitForJobId is not null)
+        {
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(TimeSpan.FromSeconds(5));
+            await backgroundJobScheduler.WaitForJobToCompleteAsync(WaitForJobId, cts.Token)
+                .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
+        }
+
+        var sortDirection = SortDirection ??= SupportUi.SortDirection.Ascending;
+        var sortBy = SortBy ??= ApiTrnRequestsSortByOption.RequestedOn;
+
         var tasks = dbContext.SupportTasks
             .Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest && t.Status == SupportTaskStatus.Open);
 
@@ -45,17 +79,43 @@ public class Index(TrsDbContext dbContext) : PageModel
             }
         }
 
+        if (sortBy == ApiTrnRequestsSortByOption.Name)
+        {
+            tasks = tasks
+                .OrderBy(sortDirection, t => t.TrnRequestMetadata!.FirstName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.MiddleName)
+                .ThenBy(sortDirection, t => t.TrnRequestMetadata!.LastName);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.Email)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.EmailAddress);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.RequestedOn)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.CreatedOn);
+        }
+        else if (sortBy == ApiTrnRequestsSortByOption.Source)
+        {
+            tasks = tasks.OrderBy(sortDirection, t => t.TrnRequestMetadata!.ApplicationUser!.Name);
+        }
+
         Results = await tasks
             .Include(t => t.TrnRequestMetadata)
             .ThenInclude(m => m!.ApplicationUser)
             .Select(t => new Result(
                 t.SupportTaskReference,
                 t.TrnRequestMetadata!.FirstName!,
+                t.TrnRequestMetadata!.MiddleName ?? "",
                 t.TrnRequestMetadata!.LastName!,
                 t.TrnRequestMetadata!.EmailAddress,
                 t.CreatedOn,
-                t.TrnRequestMetadata.ApplicationUser.Name))
-            .ToArrayAsync();
+                t.TrnRequestMetadata.ApplicationUser!.Name,
+                t.TrnRequestMetadata.ApplicationUser.ShortName))
+            .GetPageAsync(PageNumber, TasksPerPage);
+
+        Pagination = PaginationViewModel.Create(
+            Results,
+            page => linkGenerator.ApiTrnRequests(Search, SortBy, SortDirection, page));
 
         return Page();
 
@@ -69,8 +129,13 @@ public class Index(TrsDbContext dbContext) : PageModel
     public record Result(
         string SupportTaskReference,
         string FirstName,
+        string MiddleName,
         string LastName,
         string? EmailAddress,
         DateTime CreatedOn,
-        string SourceApplicationName);
+        string SourceApplicationName,
+        string? SourceApplicationShortName)
+    {
+        public string Source => !string.IsNullOrEmpty(SourceApplicationShortName) ? SourceApplicationShortName : SourceApplicationName;
+    }
 }

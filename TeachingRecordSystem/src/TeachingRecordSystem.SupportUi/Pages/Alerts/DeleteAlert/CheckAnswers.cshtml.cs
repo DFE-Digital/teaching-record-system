@@ -87,7 +87,7 @@ public class CheckAnswersModel(
 
         PersonId = personInfo.PersonId;
         PersonName = personInfo.Name;
-        AlertTypeName = alertInfo.Alert.AlertType.Name;
+        AlertTypeName = alertInfo.Alert.AlertType!.Name;
         Details = alertInfo.Alert.Details;
         Link = alertInfo.Alert.ExternalLink;
         LinkUri = TrsUriHelper.TryCreateWebsiteUri(Link, out var linkUri) ? linkUri : null;
@@ -96,7 +96,7 @@ public class CheckAnswersModel(
         DeleteReasonDetail = JourneyInstance.State.DeleteReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, AlertDefaults.FileUrlExpiry) :
+            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
 
         await next();

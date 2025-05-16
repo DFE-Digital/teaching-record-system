@@ -26,10 +26,11 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
         var request = dbContext.ProfessionalStatuses
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update") // https://github.com/dotnet/efcore/issues/26042
             .Include(ps => ps.Person)
+            .ThenInclude(p => p!.Qualifications)
             .Include(ps => ps.TrainingProvider)
             .Include(ps => ps.TrainingCountry)
-            .Include(ps => ps.Route)
-                .ThenInclude(r => r.InductionExemptionReason)
+            .Include(ps => ps.RouteToProfessionalStatus)
+            .ThenInclude(r => r!.InductionExemptionReason)
             .Include(ps => ps.DegreeType);
 
         var currentProfessionalStatus = await request
@@ -42,7 +43,7 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
         }
 
         context.HttpContext.SetCurrentProfessionalStatusFeature(new(currentProfessionalStatus));
-        context.HttpContext.SetCurrentPersonFeature(currentProfessionalStatus.Person);
+        context.HttpContext.SetCurrentPersonFeature(currentProfessionalStatus.Person!);
         await next();
     }
 }

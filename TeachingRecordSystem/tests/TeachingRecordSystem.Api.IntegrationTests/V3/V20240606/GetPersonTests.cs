@@ -342,7 +342,7 @@ public class GetPersonTests(HostFixture hostFixture) : GetPersonTestBase(hostFix
             {
                 new
                 {
-                    code = alert.AlertType.DqtSanctionCode,
+                    code = alert.AlertType!.DqtSanctionCode,
                     startDate = alert.StartDate
                 }
             },
@@ -378,7 +378,7 @@ public class GetPersonTests(HostFixture hostFixture) : GetPersonTestBase(hostFix
                 new
                 {
                     alertType = "Prohibition",
-                    dqtSanctionCode = alert.AlertType.DqtSanctionCode,
+                    dqtSanctionCode = alert.AlertType!.DqtSanctionCode,
                     startDate = alert.StartDate,
                     endDate = alert.EndDate
                 }

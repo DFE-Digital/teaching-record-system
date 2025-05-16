@@ -1,5 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Common;
-using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
@@ -37,9 +37,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithTrainingCountry(setCountry)
+                    .WithTrainingCountryId(setCountry.CountryId)
                     .WithAwardedDate(endDate)
-                    .WithExemptFromInduction(true)
+                    .WithInductionExemption(true)
                 ));
 
         var personId = person.PersonId;
@@ -118,7 +118,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -190,7 +190,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithTrainingCountry(country)
+                    .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -214,7 +214,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -248,7 +248,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithTrainingCountry(country)
+                    .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -272,7 +272,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -353,7 +353,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithTrainingCountry(country)
+                    .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -383,7 +383,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -416,7 +416,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithTrainingCountry(country)
+                    .WithTrainingCountryId(country.CountryId)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -446,7 +446,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -479,8 +479,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithTrainingCountry(country)
-                    .WithExemptFromInduction(false)
+                    .WithTrainingCountryId(country.CountryId)
+                    .WithInductionExemption(false)
                 ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -510,7 +510,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -724,7 +724,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
                 .WithAwardedDate(new DateOnly(2021, 2, 2))
-                .WithTrainingCountry(country)
+                .WithTrainingCountryId(country.CountryId)
             ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -755,7 +755,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -787,7 +787,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
                 .WithAwardedDate(new DateOnly(2021, 2, 2))
-                .WithTrainingCountry(country)
+                .WithTrainingCountryId(country.CountryId)
             ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -818,7 +818,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();
@@ -899,8 +899,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
                 .WithAwardedDate(new DateOnly(2021, 2, 2))
-                .WithTrainingCountry(country)
-                .WithTrainingProvider(provider)
+                .WithTrainingCountryId(country.CountryId)
+                .WithTrainingProviderId(provider.TrainingProviderId)
             ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -928,7 +928,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteChangeReasonPageAsync(qualificationId);
-        await page.SelectChangeReasonAsync(InductionChangeReasonOption.AnotherReason);
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
         await page.SelectReasonMoreDetailsAsync(false);
         await page.SelectReasonFileUploadAsync(false);
         await page.ClickContinueButtonAsync();

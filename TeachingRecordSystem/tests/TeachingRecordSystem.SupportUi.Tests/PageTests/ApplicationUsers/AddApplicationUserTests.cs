@@ -102,12 +102,14 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
     {
         // Arrange
         var name = TestData.GenerateApplicationUserName();
+        var shortName = TestData.GenerateApplicationUserShortName();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/application-users/add")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Name", name }
+                { "Name", name },
+                { "ShortName", shortName }
             }
         };
 
@@ -121,6 +123,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
         {
             var applicationUser = await dbContext.ApplicationUsers.SingleAsync(a => a.Name == name);
             Assert.NotNull(applicationUser);
+            Assert.Equal(shortName, applicationUser.ShortName);
 
             return applicationUser;
         });
@@ -134,6 +137,7 @@ public class AddApplicationUserTests(HostFixture hostFixture) : TestBase(hostFix
                 Assert.Equal(Clock.UtcNow, applicationUserCreatedEvent.CreatedUtc);
                 Assert.Equal(GetCurrentUserId(), applicationUserCreatedEvent.RaisedBy.UserId);
                 Assert.Equal(name, applicationUserCreatedEvent.ApplicationUser.Name);
+                Assert.Equal(shortName, applicationUserCreatedEvent.ApplicationUser.ShortName);
             });
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);

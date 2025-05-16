@@ -57,7 +57,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
 
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -72,7 +72,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
         var professionalStatusFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        Route = professionalStatusFeature!.ProfessionalStatus.Route;
+        Route = professionalStatusFeature!.ProfessionalStatus.RouteToProfessionalStatus!;
 
         if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
         || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)
@@ -86,5 +86,5 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
         linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
         JourneyInstance!.State.IsCompletingRoute ?
             linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 }

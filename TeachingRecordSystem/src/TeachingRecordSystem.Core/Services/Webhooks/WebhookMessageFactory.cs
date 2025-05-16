@@ -38,7 +38,7 @@ public class WebhookMessageFactory(EventMapperRegistry eventMapperRegistry, IClo
 
                 return await dbContext.WebhookEndpoints
                     .AsNoTracking()
-                    .Where(e => e.Enabled && e.ApplicationUser.Active)
+                    .Where(e => e.Enabled && e.ApplicationUser!.Active)
                     .ToArrayAsync();
             });
 

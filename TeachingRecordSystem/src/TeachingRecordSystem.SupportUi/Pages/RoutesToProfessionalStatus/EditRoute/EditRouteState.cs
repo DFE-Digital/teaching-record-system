@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -39,28 +40,28 @@ public class EditRouteState : IRegisterJourney
     [JsonIgnore]
     public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to awarded / approved 
 
-    public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
+    public void EnsureInitialized(ProfessionalStatus professionalStatus)
     {
         if (Initialized)
         {
             return;
         }
 
-        QualificationType = professionalStatusInfo.ProfessionalStatus.QualificationType;
-        RouteToProfessionalStatusId = professionalStatusInfo.ProfessionalStatus.RouteToProfessionalStatusId;
-        CurrentStatus = professionalStatusInfo.ProfessionalStatus.Status;
-        Status = professionalStatusInfo.ProfessionalStatus.Status;
-        AwardedDate = professionalStatusInfo.ProfessionalStatus.AwardedDate;
-        TrainingStartDate = professionalStatusInfo.ProfessionalStatus.TrainingStartDate;
-        TrainingEndDate = professionalStatusInfo.ProfessionalStatus.TrainingEndDate;
-        TrainingSubjectIds = professionalStatusInfo.ProfessionalStatus.TrainingSubjectIds;
-        TrainingAgeSpecialismType = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismType;
-        TrainingAgeSpecialismRangeFrom = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismRangeFrom;
-        TrainingAgeSpecialismRangeTo = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismRangeTo;
-        TrainingCountryId = professionalStatusInfo.ProfessionalStatus.TrainingCountryId;
-        TrainingProviderId = professionalStatusInfo.ProfessionalStatus.TrainingProviderId;
-        IsExemptFromInduction = professionalStatusInfo.ProfessionalStatus.ExemptFromInduction;
-        DegreeTypeId = professionalStatusInfo.ProfessionalStatus.DegreeTypeId;
+        QualificationType = professionalStatus.QualificationType;
+        RouteToProfessionalStatusId = professionalStatus.RouteToProfessionalStatusId;
+        CurrentStatus = professionalStatus.Status;
+        Status = professionalStatus.Status;
+        AwardedDate = professionalStatus.AwardedDate;
+        TrainingStartDate = professionalStatus.TrainingStartDate;
+        TrainingEndDate = professionalStatus.TrainingEndDate;
+        TrainingSubjectIds = professionalStatus.TrainingSubjectIds;
+        TrainingAgeSpecialismType = professionalStatus.TrainingAgeSpecialismType;
+        TrainingAgeSpecialismRangeFrom = professionalStatus.TrainingAgeSpecialismRangeFrom;
+        TrainingAgeSpecialismRangeTo = professionalStatus.TrainingAgeSpecialismRangeTo;
+        TrainingCountryId = professionalStatus.TrainingCountryId;
+        TrainingProviderId = professionalStatus.TrainingProviderId;
+        IsExemptFromInduction = professionalStatus.ExemptFromInduction;
+        DegreeTypeId = professionalStatus.DegreeTypeId;
         Initialized = true;
     }
 }

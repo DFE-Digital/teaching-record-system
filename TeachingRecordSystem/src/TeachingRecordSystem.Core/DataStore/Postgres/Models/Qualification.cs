@@ -10,5 +10,5 @@ public abstract class Qualification
     public DateTime? DeletedOn { get; set; }
     public QualificationType QualificationType { get; protected set; }
     public required Guid PersonId { get; init; }
-    public Person Person { get; } = null!;
+    public Person? Person { get; }
 }

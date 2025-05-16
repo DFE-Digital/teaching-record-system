@@ -11,11 +11,10 @@
 
             <govuk-input asp-for="Email" label-class="govuk-label--m" type="email" autocomplete="off" />
 
-            <govuk-button type="submit">Add user</govuk-button>
-
-            <p class="govuk-body">
-                <a class="govuk-link govuk-link--no-visited-state" href=@LinkGenerator.Users()>Cancel and return to users</a>
-            </p>
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Add user</govuk-button>
+                <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users()>Cancel and return to users</govuk-button-link>
+            </div>
         </form>
     </div>
 </div>

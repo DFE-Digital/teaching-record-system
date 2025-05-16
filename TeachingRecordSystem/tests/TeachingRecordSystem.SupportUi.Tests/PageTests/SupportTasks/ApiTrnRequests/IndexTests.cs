@@ -1,4 +1,6 @@
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests;
 
@@ -9,7 +11,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     public async Task Get_NoOpenTasks_ShowsNoTasksMessage()
     {
         // Arrange
-        // TODO Create a Closed task when we can set them up
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId, t => t.WithStatus(SupportTaskStatus.Closed));
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/support-tasks/api-trn-requests/");
 
@@ -43,7 +46,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
             .FirstOrDefault();
 
         Assert.NotNull(resultRow);
-        AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.LastName}");
+        AssertRowHasContent("name", $"{supportTask.TrnRequestMetadata!.FirstName} {supportTask.TrnRequestMetadata!.MiddleName} {supportTask.TrnRequestMetadata!.LastName}");
         AssertRowHasContent("email", supportTask.TrnRequestMetadata!.EmailAddress ?? string.Empty);
         AssertRowHasContent("requested-on", supportTask.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat));
         AssertRowHasContent("source", applicationUser.Name);
@@ -52,7 +55,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         {
             var column = resultRow.GetElementByTestId(testId);
             Assert.NotNull(column);
-            Assert.Equal(expectedText, column.TextContent);
+            Assert.Equal(expectedText, column.TextContent.Trim());
         }
     }
 
@@ -189,10 +192,337 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         doc.AssertResultsContainsTask(supportTask.SupportTaskReference);
     }
 
+    [Fact]
+    public async Task Get_NoSortParametersSpecified_ShowsRequestsOrderedByRequestedOnAscending()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortByNameAscending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithFirstName("Zavier"));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithFirstName("Aaron"));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.Name}&sortDirection={SortDirection.Ascending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortByNameDescending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithFirstName("Zavier"));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithFirstName("Aaron"));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.Name}&sortDirection={SortDirection.Descending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortByEmailAscending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithEmailAddress("zavier@example.com"));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithFirstName("aaron@example.com"));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.Email}&sortDirection={SortDirection.Ascending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortByEmailDescending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithEmailAddress("zavier@example.com"));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithFirstName("aaron@example.com"));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.Email}&sortDirection={SortDirection.Descending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortByRequestedOnAscending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.RequestedOn}&sortDirection={SortDirection.Ascending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortByRequestedOnDescending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithCreatedOn(new DateTime(2025, 1, 1)));
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(
+            applicationUser.UserId,
+            t => t.WithCreatedOn(new DateTime(2023, 10, 10)));
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.RequestedOn}&sortDirection={SortDirection.Descending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortBySourceAscending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.Source}&sortDirection={SortDirection.Ascending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_SortBySourceDescending_ShowsRequestsInCorrectOrder()
+    {
+        // Arrange
+        var applicationUser1 = await TestData.CreateApplicationUserAsync(name: "Application Z");
+        var applicationUser2 = await TestData.CreateApplicationUserAsync(name: "Application A");
+
+        var supportTask1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser1.UserId);
+
+        var supportTask2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser2.UserId);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.Source}&sortDirection={SortDirection.Descending}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Collection(
+            GetResultTaskReferences(doc),
+            result => Assert.Equal(supportTask1.SupportTaskReference, result),
+            result => Assert.Equal(supportTask2.SupportTaskReference, result));
+    }
+
+    [Fact]
+    public async Task Get_ShowsPageOfResults()
+    {
+        // Arrange
+        var pageSize = 20;
+        var page = 2;
+
+        var applicationUser = await TestData.CreateApplicationUserAsync();
+
+        // Create enough tasks to create 3 pages
+        var tasks = await Enumerable.Range(1, (pageSize * page) + 1)
+            .ToAsyncEnumerable()
+            .SelectAwait(async _ => await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUser.UserId))
+            .ToArrayAsync();
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?page={page}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        Assert.Equal(pageSize, GetResultTaskReferences(doc).Length);
+    }
+
+    [Fact]
+    public async Task Get_UsesApplicationShortNameIfSetOtherwiseApplicationName()
+    {
+        // Arrange
+        var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(shortName: TestData.GenerateApplicationUserShortName());
+        Clock.Advance();
+        var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(shortName: "");
+
+        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithShortName.UserId);
+        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithoutShortName.UserId);
+
+        var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"/support-tasks/api-trn-requests/?sortBy={ApiTrnRequestsSortByOption.RequestedOn}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var resultRows = GetResultRows(doc);
+        Assert.Collection(
+            resultRows,
+            row => AssertSourceColumnEquals(row, applicationUserWithShortName.ShortName!),
+            row => AssertSourceColumnEquals(row, applicationUserWithoutShortName.Name));
+
+        static void AssertSourceColumnEquals(IElement row, string expectedSource)
+        {
+            var source = row.Children[3];
+            Assert.Equal(expectedSource, source.TextContent.Trim());
+        }
+    }
+
     public Task InitializeAsync() => WithDbContext(dbContext =>
         dbContext.SupportTasks.Where(t => t.SupportTaskType == SupportTaskType.ApiTrnRequest).ExecuteDeleteAsync());
 
     public Task DisposeAsync() => Task.CompletedTask;
+
+    private static IElement[] GetResultRows(IHtmlDocument doc) =>
+        doc
+            .GetElementsByTagName("tbody")
+            .Single()
+            .GetElementsByClassName("govuk-table__row")
+            .ToArray();
+
+    private static string[] GetResultTaskReferences(IHtmlDocument doc) =>
+        GetResultRows(doc)
+            .Select(row => row.GetAttribute("data-testid")!["task:".Length..])
+            .ToArray();
 }
 
 file static class Extensions

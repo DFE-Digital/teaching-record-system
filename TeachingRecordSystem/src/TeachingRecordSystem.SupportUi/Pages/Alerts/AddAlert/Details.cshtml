@@ -13,7 +13,7 @@
         <form action="@LinkGenerator.AlertAddDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Add an alert - @Model.PersonName</span>
 
-            <govuk-character-count asp-for="Details" max-length="AlertDefaults.DetailMaxCharacterCount" rows="AlertDefaults.DetailTextAreaMinimumRows" data-testid="details">
+            <govuk-character-count asp-for="Details" max-length="FileUploadDefaults.DetailMaxCharacterCount" rows="FileUploadDefaults.DetailTextAreaMinimumRows" data-testid="details">
                 <govuk-character-count-label class="govuk-label--l" is-page-heading="true">
                     @ViewBag.Title
                 </govuk-character-count-label>

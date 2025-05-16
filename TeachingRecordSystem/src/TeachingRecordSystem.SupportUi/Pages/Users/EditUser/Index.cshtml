@@ -1,0 +1,97 @@
+@page "/users/{userId}/{handler?}"
+@using TeachingRecordSystem.Core
+@model TeachingRecordSystem.SupportUi.Pages.Users.EditUser.IndexModel
+@{
+    ViewBag.Title = $"Change {Model.Name}\u2019s role";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.Users()" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action="@LinkGenerator.EditUser(Model.UserId)" method="post">
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled />
+
+            <govuk-input asp-for="Name" input-class="govuk-!-width-two-thirds" disabled="@(!Model.IsActiveUser)" />
+
+            <govuk-radios asp-for="@Model.Role" radios-class="trs-user-roles" radios-style="--trs-user-permission-columns: @UserPermissionTypes.All.Count">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" />
+
+                    @foreach (var role in Model.RoleOptions)
+                    {
+                        <govuk-radios-item value="@role.Name" disabled="@(!Model.IsActiveUser)">@role.DisplayName</govuk-radios-item>
+                        <govuk-radios-divider>
+                            <table class="govuk-table">
+                                <caption class="govuk-table__caption govuk-table__caption--s">Permissions</caption>
+                     
+                                <thead class="govuk-table__head">
+                                    <tr class="govuk-table__row">
+                                        @foreach (var permission in role.Permissions)
+                                        {
+                                            <th scope="col" class="govuk-table__header">@permission.Type</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                    <tr class="govuk-table__row">
+                                        @foreach (var permission in role.Permissions)
+                                        {
+                                            switch (permission.Level)
+                                            {
+                                                case UserPermissionLevel.Edit:
+                                                    <td class="govuk-table__cell">
+                                                        <govuk-tag class="govuk-tag--green">
+                                                        EDIT
+                                                        </govuk-tag>
+                                                    </td>
+                                                    break;
+
+                                                case UserPermissionLevel.View:
+                                                    <td class="govuk-table__cell">
+                                                        <govuk-tag class="govuk-tag--yellow">
+                                                        VIEW
+                                                        </govuk-tag>
+                                                    </td>
+                                                    break;
+
+                                                default:
+                                                    <td class="govuk-table__cell">
+                                                        <govuk-tag class="govuk-tag--red">
+                                                        NO
+                                                        </govuk-tag>
+                                                    </td>
+                                                    break;
+                                            }
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </govuk-radios-divider>
+                    }
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+            @if (Model.IsActiveUser)
+            {
+                <div class="govuk-button-group">
+                    <govuk-button type="submit">Save changes</govuk-button>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.EditUserDeactivate(Model.UserId)>Deactivate user</govuk-button-link>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users()>Cancel and return to users</govuk-button-link>
+                </div>
+            }
+            else
+            {
+                <div class="govuk-button-group">
+                    <govuk-button type="submit" asp-page-handler="activate">Reactivate user</govuk-button>
+                    <govuk-button-link class="govuk-button--secondary" href=@LinkGenerator.Users()>Cancel and return to users</govuk-button-link>
+                </div>
+            }
+
+        </form>
+    </div>
+</div>

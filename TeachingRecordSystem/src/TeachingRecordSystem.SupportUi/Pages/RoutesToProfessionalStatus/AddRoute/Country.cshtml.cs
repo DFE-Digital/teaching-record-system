@@ -10,8 +10,8 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public string BackLink => FromCheckAnswers ?
-        _linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        _linkGenerator.RouteAddPage(PreviousPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public Country[] TrainingCountries { get; set; } = [];
 
@@ -41,7 +41,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        TrainingCountries = await _referenceDataCache.GetTrainingCountriesAsync();
+        TrainingCountries = await ReferenceDataCache.GetTrainingCountriesAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

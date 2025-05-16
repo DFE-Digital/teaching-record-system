@@ -47,6 +47,7 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
         builder.HasIndex(e => e.OneLoginAuthenticationSchemeName).IsUnique().HasDatabaseName(ApplicationUser.OneLoginAuthenticationSchemeNameUniqueIndexName)
             .HasFilter("one_login_authentication_scheme_name is not null");
         builder.HasIndex(e => e.ClientId).IsUnique().HasDatabaseName(ApplicationUser.ClientIdUniqueIndexName).HasFilter("client_id is not null");
+        builder.Property(e => e.ShortName).HasMaxLength(ApplicationUser.ShortNameMaxLength);
     }
 }
 

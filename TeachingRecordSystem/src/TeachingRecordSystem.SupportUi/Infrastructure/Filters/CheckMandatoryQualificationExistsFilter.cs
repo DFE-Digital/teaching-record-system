@@ -36,7 +36,7 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
         }
 
         context.HttpContext.SetCurrentMandatoryQualificationFeature(new(currentMq));
-        context.HttpContext.SetCurrentPersonFeature(currentMq.Person);
+        context.HttpContext.SetCurrentPersonFeature(currentMq.Person!);
 
         await next();
     }

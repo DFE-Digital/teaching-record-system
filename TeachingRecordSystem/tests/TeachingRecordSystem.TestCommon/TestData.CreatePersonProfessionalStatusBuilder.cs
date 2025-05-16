@@ -1,5 +1,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Migrations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -89,37 +91,31 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingCountry(Country trainingCountry)
+        public CreatePersonProfessionalStatusBuilder WithTrainingCountryId(string trainingCountryId)
         {
-            _trainingCountryId = trainingCountry.CountryId;
+            _trainingCountryId = trainingCountryId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingProvider(TrainingProvider trainingProvider)
+        public CreatePersonProfessionalStatusBuilder WithTrainingProviderId(Guid trainingProviderId)
         {
-            _trainingProviderId = trainingProvider.TrainingProviderId;
+            _trainingProviderId = trainingProviderId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithDegreeType(DegreeType degreeType)
+        public CreatePersonProfessionalStatusBuilder WithDegreeTypeId(Guid degreeTypeId)
         {
-            _degreeTypeId = degreeType.DegreeTypeId;
+            _degreeTypeId = degreeTypeId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingSubject(TrainingSubject[] trainingSubject)
-        {
-            _trainingSubjectIds = trainingSubject.Select(s => s.TrainingSubjectId).ToArray();
-            return this;
-        }
-
-        public CreatePersonProfessionalStatusBuilder WithExemptFromInduction(bool? isExempt)
+        public CreatePersonProfessionalStatusBuilder WithInductionExemption(bool? isExempt)
         {
             _exemptFromInduction = isExempt;
             return this;
         }
 
-        internal async Task<Guid> ExecuteAsync(
+        internal Task<Guid> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
             TestData testData,
             TrsDbContext dbContext)
@@ -152,9 +148,9 @@ public partial class TestData
                 UpdatedOn = DateTime.UtcNow
             };
 
-            await dbContext.ProfessionalStatuses.AddAsync(professionalStatus);
+            dbContext.ProfessionalStatuses.Add(professionalStatus);
 
-            return professionalStatus.QualificationId;
+            return Task.FromResult(professionalStatus.QualificationId);
         }
     }
 }

@@ -57,7 +57,7 @@ public class EndDateModel(
             NextCompletingRoutePage() :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
-                linkGenerator.RouteDetail(QualificationId, JourneyInstance.InstanceId));
+                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -77,7 +77,7 @@ public class EndDateModel(
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
                 linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId);
+                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
     private string NextCompletingRoutePage()
     {

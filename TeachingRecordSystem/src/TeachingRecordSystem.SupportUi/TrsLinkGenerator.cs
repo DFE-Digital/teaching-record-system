@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -340,14 +341,6 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
-    public string PersonEditName(Guid personId, JourneyInstanceId? journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string PersonEditNameConfirm(Guid personId, JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditName/Confirm", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string PersonEditDateOfBirth(Guid personId, JourneyInstanceId? journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditDateOfBirth/Index", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
-    public string PersonEditDateOfBirthConfirm(Guid personId, JourneyInstanceId journeyInstanceId) => GetRequiredPathByPage("/Persons/PersonDetail/EditDateOfBirth/Confirm", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-
     public string LegacyUsers() => GetRequiredPathByPage("/LegacyUsers/Index");
 
     public string LegacyAddUser() => GetRequiredPathByPage("/LegacyUsers/AddUser/Index");
@@ -356,13 +349,17 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string LegacyEditUser(Guid userId) => GetRequiredPathByPage("/LegacyUsers/EditUser", routeValues: new { userId });
 
-    public string Users() => GetRequiredPathByPage("/Users/Index");
+    public string Users(int? page = null) => GetRequiredPathByPage("/Users/Index", routeValues: new { page });
 
     public string AddUser() => GetRequiredPathByPage("/Users/AddUser/Index");
 
     public string AddUserConfirm(string userId) => GetRequiredPathByPage("/Users/AddUser/Confirm", routeValues: new { userId });
 
-    public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser", routeValues: new { userId });
+    public string EditUser(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Index", routeValues: new { userId });
+
+    public string EditUserDeactivate(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Deactivate", routeValues: new { userId });
+
+    public string EditUserDeactivateCancel(Guid userId) => GetRequiredPathByPage("/Users/EditUser/Deactivate", "cancel", routeValues: new { userId });
 
     public string ApplicationUsers() => GetRequiredPathByPage("/ApplicationUsers/Index");
 
@@ -388,17 +385,26 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
             _ => throw new ArgumentException($"Unknown {nameof(SupportTaskType)}: '{supportTaskType}'.", nameof(supportTaskType))
         };
 
-    public string ApiTrnRequests(string? search = null) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search });
+    public string ApiTrnRequests(string? search = null, ApiTrnRequestsSortByOption? sortBy = null, SortDirection? sortDirection = null, int? page = null, string? waitForJobId = null) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Index", routeValues: new { search, sortBy, sortDirection, page, waitForJobId });
 
     public string ApiTrnRequestMatches(string supportTaskReference, JourneyInstanceId? journeyInstanceId = null) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
     public string ApiTrnRequestMatchesCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Matches", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string ApiTrnRequestMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string ApiTrnRequestMergeCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
+
+    public string ApiTrnRequestCheckAnswers(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string ApiTrnRequestCheckAnswersCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/CheckAnswers", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
 
     public string ConnectOneLoginUserSupportTask(string supportTaskReference) =>
         GetRequiredPathByPage("/SupportTasks/ConnectOneLoginUser/Index", routeValues: new { supportTaskReference });

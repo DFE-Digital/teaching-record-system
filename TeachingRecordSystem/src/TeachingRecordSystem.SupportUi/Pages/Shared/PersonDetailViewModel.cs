@@ -18,9 +18,8 @@ public record PersonDetailViewModel
 public enum PersonDetailViewModelOptions
 {
     None = 0,
-    ShowChangeLinks = 1 << 0,
     ShowGender = 1 << 1,
     ShowEmail = 1 << 2,
     ShowMobileNumber = 1 << 3,
-    ShowAll = ShowChangeLinks | ShowGender | ShowEmail | ShowMobileNumber
+    ShowAll = ShowGender | ShowEmail | ShowMobileNumber
 }

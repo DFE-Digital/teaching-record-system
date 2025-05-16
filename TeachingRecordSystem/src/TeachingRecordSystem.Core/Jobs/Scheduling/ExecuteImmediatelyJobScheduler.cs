@@ -25,4 +25,9 @@ public class ExecuteImmediatelyJobScheduler : IBackgroundJobScheduler
     {
         return EnqueueAsync(expression);
     }
+
+    public Task WaitForJobToCompleteAsync(string jobId, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

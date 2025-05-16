@@ -24,7 +24,8 @@ public class ConfirmTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
@@ -132,7 +133,8 @@ public class ConfirmTests : TestBase, IAsyncLifetime
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        SetCurrentUser(TestUsers.GetUser(role: null));
+        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();

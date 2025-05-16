@@ -11,7 +11,7 @@ public class ApiKey
     public required DateTime CreatedOn { get; init; }
     public required DateTime UpdatedOn { get; set; }
     public required Guid ApplicationUserId { get; init; }
-    public ApplicationUser ApplicationUser { get; } = null!;
+    public ApplicationUser? ApplicationUser { get; }
     public required string Key { get; init; }
     public DateTime? Expires { get; set; }
 }

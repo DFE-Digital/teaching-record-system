@@ -22,6 +22,12 @@ public static class RouteToProfessionalStatusPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
+    public static Task SelectRouteChangeReasonOption(this IPage page, string reason)
+    {
+        var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
+        return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
+    }
+
     public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
@@ -146,4 +152,15 @@ public static class RouteToProfessionalStatusPageExtensions
     {
         return page.WaitForUrlPathAsync("/route/add/check-answers");
     }
+
+    public static Task AssertOnRouteDeleteChangeReasonPage(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/delete/change-reason");
+    }
+
+    public static Task AssertOnRouteDeleteCheckYourAnswersPageAsync(this IPage page, Guid qualificationId)
+    {
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/delete/check-answers");
+    }
+
 }

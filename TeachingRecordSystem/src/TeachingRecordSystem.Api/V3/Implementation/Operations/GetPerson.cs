@@ -342,7 +342,7 @@ public class GetPersonHandler(
             null;
 
         var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            WithTrsDbLockAsync(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
+            WithTrsDbLockAsync(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at!.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
             null;
 
         IEnumerable<NameInfo> previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
@@ -416,10 +416,10 @@ public class GetPersonHandler(
                 default,
             Sanctions = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) ?
                 Option.Some((await getAlertsTask!)
-                    .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType.DqtSanctionCode) && a.IsOpen)
+                    .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType!.DqtSanctionCode) && a.IsOpen)
                     .Select(s => new SanctionInfo()
                     {
-                        Code = s.AlertType.DqtSanctionCode!,
+                        Code = s.AlertType!.DqtSanctionCode!,
                         StartDate = s.StartDate
                     })
                     .AsReadOnly()) :
@@ -431,20 +431,20 @@ public class GetPersonHandler(
                         // The Legacy behavior is to only return prohibition-type alerts
                         if (command.ApplyLegacyAlertsBehavior)
                         {
-                            return Constants.LegacyProhibitionSanctionCodes.Contains(a.AlertType.DqtSanctionCode);
+                            return Constants.LegacyProhibitionSanctionCodes.Contains(a.AlertType!.DqtSanctionCode);
                         }
 
-                        return !a.AlertType.InternalOnly;
+                        return !a.AlertType!.InternalOnly;
                     })
                     .Select(a => new Alert()
                     {
                         AlertId = a.AlertId,
                         AlertType = new()
                         {
-                            AlertTypeId = a.AlertType.AlertTypeId,
+                            AlertTypeId = a.AlertType!.AlertTypeId,
                             AlertCategory = new()
                             {
-                                AlertCategoryId = a.AlertType.AlertCategory.AlertCategoryId,
+                                AlertCategoryId = a.AlertType.AlertCategory!.AlertCategoryId,
                                 Name = a.AlertType.AlertCategory.Name
                             },
                             Name = a.AlertType.Name,

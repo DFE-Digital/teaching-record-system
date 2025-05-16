@@ -448,6 +448,11 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/users/{userId}");
     }
 
+    public static async Task AssertOnEditUserDeactivatePageAsync(this IPage page, Guid userId)
+    {
+        await page.WaitForUrlPathAsync($"/users/{userId}/deactivate");
+    }
+
     public static async Task AssertOnApplicationUsersPageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/application-users");
@@ -592,4 +597,36 @@ public static class PageExtensions
         page.Locator($"input[type='radio'][value='{value}']")
         .Locator("xpath=following-sibling::label")
         .ClickAsync();
+
+    public static async Task SelectReasonMoreDetailsAsync(this IPage page, bool addAdditionalDetail, string? details = null)
+    {
+        var section = page.GetByTestId("has-additional-reason_detail-options");
+        var radioButton = section.Locator($"input[type='radio'][value='{addAdditionalDetail}']");
+        await radioButton.ClickAsync();
+        if (addAdditionalDetail)
+        {
+            await page.FillAsync("label:text-is('Add additional detail')", details!);
+        }
+    }
+
+    public static async Task SelectReasonFileUploadAsync(this IPage page, bool uploadFile, string? evidenceFileName = null)
+    {
+        var radioButton = page.GetByTestId("upload-evidence-options").Locator($"input[type='radio'][value='{uploadFile}']");
+        await radioButton.ClickAsync();
+        if (uploadFile == true)
+        {
+            if (evidenceFileName is null)
+            {
+                throw new ArgumentNullException(nameof(evidenceFileName), "Must set a filename to upload");
+            }
+            await page.GetByLabel("Upload a file")
+                .SetInputFilesAsync(
+                    new FilePayload()
+                    {
+                        Name = evidenceFileName,
+                        MimeType = "image/jpeg",
+                        Buffer = TestData.JpegImage
+                    });
+        }
+    }
 }

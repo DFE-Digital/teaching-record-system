@@ -89,7 +89,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var endDate = Clock.Today;
         var awardDate = Clock.Today;
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ReferenceDataCache.GetRouteStatusWhereAllFieldsApply();
+        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();

@@ -48,7 +48,7 @@ public class AgeRangeSpecialismModel(
             });
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteDetail(QualificationId, JourneyInstance!.InstanceId));
+            linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 
     public async Task<IActionResult> OnPostCancelAsync()

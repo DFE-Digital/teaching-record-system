@@ -2,6 +2,10 @@
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.SubjectSpecialismsModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 
+@{
+    ViewBag.Title = "Edit subject specialisms";
+}
+
 @section Styles {
     <link rel="stylesheet" href="~/Styles/Components/accessible-autocomplete.min.css" asp-append-version="true" />
 }
@@ -38,7 +42,7 @@
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+    <govuk-back-link href="@(Model.FromCheckAnswers == true ? LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteEditDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">

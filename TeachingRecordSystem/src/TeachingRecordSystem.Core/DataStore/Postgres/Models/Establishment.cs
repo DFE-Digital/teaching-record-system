@@ -29,5 +29,4 @@ public class Establishment
     public required string? Town { get; set; }
     public required string? County { get; set; }
     public required string? Postcode { get; set; }
-
 }
