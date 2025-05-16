@@ -19,7 +19,7 @@
         <table class="govuk-table">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header"
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-quarter"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.Name ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.Name, direction))">
                         Name
@@ -29,12 +29,12 @@
                         link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.Email, direction))">
                         Email
                     </th>
-                    <th scope="col" class="govuk-table__header"
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.RequestedOn ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.RequestedOn, direction))">
                         Requested on
                     </th>
-                    <th scope="col" class="govuk-table__header"
+                    <th scope="col" class="govuk-table__header trs-!-width-150"
                         sort-direction="@(Model.SortBy == ApiTrnRequestsSortByOption.Source ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.ApiTrnRequests(search: Model.Search, ApiTrnRequestsSortByOption.Source, direction))">
                         Source
@@ -54,11 +54,13 @@
                     {
                         <tr class="govuk-table__row" data-testid="task:@result.SupportTaskReference">
                             <th scope="row" class="govuk-table__header" data-testid="name">
-                                <a href="@LinkGenerator.ApiTrnRequestMatches(result.SupportTaskReference)">@result.FirstName @result.MiddleName @result.LastName</a>
+                                <a href="@LinkGenerator.ApiTrnRequestMatches(result.SupportTaskReference)" class="govuk-link">
+                                    @result.FirstName @result.MiddleName @result.LastName
+                                </a>
                             </th>
                             <td class="govuk-table__cell" data-testid="email">@result.EmailAddress</td>
                             <td class="govuk-table__cell" data-testid="requested-on">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</td>
-                            <td class="govuk-table__cell" data-testid="source"><colored-tag>@result.SourceApplicationName</colored-tag></td>
+                            <td class="govuk-table__cell" data-testid="source"><colored-tag>@result.Source</colored-tag></td>
                         </tr>
                     }
                 }

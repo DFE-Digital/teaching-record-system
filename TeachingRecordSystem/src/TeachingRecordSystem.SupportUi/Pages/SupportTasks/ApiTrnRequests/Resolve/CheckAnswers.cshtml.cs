@@ -16,7 +16,8 @@ public class CheckAnswers(
     IBackgroundJobScheduler backgroundJobScheduler,
     TrnRequestHelper trnRequestHelper,
     ITrnGenerator trnGenerator,
-    TrsLinkGenerator linkGenerator) :
+    TrsLinkGenerator linkGenerator,
+    IClock clock) :
     ResolveApiTrnRequestPageModel(dbContext)
 {
     [FromRoute]
@@ -52,7 +53,9 @@ public class CheckAnswers(
         var requestData = supportTask.TrnRequestMetadata!;
         var state = JourneyInstance!.State;
 
+        var oldSupportTaskEventModel = EventModels.SupportTask.FromModel(supportTask);
         ApiTrnRequestDataPersonAttributes? selectedPersonAttributes;
+        EventModels.TrnRequestPersonAttributes? oldPersonAttributes;
 
         async Task<string?> GenerateTrnTokenIfHaveEmailAsync(string trn)
         {
@@ -77,6 +80,7 @@ public class CheckAnswers(
             jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
                 trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
             selectedPersonAttributes = null;
+            oldPersonAttributes = null;
         }
         else
         {
@@ -94,16 +98,60 @@ public class CheckAnswers(
                 trnRequestHelper => trnRequestHelper.UpdateContactFromTrnRequestAsync(
                     requestData,
                     attributesToUpdate));
+
+            oldPersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            {
+                FirstName = selectedPersonAttributes.FirstName,
+                MiddleName = selectedPersonAttributes.MiddleName,
+                LastName = selectedPersonAttributes.LastName,
+                DateOfBirth = selectedPersonAttributes.DateOfBirth,
+                EmailAddress = selectedPersonAttributes.EmailAddress,
+                NationalInsuranceNumber = selectedPersonAttributes.NationalInsuranceNumber
+            };
         }
 
+        Debug.Assert(requestData.ResolvedPersonId is not null);
+
+        var resolvedPersonAttributes = GetResolvedPersonAttributes(selectedPersonAttributes);
+
         supportTask.Status = SupportTaskStatus.Closed;
+        supportTask.UpdatedOn = clock.UtcNow;
         supportTask.UpdateData<ApiTrnRequestData>(data => data with
         {
-            ResolvedAttributes = GetResolvedPersonAttributes(selectedPersonAttributes),
+            ResolvedAttributes = resolvedPersonAttributes,
             SelectedPersonAttributes = selectedPersonAttributes
         });
 
-        //TODO event
+        var changes = ApiTrnRequestSupportTaskUpdatedEventChanges.Status |
+            (state.FirstNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonFirstName : 0) |
+            (state.MiddleNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonMiddleName : 0) |
+            (state.LastNameSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonLastName : 0) |
+            (state.DateOfBirthSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth : 0) |
+            (state.EmailAddressSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress : 0) |
+            (state.NationalInsuranceNumberSource is PersonAttributeSource.TrnRequest ? ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber : 0);
+
+        var @event = new ApiTrnRequestSupportTaskUpdatedEvent()
+        {
+            PersonId = requestData.ResolvedPersonId!.Value,
+            SupportTask = EventModels.SupportTask.FromModel(supportTask),
+            OldSupportTask = oldSupportTaskEventModel,
+            RequestData = EventModels.TrnRequestMetadata.FromModel(requestData),
+            Changes = changes,
+            PersonAttributes = new EventModels.TrnRequestPersonAttributes()
+            {
+                FirstName = resolvedPersonAttributes.FirstName,
+                MiddleName = resolvedPersonAttributes.MiddleName,
+                LastName = resolvedPersonAttributes.LastName,
+                DateOfBirth = resolvedPersonAttributes.DateOfBirth,
+                EmailAddress = resolvedPersonAttributes.EmailAddress,
+                NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber
+            },
+            OldPersonAttributes = oldPersonAttributes,
+            EventId = Guid.NewGuid(),
+            CreatedUtc = clock.UtcNow,
+            RaisedBy = User.GetUserId()
+        };
+        await DbContext.AddEventAndBroadcastAsync(@event);
 
         await DbContext.SaveChangesAsync();
 
