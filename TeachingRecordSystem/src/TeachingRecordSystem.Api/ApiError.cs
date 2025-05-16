@@ -36,6 +36,7 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int UnableToChangeFailProfessionalStatusStatus => 10055;
         public static int UnableToChangeWithdrawnProfessionalStatusStatus => 10056;
         public static int PiiUpdatesForbiddenPersonHasEyts => 10057;
+        public static int PersonInactive => 10058;
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -53,6 +54,13 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         }
 
         return new ApiError(ErrorCodes.PersonNotFound, title, detail);
+    }
+
+    public static ApiError PersonInactive(string trn)
+    {
+        var title = $"Person is inactive.";
+
+        return new ApiError(ErrorCodes.PersonInactive, title);
     }
 
     public static ApiError SpecifiedResourceUrlDoesNotExist(string url) =>
