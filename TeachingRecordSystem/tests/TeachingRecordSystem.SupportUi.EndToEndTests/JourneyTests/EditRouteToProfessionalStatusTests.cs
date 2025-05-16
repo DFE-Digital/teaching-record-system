@@ -838,13 +838,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     {
         var awardDate = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.InductionExemptionReasonId.HasValue)
-            .Join(
-                (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
-                r => r.InductionExemptionReasonId,
-                e => e.InductionExemptionReasonId,
-                (r, e) => r
-            )
+            .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption == false)
             .RandomOne();
 
         var status = ProfessionalStatusStatus.InTraining;
