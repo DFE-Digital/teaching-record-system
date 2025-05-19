@@ -1160,7 +1160,7 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
                 Faker.Identification.UkNationalInsuranceNumber()));
 
             personMatchingServiceMock
-                .Setup(mock => mock.MatchAsync(It.Is<MatchRequest>(r =>
+                .Setup(mock => mock.MatchOneLoginUserAsync(It.Is<OneLoginUserMatchRequest>(r =>
                     r.Names.SequenceEqual(state.VerifiedNames!) &&
                     r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
                     r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
@@ -1212,12 +1212,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personMatchingServiceMock
-                .Setup(mock => mock.MatchAsync(It.Is<MatchRequest>(r =>
+                .Setup(mock => mock.MatchOneLoginUserAsync(It.Is<OneLoginUserMatchRequest>(r =>
                     r.Names.SequenceEqual(state.VerifiedNames!) &&
                     r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
                     r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
                     r.Trn == state.Trn)))
-                .ReturnsAsync(new MatchResult(
+                .ReturnsAsync(new OneLoginUserMatchResult(
                     person.PersonId,
                     person.Trn!,
                     new Dictionary<PersonMatchedAttribute, string>()
@@ -1271,12 +1271,12 @@ public class SignInJourneyHelperTests(HostFixture hostFixture) : TestBase(hostFi
             await journeyInstance.UpdateStateAsync(state => state.SetNationalInsuranceNumber(true, person.NationalInsuranceNumber));
 
             personMatchingServiceMock
-                .Setup(mock => mock.MatchAsync(It.Is<MatchRequest>(r =>
+                .Setup(mock => mock.MatchOneLoginUserAsync(It.Is<OneLoginUserMatchRequest>(r =>
                     r.Names.SequenceEqual(state.VerifiedNames!) &&
                     r.DatesOfBirth.SequenceEqual(state.VerifiedDatesOfBirth!) &&
                     r.NationalInsuranceNumber == state.NationalInsuranceNumber &&
                     r.Trn == state.Trn)))
-                .ReturnsAsync(new MatchResult(
+                .ReturnsAsync(new OneLoginUserMatchResult(
                     person.PersonId,
                     person.Trn!,
                     new Dictionary<PersonMatchedAttribute, string>()

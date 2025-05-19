@@ -313,7 +313,7 @@ public class SignInJourneyHelper(
         var nationalInsuranceNumber = state.NationalInsuranceNumber;
         var trn = state.Trn;
 
-        var matchResult = await personMatchingService.MatchAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
+        var matchResult = await personMatchingService.MatchOneLoginUserAsync(new(names!, datesOfBirth!, nationalInsuranceNumber, trn));
 
         if (matchResult is var (matchedPersonId, matchedTrn, matchedAttributes))
         {
