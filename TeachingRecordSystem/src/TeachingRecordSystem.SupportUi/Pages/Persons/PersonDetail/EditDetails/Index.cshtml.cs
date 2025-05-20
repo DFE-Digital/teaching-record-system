@@ -110,9 +110,9 @@ public class IndexModel(
             state.MiddleName = MiddleName;
             state.LastName = LastName;
             state.DateOfBirth = DateOfBirth;
-            state.NationalInsuranceNumber = new EditDetailsFieldState<NationalInsuranceNumber>(NationalInsuranceNumber, nationalInsuranceNumber);
-            state.MobileNumber = new EditDetailsFieldState<MobileNumber>(MobileNumber, mobileNumber);
-            state.EmailAddress = new EditDetailsFieldState<EmailAddress>(EmailAddress, emailAddress);
+            state.EmailAddress = new(EmailAddress, emailAddress);
+            state.MobileNumber = new(MobileNumber, mobileNumber);
+            state.NationalInsuranceNumber = new(NationalInsuranceNumber, nationalInsuranceNumber);
         });
 
         return Redirect(GetPageLink(NextPage));
