@@ -190,42 +190,11 @@ public abstract class TestBase : IDisposable
         return children.Cast<T>();
     }
 
-    protected async Task<Guid> AssertFileWasUploadedAsync()
-    {
-        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null));
-        return await Assert.IsType<Task<Guid>>(FileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
-    }
-
-    protected void AssertFileWasNotUploaded()
-    {
-        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
-    }
-
-    protected void AssertFileWasDeleted(Guid fileId)
-    {
-        FileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
-    }
-
     protected string GetHiddenInputValue(IHtmlDocument html, string name)
     {
         var element = html.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
         var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
 
         return input.Value;
-    }
-
-    protected void AssertSummaryListValue(IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
-    {
-        AssertSummaryListValue<IElement>(doc, keyContent, valueAssertion);
-    }
-
-    protected void AssertSummaryListValue<T>(IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
-    {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
-        Assert.NotNull(label);
-        var element = label.NextElementSibling;
-        Assert.NotNull(element);
-        var value = Assert.IsAssignableFrom<T>(element);
-        valueAssertion(value);
     }
 }

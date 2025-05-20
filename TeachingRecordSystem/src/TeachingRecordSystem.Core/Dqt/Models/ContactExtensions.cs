@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace TeachingRecordSystem.Core.Dqt.Models;
 
 public static class ContactExtensions
@@ -14,7 +12,7 @@ public static class ContactExtensions
         (contact.HasStatedNames() ? contact.dfeta_StatedLastName : contact.LastName) ?? string.Empty;
 
     public static string ResolveFullName(this Contact contact, bool includeMiddleName = true) =>
-        StringHelper.BuildFullName(
+        StringHelper.JoinNonEmpty(' ',
             contact.ResolveFirstName(),
             includeMiddleName ? contact.ResolveMiddleName() : null,
             contact.ResolveLastName());

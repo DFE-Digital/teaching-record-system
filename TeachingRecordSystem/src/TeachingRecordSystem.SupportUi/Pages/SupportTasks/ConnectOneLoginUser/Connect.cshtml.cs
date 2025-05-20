@@ -77,7 +77,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
                 Name = $"{p.FirstName} {p.MiddleName} {p.LastName}",
                 PreviousNames = Array.Empty<string>(),  // TODO When we've got previous names synced to TRS
                 DateOfBirth = p.DateOfBirth,
-                NationalInsuranceNumber = (string?)p.NationalInsuranceNumber,
+                NationalInsuranceNumber = p.NationalInsuranceNumber,
                 Gender = null,  // Not shown
                 Email = p.EmailAddress,
                 MobileNumber = null  // Not shown

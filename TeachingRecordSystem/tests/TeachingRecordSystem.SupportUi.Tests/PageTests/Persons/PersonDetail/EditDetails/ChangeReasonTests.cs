@@ -328,7 +328,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response, 400);
 
-        var evidenceFileId = await AssertFileWasUploadedAsync();
+        var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
@@ -423,7 +423,7 @@ public class ChangeReasonTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -460,7 +460,7 @@ public class ChangeReasonTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -521,7 +521,7 @@ public class ChangeReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        await AssertFileWasUploadedAsync();
+        await FileServiceMock.AssertFileWasUploadedAsync();
     }
 
     [Fact]
@@ -552,7 +552,7 @@ public class ChangeReasonTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
-        AssertFileWasNotUploaded();
+        FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(EditDetailsChangeReasonOption.NewInformation, journeyInstance.State.ChangeReason);

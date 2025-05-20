@@ -9,8 +9,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     public DeactivateTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
-        var mockFileService = Mock.Get(HostFixture.Services.GetRequiredService<IFileService>());
-        mockFileService.Invocations.Clear();
+        FileServiceMock.Invocations.Clear();
     }
 
     public async Task InitializeAsync()
@@ -403,7 +402,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response, 400);
 
-        var evidenceFileId = await AssertFileWasUploadedAsync();
+        var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
@@ -485,7 +484,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -514,7 +513,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -562,7 +561,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -642,7 +641,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
 
-        var evidenceFileId = await AssertFileWasUploadedAsync();
+        var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
 
         EventPublisher.AssertEventsSaved(e =>
         {
@@ -690,7 +689,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
 
-        AssertFileWasNotUploaded();
+        FileServiceMock.AssertFileWasNotUploaded();
 
         EventPublisher.AssertEventsSaved(e =>
         {
@@ -740,7 +739,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
 
-        AssertFileWasNotUploaded();
+        FileServiceMock.AssertFileWasNotUploaded();
 
         EventPublisher.AssertEventsSaved(e =>
         {

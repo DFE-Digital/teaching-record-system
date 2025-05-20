@@ -132,7 +132,7 @@ public abstract class ResolveApiTrnRequestPageModel(TrsDbContext dbContext) : Pa
             LastName = personAttributes.LastName,
             DateOfBirth = personAttributes.DateOfBirth,
             EmailAddress = personAttributes.EmailAddress,
-            NationalInsuranceNumber = (string?)personAttributes.NationalInsuranceNumber
+            NationalInsuranceNumber = personAttributes.NationalInsuranceNumber
         };
     }
 

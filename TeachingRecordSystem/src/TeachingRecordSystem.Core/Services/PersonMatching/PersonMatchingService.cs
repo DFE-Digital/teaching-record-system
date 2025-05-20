@@ -242,7 +242,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty();
         var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty();
-        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         return dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
                 """

@@ -161,7 +161,7 @@ public class DebugIdentityModel(
 
         if (_oneLoginUser?.Person is Person person)
         {
-            Person = new(person.PersonId, person.Trn, person.FirstName, person.LastName, person.DateOfBirth, (string?)person.NationalInsuranceNumber);
+            Person = new(person.PersonId, person.Trn, person.FirstName, person.LastName, person.DateOfBirth, person.NationalInsuranceNumber);
         }
 
         await base.OnPageHandlerExecutionAsync(context, next);

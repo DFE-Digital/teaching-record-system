@@ -204,7 +204,7 @@ public class CommonPageTests : TestBase
         var location = redirectResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}", location);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Theory]

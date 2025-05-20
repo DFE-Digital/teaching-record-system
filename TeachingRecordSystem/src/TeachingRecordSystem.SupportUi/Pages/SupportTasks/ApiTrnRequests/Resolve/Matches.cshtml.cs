@@ -98,7 +98,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
                     LastName = p.LastName,
                     DateOfBirth = p.DateOfBirth,
                     EmailAddress = p.EmailAddress,
-                    NationalInsuranceNumber = (string?)p.NationalInsuranceNumber,
+                    NationalInsuranceNumber = p.NationalInsuranceNumber,
                     Trn = p.Trn!,
                     HasQts = p.QtsDate != null,
                     HasEyts = p.EytsDate != null,

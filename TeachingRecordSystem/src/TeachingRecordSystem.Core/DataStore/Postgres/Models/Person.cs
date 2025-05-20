@@ -91,7 +91,7 @@ public class Person
             (DateOfBirth != oldDetails.DateOfBirth ? PersonDetailsUpdatedEventChanges.DateOfBirth : 0) |
             (EmailAddress != oldDetails.EmailAddress ? PersonDetailsUpdatedEventChanges.EmailAddress : 0) |
             (MobileNumber != oldDetails.MobileNumber ? PersonDetailsUpdatedEventChanges.MobileNumber : 0) |
-        (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0);
+            (NationalInsuranceNumber != oldDetails.NationalInsuranceNumber ? PersonDetailsUpdatedEventChanges.NationalInsuranceNumber : 0);
 
         if (changes == PersonDetailsUpdatedEventChanges.None)
         {

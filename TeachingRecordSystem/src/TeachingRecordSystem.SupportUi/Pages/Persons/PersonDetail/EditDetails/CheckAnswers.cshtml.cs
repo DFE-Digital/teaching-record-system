@@ -32,7 +32,7 @@ public class CheckAnswersModel(
     public string? EvidenceFileSizeDescription { get; set; }
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string Name => StringHelper.BuildFullName(FirstName, MiddleName, LastName);
+    public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(EditDetailsJourneyPage.Index, true);
