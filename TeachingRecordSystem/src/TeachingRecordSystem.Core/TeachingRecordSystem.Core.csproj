@@ -78,6 +78,7 @@
     <None Remove="Services\DqtReporting\Migrations\0051_TpsEmploymentsPersonEmailAndEmployerPostcode.sql" />
     <None Remove="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
     <None Remove="Services\DqtReporting\Migrations\0058_TrsNotes.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0059_TrsNotesNullContentHtml.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -168,6 +169,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0056_PqtsAndHasEyps.sql" />    
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0057_TrsQualificationsProfessionalStatusTypeAndExemptFromInduction.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0058_TrsNotes.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0059_TrsNotesNullContentHtml.sql" />
   </ItemGroup>
 
   <ItemGroup>
