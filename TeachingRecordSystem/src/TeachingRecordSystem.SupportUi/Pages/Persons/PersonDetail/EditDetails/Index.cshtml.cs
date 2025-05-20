@@ -64,12 +64,12 @@ public class IndexModel(
     public IActionResult OnGet()
     {
         FirstName = JourneyInstance!.State.FirstName;
-        MiddleName = JourneyInstance!.State.MiddleName;
-        LastName = JourneyInstance!.State.LastName;
-        DateOfBirth = JourneyInstance!.State.DateOfBirth;
-        EmailAddress = JourneyInstance!.State.EmailAddress?.ToDisplayString();
-        MobileNumber = JourneyInstance!.State.MobileNumber?.ToDisplayString();
-        NationalInsuranceNumber = JourneyInstance!.State.NationalInsuranceNumber?.ToDisplayString();
+        MiddleName = JourneyInstance.State.MiddleName;
+        LastName = JourneyInstance.State.LastName;
+        DateOfBirth = JourneyInstance.State.DateOfBirth;
+        EmailAddress = JourneyInstance.State.EmailAddress.Parsed?.ToDisplayString() ?? JourneyInstance.State.EmailAddress.Raw;
+        MobileNumber = JourneyInstance.State.MobileNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.MobileNumber.Raw;
+        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed?.ToDisplayString() ?? JourneyInstance.State.NationalInsuranceNumber.Raw;
 
         return Page();
     }
@@ -110,9 +110,9 @@ public class IndexModel(
             state.MiddleName = MiddleName;
             state.LastName = LastName;
             state.DateOfBirth = DateOfBirth;
-            state.NationalInsuranceNumber = nationalInsuranceNumber;
-            state.MobileNumber = mobileNumber;
-            state.EmailAddress = emailAddress;
+            state.NationalInsuranceNumber = new EditDetailsFieldState<NationalInsuranceNumber>(NationalInsuranceNumber, nationalInsuranceNumber);
+            state.MobileNumber = new EditDetailsFieldState<MobileNumber>(MobileNumber, mobileNumber);
+            state.EmailAddress = new EditDetailsFieldState<EmailAddress>(EmailAddress, emailAddress);
         });
 
         return Redirect(GetPageLink(NextPage));

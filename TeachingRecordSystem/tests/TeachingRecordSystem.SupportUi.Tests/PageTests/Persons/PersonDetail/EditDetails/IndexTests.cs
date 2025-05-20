@@ -107,16 +107,48 @@ public class IndexTests : TestBase
         var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
 
-        Assert.Equal("Alfred", firstName.Value);
-        Assert.Equal("The", middleName.Value);
-        Assert.Equal("Great", lastName.Value);
+        Assert.Equal("Alfred", firstName.Value.Trim());
+        Assert.Equal("The", middleName.Value.Trim());
+        Assert.Equal("Great", lastName.Value.Trim());
         Assert.Collection(dateOfBirth,
-            day => Assert.Equal("1", day.Value),
-            month => Assert.Equal("2", month.Value),
-            year => Assert.Equal("1980", year.Value));
-        Assert.Equal("test@test.com", emailAddress.Value);
-        Assert.Equal("07891234567", mobileNumber.Value);
-        Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value);
+            day => Assert.Equal("1", day.Value.Trim()),
+            month => Assert.Equal("2", month.Value.Trim()),
+            year => Assert.Equal("1980", year.Value.Trim()));
+        Assert.Equal("test@test.com", emailAddress.Value.Trim());
+        Assert.Equal("07891234567", mobileNumber.Value.Trim());
+        Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
+    }
+
+    [Fact]
+    public async Task Get_PersonDataIsInvalid_JourneyInitializationDoesNotError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithEmail("invalid")
+            .WithMobileNumber("invalid")
+            .WithNationalInsuranceNumber("invalid"));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.StartsWith($"/persons/{person.PersonId}/edit-details?ffiid=", response.Headers.Location?.OriginalString);
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Get, response.Headers.Location!.OriginalString);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
+
+        var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
+        var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
+        var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
+        var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
+
+        Assert.Equal("invalid", emailAddress.Value.Trim());
+        Assert.Equal("invalid", mobileNumber.Value.Trim());
+        Assert.Equal("invalid", nationalInsuranceNumber.Value.Trim());
     }
 
     [Fact]
@@ -150,16 +182,16 @@ public class IndexTests : TestBase
         var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
 
-        Assert.Equal("Alfred", firstName.Value);
-        Assert.Equal("The", middleName.Value);
-        Assert.Equal("Great", lastName.Value);
+        Assert.Equal("Alfred", firstName.Value.Trim());
+        Assert.Equal("The", middleName.Value.Trim());
+        Assert.Equal("Great", lastName.Value.Trim());
         Assert.Collection(dateOfBirth,
-            day => Assert.Equal("1", day.Value),
-            month => Assert.Equal("2", month.Value),
-            year => Assert.Equal("1980", year.Value));
-        Assert.Equal("test@test.com", emailAddress.Value);
-        Assert.Equal("07891234567", mobileNumber.Value);
-        Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value);
+            day => Assert.Equal("1", day.Value.Trim()),
+            month => Assert.Equal("2", month.Value.Trim()),
+            year => Assert.Equal("1980", year.Value.Trim()));
+        Assert.Equal("test@test.com", emailAddress.Value.Trim());
+        Assert.Equal("07891234567", mobileNumber.Value.Trim());
+        Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value.Trim());
     }
 
     [Fact]
@@ -657,9 +689,9 @@ public class IndexTests : TestBase
         Assert.Equal("A", journeyInstance.State.MiddleName);
         Assert.Equal("Person", journeyInstance.State.LastName);
         Assert.Equal(DateOnly.Parse("2 Mar 1981"), journeyInstance.State.DateOfBirth);
-        Assert.Equal("new@email.com", journeyInstance.State.EmailAddress?.ToString());
-        Assert.Equal("447987654321", journeyInstance.State.MobileNumber?.ToString());
-        Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber?.ToString());
+        Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
+        Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
+        Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person) =>

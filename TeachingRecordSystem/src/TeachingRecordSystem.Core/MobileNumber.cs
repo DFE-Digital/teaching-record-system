@@ -299,24 +299,22 @@ public sealed class MobileNumber : IEquatable<MobileNumber>, IParsable<MobileNum
         return result;
     }
 
-    public static bool TryParse(string number, [MaybeNullWhen(false)] out MobileNumber result) =>
-        TryParseCore(number, out result, out _);
-
-    static MobileNumber IParsable<MobileNumber>.Parse(string s, IFormatProvider? provider) => Parse(s);
-
-    static bool IParsable<MobileNumber>.TryParse(
-        string? s,
-        IFormatProvider? provider,
-        [MaybeNullWhen(false)] out MobileNumber result)
+    public static bool TryParse(string? number, [MaybeNullWhen(false)] out MobileNumber result)
     {
-        if (s is null)
+        if (number is null)
         {
             result = null;
             return false;
         }
 
-        return TryParse(s, out result);
+        return TryParseCore(number, out result, out _);
     }
+
+    static MobileNumber IParsable<MobileNumber>.Parse(string s, IFormatProvider? provider) =>
+        Parse(s);
+
+    static bool IParsable<MobileNumber>.TryParse(string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out MobileNumber result) =>
+        TryParse(s, out result);
 
     private static bool TryParseCore(
         string number,

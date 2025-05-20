@@ -244,21 +244,58 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Do you have evidence to upload", v => Assert.Equal("Not provided", v.TextContent.Trim()));
     }
 
-    [Fact]
-    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
+    public static IEnumerable<object[]> GetFieldChangeData()
+    {
+        yield return new object[] { new FieldChange[] { new FirstNameChange("Jim") } };
+        yield return new object[] { new FieldChange[] { new MiddleNameChange("A") } };
+        yield return new object[] { new FieldChange[] { new LastNameChange("Person") } };
+        yield return new object[] { new FieldChange[] { new DobChange(DateOnly.Parse("3 July 1990")) } };
+        yield return new object[] { new FieldChange[] { new EmailChange("new@email.com") } };
+        yield return new object[] { new FieldChange[] { new MobileChange("447654321987") } };
+        yield return new object[] { new FieldChange[] { new NinoChange("JK987654D") } };
+        yield return new object[] { new FieldChange[] {
+            new FirstNameChange("Jim"),
+            new MiddleNameChange("A"),
+            new LastNameChange("Person"),
+            new DobChange(DateOnly.Parse("3 July 1990")),
+            new EmailChange("new@email.com"),
+            new MobileChange("447654321987"),
+            new NinoChange("JK987654D")
+        } };
+    }
+
+    [Theory]
+    [MemberData(nameof(GetFieldChangeData))]
+    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(FieldChange[] fieldChanges)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("test@test.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var firstName = fieldChanges.OfType<FirstNameChange>().FirstOrDefault()?.NewValue ?? person.FirstName;
+        var middleName = fieldChanges.OfType<MiddleNameChange>().FirstOrDefault()?.NewValue ?? person.MiddleName;
+        var lastName = fieldChanges.OfType<LastNameChange>().FirstOrDefault()?.NewValue ?? person.LastName;
+        var dateOfBirth = fieldChanges.OfType<DobChange>().FirstOrDefault()?.NewValue ?? person.DateOfBirth;
+        var emailAddress = fieldChanges.OfType<EmailChange>().FirstOrDefault()?.NewValue ?? person.Email;
+        var mobileNumber = fieldChanges.OfType<MobileChange>().FirstOrDefault()?.NewValue ?? person.MobileNumber;
+        var nationalInsuranceNumber = fieldChanges.OfType<NinoChange>().FirstOrDefault()?.NewValue ?? person.NationalInsuranceNumber;
+
         var evidenceFileId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState(person)
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithEmail("test@test.com")
-                .WithMobileNumber("07891 234567")
-                .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithInitializedState()
+                .WithName(firstName, middleName, lastName)
+                .WithDateOfBirth(dateOfBirth)
+                .WithEmail(emailAddress)
+                .WithMobileNumber(mobileNumber)
+                .WithNationalInsuranceNumber(nationalInsuranceNumber)
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidencefile.png")
                 .Build());
@@ -281,13 +318,13 @@ public class CheckAnswersTests : TestBase
         await WithDbContext(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
-            Assert.Equal("Alfred", updatedPersonRecord.FirstName);
-            Assert.Equal("The", updatedPersonRecord.MiddleName);
-            Assert.Equal("Great", updatedPersonRecord.LastName);
-            Assert.Equal(DateOnly.Parse("1 Feb 1980"), updatedPersonRecord.DateOfBirth);
-            Assert.Equal("test@test.com", updatedPersonRecord.EmailAddress);
-            Assert.Equal("447891234567", updatedPersonRecord.MobileNumber);
-            Assert.Equal("AB123456C", updatedPersonRecord.NationalInsuranceNumber);
+            Assert.Equal(firstName, updatedPersonRecord.FirstName);
+            Assert.Equal(middleName, updatedPersonRecord.MiddleName);
+            Assert.Equal(lastName, updatedPersonRecord.LastName);
+            Assert.Equal(dateOfBirth, updatedPersonRecord.DateOfBirth);
+            Assert.Equal(emailAddress, updatedPersonRecord.EmailAddress);
+            Assert.Equal(mobileNumber, updatedPersonRecord.MobileNumber);
+            Assert.Equal(nationalInsuranceNumber, updatedPersonRecord.NationalInsuranceNumber);
         });
 
         var RaisedBy = GetCurrentUserId();
@@ -298,25 +335,18 @@ public class CheckAnswersTests : TestBase
 
             Assert.Equal(Clock.UtcNow, actualEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualEvent.PersonId);
-            Assert.Equal("Alfred", actualEvent.Details.FirstName);
-            Assert.Equal("The", actualEvent.Details.MiddleName);
-            Assert.Equal("Great", actualEvent.Details.LastName);
-            Assert.Equal(DateOnly.Parse("1 Feb 1980"), actualEvent.Details.DateOfBirth);
-            Assert.Equal("test@test.com", actualEvent.Details.EmailAddress);
-            Assert.Equal("447891234567", actualEvent.Details.MobileNumber);
-            Assert.Equal("AB123456C", actualEvent.Details.NationalInsuranceNumber);
+            Assert.Equal(firstName, actualEvent.Details.FirstName);
+            Assert.Equal(middleName, actualEvent.Details.MiddleName);
+            Assert.Equal(lastName, actualEvent.Details.LastName);
+            Assert.Equal(dateOfBirth, actualEvent.Details.DateOfBirth);
+            Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
+            Assert.Equal(mobileNumber, actualEvent.Details.MobileNumber);
+            Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
             Assert.Equal("Another reason", actualEvent.ChangeReason);
             Assert.Equal(_changeReasonDetails, actualEvent.ChangeReasonDetail);
             Assert.Equal(evidenceFileId, actualEvent.EvidenceFile!.FileId);
             Assert.Equal("evidencefile.png", actualEvent.EvidenceFile.Name);
-            var expectedChanges =
-                PersonDetailsUpdatedEventChanges.FirstName |
-                PersonDetailsUpdatedEventChanges.MiddleName |
-                PersonDetailsUpdatedEventChanges.LastName |
-                PersonDetailsUpdatedEventChanges.DateOfBirth |
-                PersonDetailsUpdatedEventChanges.EmailAddress |
-                PersonDetailsUpdatedEventChanges.MobileNumber |
-                PersonDetailsUpdatedEventChanges.NationalInsuranceNumber;
+            var expectedChanges = fieldChanges.Aggregate(PersonDetailsUpdatedEventChanges.None, (acc, c) => acc | c.Change);
             Assert.Equal(expectedChanges, actualEvent.Changes);
         });
 
@@ -332,4 +362,13 @@ public class CheckAnswersTests : TestBase
             JourneyNames.EditDetails,
             state ?? new EditDetailsState(),
             new KeyValuePair<string, object>("personId", personId));
+
+    public record FieldChange(PersonDetailsUpdatedEventChanges Change);
+    public record FirstNameChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.FirstName);
+    public record MiddleNameChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.MiddleName);
+    public record LastNameChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.LastName);
+    public record DobChange(DateOnly? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.DateOfBirth);
+    public record EmailChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.EmailAddress);
+    public record MobileChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.MobileNumber);
+    public record NinoChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber);
 }

@@ -105,9 +105,9 @@ public class CheckAnswersModel(
         MiddleName = JourneyInstance.State.MiddleName;
         LastName = JourneyInstance.State.LastName;
         DateOfBirth = JourneyInstance.State.DateOfBirth;
-        MobileNumber = JourneyInstance.State.MobileNumber;
-        EmailAddress = JourneyInstance.State.EmailAddress;
-        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber;
+        MobileNumber = JourneyInstance.State.MobileNumber.Parsed;
+        EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
+        NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
         ChangeReason = JourneyInstance.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
         EvidenceFileName = JourneyInstance.State.EvidenceFileName;

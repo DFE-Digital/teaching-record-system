@@ -13,6 +13,7 @@ namespace TeachingRecordSystem.Core;
 public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuranceNumber>, IParsable<NationalInsuranceNumber>
 {
     private static readonly string[] _invalidPrefixes = ["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"];
+    private const string ValidNinoRegexPattern = "^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$";
 
     [JsonInclude]
     private string NormalizedValue { get; }
@@ -109,7 +110,7 @@ public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuran
     }
 
     // Sourced from https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
-    [GeneratedRegex("^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$")]
+    [GeneratedRegex(ValidNinoRegexPattern)]
     private static partial Regex ValidNinoPattern();
 }
 
