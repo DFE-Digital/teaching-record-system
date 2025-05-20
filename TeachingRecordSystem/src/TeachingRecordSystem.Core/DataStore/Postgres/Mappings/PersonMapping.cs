@@ -11,6 +11,7 @@ public class PersonMapping : IEntityTypeConfiguration<Person>
         builder.HasKey(p => p.PersonId);
         builder.HasQueryFilter(p => p.Status == PersonStatus.Active);
         builder.HasIndex(p => p.DqtContactId).HasFilter("dqt_contact_id is not null").IsUnique();
+        builder.HasIndex(p => p.MergedWithPersonId).HasFilter("merged_with_person_id is not null");
         builder.HasIndex(p => p.Trn).HasFilter("trn is not null").IsUnique();
         builder.Property(p => p.Trn).HasMaxLength(7).IsFixedLength();
         builder.Property(p => p.FirstName).HasMaxLength(Person.FirstNameMaxLength).UseCollation("case_insensitive");

@@ -42,14 +42,19 @@ public class ApiResultActionResultBuilder<TResult>(ApiResult<TResult> result, Fu
     where TResult : notnull
 {
     private readonly Dictionary<int, int> _errorCodeStatusCodeMappings = [];
+    private readonly Dictionary<int, Func<ApiError, IActionResult>> _errorCodeResultMappings = [];
 
     public Task ExecuteResultAsync(ActionContext context)
     {
         if (result.IsError)
         {
             var error = result.GetError();
-            var statusCode = _errorCodeStatusCodeMappings.TryGetValue(error.ErrorCode, out var sc) ? sc : StatusCodes.Status400BadRequest;
-            return error.ToActionResult(statusCode).ExecuteResultAsync(context);
+
+            var actionResult = _errorCodeResultMappings.TryGetValue(error.ErrorCode, out var createErrorResult)
+                ? createErrorResult(error)
+                : (error.ToActionResult(_errorCodeStatusCodeMappings.TryGetValue(error.ErrorCode, out var sc) ? sc : StatusCodes.Status400BadRequest));
+
+            return actionResult.ExecuteResultAsync(context);
         }
 
         return mapSuccess(result.GetSuccess()).ExecuteResultAsync(context);
@@ -58,6 +63,12 @@ public class ApiResultActionResultBuilder<TResult>(ApiResult<TResult> result, Fu
     public ApiResultActionResultBuilder<TResult> MapErrorCode(int errorCode, int statusCode)
     {
         _errorCodeStatusCodeMappings[errorCode] = statusCode;
+        return this;
+    }
+
+    public ApiResultActionResultBuilder<TResult> MapErrorCode(int errorCode, Func<ApiError, IActionResult> mapError)
+    {
+        _errorCodeResultMappings[errorCode] = mapError;
         return this;
     }
 }
