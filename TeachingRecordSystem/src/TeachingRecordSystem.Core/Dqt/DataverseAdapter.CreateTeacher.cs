@@ -6,6 +6,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Dqt;
 
@@ -247,7 +248,7 @@ public partial class DataverseAdapter
                 dfeta_HUSID = _command.HusId,
                 dfeta_SlugId = _command.SlugId,
                 dfeta_AllowPiiUpdatesFromRegister = true,
-                dfeta_TrnRequestID = TrnRequestHelper.GetCrmTrnRequestId(_command.ApplicationUserId, _command.TrnRequestId)
+                dfeta_TrnRequestID = TrnRequestService.GetCrmTrnRequestId(_command.ApplicationUserId, _command.TrnRequestId)
             };
 
             // We get a NullReferenceException back from CRM if City is null or empty

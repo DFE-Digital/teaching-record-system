@@ -14,6 +14,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
@@ -21,7 +22,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
 {
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-    private readonly TrnRequestHelper _trnRequestHelper;
+    private readonly TrnRequestService _trnRequestService;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentUserProvider _currentUserProvider;
     private readonly IDistributedLockProvider _distributedLockProvider;
@@ -29,14 +30,14 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public GetOrCreateTrnRequestHandler(
-        TrnRequestHelper trnRequestHelper,
+        TrnRequestService trnRequestService,
         IDataverseAdapter dataverseAdapter,
         ICurrentUserProvider currentUserProvider,
         IDistributedLockProvider distributedLockProvider,
         IGetAnIdentityApiClient identityApiClient,
         IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
-        _trnRequestHelper = trnRequestHelper;
+        _trnRequestService = trnRequestService;
         _dataverseAdapter = dataverseAdapter;
         _currentUserProvider = currentUserProvider;
         _distributedLockProvider = distributedLockProvider;
@@ -56,7 +57,7 @@ public class GetOrCreateTrnRequestHandler : IRequestHandler<GetOrCreateTrnReques
             (IAsyncDisposable)await _distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Husid(request.HusId), _lockTimeout) :
             NoopAsyncDisposable.Instance;
 
-        var trnRequest = await _trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, request.RequestId);
+        var trnRequest = await _trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, request.RequestId);
 
         bool wasCreated;
         string trn;

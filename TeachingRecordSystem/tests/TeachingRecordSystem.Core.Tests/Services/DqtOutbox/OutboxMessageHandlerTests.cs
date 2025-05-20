@@ -9,6 +9,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
@@ -245,7 +246,7 @@ public class OutboxMessageHandlerFixture
             .AddDatabase(configuration.GetPostgresConnectionString())
             .AddTransient<TrsDbContext>(sp => sp.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContext())
             .AddSingleton(TestData)
-            .AddTransient<TrnRequestHelper>()
+            .AddTrnRequestService()
             .AddCrmQueries()
             .AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService)
             .AddSingleton<WebhookMessageFactory>()
