@@ -50,7 +50,9 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post,
@@ -75,7 +77,9 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -102,7 +106,9 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -143,7 +149,9 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -180,7 +188,9 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .Build());
@@ -218,7 +228,9 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .Build());
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}{fromPage}?FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}");
 
@@ -243,8 +255,10 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-               .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
-               .Build());
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}{page}?FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
         {

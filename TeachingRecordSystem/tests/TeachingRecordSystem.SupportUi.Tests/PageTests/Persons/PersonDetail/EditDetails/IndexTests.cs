@@ -1,5 +1,8 @@
+using System.Diagnostics.Metrics;
 using AngleSharp.Html.Dom;
+using FakeItEasy;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using Xunit;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -28,7 +31,8 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("A", "New", "Name", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState()
+                .WithName("A", "New", "Name")
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -50,7 +54,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -111,8 +115,8 @@ public class IndexTests : TestBase
             month => Assert.Equal("2", month.Value),
             year => Assert.Equal("1980", year.Value));
         Assert.Equal("test@test.com", emailAddress.Value);
-        Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value);
         Assert.Equal("07891234567", mobileNumber.Value);
+        Assert.Equal("AB 12 34 56 C", nationalInsuranceNumber.Value);
     }
 
     [Fact]
@@ -123,7 +127,12 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmail("test@test.com")
+                .WithMobileNumber("07891 234567")
+                .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -161,7 +170,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -189,7 +198,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -217,7 +226,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -245,7 +254,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -273,7 +282,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -301,7 +310,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -329,7 +338,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -357,7 +366,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -385,7 +394,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -406,14 +415,14 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Post_EmailAddressInvalid_ShowsPageError()
+    public async Task Post_EmailAddressMoreThan100Characters_ShowsPageError()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -422,10 +431,8 @@ public class IndexTests : TestBase
                     .WithFirstName("Alfred")
                     .WithMiddleName("The")
                     .WithLastName("Great")
+                    .WithEmailAddress($"test@{string.Join(".", Enumerable.Repeat("test", 20))}.com")
                     .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithEmailAddress("XYZ")
-                    .WithMobileNumber("07891 234567")
-                    .WithNationalInsuranceNumber("AB 12 34 56 C")
                     .Build())
         };
 
@@ -433,18 +440,29 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Enter a valid email address");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Person\u2019s email address must be 100 characters or less");
     }
 
-    [Fact]
-    public async Task Post_MobileNumberInvalid_ShowsPageError()
+    [Theory]
+    [InlineData("test", false)]
+    [InlineData("test.test.test", false)]
+    [InlineData("test@test", false)]
+    [InlineData("test@test.%test", false)]
+    [InlineData("test@test..test", false)]
+    [InlineData("test@test.t", false)]
+    [InlineData("test@\"test\".test", false)]
+    [InlineData("test.test.test.test@test.test.test.test", true)]
+    [InlineData(".!#$%&'*+/=?^_`{|}~-@test.test", true)]
+    // Ignore surrounding whitespace
+    [InlineData("    test@test.test    ", true)]
+    public async Task Post_EmailAddressInvalid_ShowsPageError(string emailAddress, bool shouldBeValid)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -454,8 +472,7 @@ public class IndexTests : TestBase
                     .WithMiddleName("The")
                     .WithLastName("Great")
                     .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithNationalInsuranceNumber("AB 12 34 56 C")
-                    .WithMobileNumber("XYZ")
+                    .WithEmailAddress(emailAddress)
                     .Build())
         };
 
@@ -463,18 +480,41 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.MobileNumber), "Enter a valid UK or international mobile phone number");
+        if (shouldBeValid)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.EmailAddress), "Enter a valid email address");
+        }
     }
 
-    [Fact]
-    public async Task Post_NationalInsuranceNumberInvalid_ShowsPageError()
+    [Theory]
+    [InlineData("test", false)]
+    [InlineData("07891 234567", true)]
+    [InlineData("08891 234567", false)]
+    [InlineData("44 7891 234567", true)]
+    [InlineData("44 6891 234567", false)]
+    [InlineData("37 9891 234567", false)]
+    [InlineData("20 12345", false)]
+    [InlineData("20 123456", true)]
+    [InlineData("20 1234567891234", true)]
+    [InlineData("20 12345678912345", false)]
+    // Ignore whitespace and symbols
+    [InlineData("(07891) 234567", true)]
+    [InlineData("+44 78-91-23-45-67", true)]
+    [InlineData("   (078 91) 234 567   ", true)]
+    [InlineData("07891234567", true)]
+    [InlineData("447891234567", true)]
+    public async Task Post_MobileNumberInvalid_ShowsPageError(string mobileNumber, bool shouldBeValid)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -484,7 +524,7 @@ public class IndexTests : TestBase
                     .WithMiddleName("The")
                     .WithLastName("Great")
                     .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithNationalInsuranceNumber("XYZ")
+                    .WithMobileNumber(mobileNumber)
                     .Build())
         };
 
@@ -492,7 +532,90 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+        if (shouldBeValid)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.MobileNumber), "Enter a valid UK or international mobile phone number");
+        }
+    }
+
+    [Theory]
+    // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
+    // A NINO is made up of 2 letters, 6 numbers and a final letter, which is always A, B, C, or D.
+    [InlineData("test", false)]
+    [InlineData("A 12 34 56 A", false)]
+    [InlineData("AB 12 34 56 AB", false)]
+    [InlineData("AB 12 34 5 A", false)]
+    [InlineData("AB 12 34 56 7 A", false)]
+    [InlineData("AB CD 34 56 A", false)]
+    [InlineData("AB 12 34 56 A", true)]
+    [InlineData("AB 12 34 56 B", true)]
+    [InlineData("AB 12 34 56 C", true)]
+    [InlineData("AB 12 34 56 D", true)]
+    [InlineData("AB 12 34 56 E", false)]
+    [InlineData("AB 12 34 56 X", false)]
+    // The characters D, F, I, Q, U, and V are not used as either the first or second letter of a NINO prefix.
+    [InlineData("DA 12 34 56 A", false)]
+    [InlineData("FA 12 34 56 A", false)]
+    [InlineData("IA 12 34 56 A", false)]
+    [InlineData("QA 12 34 56 A", false)]
+    [InlineData("UA 12 34 56 A", false)]
+    [InlineData("VA 12 34 56 A", false)]
+    [InlineData("AD 12 34 56 A", false)]
+    [InlineData("AF 12 34 56 A", false)]
+    [InlineData("AI 12 34 56 A", false)]
+    [InlineData("AQ 12 34 56 A", false)]
+    [InlineData("AU 12 34 56 A", false)]
+    [InlineData("AV 12 34 56 A", false)]
+    // The letter O is not used as the second letter of a prefix.
+    [InlineData("AO 12 34 56 A", false)]
+    // Prefixes BG, GB, KN, NK, NT, TN and ZZ are not to be used
+    [InlineData("BG 12 34 56 A", false)]
+    [InlineData("GB 12 34 56 A", false)]
+    [InlineData("KN 12 34 56 A", false)]
+    [InlineData("NK 12 34 56 A", false)]
+    [InlineData("NT 12 34 56 A", false)]
+    [InlineData("TN 12 34 56 A", false)]
+    [InlineData("ZZ 12 34 56 A", false)]
+    // Ignore whitespace
+    [InlineData("  AB   12   34  56    D    ", true)]
+    [InlineData("AB123456D", true)]
+    public async Task Post_NationalInsuranceNumberInvalid_ShowsPageError(string niNumber, bool shouldBeValid)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
+                    .WithFirstName("Alfred")
+                    .WithMiddleName("The")
+                    .WithLastName("Great")
+                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                    .WithNationalInsuranceNumber(niNumber)
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        if (shouldBeValid)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+        }
     }
 
     [Fact]
@@ -503,7 +626,12 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmail("test@test.com")
+                .WithMobileNumber("07891 234567")
+                .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))

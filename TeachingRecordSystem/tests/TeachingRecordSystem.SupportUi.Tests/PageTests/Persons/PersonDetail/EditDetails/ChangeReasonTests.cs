@@ -30,7 +30,8 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("A", "New", "Name", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("A", "New", "Name")
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -52,7 +53,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -83,7 +84,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .WithChangeReasonChoice(reasonChoice, reasonDetail)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .Build());
@@ -128,7 +129,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -167,7 +168,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -196,7 +197,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
@@ -217,7 +218,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
@@ -239,15 +240,11 @@ public class ChangeReasonTests : TestBase
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great")
-            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+        var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -269,15 +266,11 @@ public class ChangeReasonTests : TestBase
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great")
-            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+        var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -301,15 +294,11 @@ public class ChangeReasonTests : TestBase
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great")
-            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+        var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -345,15 +334,11 @@ public class ChangeReasonTests : TestBase
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great")
-            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+        var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
         var evidenceFileId = Guid.NewGuid();
 
@@ -392,15 +377,11 @@ public class ChangeReasonTests : TestBase
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great")
-            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+        var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
         var evidenceFileId = Guid.NewGuid();
 
@@ -430,15 +411,11 @@ public class ChangeReasonTests : TestBase
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great")
-            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+        var person = await TestData.CreatePersonAsync();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
         var evidenceFileId = Guid.NewGuid();
 
@@ -472,7 +449,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -504,7 +481,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -533,7 +510,7 @@ public class ChangeReasonTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
@@ -562,9 +539,6 @@ public class ChangeReasonTests : TestBase
         Assert.Null(journeyInstance.State.EvidenceFileName);
         Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
     }
-
-    private string GetRequestPath(TestData.CreatePersonResult person) =>
-        $"/persons/{person.PersonId}/edit-details/change-reason";
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";

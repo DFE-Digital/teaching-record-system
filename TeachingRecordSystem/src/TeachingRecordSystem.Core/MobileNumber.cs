@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace TeachingRecordSystem.Core;
 
 /// <summary>
-/// Represents a valid mobile phone number that can be sent messages via Notify.
+/// Represents a valid mobile phone number that can be sent messages via Notify (code ported from Notify).
 /// </summary>
 [DebuggerDisplay("{NormalizedValue}")]
 public sealed class MobileNumber : IEquatable<MobileNumber>, IParsable<MobileNumber>

@@ -1,4 +1,7 @@
+using TeachingRecordSystem.Core;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -19,17 +22,54 @@ public class EditDetailsStateBuilder
     public string? EvidenceFileSizeDescription { get; set; }
     private bool Initialized { get; set; }
 
-    public EditDetailsStateBuilder WithInitializedState(string? firstName, string? middleName, string? lastName, DateOnly? dateOfBirth, string? emailAddress, string? mobileNumber, string? nationalInsuranceNumber)
+    public EditDetailsStateBuilder WithInitializedState()
     {
-        this.Initialized = true;
+        Initialized = true;
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithInitializedState(CreatePersonResult person)
+    {
+        Initialized = true;
+        FirstName = person.FirstName;
+        MiddleName = person.MiddleName;
+        LastName = person.LastName;
+        DateOfBirth = person.DateOfBirth;
+        EmailAddress = person.Email;
+        MobileNumber = person.MobileNumber;
+        NationalInsuranceNumber = person.NationalInsuranceNumber;
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithName(string? firstName, string? middleName, string? lastName)
+    {
         FirstName = firstName;
         MiddleName = middleName;
         LastName = lastName;
-        DateOfBirth = dateOfBirth;
-        EmailAddress = emailAddress;
-        MobileNumber = mobileNumber;
-        NationalInsuranceNumber = nationalInsuranceNumber;
+        return this;
+    }
 
+    public EditDetailsStateBuilder WithDateOfBirth(DateOnly? dateOfBirth)
+    {
+        DateOfBirth = dateOfBirth;
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithEmail(string? emailAddress)
+    {
+        EmailAddress = emailAddress;
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithMobileNumber(string? mobileNumber)
+    {
+        MobileNumber = mobileNumber;
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithNationalInsuranceNumber(string? nationalInsuranceNumber)
+    {
+        NationalInsuranceNumber = nationalInsuranceNumber;
         return this;
     }
 

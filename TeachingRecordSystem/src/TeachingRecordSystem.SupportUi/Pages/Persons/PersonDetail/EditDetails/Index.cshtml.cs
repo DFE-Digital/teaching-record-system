@@ -48,6 +48,7 @@ public class IndexModel(
 
     [BindProperty]
     [Display(Name = "Email address (optional)")]
+    [MaxLength(Person.EmailAddressMaxLength, ErrorMessage = $"Person\u2019s email address must be 100 characters or less")]
     public string? EmailAddress { get; set; }
 
     [BindProperty]

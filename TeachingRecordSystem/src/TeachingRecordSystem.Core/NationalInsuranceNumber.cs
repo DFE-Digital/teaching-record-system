@@ -12,6 +12,8 @@ namespace TeachingRecordSystem.Core;
 [DebuggerDisplay("{NormalizedValue}")]
 public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuranceNumber>, IParsable<NationalInsuranceNumber>
 {
+    private static readonly string[] _invalidPrefixes = ["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"];
+
     [JsonInclude]
     private string NormalizedValue { get; }
 
@@ -71,6 +73,12 @@ public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuran
         var normalized = Normalize(s);
 
         if (!ValidNinoPattern().IsMatch(normalized))
+        {
+            result = null;
+            return false;
+        }
+
+        if (_invalidPrefixes.Any(normalized.StartsWith))
         {
             result = null;
             return false;

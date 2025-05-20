@@ -1,5 +1,4 @@
 using AngleSharp.Html.Dom;
-using Newtonsoft.Json.Linq;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
@@ -31,7 +30,8 @@ public class CheckAnswersTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("A", "New", "Name", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("A", "New", "Name")
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -55,7 +55,7 @@ public class CheckAnswersTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
@@ -79,13 +79,17 @@ public class CheckAnswersTests : TestBase
     {
         yield return new object[] {
             new EditDetailsStateBuilder()
-                .WithInitializedState(null, "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState()
+                .WithName(null, "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .Build()
         };
         yield return new object[] {
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason)
                 .Build()
         };
@@ -93,15 +97,11 @@ public class CheckAnswersTests : TestBase
 
     [Theory]
     [MemberData(nameof(GetInvalidStateData))]
-    public async Task Get_WithInvalidJourneyState_RedirectsToStart(EditDetailsState editEditDetailsState)
+    public async Task Get_WithInvalidJourneyState_RedirectsToIndex(EditDetailsState state)
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(p => p.WithQts());
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            editEditDetailsState);
-
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state);
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
         // Act
@@ -116,17 +116,21 @@ public class CheckAnswersTests : TestBase
     public async Task Get_ShowsPersonalDetails_AsExpected()
     {
         // Arrange
-        var editEditDetailsState = new EditDetailsStateBuilder()
-            .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
-            .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
-            .WithUploadEvidenceChoice(false)
-            .Build();
 
         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editEditDetailsState);
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmail("test@test.com")
+                .WithMobileNumber("07891 234567")
+                .WithNationalInsuranceNumber("AB 12 34 56 C")
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -148,17 +152,18 @@ public class CheckAnswersTests : TestBase
     public async Task Get_ShowsMissingOptionalPersonalDetails_AsNotProvided()
     {
         // Arrange
-        var editEditDetailsState = new EditDetailsStateBuilder()
-            .WithInitializedState("Alfred", null, "Great", DateOnly.Parse("1 Feb 1980"), null, null, null)
-            .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
-            .WithUploadEvidenceChoice(false)
-            .Build();
 
         var person = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editEditDetailsState);
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", null, "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -180,17 +185,16 @@ public class CheckAnswersTests : TestBase
     {
         // Arrange
         var evidenceFileId = Guid.NewGuid();
-        var editEditDetailsState = new EditDetailsStateBuilder()
-            .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
-            .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
-            .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
-            .Build();
 
         var person = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editEditDetailsState);
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -216,17 +220,16 @@ public class CheckAnswersTests : TestBase
     {
         // Arrange
         var evidenceFileId = Guid.NewGuid();
-        var editEditDetailsState = new EditDetailsStateBuilder()
-            .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
-            .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-            .WithUploadEvidenceChoice(false)
-            .Build();
 
         var person = await TestData.CreatePersonAsync();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            editEditDetailsState);
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
@@ -250,7 +253,12 @@ public class CheckAnswersTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState("Alfred", "The", "Great", DateOnly.Parse("1 Feb 1980"), "test@test.com", "07891 234567", "AB 12 34 56 C")
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmail("test@test.com")
+                .WithMobileNumber("07891 234567")
+                .WithNationalInsuranceNumber("AB 12 34 56 C")
                 .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
                 .WithUploadEvidenceChoice(true, evidenceFileId, "evidencefile.png")
                 .Build());
@@ -316,14 +324,8 @@ public class CheckAnswersTests : TestBase
         Assert.True(journeyInstance.Completed);
     }
 
-    private string GetRequestPath(TestData.CreatePersonResult person) =>
-        $"/persons/{person.PersonId}/edit-details/check-answers";
-
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>
         $"/persons/{person.PersonId}/edit-details/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}";
-
-    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance, bool fromCheckAnswers) =>
-        $"/persons/{person.PersonId}/edit-details/check-answers?fromCheckAnswers={fromCheckAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<EditDetailsState>> CreateJourneyInstanceAsync(Guid personId, EditDetailsState? state = null) =>
         CreateJourneyInstance(
