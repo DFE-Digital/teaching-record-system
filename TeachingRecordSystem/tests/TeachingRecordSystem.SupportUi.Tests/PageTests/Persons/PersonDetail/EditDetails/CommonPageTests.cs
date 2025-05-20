@@ -1,6 +1,5 @@
 using AngleSharp.Html.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using TeachingRecordSystem.WebCommon.FormFlow;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -260,7 +259,7 @@ public class CommonPageTests : TestBase
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}{page}?FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}{page}?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContent(
                 new EditDetailsPostRequestBuilder()
