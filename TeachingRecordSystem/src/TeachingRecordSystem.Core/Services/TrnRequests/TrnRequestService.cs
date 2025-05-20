@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using Microsoft.Xrm.Sdk.Query;
 using Optional;
@@ -8,11 +7,10 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
-using TeachingRecordSystem.Core.Services.TrnGeneration;
 
-namespace TeachingRecordSystem.Core;
+namespace TeachingRecordSystem.Core.Services.TrnRequests;
 
-public class TrnRequestHelper(
+public class TrnRequestService(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     IGetAnIdentityApiClient idApiClient,
@@ -184,13 +182,4 @@ public class TrnRequestHelper(
 
     public static string GetCrmTrnRequestId(Guid currentApplicationUserId, string requestId) =>
         $"{currentApplicationUserId}::{requestId}";
-}
-
-public record GetTrnRequestResult(Guid ApplicationUserId, Contact Contact, TrnRequestMetadata Metadata)
-{
-    public string? Trn => Contact.dfeta_TRN;
-    public bool PotentialDuplicate => Metadata.PotentialDuplicate == true;
-    public string? TrnToken => Metadata.TrnToken;
-    [MemberNotNullWhen(true, nameof(Trn))]
-    public bool IsCompleted => Trn is not null;
 }

@@ -10,6 +10,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.WebCommon.FormFlow;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 using static TeachingRecordSystem.AuthorizeAccess.IdModelTypes;
@@ -24,7 +25,7 @@ public class SignInJourneyHelper(
     IOptions<AuthorizeAccessOptions> optionsAccessor,
     IUserInstanceStateProvider userInstanceStateProvider,
     IClock clock,
-    TrnRequestHelper trnRequestHelper)
+    TrnRequestService trnRequestService)
 {
     public const string AuthenticationOnlyVtr = @"[""Cl.Cm""]";
     public const string AuthenticationAndIdentityVerificationVtr = @"[""Cl.Cm.P2""]";
@@ -358,7 +359,7 @@ public class SignInJourneyHelper(
             return null;
         }
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(trnRequestMetadata.ApplicationUserId, trnRequestMetadata.RequestId);
         if (trnRequest is null)
         {
             Debug.Fail("TRN request does not exist.");
