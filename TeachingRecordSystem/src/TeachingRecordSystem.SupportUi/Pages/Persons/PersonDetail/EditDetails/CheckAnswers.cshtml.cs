@@ -49,9 +49,9 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         _person!.UpdateDetails(
-            FirstName!,
-            MiddleName!,
-            LastName!,
+            FirstName ?? string.Empty,
+            MiddleName ?? string.Empty,
+            LastName ?? string.Empty,
             DateOfBirth,
             (string?)EmailAddress,
             (string?)MobileNumber,

@@ -28,16 +28,24 @@ public class IndexTests : TestBase
     public async Task Get_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
-        var email = TestData.GenerateUniqueEmail();
-        var mobileNumber = TestData.GenerateUniqueMobileNumber();
+        var randomEmail = TestData.GenerateUniqueEmail();
+        if (!EmailAddress.TryParse(randomEmail, out var email))
+        {
+            Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
+        }
+        var randomMobile = TestData.GenerateUniqueMobileNumber();
+        if (!MobileNumber.TryParse(randomMobile, out var mobileNumber))
+        {
+            Assert.Fail($@"Randomly generated mobile number ""{randomMobile}"" is invalid.");
+        }
         var updatedFirstName = TestData.GenerateFirstName();
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
         var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithTrn()
-            .WithEmail(email)
-            .WithMobileNumber(mobileNumber)
+            .WithEmail((string?)email)
+            .WithMobileNumber((string?)mobileNumber)
             .WithNationalInsuranceNumber());
 
         await TestData.UpdatePersonAsync(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
