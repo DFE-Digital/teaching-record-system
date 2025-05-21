@@ -43,19 +43,4 @@ public class TeachersController : ControllerBase
         var response = await _mediator.Send(request);
         return response != null ? Ok(response) : NotFound();
     }
-
-    [HttpPatch("update/{trn}")]
-    [SwaggerOperation(
-        OperationId = "UpdateTeacher",
-        Summary = "Update teacher",
-        Description = "Updates a teacher")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [MapError(10001, statusCode: StatusCodes.Status404NotFound)]
-    [MapError(10002, statusCode: StatusCodes.Status409Conflict)]
-    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.UpdatePerson)]
-    public async Task<IActionResult> UpdateAsync([FromBody] UpdateTeacherRequest request)
-    {
-        await _mediator.Send(request);
-        return NoContent();
-    }
 }
