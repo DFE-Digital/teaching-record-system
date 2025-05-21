@@ -157,9 +157,18 @@ just build
 just cli migrate-db
 ```
 
-**Note:** `just build` needs to be run first as `just cli migrate-db` will fail if the debug `TeachingRecordSystem.Cli` dll doesn't exist.
+**Note:** `just build` needs to be run first to make sure that the latest migration is compiled into the `TeachingRecordSystem.Cli` dll - `just cli migrate-db` will fail if the dll doesn't exist.
 
 The trs_tests database for the tests should be migrated automatically when running the tests. 
+
+#### Downgrading the local database
+To rollback a series of migrations, use the `--target-migration` parameter to indicate the name of a migration to end on 
+(the database will be left in the state just after applying this migration)
+
+```shell
+just build
+just cli migrate-db --target-migration BeforeAddingUserRoleColumn
+```
 
 #### Regenerating the test cache
 

@@ -71,16 +71,30 @@
     <None Remove="Services\DqtReporting\Migrations\0036_TrsPersonsInduction.sql" />
     <None Remove="Services\DqtReporting\Migrations\0037_RenameSanctionTable.sql" />
     <None Remove="Services\DqtReporting\Migrations\0038_TrsPersonsInductionSync.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0039_InductionFields.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0040_PersonInductionExemptionReasons.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0041_ProfessionalStatus.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0042_InductionStatusWithoutExemption.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0043_InductionExemptWithoutReason.sql" />
     <None Remove="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0045_InductionExemptWithoutReason.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0046_ProfessionalStatusUpdates.sql" />
     <None Remove="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
     <None Remove="Services\DqtReporting\Migrations\0048_TrsQualificationsProfessionalStatusType.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0049_TrsQualificationsDegreeTypeId.sql" />
     <None Remove="Services\DqtReporting\Migrations\0050_TrsEstablishmentsPhaseSizeFsm.sql" />
     <None Remove="Services\DqtReporting\Migrations\0051_TpsEmploymentsPersonEmailAndEmployerPostcode.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0052_TrsQualificationsExemptFromInduction.sql" />
     <None Remove="Services\DqtReporting\Migrations\0053_TpsEmploymentsEmployerEmail.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0054_QtsAndEytsDates.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0055_TrsQualificationsRemoveProfessionalStatusType.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0056_PqtsAndHasEyps.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0057_TrsQualificationsProfessionalStatusTypeAndExemptFromInduction.sql" />
     <None Remove="Services\DqtReporting\Migrations\0058_TrsNotes.sql" />
     <None Remove="Services\DqtReporting\Migrations\0059_TrsNotesNullContentHtml.sql" />
     <None Remove="Services\DqtReporting\Migrations\0060_TrsPersonsMobileNumber.sql" />
     <None Remove="Services\DqtReporting\Migrations\0061_TrsNotesInsertedColumn.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0062_TrsPreviousNames.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -142,7 +156,6 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0027_TrsWorkforceData.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0028_TrsEstablishments.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0029_TrsPersons.sql" />
-    <EmbeddedResource Include="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0030_TrsAlerts.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0031_TrsAlertsSyncMetadata.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0032_AddMissingProgrammeTypes.sql" />
@@ -157,6 +170,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0041_ProfessionalStatus.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0042_InductionStatusWithoutExemption.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0043_InductionExemptWithoutReason.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0044_TrsTrainingProviders.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0045_InductionExemptWithoutReason.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0046_ProfessionalStatusUpdates.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0047_DegreeTypesTrainingSubjectsAndCountries.sql" />
@@ -174,6 +188,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0059_TrsNotesNullContentHtml.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0060_TrsPersonsMobileNumber.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0061_TrsNotesInsertedColumn.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0062_TrsPreviousNames.sql" />
   </ItemGroup>
 
   <ItemGroup>
