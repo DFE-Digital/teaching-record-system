@@ -1,4 +1,4 @@
-namespace TeachingRecordSystem.SupportUi.EndToEndTests;
+namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
