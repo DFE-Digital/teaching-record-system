@@ -20,7 +20,7 @@ public class Person
     public DateTime? DeletedOn { get; set; }
     public required string? Trn { get; set; }
     public required string FirstName { get; set; }
-    public required string? MiddleName { get; set; }
+    public required string MiddleName { get; set; }
     public required string LastName { get; set; }
     public required DateOnly? DateOfBirth { get; set; }  // A few DQT records in prod have a null DOB
     public string? EmailAddress { get; set; }
@@ -61,7 +61,7 @@ public class Person
 
     public void UpdateDetails(
         string firstName,
-        string? middleName,
+        string middleName,
         string lastName,
         DateOnly? dateOfBirth,
         string? emailAddress,
@@ -98,8 +98,6 @@ public class Person
             @event = null;
             return;
         }
-
-        InductionModifiedOn = now;
 
         @event = new PersonDetailsUpdatedEvent()
         {

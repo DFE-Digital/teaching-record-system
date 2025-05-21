@@ -7,12 +7,12 @@ public class CommonPageTests : TestBase
 {
     public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
 
     public override void Dispose()
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
         base.Dispose();
     }
 
@@ -22,7 +22,7 @@ public class CommonPageTests : TestBase
     [InlineData("/edit-details/check-answers")]
     public async Task Get_FeatureFlagDisabled_ReturnsNotFound(string page)
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
 
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -34,7 +34,7 @@ public class CommonPageTests : TestBase
         // Assert
         Assert.Equal(StatusCodes.Status404NotFound, (int)response.StatusCode);
 
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
 
     [Theory]

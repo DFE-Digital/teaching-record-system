@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.NewPersonDetails)]
+[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class ChangeReasonModel(
     TrsLinkGenerator linkGenerator,

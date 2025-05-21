@@ -8,13 +8,13 @@ public class ChangeReasonTests : TestBase
 {
     public ChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         FileServiceMock.Invocations.Clear();
     }
 
     public override void Dispose()
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
         base.Dispose();
     }
 

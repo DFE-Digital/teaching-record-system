@@ -4,7 +4,7 @@
 <govuk-summary-card>
     <govuk-summary-card-title>Personal details</govuk-summary-card-title>
     <govuk-summary-card-actions>
-        @if (FeatureProvider.IsEnabled(FeatureNames.NewPersonDetails))
+        @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
             <govuk-summary-card-action href=@LinkGenerator.EditDetailsIndex(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
         }

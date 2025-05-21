@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-[RequireFeatureEnabledFilterFactory(FeatureNames.NewPersonDetails)]
+[RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
 [Journey(JourneyNames.EditDetails), RequireJourneyInstance]
 public class CheckAnswersModel(
     TrsLinkGenerator linkGenerator,
@@ -50,7 +50,7 @@ public class CheckAnswersModel(
     {
         _person!.UpdateDetails(
             FirstName!,
-            MiddleName,
+            MiddleName!,
             LastName!,
             DateOfBirth,
             (string?)EmailAddress,

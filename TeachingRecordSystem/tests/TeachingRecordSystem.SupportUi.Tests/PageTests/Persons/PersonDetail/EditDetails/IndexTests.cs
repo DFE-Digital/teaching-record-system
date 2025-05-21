@@ -10,12 +10,12 @@ public class IndexTests : TestBase
 {
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
     }
 
     public override void Dispose()
     {
-        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.NewPersonDetails);
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
         base.Dispose();
     }
 
