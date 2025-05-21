@@ -1,0 +1,32 @@
+create table previous_names (
+    previous_name_id uniqueidentifier not null primary key,
+    person_id uniqueidentifier not null,
+    created_on datetime,
+    updated_on datetime,
+    deleted_on datetime,
+    first_name varchar(100) not null,
+    middle_name varchar(100) not null,
+    last_name varchar(100) not null,
+    dqt_first_name_previous_name_id uniqueidentifier,
+    dqt_first_name_first_sync datetime,
+    dqt_first_name_last_sync datetime,
+    dqt_first_name_state integer,
+    dqt_first_name_created_on datetime,
+    dqt_first_name_modified_on datetime,
+    dqt_middle_name_previous_name_id uniqueidentifier,
+    dqt_middle_name_first_sync datetime,
+    dqt_middle_name_last_sync datetime,
+    dqt_middle_name_state integer,
+    dqt_middle_name_created_on datetime,
+    dqt_middle_name_modified_on datetime,
+    dqt_last_name_previous_name_id uniqueidentifier,
+    dqt_last_name_first_sync datetime,
+    dqt_last_name_last_sync datetime,
+    dqt_last_name_state integer,
+    dqt_last_name_created_on datetime,
+    dqt_last_name_modified_on datetime,
+    [__Inserted] datetime,
+    [__Updated] datetime
+)
+
+CREATE INDEX ix_previous_names_person_id ON previous_names (person_id)
