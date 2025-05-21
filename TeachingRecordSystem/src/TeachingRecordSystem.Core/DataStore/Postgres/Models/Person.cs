@@ -46,6 +46,7 @@ public class Person
     public DateOnly? PqtsDate { get; internal set; }
     public ICollection<Qualification>? Qualifications { get; }
     public ICollection<Alert>? Alerts { get; }
+    public ICollection<PreviousName>? PreviousNames { get; }
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }
