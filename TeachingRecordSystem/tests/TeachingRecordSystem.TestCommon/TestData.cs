@@ -163,7 +163,18 @@ public partial class TestData
         return newMiddleName;
     }
 
-    public string GenerateLastName() => Faker.Name.Last();
+    public string GenerateLastName()
+    {
+        string lastName;
+
+        do
+        {
+            lastName = Faker.Name.Last();
+        }
+        while (lastName.Contains('\''));
+
+        return lastName;
+    }
 
     public string GenerateChangedLastName(string currentLastName)
     {
@@ -178,7 +189,18 @@ public partial class TestData
         return newLastName;
     }
 
-    public string GenerateName() => Faker.Name.FullName();
+    public string GenerateName()
+    {
+        string fullName;
+
+        do
+        {
+            fullName = Faker.Name.FullName();
+        }
+        while (fullName.Contains('\''));
+
+        return fullName;
+    }
 
     public string GenerateChangedName(string currentName)
     {
