@@ -341,6 +341,18 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string PersonNotes(Guid personId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/Notes", routeValues: new { personId });
 
+    public string EditDetailsIndex(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string EditDetailsChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/ChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string EditDetailsCheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
+    public string EditDetailsCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/Index", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+
     public string LegacyUsers() => GetRequiredPathByPage("/LegacyUsers/Index");
 
     public string LegacyAddUser() => GetRequiredPathByPage("/LegacyUsers/AddUser/Index");

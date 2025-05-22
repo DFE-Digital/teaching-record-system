@@ -34,7 +34,7 @@ public class NationalInsuranceNumberModel(SignInJourneyHelper helper) : PageMode
     {
         if (HaveNationalInsuranceNumber == true)
         {
-            if (!string.IsNullOrEmpty(NationalInsuranceNumber) && !NationalInsuranceNumberHelper.IsValid(NationalInsuranceNumber))
+            if (!string.IsNullOrEmpty(NationalInsuranceNumber) && !Core.NationalInsuranceNumber.TryParse(NationalInsuranceNumber, out _))
             {
                 ModelState.AddModelError(nameof(NationalInsuranceNumber), "Enter a National Insurance number in the correct format");
             }

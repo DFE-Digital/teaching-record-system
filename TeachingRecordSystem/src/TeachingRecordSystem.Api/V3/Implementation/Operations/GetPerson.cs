@@ -213,7 +213,7 @@ public class GetPersonHandler(
         {
             // Check the NINO in DQT first. If that fails, check workforce data in TRS (which may have different NINO(s) for the person).
 
-            var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
+            var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
             var dqtNino = contactDetail.Contact.dfeta_NINumber;
 
             if (string.IsNullOrEmpty(dqtNino) || !dqtNino.Equals(normalizedNino, StringComparison.OrdinalIgnoreCase))

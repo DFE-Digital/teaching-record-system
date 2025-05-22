@@ -1,0 +1,1 @@
+alter table trs_persons add mobile_number varchar(15)

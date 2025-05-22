@@ -86,7 +86,7 @@ public class TpsCsvExtractFileImporter(
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.TrnIncorrectFormat;
             }
 
-            if (row.NationalInsuranceNumber is null || !NationalInsuranceNumberHelper.IsValid(row.NationalInsuranceNumber))
+            if (row.NationalInsuranceNumber is null || !NationalInsuranceNumber.TryParse(row.NationalInsuranceNumber, out _))
             {
                 loadErrors = loadErrors | TpsCsvExtractItemLoadErrors.NationalInsuranceNumberIncorrectFormat;
             }

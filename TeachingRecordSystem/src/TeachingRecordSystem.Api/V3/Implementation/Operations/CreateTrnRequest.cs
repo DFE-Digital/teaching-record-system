@@ -62,7 +62,7 @@ public class CreateTrnRequestHandler(
         //var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
         var firstNameSynonyms = Array.Empty<string>();  // Disabled temporarily
 
-        var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
+        var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
         string? trnToken;
         string? aytqLink;
@@ -194,7 +194,7 @@ public class CreateTrnRequestHandler(
             DateOfBirth = command.DateOfBirth,
             Gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
+            NationalInsuranceNumber = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
             ReviewTasks = reviewTasks,
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,

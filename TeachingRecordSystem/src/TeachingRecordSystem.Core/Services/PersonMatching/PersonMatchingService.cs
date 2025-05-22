@@ -16,7 +16,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         }
 
         var trn = NormalizeTrn(request.Trn);
-        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         var results = await dbContext.Database.SqlQueryRaw<OneLoginUserMatchQueryResult>(
                 """
@@ -69,7 +69,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
         var firstNames = request.Names.Select(parts => parts.First()).ToArray();
         var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(NormalizeTrn).ToArray();
-        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         var results = await dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
                 """
@@ -148,7 +148,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
         var lastNames = request.Names.Select(parts => parts.Last()).ToArray();
         var firstNames = request.Names.Select(parts => parts.First()).ToArray();
         var trns = new[] { request.Trn, request.TrnTokenTrnHint }.Where(trn => trn is not null).Distinct().Select(NormalizeTrn).ToArray();
-        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         var results = await dbContext.Database.SqlQueryRaw<MatchedAttributesQueryResult>(
                 """
@@ -242,7 +242,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
         var firstNames = new[] { request.FirstName, request.PreviousFirstName }.ExceptEmpty();
         var lastNames = new[] { request.LastName, request.PreviousLastName }.ExceptEmpty();
-        var nationalInsuranceNumber = NormalizeNationalInsuranceNumber(request.NationalInsuranceNumber);
+        var nationalInsuranceNumber = NationalInsuranceNumber.Normalize(request.NationalInsuranceNumber);
 
         return dbContext.Database.SqlQueryRaw<SuggestionsQueryResult>(
                 """
@@ -301,9 +301,6 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
 
     private static string? NormalizeTrn(string? value) =>
         string.IsNullOrEmpty(value) ? null : new(value.Where(char.IsAsciiDigit).ToArray());
-
-    private static string? NormalizeNationalInsuranceNumber(string? value) =>
-        NationalInsuranceNumberHelper.Normalize(value);
 
 #pragma warning disable IDE1006 // Naming Styles
     private record OneLoginUserMatchQueryResult(Guid person_id, string trn, JsonDocument matched_attrs);
