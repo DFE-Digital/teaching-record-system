@@ -46,6 +46,7 @@ public partial class TestData
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private readonly List<CreatePersonProfessionalStatusBuilder> _professionalStatusBuilders = [];
         private readonly List<ProfessionalStatusType> _awardedProfessionalStatuses = [];
+        private readonly List<(string FirstName, string MiddleName, string LastName, DateTime Created)> _previousNames = [];
         private DateOnly? _qtlsDate;
         private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
         private string? _trnToken;
@@ -308,6 +309,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithPreviousNames(params (string FirstName, string MiddleName, string LastName, DateTime Created)[] previousNames)
+        {
+            _previousNames.AddRange(previousNames);
+            return this;
+        }
+
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
@@ -535,7 +542,7 @@ public partial class TestData
                 helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
                 _syncEnabledOverride);
 
-            var (mqs, alerts, person, routes) = await testData.WithDbContextAsync(async dbContext =>
+            var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
             {
                 if (!syncedPerson)
                 {
@@ -558,6 +565,7 @@ public partial class TestData
                 var alertIds = await AddAlertsAsync();
                 var professionalStatusIds = await AddProfessionalStatusRoutesAsync();
                 var awardedProfessionalStatusIds = await AddAwardedProfessionalStatusRoutesAsync();
+                var previousNameIds = await AddPreviousNamesAsync();
 
                 await dbContext.SaveChangesAsync();
 
@@ -565,6 +573,7 @@ public partial class TestData
                     .Include(p => p.Alerts!)
                     .ThenInclude(a => a.AlertType)
                     .ThenInclude(at => at!.AlertCategory)
+                    .Include(p => p.PreviousNames)
                     .AsSplitQuery()
                     .SingleAsync(p => p.PersonId == contact.Id);
 
@@ -585,8 +594,9 @@ public partial class TestData
                 var routesToProfessionalStatus = professionalStatusIds.Concat(awardedProfessionalStatusIds)
                     .Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id))
                     .AsReadOnly();
+                var previousNames = previousNameIds.Select(id => person.PreviousNames!.Single(a => a.PreviousNameId == id)).AsReadOnly();
 
-                return (mqs, alerts, person, routesToProfessionalStatus);
+                return (mqs, alerts, person, routesToProfessionalStatus, previousNames);
 
                 async Task<IReadOnlyCollection<Guid>> AddMqsAsync()
                 {
@@ -673,6 +683,35 @@ public partial class TestData
                     return alertIds;
                 }
 
+                async Task<IReadOnlyCollection<Guid>> AddPreviousNamesAsync()
+                {
+                    return await testData.WithDbContextAsync(async dbContext =>
+                    {
+                        var previousNameIds = new List<Guid>();
+                        foreach (var pn in _previousNames)
+                        {
+                            var id = Guid.NewGuid();
+                            var previousName = new PreviousName
+                            {
+                                PreviousNameId = id,
+                                PersonId = PersonId,
+                                FirstName = pn.FirstName,
+                                MiddleName = pn.MiddleName ?? string.Empty,
+                                LastName = pn.LastName,
+                                CreatedOn = pn.Created,
+                                UpdatedOn = pn.Created
+                            };
+
+                            previousNameIds.Add(id);
+                            dbContext.PreviousNames.Add(previousName);
+                        }
+
+                        await dbContext.SaveChangesAsync();
+
+                        return previousNameIds;
+                    });
+                }
+
                 void AddTrnRequestMetadata()
                 {
                     if (_trnRequest is not { WriteMetadata: true } trnRequest)
@@ -739,7 +778,8 @@ public partial class TestData
                 MandatoryQualifications = mqs,
                 Alerts = alerts,
                 DqtContactAuditDetail = auditDetail,
-                ProfessionalStatuses = routes
+                ProfessionalStatuses = routes,
+                PreviousNames = previousNames
             };
         }
 
@@ -1212,6 +1252,7 @@ public partial class TestData
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
         public required IReadOnlyCollection<ProfessionalStatus> ProfessionalStatuses { get; init; }
+        public required IReadOnlyCollection<PreviousName> PreviousNames { get; init; }
         public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
 

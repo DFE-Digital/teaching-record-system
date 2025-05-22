@@ -67,7 +67,13 @@ public class CheckAnswersModel(
                 : null,
             User.GetUserId(),
             clock.UtcNow,
+            out var previousName,
             out var updatedEvent);
+
+        if (previousName is not null)
+        {
+            DbContext.PreviousNames.Add(previousName);
+        }
 
         if (updatedEvent is not null)
         {
