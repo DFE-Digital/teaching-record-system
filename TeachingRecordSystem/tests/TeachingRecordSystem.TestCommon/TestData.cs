@@ -230,7 +230,7 @@ public partial class TestData
         {
             do
             {
-                mobileNumber = Faker.Phone.Number();
+                mobileNumber = $"0{Faker.RandomNumber.Next(7000000000, 7999999999)}";
             }
             while (!_mobileNumbers.Add(mobileNumber));
         }

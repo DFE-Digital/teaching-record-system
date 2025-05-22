@@ -63,7 +63,7 @@ public class SetPiiHandler(ICrmQueryDispatcher crmQueryDispatcher)
             MiddleName: middleName,
             LastName: command.LastName,
             DateOfBirth: command.DateOfBirth,
-            NationalInsuranceNumber: NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
+            NationalInsuranceNumber: NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
             Gender: command.Gender?.ConvertToContact_GenderCode(),
             EmailAddress: command.EmailAddresses
         ));

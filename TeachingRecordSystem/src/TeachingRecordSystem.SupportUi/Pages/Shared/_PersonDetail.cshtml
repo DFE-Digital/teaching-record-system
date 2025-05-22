@@ -3,6 +3,12 @@
 
 <govuk-summary-card>
     <govuk-summary-card-title>Personal details</govuk-summary-card-title>
+    <govuk-summary-card-actions>
+        @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
+        {
+            <govuk-summary-card-action href=@LinkGenerator.EditDetailsIndex(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
+        }
+    </govuk-summary-card-actions>
     <govuk-summary-list>
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>

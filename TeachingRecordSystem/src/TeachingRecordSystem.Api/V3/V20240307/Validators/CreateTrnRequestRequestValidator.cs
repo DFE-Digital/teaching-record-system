@@ -44,7 +44,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
         RuleFor(r => r.Person.NationalInsuranceNumber)
             .Custom((value, ctx) =>
             {
-                if (!string.IsNullOrEmpty(value) && !NationalInsuranceNumberHelper.IsValid(value))
+                if (!string.IsNullOrEmpty(value) && !NationalInsuranceNumber.TryParse(value, out _))
                 {
                     ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_EnterNinoNumberInCorrectFormat);
                 }

@@ -1,4 +1,7 @@
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using Moq;
+using TeachingRecordSystem.Core.Services.Files;
 using Xunit;
 using Xunit.Sdk;
 
@@ -93,5 +96,36 @@ public static partial class AssertEx
         Assert.NotNull(label);
         var value = label.NextElementSibling;
         Assert.Null(value!.NextElementSibling);
+    }
+
+    public static async Task<Guid> AssertFileWasUploadedAsync(this Mock<IFileService> fileServiceMock)
+    {
+        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Once);
+        return await Assert.IsType<Task<Guid>>(fileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
+    }
+
+    public static void AssertFileWasNotUploaded(this Mock<IFileService> fileServiceMock)
+    {
+        fileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
+    }
+
+    public static void AssertFileWasDeleted(this Mock<IFileService> fileServiceMock, Guid fileId)
+    {
+        fileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
+    }
+
+    public static void AssertSummaryListValue(this IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
+    {
+        AssertSummaryListValue<IElement>(doc, keyContent, valueAssertion);
+    }
+
+    public static void AssertSummaryListValue<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        Assert.NotNull(label);
+        var element = label.NextElementSibling;
+        Assert.NotNull(element);
+        var value = Assert.IsAssignableFrom<T>(element);
+        valueAssertion(value);
     }
 }
