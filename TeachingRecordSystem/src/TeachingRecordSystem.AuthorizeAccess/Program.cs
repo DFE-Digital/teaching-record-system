@@ -28,6 +28,7 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Infrastructure.FormFlow;
 using TeachingRecordSystem.WebCommon;
 using TeachingRecordSystem.WebCommon.Filters;
@@ -180,7 +181,8 @@ if (!builder.Environment.IsUnitTests() && !builder.Environment.IsEndToEndTests()
 
 builder
     .AddBlobStorage()
-    .AddIdentityApi();
+    .AddIdentityApi()
+    .AddTrnRequestService();
 
 builder.Services
     .AddTrsBaseServices()
