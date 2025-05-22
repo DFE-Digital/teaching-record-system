@@ -78,9 +78,9 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
             }
         };
         // setting expected query pagesize to the hardcoded value sent from the job, but returning fewer in the mock setup
-        var crmQuery1 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 1000, It.IsAny<string>());
-        var crmQuery2 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 2, pagesize: 1000, It.IsAny<string?>());
-        var crmQuery3 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 3, pagesize: 1000, It.IsAny<string>());
+        var crmQuery1 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 1, Pagesize: 1000, It.IsAny<string>());
+        var crmQuery2 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 2, Pagesize: 1000, It.IsAny<string?>());
+        var crmQuery3 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 3, Pagesize: 1000, It.IsAny<string>());
 
         _crmQueryDispatcherMock
             .Setup(x => x.ExecuteQueryAsync(crmQuery1))

@@ -9,7 +9,7 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
 {
     public async Task<PagedProviderResults> ExecuteAsync(GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery query, IOrganizationServiceAsync organizationService)
     {
-        int pageSize = query.pagesize;
+        int pageSize = query.Pagesize;
         var queryExpression = new QueryExpression(Account.EntityLogicalName)
         {
             ColumnSet = new(
@@ -19,8 +19,8 @@ public class GetAllIttProvidersWithCorrespondingIttRecordsHandler : ICrmQueryHan
             PageInfo = new PagingInfo()
             {
                 Count = pageSize,
-                PageNumber = query.pageNumber,
-                PagingCookie = query.pagingCookie
+                PageNumber = query.PageNumber,
+                PagingCookie = query.PagingCookie
             },
             LinkEntities =
             {

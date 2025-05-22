@@ -52,7 +52,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 1000);
+        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 1, Pagesize: 1000);
 
         while (true)
         {
@@ -73,7 +73,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
             if (result.MoreRecords)
             {
-                crmQuery = crmQuery with { pageNumber = crmQuery.pageNumber + 1, pagingCookie = result.PagingCookie };
+                crmQuery = crmQuery with { PageNumber = crmQuery.PageNumber + 1, PagingCookie = result.PagingCookie };
             }
             else
             {
