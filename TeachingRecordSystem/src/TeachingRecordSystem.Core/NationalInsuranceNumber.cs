@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Metrics;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -12,8 +14,15 @@ namespace TeachingRecordSystem.Core;
 [DebuggerDisplay("{NormalizedValue}")]
 public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuranceNumber>, IParsable<NationalInsuranceNumber>
 {
-    private static readonly string[] _invalidPrefixes = ["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"];
+    // Sourced from https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
+    // A NINO is made up of 2 letters, 6 numbers and a final letter, which is always A, B, C, or D
+    // The characters D, F, I, Q, U, and V are not used as either the first or second letter of a NINO prefix.
+    // The letter O is not used as the second letter of a prefix.
     private const string ValidNinoRegexPattern = "^[A-CEGHJ-PR-TW-Z]{1}[A-CEGHJ-NPR-TW-Z]{1}[0-9]{6}[A-D]{1}$";
+    // Prefixes BG, GB, KN, NK, NT, TN and ZZ are not to be used
+    private static readonly string[] _invalidPrefixes = ["BG", "GB", "KN", "NK", "NT", "TN", "ZZ"];
+    // It is sometimes necessary to use a Temporary Reference Number (TRN) for Individuals. The format of a TRN is 11 a1 11 11
+    private const string ValidTempNinoRegexPattern = "^[0-9]{2}[A-Z]{1}[0-9]{5}$";
 
     [JsonInclude]
     private string NormalizedValue { get; }
@@ -73,7 +82,7 @@ public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuran
 
         var normalized = Normalize(s);
 
-        if (!ValidNinoPattern().IsMatch(normalized))
+        if (!ValidNinoPattern().IsMatch(normalized) && !ValidTempNinoPattern().IsMatch(normalized))
         {
             result = null;
             return false;
@@ -109,9 +118,11 @@ public sealed partial class NationalInsuranceNumber : IEquatable<NationalInsuran
         return new(value.Where(c => !char.IsWhiteSpace(c) && c != '-').Select(char.ToUpperInvariant).ToArray());
     }
 
-    // Sourced from https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
     [GeneratedRegex(ValidNinoRegexPattern)]
     private static partial Regex ValidNinoPattern();
+
+    [GeneratedRegex(ValidTempNinoRegexPattern)]
+    private static partial Regex ValidTempNinoPattern();
 }
 
 public class NationalInsuranceNumberConverter : ValueConverter<NationalInsuranceNumber, string>

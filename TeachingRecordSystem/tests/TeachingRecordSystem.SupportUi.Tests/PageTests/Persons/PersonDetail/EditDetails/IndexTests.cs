@@ -1,8 +1,5 @@
-using System.Diagnostics.Metrics;
 using AngleSharp.Html.Dom;
-using FakeItEasy;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
-using Xunit;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
@@ -487,7 +484,7 @@ public class IndexTests : TestBase
     [InlineData(".!#$%&'*+/=?^_`{|}~-@test.test", true)]
     // Ignore surrounding whitespace
     [InlineData("    test@test.test    ", true)]
-    public async Task Post_EmailAddressInvalid_ShowsPageError(string emailAddress, bool shouldBeValid)
+    public async Task Post_ValidatesEmailAddress_ShowsPageErrorIfInvalid(string emailAddress, bool shouldBeValid)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -539,7 +536,7 @@ public class IndexTests : TestBase
     [InlineData("   (078 91) 234 567   ", true)]
     [InlineData("07891234567", true)]
     [InlineData("447891234567", true)]
-    public async Task Post_MobileNumberInvalid_ShowsPageError(string mobileNumber, bool shouldBeValid)
+    public async Task Post_ValidatesMobileNumber_ShowsPageErrorIfInvalid(string mobileNumber, bool shouldBeValid)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
@@ -615,7 +612,52 @@ public class IndexTests : TestBase
     // Ignore whitespace
     [InlineData("  AB   12   34  56    D    ", true)]
     [InlineData("AB123456D", true)]
-    public async Task Post_NationalInsuranceNumberInvalid_ShowsPageError(string niNumber, bool shouldBeValid)
+    public async Task Post_ValidatesNationalInsuranceNumber_ShowsPageErrorIfInvalid(string niNumber, bool shouldBeValid)
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
+                    .WithFirstName("Alfred")
+                    .WithMiddleName("The")
+                    .WithLastName("Great")
+                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                    .WithNationalInsuranceNumber(niNumber)
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        if (shouldBeValid)
+        {
+            Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        }
+        else
+        {
+            await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.NationalInsuranceNumber), "Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C");
+        }
+    }
+
+    [Theory]
+    // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim39110
+    // It is sometimes necessary to use a Temporary Reference Number (TRN) for Individuals. The format of a TRN is 11 a1 11 11
+    [InlineData("test", false)]
+    [InlineData("1 A2 34 56", false)]
+    [InlineData("12 BC 34 56", false)]
+    [InlineData("12 D3 45 67", true)]
+    // Ignore whitespace
+    [InlineData("  98   Z 7  6  543    ", true)]
+    [InlineData("45X67890", true)]
+    public async Task Post_ValidatesNationalInsuranceNumber_AllowesTemporaryNino_ShowsPageErrorIfInvalid(string niNumber, bool shouldBeValid)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
