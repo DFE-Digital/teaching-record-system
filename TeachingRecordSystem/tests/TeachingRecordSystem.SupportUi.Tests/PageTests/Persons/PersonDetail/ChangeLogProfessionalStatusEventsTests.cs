@@ -84,6 +84,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var awardDate = Clock.Today;
+        var oldAwardDate = awardDate.AddDays(1);
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory)
             .RandomOne();
@@ -105,6 +106,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             .WithCreatedByUser(raisedByUser)
             .WithCreatedUtc(Clock.UtcNow)
             .WithPersonAttributes(new Core.Events.Models.ProfessionalStatusPersonAttributes() { EytsDate = awardDate, HasEyps = false, PqtsDate = null, QtsDate = null })
+            .WithOldPersonAttributes(new Core.Events.Models.ProfessionalStatusPersonAttributes() { EytsDate = oldAwardDate, HasEyps = false, PqtsDate = null, QtsDate = null })
             .WithChanges(ProfessionalStatusCreatedEventChanges.PersonEytsDate)
             ) as ProfessionalStatusCreatedEvent;
 
@@ -125,7 +127,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TextContent.Trim());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("has-eyps")); Assert.Equal(professionalStatusCreatedEvent!.PersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TextContent.Trim());
+        Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
+        Assert.Equal(oldAwardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TextContent.Trim());
     }
 
     [Fact]
@@ -145,8 +148,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var awardDate = oldAwardDate.AddDays(1);
         var startDate = oldStartDate.AddDays(1);
         var endDate = oldEndDate.AddDays(1);
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
+        var route = oldRoute;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.TrainingSubjectId != oldSubject.TrainingSubjectId).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => x.TrainingProviderId != oldTrainingProvider.TrainingProviderId).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).Where(x => x.DegreeTypeId != oldDegreeType.DegreeTypeId).RandomOne();
@@ -156,8 +158,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             .WithProfessionalStatus(q =>
             {
                 q.WithRoute(route);
-                q.WithStatus(status);
-                q.WithAwardedDate(Clock.Today);
+                q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
                 q.WithTrainingEndDate(endDate);
@@ -173,17 +174,35 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
         var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus) with
         {
-            TrainingAgeSpecialismType = ageRange
+            AwardedDate = oldAwardDate,
+            DegreeTypeId = oldDegreeType.DegreeTypeId,
+            ExemptFromInduction = false,
+            TrainingCountryId = oldCountry.CountryId,
+            TrainingEndDate = oldEndDate,
+            TrainingStartDate = oldStartDate,
+            TrainingProviderId = oldTrainingProvider.TrainingProviderId,
+            TrainingSubjectIds = new List<Guid>() { oldSubject.TrainingSubjectId }.ToArray(),
+            TrainingAgeSpecialismType = oldAgeRange
         };
         var createdByUser = await TestData.CreateUserAsync();
         var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
-        var professionalStatusCreatedEvent = await TestData.CreateProfessionalStatusCreatedEventAsync(e => e
+        var professionalStatusUpdatedEvent = await TestData.CreateProfessionalStatusUpdatedEventAsync(e => e
             .ForPerson(person.Person)
             .WithProfessionalStatus(professionalStatus)
             .WithOldProfessionalStatus(oldProfessionalStatus)
             .WithCreatedByUser(raisedByUser)
             .WithCreatedUtc(Clock.UtcNow)
-            ) as ProfessionalStatusCreatedEvent;
+            .WithChanges(
+                ProfessionalStatusUpdatedEventChanges.AwardedDate
+                | ProfessionalStatusUpdatedEventChanges.StartDate
+                | ProfessionalStatusUpdatedEventChanges.EndDate
+                | ProfessionalStatusUpdatedEventChanges.DegreeType
+                | ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds
+                | ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType
+                | ProfessionalStatusUpdatedEventChanges.TrainingCountry
+                | ProfessionalStatusUpdatedEventChanges.TrainingProvider
+                | ProfessionalStatusUpdatedEventChanges.ExemptFromInduction)
+            ) as ProfessionalStatusUpdatedEvent;
 
         var qualification = person.ProfessionalStatuses.First();
 
@@ -195,7 +214,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
         Assert.NotNull(timelineItem);
         Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TextContent.Trim());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
@@ -203,16 +222,172 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
-        Assert.Equal(oldAwardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TextContent.Trim());
-        Assert.Equal(oldStatus.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TextContent.Trim());
-        Assert.Equal(oldRoute.Name, timelineItem.GetElementByTestId("route")?.TextContent.Trim());
-        Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TextContent.Trim());
-        Assert.Equal(oldEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TextContent.Trim());
+        Assert.Null(timelineItem.GetElementByTestId("status"));
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TextContent.Trim());
+        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TextContent.Trim());
+        Assert.Equal(endDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TextContent.Trim());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("exemption")?.TextContent.Trim());
-        Assert.Equal(oldTrainingProvider.Name, timelineItem.GetElementByTestId("training-provider")?.TextContent.Trim());
-        Assert.Equal(oldDegreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TextContent.Trim());
-        Assert.Equal(oldCountry.Name, timelineItem.GetElementByTestId("country")?.TextContent.Trim());
-        Assert.Equal(oldAgeRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TextContent.Trim());
-        Assert.Equal(oldSubject.Name, timelineItem.GetElementByTestId("subjects")?.TextContent.Trim());
+        Assert.Equal(trainingProvider.Name, timelineItem.GetElementByTestId("training-provider")?.TextContent.Trim());
+        Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TextContent.Trim());
+        Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TextContent.Trim());
+        Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TextContent.Trim());
+        Assert.Equal(subject.Name, timelineItem.GetElementByTestId("subjects")?.TextContent.Trim());
+
+        Assert.Equal(oldAwardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-award-date")?.TextContent.Trim());
+        Assert.Null(timelineItem.GetElementByTestId("status"));
+        Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-start-date")!.TextContent.Trim());
+        Assert.Equal(oldEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-end-date")!.TextContent.Trim());
+        Assert.Equal("No", timelineItem.GetElementByTestId("old-exemption")?.TextContent.Trim());
+        Assert.Equal(oldTrainingProvider.Name, timelineItem.GetElementByTestId("old-training-provider")?.TextContent.Trim());
+        Assert.Equal(oldDegreeType.Name, timelineItem.GetElementByTestId("old-degree-type")?.TextContent.Trim());
+        Assert.Equal(oldCountry.Name, timelineItem.GetElementByTestId("old-country")?.TextContent.Trim());
+        Assert.Equal(oldAgeRange.GetDisplayName(), timelineItem.GetElementByTestId("old-age-range-type")?.TextContent.Trim());
+        Assert.Equal(oldSubject.Name, timelineItem.GetElementByTestId("old-subjects")?.TextContent.Trim());
+    }
+
+    [Fact]
+    public async Task ProfessionalStatusUpdatedEvent_StatusChanged_PersonQtsChanged_RendersExpectedContent()
+    {
+        // Arrange
+        var oldStatus = ProfessionalStatusStatus.InTraining;
+        var startDate = Clock.Today.AddYears(-2);
+        var endDate = startDate.AddYears(1);
+        var awardDate = endDate.AddDays(1);
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = ProfessionalStatusStatus.Awarded;
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var ageRange = TrainingAgeSpecialismType.KeyStage1;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(q =>
+            {
+                q.WithRoute(route);
+                q.WithStatus(status);
+                q.WithInductionExemption(true);
+                q.WithTrainingStartDate(startDate);
+                q.WithTrainingEndDate(endDate);
+                q.WithAwardedDate(awardDate);
+                q.WithTrainingProvider(trainingProvider);
+                q.WithTrainingCountryId(country.CountryId);
+                q.WithTrainingSubjectIds(new List<Guid>() { subject.TrainingSubjectId }.ToArray());
+                q.WithTrainingAgeSpecialismType(ageRange);
+                q.WithDegreeTypeId(degreeType.DegreeTypeId);
+                q.WithInductionExemption(true);
+            }));
+
+        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
+        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus) with
+        {
+            Status = oldStatus
+        };
+        var createdByUser = await TestData.CreateUserAsync();
+        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
+        var professionalStatusUpdatedEvent = await TestData.CreateProfessionalStatusUpdatedEventAsync(e => e
+            .ForPerson(person.Person)
+            .WithProfessionalStatus(professionalStatus)
+            .WithOldProfessionalStatus(oldProfessionalStatus)
+            .WithCreatedByUser(raisedByUser)
+            .WithCreatedUtc(Clock.UtcNow)
+            .WithPersonAttributes(new Core.Events.Models.ProfessionalStatusPersonAttributes() { EytsDate = awardDate, HasEyps = false, PqtsDate = null, QtsDate = null })
+            .WithChanges(ProfessionalStatusUpdatedEventChanges.Status | ProfessionalStatusUpdatedEventChanges.PersonEytsDate)
+            ) as ProfessionalStatusUpdatedEvent;
+
+        var qualification = person.ProfessionalStatuses.First();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TextContent.Trim());
+        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+        Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TextContent.Trim());
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TextContent.Trim());
+        Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
+        Assert.Null(timelineItem.GetElementByTestId("qts-date"));
+        Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
+        Assert.Null(timelineItem.GetElementByTestId("award-date"));
+        Assert.Null(timelineItem.GetElementByTestId("start-date"));
+        Assert.Null(timelineItem.GetElementByTestId("end-date"));
+        Assert.Null(timelineItem.GetElementByTestId("exemption"));
+        Assert.Null(timelineItem.GetElementByTestId("training-provider"));
+        Assert.Null(timelineItem.GetElementByTestId("degree-type"));
+        Assert.Null(timelineItem.GetElementByTestId("country"));
+        Assert.Null(timelineItem.GetElementByTestId("age-range-type"));
+        Assert.Null(timelineItem.GetElementByTestId("subjects"));
+
+        Assert.Equal(oldStatus.GetDisplayName(), timelineItem.GetElementByTestId("old-status")?.TextContent.Trim());
+        Assert.Equal("Not provided", timelineItem.GetElementByTestId("old-eyts-date")?.TextContent.Trim());
+        Assert.Null(timelineItem.GetElementByTestId("old-start-date"));
+        Assert.Null(timelineItem.GetElementByTestId("old-end-date"));
+        Assert.Null(timelineItem.GetElementByTestId("old-exemption"));
+        Assert.Null(timelineItem.GetElementByTestId("old-training-provider"));
+        Assert.Null(timelineItem.GetElementByTestId("old-degree-type"));
+        Assert.Null(timelineItem.GetElementByTestId("old-country"));
+        Assert.Null(timelineItem.GetElementByTestId("old-age-range-type"));
+        Assert.Null(timelineItem.GetElementByTestId("old-subjects"));
+    }
+
+    [Fact]
+    public async Task ProfessionalStatusUpdatedEvent_RendersExpectedChangeReasonContent()
+    {
+        // Arrange
+        var oldStatus = ProfessionalStatusStatus.InTraining;
+        var startDate = Clock.Today.AddYears(-2);
+        var endDate = startDate.AddYears(1);
+        var awardDate = endDate.AddDays(1);
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = ProfessionalStatusStatus.Awarded;
+        var changeReason = "Text from change reason selection";
+        var changeReasonDetails = TestData.GenerateLoremIpsum();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithProfessionalStatus(q =>
+            {
+                q.WithRoute(route);
+                q.WithStatus(status);
+                q.WithInductionExemption(true);
+                q.WithAwardedDate(awardDate);
+            }));
+
+        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
+        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus) with
+        {
+            Status = oldStatus
+        };
+
+        var createdByUser = await TestData.CreateUserAsync();
+        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
+        var professionalStatusUpdatedEvent = await TestData.CreateProfessionalStatusUpdatedEventAsync(e => e
+            .ForPerson(person.Person)
+            .WithProfessionalStatus(professionalStatus)
+            .WithOldProfessionalStatus(oldProfessionalStatus)
+            .WithCreatedByUser(raisedByUser)
+            .WithCreatedUtc(Clock.UtcNow)
+            .WithChanges(ProfessionalStatusUpdatedEventChanges.Status)
+            .WithChangeReason(changeReason)
+            .WithChangeReasonDetails(changeReasonDetails)
+            ) as ProfessionalStatusUpdatedEvent;
+
+        var qualification = person.ProfessionalStatuses.First();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal(changeReason, timelineItem.GetElementByTestId("reason")?.TextContent.Trim());
+        Assert.Equal(changeReasonDetails, timelineItem.GetElementByTestId("reason-detail")?.TextContent.Trim());
     }
 }

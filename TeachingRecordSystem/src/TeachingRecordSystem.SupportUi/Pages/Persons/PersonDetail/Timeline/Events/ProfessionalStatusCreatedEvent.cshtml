@@ -108,5 +108,40 @@
                 <govuk-summary-list-row-value data-testid="subjects"><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
             </govuk-summary-list-row>
         </govuk-summary-list>
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonHasEyps))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-has-eyps">@(Model.ItemModel.Event.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonEytsDate))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@Model.ItemModel.Event.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonPqtsDate))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@Model.ItemModel.Event.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonQtsDate))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@Model.ItemModel.Event.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
     </div>
 </div>

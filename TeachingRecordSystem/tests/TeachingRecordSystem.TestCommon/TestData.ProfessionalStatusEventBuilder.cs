@@ -22,6 +22,7 @@ public partial class TestData
         Core.Events.Models.ProfessionalStatus? _professionalStatus;
         Person? _person;
         ProfessionalStatusPersonAttributes? _personAttributes;
+        ProfessionalStatusPersonAttributes? _oldPersonAttributes;
         ProfessionalStatusCreatedEventChanges? _changes;
 
         public CreateProfessionalStatusEventBuilder WithCreatedByUser(EventModels.RaisedByUserInfo createdByUser)
@@ -47,16 +48,15 @@ public partial class TestData
             return this;
         }
 
-        public CreateProfessionalStatusEventBuilder WithOldProfessionalStatus(Core.Events.Models.ProfessionalStatus professionalStatus)
-        {
-            _professionalStatus = professionalStatus;
-            return this;
-        }
-
-
         public CreateProfessionalStatusEventBuilder WithPersonAttributes(ProfessionalStatusPersonAttributes personAttributes)
         {
             _personAttributes = personAttributes;
+            return this;
+        }
+
+        public CreateProfessionalStatusEventBuilder WithOldPersonAttributes(ProfessionalStatusPersonAttributes personAttributes)
+        {
+            _oldPersonAttributes = personAttributes;
             return this;
         }
 
@@ -87,7 +87,7 @@ public partial class TestData
                 RaisedBy = _createdByUser!,
                 PersonId = _personId!.Value,
                 ProfessionalStatus = _professionalStatus,
-                OldPersonAttributes = ProfessionalStatusPersonAttributes.FromModel(_person!),
+                OldPersonAttributes = _oldPersonAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 PersonAttributes = _personAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 Changes = _changes ?? ProfessionalStatusCreatedEventChanges.None
             };
@@ -142,15 +142,27 @@ public partial class TestData
             _personId = person.PersonId;
             return this;
         }
-        public UpdateProfessionalStatusEventBuilder ForProfessionalStatus(Core.DataStore.Postgres.Models.ProfessionalStatus professionalStatus)
+        public UpdateProfessionalStatusEventBuilder WithProfessionalStatus(Core.DataStore.Postgres.Models.ProfessionalStatus professionalStatus)
         {
             _professionalStatus = Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus);
+            return this;
+        }
+
+        public UpdateProfessionalStatusEventBuilder WithOldProfessionalStatus(Core.Events.Models.ProfessionalStatus oldProfessionalStatus)
+        {
+            _oldProfessionalStatus = oldProfessionalStatus;
             return this;
         }
 
         public UpdateProfessionalStatusEventBuilder WithPersonAttributes(ProfessionalStatusPersonAttributes personAttributes)
         {
             _personAttributes = personAttributes;
+            return this;
+        }
+
+        public UpdateProfessionalStatusEventBuilder WithOldPersonAttributes(ProfessionalStatusPersonAttributes personAttributes)
+        {
+            _oldPersonAttributes = personAttributes;
             return this;
         }
 
@@ -174,7 +186,7 @@ public partial class TestData
 
         public async Task<EventBase> ExecuteAsync(TestData testData)
         {
-            if (!_createdUtc.HasValue || _createdByUser is null || _person is null || _professionalStatus is null)
+            if (!_createdUtc.HasValue || _createdByUser is null || _person is null || _professionalStatus is null || _oldProfessionalStatus is null)
             {
                 var nullValues = new List<string>();
                 if (!_createdUtc.HasValue) nullValues.Add(nameof(_createdUtc));
@@ -194,7 +206,7 @@ public partial class TestData
                 PersonId = _personId!.Value,
                 ProfessionalStatus = _professionalStatus,
                 OldProfessionalStatus = _oldProfessionalStatus,
-                OldPersonAttributes = ProfessionalStatusPersonAttributes.FromModel(_person!),
+                OldPersonAttributes = _oldPersonAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 PersonAttributes = _personAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 Changes = _changes ?? ProfessionalStatusUpdatedEventChanges.None,
                 ChangeReason = _changeReason,
