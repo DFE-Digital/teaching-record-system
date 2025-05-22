@@ -13,13 +13,13 @@ public class NotesModel(TrsDbContext dbContext) : PageModel
 
     public async Task OnGetAsync()
     {
-        var notesResult = await dbContext.DqtNotes
+        var notesResult = await dbContext.Notes
             .Where(x => x.PersonId == PersonId)
             .ToArrayAsync();
 
         var noteTasks = notesResult.Select(async x =>
             new Note(
-                x.Id,
+                x.NoteId,
                 string.Empty,
                 await x.GetNoteTextWithoutHtmlAsync(),
                 x.CreatedOn.ToLocal(),
@@ -36,4 +36,4 @@ public class NotesModel(TrsDbContext dbContext) : PageModel
     }
 }
 
-public record Note(Guid NoteId, string Title, string Description, DateTime CreatedOn, string? FileName, string? OriginalFileName, string CreatedByDqtUserName);
+public record Note(Guid NoteId, string Title, string Description, DateTime CreatedOn, string? FileName, string? OriginalFileName, string? CreatedByDqtUserName);

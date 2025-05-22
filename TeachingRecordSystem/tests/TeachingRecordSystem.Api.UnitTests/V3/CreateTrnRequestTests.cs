@@ -10,6 +10,7 @@ using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 #pragma warning disable TRS0001
 
@@ -537,7 +538,7 @@ public class CreateTrnRequestTests(OperationTestFixture operationTestFixture) : 
         Assert.Equal(command.DateOfBirth, query.DateOfBirth);
         Assert.Equal(command.Gender?.ConvertToContact_GenderCode(), query.Gender);
         Assert.Equal(command.NationalInsuranceNumber, query.NationalInsuranceNumber);
-        Assert.Equal(TrnRequestHelper.GetCrmTrnRequestId(applicationUserId, command.RequestId), query.TrnRequestId);
+        Assert.Equal(TrnRequestService.GetCrmTrnRequestId(applicationUserId, command.RequestId), query.TrnRequestId);
 
         if (expectTrn)
         {

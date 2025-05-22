@@ -62,7 +62,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var data = (ConnectOneLoginUserData)supportTask.Data;
 
-        var suggestedMatches = await personMatchingService.GetSuggestedMatchesAsync(new(
+        var suggestedMatches = await personMatchingService.GetSuggestedOneLoginUserMatchesAsync(new(
             data.VerifiedNames!,
             data.VerifiedDatesOfBirth!,
             data.StatedNationalInsuranceNumber,
@@ -88,7 +88,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
                 DateOfBirth = m.DateOfBirth,
                 NationalInsuranceNumber = m.NationalInsuranceNumber,
                 Gender = null,  // Not shown
-                Email = m.Email,
+                Email = m.EmailAddress,
                 MobileNumber = null  // Not shown
             })
             .ToArray();

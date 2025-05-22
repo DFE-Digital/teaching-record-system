@@ -7,24 +7,25 @@ using TeachingRecordSystem.Api.V2.Requests;
 using TeachingRecordSystem.Api.V2.Responses;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.V2.Handlers;
 
 public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInfo>
 {
-    private readonly TrnRequestHelper _trnRequestHelper;
+    private readonly TrnRequestService _trnRequestService;
     private readonly IDataverseAdapter _dataverseAdapter;
     private readonly ICurrentUserProvider _currentUserProvider;
     private readonly AccessYourTeachingQualificationsOptions _accessYourTeachingQualificationsOptions;
 
     public GetTrnRequestHandler(
-        TrnRequestHelper trnRequestHelper,
+        TrnRequestService trnRequestService,
         TrsDbContext TrsDbContext,
         IDataverseAdapter dataverseAdapter,
         ICurrentUserProvider currentUserProvider,
         IOptions<AccessYourTeachingQualificationsOptions> accessYourTeachingQualificationsOptions)
     {
-        _trnRequestHelper = trnRequestHelper;
+        _trnRequestService = trnRequestService;
         _dataverseAdapter = dataverseAdapter;
         _currentUserProvider = currentUserProvider;
         _accessYourTeachingQualificationsOptions = accessYourTeachingQualificationsOptions.Value;
@@ -34,7 +35,7 @@ public class GetTrnRequestHandler : IRequestHandler<GetTrnRequest, TrnRequestInf
     {
         var (currentApplicationUserId, _) = _currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await _trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, request.RequestId);
+        var trnRequest = await _trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, request.RequestId);
         if (trnRequest == null)
         {
             return null;

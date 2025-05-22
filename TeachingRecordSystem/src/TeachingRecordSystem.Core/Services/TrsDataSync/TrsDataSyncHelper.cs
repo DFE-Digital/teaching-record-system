@@ -259,12 +259,13 @@ public class TrsDataSyncHelper(
     .Select(s => s.ToLowerInvariant())
     .ToList();
 
-    private DqtNoteInfo? MapNoteFromDqtAnnotation(
+    private async Task<DqtNoteInfo?> MapNoteFromDqtAnnotationAsync(
         Annotation annotation)
     {
         var ignoredTerms = GetIgnoreNotesContainingTerms();
-        var lowerInput = annotation.NoteText.ToLowerInvariant();
-        if (ignoredTerms.Any(term => lowerInput.Contains(term)))
+        var lowerInput = await annotation.GetNoteTextWithoutHtmlAsync() ?? string.Empty;
+        if (ignoredTerms.Any(term => lowerInput.ToLower().Contains(term)) &&
+            (!string.IsNullOrEmpty(annotation.Subject) && annotation.Subject.Contains("Entered by REG", StringComparison.InvariantCultureIgnoreCase)))
         {
             return null;
         }
@@ -273,7 +274,7 @@ public class TrsDataSyncHelper(
         {
             Id = annotation.Id,
             PersonId = annotation!.ObjectId.Id,
-            NoteText = annotation.NoteText,
+            ContentHtml = annotation.NoteText,
             CreatedByDqtUserId = annotation.CreatedBy.Id,
             CreatedByDqtUserName = annotation.CreatedBy.Name,
             UpdatedOn = annotation.ModifiedOn,
@@ -603,7 +604,15 @@ public class TrsDataSyncHelper(
     {
         var modelTypeSyncInfo = GetModelTypeSyncInfo<DqtNoteInfo>(ModelTypes.DqtNote);
         await using var connection = await trsDbDataSource.OpenConnectionAsync(cancellationToken);
-        var toSync = annotations.Select(x => MapNoteFromDqtAnnotation(x)).Where(x => x != null).Select(x => x!).ToList();
+        var toSync = new List<DqtNoteInfo>();
+        foreach (var ann in annotations)
+        {
+            var dqtNote = await MapNoteFromDqtAnnotationAsync(ann);
+            if (dqtNote is not null)
+            {
+                toSync.Add(dqtNote);
+            }
+        }
 
         //upload attachments new or remove attachment
         foreach (var noteAttachment in toSync)
@@ -1246,13 +1255,13 @@ public class TrsDataSyncHelper(
     private static ModelTypeSyncInfo GetModelTypeSyncInfoForNotes()
     {
         var tempTableName = "temp_notes_import";
-        var tableName = "dqt_notes";
+        var tableName = "notes";
 
         var columnNames = new[]
         {
-            "id",
+            "note_id",
             "person_id",
-            "note_text",
+            "content_html",
             "created_on",
             "created_by_dqt_user_id",
             "file_name",
@@ -1264,7 +1273,7 @@ public class TrsDataSyncHelper(
         };
 
         var columnsToUpdate = new[] {
-            "note_text",
+            "content_html",
             "file_name",
             "original_file_name",
             "updated_on",
@@ -1278,9 +1287,9 @@ public class TrsDataSyncHelper(
             $"""
             CREATE TEMP TABLE {tempTableName}
             (
-                id uuid NOT NULL,
+                note_id uuid NOT NULL,
                 person_id uuid NOT NULL,
-                note_text TEXT NULL,
+                content_html TEXT NULL,
                 created_on timestamp with time zone,
                 created_by_dqt_user_id uuid NOT NULL,
                 file_name TEXT NULL,
@@ -1298,7 +1307,7 @@ public class TrsDataSyncHelper(
             $"""
             INSERT INTO {tableName} ({columnList})
             SELECT {columnList} FROM {tempTableName}
-            ON CONFLICT (id) DO UPDATE
+            ON CONFLICT (note_id) DO UPDATE
             SET {string.Join(", ", columnsToUpdate.Select(c => $"{c} = EXCLUDED.{c}"))}
             WHERE {tableName}.updated_on IS NULL OR {tableName}.updated_on < EXCLUDED.updated_on;
             """;
@@ -1306,7 +1315,7 @@ public class TrsDataSyncHelper(
         //artitrary date of now-1 day because there are no rows in dqt_note
         var getLastModifiedOnStatement = $"SELECT COALESCE(MAX(updated_on), NOW() - INTERVAL '1 day') FROM {tableName}";
 
-        var deleteStatement = $"DELETE FROM {tableName} WHERE id = ANY({IdsParameterName})";
+        var deleteStatement = $"DELETE FROM {tableName} WHERE note_id = ANY({IdsParameterName})";
 
         var attributeNames = new[]
         {
@@ -1322,19 +1331,19 @@ public class TrsDataSyncHelper(
             Annotation.Fields.MimeType,
         };
 
-        Action<NpgsqlBinaryImporter, DqtNoteInfo> writeRecord = (writer, person) =>
+        Action<NpgsqlBinaryImporter, DqtNoteInfo> writeRecord = (writer, note) =>
         {
-            writer.WriteValueOrNull(person.Id, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(person.NoteText, NpgsqlDbType.Text);
-            writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
-            writer.WriteValueOrNull(person.CreatedByDqtUserId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(person.FileName, NpgsqlDbType.Text);
-            writer.WriteValueOrNull(person.OriginalFileName, NpgsqlDbType.Text);
-            writer.WriteValueOrNull(person.CreatedByDqtUserName, NpgsqlDbType.Text);
-            writer.WriteValueOrNull(person.UpdatedByDqtUserId, NpgsqlDbType.Uuid);
-            writer.WriteValueOrNull(person.UpdatedByDqtUserName, NpgsqlDbType.Text);
-            writer.WriteValueOrNull(person.UpdatedOn ?? person.CreatedOn, NpgsqlDbType.TimestampTz); //default updated on to when it was created
+            writer.WriteValueOrNull(note.Id, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(note.PersonId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(note.ContentHtml, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(note.CreatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull(note.CreatedByDqtUserId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(note.FileName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(note.OriginalFileName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(note.CreatedByDqtUserName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(note.UpdatedByDqtUserId, NpgsqlDbType.Uuid);
+            writer.WriteValueOrNull(note.UpdatedByDqtUserName, NpgsqlDbType.Text);
+            writer.WriteValueOrNull(note.UpdatedOn ?? note.CreatedOn, NpgsqlDbType.TimestampTz); //default updated on to when it was created
         };
 
         return new ModelTypeSyncInfo<DqtNoteInfo>()
@@ -2004,7 +2013,7 @@ public class TrsDataSyncHelper(
     {
         public required Guid? Id { get; set; }
         public required Guid PersonId { get; set; }
-        public required string? NoteText { get; set; }
+        public required string? ContentHtml { get; set; }
         public required DateTime CreatedOn { get; set; }
         public required Guid CreatedByDqtUserId { get; set; }
         public required string? CreatedByDqtUserName { get; set; }

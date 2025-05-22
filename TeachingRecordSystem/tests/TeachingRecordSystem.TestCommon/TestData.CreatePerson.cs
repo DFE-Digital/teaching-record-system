@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -333,7 +334,7 @@ public partial class TestData
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
                 GenderCode = gender,
                 dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestHelper.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
+                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
                 dfeta_SlugId = _slugId,
                 dfeta_loginfailedcounter = _loginFailedCounter

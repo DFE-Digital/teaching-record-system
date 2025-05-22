@@ -11,13 +11,13 @@ namespace TeachingRecordSystem.TestCommon
 {
     public partial class TestData
     {
-        public Task<DqtNote> CreateDqtNoteAsync(Guid personId, string noteText, Guid createdByUserId, string? createdByUserName, string? originalFileName, Guid? fileName, DateTime? createDate = null) => WithDbContextAsync(async dbContext =>
+        public Task<Note> CreateNoteAsync(Guid personId, string noteText, Guid createdByUserId, string? createdByUserName, string? originalFileName, Guid? fileName, DateTime? createDate = null) => WithDbContextAsync(async dbContext =>
         {
-            var note = new DqtNote()
+            var note = new Note()
             {
-                Id = Guid.NewGuid(),
+                NoteId = Guid.NewGuid(),
                 PersonId = personId,
-                NoteText = noteText,
+                ContentHtml = noteText,
                 CreatedByDqtUserName = createdByUserName ?? Faker.Name.FullName(),
                 CreatedByDqtUserId = createdByUserId,
                 CreatedOn = createDate ?? Clock.UtcNow,
@@ -28,7 +28,7 @@ namespace TeachingRecordSystem.TestCommon
                 FileName = fileName?.ToString()
             };
 
-            dbContext.DqtNotes.Add(note);
+            dbContext.Notes.Add(note);
             await dbContext.SaveChangesAsync();
 
             return note;

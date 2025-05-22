@@ -4,6 +4,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -377,7 +378,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith("/support-tasks/api-trn-requests?waitForJobId=", response.Headers.Location?.OriginalString);
 
-        var expectedCrmRequestId = TrnRequestHelper.GetCrmTrnRequestId(applicationUser.UserId, requestData.RequestId);
+        var expectedCrmRequestId = TrnRequestService.GetCrmTrnRequestId(applicationUser.UserId, requestData.RequestId);
         var crmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.dfeta_TrnRequestID == expectedCrmRequestId);
         Assert.NotEqual(matchedPerson.ContactId, crmContact.Id);
         Assert.Equal(requestData.FirstName, crmContact.FirstName);
