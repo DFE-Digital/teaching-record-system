@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 
@@ -12,11 +13,15 @@ namespace TeachingRecordSystem.Core.Jobs;
 public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncService.CrmClientName)]
     IOrganizationServiceAsync2 organizationService,
     TrsDataSyncHelper trsDataSyncHelper,
-    ILogger<BackfillDqtNotesJob> logger)
+    ILogger<BackfillDqtNotesJob> logger,
+    TrsDbContext dbContext)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         const int pageSize = 100;
+
+        var defaultMinCreatedOn = new DateTime(2014, 01, 01);
+        var minCreatedOn = await dbContext.Notes.MaxAsync(n => (DateTime?)n.CreatedOn);
 
         var query = new QueryExpression(Annotation.EntityLogicalName)
         {
@@ -36,10 +41,19 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncService.CrmClient
             {
                 Count = pageSize,
                 PageNumber = 1
+            },
+            Orders =
+            {
+                new OrderExpression
+                {
+                    AttributeName = Annotation.Fields.CreatedOn,
+                    OrderType = OrderType.Ascending
+                }
             }
         };
         query.Criteria.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.NotNull);
         query.Criteria.AddCondition(Annotation.Fields.ObjectTypeCode, ConditionOperator.Equal, Contact.EntityLogicalName);
+        query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.GreaterThan, minCreatedOn ?? defaultMinCreatedOn);
 
         var fetched = 0;
 
