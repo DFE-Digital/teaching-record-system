@@ -4,6 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
+[Collection(nameof(DisableParallelization))]
 public class ChangeReasonTests : TestBase
 {
     public ChangeReasonTests(HostFixture hostFixture) : base(hostFixture)

@@ -73,6 +73,7 @@ public class Person
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
+        out PreviousName? previousName,
         out PersonDetailsUpdatedEvent? @event)
     {
         var oldDetails = EventModels.PersonDetails.FromModel(this);
@@ -84,6 +85,7 @@ public class Person
         MobileNumber = mobileNumber;
         EmailAddress = emailAddress;
         NationalInsuranceNumber = nationalInsuranceNumber;
+        UpdatedOn = now;
 
         var changes = PersonDetailsUpdatedEventChanges.None |
             (FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
@@ -97,8 +99,22 @@ public class Person
         if (changes == PersonDetailsUpdatedEventChanges.None)
         {
             @event = null;
+            previousName = null;
             return;
         }
+
+        previousName = (changes & PersonDetailsUpdatedEventChanges.AnyNameChange) == PersonDetailsUpdatedEventChanges.None
+            ? null
+            : new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = PersonId,
+                FirstName = oldDetails.FirstName ?? string.Empty,
+                MiddleName = oldDetails.MiddleName ?? string.Empty,
+                LastName = oldDetails.LastName ?? string.Empty,
+                CreatedOn = now,
+                UpdatedOn = now
+            };
 
         @event = new PersonDetailsUpdatedEvent()
         {

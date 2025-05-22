@@ -3,6 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
+[Collection(nameof(DisableParallelization))]
 public class IndexTests : TestBase
 {
     public IndexTests(HostFixture hostFixture) : base(hostFixture)
