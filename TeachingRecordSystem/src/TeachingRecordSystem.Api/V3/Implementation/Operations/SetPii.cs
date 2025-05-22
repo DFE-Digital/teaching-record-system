@@ -1,5 +1,4 @@
 using Microsoft.Xrm.Sdk.Query;
-using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
@@ -16,7 +15,7 @@ public record SetPiiCommand
     public required DateOnly DateOfBirth { get; init; }
     public required string? EmailAddresses { get; init; }
     public required string? NationalInsuranceNumber { get; init; }
-    public required Dtos.Gender? Gender { get; init; }
+    public required Gender? Gender { get; init; }
 }
 
 public class SetPiiHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryDispatcher)
@@ -68,7 +67,7 @@ public class SetPiiHandler(TrsDbContext dbContext, ICrmQueryDispatcher crmQueryD
                 LastName: command.LastName,
                 DateOfBirth: command.DateOfBirth,
                 NationalInsuranceNumber: NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
-                Gender: command.Gender?.ConvertToContact_GenderCode(),
+                Gender: command.Gender?.ToContact_GenderCode(),
                 EmailAddress: command.EmailAddresses));
 
         return Unit.Instance;

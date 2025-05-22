@@ -5,9 +5,12 @@ using Npgsql;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.Webhooks;
 using TeachingRecordSystem.TestCommon.Infrastructure;
 
@@ -56,7 +59,10 @@ public class Startup
                     .AddSingleton<WebhookMessageFactory>()
                     .AddSingleton<EventMapperRegistry>()
                     .AddMemoryCache()
-                    .AddTransient<GetPersonHelper>();
+                    .AddTransient<GetPersonHelper>()
+                    .AddPersonMatching()
+                    .AddTrnRequestService(context.Configuration)
+                    .AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
             });
     }
 
