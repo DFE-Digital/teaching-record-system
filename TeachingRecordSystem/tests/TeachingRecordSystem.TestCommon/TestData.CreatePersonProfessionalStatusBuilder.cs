@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Migrations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
@@ -7,6 +6,13 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
+    //public Task<EventBase> CreateProfessionalStatusAsync(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
+    //{
+    //    var builder = new CreatePersonProfessionalStatusBuilder();
+    //    configure?.Invoke(builder);
+    //    return builder.ExecuteAsync(this);
+    //}
+
     public class CreatePersonProfessionalStatusBuilder
     {
         private Guid? _personId = null;
@@ -23,6 +29,8 @@ public partial class TestData
         private Guid? _trainingProviderId;
         private Guid? _degreeTypeId;
         private bool? _exemptFromInduction;
+        private TrainingProvider? _trainingProvider;
+        private RouteToProfessionalStatus? _routeToProfessionalStatus;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -91,6 +99,13 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonProfessionalStatusBuilder WithRoute(RouteToProfessionalStatus route)
+        {
+            _routeToProfessionalStatus = route;
+            _routeToProfessionalStatusId = route.RouteToProfessionalStatusId;
+            return this;
+        }
+
         public CreatePersonProfessionalStatusBuilder WithTrainingCountryId(string trainingCountryId)
         {
             _trainingCountryId = trainingCountryId;
@@ -100,6 +115,13 @@ public partial class TestData
         public CreatePersonProfessionalStatusBuilder WithTrainingProviderId(Guid trainingProviderId)
         {
             _trainingProviderId = trainingProviderId;
+            return this;
+        }
+
+        public CreatePersonProfessionalStatusBuilder WithTrainingProvider(TrainingProvider trainingProvider)
+        {
+            _trainingProvider = trainingProvider;
+            _trainingProviderId = trainingProvider.TrainingProviderId;
             return this;
         }
 
@@ -113,6 +135,37 @@ public partial class TestData
         {
             _exemptFromInduction = isExempt;
             return this;
+        }
+
+        internal async Task<Guid> ExecuteAsync(TestData testData)
+        {
+            var professionalStatus = new ProfessionalStatus()
+            {
+                PersonId = Guid.NewGuid(), //_personId,
+                QualificationId = QualificationId,
+                RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
+                Status = _status,
+                AwardedDate = _awardedDate,
+                TrainingStartDate = _trainingStartDate,
+                TrainingEndDate = _trainingEndDate,
+                TrainingSubjectIds = _trainingSubjectIds,
+                TrainingAgeSpecialismType = _trainingAgeSpecialismType,
+                TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
+                TrainingCountryId = _trainingCountryId,
+                TrainingProviderId = _trainingProviderId,
+                ExemptFromInduction = _exemptFromInduction,
+                DegreeTypeId = _degreeTypeId,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
+            };
+
+            await testData.WithDbContextAsync(async dbContext =>
+            {
+                await dbContext.ProfessionalStatuses.AddAsync(professionalStatus);
+            });
+
+            return professionalStatus.QualificationId;
         }
 
         internal Task<Guid> ExecuteAsync(
