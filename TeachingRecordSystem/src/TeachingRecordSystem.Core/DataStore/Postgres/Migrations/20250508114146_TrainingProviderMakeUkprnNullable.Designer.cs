@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250508114146_TrainingProviderMakeUkprnNullable")]
+    partial class TrainingProviderMakeUkprnNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2821,6 +2824,61 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.DqtNote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CreatedByDqtUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_dqt_user_id");
+
+                    b.Property<string>("CreatedByDqtUserName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("created_by_dqt_user_name");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("note_text");
+
+                    b.Property<string>("OriginalFileName")
+                        .HasColumnType("text")
+                        .HasColumnName("original_file_name");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("person_id");
+
+                    b.Property<Guid?>("UpdatedByDqtUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by_dqt_user_id");
+
+                    b.Property<string>("UpdatedByDqtUserName")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by_dqt_user_name");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("Id")
+                        .HasName("pk_dqt_notes");
+
+                    b.ToTable("dqt_notes", (string)null);
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EntityChangesJournal", b =>
                 {
                     b.Property<string>("Key")
@@ -3630,59 +3688,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.ToTable("name_synonyms", (string)null);
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Note", b =>
-                {
-                    b.Property<Guid>("NoteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("note_id");
-
-                    b.Property<string>("ContentHtml")
-                        .HasColumnType("text")
-                        .HasColumnName("content_html");
-
-                    b.Property<Guid?>("CreatedByDqtUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("created_by_dqt_user_id");
-
-                    b.Property<string>("CreatedByDqtUserName")
-                        .HasColumnType("text")
-                        .HasColumnName("created_by_dqt_user_name");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
-
-                    b.Property<string>("FileName")
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
-
-                    b.Property<string>("OriginalFileName")
-                        .HasColumnType("text")
-                        .HasColumnName("original_file_name");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("person_id");
-
-                    b.Property<Guid?>("UpdatedByDqtUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("updated_by_dqt_user_id");
-
-                    b.Property<string>("UpdatedByDqtUserName")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by_dqt_user_name");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_on");
-
-                    b.HasKey("NoteId")
-                        .HasName("pk_notes");
-
-                    b.ToTable("notes", (string)null);
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", b =>
                 {
                     b.Property<string>("Subject")
@@ -3869,10 +3874,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("first_name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<bool>("HasEyps")
-                        .HasColumnType("boolean")
-                        .HasColumnName("has_eyps");
-
                     b.Property<DateOnly?>("InductionCompletedDate")
                         .HasColumnType("date")
                         .HasColumnName("induction_completed_date");
@@ -3918,20 +3919,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("middle_name")
                         .UseCollation("case_insensitive");
 
-                    b.Property<string>("MobileNumber")
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)")
-                        .HasColumnName("mobile_number");
-
                     b.Property<string>("NationalInsuranceNumber")
                         .HasMaxLength(9)
                         .HasColumnType("character(9)")
                         .HasColumnName("national_insurance_number")
                         .IsFixedLength();
-
-                    b.Property<DateOnly?>("PqtsDate")
-                        .HasColumnType("date")
-                        .HasColumnName("pqts_date");
 
                     b.Property<DateOnly?>("QtsDate")
                         .HasColumnType("date")
@@ -4310,7 +4302,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Assessment Only",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 1,
@@ -4326,7 +4318,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Graduate Employment Based",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
                             TrainingEndDateRequired = 1,
@@ -4342,7 +4334,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Graduate Entry",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 1,
                             TrainingEndDateRequired = 1,
@@ -4358,7 +4350,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT School Direct",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 1,
@@ -4374,7 +4366,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Undergraduate",
-                            ProfessionalStatusType = 1,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 1,
@@ -4422,7 +4414,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "European Recognition - PQTS",
-                            ProfessionalStatusType = 3,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4438,7 +4430,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "EYPS",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4454,7 +4446,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "EYPS ITT Migrated",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -4470,7 +4462,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "EYTS ITT Migrated",
-                            ProfessionalStatusType = 2,
+                            ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
                             TrainingCountryRequired = 0,
                             TrainingEndDateRequired = 0,
@@ -17227,11 +17219,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("varchar[]")
                         .HasColumnName("redirect_uris");
 
-                    b.Property<string>("ShortName")
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)")
-                        .HasColumnName("short_name");
-
                     b.HasIndex("ClientId")
                         .IsUnique()
                         .HasDatabaseName("ix_users_client_id")
@@ -17369,6 +17356,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.DqtNote", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_dqt_notes_persons_person_id");
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.EstablishmentSource", null)
@@ -17413,16 +17410,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_international_qts_awarded_emails_job_items_international_qt");
 
                     b.Navigation("InternationalQtsAwardedEmailsJob");
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Note", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_notes_persons_person_id");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", b =>
@@ -17640,7 +17627,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasForeignKey("DegreeTypeId")
                         .HasConstraintName("fk_qualifications_degree_types_degree_type_id");
 
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatus", "RouteToProfessionalStatus")
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.RouteToProfessionalStatus", "Route")
                         .WithMany()
                         .HasForeignKey("RouteToProfessionalStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -17664,7 +17651,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                     b.Navigation("DegreeType");
 
-                    b.Navigation("RouteToProfessionalStatus");
+                    b.Navigation("Route");
 
                     b.Navigation("TrainingCountry");
 
