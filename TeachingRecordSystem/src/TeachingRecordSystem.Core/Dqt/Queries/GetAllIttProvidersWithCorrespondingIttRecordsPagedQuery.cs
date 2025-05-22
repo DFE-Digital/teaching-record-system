@@ -1,3 +1,3 @@
 ﻿namespace TeachingRecordSystem.Core.Dqt.Queries;
 
-public record GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(int pageNumber, string? pagingCookie = null) : ICrmQuery<PagedProviderResults>;
+public record GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(int pageNumber, int pagesize, string? pagingCookie = null) : ICrmQuery<PagedProviderResults>;

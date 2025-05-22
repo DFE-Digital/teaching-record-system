@@ -2,6 +2,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Jobs;
 
 namespace TeachingRecordSystem.Core.Tests.Jobs;
@@ -76,11 +77,26 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
                 dfeta_UKPRN = "1234"
             }
         };
+        var crmQuery1 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 3, It.IsAny<string>());
+        var crmQuery2 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 2, pagesize: 3, It.IsAny<string>());
+        var crmQuery3 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 3, pagesize: 3, It.IsAny<string>());
 
         _crmQueryDispatcherMock
-            .Setup(x => x.ExecuteQueryAsync(It.IsAny<ICrmQuery<PagedProviderResults>>()))
+            .Setup(x => x.ExecuteQueryAsync(crmQuery1))
             .ReturnsAsync(new PagedProviderResults(
-                Providers: accounts.ToArray(),
+                Providers: accounts.ToArray()[..3],
+                MoreRecords: true,
+                PagingCookie: null));
+        _crmQueryDispatcherMock
+            .Setup(x => x.ExecuteQueryAsync(crmQuery2))
+            .ReturnsAsync(new PagedProviderResults(
+                Providers: accounts.ToArray()[3..6],
+                MoreRecords: true,
+                PagingCookie: null));
+        _crmQueryDispatcherMock
+            .Setup(x => x.ExecuteQueryAsync(crmQuery3))
+            .ReturnsAsync(new PagedProviderResults(
+                Providers: accounts.ToArray()[6..],
                 MoreRecords: false,
                 PagingCookie: null));
 

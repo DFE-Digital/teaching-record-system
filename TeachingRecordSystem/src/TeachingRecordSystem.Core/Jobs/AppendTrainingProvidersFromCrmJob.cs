@@ -15,7 +15,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
     private async Task ProcessPagedResultAsync(Account[] providersInCrm)
     {
         var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
-        var emptyUkprnProvidersToAdd = providersInCrm
+        var providersWithNoUkprnToAdd = providersInCrm
             .Where(p => string.IsNullOrEmpty(p.dfeta_UKPRN) && !providersInTrs.Any(t => t.TrainingProviderId == p.Id));
         var uniqueUnmatchedUkprnProviders = providersInCrm
             .Where(p =>
@@ -25,13 +25,13 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
             .Select(g => g.First());
 
         // add to Trs
-        dbContext.TrainingProviders.AddRange(emptyUkprnProvidersToAdd
+        dbContext.TrainingProviders.AddRange(providersWithNoUkprnToAdd
             .Select(s => new TrainingProvider()
             {
                 IsActive = false,
                 Name = s.Name,
                 TrainingProviderId = s.Id,
-                Ukprn = s.dfeta_UKPRN
+                Ukprn = null
             })
             .ToList());
         dbContext.TrainingProviders.AddRange(uniqueUnmatchedUkprnProviders
@@ -52,7 +52,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1);
+        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 2);
 
         while (true)
         {
