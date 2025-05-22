@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
@@ -68,6 +69,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddSingleton<TrsDataSyncHelper>();
             services.AddSingleton<IAuditRepository, TestableAuditRepository>();
             services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
+            services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
         });
     }
 

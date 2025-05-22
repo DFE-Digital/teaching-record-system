@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
@@ -86,6 +87,7 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton(GetMockAdUserService());
                     services.AddSingleton(GetMockGetAnIdentityApiClient());
                     services.AddStartupTask<SeedLookupData>();
+                    services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
 
                     IFileService GetMockFileService()
                     {

@@ -4,9 +4,13 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
+using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -43,7 +47,10 @@ public class Startup
                             TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()))
                     .AddSingleton<ICurrentUserProvider>(Mock.Of<ICurrentUserProvider>())
                     .AddNameSynonyms()
-                    .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object);
+                    .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object)
+                    .AddPersonMatching()
+                    .AddTrnRequestService(context.Configuration)
+                    .AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
             });
     }
 }
