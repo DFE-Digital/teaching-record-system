@@ -77,9 +77,10 @@ public class AppendTrainingProvidersFromCrmJobTests : IAsyncLifetime
                 dfeta_UKPRN = "1234"
             }
         };
-        var crmQuery1 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, It.IsAny<int>(), It.IsAny<string>());
-        var crmQuery2 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 2, It.IsAny<int>(), It.IsAny<string>());
-        var crmQuery3 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 3, It.IsAny<int>(), It.IsAny<string>());
+        // setting expected query pagesize to the hardcoded value sent from the job, but returning fewer in the mock setup
+        var crmQuery1 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 1000, It.IsAny<string>());
+        var crmQuery2 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 2, pagesize: 1000, It.IsAny<string?>());
+        var crmQuery3 = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 3, pagesize: 1000, It.IsAny<string>());
 
         _crmQueryDispatcherMock
             .Setup(x => x.ExecuteQueryAsync(crmQuery1))
