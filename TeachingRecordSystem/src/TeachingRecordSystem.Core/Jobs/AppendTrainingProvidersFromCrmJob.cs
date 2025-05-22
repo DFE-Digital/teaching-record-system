@@ -52,7 +52,7 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
     public async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 2);
+        var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(pageNumber: 1, pagesize: 1000);
 
         while (true)
         {
