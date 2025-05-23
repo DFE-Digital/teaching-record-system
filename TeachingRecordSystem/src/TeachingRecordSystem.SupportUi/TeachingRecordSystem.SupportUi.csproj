@@ -902,4 +902,11 @@
     <_ContentIncludedByDefault Remove="Pages\Persons\PersonDetail\EditName\Confirm.cshtml" />
     <_ContentIncludedByDefault Remove="Pages\Persons\PersonDetail\EditName\Index.cshtml" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Pages\Persons\PersonDetail\Timeline\Events\ProfessionalStatusDeletedEvent.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

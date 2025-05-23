@@ -1,18 +1,10 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    //public Task<EventBase> CreateProfessionalStatusAsync(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
-    //{
-    //    var builder = new CreatePersonProfessionalStatusBuilder();
-    //    configure?.Invoke(builder);
-    //    return builder.ExecuteAsync(this);
-    //}
-
     public class CreatePersonProfessionalStatusBuilder
     {
         private Guid? _personId = null;
@@ -29,8 +21,6 @@ public partial class TestData
         private Guid? _trainingProviderId;
         private Guid? _degreeTypeId;
         private bool? _exemptFromInduction;
-        private TrainingProvider? _trainingProvider;
-        private RouteToProfessionalStatus? _routeToProfessionalStatus;
 
         private Guid QualificationId { get; } = Guid.NewGuid();
 
@@ -99,13 +89,6 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithRoute(RouteToProfessionalStatus route)
-        {
-            _routeToProfessionalStatus = route;
-            _routeToProfessionalStatusId = route.RouteToProfessionalStatusId;
-            return this;
-        }
-
         public CreatePersonProfessionalStatusBuilder WithTrainingCountryId(string trainingCountryId)
         {
             _trainingCountryId = trainingCountryId;
@@ -115,13 +98,6 @@ public partial class TestData
         public CreatePersonProfessionalStatusBuilder WithTrainingProviderId(Guid trainingProviderId)
         {
             _trainingProviderId = trainingProviderId;
-            return this;
-        }
-
-        public CreatePersonProfessionalStatusBuilder WithTrainingProvider(TrainingProvider trainingProvider)
-        {
-            _trainingProvider = trainingProvider;
-            _trainingProviderId = trainingProvider.TrainingProviderId;
             return this;
         }
 
@@ -141,7 +117,7 @@ public partial class TestData
         {
             var professionalStatus = new ProfessionalStatus()
             {
-                PersonId = Guid.NewGuid(), //_personId,
+                PersonId = _personId!.Value,
                 QualificationId = QualificationId,
                 RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
                 Status = _status,
