@@ -80,7 +80,7 @@
             }
             @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.StartDate))
             {
-                <govuk-summary-list-row show-if=false>
+                <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
@@ -227,7 +227,7 @@
                     }
                     @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.StartDate))
                     {
-                        <govuk-summary-list-row show-if=false>
+                        <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldDetails.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
