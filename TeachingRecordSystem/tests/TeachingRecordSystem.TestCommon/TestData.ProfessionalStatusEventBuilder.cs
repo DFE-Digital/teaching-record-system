@@ -1,6 +1,5 @@
 ﻿using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Models;
-using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -123,7 +122,6 @@ public partial class TestData
         ProfessionalStatusUpdatedEventChanges? _changes;
         string? _changeReason;
         string? _changeReasonDetail;
-        File? _evidenceFile;
 
         public UpdateProfessionalStatusEventBuilder WithCreatedByUser(EventModels.RaisedByUserInfo createdByUser)
         {
@@ -211,7 +209,7 @@ public partial class TestData
                 Changes = _changes ?? ProfessionalStatusUpdatedEventChanges.None,
                 ChangeReason = _changeReason,
                 ChangeReasonDetail = _changeReasonDetail,
-                EvidenceFile = _evidenceFile
+                EvidenceFile = null
             };
 
             await testData.WithDbContextAsync(async dbContext =>
@@ -244,8 +242,6 @@ public partial class TestData
         ProfessionalStatusDeletedEventChanges? _changes;
         string? _changeReason;
         string? _changeReasonDetail;
-        File? _evidenceFile;
-
         public DeleteProfessionalStatusEventBuilder WithCreatedByUser(EventModels.RaisedByUserInfo createdByUser)
         {
             _createdByUser = createdByUser;
@@ -325,7 +321,7 @@ public partial class TestData
                 Changes = _changes ?? ProfessionalStatusDeletedEventChanges.None,
                 DeletionReason = _changeReason,
                 DeletionReasonDetail = _changeReasonDetail,
-                EvidenceFile = _evidenceFile
+                EvidenceFile = null
             };
 
             await testData.WithDbContextAsync(async dbContext =>
