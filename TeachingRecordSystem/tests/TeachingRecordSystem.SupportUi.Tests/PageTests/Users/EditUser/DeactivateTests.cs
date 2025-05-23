@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Users.EditUser;
 
@@ -8,6 +9,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     public DeactivateTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.NewUserRoles);
+        FileServiceMock.Invocations.Clear();
     }
 
     public async Task InitializeAsync()
@@ -400,7 +402,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
         var html = await AssertEx.HtmlResponseAsync(response, 400);
 
-        var evidenceFileId = await AssertFileWasUploadedAsync();
+        var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
@@ -482,7 +484,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -511,7 +513,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -552,7 +554,6 @@ public class DeactivateTests : TestBase, IAsyncLifetime
             }
         };
 
-
         // Act
         var response = await HttpClient.SendAsync(request);
 
@@ -560,7 +561,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.StartsWith($"/users/{existingUser.UserId}", response.Headers.Location?.OriginalString);
 
-        AssertFileWasDeleted(evidenceFileId);
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -640,7 +641,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
 
-        var evidenceFileId = await AssertFileWasUploadedAsync();
+        var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
 
         EventPublisher.AssertEventsSaved(e =>
         {
@@ -688,7 +689,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
 
-        AssertFileWasNotUploaded();
+        FileServiceMock.AssertFileWasNotUploaded();
 
         EventPublisher.AssertEventsSaved(e =>
         {
@@ -738,7 +739,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         Assert.NotNull(updatedUser);
         Assert.False(updatedUser.Active);
 
-        AssertFileWasNotUploaded();
+        FileServiceMock.AssertFileWasNotUploaded();
 
         EventPublisher.AssertEventsSaved(e =>
         {
@@ -753,30 +754,6 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
         AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{existingUser.Name}\u2019s account has been deactivated.");
-    }
-
-    private async Task<Guid> AssertFileWasUploadedAsync()
-    {
-        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null));
-        return await Assert.IsType<Task<Guid>>(FileServiceMock.Invocations.FirstOrDefault(i => i.Method.Name == "UploadFileAsync")?.ReturnValue);
-    }
-
-    private void AssertFileWasNotUploaded()
-    {
-        FileServiceMock.Verify(mock => mock.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string?>(), null), Times.Never);
-    }
-
-    private void AssertFileWasDeleted(Guid fileId)
-    {
-        FileServiceMock.Verify(mock => mock.DeleteFileAsync(fileId));
-    }
-
-    private string GetHiddenInputValue(IHtmlDocument html, string name)
-    {
-        var element = html.QuerySelector($@"input[type=""hidden""][name=""{name}""]");
-        var input = Assert.IsAssignableFrom<IHtmlInputElement>(element);
-
-        return input.Value;
     }
 
     private static string GetRequestPath(Guid userId) => $"/users/{userId}/deactivate";

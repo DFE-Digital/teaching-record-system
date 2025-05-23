@@ -1,0 +1,1 @@
+ALTER TABLE trs_notes ALTER COLUMN content_html NVARCHAR(MAX) NULL;

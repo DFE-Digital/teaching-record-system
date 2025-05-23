@@ -9,7 +9,7 @@ public class Note
 {
     public required Guid NoteId { get; set; }
     public required Guid PersonId { get; set; }
-    public required string ContentHtml { get; set; }
+    public required string? ContentHtml { get; set; }
     public required DateTime? UpdatedOn { get; set; }
     public required DateTime CreatedOn { get; set; }
     public required Guid? CreatedByDqtUserId { get; set; }

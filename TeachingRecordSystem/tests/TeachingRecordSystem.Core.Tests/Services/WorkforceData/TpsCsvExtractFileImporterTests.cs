@@ -11,7 +11,7 @@ public class TpsCsvExtractFileImporterTests(DbFixture dbFixture)
     {
         var validFormatTrn = "1234567";
         var invalidFormatTrn = "12345678";
-        var validFormatNationalInsuranceNumber = "QQ123456U";
+        var validFormatNationalInsuranceNumber = "AB123456D";
         var invalidFormatNationalInsuranceNumber = "1234";
         var validFormatDateOfBirth = "01/01/1980";
         var invalidFormatDateOfBirth = "1234";

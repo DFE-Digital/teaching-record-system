@@ -12,6 +12,8 @@ using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
+
 #pragma warning disable TRS0001
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -33,7 +35,7 @@ public record CreateTrnRequestCommand
 public class CreateTrnRequestHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
-    TrnRequestHelper trnRequestHelper,
+    TrnRequestService trnRequestService,
     ICurrentUserProvider currentUserProvider,
     ITrnGenerator trnGenerationApiClient,
 #pragma warning disable CS9113 // Parameter is unread.
@@ -46,7 +48,7 @@ public class CreateTrnRequestHandler(
     {
         var (currentApplicationUserId, currentApplicationUserName) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
         if (trnRequest is not null)
         {
             return ApiError.TrnRequestAlreadyCreated(command.RequestId);
@@ -60,7 +62,7 @@ public class CreateTrnRequestHandler(
         //var firstNameSynonyms = (await nameSynonymProvider.GetAllNameSynonyms()).GetValueOrDefault(firstName, []);
         var firstNameSynonyms = Array.Empty<string>();  // Disabled temporarily
 
-        var normalizedNino = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber);
+        var normalizedNino = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber);
         var emailAddress = command.EmailAddresses.FirstOrDefault();
         string? trnToken;
         string? aytqLink;
@@ -124,8 +126,8 @@ public class CreateTrnRequestHandler(
         {
             // FUTURE: consider whether we should be updating any missing attributes here
 
-            trnToken = emailAddress is not null ? await trnRequestHelper.CreateTrnTokenAsync(singleMatchOnNinoAndDob.Trn, emailAddress) : null;
-            aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
+            trnToken = emailAddress is not null ? await trnRequestService.CreateTrnTokenAsync(singleMatchOnNinoAndDob.Trn, emailAddress) : null;
+            aytqLink = trnToken is not null ? trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) : null;
 
             await crmQueryDispatcher.ExecuteQueryAsync(
                 new CreateDqtOutboxMessageQuery(CreateMetadataOutboxMessage(potentialDuplicate: false, singleMatchOnNinoAndDob.ContactId, trnToken)));
@@ -170,8 +172,8 @@ public class CreateTrnRequestHandler(
 
         var allowContactPiiUpdatesFromUserIds = configuration.GetSection("AllowContactPiiUpdatesFromUserIds").Get<string[]>() ?? [];
 
-        trnToken = emailAddress is not null && trn is not null ? await trnRequestHelper.CreateTrnTokenAsync(trn, emailAddress) : null;
-        aytqLink = trnToken is not null ? trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnToken) : null;
+        trnToken = emailAddress is not null && trn is not null ? await trnRequestService.CreateTrnTokenAsync(trn, emailAddress) : null;
+        aytqLink = trnToken is not null ? trnRequestService.GetAccessYourTeachingQualificationsLink(trnToken) : null;
 
         var contactId = Guid.NewGuid();
 
@@ -192,11 +194,11 @@ public class CreateTrnRequestHandler(
             DateOfBirth = command.DateOfBirth,
             Gender = command.Gender?.ConvertToContact_GenderCode() ?? Contact_GenderCode.Notavailable,
             EmailAddress = emailAddress,
-            NationalInsuranceNumber = NationalInsuranceNumberHelper.Normalize(command.NationalInsuranceNumber),
+            NationalInsuranceNumber = NationalInsuranceNumber.Normalize(command.NationalInsuranceNumber),
             ReviewTasks = reviewTasks,
             ApplicationUserName = currentApplicationUserName,
             Trn = trn,
-            TrnRequestId = TrnRequestHelper.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
+            TrnRequestId = TrnRequestService.GetCrmTrnRequestId(currentApplicationUserId, command.RequestId),
             TrnRequestMetadataMessage = metadataMessage,
             AllowPiiUpdates = allowContactPiiUpdatesFromUserIds.Contains(currentApplicationUserId.ToString())
         });

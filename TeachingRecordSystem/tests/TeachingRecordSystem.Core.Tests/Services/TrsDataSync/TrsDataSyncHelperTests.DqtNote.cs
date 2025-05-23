@@ -32,6 +32,7 @@ public partial class TrsDataSyncHelperTests
             updatedBy,
             updatedOn,
             createdByDqtUserName,
+            null,
             null);
 
         // Act
@@ -85,7 +86,8 @@ public partial class TrsDataSyncHelperTests
             updatedBy,
             updatedOn,
             createdByDqtUserName,
-            updatedByUserName);
+            updatedByUserName,
+            null);
         var updatedNoteText = "THIS IS UPDATED";
         var updatedDate = createdOn.AddHours(1);
         await Helper.SyncAnnotationsAsync(new[] { note }, ignoreInvalid: true, dryRun: false, ct.Token);
@@ -136,7 +138,8 @@ public partial class TrsDataSyncHelperTests
             updatedBy,
             updatedOn,
             createdByDqtUserName,
-            updatedByDqtUserName);
+            updatedByDqtUserName,
+            null);
         var updatedNoteText = "THIS WILL NOT BE UPDATED";
 
         // Act
@@ -188,7 +191,8 @@ public partial class TrsDataSyncHelperTests
             updatedBy,
             updatedOn,
             createdByDqtUserName,
-            updatedByDqtUserName);
+            updatedByDqtUserName,
+            null);
         await Helper.SyncAnnotationsAsync(new[] { note }, ignoreInvalid: true, dryRun: false, ct.Token);
 
         // Act
@@ -229,7 +233,8 @@ public partial class TrsDataSyncHelperTests
             updatedBy,
             updatedOn,
             createdByDqtUserName,
-            updatedByDqtUserName);
+            updatedByDqtUserName,
+            null);
         note.DocumentBody = attachmentbase64;
 
         // Act
@@ -283,7 +288,8 @@ public partial class TrsDataSyncHelperTests
             null,
             null,
             createdByDqtUserName,
-            updatedByDqtUserName);
+            updatedByDqtUserName,
+            null);
         note.DocumentBody = attachmentbase64;
         await Helper.SyncAnnotationsAsync(new[] { note }, ignoreInvalid: true, dryRun: false, ct.Token);
         note.DocumentBody = null;
@@ -326,7 +332,8 @@ public partial class TrsDataSyncHelperTests
         Guid? updatedByDqtUserId,
         DateTime? updatedOn,
         string createdByDqtUserName,
-        string? updatedByDqtUserName
+        string? updatedByDqtUserName,
+        string? subject
         )
     {
         var newAnnoation = new Annotation()
@@ -339,7 +346,8 @@ public partial class TrsDataSyncHelperTests
             CreatedBy = GetUserReference(createdByDqtUserId, createdByDqtUserName),
             CreatedOn = createdOn,
             ModifiedBy = GetUserReference(updatedByDqtUserId, updatedByDqtUserName),
-            ModifiedOn = updatedOn
+            ModifiedOn = updatedOn,
+            Subject = subject
         };
         return newAnnoation;
     }
@@ -382,7 +390,8 @@ public partial class TrsDataSyncHelperTests
             null,
             null,
             createdByDqtUserName,
-            updatedByDqtUserName);
+            updatedByDqtUserName,
+            "Entered by REG");
         note.DocumentBody = attachmentbase64;
         await Helper.SyncAnnotationsAsync(new[] { note }, ignoreInvalid: true, dryRun: false, ct.Token);
         note.DocumentBody = null;

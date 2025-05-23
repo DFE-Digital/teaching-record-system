@@ -3638,7 +3638,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("note_id");
 
                     b.Property<string>("ContentHtml")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("content_html");
 
@@ -3918,6 +3917,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("middle_name")
                         .UseCollation("case_insensitive");
+
+                    b.Property<string>("MobileNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("mobile_number");
 
                     b.Property<string>("NationalInsuranceNumber")
                         .HasMaxLength(9)
@@ -5739,7 +5743,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("Ukprn")
-                        .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character(8)")
                         .HasColumnName("ukprn")

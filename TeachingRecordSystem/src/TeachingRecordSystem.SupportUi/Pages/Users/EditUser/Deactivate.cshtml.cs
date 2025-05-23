@@ -132,8 +132,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Users.EditUser
                 User = EventModels.User.FromModel(_user),
                 RaisedBy = User.GetUserId(),
                 CreatedUtc = clock.UtcNow,
-                DeactivatedReason = (HasAdditionalReason ?? false) ? AdditionalReasonDetail : null,
-                DeactivatedReasonDetail = (HasMoreInformation ?? false) ? MoreInformationDetail : null,
+                DeactivatedReason = HasAdditionalReason is true ? AdditionalReasonDetail : null,
+                DeactivatedReasonDetail = HasMoreInformation is true ? MoreInformationDetail : null,
                 EvidenceFileId = EvidenceFileId,
             });
 

@@ -264,7 +264,8 @@ public class TrsDataSyncHelper(
     {
         var ignoredTerms = GetIgnoreNotesContainingTerms();
         var lowerInput = await annotation.GetNoteTextWithoutHtmlAsync() ?? string.Empty;
-        if (ignoredTerms.Any(term => lowerInput.ToLower().Contains(term)))
+        if (ignoredTerms.Any(term => lowerInput.ToLower().Contains(term)) &&
+            (!string.IsNullOrEmpty(annotation.Subject) && annotation.Subject.Contains("Entered by REG", StringComparison.InvariantCultureIgnoreCase)))
         {
             return null;
         }
@@ -1378,6 +1379,7 @@ public class TrsDataSyncHelper(
             "date_of_birth",
             "email_address",
             "national_insurance_number",
+            "mobile_number",
             "dqt_contact_id",
             "dqt_state",
             "dqt_created_on",
@@ -1426,6 +1428,7 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_StatedLastName,
             Contact.Fields.BirthDate,
             Contact.Fields.dfeta_NINumber,
+            Contact.Fields.MobilePhone,
             Contact.Fields.EMailAddress1,
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
@@ -1445,6 +1448,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DateOfBirth, NpgsqlDbType.Date);
             writer.WriteValueOrNull(person.EmailAddress, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.NationalInsuranceNumber, NpgsqlDbType.Char);
+            writer.WriteValueOrNull(person.MobileNumber, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.DqtContactId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.DqtState, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(person.DqtCreatedOn, NpgsqlDbType.TimestampTz);
@@ -1700,6 +1704,7 @@ public class TrsDataSyncHelper(
             DateOfBirth = c.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             EmailAddress = c.EMailAddress1.NormalizeString(),
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
+            MobileNumber = c.MobilePhone.NormalizeString(),
             QtsDate = c.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EytsDate = c.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             DqtContactId = c.Id,
@@ -1985,6 +1990,7 @@ public class TrsDataSyncHelper(
         public required DateOnly? DateOfBirth { get; init; }
         public required string? EmailAddress { get; init; }
         public required string? NationalInsuranceNumber { get; init; }
+        public required string? MobileNumber { get; init; }
         public required DateOnly? QtsDate { get; init; }
         public required DateOnly? EytsDate { get; init; }
         public required Guid? DqtContactId { get; init; }

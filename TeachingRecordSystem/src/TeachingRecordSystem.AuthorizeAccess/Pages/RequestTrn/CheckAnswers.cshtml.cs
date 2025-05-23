@@ -88,8 +88,8 @@ public class CheckAnswersModel(AuthorizeAccessLinkGenerator linkGenerator, ICrmQ
             Work Email: {state.WorkEmail}
             Name: {state.Name}
             Previous name: {state.PreviousName}
-            Date of birth: {state.DateOfBirth:dd/MM/yyyy}                
-            National Insurance number: {NationalInsuranceNumberHelper.Normalize(state.NationalInsuranceNumber)}
+            Date of birth: {state.DateOfBirth:dd/MM/yyyy}
+            National Insurance number: {Core.NationalInsuranceNumber.Normalize(state.NationalInsuranceNumber)}
             Registered For NPQ: {(state.HaveRegisteredForAnNpq == true ? "Yes" : "No")}
             NPQ application ID: {state.NpqApplicationId}
             NPQ name: {state.NpqName}

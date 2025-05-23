@@ -479,11 +479,11 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
     {
         // Arrange
         var applicationUserWithShortName = await TestData.CreateApplicationUserAsync(shortName: TestData.GenerateApplicationUserShortName());
-        Clock.Advance();
         var applicationUserWithoutShortName = await TestData.CreateApplicationUserAsync(shortName: "");
 
-        var task1 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithShortName.UserId);
-        var task2 = await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithoutShortName.UserId);
+        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithShortName.UserId);
+        Clock.Advance();
+        await TestData.CreateApiTrnRequestSupportTaskAsync(applicationUserWithoutShortName.UserId);
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
