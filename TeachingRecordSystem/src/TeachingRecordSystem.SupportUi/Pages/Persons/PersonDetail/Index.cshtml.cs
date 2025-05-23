@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -10,7 +9,8 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 public class IndexModel(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
-    PreviousNameHelper previousNameHelper) : PageModel
+    PreviousNameHelper previousNameHelper,
+    IFeatureProvider featureProvider) : PageModel
 {
     [FromRoute]
     public Guid PersonId { get; set; }
@@ -30,71 +30,75 @@ public class IndexModel(
 
     public async Task OnGetAsync()
     {
-        var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveContactDetailByIdQuery(
-                PersonId,
-                new ColumnSet(
-                    Contact.Fields.dfeta_TRN,
-                    Contact.Fields.CreatedOn,
-                    Contact.Fields.BirthDate,
-                    Contact.Fields.FirstName,
-                    Contact.Fields.MiddleName,
-                    Contact.Fields.LastName,
-                    Contact.Fields.dfeta_StatedFirstName,
-                    Contact.Fields.dfeta_StatedMiddleName,
-                    Contact.Fields.dfeta_StatedLastName,
-                    Contact.Fields.EMailAddress1,
-                    Contact.Fields.MobilePhone,
-                    Contact.Fields.dfeta_NINumber,
-                    Contact.Fields.GenderCode)));
-
-        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == PersonId && a.IsOpen).AnyAsync();
-
-        var contact = contactDetail!.Contact;
-        var previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact);
-
-        Person = new PersonInfo()
-        {
-            Name = contact.ResolveFullName(includeMiddleName: true),
-            DateOfBirth = contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
-            Trn = contact.dfeta_TRN,
-            NationalInsuranceNumber = contact.dfeta_NINumber,
-            Email = contact.EMailAddress1,
-            MobileNumber = contact.MobilePhone,
-            Gender = contact.GenderCode.ToString(),
-            HasActiveAlert = hasActiveAlert,
-            PreviousNames = previousNames
-                .Select(name => GetFullName(name.FirstName, name.MiddleName, name.LastName))
-                .ToArray()
-        };
-
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
+        Person = await GetPersonInfoAsync();
     }
 
-    private static string GetFullName(string? firstName, string? middleName, string? lastName)
+    private async Task<PersonInfo> GetPersonInfoAsync()
     {
-        var fullName = new StringBuilder(firstName);
-        if (!string.IsNullOrEmpty(middleName))
+        var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == PersonId && a.IsOpen).AnyAsync();
+
+        if (featureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
-            if (fullName.Length > 0)
+            var person = await dbContext.Persons
+                .SingleOrDefaultAsync(p => p.PersonId == PersonId);
+
+            var previousNames = await dbContext.PreviousNames
+                .Where(n => n.PersonId == PersonId)
+                .OrderByDescending(n => n.CreatedOn)
+                .ToArrayAsync();
+
+            return new PersonInfo
             {
-                fullName.Append(' ');
-            }
-
-            fullName.Append(middleName);
+                Name = StringHelper.JoinNonEmpty(' ', person!.FirstName, person.MiddleName, person.LastName),
+                DateOfBirth = person.DateOfBirth,
+                Trn = person.Trn,
+                NationalInsuranceNumber = person.NationalInsuranceNumber,
+                Email = person.EmailAddress,
+                MobileNumber = person.MobileNumber,
+                Gender = null,
+                HasActiveAlert = hasActiveAlert,
+                PreviousNames = previousNames
+                    .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
+                    .ToArray()
+            };
         }
-
-        if (!string.IsNullOrEmpty(lastName))
+        else
         {
-            if (fullName.Length > 0)
+            var contactDetail = await crmQueryDispatcher.ExecuteQueryAsync(
+                new GetActiveContactDetailByIdQuery(
+                    PersonId,
+                    new ColumnSet(
+                        Contact.Fields.dfeta_TRN,
+                        Contact.Fields.CreatedOn,
+                        Contact.Fields.BirthDate,
+                        Contact.Fields.FirstName,
+                        Contact.Fields.MiddleName,
+                        Contact.Fields.LastName,
+                        Contact.Fields.dfeta_StatedFirstName,
+                        Contact.Fields.dfeta_StatedMiddleName,
+                        Contact.Fields.dfeta_StatedLastName,
+                        Contact.Fields.EMailAddress1,
+                        Contact.Fields.MobilePhone,
+                        Contact.Fields.dfeta_NINumber,
+                        Contact.Fields.GenderCode)));
+            var contact = contactDetail!.Contact;
+
+            return new PersonInfo()
             {
-                fullName.Append(' ');
-            }
-
-            fullName.Append(lastName);
+                Name = contact.ResolveFullName(includeMiddleName: true),
+                DateOfBirth = contact.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
+                Trn = contact.dfeta_TRN,
+                NationalInsuranceNumber = contact.dfeta_NINumber,
+                Email = contact.EMailAddress1,
+                MobileNumber = contact.MobilePhone,
+                Gender = contact.GenderCode.ToString(),
+                HasActiveAlert = hasActiveAlert,
+                PreviousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
+                    .Select(name => StringHelper.JoinNonEmpty(' ', name.FirstName, name.MiddleName, name.LastName))
+                    .ToArray()
+            };
         }
-
-        return fullName.ToString();
     }
 
     public record PersonInfo
