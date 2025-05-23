@@ -181,6 +181,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<TrnRequestMetadataBackfillJob>(
+                    nameof(TrnRequestMetadataBackfillJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 recurringJobManager.AddOrUpdate<ClearAlertsJob>(
                     nameof(ClearAlertsJob),
                     job => job.ExecuteAsync(),
