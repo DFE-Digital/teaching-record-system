@@ -162,10 +162,6 @@ public class GetTrnRequestTests : TestBase
 
     private async Task<string> GetAccessYourTeachingQualificationsLinkAsync(string requestId)
     {
-        // We need Metadata in the DB to retrieve the TrnToken
-        await ProcessOutboxMessages<CreateContactQuery, Guid>(q => q.TrnRequestMetadataMessage);
-        await ProcessOutboxMessages<CreateDqtOutboxMessageQuery, Guid>(q => q.Message);
-
         var trnToken = await WithDbContextAsync(async dbContext =>
         {
             var metadata = await dbContext.TrnRequestMetadata.SingleAsync(r => r.ApplicationUserId == ApplicationUserId && r.RequestId == requestId);

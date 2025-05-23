@@ -246,7 +246,7 @@ public class OutboxMessageHandlerFixture
             .AddDatabase(configuration.GetPostgresConnectionString())
             .AddTransient<TrsDbContext>(sp => sp.GetRequiredService<IDbContextFactory<TrsDbContext>>().CreateDbContext())
             .AddSingleton(TestData)
-            .AddTrnRequestService()
+            .AddTrnRequestService(configuration)
             .AddCrmQueries()
             .AddDefaultServiceClient(ServiceLifetime.Singleton, _ => organizationService)
             .AddSingleton<WebhookMessageFactory>()

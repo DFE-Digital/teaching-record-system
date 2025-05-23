@@ -199,7 +199,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     .IsSupersetOf([PersonMatchedAttribute.DateOfBirth, PersonMatchedAttribute.NationalInsuranceNumber]) =>
                 TrnRequestMatchResult.DefiniteMatch(singleMatch.person_id, singleMatch.trn),
             [] => TrnRequestMatchResult.NoMatches(),
-            _ => TrnRequestMatchResult.PotentialMatches()
+            _ => TrnRequestMatchResult.PotentialMatches(results.Select(r => r.person_id))
         };
     }
 

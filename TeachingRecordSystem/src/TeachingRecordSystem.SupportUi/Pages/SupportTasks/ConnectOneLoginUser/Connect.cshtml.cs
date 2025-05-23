@@ -35,8 +35,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
         });
         _supportTask.Status = SupportTaskStatus.Closed;
 
-        var matchedAttributes = (await personMatchingService
-            .GetMatchedAttributesAsync(
+        var matchedAttributes = (await personMatchingService.GetMatchedAttributesAsync(
                 new(data.VerifiedNames!, data.VerifiedDatesOfBirth!, data.StatedNationalInsuranceNumber, data.StatedTrn, data.TrnTokenTrn),
                 PersonDetail!.PersonId))
             .ToArray();

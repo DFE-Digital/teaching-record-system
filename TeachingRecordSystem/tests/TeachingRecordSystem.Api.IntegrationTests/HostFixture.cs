@@ -10,12 +10,14 @@ using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.IntegrationTests.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
@@ -91,6 +93,7 @@ public class HostFixture : WebApplicationFactory<Program>
                     TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()));
             services.AddSingleton<OutboxMessageHandler>();
             services.AddSingleton<MessageSerializer>();
+            services.AddSingleton<IBackgroundJobScheduler, TestBackgroundJobScheduler>();
 
             services.Configure<GetAnIdentityOptions>(options =>
             {
