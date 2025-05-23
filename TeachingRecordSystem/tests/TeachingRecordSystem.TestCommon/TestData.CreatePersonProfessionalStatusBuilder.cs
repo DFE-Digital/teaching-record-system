@@ -1,6 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Migrations;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -113,6 +111,37 @@ public partial class TestData
         {
             _exemptFromInduction = isExempt;
             return this;
+        }
+
+        internal async Task<Guid> ExecuteAsync(TestData testData)
+        {
+            var professionalStatus = new ProfessionalStatus()
+            {
+                PersonId = _personId!.Value,
+                QualificationId = QualificationId,
+                RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
+                Status = _status,
+                AwardedDate = _awardedDate,
+                TrainingStartDate = _trainingStartDate,
+                TrainingEndDate = _trainingEndDate,
+                TrainingSubjectIds = _trainingSubjectIds,
+                TrainingAgeSpecialismType = _trainingAgeSpecialismType,
+                TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
+                TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
+                TrainingCountryId = _trainingCountryId,
+                TrainingProviderId = _trainingProviderId,
+                ExemptFromInduction = _exemptFromInduction,
+                DegreeTypeId = _degreeTypeId,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
+            };
+
+            await testData.WithDbContextAsync(async dbContext =>
+            {
+                await dbContext.ProfessionalStatuses.AddAsync(professionalStatus);
+            });
+
+            return professionalStatus.QualificationId;
         }
 
         internal Task<Guid> ExecuteAsync(
