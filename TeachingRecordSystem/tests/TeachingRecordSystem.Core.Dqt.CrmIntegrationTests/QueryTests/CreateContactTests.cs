@@ -40,45 +40,12 @@ public class CreateContactTests : IAsyncLifetime
             FirstName = firstName,
             MiddleName = middleName,
             LastName = lastName,
-            StatedFirstName = Option.Some(firstName),
-            StatedMiddleName = Option.Some(middleName),
-            StatedLastName = Option.Some(lastName),
             EmailAddress = email,
             NationalInsuranceNumber = nino,
             DateOfBirth = dateOfBirth,
             Gender = gender,
             Trn = trn,
-            ReviewTasks = [],
             ApplicationUserName = "Tests",
-            TrnRequestMetadataMessage = new TrnRequestMetadataMessage
-            {
-                ApplicationUserId = Guid.NewGuid(),
-                RequestId = Guid.NewGuid().ToString(),
-                CreatedOn = DateTime.UtcNow,
-                IdentityVerified = null,
-                EmailAddress = email,
-                OneLoginUserSubject = null,
-                Name = new string[]
-                {
-                    firstName,
-                    middleName,
-                    lastName
-                },
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                PotentialDuplicate = false,
-                NationalInsuranceNumber = nino,
-                Gender = null,
-                AddressLine1 = null,
-                AddressLine2 = null,
-                AddressLine3 = null,
-                City = null,
-                Postcode = null,
-                Country = null,
-                TrnToken = null
-            },
             AllowPiiUpdates = true
         };
 

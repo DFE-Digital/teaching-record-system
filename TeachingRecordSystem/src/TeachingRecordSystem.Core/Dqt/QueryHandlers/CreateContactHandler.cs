@@ -13,9 +13,6 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
     {
         var contactId = query.ContactId;
 
-        var requestBuilder = RequestBuilder.CreateTransaction(organizationService);
-        var serializer = new MessageSerializer();
-
         var contact = new Contact()
         {
             Id = contactId,
@@ -31,50 +28,12 @@ public class CreateContactHandler : ICrmQueryHandler<CreateContactQuery, Guid>
             dfeta_TRN = query.Trn
         };
 
-        void SetAttributeIfSpecified<T>(Option<T> value, string attributeName)
-        {
-            if (value.HasValue)
-            {
-                object? attributeValue = value.ValueOrFailure();
-                contact.Attributes.Add(attributeName, attributeValue);
-            }
-        }
-
-        SetAttributeIfSpecified(query.StatedFirstName, Contact.Fields.dfeta_StatedFirstName);
-        SetAttributeIfSpecified(query.StatedMiddleName, Contact.Fields.dfeta_StatedMiddleName);
-        SetAttributeIfSpecified(query.StatedLastName, Contact.Fields.dfeta_StatedLastName);
-
         if (query.Trn is null)
         {
             // CRM plug-in explodes if TRN is specified but is null
             contact.Attributes.Remove(Contact.Fields.dfeta_TRN);
         }
 
-        requestBuilder.AddRequest(new CreateRequest() { Target = contact });
-
-        foreach (var reviewTask in query.ReviewTasks)
-        {
-            var task = new CrmTask()
-            {
-                RegardingObjectId = contactId.ToEntityReference(Contact.EntityLogicalName),
-                dfeta_potentialduplicateid = reviewTask.PotentialDuplicateContactId.ToEntityReference(Contact.EntityLogicalName),
-                Category = reviewTask.Category,
-                Subject = reviewTask.Subject,
-                Description = reviewTask.Description
-            };
-
-            requestBuilder.AddRequest(new CreateRequest() { Target = task });
-        }
-
-        if (query.TrnRequestMetadataMessage is not null)
-        {
-            requestBuilder.AddRequest(new CreateRequest() { Target = serializer.CreateCrmOutboxMessage(query.TrnRequestMetadataMessage) });
-        }
-
-        await requestBuilder.ExecuteAsync();
-
-        return contactId;
-
-
+        return await organizationService.CreateAsync(contact);
     }
 }

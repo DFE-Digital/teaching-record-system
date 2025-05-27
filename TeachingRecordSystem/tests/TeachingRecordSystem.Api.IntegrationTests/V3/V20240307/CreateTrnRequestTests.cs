@@ -412,7 +412,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus()
+    public async Task Post_NotMatchedToExistingRecord_ReturnsCompletedStatusAndTrn()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -451,15 +451,6 @@ public class CreateTrnRequestTests : TestBase
         var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
         Assert.NotNull(contact);
         Assert.NotEmpty(contact.dfeta_TRN);
-        Assert.Equal(dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false), contact.BirthDate);
-        Assert.Equal(firstNames.First(), contact.FirstName);
-        Assert.Equal(string.Join(" ", firstNames.Skip(1).Append(middleName)), contact.MiddleName);
-        Assert.Equal(lastName, contact.LastName);
-        Assert.Equal(firstName, contact.dfeta_StatedFirstName);
-        Assert.Equal(middleName, contact.dfeta_StatedMiddleName);
-        Assert.Equal(lastName, contact.dfeta_StatedLastName);
-        Assert.Equal(email, contact.EMailAddress1);
-        Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
 
         await AssertEx.JsonResponseEqualsAsync(
             response,
@@ -482,7 +473,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PotentialDuplicateContact_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    public async Task Post_PotentialDuplicateContact_ReturnsPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -523,11 +514,6 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.Null(contact.dfeta_TRN);
-
         await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new

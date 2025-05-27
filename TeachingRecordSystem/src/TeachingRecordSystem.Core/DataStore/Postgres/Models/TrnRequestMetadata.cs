@@ -16,7 +16,7 @@ public class TrnRequestMetadata
     public string? PreviousLastName { get; init; }
     public required string[] Name { get; init; }
     public required DateOnly DateOfBirth { get; init; }
-    public bool? PotentialDuplicate { get; init; }
+    public bool? PotentialDuplicate { get; set; }
     public string? NationalInsuranceNumber { get; init; }
     public int? Gender { get; init; }
     public string? AddressLine1 { get; init; }

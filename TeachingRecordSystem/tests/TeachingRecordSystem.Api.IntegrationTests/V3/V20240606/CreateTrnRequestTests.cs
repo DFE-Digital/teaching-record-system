@@ -378,7 +378,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_NotMatchedToExistingRecord_CreatesTeacherWithTrnAndReturnsCompletedStatus()
+    public async Task Post_NotMatchedToExistingRecord_ReturnsCompletedStatusAndTrn()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -389,8 +389,6 @@ public class CreateTrnRequestTests : TestBase
         var dateOfBirth = new DateOnly(1990, 01, 01);
         var email = Faker.Internet.Email();
         var nationalInsuranceNumber = Faker.Identification.UkNationalInsuranceNumber();
-
-        var configuration = HostFixture.Services.GetRequiredService<IConfiguration>();
 
         var requestBody = CreateJsonContent(CreateDummyRequest() with
         {
@@ -419,15 +417,6 @@ public class CreateTrnRequestTests : TestBase
         var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
         Assert.NotNull(contact);
         Assert.NotEmpty(contact.dfeta_TRN);
-        Assert.Equal(dateOfBirth.ToDateTimeWithDqtBstFix(isLocalTime: false), contact.BirthDate);
-        Assert.Equal(firstNames.First(), contact.FirstName);
-        Assert.Equal(string.Join(" ", firstNames.Skip(1).Append(middleName)), contact.MiddleName);
-        Assert.Equal(lastName, contact.LastName);
-        Assert.Equal(firstName, contact.dfeta_StatedFirstName);
-        Assert.Equal(middleName, contact.dfeta_StatedMiddleName);
-        Assert.Equal(lastName, contact.dfeta_StatedLastName);
-        Assert.Equal(email, contact.EMailAddress1);
-        Assert.Equal(nationalInsuranceNumber, contact.dfeta_NINumber);
 
         await AssertEx.JsonResponseEqualsAsync(
             response,
@@ -441,7 +430,7 @@ public class CreateTrnRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Post_PotentialDuplicateContact_CreatesContactWithoutTrnAndReturnsPendingStatus()
+    public async Task Post_PotentialDuplicateContact_ReturnsPendingStatus()
     {
         // Arrange
         var requestId = Guid.NewGuid().ToString();
@@ -482,70 +471,6 @@ public class CreateTrnRequestTests : TestBase
         var response = await GetHttpClientWithApiKey().SendAsync(request);
 
         // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.Null(contact.dfeta_TRN);
-
-        await AssertEx.JsonResponseEqualsAsync(
-            response,
-            expected: new
-            {
-                requestId,
-                trn = (string?)null,
-                status = "Pending"
-            },
-            expectedStatusCode: 200);
-    }
-
-    [Fact]
-    public async Task Post_WithMultipleEmailAddresses_MatchesByEmail()
-    {
-        // Arrange
-        var requestId = Guid.NewGuid().ToString();
-        var firstName = Faker.Name.First();
-        var middleName = Faker.Name.Middle();
-        var lastName = Faker.Name.Last();
-        var dateOfBirth = new DateOnly(1990, 01, 01);
-        var email1 = Faker.Internet.Email();
-        var email2 = Faker.Internet.Email();
-
-        await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithFirstName(firstName)
-            .WithMiddleName(middleName)
-            .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth)
-            .WithEmail(email2));
-
-        var requestBody = CreateJsonContent(CreateDummyRequest() with
-        {
-            RequestId = requestId,
-            Person = new()
-            {
-                FirstName = firstName,
-                MiddleName = middleName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                EmailAddresses = [email1, email2]
-            }
-        });
-
-        var request = new HttpRequestMessage(HttpMethod.Post, "v3/trn-requests")
-        {
-            Content = requestBody
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        var (_, createdContactId) = CrmQueryDispatcherSpy.GetSingleQuery<CreateContactQuery, Guid>();
-        var contact = XrmFakedContext.CreateQuery<Contact>().SingleOrDefault(c => c.Id == createdContactId);
-        Assert.NotNull(contact);
-        Assert.Null(contact.dfeta_TRN);
-        Assert.Equal(email1, contact.EMailAddress1);
-
         await AssertEx.JsonResponseEqualsAsync(
             response,
             expected: new
