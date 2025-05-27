@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using TeachingRecordSystem.AuthorizeAccess.Infrastructure.Security;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Services.PersonMatching;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.WebCommon.FormFlow;
@@ -215,8 +214,7 @@ public class SignInJourneyHelper(
                     t => t.TrnToken == trnToken && t.ExpiresUtc > clock.UtcNow && t.UserId == null);
                 if (trnTokenModel is not null)
                 {
-                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(
-                        p => p.Trn == trnTokenModel.Trn && p.DqtState == (int)ContactState.Active);
+                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == trnTokenModel.Trn);
                     matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.TrnToken : null;
                 }
             }
@@ -233,8 +231,7 @@ public class SignInJourneyHelper(
                             || u.TrnAssociationSource == TrnAssociationSource.SupportUi));
                 if (identityUser is not null)
                 {
-                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(
-                        p => p.Trn == identityUser.Trn && p.DqtState == (int)ContactState.Active);
+                    getAnIdentityPerson = await dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == identityUser.Trn);
                     matchRoute = getAnIdentityPerson is not null ? OneLoginUserMatchRoute.GetAnIdentityUser : null;
                 }
             }

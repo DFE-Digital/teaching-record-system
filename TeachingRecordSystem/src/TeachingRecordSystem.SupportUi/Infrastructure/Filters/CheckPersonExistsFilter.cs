@@ -80,7 +80,7 @@ public class CheckPersonExistsFilter(
         await next();
 
         Task<Person?> GetPersonAsync() => dbContext.Persons
-            .FromSql($"select * from persons where person_id = {personId} and dqt_state = 0 for update")  // https://github.com/dotnet/efcore/issues/26042
+            .FromSql($"select * from persons where person_id = {personId} and status = 0 for update")  // https://github.com/dotnet/efcore/issues/26042
             .SingleOrDefaultAsync();
     }
 }
