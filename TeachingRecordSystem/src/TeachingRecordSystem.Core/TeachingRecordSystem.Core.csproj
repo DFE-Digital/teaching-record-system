@@ -95,6 +95,7 @@
     <None Remove="Services\DqtReporting\Migrations\0060_TrsPersonsMobileNumber.sql" />
     <None Remove="Services\DqtReporting\Migrations\0061_TrsNotesInsertedColumn.sql" />
     <None Remove="Services\DqtReporting\Migrations\0062_TrsPreviousNames.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0063_TrsPersonStatus.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -189,6 +190,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0060_TrsPersonsMobileNumber.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0061_TrsNotesInsertedColumn.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0062_TrsPreviousNames.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0063_TrsPersonStatus.sql" />
   </ItemGroup>
 
   <ItemGroup>

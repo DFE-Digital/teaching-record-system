@@ -1371,6 +1371,7 @@ public class TrsDataSyncHelper(
             "person_id",
             "created_on",
             "updated_on",
+            "status",
             "trn",
             "first_name",
             "middle_name",
@@ -1440,6 +1441,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.PersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.UpdatedOn, NpgsqlDbType.TimestampTz);
+            writer.WriteValueOrNull((int)person.Status, NpgsqlDbType.Integer);
             writer.WriteValueOrNull(person.Trn, NpgsqlDbType.Char);
             writer.WriteValueOrNull(person.FirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.MiddleName, NpgsqlDbType.Varchar);
@@ -1696,6 +1698,7 @@ public class TrsDataSyncHelper(
             PersonId = c.ContactId!.Value,
             CreatedOn = c.CreatedOn!.Value,
             UpdatedOn = c.ModifiedOn!.Value,
+            Status = c.StateCode == ContactState.Active ? PersonStatus.Active : PersonStatus.Inactive,
             Trn = c.dfeta_TRN,
             FirstName = (c.HasStatedNames() ? c.dfeta_StatedFirstName : c.FirstName) ?? string.Empty,
             MiddleName = (c.HasStatedNames() ? c.dfeta_StatedMiddleName : c.MiddleName) ?? string.Empty,
@@ -1982,6 +1985,7 @@ public class TrsDataSyncHelper(
         public required Guid PersonId { get; init; }
         public required DateTime? CreatedOn { get; init; }
         public required DateTime? UpdatedOn { get; init; }
+        public required PersonStatus Status { get; init; }
         public required string? Trn { get; init; }
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
