@@ -24,12 +24,7 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.PluginTests
         public async Task Put_MutipleUpdatesContactLastName_PluginUpdatesPreviousName()
         {
             // Arrange
-            var person = await _dataScope.TestData.CreatePersonAsync(x =>
-            {
-                x.WithNationalInsuranceNumber();
-                x.WithGender(Contact_GenderCode.Male);
-            });
-
+            var person = await _dataScope.TestData.CreatePersonAsync();
             var newFirstName = _dataScope.TestData.GenerateChangedFirstName(person.FirstName);
             var newMiddleName = _dataScope.TestData.GenerateChangedMiddleName(person.MiddleName);
             var newNationalInsuranceNumber = _dataScope.TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
@@ -77,11 +72,7 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.PluginTests
         public async Task DeactivatePreviousNameWithNoPreviousName_PluginClearsPreviousName()
         {
             // Arrange
-            var person = await _dataScope.TestData.CreatePersonAsync(x =>
-            {
-                x.WithNationalInsuranceNumber();
-                x.WithGender(Contact_GenderCode.Male);
-            });
+            var person = await _dataScope.TestData.CreatePersonAsync();
             var newFirstName = _dataScope.TestData.GenerateChangedFirstName(person.FirstName);
             var newMiddleName = _dataScope.TestData.GenerateChangedMiddleName(person.MiddleName);
             var newNationalInsuranceNumber = _dataScope.TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
@@ -124,11 +115,7 @@ namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.PluginTests
         public async Task DeactivatePreviousNameWithAPreviousName_PluginSetsToMostRecentPreviousName()
         {
             // Arrange
-            var person = await _dataScope.TestData.CreatePersonAsync(x =>
-            {
-                x.WithNationalInsuranceNumber();
-                x.WithGender(Contact_GenderCode.Male);
-            });
+            var person = await _dataScope.TestData.CreatePersonAsync();
             var newFirstName = _dataScope.TestData.GenerateChangedFirstName(person.FirstName);
             var newMiddleName = _dataScope.TestData.GenerateChangedMiddleName(person.MiddleName);
             var newNationalInsuranceNumber = _dataScope.TestData.GenerateChangedNationalInsuranceNumber(person.NationalInsuranceNumber!);
