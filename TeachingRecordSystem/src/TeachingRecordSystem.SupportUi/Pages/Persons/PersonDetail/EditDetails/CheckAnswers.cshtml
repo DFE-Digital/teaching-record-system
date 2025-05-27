@@ -25,6 +25,13 @@
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
+                    @if (Model.NameChanged)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Previous name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.PreviousName</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Teacher reference number (TRN)</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
