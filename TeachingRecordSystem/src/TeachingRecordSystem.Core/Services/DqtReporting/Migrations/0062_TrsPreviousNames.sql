@@ -11,4 +11,4 @@ create table trs_previous_names (
     [__Updated] datetime
 )
 
-CREATE INDEX ix_previous_names_person_id ON previous_names (person_id)
+CREATE INDEX ix_previous_names_person_id ON trs_previous_names (person_id)
