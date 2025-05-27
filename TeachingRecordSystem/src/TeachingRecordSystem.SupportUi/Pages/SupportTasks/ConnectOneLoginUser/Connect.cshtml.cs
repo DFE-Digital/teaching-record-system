@@ -68,7 +68,7 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
         var data = (ConnectOneLoginUserData)_supportTask.Data;
 
         PersonDetail = await dbContext.Persons
-            .Where(p => p.Trn == Trn && p.DqtState == 0)
+            .Where(p => p.Trn == Trn)
             .Select(p => new PersonDetailViewModel()
             {
                 PersonId = p.PersonId,

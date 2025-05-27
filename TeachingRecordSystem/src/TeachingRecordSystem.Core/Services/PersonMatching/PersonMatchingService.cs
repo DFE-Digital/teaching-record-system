@@ -37,7 +37,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 JOIN persons p ON m.person_id = p.person_id
                 WHERE ARRAY['FullName', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
                 AND ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys
-                AND p.dqt_state = 0
+                AND p.status = 0
                 """,
                 parameters:
                 [
@@ -96,7 +96,7 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                 JOIN persons p ON m.person_id = p.person_id
                 WHERE ((ARRAY['LastName', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
                 OR ARRAY['NationalInsuranceNumber', 'Trn']::varchar[] && m.matched_attr_keys))
-                AND p.dqt_state = 0
+                AND p.status = 0
                 """,
                 parameters:
                 [
@@ -271,11 +271,11 @@ public class PersonMatchingService(TrsDbContext dbContext) : IPersonMatchingServ
                     p.date_of_birth,
                     p.national_insurance_number
                 FROM matches m
-                JOIN persons p ON m.person_id = p.person_id 
+                JOIN persons p ON m.person_id = p.person_id
                 WHERE (
                     ARRAY['NationalInsuranceNumber', 'DateOfBirth']::varchar[] <@ m.matched_attr_keys
                     OR array_length(m.matched_attr_keys, 1) >= 3)
-                AND p.dqt_state = 0 AND p.trn IS NOT NULL
+                AND p.status = 0 AND p.trn IS NOT NULL
                 """,
                 parameters:
                 [

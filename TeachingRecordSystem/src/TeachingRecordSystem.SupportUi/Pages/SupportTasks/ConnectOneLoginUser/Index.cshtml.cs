@@ -47,7 +47,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
         {
             trn = TrnOverride!;
 
-            if (!await dbContext.Persons.AnyAsync(p => p.Trn == trn && p.DqtState == 0))
+            if (!await dbContext.Persons.AnyAsync(p => p.Trn == trn))
             {
                 ModelState.AddModelError(nameof(TrnOverride), "Enter a valid TRN");
                 return this.PageWithErrors();
