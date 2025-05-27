@@ -129,7 +129,7 @@ public class CheckAnswersTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
@@ -147,6 +147,73 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Email", v => Assert.Equal("test@test.com", v.TextContent.Trim()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TextContent.Trim()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TextContent.Trim()));
+    }
+
+    [Fact]
+    public async Task Get_WhenAnyNameFieldNotChanged_DoesNotShowPreviousName()
+    {
+        // Arrange
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great"));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
+        doc.AssertSummaryListRowDoesNotExist("Previous name");
+    }
+
+    [Theory]
+    [InlineData("Alfred", "The", "OK")]
+    [InlineData("Alfred", "A", "Great")]
+    [InlineData("Jimmy", "The", "Great")]
+    public async Task Get_WhenAnyNameFieldChanged_ShowsPreviousName(string firstName, string middleName, string lastName)
+    {
+        // Arrange
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great"));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName(firstName, middleName, lastName)
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Previous name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
     }
 
     [Fact]

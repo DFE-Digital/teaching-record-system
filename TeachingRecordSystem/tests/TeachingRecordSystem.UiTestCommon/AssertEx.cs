@@ -119,6 +119,12 @@ public static partial class AssertEx
         AssertSummaryListValue<IElement>(doc, keyContent, valueAssertion);
     }
 
+    public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string keyContent)
+    {
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TextContent == keyContent);
+        Assert.Null(label);
+    }
+
     public static void AssertSummaryListValue<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
     {
         var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
