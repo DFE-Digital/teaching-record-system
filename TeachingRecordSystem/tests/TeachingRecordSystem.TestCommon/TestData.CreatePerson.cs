@@ -550,13 +550,15 @@ public partial class TestData
                     return default;
                 }
 
-                var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
+                var person = await dbContext.Persons
+                    .Include(p => p.Qualifications)
+                    .SingleAsync(p => p.PersonId == PersonId);
 
                 AddTrnRequestMetadata();
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
-                var professionalStatusIds = await AddProfessionalStatusRoutesAsync();
+                var professionalStatusIds = await AddProfessionalStatusRoutesAsync(person);
                 var awardedProfessionalStatusIds = await AddAwardedProfessionalStatusRoutesAsync();
 
                 await dbContext.SaveChangesAsync();
@@ -602,14 +604,15 @@ public partial class TestData
                     return mqIds;
                 }
 
-                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync()
+                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync(Person person)
                 {
                     var routeIds = new List<Guid>();
 
                     foreach (var builder in _professionalStatusBuilders)
                     {
-                        var routeId = await builder.ExecuteAsync(this, testData, dbContext);
+                        var (routeId, createdEvents) = await builder.ExecuteAsync(this, person, testData, dbContext);
                         routeIds.Add(routeId);
+                        events.AddRange(createdEvents);
                     }
 
                     return routeIds;
