@@ -1,4 +1,3 @@
-using FakeXrmEasy;
 using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.Infrastructure.Security;

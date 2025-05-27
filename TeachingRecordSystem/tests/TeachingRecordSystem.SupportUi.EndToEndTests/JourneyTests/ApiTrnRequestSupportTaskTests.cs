@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 
 public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)

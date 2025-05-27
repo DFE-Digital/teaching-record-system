@@ -1,6 +1,5 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
 using TeachingRecordSystem.Core.Services.TrnRequests;

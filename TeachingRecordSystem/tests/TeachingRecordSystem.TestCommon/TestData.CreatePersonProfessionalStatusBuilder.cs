@@ -1,6 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Migrations;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;

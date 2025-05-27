@@ -1,4 +1,4 @@
-﻿namespace TeachingRecordSystem.SupportUi.Pages.Shared;
+namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
 public class PaginationViewModel(int currentPage, int lastPage, Func<int, string> getPageLink)
 {

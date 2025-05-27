@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.AuthorizationHandlers;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 
