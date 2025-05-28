@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
 
