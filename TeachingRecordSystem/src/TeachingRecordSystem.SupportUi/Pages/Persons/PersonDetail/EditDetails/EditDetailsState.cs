@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -20,10 +21,7 @@ public class EditDetailsState : IRegisterJourney
     public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new(null, null);
     public EditDetailsChangeReasonOption? ChangeReason { get; set; }
     public string? ChangeReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+    public UploadEvidenceViewModel? UploadEvidence { get; set; }
 
     public bool Initialized { get; set; }
 
@@ -34,8 +32,7 @@ public class EditDetailsState : IRegisterJourney
         DateOfBirth.HasValue &&
         ChangeReason.HasValue &&
         (ChangeReason.Value is not EditDetailsChangeReasonOption.AnotherReason || ChangeReasonDetail is not null) &&
-        UploadEvidence.HasValue &&
-        (UploadEvidence.Value is not true || EvidenceFileId.HasValue);
+        UploadEvidence is not null && UploadEvidence.IsValid;
 
     public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId)
     {

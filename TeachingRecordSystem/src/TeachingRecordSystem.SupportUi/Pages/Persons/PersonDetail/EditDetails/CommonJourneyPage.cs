@@ -26,9 +26,9 @@ public abstract class CommonJourneyPage(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        if (JourneyInstance!.State.EvidenceFileId.HasValue)
+        if (JourneyInstance!.State.UploadEvidence!.EvidenceFileId.HasValue)
         {
-            await FileService.DeleteFileAsync(JourneyInstance!.State.EvidenceFileId.Value);
+            await FileService.DeleteFileAsync(JourneyInstance!.State.UploadEvidence!.EvidenceFileId.Value);
         }
 
         await JourneyInstance!.DeleteAsync();

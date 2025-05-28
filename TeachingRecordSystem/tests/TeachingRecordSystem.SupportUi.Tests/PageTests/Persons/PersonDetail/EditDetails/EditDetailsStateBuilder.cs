@@ -103,10 +103,13 @@ public class EditDetailsStateBuilder
             NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
             ChangeReason = ChangeReason,
             ChangeReasonDetail = ChangeReasonDetail,
-            UploadEvidence = UploadEvidence,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
+            UploadEvidence = new Views.Shared.Components.UploadEvidence.UploadEvidenceViewModel
+            {
+                UploadEvidence = UploadEvidence,
+                EvidenceFileId = EvidenceFileId,
+                EvidenceFileName = EvidenceFileName,
+                EvidenceFileSizeDescription = EvidenceFileSizeDescription
+            },
             Initialized = Initialized
         };
     }

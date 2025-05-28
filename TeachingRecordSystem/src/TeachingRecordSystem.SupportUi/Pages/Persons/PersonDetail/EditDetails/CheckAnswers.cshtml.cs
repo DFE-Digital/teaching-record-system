@@ -60,11 +60,11 @@ public class CheckAnswersModel(
             (string?)NationalInsuranceNumber,
             ChangeReason!.GetDisplayName()!,
             ChangeReasonDetail!,
-            JourneyInstance!.State.EvidenceFileId is Guid fileId
+            JourneyInstance!.State.UploadEvidence!.EvidenceFileId is Guid fileId
                 ? new EventModels.File()
                 {
                     FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
+                    Name = JourneyInstance.State.UploadEvidence!.EvidenceFileName!
                 }
                 : null,
             User.GetUserId(),
@@ -118,9 +118,9 @@ public class CheckAnswersModel(
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
         ChangeReason = JourneyInstance.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance.State.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+        EvidenceFileName = JourneyInstance.State.UploadEvidence!.EvidenceFileName;
+        UploadedEvidenceFileUrl = JourneyInstance.State.UploadEvidence!.EvidenceFileId is not null ?
+            await FileService.GetFileUrlAsync(JourneyInstance.State.UploadEvidence!.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
     }
 }

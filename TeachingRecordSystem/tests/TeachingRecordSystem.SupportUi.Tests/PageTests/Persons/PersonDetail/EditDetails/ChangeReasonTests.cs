@@ -469,9 +469,9 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.EvidenceFileName);
-        Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.True(journeyInstance.State.UploadEvidence!.UploadEvidence);
+        Assert.Equal("evidence.pdf", journeyInstance.State.UploadEvidence!.EvidenceFileName);
+        Assert.Equal("1.2 KB", journeyInstance.State.UploadEvidence!.EvidenceFileSizeDescription);
     }
 
     [Fact]
@@ -535,10 +535,10 @@ public class ChangeReasonTests : TestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(EditDetailsChangeReasonOption.NewInformation, journeyInstance.State.ChangeReason);
         Assert.Null(journeyInstance.State.ChangeReasonDetail);
-        Assert.False(journeyInstance.State.UploadEvidence);
-        Assert.Null(journeyInstance.State.EvidenceFileId);
-        Assert.Null(journeyInstance.State.EvidenceFileName);
-        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.False(journeyInstance.State.UploadEvidence!.UploadEvidence);
+        Assert.Null(journeyInstance.State.UploadEvidence!.EvidenceFileId);
+        Assert.Null(journeyInstance.State.UploadEvidence!.EvidenceFileName);
+        Assert.Null(journeyInstance.State.UploadEvidence!.EvidenceFileSizeDescription);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>

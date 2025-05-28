@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -36,17 +35,13 @@ public class ChangeReasonModel(
     public EditDetailsJourneyPage NextPage =>
         EditDetailsJourneyPage.CheckAnswers;
 
-    public async Task OnGetAsync()
+    public Task OnGetAsync()
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        UploadEvidence = new UploadEvidenceViewModel
-        {
-            UploadEvidence = JourneyInstance.State.UploadEvidence,
-            EvidenceFileId = JourneyInstance.State.EvidenceFileId,
-            EvidenceFileName = JourneyInstance.State.EvidenceFileName,
-            EvidenceFileSizeDescription = JourneyInstance.State.EvidenceFileSizeDescription,
-        };
+        UploadEvidence = JourneyInstance.State.UploadEvidence;
+
+        return Task.CompletedTask;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -54,39 +49,6 @@ public class ChangeReasonModel(
         if (ChangeReason is not null && ChangeReason.Value == EditDetailsChangeReasonOption.AnotherReason && ChangeReasonDetail is null)
         {
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter a reason");
-        }
-
-        if (UploadEvidence!.UploadEvidence == true && UploadEvidence!.EvidenceFileId is null && UploadEvidence!.EvidenceFile is null)
-        {
-            ModelState.AddModelError("EvidenceFile", "Select a file");
-        }
-
-        // Delete any previously uploaded file if they're uploading a new one,
-        // or choosing not to upload evidence (check for UploadEvidence != true because if
-        // UploadEvidence somehow got set to null we still want to delete the file)
-        if (UploadEvidence!.EvidenceFileId.HasValue && (UploadEvidence!.EvidenceFile is not null || UploadEvidence!.UploadEvidence != true))
-        {
-            await FileService.DeleteFileAsync(UploadEvidence!.EvidenceFileId.Value);
-            UploadEvidence!.EvidenceFileName = null;
-            UploadEvidence!.EvidenceFileSizeDescription = null;
-            UploadEvidence!.UploadedEvidenceFileUrl = null;
-            UploadEvidence!.EvidenceFileId = null;
-        }
-
-        // Upload the file even if the rest of the form is invalid
-        // otherwise the user will have to re-upload every time they re-submit
-        if (UploadEvidence!.UploadEvidence == true)
-        {
-            // Upload the file and set the display fields
-            if (UploadEvidence!.EvidenceFile is not null)
-            {
-                using var stream = UploadEvidence!.EvidenceFile.OpenReadStream();
-                var evidenceFileId = await FileService.UploadFileAsync(stream, UploadEvidence!.EvidenceFile.ContentType);
-                UploadEvidence!.EvidenceFileId = evidenceFileId;
-                UploadEvidence!.EvidenceFileName = UploadEvidence!.EvidenceFile?.FileName;
-                UploadEvidence!.EvidenceFileSizeDescription = UploadEvidence!.EvidenceFile?.Length.Bytes().Humanize();
-                UploadEvidence!.UploadedEvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
-            }
         }
 
         if (!ModelState.IsValid)
@@ -98,10 +60,7 @@ public class ChangeReasonModel(
         {
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail = ChangeReason is EditDetailsChangeReasonOption.AnotherReason ? ChangeReasonDetail : null;
-            state.UploadEvidence = UploadEvidence!.UploadEvidence;
-            state.EvidenceFileId = UploadEvidence!.UploadEvidence is true ? UploadEvidence!.EvidenceFileId : null;
-            state.EvidenceFileName = UploadEvidence!.UploadEvidence is true ? UploadEvidence!.EvidenceFileName : null;
-            state.EvidenceFileSizeDescription = UploadEvidence!.UploadEvidence is true ? UploadEvidence!.EvidenceFileSizeDescription : null;
+            state.UploadEvidence = UploadEvidence;
         });
 
         return Redirect(GetPageLink(EditDetailsJourneyPage.CheckAnswers));
