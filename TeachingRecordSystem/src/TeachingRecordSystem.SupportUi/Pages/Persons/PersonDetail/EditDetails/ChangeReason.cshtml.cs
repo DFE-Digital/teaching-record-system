@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
-using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -28,26 +28,7 @@ public class ChangeReasonModel(
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    [Display(Name = "Do you want to upload evidence?")]
-    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
-    public bool? UploadEvidence { get; set; }
-
-    [BindProperty]
-    [EvidenceFile]
-    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
-    public IFormFile? EvidenceFile { get; set; }
-
-    [BindProperty]
-    public Guid? EvidenceFileId { get; set; }
-
-    [BindProperty]
-    public string? EvidenceFileName { get; set; }
-
-    [BindProperty]
-    public string? EvidenceFileSizeDescription { get; set; }
-
-    [BindProperty]
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public UploadEvidenceViewModel? UploadEvidence { get; set; }
 
     public string BackLink =>
         GetPageLink(FromCheckAnswers ? EditDetailsJourneyPage.CheckAnswers : EditDetailsJourneyPage.Index);
@@ -59,12 +40,13 @@ public class ChangeReasonModel(
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        UploadEvidence = JourneyInstance.State.UploadEvidence;
-        EvidenceFileId = JourneyInstance.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance.State.EvidenceFileSizeDescription;
-        UploadedEvidenceFileUrl = JourneyInstance.State.EvidenceFileId is null ? null :
-            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry);
+        UploadEvidence = new UploadEvidenceViewModel
+        {
+            UploadEvidence = JourneyInstance.State.UploadEvidence,
+            EvidenceFileId = JourneyInstance.State.EvidenceFileId,
+            EvidenceFileName = JourneyInstance.State.EvidenceFileName,
+            EvidenceFileSizeDescription = JourneyInstance.State.EvidenceFileSizeDescription,
+        };
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -74,36 +56,36 @@ public class ChangeReasonModel(
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter a reason");
         }
 
-        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
+        if (UploadEvidence!.UploadEvidence == true && UploadEvidence!.EvidenceFileId is null && UploadEvidence!.EvidenceFile is null)
         {
-            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
+            ModelState.AddModelError("EvidenceFile", "Select a file");
         }
 
         // Delete any previously uploaded file if they're uploading a new one,
         // or choosing not to upload evidence (check for UploadEvidence != true because if
         // UploadEvidence somehow got set to null we still want to delete the file)
-        if (EvidenceFileId.HasValue && (EvidenceFile is not null || UploadEvidence != true))
+        if (UploadEvidence!.EvidenceFileId.HasValue && (UploadEvidence!.EvidenceFile is not null || UploadEvidence!.UploadEvidence != true))
         {
-            await FileService.DeleteFileAsync(EvidenceFileId.Value);
-            EvidenceFileName = null;
-            EvidenceFileSizeDescription = null;
-            UploadedEvidenceFileUrl = null;
-            EvidenceFileId = null;
+            await FileService.DeleteFileAsync(UploadEvidence!.EvidenceFileId.Value);
+            UploadEvidence!.EvidenceFileName = null;
+            UploadEvidence!.EvidenceFileSizeDescription = null;
+            UploadEvidence!.UploadedEvidenceFileUrl = null;
+            UploadEvidence!.EvidenceFileId = null;
         }
 
         // Upload the file even if the rest of the form is invalid
         // otherwise the user will have to re-upload every time they re-submit
-        if (UploadEvidence == true)
+        if (UploadEvidence!.UploadEvidence == true)
         {
             // Upload the file and set the display fields
-            if (EvidenceFile is not null)
+            if (UploadEvidence!.EvidenceFile is not null)
             {
-                using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await FileService.UploadFileAsync(stream, EvidenceFile.ContentType);
-                EvidenceFileId = evidenceFileId;
-                EvidenceFileName = EvidenceFile?.FileName;
-                EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
-                UploadedEvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
+                using var stream = UploadEvidence!.EvidenceFile.OpenReadStream();
+                var evidenceFileId = await FileService.UploadFileAsync(stream, UploadEvidence!.EvidenceFile.ContentType);
+                UploadEvidence!.EvidenceFileId = evidenceFileId;
+                UploadEvidence!.EvidenceFileName = UploadEvidence!.EvidenceFile?.FileName;
+                UploadEvidence!.EvidenceFileSizeDescription = UploadEvidence!.EvidenceFile?.Length.Bytes().Humanize();
+                UploadEvidence!.UploadedEvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
             }
         }
 
@@ -116,10 +98,10 @@ public class ChangeReasonModel(
         {
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail = ChangeReason is EditDetailsChangeReasonOption.AnotherReason ? ChangeReasonDetail : null;
-            state.UploadEvidence = UploadEvidence;
-            state.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
-            state.EvidenceFileName = UploadEvidence is true ? EvidenceFileName : null;
-            state.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
+            state.UploadEvidence = UploadEvidence!.UploadEvidence;
+            state.EvidenceFileId = UploadEvidence!.UploadEvidence is true ? UploadEvidence!.EvidenceFileId : null;
+            state.EvidenceFileName = UploadEvidence!.UploadEvidence is true ? UploadEvidence!.EvidenceFileName : null;
+            state.EvidenceFileSizeDescription = UploadEvidence!.UploadEvidence is true ? UploadEvidence!.EvidenceFileSizeDescription : null;
         });
 
         return Redirect(GetPageLink(EditDetailsJourneyPage.CheckAnswers));
