@@ -52,9 +52,9 @@ namespace TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence
                     }
                 }
 
-                model.EvidenceFileId = model.UploadEvidence is true ? model.EvidenceFileId : null;
-                model.EvidenceFileName = model.UploadEvidence is true ? model.EvidenceFileName : null;
-                model.EvidenceFileSizeDescription = model.UploadEvidence is true ? model.EvidenceFileSizeDescription : null;
+                //model.EvidenceFileId = model.UploadEvidence is true ? model.EvidenceFileId : null;
+                //model.EvidenceFileName = model.UploadEvidence is true ? model.EvidenceFileName : null;
+                //model.EvidenceFileSizeDescription = model.UploadEvidence is true ? model.EvidenceFileSizeDescription : null;
             }
 
             return View(model);

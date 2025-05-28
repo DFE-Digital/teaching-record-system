@@ -1,4 +1,15 @@
-﻿@using TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence
+﻿@using GovUk.Frontend.AspNetCore
+@using Microsoft.AspNetCore.Http.Features
+@using TeachingRecordSystem.Core.Models
+@using TeachingRecordSystem.WebCommon
+@using TeachingRecordSystem.SupportUi
+@namespace TeachingRecordSystem.SupportUi.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, GovUk.Frontend.AspNetCore
+@addTagHelper *, TeachingRecordSystem.SupportUi
+@inject TeachingRecordSystem.SupportUi.TrsLinkGenerator LinkGenerator
+@inject TeachingRecordSystem.SupportUi.IFeatureProvider FeatureProvider
+@using TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence
 
 @model UploadEvidenceViewModel
 
