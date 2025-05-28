@@ -138,21 +138,6 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/change-requests/{caseReference}/reject");
     }
 
-    public static async Task AssertOnPersonDetailPageAsync(this IPage page, Guid personId)
-    {
-        await page.WaitForUrlPathAsync($"/persons/{personId}");
-    }
-
-    public static async Task AssertOnPersonAlertsPageAsync(this IPage page, Guid personId)
-    {
-        await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
-    }
-
-    public static async Task AssertOnPersonQualificationsPageAsync(this IPage page, Guid personId)
-    {
-        await page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
-    }
-
     public static async Task AssertOnAddAlertTypePageAsync(this IPage page)
     {
         await page.WaitForUrlPathAsync($"/alerts/add/type");
@@ -293,6 +278,21 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/alerts/{alertId}/delete/check-answers");
     }
 
+    public static async Task AssertOnPersonDetailPageAsync(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}");
+    }
+
+    public static async Task AssertOnPersonAlertsPageAsync(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/alerts");
+    }
+
+    public static async Task AssertOnPersonQualificationsPageAsync(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/qualifications");
+    }
+
     public static async Task AssertOnPersonEditNamePageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-name");
@@ -311,6 +311,21 @@ public static class PageExtensions
     public static async Task AssertOnPersonEditDateOfBirthConfirmPageAsync(this IPage page, Guid personId)
     {
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-date-of-birth/confirm");
+    }
+
+    public static async Task AssertOnPersonEditDetailsPageAsync(this IPage page, Guid personId)
+    {
+        await page.WaitForUrlPathAsync($"/persons/{personId}/edit-details");
+    }
+
+    public static Task AssertOnPersonEditDetailsChangeReasonPageAsync(this IPage page, Guid personId)
+    {
+        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/change-reason");
+    }
+
+    public static Task AssertOnPersonEditDetailsCheckAnswersPageAsync(this IPage page, Guid personId)
+    {
+        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/check-answers");
     }
 
     public static async Task AssertOnAddMqProviderPageAsync(this IPage page)
@@ -502,6 +517,14 @@ public static class PageExtensions
         Assert.Equal(date.Month.ToString(), await page.InputValueAsync("label:text-is('Month')"));
         Assert.Equal(date.Year.ToString(), await page.InputValueAsync("label:text-is('Year')"));
     }
+
+    public static async Task AssertNameInputAsync(this IPage page, string firstName, string middleName, string lastName)
+    {
+        Assert.Equal(firstName, await page.InputValueAsync("text=First Name"));
+        Assert.Equal(middleName, await page.InputValueAsync("text=Middle Name"));
+        Assert.Equal(lastName, await page.InputValueAsync("text=Last Name"));
+    }
+
     public static async Task AssertDateInputEmptyAsync(this IPage page)
     {
         Assert.Empty(await page.InputValueAsync("label:text-is('Day')"));
@@ -606,6 +629,20 @@ public static class PageExtensions
         if (addAdditionalDetail)
         {
             await page.FillAsync("label:text-is('Add additional detail')", details!);
+        }
+    }
+
+    public static async Task SelectChangeReasonAsync(this IPage page, string testId, Enum changeReason, string? details = null)
+    {
+        var section = page.GetByTestId(testId);
+        var option = section.Locator($".govuk-radios__item:has(input[type='radio'][value='{changeReason}'])");
+        var radioButton = option.Locator("input");
+        await radioButton.ClickAsync();
+
+        if (changeReason.ToString() == "AnotherReason")
+        {
+            var reason = option.Locator($":scope + .govuk-radios__conditional textarea");
+            await reason.FillAsync(details!);
         }
     }
 

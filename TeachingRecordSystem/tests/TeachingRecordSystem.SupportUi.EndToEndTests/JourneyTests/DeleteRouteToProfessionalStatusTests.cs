@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.DeleteRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
 

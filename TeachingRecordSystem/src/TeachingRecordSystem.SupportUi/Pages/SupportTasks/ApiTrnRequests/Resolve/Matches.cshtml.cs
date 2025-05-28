@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve;
 
@@ -87,7 +85,7 @@ public class Matches(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) : R
         var matchedPersonIds = RequestData.Matches.MatchedRecords.Select(m => m.PersonId).ToArray();
 
         PotentialDuplicates = (await DbContext.Persons
-                .Where(p => matchedPersonIds.Contains(p.PersonId) && p.DqtState == (int)ContactState.Active)
+                .Where(p => matchedPersonIds.Contains(p.PersonId))
                 .Select(p => new PotentialDuplicate
                 {
                     Identifier = 'X', // We'll fix this below, can't do it over an IQueryable

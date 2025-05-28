@@ -18,6 +18,7 @@ public class Person
     public required DateTime? CreatedOn { get; init; }
     public required DateTime? UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
+    public PersonStatus Status { get; set; }
     public required string? Trn { get; set; }
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
@@ -46,6 +47,7 @@ public class Person
     public DateOnly? PqtsDate { get; internal set; }
     public ICollection<Qualification>? Qualifications { get; }
     public ICollection<Alert>? Alerts { get; }
+    public ICollection<PreviousName>? PreviousNames { get; }
 
     public Guid? DqtContactId { get; init; }
     public DateTime? DqtFirstSync { get; set; }
@@ -72,6 +74,7 @@ public class Person
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
+        out PreviousName? previousName,
         out PersonDetailsUpdatedEvent? @event)
     {
         var oldDetails = EventModels.PersonDetails.FromModel(this);
@@ -83,6 +86,7 @@ public class Person
         MobileNumber = mobileNumber;
         EmailAddress = emailAddress;
         NationalInsuranceNumber = nationalInsuranceNumber;
+        UpdatedOn = now;
 
         var changes = PersonDetailsUpdatedEventChanges.None |
             (FirstName != oldDetails.FirstName ? PersonDetailsUpdatedEventChanges.FirstName : 0) |
@@ -96,8 +100,22 @@ public class Person
         if (changes == PersonDetailsUpdatedEventChanges.None)
         {
             @event = null;
+            previousName = null;
             return;
         }
+
+        previousName = (changes & PersonDetailsUpdatedEventChanges.AnyNameChange) == PersonDetailsUpdatedEventChanges.None
+            ? null
+            : new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = PersonId,
+                FirstName = oldDetails.FirstName ?? string.Empty,
+                MiddleName = oldDetails.MiddleName ?? string.Empty,
+                LastName = oldDetails.LastName ?? string.Empty,
+                CreatedOn = now,
+                UpdatedOn = now
+            };
 
         @event = new PersonDetailsUpdatedEvent()
         {

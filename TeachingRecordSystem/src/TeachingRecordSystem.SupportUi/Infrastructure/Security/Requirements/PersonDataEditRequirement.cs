@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.Security.Requirements;
 

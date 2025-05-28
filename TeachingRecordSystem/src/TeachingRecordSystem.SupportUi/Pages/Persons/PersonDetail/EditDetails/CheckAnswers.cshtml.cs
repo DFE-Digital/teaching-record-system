@@ -33,6 +33,8 @@ public class CheckAnswersModel(
     public string? UploadedEvidenceFileUrl { get; set; }
 
     public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
+    public string PreviousName => StringHelper.JoinNonEmpty(' ', _person!.FirstName, _person!.MiddleName, _person!.LastName);
+    public bool NameChanged => Name != PreviousName;
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(EditDetailsJourneyPage.Index, true);
@@ -67,7 +69,13 @@ public class CheckAnswersModel(
                 : null,
             User.GetUserId(),
             clock.UtcNow,
+            out var previousName,
             out var updatedEvent);
+
+        if (previousName is not null)
+        {
+            DbContext.PreviousNames.Add(previousName);
+        }
 
         if (updatedEvent is not null)
         {

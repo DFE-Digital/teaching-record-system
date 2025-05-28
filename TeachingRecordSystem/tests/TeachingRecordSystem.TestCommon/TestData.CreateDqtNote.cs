@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using static TeachingRecordSystem.TestCommon.TestData;
 
 namespace TeachingRecordSystem.TestCommon
 {

@@ -22,4 +22,5 @@ public enum PersonDetailsUpdatedEventChanges
     EmailAddress = 1 << 4,
     MobileNumber = 1 << 5,
     NationalInsuranceNumber = 1 << 6,
+    AnyNameChange = FirstName | MiddleName | LastName
 }

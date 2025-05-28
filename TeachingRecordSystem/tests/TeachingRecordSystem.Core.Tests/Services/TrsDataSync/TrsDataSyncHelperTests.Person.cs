@@ -96,6 +96,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.Id, person.PersonId);
             Assert.Equal(entity.CreatedOn, person.CreatedOn);
             Assert.Equal(entity.ModifiedOn, person.UpdatedOn);
+            Assert.Equal((int?)entity.StateCode, (int)person.Status);
             Assert.Equal(entity.Id, person.DqtContactId);
             Assert.Equal(entity.dfeta_TRN, person.Trn);
             Assert.Equal(entity.FirstName, person.FirstName);

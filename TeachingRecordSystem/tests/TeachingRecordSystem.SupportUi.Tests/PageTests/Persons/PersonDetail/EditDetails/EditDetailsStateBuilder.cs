@@ -1,5 +1,3 @@
-using TeachingRecordSystem.Core;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 using static TeachingRecordSystem.TestCommon.TestData;
 

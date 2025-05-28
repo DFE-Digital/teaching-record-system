@@ -18,13 +18,20 @@
             <govuk-summary-card>
                 <govuk-summary-card-title>Personal details</govuk-summary-card-title>
                 <govuk-summary-card-actions>
-                    <govuk-summary-card-action href=@Model.ChangePersonalDetailsLink visually-hidden-text="personal details">Change</govuk-summary-card-action>
+                    <govuk-summary-card-action href=@Model.ChangePersonalDetailsLink data-testid="change-details-link" visually-hidden-text="personal details">Change</govuk-summary-card-action>
                 </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value>@Model.Name</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
+                    @if (Model.NameChanged)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Previous name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>@Model.PreviousName</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Teacher reference number (TRN)</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@Model.Trn</govuk-summary-list-row-value>
@@ -51,7 +58,7 @@
             <govuk-summary-card>
                 <govuk-summary-card-title>Reason for change</govuk-summary-card-title>
                 <govuk-summary-card-actions>
-                    <govuk-summary-card-action href=@Model.ChangeChangeReasonLink visually-hidden-text="reason for change">Change</govuk-summary-card-action>
+                    <govuk-summary-card-action href=@Model.ChangeChangeReasonLink data-testid="change-reason-link" visually-hidden-text="reason for change">Change</govuk-summary-card-action>
                 </govuk-summary-card-actions>
                 <govuk-summary-list>
                     <govuk-summary-list-row>

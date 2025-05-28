@@ -3,6 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
+[Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests : TestBase
 {
     private const string _changeReasonDetails = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
@@ -128,7 +129,7 @@ public class CheckAnswersTests : TestBase
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
                 .WithUploadEvidenceChoice(false)
                 .Build());
 
@@ -146,6 +147,73 @@ public class CheckAnswersTests : TestBase
         doc.AssertSummaryListValue("Email", v => Assert.Equal("test@test.com", v.TextContent.Trim()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TextContent.Trim()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TextContent.Trim()));
+    }
+
+    [Fact]
+    public async Task Get_WhenAnyNameFieldNotChanged_DoesNotShowPreviousName()
+    {
+        // Arrange
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great"));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
+        doc.AssertSummaryListRowDoesNotExist("Previous name");
+    }
+
+    [Theory]
+    [InlineData("Alfred", "The", "OK")]
+    [InlineData("Alfred", "A", "Great")]
+    [InlineData("Jimmy", "The", "Great")]
+    public async Task Get_WhenAnyNameFieldChanged_ShowsPreviousName(string firstName, string middleName, string lastName)
+    {
+        // Arrange
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great"));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName(firstName, middleName, lastName)
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
+                .WithUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Previous name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
     }
 
     [Fact]
@@ -318,6 +386,7 @@ public class CheckAnswersTests : TestBase
         await WithDbContext(async dbContext =>
         {
             var updatedPersonRecord = await dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId);
+            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
             Assert.Equal(firstName, updatedPersonRecord.FirstName);
             Assert.Equal(middleName, updatedPersonRecord.MiddleName);
             Assert.Equal(lastName, updatedPersonRecord.LastName);
@@ -352,6 +421,60 @@ public class CheckAnswersTests : TestBase
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.True(journeyInstance.Completed);
+    }
+
+    [Fact]
+    public async Task Post_Confirm_WhenAnyNameFieldChanged_UpdatesPersonPreviousNames()
+    {
+        // Arrange
+        var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();
+        var conanDate = DateTime.Parse("1 Jan 1991").ToUniversalTime();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithPreviousNames([("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate)])
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState()
+                .WithName("Megan", "Thee", "Stallion")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithChangeReasonChoice(EditDetailsChangeReasonOption.NewInformation)
+                .WithUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: "Personal details have been updated successfully.");
+
+        await WithDbContext(async dbContext =>
+        {
+            var updatedPersonRecord = await dbContext.Persons
+                .Include(p => p.PreviousNames)
+                .SingleAsync(p => p.PersonId == person.PersonId);
+
+            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal("Megan", updatedPersonRecord.FirstName);
+            Assert.Equal("Thee", updatedPersonRecord.MiddleName);
+            Assert.Equal("Stallion", updatedPersonRecord.LastName);
+
+            Assert.Collection(updatedPersonRecord.PreviousNames!.OrderByDescending(pn => pn.CreatedOn),
+                pn => Assert.Equal(("Alfred", "The", "Great", Clock.UtcNow, Clock.UtcNow), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)),
+                pn => Assert.Equal(("Conan", "The", "Barbarian", conanDate, conanDate), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)),
+                pn => Assert.Equal(("Ethelred", "The", "Unready", ethelredDate, ethelredDate), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)));
+        });
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>
