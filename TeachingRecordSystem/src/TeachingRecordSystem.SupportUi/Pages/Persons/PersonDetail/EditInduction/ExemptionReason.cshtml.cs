@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -10,17 +11,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInductio
 public class ExemptionReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
-    ReferenceDataCache referenceDataCache)
-    : CommonJourneyPage(linkGenerator)
+    ReferenceDataCache referenceDataCache,
+    IFileService fileService)
+    : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    [FromQuery]
-    public JourneyFromCheckYourAnswersPage FromCheckAnswers { get; set; }
-
     [BindProperty]
     [Display(Name = "Why are they exempt from induction?")]
     public Guid[] ExemptionReasonIds { get; set; } = [];
-
-    public string? PersonName { get; set; }
 
     public InductionExemptionReason[] ExemptionReasons { get; set; } = [];
 
@@ -66,6 +63,7 @@ public class ExemptionReasonModel(
         {
             ModelState.AddModelError(nameof(ExemptionReasonIds), "Select the reason for a teacher’s exemption to induction");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -79,9 +77,11 @@ public class ExemptionReasonModel(
         return Redirect(GetPageLink(NextPage));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override InductionJourneyPage StartPage => InductionJourneyPage.ExemptionReason;
+
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.ExemptionReason);
+        await base.OnPageHandlerExecutingAsync(context);
 
         if (JourneyInstance!.State.InductionStatus != InductionStatus.Exempt)
         {
@@ -90,11 +90,5 @@ public class ExemptionReasonModel(
         }
 
         ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-
-        await next();
     }
 }

@@ -1,12 +1,16 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class ChangeReasonTests : TestBase
 {
+    public ChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        FileServiceMock.Invocations.Clear();
+    }
+
     [Fact]
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
@@ -24,7 +28,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithFileUploadChoice(false)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -65,7 +69,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(InductionStatus.InProgress, InductionJourneyPage.Status)
                 .Build());
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -81,12 +85,16 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Select(i => i.Value);
         Assert.Equal(expectedChoices, reasonChoices);
 
+        var additionalDetailLegend = doc.GetElementByTestId("has-additional-reason_detail-options-legend");
+        Assert.Equal("Do you want to add more information about why you’re changing the induction details?", additionalDetailLegend!.TextContent);
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
             .Select(i => i.Value);
         Assert.Equal(new[] { "True", "False" }, additionalDetailChoices);
 
+        var uploadEvidenceChoicesLegend = doc.GetElementByTestId("upload-evidence-options-legend");
+        Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TextContent);
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -109,7 +117,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
@@ -163,7 +171,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new FormUrlEncodedContent(
                 new EditInductionPostRequestBuilder()
@@ -192,7 +200,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -206,6 +214,168 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+    }
+
+    [Fact]
+    public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var inductionStatus = InductionStatus.InProgress;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("ChangeReasonDetail", "")
+                .Add("UploadEvidence", true)
+                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        var html = await AssertEx.HtmlResponseAsync(response, 400);
+
+        var evidenceFileId = await FileServiceMock.AssertFileWasUploadedAsync();
+        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+
+        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
+        Assert.Equal("validfile.png (1.2 KB)", link.TextContent);
+        Assert.Equal(expectedFileUrl, link.Href);
+
+        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
+        Assert.Equal("validfile.png", GetHiddenInputValue(html, "EvidenceFileName"));
+        Assert.Equal("1.2 KB", GetHiddenInputValue(html, "EvidenceFileSizeDescription"));
+        Assert.Equal(expectedFileUrl, GetHiddenInputValue(html, "UploadedEvidenceFileUrl"));
+    }
+
+    [Fact]
+    public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var inductionStatus = InductionStatus.InProgress;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
+        var evidenceFileId = Guid.NewGuid();
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("ChangeReasonDetail", "")
+                .Add("UploadEvidence", true)
+                .Add("EvidenceFileId", evidenceFileId)
+                .Add("EvidenceFileName", "testfile.jpg")
+                .Add("EvidenceFileSizeDescription", "3 KB")
+                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+        var html = await AssertEx.HtmlResponseAsync(response, 400);
+
+        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+
+        var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
+        Assert.Equal("testfile.jpg (3 KB)", link.TextContent);
+        Assert.Equal("http://test.com/file", link.Href);
+
+        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
+        Assert.Equal("testfile.jpg", GetHiddenInputValue(html, "EvidenceFileName"));
+        Assert.Equal("3 KB", GetHiddenInputValue(html, "EvidenceFileSizeDescription"));
+        Assert.Equal("http://test.com/file", GetHiddenInputValue(html, "UploadedEvidenceFileUrl"));
+    }
+
+    [Fact]
+    public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var inductionStatus = InductionStatus.InProgress;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
+        var evidenceFileId = Guid.NewGuid();
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("ChangeReasonDetail", "")
+                .Add("UploadEvidence", true)
+                .Add("EvidenceFileId", evidenceFileId)
+                .Add("EvidenceFileName", "testfile.jpg")
+                .Add("EvidenceFileSizeDescription", "3 KB")
+                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
+                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
+    }
+
+    [Fact]
+    public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var inductionStatus = InductionStatus.InProgress;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
+        var evidenceFileId = Guid.NewGuid();
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
+                .Add("HasAdditionalReasonDetail", true)
+                .Add("ChangeReasonDetail", "")
+                .Add("UploadEvidence", false)
+                .Add("EvidenceFileId", evidenceFileId)
+                .Add("EvidenceFileName", "testfile.jpg")
+                .Add("EvidenceFileSizeDescription", "3 KB")
+                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
+
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Fact]
@@ -223,7 +393,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -246,9 +416,6 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
-        var mockFileService = Mock.Get(HostFixture.Services.GetRequiredService<IFileService>());
-        mockFileService.Invocations.Clear();
-
         var changeReason = InductionChangeReasonOption.NewInformation;
         var changeReasonDetails = "A description about why the change typed into the box";
         var evidenceFileName = "evidence.pdf";
@@ -261,7 +428,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
                 .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
                 .Add("ChangeReason", changeReason)
@@ -276,9 +443,53 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        mockFileService.Verify(
-            s => s.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<Guid?>()), Times.Once);
+        await FileServiceMock.AssertFileWasUploadedAsync();
     }
+
+    [Fact]
+    public async Task Post_ValidRequest_WithAdditionalInfo_ButAdditionalInfoRadioButtonsNotSetToYes_DiscardsAdditionalInfo()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p.WithQts());
+        var inductionStatus = InductionStatus.InProgress;
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .Build());
+        var evidenceFileId = Guid.NewGuid();
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new MultipartFormDataContentBuilder()
+                .Add("ChangeReason", InductionChangeReasonOption.NewInformation)
+                .Add("HasAdditionalReasonDetail", false)
+                .Add("ChangeReasonDetail", "A description about why the change typed into the box")
+                .Add("UploadEvidence", false)
+                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), "evidence.pdf")
+                .Build()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+
+        FileServiceMock.AssertFileWasNotUploaded();
+
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Equal(InductionChangeReasonOption.NewInformation, journeyInstance.State.ChangeReason);
+        Assert.False(journeyInstance.State.HasAdditionalReasonDetail);
+        Assert.Null(journeyInstance.State.ChangeReasonDetail);
+        Assert.False(journeyInstance.State.UploadEvidence);
+        Assert.Null(journeyInstance.State.EvidenceFileId);
+        Assert.Null(journeyInstance.State.EvidenceFileName);
+        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+    }
+
+    private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditInductionState> journeyInstance) =>
+        $"/persons/{person.PersonId}/edit-induction/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>
         CreateJourneyInstance(

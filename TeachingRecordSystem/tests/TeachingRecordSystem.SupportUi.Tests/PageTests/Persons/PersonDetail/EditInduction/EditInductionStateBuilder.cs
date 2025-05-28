@@ -69,12 +69,12 @@ public class EditInductionStateBuilder
         return this;
     }
 
-    public EditInductionStateBuilder WithFileUploadChoice(bool uploadFile)
+    public EditInductionStateBuilder WithFileUploadChoice(bool uploadFile, Guid? evidenceFileId = null)
     {
         FileUpload = uploadFile;
         if (uploadFile)
         {
-            EvidenceFileId = Guid.NewGuid();
+            EvidenceFileId = evidenceFileId ?? Guid.NewGuid();
             EvidenceFileName = "evidence.jpeg";
             EvidenceFileSizeDescription = "5MB";
         }

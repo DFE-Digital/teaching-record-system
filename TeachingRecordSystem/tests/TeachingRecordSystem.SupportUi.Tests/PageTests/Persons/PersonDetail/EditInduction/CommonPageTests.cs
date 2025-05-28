@@ -3,8 +3,13 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
 
-public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class CommonPageTests : TestBase
 {
+    public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
+    {
+        FileServiceMock.Invocations.Clear();
+    }
+
     [Theory]
     [InlineData("edit-induction/status", InductionStatus.Exempt, "edit-induction/exemption-reasons")]
     [InlineData("edit-induction/status", InductionStatus.InProgress, "edit-induction/start-date")]
@@ -78,7 +83,7 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
     [InlineData("edit-induction/start-date", InductionStatus.Passed)]
     [InlineData("edit-induction/date-completed", InductionStatus.Passed)]
     [InlineData("edit-induction/change-reason", InductionStatus.InProgress)]
-    public async Task Cancel_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus)
+    public async Task Post_Cancel_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -114,6 +119,55 @@ public class CommonPageTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
         var location = redirectResponse.Headers.Location?.OriginalString;
         Assert.Equal($"/persons/{person.PersonId}/induction", location);
+    }
+
+    [Theory]
+    [InlineData("edit-induction/status", InductionStatus.InProgress)]
+    [InlineData("edit-induction/exemption-reasons", InductionStatus.Exempt)]
+    [InlineData("edit-induction/start-date", InductionStatus.Passed)]
+    [InlineData("edit-induction/date-completed", InductionStatus.Passed)]
+    [InlineData("edit-induction/change-reason", InductionStatus.InProgress)]
+    public async Task Post_Cancel_EvidenceFilePreviouslyUploaded_DeletesPreviouslyUploadedFile(string fromPage, InductionStatus inductionStatus)
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(s => s.
+                WithStatus(inductionStatus)));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(inductionStatus, InductionJourneyPage.Status)
+                .WithStartDate(Clock.Today.AddYears(-2))
+                .WithCompletedDate(Clock.Today)
+                .WithReasonChoice(InductionChangeReasonOption.AnotherReason)
+                .WithReasonDetailsChoice(true, "Details")
+                .WithFileUploadChoice(true, evidenceFileId)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var cancelButton = doc.GetElementByTestId("cancel-button") as IHtmlButtonElement;
+
+        // Act
+        var redirectRequest = new HttpRequestMessage(HttpMethod.Post, cancelButton!.FormAction);
+        var redirectResponse = await HttpClient.SendAsync(redirectRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)redirectResponse.StatusCode);
+        var location = redirectResponse.Headers.Location?.OriginalString;
+        Assert.Equal($"/persons/{person.PersonId}/induction", location);
+
+        FileServiceMock.AssertFileWasDeleted(evidenceFileId);
     }
 
     [Theory]
