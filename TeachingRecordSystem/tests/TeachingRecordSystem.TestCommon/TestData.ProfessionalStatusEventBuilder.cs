@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -91,10 +91,10 @@ public partial class TestData
             if (!_createdUtc.HasValue || _createdByUser is null || _person is null || _professionalStatus is null || _oldProfessionalStatus is null)
             {
                 var nullValues = new List<string>();
-                if (!_createdUtc.HasValue) nullValues.Add(nameof(_createdUtc));
-                if (_createdByUser == null) nullValues.Add(nameof(_createdByUser));
-                if (_person == null) nullValues.Add(nameof(_person));
-                if (_professionalStatus == null) nullValues.Add(nameof(_professionalStatus));
+                if (!_createdUtc.HasValue) { nullValues.Add(nameof(_createdUtc)); }
+                if (_createdByUser == null) { nullValues.Add(nameof(_createdByUser)); }
+                if (_person == null) { nullValues.Add(nameof(_person)); }
+                if (_professionalStatus == null) { nullValues.Add(nameof(_professionalStatus)); }
 
                 throw new InvalidOperationException($"Setup value(s) cannot be null: {string.Join(",", nullValues)}");
             }
@@ -204,10 +204,25 @@ public partial class TestData
             if (!_createdUtc.HasValue || _createdByUser is null || _person is null || _professionalStatus is null)
             {
                 var nullValues = new List<string>();
-                if (!_createdUtc.HasValue) nullValues.Add(nameof(_createdUtc));
-                if (_createdByUser == null) nullValues.Add(nameof(_createdByUser));
-                if (_person == null) nullValues.Add(nameof(_person));
-                if (_professionalStatus == null) nullValues.Add(nameof(_professionalStatus));
+                if (!_createdUtc.HasValue)
+                {
+                    nullValues.Add(nameof(_createdUtc));
+                }
+
+                if (_createdByUser == null)
+                {
+                    nullValues.Add(nameof(_createdByUser));
+                }
+
+                if (_person == null)
+                {
+                    nullValues.Add(nameof(_person));
+                }
+
+                if (_professionalStatus == null)
+                {
+                    nullValues.Add(nameof(_professionalStatus));
+                }
 
                 throw new InvalidOperationException($"Setup value(s) cannot be null: {string.Join(",", nullValues)}");
             }
