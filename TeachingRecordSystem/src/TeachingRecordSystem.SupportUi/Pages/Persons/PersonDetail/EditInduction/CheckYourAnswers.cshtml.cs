@@ -13,12 +13,8 @@ public class CheckYourAnswersModel(
     ReferenceDataCache referenceDataCache,
     IClock clock,
     IFileService fileService)
-    : CommonJourneyPage(linkGenerator)
+    : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    private InductionJourneyPage? StartPage => JourneyInstance!.State.JourneyStartPage;
-
-    public string? PersonName { get; set; }
-
     public InductionStatus InductionStatus { get; set; }
 
     public DateOnly? StartDate { get; set; }
@@ -52,17 +48,14 @@ public class CheckYourAnswersModel(
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public bool ShowStatusChangeLink => StartPage == InductionJourneyPage.Status;
+    public bool ShowStatusChangeLink => JourneyInstance!.State.JourneyStartPage == InductionJourneyPage.Status;
 
     public bool ShowStartDateChangeLink =>
-        StartPage is InductionJourneyPage.Status or InductionJourneyPage.StartDate && InductionStatus.RequiresStartDate();
+        JourneyInstance!.State.JourneyStartPage is InductionJourneyPage.Status or InductionJourneyPage.StartDate && InductionStatus.RequiresStartDate();
 
     public bool ShowCompletedDateChangeLink => InductionStatus.RequiresCompletedDate();
 
     public bool ShowExemptionReasonsChangeLink => InductionStatus == InductionStatus.Exempt;
-
-    [FromQuery]
-    public bool FromCheckAnswers { get; set; }
 
     public string BackLink => GetPageLink(InductionJourneyPage.ChangeReasons);
 
@@ -81,7 +74,7 @@ public class CheckYourAnswersModel(
                     fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers));
         }
 
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
 
         person.SetInductionStatus(
             InductionStatus,
@@ -103,8 +96,8 @@ public class CheckYourAnswersModel(
 
         if (updatedEvent is not null)
         {
-            await dbContext.AddEventAndBroadcastAsync(updatedEvent);
-            await dbContext.SaveChangesAsync();
+            await DbContext.AddEventAndBroadcastAsync(updatedEvent);
+            await DbContext.SaveChangesAsync();
         }
 
         await JourneyInstance!.CompleteAsync();
@@ -114,21 +107,17 @@ public class CheckYourAnswersModel(
         return Redirect(LinkGenerator.PersonInduction(PersonId));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
+        await base.OnPageHandlerExecutingAsync(context);
+
         if (!JourneyInstance!.State.IsComplete)
         {
             context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
             return;
         }
 
-        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.Status);
-
         ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
         EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
         ChangeReason = JourneyInstance!.State.ChangeReason!.Value;
         ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
@@ -136,9 +125,7 @@ public class CheckYourAnswersModel(
         StartDate = JourneyInstance!.State.StartDate;
         CompletedDate = JourneyInstance!.State.CompletedDate;
         UploadedEvidenceFileUrl = JourneyInstance!.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            await FileService.GetFileUrlAsync(JourneyInstance!.State.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
-
-        await next();
     }
 }
