@@ -188,6 +188,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.InTraining)));
+        EventPublisher.Clear();
+
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
@@ -247,7 +249,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithQts(qtsDate)
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status)));
+                .WithStatus(status)
+                .WithAwardedDate(qtsDate)));
+        EventPublisher.Clear();
+
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
@@ -306,6 +311,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDateLatest)));
+        EventPublisher.Clear();
+
         var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.AwardedDate == awardedDateEarliest).QualificationId;
         var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.AwardedDate == awardedDateLatest).QualificationId;
         var deleteRouteState = new DeleteRouteState()

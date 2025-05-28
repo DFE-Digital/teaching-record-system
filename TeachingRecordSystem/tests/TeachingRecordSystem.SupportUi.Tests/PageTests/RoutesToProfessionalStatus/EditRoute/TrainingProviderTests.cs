@@ -15,7 +15,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -61,7 +61,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
@@ -101,12 +101,12 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved)));
+                .WithStatus(status.Value)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var editRouteState = new EditRouteStateBuilder()
@@ -141,17 +141,18 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional)
-            .RandomOne();
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .RandomOne()
+            .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved)));
+                .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
-            .WithStatus(status.Value)
+            .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
             qualificationId,

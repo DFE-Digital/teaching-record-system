@@ -557,13 +557,15 @@ public partial class TestData
                     return default;
                 }
 
-                var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
+                var person = await dbContext.Persons
+                    .Include(p => p.Qualifications)
+                    .SingleAsync(p => p.PersonId == PersonId);
 
                 AddTrnRequestMetadata();
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
-                var professionalStatusIds = await AddProfessionalStatusRoutesAsync();
+                var professionalStatusIds = await AddProfessionalStatusRoutesAsync(person);
                 var awardedProfessionalStatusIds = await AddAwardedProfessionalStatusRoutesAsync();
                 var previousNameIds = await AddPreviousNamesAsync();
 
@@ -612,14 +614,15 @@ public partial class TestData
                     return mqIds;
                 }
 
-                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync()
+                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync(Person person)
                 {
                     var routeIds = new List<Guid>();
 
                     foreach (var builder in _professionalStatusBuilders)
                     {
-                        var routeId = await builder.ExecuteAsync(this, testData, dbContext);
+                        var (routeId, createdEvents) = await builder.ExecuteAsync(this, person, testData, dbContext);
                         routeIds.Add(routeId);
+                        events.AddRange(createdEvents);
                     }
 
                     return routeIds;
@@ -639,30 +642,32 @@ public partial class TestData
                     {
                         var route = allRoutes.Where(r => r.ProfessionalStatusType == professionalStatusType).RandomOne();
 
-                        var professionalStatus = new ProfessionalStatus
-                        {
-                            RouteToProfessionalStatusId = route.RouteToProfessionalStatusId,
-                            Status = ProfessionalStatusStatus.Awarded,
-                            TrainingStartDate = route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
-                            TrainingEndDate = route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
-                            TrainingSubjectIds = route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
+                        var professionalStatus = ProfessionalStatus.Create(
+                                person,
+                                allRoutes,
+                                route.RouteToProfessionalStatusId,
+                                ProfessionalStatusStatus.Awarded,
+                                testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
+                                route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
+                                route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
+                                route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
                                 new[] { allSubjects.RandomOne().TrainingSubjectId } :
                                 [],
-                            TrainingAgeSpecialismType = route.TrainingAgeSpecialismTypeRequired is not FieldRequirement.NotApplicable ? TrainingAgeSpecialismType.FoundationStage : null,
-                            TrainingAgeSpecialismRangeFrom = null,
-                            TrainingAgeSpecialismRangeTo = null,
-                            TrainingCountryId = route.TrainingCountryRequired is not FieldRequirement.NotApplicable ? allCountries.RandomOne().CountryId : null,
-                            TrainingProviderId = allProviders.RandomOne().TrainingProviderId,
-                            ExemptFromInduction = route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
-                            DegreeTypeId = route.DegreeTypeRequired is not FieldRequirement.NotApplicable ? allDegreeTypes.RandomOne().DegreeTypeId : null,
-                            QualificationId = Guid.NewGuid(),
-                            CreatedOn = testData.Clock.UtcNow,
-                            UpdatedOn = testData.Clock.UtcNow,
-                            PersonId = PersonId,
-                            AwardedDate = testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1))
-                        };
+                                route.TrainingAgeSpecialismTypeRequired is not FieldRequirement.NotApplicable ? TrainingAgeSpecialismType.FoundationStage : null,
+                                null,
+                                null,
+                                route.TrainingCountryRequired is not FieldRequirement.NotApplicable ? allCountries.RandomOne().CountryId : null,
+                                allProviders.RandomOne().TrainingProviderId,
+                                route.DegreeTypeRequired is not FieldRequirement.NotApplicable ? allDegreeTypes.RandomOne().DegreeTypeId : null,
+                                route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
+                                EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                                DateTime.UtcNow,
+                                out var @createdEvent
+                                );
 
                         dbContext.ProfessionalStatuses.Add(professionalStatus);
+                        dbContext.AddEventWithoutBroadcast(createdEvent);
+
                         createdProfessionalStatusIds.Add(professionalStatus.QualificationId);
                     }
 
