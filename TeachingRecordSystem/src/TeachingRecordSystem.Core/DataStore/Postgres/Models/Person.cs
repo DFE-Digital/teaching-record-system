@@ -19,6 +19,8 @@ public class Person
     public required DateTime? UpdatedOn { get; set; }
     public DateTime? DeletedOn { get; set; }
     public PersonStatus Status { get; set; }
+    public Guid? MergedWithPersonId { get; set; }
+    public Person? MergedWithPerson { get; }
     public required string? Trn { get; set; }
     public required string FirstName { get; set; }
     public required string MiddleName { get; set; }
