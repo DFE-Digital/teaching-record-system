@@ -33,3 +33,18 @@
     };
 }
 @await Html.PartialAsync("_PersonDetail", personDetailModel)
+
+@{
+    if (Model.PersonStatus is not null)
+    {
+        var personStatusDetailModel = new PersonStatusDetailViewModel()
+        {
+            EytsDate = Model.PersonStatus.EytsDate,
+            HasEyps = Model.PersonStatus.HasEyps,
+            InductionStatusInfo = InductionStatusRegistry.All.Single(s => s.Value == Model.PersonStatus.InductionStatus),
+            PqtsDate = Model.PersonStatus.PqtsDate,
+            QtsDate = Model.PersonStatus.QtsDate
+        };
+        @await Html.PartialAsync("_PersonStatusDetail", personStatusDetailModel)
+    }
+}
