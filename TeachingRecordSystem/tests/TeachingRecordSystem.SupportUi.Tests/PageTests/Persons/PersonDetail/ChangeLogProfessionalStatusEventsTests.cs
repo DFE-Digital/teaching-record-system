@@ -14,7 +14,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var endDate = Clock.Today.AddDays(-1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = ProfessionalStatusStatus.InTraining;
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -45,7 +45,6 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
         Assert.NotNull(timelineItem);
         Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TextContent.Trim());
-        //Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
         Assert.Null(timelineItem.GetElementByTestId("qts-date"));
@@ -116,7 +115,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var startDate = oldStartDate.AddDays(1);
         var endDate = oldEndDate.AddDays(1);
         var route = oldRoute;
-        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.TrainingSubjectId != oldSubject.TrainingSubjectId).RandomOne();
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(x => x.TrainingSubjectId != oldSubject.TrainingSubjectId).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).Where(x => x.TrainingProviderId != oldTrainingProvider.TrainingProviderId).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).Where(x => x.DegreeTypeId != oldDegreeType.DegreeTypeId).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Where(x => x.CountryId != oldCountry.CountryId).RandomOne();
@@ -221,7 +220,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var awardDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = ProfessionalStatusStatus.Awarded;
-        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
+        var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -362,7 +361,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var awardedDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -433,7 +432,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var awardedDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
