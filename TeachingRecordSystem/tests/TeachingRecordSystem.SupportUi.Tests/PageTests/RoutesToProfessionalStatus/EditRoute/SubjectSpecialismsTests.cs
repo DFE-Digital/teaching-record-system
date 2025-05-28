@@ -15,7 +15,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -55,7 +55,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -101,7 +101,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -141,7 +141,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(s => s.TrainingSubjectsRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

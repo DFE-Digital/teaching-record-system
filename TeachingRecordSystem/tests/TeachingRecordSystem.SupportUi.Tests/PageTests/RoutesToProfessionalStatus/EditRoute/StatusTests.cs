@@ -222,17 +222,20 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusStaysAwarded_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
+        var awardDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status)));
+                .WithStatus(status)
+                .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
             .WithStatus(status)
+            .WithAwardedDate(awardDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
