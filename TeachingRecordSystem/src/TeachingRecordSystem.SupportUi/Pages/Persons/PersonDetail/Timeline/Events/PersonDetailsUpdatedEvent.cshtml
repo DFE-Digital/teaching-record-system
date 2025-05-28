@@ -1,0 +1,162 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<PersonDetailsUpdatedEvent>>
+@{
+    var updatedEvent = Model.ItemModel.Event;
+    var details = updatedEvent.Details;
+    var oldDetails = updatedEvent.OldDetails;
+    var evidenceFileUrl = updatedEvent.EvidenceFile is not null 
+        ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) 
+        : null;
+    var name = StringHelper.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
+    var oldName = StringHelper.JoinNonEmpty(' ', oldDetails.FirstName, oldDetails.MiddleName, oldDetails.LastName);
+    var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
+        ? parsedEmail.ToDisplayString()
+        : details.EmailAddress;
+    var oldEmail = EmailAddress.TryParse(oldDetails.EmailAddress, out var oldParsedEmail)
+        ? oldParsedEmail.ToDisplayString()
+        : oldDetails.EmailAddress;
+    var mobile = MobileNumber.TryParse(details.MobileNumber, out var parsedMobile)
+        ? parsedMobile.ToDisplayString()
+        : details.MobileNumber;
+    var oldMobile = MobileNumber.TryParse(oldDetails.MobileNumber, out var oldParsedMobile)
+        ? oldParsedMobile.ToDisplayString()
+        : oldDetails.MobileNumber;
+    var nino = NationalInsuranceNumber.TryParse(details.NationalInsuranceNumber, out var parsedNino)
+        ? parsedNino.ToDisplayString()
+        : details.NationalInsuranceNumber;
+    var oldNino = NationalInsuranceNumber.TryParse(oldDetails.NationalInsuranceNumber, out var oldParsedNino)
+        ? oldParsedNino.ToDisplayString()
+        : oldDetails.NationalInsuranceNumber;
+}
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Personal details changed</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <govuk-summary-list>
+            @if (updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.AnyNameChange))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details-name" use-empty-fallback>@name</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details-dob" use-empty-fallback>@details.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details-email" use-empty-fallback>@email</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details-mobile" use-empty-fallback>@mobile</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+            @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+            {
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value data-testid="details-nino" use-empty-fallback>@nino</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            }
+        </govuk-summary-list>
+
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@updatedEvent.ChangeReason</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (updatedEvent.ChangeReasonDetail is not null)
+                            {
+                                <multi-line-text text="@updatedEvent.ChangeReasonDetail" data-testid="reason-detail" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback data-testid="reason-detail"></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+            <govuk-details-summary>Previous data</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    @if (updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.AnyNameChange))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-details-name" use-empty-fallback>@oldName</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-details-dob" use-empty-fallback>@oldDetails.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-details-email" use-empty-fallback>@oldEmail</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-details-mobile" use-empty-fallback>@oldMobile</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="old-details-nino" use-empty-fallback>@oldNino</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>

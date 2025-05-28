@@ -104,7 +104,7 @@ public class Person
             return;
         }
 
-        previousName = (changes & PersonDetailsUpdatedEventChanges.AnyNameChange) == PersonDetailsUpdatedEventChanges.None
+        previousName = !changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.AnyNameChange)
             ? null
             : new PreviousName
             {
