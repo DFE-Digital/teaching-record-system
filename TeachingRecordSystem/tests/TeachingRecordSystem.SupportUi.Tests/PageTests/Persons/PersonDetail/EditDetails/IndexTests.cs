@@ -29,7 +29,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("A", "New", "Name")
                 .Build());
 
@@ -122,6 +122,7 @@ public class IndexTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
+            .WithMobileNumber("invalid")
             .WithEmail("invalid")
             .WithNationalInsuranceNumber("invalid"));
 
@@ -139,9 +140,12 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
 
         var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
+        var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
 
+        // Mobile number is normalized during TRS Sync process so invalid numbers are converted to null
+        Assert.Equal("", mobileNumber.Value.Trim());
         Assert.Equal("invalid", emailAddress.Value.Trim());
         Assert.Equal("invalid", nationalInsuranceNumber.Value.Trim());
     }
@@ -154,7 +158,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
@@ -691,6 +695,45 @@ public class IndexTests : TestBase
     }
 
     [Fact]
+    public async Task Post_NoDetailsChanged_ShowsPageError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("test@test.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
+                    .WithFirstName("Alfred")
+                    .WithMiddleName("The")
+                    .WithLastName("Great")
+                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                    .WithEmailAddress("test@test.com")
+                    .WithMobileNumber("447891234567")
+                    .WithNationalInsuranceNumber("AB123456C")
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Please change one or more of the person\u2019s details");
+    }
+
+    [Fact]
     public async Task Post_DetailsChanged_PersistsDetails()
     {
         // Arrange
@@ -698,7 +741,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")

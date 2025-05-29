@@ -26,9 +26,9 @@ public abstract class CommonJourneyPage(
 
     public async Task<IActionResult> OnPostCancelAsync()
     {
-        if (JourneyInstance!.State.EvidenceFileId.HasValue)
+        if (JourneyInstance!.State.OtherDetailsChangeEvidenceFileId.HasValue)
         {
-            await FileService.DeleteFileAsync(JourneyInstance!.State.EvidenceFileId.Value);
+            await FileService.DeleteFileAsync(JourneyInstance!.State.OtherDetailsChangeEvidenceFileId.Value);
         }
 
         await JourneyInstance!.DeleteAsync();
@@ -40,16 +40,33 @@ public abstract class CommonJourneyPage(
         return pageName switch
         {
             EditDetailsJourneyPage.Index => LinkGenerator.EditDetailsIndex(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.ChangeReason => LinkGenerator.EditDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.NameChangeReason => LinkGenerator.EditDetailsNameChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.OtherDetailsChangeReason => LinkGenerator.EditDetailsOtherDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
             EditDetailsJourneyPage.CheckAnswers => LinkGenerator.EditDetailsCheckAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonDetail(PersonId)
         };
     }
 
+    public EditDetailsJourneyPage NextIncompletePage =>
+        !JourneyInstance!.State.IsIndexComplete
+            ? EditDetailsJourneyPage.Index
+            : !JourneyInstance!.State.IsNameChangeReasonComplete
+                ? EditDetailsJourneyPage.NameChangeReason
+                : !JourneyInstance!.State.IsOtherDetailsChangeReasonComplete
+                    ? EditDetailsJourneyPage.OtherDetailsChangeReason
+                    : EditDetailsJourneyPage.CheckAnswers;
+
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
+
+        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        JourneyInstance!.State.EnsureInitialized(person);
+
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
 
         OnPageHandlerExecuting(context);
         await OnPageHandlerExecutingAsync(context);
@@ -61,14 +78,8 @@ public abstract class CommonJourneyPage(
         }
     }
 
-    protected virtual async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
-    {
-        await JourneyInstance!.State.EnsureInitializedAsync(DbContext, PersonId);
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-    }
+    protected virtual Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
+        => Task.CompletedTask;
 
     protected virtual Task OnPageHandlerExecutedAsync(PageHandlerExecutedContext context)
         => Task.CompletedTask;

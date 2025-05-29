@@ -318,9 +318,14 @@ public static class PageExtensions
         await page.WaitForUrlPathAsync($"/persons/{personId}/edit-details");
     }
 
-    public static Task AssertOnPersonEditDetailsChangeReasonPageAsync(this IPage page, Guid personId)
+    public static Task AssertOnPersonEditDetailsNameChangeReasonPageAsync(this IPage page, Guid personId)
     {
-        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/change-reason");
+        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/name-change-reason");
+    }
+
+    public static Task AssertOnPersonEditDetailsOtherDetailsChangeReasonPageAsync(this IPage page, Guid personId)
+    {
+        return page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/other-details-change-reason");
     }
 
     public static Task AssertOnPersonEditDetailsCheckAnswersPageAsync(this IPage page, Guid personId)
@@ -626,9 +631,10 @@ public static class PageExtensions
         var section = page.GetByTestId("has-additional-reason_detail-options");
         var radioButton = section.Locator($"input[type='radio'][value='{addAdditionalDetail}']");
         await radioButton.ClickAsync();
-        if (addAdditionalDetail)
+
+        if (details != null)
         {
-            await page.FillAsync("label:text-is('Add additional detail')", details!);
+            await page.FillAsync("label:text-is('Add additional detail')", details);
         }
     }
 
@@ -639,10 +645,10 @@ public static class PageExtensions
         var radioButton = option.Locator("input");
         await radioButton.ClickAsync();
 
-        if (changeReason.ToString() == "AnotherReason")
+        if (details != null)
         {
             var reason = option.Locator($":scope + .govuk-radios__conditional textarea");
-            await reason.FillAsync(details!);
+            await reason.FillAsync(details);
         }
     }
 

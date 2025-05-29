@@ -66,15 +66,16 @@ public class Person
         string middleName,
         string lastName,
         DateOnly? dateOfBirth,
-        string? emailAddress,
-        string? mobileNumber,
-        string? nationalInsuranceNumber,
-        string changeReason,
-        string changeReasonDetail,
-        EventModels.File? evidenceFile,
+        EmailAddress? emailAddress,
+        MobileNumber? mobileNumber,
+        NationalInsuranceNumber? nationalInsuranceNumber,
+        string? nameChangeReason,
+        EventModels.File? nameChangeEvidenceFile,
+        string? detailsChangeReason,
+        string? detailsChangeReasonDetail,
+        EventModels.File? detailsChangeEvidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        out PreviousName? previousName,
         out PersonDetailsUpdatedEvent? @event)
     {
         var oldDetails = EventModels.PersonDetails.FromModel(this);
@@ -83,9 +84,9 @@ public class Person
         MiddleName = middleName;
         LastName = lastName;
         DateOfBirth = dateOfBirth;
-        MobileNumber = mobileNumber;
-        EmailAddress = emailAddress;
-        NationalInsuranceNumber = nationalInsuranceNumber;
+        MobileNumber = (string?)mobileNumber;
+        EmailAddress = (string?)emailAddress;
+        NationalInsuranceNumber = (string?)nationalInsuranceNumber;
         UpdatedOn = now;
 
         var changes = PersonDetailsUpdatedEventChanges.None |
@@ -100,22 +101,8 @@ public class Person
         if (changes == PersonDetailsUpdatedEventChanges.None)
         {
             @event = null;
-            previousName = null;
             return;
         }
-
-        previousName = !changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.AnyNameChange)
-            ? null
-            : new PreviousName
-            {
-                PreviousNameId = Guid.NewGuid(),
-                PersonId = PersonId,
-                FirstName = oldDetails.FirstName ?? string.Empty,
-                MiddleName = oldDetails.MiddleName ?? string.Empty,
-                LastName = oldDetails.LastName ?? string.Empty,
-                CreatedOn = now,
-                UpdatedOn = now
-            };
 
         @event = new PersonDetailsUpdatedEvent()
         {
@@ -125,9 +112,11 @@ public class Person
             PersonId = PersonId,
             Details = EventModels.PersonDetails.FromModel(this),
             OldDetails = oldDetails,
-            ChangeReason = changeReason,
-            ChangeReasonDetail = changeReasonDetail,
-            EvidenceFile = evidenceFile,
+            NameChangeReason = nameChangeReason,
+            NameChangeEvidenceFile = nameChangeEvidenceFile,
+            DetailsChangeReason = detailsChangeReason,
+            DetailsChangeReasonDetail = detailsChangeReasonDetail,
+            DetailsChangeEvidenceFile = detailsChangeEvidenceFile,
             Changes = changes
         };
     }
