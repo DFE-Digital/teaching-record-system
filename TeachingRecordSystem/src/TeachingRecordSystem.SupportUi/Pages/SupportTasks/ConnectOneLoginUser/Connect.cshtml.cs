@@ -68,13 +68,13 @@ public class ConnectModel(TrsDbContext dbContext, IPersonMatchingService personM
         var data = (ConnectOneLoginUserData)_supportTask.Data;
 
         PersonDetail = await dbContext.Persons
-            .Where(p => p.Trn == Trn && p.DqtState == 0)
+            .Where(p => p.Trn == Trn)
             .Select(p => new PersonDetailViewModel()
             {
                 PersonId = p.PersonId,
                 Options = PersonDetailViewModelOptions.None,
                 Trn = p.Trn,
-                Name = $"{p.FirstName} {p.MiddleName} {p.LastName}",
+                Name = StringHelper.JoinNonEmpty(' ', p.FirstName, p.MiddleName, p.LastName),
                 PreviousNames = Array.Empty<string>(),  // TODO When we've got previous names synced to TRS
                 DateOfBirth = p.DateOfBirth,
                 NationalInsuranceNumber = p.NationalInsuranceNumber,

@@ -96,6 +96,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.Id, person.PersonId);
             Assert.Equal(entity.CreatedOn, person.CreatedOn);
             Assert.Equal(entity.ModifiedOn, person.UpdatedOn);
+            Assert.Equal((int?)entity.StateCode, (int)person.Status);
             Assert.Equal(entity.Id, person.DqtContactId);
             Assert.Equal(entity.dfeta_TRN, person.Trn);
             Assert.Equal(entity.FirstName, person.FirstName);
@@ -103,7 +104,7 @@ public partial class TrsDataSyncHelperTests
             Assert.Equal(entity.LastName, person.LastName);
             Assert.Equal(entity.BirthDate?.ToDateOnlyWithDqtBstFix(isLocalTime: false), person.DateOfBirth);
             Assert.Equal(entity.EMailAddress1, person.EmailAddress);
-            Assert.Equal(entity.dfeta_NINumber, person.NationalInsuranceNumber);
+            Assert.Equal(entity.dfeta_NINumber, (string?)person.NationalInsuranceNumber);
             Assert.Equal(entity.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true), person.QtsDate);
             Assert.Equal(entity.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true), person.EytsDate);
             Assert.Equal((int)entity.StateCode!, person.DqtState);

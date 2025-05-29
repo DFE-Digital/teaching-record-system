@@ -73,6 +73,10 @@ public class ChangeHistoryModel(
             nameof(DqtInductionReactivatedEvent),
             nameof(DqtContactInductionStatusChangedEvent),
             nameof(PersonInductionUpdatedEvent),
+            nameof(PersonDetailsUpdatedEvent),
+            nameof(ProfessionalStatusCreatedEvent),
+            nameof(ProfessionalStatusUpdatedEvent),
+            nameof(ProfessionalStatusDeletedEvent)
         };
 
         var alertEventTypes = eventTypes.Where(et => et.StartsWith("Alert")).ToArray();

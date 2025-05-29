@@ -1,8 +1,8 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.Core.Services.GetAnIdentity.Api.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250425;
 
@@ -177,7 +177,7 @@ public class GetTrnRequestTests : TestBase
             return metadata.TrnToken!;
         });
 
-        return HostFixture.Services.GetRequiredService<TrnRequestHelper>()
+        return HostFixture.Services.GetRequiredService<TrnRequestService>()
             .GetAccessYourTeachingQualificationsLink(trnToken);
     }
 }

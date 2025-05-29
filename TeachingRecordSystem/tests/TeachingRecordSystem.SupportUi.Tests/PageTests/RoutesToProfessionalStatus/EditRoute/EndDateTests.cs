@@ -18,7 +18,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -167,7 +167,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

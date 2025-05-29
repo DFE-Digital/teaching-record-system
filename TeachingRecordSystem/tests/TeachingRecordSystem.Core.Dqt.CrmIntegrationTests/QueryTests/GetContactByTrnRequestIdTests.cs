@@ -1,4 +1,5 @@
 using Microsoft.Xrm.Sdk.Query;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Core.Dqt.CrmIntegrationTests.QueryTests;
 
@@ -42,7 +43,7 @@ public class GetContactByTrnRequestIdTests : IAsyncLifetime
 
         // Act
         var result = await _crmQueryDispatcher.ExecuteQueryAsync(
-            new GetContactByTrnRequestIdQuery(TrnRequestHelper.GetCrmTrnRequestId(applicationUserId, requestId), new ColumnSet()));
+            new GetContactByTrnRequestIdQuery(TrnRequestService.GetCrmTrnRequestId(applicationUserId, requestId), new ColumnSet()));
 
         // Assert
         Assert.NotNull(result);

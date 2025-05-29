@@ -1,5 +1,4 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
-using TeachingRecordSystem.Core.DataStore.Postgres.Migrations;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
@@ -23,8 +22,7 @@ public partial class TestData
         private Guid? _trainingProviderId;
         private Guid? _degreeTypeId;
         private bool? _exemptFromInduction;
-
-        private Guid QualificationId { get; } = Guid.NewGuid();
+        private EventModels.RaisedByUserInfo? _createdByUser;
 
         public CreatePersonProfessionalStatusBuilder WithPersonId(Guid personId)
         {
@@ -115,8 +113,15 @@ public partial class TestData
             return this;
         }
 
-        internal Task<Guid> ExecuteAsync(
+        public CreatePersonProfessionalStatusBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
+        {
+            _createdByUser = user;
+            return this;
+        }
+
+        internal async Task<(Guid ProfessionalStatusId, IReadOnlyCollection<EventBase> Events)> ExecuteAsync(
             CreatePersonBuilder createPersonBuilder,
+            Person person,
             TestData testData,
             TrsDbContext dbContext)
         {
@@ -124,33 +129,39 @@ public partial class TestData
             {
                 throw new InvalidOperationException("RouteToProfessionalStatusId has not been set");
             }
+            if (_createdByUser is null)
+            {
+                _createdByUser = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
+            }
 
             var personId = createPersonBuilder.PersonId;
+            var allRoutes = await testData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync();
 
-            var professionalStatus = new ProfessionalStatus()
-            {
-                PersonId = personId,
-                QualificationId = QualificationId,
-                RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
-                Status = _status,
-                AwardedDate = _awardedDate,
-                TrainingStartDate = _trainingStartDate,
-                TrainingEndDate = _trainingEndDate,
-                TrainingSubjectIds = _trainingSubjectIds,
-                TrainingAgeSpecialismType = _trainingAgeSpecialismType,
-                TrainingAgeSpecialismRangeFrom = _trainingAgeSpecialismRangeFrom,
-                TrainingAgeSpecialismRangeTo = _trainingAgeSpecialismRangeTo,
-                TrainingCountryId = _trainingCountryId,
-                TrainingProviderId = _trainingProviderId,
-                ExemptFromInduction = _exemptFromInduction,
-                DegreeTypeId = _degreeTypeId,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = DateTime.UtcNow
-            };
+            var professionalStatus = ProfessionalStatus.Create(
+                person,
+                allRoutes,
+                _routeToProfessionalStatusId!.Value,
+                _status,
+                _awardedDate,
+                _trainingStartDate,
+                _trainingEndDate,
+                _trainingSubjectIds,
+                _trainingAgeSpecialismType,
+                _trainingAgeSpecialismRangeFrom,
+                _trainingAgeSpecialismRangeTo,
+                _trainingCountryId,
+                _trainingProviderId,
+                _degreeTypeId,
+                _exemptFromInduction,
+                _createdByUser,
+                DateTime.UtcNow,
+                out var @createdEvent
+                );
 
             dbContext.ProfessionalStatuses.Add(professionalStatus);
+            dbContext.AddEventWithoutBroadcast(createdEvent);
 
-            return Task.FromResult(professionalStatus.QualificationId);
+            return (professionalStatus.QualificationId, [createdEvent]);
         }
     }
 }

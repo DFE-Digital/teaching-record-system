@@ -1,18 +1,19 @@
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
 using TeachingRecordSystem.Core.Dqt;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
 public record GetTrnRequestCommand(string RequestId);
 
-public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUserProvider currentUserProvider)
+public class GetTrnRequestHandler(TrnRequestService trnRequestService, ICurrentUserProvider currentUserProvider)
 {
     public async Task<ApiResult<TrnRequestInfo>> HandleAsync(GetTrnRequestCommand command)
     {
         var (currentApplicationUserId, _) = currentUserProvider.GetCurrentApplicationUser();
 
-        var trnRequest = await trnRequestHelper.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
+        var trnRequest = await trnRequestService.GetTrnRequestInfoAsync(currentApplicationUserId, command.RequestId);
         if (trnRequest is null)
         {
             return ApiError.TrnRequestDoesNotExist(command.RequestId);
@@ -39,7 +40,7 @@ public class GetTrnRequestHandler(TrnRequestHelper trnRequestHelper, ICurrentUse
             Status = trnRequest.IsCompleted ? TrnRequestStatus.Completed : TrnRequestStatus.Pending,
             PotentialDuplicate = trnRequest.PotentialDuplicate,
             AccessYourTeachingQualificationsLink = trnRequest.TrnToken is not null ?
-                trnRequestHelper.GetAccessYourTeachingQualificationsLink(trnRequest.TrnToken) :
+                trnRequestService.GetAccessYourTeachingQualificationsLink(trnRequest.TrnToken) :
                 null
         };
     }

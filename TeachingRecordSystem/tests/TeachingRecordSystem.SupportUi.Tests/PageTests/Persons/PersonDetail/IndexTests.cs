@@ -2,11 +2,18 @@ using System.Diagnostics;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
+[Collection(nameof(DisableParallelization))]
 public class IndexTests : TestBase
 {
     public IndexTests(HostFixture hostFixture)
         : base(hostFixture)
     {
+    }
+
+    public override void Dispose()
+    {
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
+        base.Dispose();
     }
 
     [Fact]
@@ -28,21 +35,33 @@ public class IndexTests : TestBase
     public async Task Get_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
-        var email = TestData.GenerateUniqueEmail();
-        var mobileNumber = TestData.GenerateUniqueMobileNumber();
+        var randomEmail = TestData.GenerateUniqueEmail();
+        if (!EmailAddress.TryParse(randomEmail, out var email))
+        {
+            Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
+        }
+        var randomMobile = TestData.GenerateUniqueMobileNumber();
+        if (!MobileNumber.TryParse(randomMobile, out var mobileNumber))
+        {
+            Assert.Fail($@"Randomly generated mobile number ""{randomMobile}"" is invalid.");
+        }
         var updatedFirstName = TestData.GenerateFirstName();
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
         var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
         var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithTrn()
-            .WithEmail(email)
-            .WithMobileNumber(mobileNumber)
+            .WithEmail((string?)email)
+            .WithMobileNumber((string?)mobileNumber)
             .WithNationalInsuranceNumber());
 
-        await TestData.UpdatePersonAsync(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
+        await TestData.UpdatePersonAsync(b => b
+            .WithPersonId(createPersonResult.ContactId)
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName));
         await Task.Delay(2000);
-        await TestData.UpdatePersonAsync(b => b.WithPersonId(createPersonResult.ContactId).WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
+        await TestData.UpdatePersonAsync(b => b
+            .WithPersonId(createPersonResult.ContactId)
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
 
@@ -59,6 +78,64 @@ public class IndexTests : TestBase
         Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TextContent);
         Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
         Assert.Equal(createPersonResult.Gender, doc.GetSummaryListValueForKey("Gender"));
+        Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
+        Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
+        Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));
+        Assert.Equal(createPersonResult.MobileNumber, doc.GetSummaryListValueForKey("Mobile number"));
+    }
+
+    [Fact]
+    public async Task Get_AfterContactsMigrated_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
+    {
+        // Arrange
+        TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+
+        var randomEmail = TestData.GenerateUniqueEmail();
+        if (!EmailAddress.TryParse(randomEmail, out var email))
+        {
+            Assert.Fail($@"Randomly generated email address ""{randomEmail}"" is invalid.");
+        }
+        var randomMobile = TestData.GenerateUniqueMobileNumber();
+        if (!MobileNumber.TryParse(randomMobile, out var mobileNumber))
+        {
+            Assert.Fail($@"Randomly generated mobile number ""{randomMobile}"" is invalid.");
+        }
+        var updatedFirstName = TestData.GenerateFirstName();
+        var updatedMiddleName = TestData.GenerateMiddleName();
+        var updatedLastName = TestData.GenerateLastName();
+        var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
+        var createPersonResult = await TestData.CreatePersonAsync(b => b
+            .WithTrn()
+            .WithEmail((string?)email)
+            .WithMobileNumber((string?)mobileNumber)
+            .WithNationalInsuranceNumber());
+
+        await TestData.UpdatePersonAsync(b => b
+            .WithPersonId(createPersonResult.ContactId)
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, createPersonResult.LastName)
+            .AfterContactsMigrated());
+        Clock.Advance();
+        await TestData.UpdatePersonAsync(b => b
+            .WithPersonId(createPersonResult.ContactId)
+            .WithUpdatedName(updatedFirstName, updatedMiddleName, updatedLastName)
+            .AfterContactsMigrated());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{createPersonResult.ContactId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetElementByTestId("page-title")!.TextContent);
+        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", doc.GetSummaryListValueForKey("Name"));
+        var previousNames = doc.GetSummaryListValueElementForKey("Previous name(s)")?.QuerySelectorAll("li");
+        Assert.Equal($"{updatedFirstName} {updatedMiddleName} {createPersonResult.LastName}", previousNames?.First().TextContent);
+        Assert.Equal($"{createPersonResult.FirstName} {createPersonResult.MiddleName} {createPersonResult.LastName}", previousNames?.Last().TextContent);
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Date of birth"));
+        // TODO: expected createPersonResult.Gender when Gender migration issue is resolved
+        Assert.Equal("Not provided", doc.GetSummaryListValueForKey("Gender"));
         Assert.Equal(createPersonResult.Trn, doc.GetSummaryListValueForKey("TRN"));
         Assert.Equal(createPersonResult.NationalInsuranceNumber, doc.GetSummaryListValueForKey("National Insurance number"));
         Assert.Equal(createPersonResult.Email, doc.GetSummaryListValueForKey("Email"));

@@ -44,7 +44,14 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
                 return this.PageWithErrors();
             }
 
-            await JourneyInstance!.UpdateStateAsync(x => x.Status = Status);
+            await JourneyInstance!.UpdateStateAsync(
+                x =>
+                {
+                    x.Status = Status;
+                    x.IsExemptFromInduction = (Status == ProfessionalStatusStatus.Awarded || Status == ProfessionalStatusStatus.Approved) ?
+                        Route.InductionExemptionReason?.RouteImplicitExemption
+                        : null;
+                });
 
             var nextPage = PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
             return Redirect(FromCheckAnswers ?

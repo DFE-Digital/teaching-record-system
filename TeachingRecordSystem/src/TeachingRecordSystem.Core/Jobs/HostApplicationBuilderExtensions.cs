@@ -54,6 +54,7 @@ public static class HostApplicationBuilderExtensions
                 builder.Services.AddHttpClient<PopulateNameSynonymsJob>();
                 builder.Services.AddTransient<InductionStatusUpdatedSupportJob>();
                 builder.Services.AddTransient<CpdInductionImporterJob>();
+                builder.Services.AddTransient<BackfillDqtNotesJob>();
 
                 builder.Services.AddStartupTask(sp =>
                 {
@@ -162,6 +163,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(CancellationToken.None),
                     InductionStatusUpdatedSupportJob.JobSchedule);
 
+                recurringJobManager.AddOrUpdate<BackfillDqtNotesJob>(
+                    nameof(BackfillDqtNotesJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never);
+
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob");
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob (dry-run)");
                 recurringJobManager.RemoveIfExists("SyncAllAlertsFromCrmJob & migrate");
@@ -225,6 +231,12 @@ public static class HostApplicationBuilderExtensions
                     nameof(BackfillEmployerEmailAddressInEmploymentHistoryJob),
                     job => job.ExecuteAsync(CancellationToken.None),
                     Cron.Never);
+
+                recurringJobManager.AddOrUpdate<AppendTrainingProvidersFromCrmJob>(
+                    nameof(AppendTrainingProvidersFromCrmJob),
+                    job => job.ExecuteAsync(CancellationToken.None),
+                    Cron.Never
+                    );
 
                 return Task.CompletedTask;
             });

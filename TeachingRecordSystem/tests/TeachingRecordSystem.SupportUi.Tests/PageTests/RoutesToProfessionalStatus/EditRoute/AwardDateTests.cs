@@ -22,7 +22,8 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status)));
+                .WithStatus(status)
+                .WithAwardedDate(awardedDate)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
@@ -226,7 +227,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)));
+                .WithStatus(ProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
@@ -264,7 +265,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)));
+                .WithStatus(ProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)

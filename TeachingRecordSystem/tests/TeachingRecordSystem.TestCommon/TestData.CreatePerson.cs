@@ -8,6 +8,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using static TeachingRecordSystem.Core.Dqt.RequestBuilder;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
@@ -45,6 +46,7 @@ public partial class TestData
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
         private readonly List<CreatePersonProfessionalStatusBuilder> _professionalStatusBuilders = [];
         private readonly List<ProfessionalStatusType> _awardedProfessionalStatuses = [];
+        private readonly List<(string FirstName, string MiddleName, string LastName, DateTime Created)> _previousNames = [];
         private DateOnly? _qtlsDate;
         private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
         private string? _trnToken;
@@ -307,6 +309,12 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonBuilder WithPreviousNames(params (string FirstName, string MiddleName, string LastName, DateTime Created)[] previousNames)
+        {
+            _previousNames.AddRange(previousNames);
+            return this;
+        }
+
         internal async Task<CreatePersonResult> ExecuteAsync(TestData testData)
         {
             var trn = _hasTrn == true ? await testData.GenerateTrnAsync() : null;
@@ -333,7 +341,7 @@ public partial class TestData
                 BirthDate = dateOfBirth.ToDateTime(new TimeOnly()),
                 GenderCode = gender,
                 dfeta_qtlsdate = _qtlsDate.ToDateTimeWithDqtBstFix(isLocalTime: false),
-                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestHelper.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
+                dfeta_TrnRequestID = _trnRequest is { } trnRequest ? TrnRequestService.GetCrmTrnRequestId(trnRequest.ApplicationUserId, trnRequest.RequestId) : null,
                 dfeta_TrnToken = _trnToken,
                 dfeta_SlugId = _slugId,
                 dfeta_loginfailedcounter = _loginFailedCounter
@@ -534,7 +542,7 @@ public partial class TestData
                 helper => helper.SyncPersonAsync(contact, syncAudit: true, ignoreInvalid: false),
                 _syncEnabledOverride);
 
-            var (mqs, alerts, person, routes) = await testData.WithDbContextAsync(async dbContext =>
+            var (mqs, alerts, person, routes, previousNames) = await testData.WithDbContextAsync(async dbContext =>
             {
                 if (!syncedPerson)
                 {
@@ -549,14 +557,17 @@ public partial class TestData
                     return default;
                 }
 
-                var person = await dbContext.Persons.SingleAsync(p => p.PersonId == PersonId);
+                var person = await dbContext.Persons
+                    .Include(p => p.Qualifications)
+                    .SingleAsync(p => p.PersonId == PersonId);
 
                 AddTrnRequestMetadata();
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
-                var professionalStatusIds = await AddProfessionalStatusRoutesAsync();
+                var professionalStatusIds = await AddProfessionalStatusRoutesAsync(person);
                 var awardedProfessionalStatusIds = await AddAwardedProfessionalStatusRoutesAsync();
+                var previousNameIds = await AddPreviousNamesAsync();
 
                 await dbContext.SaveChangesAsync();
 
@@ -564,6 +575,7 @@ public partial class TestData
                     .Include(p => p.Alerts!)
                     .ThenInclude(a => a.AlertType)
                     .ThenInclude(at => at!.AlertCategory)
+                    .Include(p => p.PreviousNames)
                     .AsSplitQuery()
                     .SingleAsync(p => p.PersonId == contact.Id);
 
@@ -584,8 +596,9 @@ public partial class TestData
                 var routesToProfessionalStatus = professionalStatusIds.Concat(awardedProfessionalStatusIds)
                     .Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id))
                     .AsReadOnly();
+                var previousNames = previousNameIds.Select(id => person.PreviousNames!.Single(a => a.PreviousNameId == id)).AsReadOnly();
 
-                return (mqs, alerts, person, routesToProfessionalStatus);
+                return (mqs, alerts, person, routesToProfessionalStatus, previousNames);
 
                 async Task<IReadOnlyCollection<Guid>> AddMqsAsync()
                 {
@@ -601,14 +614,15 @@ public partial class TestData
                     return mqIds;
                 }
 
-                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync()
+                async Task<IReadOnlyCollection<Guid>> AddProfessionalStatusRoutesAsync(Person person)
                 {
                     var routeIds = new List<Guid>();
 
                     foreach (var builder in _professionalStatusBuilders)
                     {
-                        var routeId = await builder.ExecuteAsync(this, testData, dbContext);
+                        var (routeId, createdEvents) = await builder.ExecuteAsync(this, person, testData, dbContext);
                         routeIds.Add(routeId);
+                        events.AddRange(createdEvents);
                     }
 
                     return routeIds;
@@ -628,30 +642,32 @@ public partial class TestData
                     {
                         var route = allRoutes.Where(r => r.ProfessionalStatusType == professionalStatusType).RandomOne();
 
-                        var professionalStatus = new ProfessionalStatus
-                        {
-                            RouteToProfessionalStatusId = route.RouteToProfessionalStatusId,
-                            Status = ProfessionalStatusStatus.Awarded,
-                            TrainingStartDate = route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
-                            TrainingEndDate = route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
-                            TrainingSubjectIds = route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
+                        var professionalStatus = ProfessionalStatus.Create(
+                                person,
+                                allRoutes,
+                                route.RouteToProfessionalStatusId,
+                                ProfessionalStatusStatus.Awarded,
+                                testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
+                                route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
+                                route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
+                                route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
                                 new[] { allSubjects.RandomOne().TrainingSubjectId } :
                                 [],
-                            TrainingAgeSpecialismType = route.TrainingAgeSpecialismTypeRequired is not FieldRequirement.NotApplicable ? TrainingAgeSpecialismType.FoundationStage : null,
-                            TrainingAgeSpecialismRangeFrom = null,
-                            TrainingAgeSpecialismRangeTo = null,
-                            TrainingCountryId = route.TrainingCountryRequired is not FieldRequirement.NotApplicable ? allCountries.RandomOne().CountryId : null,
-                            TrainingProviderId = allProviders.RandomOne().TrainingProviderId,
-                            ExemptFromInduction = route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
-                            DegreeTypeId = route.DegreeTypeRequired is not FieldRequirement.NotApplicable ? allDegreeTypes.RandomOne().DegreeTypeId : null,
-                            QualificationId = Guid.NewGuid(),
-                            CreatedOn = testData.Clock.UtcNow,
-                            UpdatedOn = testData.Clock.UtcNow,
-                            PersonId = PersonId,
-                            AwardedDate = testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1))
-                        };
+                                route.TrainingAgeSpecialismTypeRequired is not FieldRequirement.NotApplicable ? TrainingAgeSpecialismType.FoundationStage : null,
+                                null,
+                                null,
+                                route.TrainingCountryRequired is not FieldRequirement.NotApplicable ? allCountries.RandomOne().CountryId : null,
+                                allProviders.RandomOne().TrainingProviderId,
+                                route.DegreeTypeRequired is not FieldRequirement.NotApplicable ? allDegreeTypes.RandomOne().DegreeTypeId : null,
+                                route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
+                                EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
+                                DateTime.UtcNow,
+                                out var @createdEvent
+                                );
 
                         dbContext.ProfessionalStatuses.Add(professionalStatus);
+                        dbContext.AddEventWithoutBroadcast(createdEvent);
+
                         createdProfessionalStatusIds.Add(professionalStatus.QualificationId);
                     }
 
@@ -670,6 +686,35 @@ public partial class TestData
                     }
 
                     return alertIds;
+                }
+
+                async Task<IReadOnlyCollection<Guid>> AddPreviousNamesAsync()
+                {
+                    return await testData.WithDbContextAsync(async dbContext =>
+                    {
+                        var previousNameIds = new List<Guid>();
+                        foreach (var pn in _previousNames)
+                        {
+                            var id = Guid.NewGuid();
+                            var previousName = new PreviousName
+                            {
+                                PreviousNameId = id,
+                                PersonId = PersonId,
+                                FirstName = pn.FirstName,
+                                MiddleName = pn.MiddleName ?? string.Empty,
+                                LastName = pn.LastName,
+                                CreatedOn = pn.Created,
+                                UpdatedOn = pn.Created
+                            };
+
+                            previousNameIds.Add(id);
+                            dbContext.PreviousNames.Add(previousName);
+                        }
+
+                        await dbContext.SaveChangesAsync();
+
+                        return previousNameIds;
+                    });
                 }
 
                 void AddTrnRequestMetadata()
@@ -738,7 +783,8 @@ public partial class TestData
                 MandatoryQualifications = mqs,
                 Alerts = alerts,
                 DqtContactAuditDetail = auditDetail,
-                ProfessionalStatuses = routes
+                ProfessionalStatuses = routes,
+                PreviousNames = previousNames
             };
         }
 
@@ -1211,6 +1257,7 @@ public partial class TestData
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
         public required IReadOnlyCollection<ProfessionalStatus> ProfessionalStatuses { get; init; }
+        public required IReadOnlyCollection<PreviousName> PreviousNames { get; init; }
         public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
 

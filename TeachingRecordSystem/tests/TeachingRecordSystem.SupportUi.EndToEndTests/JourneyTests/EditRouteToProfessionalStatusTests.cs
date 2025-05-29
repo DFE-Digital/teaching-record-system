@@ -143,7 +143,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
 
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);
         var setEndDate = startDate.AddDays(2);
@@ -296,7 +296,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setStartDate = endDate.AddDays(2);
@@ -479,6 +479,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
+                    .WithAwardedDate(setAwardDate)
                     .WithTrainingCountryId(country.CountryId)
                     .WithInductionExemption(false)
                 ));
@@ -533,7 +534,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.InTraining;
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
@@ -575,7 +576,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.InTraining;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
         var person = await TestData.CreatePersonAsync(
@@ -618,7 +619,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
@@ -670,7 +671,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
             .First();
-        var status = ProfessionalStatusStatus.Approved;
+        var status = ProfessionalStatusStatus.InTraining;
         var newTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
@@ -952,6 +953,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [InlineData("Awarded")]
     public async Task EditStatus_StatusAlreadyAwarded_Continue_Details(string status)
     {
+        var awardedDate = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
             .RandomOne();
@@ -960,6 +962,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate)
             ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;

@@ -24,7 +24,7 @@ public partial class TrsDataSyncServiceTests
         // Assert
         await fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
+            var person = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.NotNull(person);
             Assert.Equal(fixture.Clock.UtcNow, person.DqtFirstSync);
             Assert.Equal(fixture.Clock.UtcNow, person.DqtLastSync);
@@ -58,7 +58,7 @@ public partial class TrsDataSyncServiceTests
         // Assert
         await fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
+            var person = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.NotNull(person);
             Assert.Equal(expectedFirstSync, person.DqtFirstSync);
             Assert.Equal(Clock.UtcNow, person.DqtLastSync);
@@ -81,7 +81,7 @@ public partial class TrsDataSyncServiceTests
         // Assert
         await fixture.DbFixture.WithDbContextAsync(async dbContext =>
         {
-            var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.DqtContactId == contactId);
+            var person = await dbContext.Persons.IgnoreQueryFilters().SingleOrDefaultAsync(p => p.DqtContactId == contactId);
             Assert.Null(person);
         });
     }

@@ -1,6 +1,5 @@
 using System.Net;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240606;
 

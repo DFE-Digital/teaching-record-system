@@ -47,7 +47,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
         {
             trn = TrnOverride!;
 
-            if (!await dbContext.Persons.AnyAsync(p => p.Trn == trn && p.DqtState == 0))
+            if (!await dbContext.Persons.AnyAsync(p => p.Trn == trn))
             {
                 ModelState.AddModelError(nameof(TrnOverride), "Enter a valid TRN");
                 return this.PageWithErrors();
@@ -62,7 +62,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
         var supportTask = HttpContext.GetCurrentSupportTaskFeature().SupportTask;
         var data = (ConnectOneLoginUserData)supportTask.Data;
 
-        var suggestedMatches = await personMatchingService.GetSuggestedMatchesAsync(new(
+        var suggestedMatches = await personMatchingService.GetSuggestedOneLoginUserMatchesAsync(new(
             data.VerifiedNames!,
             data.VerifiedDatesOfBirth!,
             data.StatedNationalInsuranceNumber,
@@ -88,7 +88,7 @@ public class IndexModel(TrsDbContext dbContext, IPersonMatchingService personMat
                 DateOfBirth = m.DateOfBirth,
                 NationalInsuranceNumber = m.NationalInsuranceNumber,
                 Gender = null,  // Not shown
-                Email = m.Email,
+                Email = m.EmailAddress,
                 MobileNumber = null  // Not shown
             })
             .ToArray();

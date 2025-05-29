@@ -165,7 +165,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(status.Value)));
+                .WithStatus(status.Value)
+                .WithAwardedDate(endDate)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -300,6 +301,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
+        EventPublisher.Clear();
+
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
@@ -386,10 +389,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithAwardedProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
+        EventPublisher.Clear();
 
         var qualification = person.ProfessionalStatuses.First();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(qualification);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification, e => e.AwardedDate = qualification.AwardedDate!.Value.AddDays(-1));
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -409,21 +413,21 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var actualCreatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
 
             Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.QtsDate);
-            Assert.Null(actualCreatedEvent.OldPersonAttributes.QtsDate);
+            Assert.Equal(qualification.AwardedDate, actualCreatedEvent.OldPersonAttributes.QtsDate);
         });
     }
 
     [Fact]
-    public async Task Post_Confirm_WithAwardedEytsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
+    public async Task Post_Confirm_WithAwardedEytsRouteTypeUpdatesPersonEytsDateAndHasChangesInEvent()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithAwardedProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+        EventPublisher.Clear();
 
         var qualification = person.ProfessionalStatuses.First();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(qualification);
-
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification, e => e.AwardedDate = qualification.AwardedDate!.Value.AddDays(-1));
         var request = new HttpRequestMessage(
             HttpMethod.Post,
             $"/route/{qualification.QualificationId}/edit/check-answers?{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -442,7 +446,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var actualCreatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
 
             Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.EytsDate);
-            Assert.Null(actualCreatedEvent.OldPersonAttributes.EytsDate);
+            Assert.Equal(qualification.AwardedDate, actualCreatedEvent.OldPersonAttributes.EytsDate);
         });
     }
 
@@ -455,10 +459,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithAwardedProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
+        EventPublisher.Clear();
 
         var qualification = person.ProfessionalStatuses.First();
 
-        var journeyInstance = await CreateJourneyInstanceAsync(qualification);
+        var journeyInstance = await CreateJourneyInstanceAsync(qualification, e => e.AwardedDate = qualification.AwardedDate!.Value.AddDays(1));
 
         var request = new HttpRequestMessage(
             HttpMethod.Post,
@@ -478,7 +483,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             var actualCreatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
 
             Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.PqtsDate);
-            Assert.Null(actualCreatedEvent.OldPersonAttributes.PqtsDate);
+            Assert.Equal(qualification.AwardedDate, actualCreatedEvent.OldPersonAttributes.PqtsDate);
         });
     }
 
@@ -488,10 +493,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             state ?? new EditRouteState(),
             new KeyValuePair<string, object>("qualificationId", qualificationId));
 
-    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(ProfessionalStatus qualification)
+    private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(ProfessionalStatus qualification, Action<EditRouteState> action)
     {
         var editRouteState = new EditRouteState();
         editRouteState.EnsureInitialized(qualification);
+        action(editRouteState);
         editRouteState.ChangeReason = ChangeReasonOption.AnotherReason;
         editRouteState.ChangeReasonDetail = new ChangeReasonDetailsState()
         {

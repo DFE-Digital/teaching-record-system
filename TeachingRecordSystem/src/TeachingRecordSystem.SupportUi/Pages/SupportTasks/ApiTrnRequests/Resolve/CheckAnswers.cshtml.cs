@@ -5,6 +5,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Jobs.Scheduling;
 using TeachingRecordSystem.Core.Models.SupportTaskData;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.WebCommon;
 using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resolve.ResolveApiTrnRequestState;
 
@@ -14,7 +15,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Resol
 public class CheckAnswers(
     TrsDbContext dbContext,
     IBackgroundJobScheduler backgroundJobScheduler,
-    TrnRequestHelper trnRequestHelper,
+    TrnRequestService trnRequestService,
     ITrnGenerator trnGenerator,
     TrsLinkGenerator linkGenerator,
     IClock clock) :
@@ -64,7 +65,7 @@ public class CheckAnswers(
                 return null;
             }
 
-            return await trnRequestHelper.CreateTrnTokenAsync(trn, requestData.EmailAddress);
+            return await trnRequestService.CreateTrnTokenAsync(trn, requestData.EmailAddress);
         }
 
         string jobId;
@@ -77,8 +78,8 @@ public class CheckAnswers(
             var trnToken = await GenerateTrnTokenIfHaveEmailAsync(trn);
             requestData.TrnToken = trnToken;
 
-            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
-                trnRequestHelper => trnRequestHelper.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
+            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
+                trnRequestService => trnRequestService.CreateContactFromTrnRequestAsync(requestData, newContactId, trn));
             selectedPersonAttributes = null;
             oldPersonAttributes = null;
         }
@@ -94,8 +95,8 @@ public class CheckAnswers(
             selectedPersonAttributes = await GetPersonAttributesAsync(existingContactId);
             var attributesToUpdate = GetAttributesToUpdate();
 
-            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestHelper>(
-                trnRequestHelper => trnRequestHelper.UpdateContactFromTrnRequestAsync(
+            jobId = await backgroundJobScheduler.EnqueueAsync<TrnRequestService>(
+                trnRequestService => trnRequestService.UpdateContactFromTrnRequestAsync(
                     requestData,
                     attributesToUpdate));
 

@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xunit;
+using Xunit.Sdk;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -11,12 +12,29 @@ public static partial class AssertEx
     {
         ArgumentNullException.ThrowIfNull(response);
 
-        Assert.Equal(expectedStatusCode, (int)response.StatusCode);
-        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+        var contentType = response.Content.Headers.ContentType?.MediaType;
+        if (contentType is not "application/json" and not "application/problem+json")
+        {
+            throw new XunitException($"Content type '{contentType}' is not a JSON content type");
+        }
+
+        if (expectedStatusCode != (int)response.StatusCode)
+        {
+            throw new XunitException(
+                $"""
+                Response status code does not match
+                Expected: {expectedStatusCode}
+                Actual:   {(int)response.StatusCode}
+                
+                Response body:
+                {await response.Content.ReadAsStringAsync()}
+                """);
+        }
+
 
         var result = await response.Content.ReadFromJsonAsync<JsonDocument>(SerializerOptions);
         Assert.NotNull(result);
-        return result!;
+        return result;
     }
 
     public static async Task JsonResponseEqualsAsync(HttpResponseMessage response, object expected, int expectedStatusCode = 200)

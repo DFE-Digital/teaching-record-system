@@ -45,10 +45,7 @@ public class StatusModel(
         if (CompletingRoute) // if user has set the status to awarded or approved from another status
         {
             // if the route has an implicit exemption it needs to be set now
-            var hasImplicitExemption =
-                Route.InductionExemptionReasonId.HasValue ?
-                    (await referenceDataCache.GetInductionExemptionReasonByIdAsync(Route.InductionExemptionReasonId.Value)).RouteImplicitExemption
-                    : false;
+            var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
 
             // initialise a temporary part of journey state for the data collection for a completing route
             await JourneyInstance!.UpdateStateAsync(

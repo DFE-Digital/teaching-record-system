@@ -1,4 +1,3 @@
-using Optional;
 using TeachingRecordSystem.Core.Events.Models;
 
 namespace TeachingRecordSystem.Core.Events;

@@ -2821,61 +2821,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.DqtNote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CreatedByDqtUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("created_by_dqt_user_id");
-
-                    b.Property<string>("CreatedByDqtUserName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("created_by_dqt_user_name");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
-
-                    b.Property<string>("FileName")
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
-
-                    b.Property<string>("NoteText")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("note_text");
-
-                    b.Property<string>("OriginalFileName")
-                        .HasColumnType("text")
-                        .HasColumnName("original_file_name");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("person_id");
-
-                    b.Property<Guid?>("UpdatedByDqtUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("updated_by_dqt_user_id");
-
-                    b.Property<string>("UpdatedByDqtUserName")
-                        .HasColumnType("text")
-                        .HasColumnName("updated_by_dqt_user_name");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_on");
-
-                    b.HasKey("Id")
-                        .HasName("pk_dqt_notes");
-
-                    b.ToTable("dqt_notes", (string)null);
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.EntityChangesJournal", b =>
                 {
                     b.Property<string>("Key")
@@ -3685,6 +3630,59 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.ToTable("name_synonyms", (string)null);
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Note", b =>
+                {
+                    b.Property<Guid>("NoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("note_id");
+
+                    b.Property<string>("ContentHtml")
+                        .HasColumnType("text")
+                        .HasColumnName("content_html");
+
+                    b.Property<Guid?>("CreatedByDqtUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_dqt_user_id");
+
+                    b.Property<string>("CreatedByDqtUserName")
+                        .HasColumnType("text")
+                        .HasColumnName("created_by_dqt_user_name");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("OriginalFileName")
+                        .HasColumnType("text")
+                        .HasColumnName("original_file_name");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("person_id");
+
+                    b.Property<Guid?>("UpdatedByDqtUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by_dqt_user_id");
+
+                    b.Property<string>("UpdatedByDqtUserName")
+                        .HasColumnType("text")
+                        .HasColumnName("updated_by_dqt_user_name");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("NoteId")
+                        .HasName("pk_notes");
+
+                    b.ToTable("notes", (string)null);
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", b =>
                 {
                     b.Property<string>("Subject")
@@ -3920,6 +3918,11 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("middle_name")
                         .UseCollation("case_insensitive");
 
+                    b.Property<string>("MobileNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)")
+                        .HasColumnName("mobile_number");
+
                     b.Property<string>("NationalInsuranceNumber")
                         .HasMaxLength(9)
                         .HasColumnType("character(9)")
@@ -3933,6 +3936,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<DateOnly?>("QtsDate")
                         .HasColumnType("date")
                         .HasColumnName("qts_date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.Property<string>("Trn")
                         .HasMaxLength(7)
@@ -4008,6 +4015,59 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasDatabaseName("ix_person_search_attributes_attribute_type_and_value");
 
                     b.ToTable("person_search_attributes", (string)null);
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.PreviousName", b =>
+                {
+                    b.Property<Guid>("PreviousNameId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("previous_name_id");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_on");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("first_name")
+                        .UseCollation("case_insensitive");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("last_name")
+                        .UseCollation("case_insensitive");
+
+                    b.Property<string>("MiddleName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("middle_name")
+                        .UseCollation("case_insensitive");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("person_id");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("PreviousNameId")
+                        .HasName("pk_previous_names");
+
+                    b.HasIndex("PersonId")
+                        .HasDatabaseName("ix_previous_names_person_id");
+
+                    b.ToTable("previous_names", (string)null);
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.QtsAwardedEmailsJob", b =>
@@ -5740,7 +5800,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("Ukprn")
-                        .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character(8)")
                         .HasColumnName("ukprn")
@@ -17367,16 +17426,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.DqtNote", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_dqt_notes_persons_person_id");
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Establishment", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.EstablishmentSource", null)
@@ -17423,6 +17472,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("InternationalQtsAwardedEmailsJob");
                 });
 
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Note", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notes_persons_person_id");
+                });
+
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.OneLoginUser", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
@@ -17434,6 +17493,18 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .WithMany()
                         .HasForeignKey("VerifiedByApplicationUserId")
                         .HasConstraintName("fk_one_login_users_application_users_verified_by_application_u");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.PreviousName", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
+                        .WithMany("PreviousNames")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_previous_names_person");
 
                     b.Navigation("Person");
                 });
@@ -17704,6 +17775,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", b =>
                 {
                     b.Navigation("Alerts");
+
+                    b.Navigation("PreviousNames");
 
                     b.Navigation("Qualifications");
                 });
