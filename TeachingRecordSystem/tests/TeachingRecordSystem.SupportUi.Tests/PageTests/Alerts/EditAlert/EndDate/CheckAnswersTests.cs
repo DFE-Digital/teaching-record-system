@@ -61,7 +61,7 @@ public class CheckAnswersTests : EndDateTestBase
     [Fact]
     public async Task Get_MissingDataInJourneyState_RedirectsToIndexPage()
     {
-        // Arrange        
+        // Arrange
         var (person, alert) = await CreatePersonWithClosedAlert();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(JourneySteps.Index, alert);
 
@@ -208,7 +208,7 @@ public class CheckAnswersTests : EndDateTestBase
                 PersonId = person.PersonId,
                 Alert = new()
                 {
-                    AlertId = actualAlertUpdatedEvent.EventId,
+                    AlertId = actualAlertUpdatedEvent.Alert.AlertId,
                     AlertTypeId = alert.AlertTypeId,
                     Details = alert.Details,
                     ExternalLink = alert.ExternalLink,

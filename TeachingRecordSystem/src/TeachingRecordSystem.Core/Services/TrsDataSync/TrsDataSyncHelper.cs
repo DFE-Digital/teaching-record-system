@@ -897,7 +897,9 @@ public class TrsDataSyncHelper(
                 InductionStatus = mappedInduction.InductionStatus,
                 InductionExemptionReasonId = mappedInduction.InductionExemptionReasonIds switch
                 {
+#pragma warning disable format
                     [var id] => id,
+#pragma warning restore format
                     _ => null
                 },
                 DqtInduction = dqtInduction is not null ? GetEventDqtInduction(dqtInduction) : null,
