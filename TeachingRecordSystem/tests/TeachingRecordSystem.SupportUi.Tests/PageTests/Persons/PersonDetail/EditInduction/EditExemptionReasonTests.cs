@@ -31,7 +31,14 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_ShowsExemptionReasonsList()
     {
         // Arrange
-        var exemptionReasonsForDisplay = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+            .ToArray();
+        var exemptionReasonsForDisplay = allGuidsToDisplay.Join(
+            exemptionReasons,
+            guid => guid,
+            exemption => exemption.InductionExemptionReasonId,
+            (guid, exemption) => new { guid, exemption.Name })
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
@@ -54,7 +61,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElement.Count());
         Assert.All(exemptionReasonsElement, checkbox =>
         {
-            Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.InductionExemptionReasonId.ToString()));
+            Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
             Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
         });
     }

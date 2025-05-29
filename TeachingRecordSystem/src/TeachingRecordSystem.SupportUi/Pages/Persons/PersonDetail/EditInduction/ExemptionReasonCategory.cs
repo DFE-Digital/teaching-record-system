@@ -64,5 +64,8 @@ public static class ExemptionReasonCategories
         return ExemptionReasonCategoryMap.ContainsKey(category) ? ExemptionReasonCategoryMap[category] : new List<Guid>();
     }
 
+    public static IEnumerable<Guid> ExemptionReasonIds =>
+        ExemptionReasonCategoryMap.Values.SelectMany(g => g);
+
     public static IEnumerable<ExemptionReasonCategory> All => Enum.GetValues(typeof(ExemptionReasonCategory)).Cast<ExemptionReasonCategory>();
 }
