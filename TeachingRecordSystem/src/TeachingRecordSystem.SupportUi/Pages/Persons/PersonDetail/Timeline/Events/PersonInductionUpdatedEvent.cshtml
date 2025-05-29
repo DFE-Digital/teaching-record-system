@@ -31,162 +31,172 @@
             heading = "Induction exemption reason changed";
         }
     }
+
+    var showItem = (updatedEvent.Changes &
+                   (PersonInductionUpdatedEventChanges.InductionStatus |
+                    PersonInductionUpdatedEventChanges.InductionExemptionReasons |
+                    PersonInductionUpdatedEventChanges.InductionStartDate |
+                    PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                   != 0;
 }
 
-<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-person-induction-updated-event">
-    <div class="moj-timeline__header">
-        <h2 class="moj-timeline__title">@heading</h2>
-    </div>
-    <p class="moj-timeline__date">
-        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
-        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
-    </p>
-    <div class="moj-timeline__description">
-        <govuk-summary-list>
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="induction-status" use-empty-fallback>@induction.Status.GetTitle()</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="exemption-reason">
-                        @if (induction.ExemptionReasonIds.Length > 0)
-                        {
-                            <ul class="govuk-list">
-                                @foreach (var id in induction.ExemptionReasonIds)
-                                {
-                                    <li>@exemptionReasons[id].Name</li>
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <span use-empty-fallback></span>
-                        }
-                    </govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-
-            @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
-            {
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-            }
-        </govuk-summary-list>
-
-        <govuk-details class="govuk-!-margin-bottom-2">
-            <govuk-details-summary>Reason for change</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
+@if (showItem)
+{
+    <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-person-induction-updated-event">
+        <div class="moj-timeline__header">
+            <h2 class="moj-timeline__title">@heading</h2>
+        </div>
+        <p class="moj-timeline__date">
+            <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+            <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+        </p>
+        <div class="moj-timeline__description">
+            <govuk-summary-list>
+                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+                {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@updatedEvent.ChangeReason</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="induction-status" use-empty-fallback>@induction.Status.GetTitle()</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+                {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (updatedEvent.ChangeReasonDetail is not null)
+                        <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="exemption-reason">
+                            @if (induction.ExemptionReasonIds.Length > 0)
                             {
-                                <multi-line-text text="@updatedEvent.ChangeReasonDetail" data-testid="reason-detail" />
+                                <ul class="govuk-list">
+                                    @foreach (var id in induction.ExemptionReasonIds)
+                                    {
+                                        <li>@exemptionReasons[id].Name</li>
+                                    }
+                                </ul>
                             }
                             else
                             {
-                                <span use-empty-fallback data-testid="reason-detail"></span>
+                                <span use-empty-fallback></span>
                             }
                         </govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>
-                            @if (evidenceFileUrl is not null)
-                            {
-                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
-                            }
-                            else
-                            {
-                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
-                            }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
+                }
 
-        <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
-            <govuk-details-summary>Previous data</govuk-details-summary>
-            <govuk-details-text>
-                <govuk-summary-list>
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
-                    {
+                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@induction.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+
+                @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="completed-date" use-empty-fallback>@induction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+            </govuk-summary-list>
+
+            <govuk-details class="govuk-!-margin-bottom-2">
+                <govuk-details-summary>Reason for change</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-induction-status" use-empty-fallback>@oldInduction.Status.GetTitle()</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@updatedEvent.ChangeReason</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
-                    }
-
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
-                    {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-exemption-reason">
-                                @if (oldInduction.ExemptionReasonIds.Length > 0)
+                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (updatedEvent.ChangeReasonDetail is not null)
                                 {
-                                    <ul class="govuk-list">
-                                        @foreach (var id in oldInduction.ExemptionReasonIds)
-                                        {
-                                            <li>@exemptionReasons[id].Name</li>
-                                        }
-                                    </ul>
+                                    <multi-line-text text="@updatedEvent.ChangeReasonDetail" data-testid="reason-detail"/>
                                 }
                                 else
                                 {
-                                    <span use-empty-fallback></span>
+                                    <span use-empty-fallback data-testid="reason-detail"></span>
                                 }
                             </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
-                    }
-
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
-                    {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (evidenceFileUrl is not null)
+                                {
+                                    <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                                }
+                                else
+                                {
+                                    <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
                         </govuk-summary-list-row>
-                    }
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
 
-                    @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
+            <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-data">
+                <govuk-details-summary>Previous data</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Induction status</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="old-induction-status" use-empty-fallback>@oldInduction.Status.GetTitle()</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
 
-                    @if (oldInduction.CpdCpdModifiedOn.HasValue)
-                    {
-                        <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>CPD modified on</govuk-summary-list-row-key>
-                            <govuk-summary-list-row-value data-testid="old-cpd-modified-on" use-empty-fallback>@oldInduction.CpdCpdModifiedOn.ValueOrDefault()!.ToString(TimelineItem.TimestampFormat)</govuk-summary-list-row-value>
-                        </govuk-summary-list-row>
-                    }
-                </govuk-summary-list>
-            </govuk-details-text>
-        </govuk-details>
+                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionExemptionReasons))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="old-exemption-reason">
+                                    @if (oldInduction.ExemptionReasonIds.Length > 0)
+                                    {
+                                        <ul class="govuk-list">
+                                            @foreach (var id in oldInduction.ExemptionReasonIds)
+                                            {
+                                                <li>@exemptionReasons[id].Name</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span use-empty-fallback></span>
+                                    }
+                                </govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+
+                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldInduction.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+
+                        @if (updatedEvent.Changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Completed date</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="old-completed-date" use-empty-fallback>@oldInduction.CompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+
+                        @if (oldInduction.CpdCpdModifiedOn.HasValue)
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>CPD modified on</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value data-testid="old-cpd-modified-on" use-empty-fallback>@oldInduction.CpdCpdModifiedOn.ValueOrDefault()!.ToString(TimelineItem.TimestampFormat)</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        </div>
     </div>
-</div>
+}
