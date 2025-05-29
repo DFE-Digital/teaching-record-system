@@ -8,6 +8,7 @@ public class CommonPageTests : TestBase
     public CommonPageTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FileServiceMock.Invocations.Clear();
     }
 
     public override void Dispose()

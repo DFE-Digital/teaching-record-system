@@ -19,11 +19,10 @@ public abstract class CommonJourneyPage(
 
     [FromRoute]
     public Guid PersonId { get; set; }
+    public string? PersonName { get; set; }
 
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
-
-    public string? PersonName { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {

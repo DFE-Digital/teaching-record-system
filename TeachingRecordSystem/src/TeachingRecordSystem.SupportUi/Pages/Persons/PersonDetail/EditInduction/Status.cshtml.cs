@@ -2,25 +2,27 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock)
-    : CommonJourneyPage(linkGenerator)
+public class StatusModel(
+    TrsLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    IClock clock,
+    IFileService fileService)
+    : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
     private bool _inductionStatusManagedByCpd;
-
-    [FromQuery]
-    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [Display(Name = "What is their induction status?")]
     [NotEqual(InductionStatus.None, ErrorMessage = "Select a status")]
     public InductionStatus InductionStatus { get; set; }
     public InductionStatus CurrentInductionStatus { get; set; }
-    public string? PersonName { get; set; }
+
     public IEnumerable<InductionStatusInfo> StatusChoices
     {
         get
@@ -97,18 +99,12 @@ public class StatusModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext,
         return Redirect(GetPageLink(NextPage));
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.Status);
+        await base.OnPageHandlerExecutingAsync(context);
 
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
+        var person = await DbContext.Persons.SingleAsync(q => q.PersonId == PersonId);
         _inductionStatusManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         CurrentInductionStatus = JourneyInstance!.State.CurrentInductionStatus;
-
-        await next();
     }
 }
