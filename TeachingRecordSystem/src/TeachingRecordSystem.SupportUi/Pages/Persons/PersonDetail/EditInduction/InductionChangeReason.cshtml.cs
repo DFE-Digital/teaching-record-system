@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Humanizer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
@@ -13,13 +12,8 @@ public class InductionChangeReasonModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     IFileService fileService)
-    : CommonJourneyPage(linkGenerator)
+    : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    public string? PersonName { get; set; }
-
-    [FromQuery]
-    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
-
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
     [Display(Name = "Why are you changing the induction details?")]
@@ -45,12 +39,16 @@ public class InductionChangeReasonModel(
     [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
     public IFormFile? EvidenceFile { get; set; }
 
+    [BindProperty]
     public Guid? EvidenceFileId { get; set; }
 
+    [BindProperty]
     public string? EvidenceFileName { get; set; }
 
+    [BindProperty]
     public string? EvidenceFileSizeDescription { get; set; }
 
+    [BindProperty]
     public string? UploadedEvidenceFileUrl { get; set; }
 
     protected InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
@@ -81,8 +79,11 @@ public class InductionChangeReasonModel(
         HasAdditionalReasonDetail = JourneyInstance!.State.HasAdditionalReasonDetail;
         ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail;
         UploadEvidence = JourneyInstance?.State.UploadEvidence;
+        EvidenceFileId = JourneyInstance?.State.EvidenceFileId;
+        EvidenceFileName = JourneyInstance?.State.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance?.State.EvidenceFileSizeDescription;
         UploadedEvidenceFileUrl = JourneyInstance?.State.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
     }
 
@@ -92,66 +93,57 @@ public class InductionChangeReasonModel(
         {
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
+
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
         }
+
+        // Delete any previously uploaded file if they're uploading a new one,
+        // or choosing not to upload evidence (check for UploadEvidence != true because if
+        // UploadEvidence somehow got set to null we still want to delete the file)
+        if (EvidenceFileId.HasValue && (EvidenceFile is not null || UploadEvidence != true))
+        {
+            await FileService.DeleteFileAsync(EvidenceFileId.Value);
+            EvidenceFileName = null;
+            EvidenceFileSizeDescription = null;
+            UploadedEvidenceFileUrl = null;
+            EvidenceFileId = null;
+        }
+
+        // Upload the file even if the rest of the form is invalid
+        // otherwise the user will have to re-upload every time they re-submit
+        if (UploadEvidence == true)
+        {
+            // Upload the file and set the display fields
+            if (EvidenceFile is not null)
+            {
+                using var stream = EvidenceFile.OpenReadStream();
+                var evidenceFileId = await FileService.UploadFileAsync(stream, EvidenceFile.ContentType);
+                EvidenceFileId = evidenceFileId;
+                EvidenceFileName = EvidenceFile?.FileName;
+                EvidenceFileSizeDescription = EvidenceFile?.Length.Bytes().Humanize();
+                UploadedEvidenceFileUrl = await FileService.GetFileUrlAsync(evidenceFileId, FileUploadDefaults.FileUrlExpiry);
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
-        }
-        if (UploadEvidence == true)
-        {
-            if (EvidenceFile is not null)
-            {
-                if (EvidenceFileId is not null)
-                {
-                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
-                }
-
-                using var stream = EvidenceFile.OpenReadStream();
-                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
-                await JourneyInstance!.UpdateStateAsync(state =>
-                {
-                    state.EvidenceFileId = evidenceFileId;
-                    state.EvidenceFileName = EvidenceFile.FileName;
-                    state.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
-                });
-            }
-        }
-        else if (EvidenceFileId is not null)
-        {
-            await fileService.DeleteFileAsync(EvidenceFileId.Value);
-            await JourneyInstance!.UpdateStateAsync(state =>
-            {
-                state.EvidenceFileId = null;
-                state.EvidenceFileName = null;
-                state.EvidenceFileSizeDescription = null;
-            });
         }
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.ChangeReason = ChangeReason;
             state.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail = ChangeReasonDetail;
+            state.ChangeReasonDetail = HasAdditionalReasonDetail is true ? ChangeReasonDetail : null;
             state.UploadEvidence = UploadEvidence;
+            state.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
+            state.EvidenceFileName = UploadEvidence is true ? EvidenceFileName : null;
+            state.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
+
         });
 
         return Redirect(GetPageLink(NextPage));
-    }
-
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
-    {
-        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.Status);
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-        EvidenceFileId = JourneyInstance!.State.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.EvidenceFileSizeDescription;
-
-        await next();
     }
 }

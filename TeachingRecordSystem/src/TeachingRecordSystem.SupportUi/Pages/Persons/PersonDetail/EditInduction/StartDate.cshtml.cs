@@ -3,21 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 [Journey(JourneyNames.EditInduction), ActivatesJourney, RequireJourneyInstance]
-public class StartDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbContext, IClock clock)
-    : CommonJourneyPage(linkGenerator)
+public class StartDateModel(
+    TrsLinkGenerator linkGenerator,
+    TrsDbContext dbContext,
+    IClock clock,
+    IFileService fileService)
+    : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
     private InductionStatus InductionStatus => JourneyInstance!.State.InductionStatus;
 
     public DateOnly? CompletedDate => JourneyInstance!.State.CompletedDate;
-
-    public string? PersonName { get; set; }
-
-    [FromQuery]
-    public JourneyFromCheckYourAnswersPage? FromCheckAnswers { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -86,20 +86,16 @@ public class StartDateModel(TrsLinkGenerator linkGenerator, TrsDbContext dbConte
         return Redirect(NextPage);
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override InductionJourneyPage StartPage => InductionJourneyPage.StartDate;
+
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await JourneyInstance!.State.EnsureInitializedAsync(dbContext, PersonId, InductionJourneyPage.StartDate);
+        await base.OnPageHandlerExecutingAsync(context);
 
         if (!JourneyInstance!.State.InductionStatus.RequiresStartDate())
         {
             context.Result = Redirect(GetPageLink(JourneyInstance!.State.JourneyStartPage));
             return;
         }
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
-
-        await next();
     }
 }

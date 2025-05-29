@@ -724,6 +724,85 @@ public class ChangeLogInductionEventTests : TestBase
             });
     }
 
+    [Fact]
+
+    public async Task Person_WithPersonInductionUpdatedEvent_ChangesNotRelevant_EventNotRendered()
+    {
+        // Arrange
+        var changes = PersonInductionUpdatedEventChanges.InductionExemptWithoutReason;
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        DateOnly? oldStartDate = Clock.Today.AddYears(-1);
+        DateOnly? oldCompletedDate = Clock.Today.AddDays(-10);
+        InductionStatus oldInductionStatus = InductionStatus.Exempt;
+        Guid[] oldExemptionReasons = [Guid.Parse("5a80cee8-98a8-426b-8422-b0e81cb49b36")];
+        string[] oldExemptionReasonNames = ["Qualified before 07 May 2000"];
+        var oldCpdModifiedOn = Clock.UtcNow.AddDays(-2);
+
+        DateOnly? startDate = oldStartDate;
+        DateOnly? completedDate = oldCompletedDate;
+        InductionStatus inductionStatus = oldInductionStatus;
+        Guid[] exemptionReasons = oldExemptionReasons;
+        string[] exemptionReasonNames = oldExemptionReasonNames;
+        var cpdModifiedOn = Clock.UtcNow;
+
+        var changeReason = InductionChangeReasonOption.AnotherReason.GetDisplayName();
+        var changeReasonDetail = "Reason detail";
+
+        var induction = new EventModels.Induction
+        {
+            StartDate = null,
+            CompletedDate = null,
+            Status = InductionStatus.None,
+            StatusWithoutExemption = InductionStatus.Passed,
+            ExemptionReasonIds = [],
+            CpdCpdModifiedOn = Option.None<DateTime>(),
+            InductionExemptWithoutReason = false
+        };
+
+        var oldInduction = new EventModels.Induction
+        {
+            StartDate = null,
+            CompletedDate = null,
+            Status = InductionStatus.None,
+            StatusWithoutExemption = InductionStatus.Passed,
+            ExemptionReasonIds = [],
+            CpdCpdModifiedOn = Option.None<DateTime>(),
+            InductionExemptWithoutReason = true
+        };
+
+        var updatedEvent = new PersonInductionUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            Induction = induction,
+            OldInduction = oldInduction,
+            Changes = changes,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            EvidenceFile = null
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Empty(doc.GetAllElementsByTestId("timeline-item-person-induction-updated-event"));
+    }
+
     [Flags]
     public enum DqtInductionFields
     {
