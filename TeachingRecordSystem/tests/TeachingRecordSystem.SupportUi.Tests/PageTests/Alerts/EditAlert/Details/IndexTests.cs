@@ -74,7 +74,7 @@ public class IndexTests : DetailsTestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(alert.Details, doc.GetElementById("Details")?.TextContent);
+        Assert.Equal(alert.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class IndexTests : DetailsTestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TextContent);
+        Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
     [Theory]

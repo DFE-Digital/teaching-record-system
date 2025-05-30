@@ -27,7 +27,7 @@ public static partial class AssertEx
         }
 
         var vht = errorElement.GetElementsByTagName("span")[0];
-        var errorMessage = errorElement.InnerHtml[vht.OuterHtml.Length..];
+        var errorMessage = errorElement.InnerHtml.Replace(vht.OuterHtml, "").Trim();
         Assert.Equal(expectedMessage, errorMessage);
     }
 
@@ -44,12 +44,12 @@ public static partial class AssertEx
         {
             var heading = banner.GetElementsByClassName("govuk-notification-banner__heading").SingleOrDefault();
 
-            Assert.Equal(expectedHeading, heading?.TextContent?.Trim());
+            Assert.Equal(expectedHeading, heading?.TrimmedText());
         }
 
         if (expectedMessage != null)
         {
-            var message = string.Join("\n", banner.QuerySelectorAll(".govuk-notification-banner p").Select(e => e.TextContent.Trim()));
+            var message = string.Join("\n", banner.QuerySelectorAll(".govuk-notification-banner p").Select(e => e.TrimmedText()));
 
             Assert.Equal(expectedMessage, message);
         }
@@ -67,24 +67,24 @@ public static partial class AssertEx
 
     public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, string expected)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
         var value = label.NextElementSibling;
-        Assert.Equal(expected, value!.TextContent.Trim());
+        Assert.Equal(expected, value!.TrimmedText());
     }
 
     public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, IEnumerable<string> expected)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
-        var value = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TextContent.Trim());
+        var value = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TrimmedText());
         Assert.NotEmpty(value);
         Assert.Equal(expected, value);
     }
 
     public static void AssertChangeLinkExists(this IHtmlDocument doc, string keyContent)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
         var value = label.NextElementSibling;
         Assert.NotNull(value!.NextElementSibling!.GetElementsByTagName("a").First());
@@ -92,7 +92,7 @@ public static partial class AssertEx
 
     public static void AssertNoChangeLink(this IHtmlDocument doc, string keyContent)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
         var value = label.NextElementSibling;
         Assert.Null(value!.NextElementSibling);
@@ -121,13 +121,13 @@ public static partial class AssertEx
 
     public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string keyContent)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TextContent == keyContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
         Assert.Null(label);
     }
 
     public static void AssertSummaryListValue<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == keyContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
         Assert.NotNull(label);
         var element = label.NextElementSibling;
         Assert.NotNull(element);

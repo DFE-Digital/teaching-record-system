@@ -60,7 +60,7 @@ public class AlertDetailsTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var h1 = doc.GetElementsByTagName("h1").Single();
-        Assert.Equal(alert.AlertType!.Name, h1.TextContent);
+        Assert.Equal(alert.AlertType!.Name, h1.TrimmedText());
 
         Assert.Equal(alert.Details, doc.GetSummaryListValueForKey("Details"));
         Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("Start date"));

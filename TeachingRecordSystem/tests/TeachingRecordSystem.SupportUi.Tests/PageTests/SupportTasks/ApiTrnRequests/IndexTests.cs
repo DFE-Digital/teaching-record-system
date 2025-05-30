@@ -55,7 +55,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         {
             var column = resultRow.GetElementByTestId(testId);
             Assert.NotNull(column);
-            Assert.Equal(expectedText, column.TextContent.Trim());
+            Assert.Equal(expectedText, column.TrimmedText());
         }
     }
 
@@ -503,7 +503,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
         static void AssertSourceColumnEquals(IElement row, string expectedSource)
         {
             var source = row.Children[3];
-            Assert.Equal(expectedSource, source.TextContent.Trim());
+            Assert.Equal(expectedSource, source.TrimmedText());
         }
     }
 

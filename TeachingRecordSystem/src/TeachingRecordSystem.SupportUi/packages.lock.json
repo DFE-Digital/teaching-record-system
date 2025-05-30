@@ -14,11 +14,13 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.7.1, )",
-        "resolved": "2.7.1",
-        "contentHash": "dlX2w/P5sc4hscddOij6HPqocWJkoHlY++++r6qtro+itMVRz7gmJwVMOeZrvLYPmzu8DSKiyXA7m4dXUbEIoQ==",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "3tZpIv6a5blHTlbs9lwNTUKcj2xINO2suSDIQKJ3Bd3SE1hi+RP4Q8gd9JnY+alMjxKX2pML2D4eXh0JV35t9Q==",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.11"
+          "Fluid.Core": "[2.15.0, 3.0.0)",
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.16",
+          "SoftCircuits.HtmlMonkey": "3.0.0"
         }
       },
       "Humanizer.Core": {
@@ -180,6 +182,16 @@
         "type": "Transitive",
         "resolved": "3.0.4",
         "contentHash": "kgt6jRnomAaRvb6c/2kRIGXYeDH9MdLr8MuHXejwnw32JI7/B8z5d6LIEd9TpDWjDGgvQ3UQtxkyYtpJyJdTRQ=="
+      },
+      "Fluid.Core": {
+        "type": "Transitive",
+        "resolved": "2.15.0",
+        "contentHash": "J0x83Z99D2WwtUuMuD21w5b31T1P960IkK3MYvlwDiPUEWtqD5tndHguthI+JCkzlMgnfR4R9d3CQUmEwCNTAg==",
+        "dependencies": {
+          "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0",
+          "Parlot": "1.2.2",
+          "TimeZoneConverter": "6.1.0"
+        }
       },
       "Google.Api.Gax": {
         "type": "Transitive",
@@ -467,8 +479,8 @@
       },
       "Microsoft.Extensions.FileProviders.Embedded": {
         "type": "Transitive",
-        "resolved": "8.0.11",
-        "contentHash": "1tn+c7d628+dASqo0UezdeWdKrEpp2XA376MUkr4nFYDj295iPWeWOV8rOvgR0Gma1xfOEjNJur1QvS6AVnjng==",
+        "resolved": "8.0.16",
+        "contentHash": "YIo25vIQ4sMG4zAVNz08zVFMsbKN38D9BJKWfE+V5AJ6irPDQthlYGmADBdoWNNY9U6PwDE6ba0o4DhU9RiTRg==",
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0"
         }
@@ -1008,6 +1020,11 @@
         "resolved": "5.2.0",
         "contentHash": "CMzogVlVEaeZK/xlYPAeqDsZM01512x4dMQsgFKH2RzE+o5tI8LzpwX+0pQ2WKaNq6cl82zDEHS2rnOPIOUCUg=="
       },
+      "Parlot": {
+        "type": "Transitive",
+        "resolved": "1.2.2",
+        "contentHash": "Vz4SFXeF5BKiQ8jjnkYxw3B8ZVXrl/TcT6RM9hH8+HGLeSqpnWmYi1BidUlchwVFlliW6lorv4TAcGPFvhPj0Q=="
+      },
       "Pipelines.Sockets.Unofficial": {
         "type": "Transitive",
         "resolved": "2.2.8",
@@ -1157,6 +1174,11 @@
         "type": "Transitive",
         "resolved": "1.1.6",
         "contentHash": "aLJu7Q0mVk0e9QwjJLEh70tXQ0Url8fHITrHXwqF+eq7N20jGMOhkmTXUUjpPim+rCm0I4fARcVBRzJPSipN+w=="
+      },
+      "SoftCircuits.HtmlMonkey": {
+        "type": "Transitive",
+        "resolved": "3.0.0",
+        "contentHash": "+6WOklC83vg3aKXml7pXghQGH7cR7k7A0kP9OUlF8lH/JfvhOLdVkHgULoGes0pYIQCJX0hDUnFHbPV0LL2k9Q=="
       },
       "StackExchange.Redis": {
         "type": "Transitive",
@@ -2296,6 +2318,11 @@
           "System.Xml.ReaderWriter": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
         }
+      },
+      "TimeZoneConverter": {
+        "type": "Transitive",
+        "resolved": "6.1.0",
+        "contentHash": "UGdtyKWJqXXinyvGB9X6NVoIYbTAidoZYmn3aXzxeEYC9+OL8vF36eDt1qjb6RqBkWDl4v7iE84ecI+dFhA80A=="
       },
       "ZstdSharp.Port": {
         "type": "Transitive",

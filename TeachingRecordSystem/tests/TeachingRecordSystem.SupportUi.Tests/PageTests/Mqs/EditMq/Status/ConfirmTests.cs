@@ -111,8 +111,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isStatusChange)
         {
-            Assert.Equal(oldStatus.HasValue ? oldStatus.Value.GetTitle() : "None", changeSummary.GetElementByTestId("current-status")!.TextContent);
-            Assert.Equal(newStatus.GetTitle(), changeSummary.GetElementByTestId("new-status")!.TextContent);
+            Assert.Equal(oldStatus.HasValue ? oldStatus.Value.GetTitle() : "None", changeSummary.GetElementByTestId("current-status")!.TrimmedText());
+            Assert.Equal(newStatus.GetTitle(), changeSummary.GetElementByTestId("new-status")!.TrimmedText());
         }
         else
         {
@@ -122,8 +122,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isEndDateChange)
         {
-            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("current-end-date")!.TextContent);
-            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("new-end-date")!.TextContent);
+            Assert.Equal(oldEndDate.HasValue ? oldEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("current-end-date")!.TrimmedText());
+            Assert.Equal(newEndDate.HasValue ? newEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : "None", changeSummary.GetElementByTestId("new-end-date")!.TrimmedText());
         }
         else
         {
@@ -131,8 +131,8 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
             Assert.Null(changeSummary.GetElementByTestId("new-end-date"));
         }
 
-        Assert.Equal(changeReason, changeSummary.GetElementByTestId("change-reason")!.TextContent);
-        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
+        Assert.Equal(changeReason, changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
         var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
         if (uploadEvidence)
         {

@@ -78,7 +78,7 @@ public class ChangeReasonTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("reason-options-legend");
-        Assert.Equal("Why are you changing the induction details?", reasonChoicesLegend!.TextContent);
+        Assert.Equal("Why are you changing the induction details?", reasonChoicesLegend!.TrimmedText());
         var reasonChoices = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -86,7 +86,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(expectedChoices, reasonChoices);
 
         var additionalDetailLegend = doc.GetElementByTestId("has-additional-reason_detail-options-legend");
-        Assert.Equal("Do you want to add more information about why you’re changing the induction details?", additionalDetailLegend!.TextContent);
+        Assert.Equal("Do you want to add more information about why you’re changing the induction details?", additionalDetailLegend!.TrimmedText());
         var additionalDetailChoices = doc.GetElementByTestId("has-additional-reason_detail-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -94,7 +94,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(new[] { "True", "False" }, additionalDetailChoices);
 
         var uploadEvidenceChoicesLegend = doc.GetElementByTestId("upload-evidence-options-legend");
-        Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TextContent);
+        Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TrimmedText());
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -250,7 +250,7 @@ public class ChangeReasonTests : TestBase
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
-        Assert.Equal("validfile.png (1.2 KB)", link.TextContent);
+        Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
         Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
@@ -296,7 +296,7 @@ public class ChangeReasonTests : TestBase
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
-        Assert.Equal("testfile.jpg (3 KB)", link.TextContent);
+        Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal("http://test.com/file", link.Href);
 
         Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));

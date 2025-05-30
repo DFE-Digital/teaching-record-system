@@ -37,7 +37,7 @@ public class NotesTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
         var noNotesMessage = doc.GetElementByTestId("no-dqt-notes");
         Assert.NotNull(noNotesMessage);
-        Assert.Equal("There are no notes associated with this record", noNotesMessage.TextContent);
+        Assert.Equal("There are no notes associated with this record", noNotesMessage.TrimmedText());
     }
 
     [Fact]
@@ -61,13 +61,13 @@ public class NotesTests : TestBase
         Assert.Null(noNotesMessage);
         var createdby = doc.GetElementByTestId($"{note.NoteId}-dqt-note-created-by");
         Assert.NotNull(createdby);
-        Assert.Equal(expectedCreatedBy, createdby.TextContent);
+        Assert.Equal(expectedCreatedBy, createdby.TrimmedText());
         var createddate = doc.GetElementByTestId($"{note.NoteId}-dqt-note-created-on");
         Assert.NotNull(createddate);
-        Assert.Equal(note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TextContent);
+        Assert.Equal(note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TrimmedText());
         var noteText = doc.GetElementByTestId($"{note.NoteId}-dqt-note-text");
         Assert.NotNull(noteText);
-        Assert.Equal(expectedNoteText, noteText.TextContent);
+        Assert.Equal(expectedNoteText, noteText.TrimmedText());
         var originalFileName = doc.GetElementByTestId($"{note.NoteId}-dqt-note-file-name");
         Assert.Null(originalFileName);
     }
@@ -94,16 +94,16 @@ public class NotesTests : TestBase
         Assert.Null(noNotesMessage);
         var createdby = doc.GetElementByTestId($"{note.NoteId}-dqt-note-created-by");
         Assert.NotNull(createdby);
-        Assert.Equal(expectedCreatedBy, createdby.TextContent);
+        Assert.Equal(expectedCreatedBy, createdby.TrimmedText());
         var createddate = doc.GetElementByTestId($"{note.NoteId}-dqt-note-created-on");
         Assert.NotNull(createddate);
-        Assert.Equal(note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TextContent);
+        Assert.Equal(note.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TrimmedText());
         var noteText = doc.GetElementByTestId($"{note.NoteId}-dqt-note-text");
         Assert.NotNull(noteText);
-        Assert.Equal(expectedNoteText, noteText.TextContent);
+        Assert.Equal(expectedNoteText, noteText.TrimmedText());
         var originalFileName = doc.GetElementByTestId($"{note.NoteId}-dqt-note-file-name");
         Assert.NotNull(originalFileName);
-        Assert.Equal(expectedOriginalFileName, originalFileName.TextContent);
+        Assert.Equal(expectedOriginalFileName, originalFileName.TrimmedText());
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class NotesTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
         var noteText = doc.GetElementByTestId($"{note.NoteId}-dqt-note-text");
         Assert.NotNull(noteText);
-        Assert.Equal(expectedNoteText, noteText.TextContent);
+        Assert.Equal(expectedNoteText, noteText.TrimmedText());
     }
 
     [Fact]
@@ -160,31 +160,31 @@ public class NotesTests : TestBase
             {
                 var createdby = item1.GetElementByTestId($"{note2.NoteId}-dqt-note-created-by");
                 Assert.NotNull(createdby);
-                Assert.Equal(expectedCreatedBy2, createdby.TextContent);
+                Assert.Equal(expectedCreatedBy2, createdby.TrimmedText());
                 var createddate = item1.GetElementByTestId($"{note2.NoteId}-dqt-note-created-on");
                 Assert.NotNull(createddate);
-                Assert.Equal(note2.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TextContent);
+                Assert.Equal(note2.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TrimmedText());
                 var noteText = item1.GetElementByTestId($"{note2.NoteId}-dqt-note-text");
                 Assert.NotNull(noteText);
-                Assert.Equal(expectedNoteText2, noteText.TextContent);
+                Assert.Equal(expectedNoteText2, noteText.TrimmedText());
                 var originalFileName = item1.GetElementByTestId($"{note2.NoteId}-dqt-note-file-name");
                 Assert.NotNull(originalFileName);
-                Assert.Equal(expectedOriginalFileName2, originalFileName.TextContent);
+                Assert.Equal(expectedOriginalFileName2, originalFileName.TrimmedText());
             },
             item2 =>
             {
                 var createdby = item2.GetElementByTestId($"{note1.NoteId}-dqt-note-created-by");
                 Assert.NotNull(createdby);
-                Assert.Equal(expectedCreatedBy1, createdby.TextContent);
+                Assert.Equal(expectedCreatedBy1, createdby.TrimmedText());
                 var createddate = item2.GetElementByTestId($"{note1.NoteId}-dqt-note-created-on");
                 Assert.NotNull(createddate);
-                Assert.Equal(note1.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TextContent);
+                Assert.Equal(note1.CreatedOn.ToString("dd MMMM yyyy 'at' HH:mm"), createddate.TrimmedText());
                 var noteText = item2.GetElementByTestId($"{note1.NoteId}-dqt-note-text");
                 Assert.NotNull(noteText);
-                Assert.Equal(expectedNoteText1, noteText.TextContent);
+                Assert.Equal(expectedNoteText1, noteText.TrimmedText());
                 var originalFileName = item2.GetElementByTestId($"{note1.NoteId}-dqt-note-file-name");
                 Assert.NotNull(originalFileName);
-                Assert.Equal(expectedOriginalFileName1, originalFileName.TextContent);
+                Assert.Equal(expectedOriginalFileName1, originalFileName.TrimmedText());
             });
     }
 }

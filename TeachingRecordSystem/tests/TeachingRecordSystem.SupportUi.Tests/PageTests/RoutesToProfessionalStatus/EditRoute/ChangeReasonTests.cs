@@ -85,7 +85,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("reason-options-legend");
-        Assert.Equal("Why are you editing this route?", reasonChoicesLegend!.TextContent);
+        Assert.Equal("Why are you editing this route?", reasonChoicesLegend!.TrimmedText());
         var reasonChoices = doc.GetElementByTestId("reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
              .Select(i => i.Value);

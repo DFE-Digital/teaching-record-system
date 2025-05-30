@@ -41,7 +41,7 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("edit-details-caption");
-        Assert.Equal("Alfred The Great", caption!.TextContent);
+        Assert.Equal("Alfred The Great", caption!.TrimmedText());
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public class IndexTests : TestBase
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
         Assert.Collection(buttons,
-            b => Assert.Equal("Continue", b.TextContent),
-            b => Assert.Equal("Cancel and return to record", b.TextContent));
+            b => Assert.Equal("Continue", b.TrimmedText()),
+            b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
     [Fact]

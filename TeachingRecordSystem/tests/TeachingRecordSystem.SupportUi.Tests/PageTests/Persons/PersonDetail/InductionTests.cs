@@ -47,7 +47,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TextContent);
+        Assert.Contains(expectedWarning, doc.GetElementByTestId("induction-status-warning")!.TrimmedText());
         Assert.Null(doc.GetElementByTestId("induction-card"));
     }
 
@@ -71,7 +71,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TextContent);
+        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
         Assert.Null(doc.GetElementByTestId("induction-end-date"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
@@ -102,8 +102,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(InductionStatus.Exempt.GetTitle(), inductionStatus!.TextContent);
-        var exemptionReason = doc.GetElementByTestId("induction-exemption-reasons")!.Children[1].TextContent;
+        Assert.Contains(InductionStatus.Exempt.GetTitle(), inductionStatus!.TrimmedText());
+        var exemptionReason = doc.GetElementByTestId("induction-exemption-reasons")!.Children[1].TrimmedText();
         Assert.Contains(expectedExemptionReasonText, exemptionReason);
         Assert.Null(doc.GetElementByTestId("induction-start-date"));
         Assert.Null(doc.GetElementByTestId("induction-end-date"));
@@ -133,8 +133,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TextContent);
-        var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
+        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
+        var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TrimmedText();
         Assert.Contains(setStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), startDate);
         Assert.Null(doc.GetElementByTestId("induction-exemption-reasons"));
         Assert.NotNull(doc.GetAllElementsByTestId("induction-backlink"));
@@ -157,7 +157,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TextContent;
+        var startDate = doc.GetElementByTestId("induction-start-date")!.Children[1].TrimmedText();
         Assert.True(string.IsNullOrWhiteSpace(startDate.Trim()));
     }
 
@@ -186,8 +186,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TextContent);
-        var completedDate = doc.GetElementByTestId("induction-completed-date")!.Children[1].TextContent;
+        Assert.Contains(setInductionStatus.GetTitle(), inductionStatus!.TrimmedText());
+        var completedDate = doc.GetElementByTestId("induction-completed-date")!.Children[1].TrimmedText();
         Assert.Contains(setCompletedDate.ToString(UiDefaults.DateOnlyDisplayFormat), completedDate);
     }
 
@@ -235,7 +235,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (hasReadWriteAccess)
         {
-            var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TextContent;
+            var warningMessage = doc.GetElementByTestId("induction-status-warning")!.Children[1].TrimmedText();
             Assert.Contains(expectedWarningMessage, warningMessage);
         }
         else
@@ -336,7 +336,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var inductionStatus = doc.GetElementByTestId("induction-status");
-        Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TextContent);
+        Assert.Contains("Change", inductionStatus!.GetElementsByTagName("a")[0].TrimmedText());
     }
 
     [Fact]

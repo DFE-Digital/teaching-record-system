@@ -45,7 +45,7 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("check-answers-caption");
-        Assert.Equal("Alfred The Great", caption!.TextContent);
+        Assert.Equal("Alfred The Great", caption!.TrimmedText());
     }
 
     [Fact]
@@ -72,8 +72,8 @@ public class CheckAnswersTests : TestBase
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
         Assert.Collection(buttons,
-            b => Assert.Equal("Confirm changes", b.TextContent),
-            b => Assert.Equal("Cancel and return to record", b.TextContent));
+            b => Assert.Equal("Confirm changes", b.TrimmedText()),
+            b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
     public static IEnumerable<object[]> GetInvalidStateData()
@@ -141,12 +141,12 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Teacher reference number (TRN)", v => Assert.Equal(person.Trn!, v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Date of birth", v => Assert.Equal("1 February 1980", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Email", v => Assert.Equal("test@test.com", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
+        doc.AssertSummaryListValue("Teacher reference number (TRN)", v => Assert.Equal(person.Trn!, v.TrimmedText()));
+        doc.AssertSummaryListValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
+        doc.AssertSummaryListValue("Email", v => Assert.Equal("test@test.com", v.TrimmedText()));
+        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
+        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
         doc.AssertSummaryListRowDoesNotExist("Previous name");
     }
 
@@ -212,8 +212,8 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Previous name", v => Assert.Equal("Alfred The Great", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
+        doc.AssertSummaryListValue("Previous name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
     }
 
     [Fact]
@@ -241,11 +241,11 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred Great", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Teacher reference number (TRN)", v => Assert.Equal("Not provided", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Email", v => Assert.Equal("Not provided", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
+        doc.AssertSummaryListValue("Teacher reference number (TRN)", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Email", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]
@@ -272,13 +272,13 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for changing record", v => Assert.Equal("Another reason", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Reason for changing record", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
         doc.AssertSummaryListValue("Do you have evidence to upload", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
-            Assert.Equal("evidence.pdf (opens in new tab)", link.TextContent.Trim());
+            Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
     }
@@ -307,9 +307,9 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for changing record", v => Assert.Equal("Data loss or incomplete information", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal("Not provided", v.TextContent.Trim()));
-        doc.AssertSummaryListValue("Do you have evidence to upload", v => Assert.Equal("Not provided", v.TextContent.Trim()));
+        doc.AssertSummaryListValue("Reason for changing record", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Do you have evidence to upload", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     public static IEnumerable<object[]> GetFieldChangeData()

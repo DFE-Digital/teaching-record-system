@@ -58,10 +58,10 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
             card =>
             {
                 var title = card.GetElementsByClassName("govuk-summary-card__title").SingleOrDefault();
-                Assert.Equal(alert.AlertType!.Name, title?.TextContent);
+                Assert.Equal(alert.AlertType!.Name, title?.TrimmedText());
 
                 Assert.Equal(alert.Details, card.GetSummaryListValueForKey("Details"));
-                Assert.Equal(alert.ExternalLink, card.GetSummaryListValueElementForKey("Link")?.GetElementsByTagName("a").FirstOrDefault()?.TextContent);
+                Assert.Equal(alert.ExternalLink, card.GetSummaryListValueElementForKey("Link")?.GetElementsByTagName("a").FirstOrDefault()?.TrimmedText());
                 Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), card.GetSummaryListValueForKey("Start date"));
                 Assert.Equal(UiDefaults.EmptyDisplayContent, card.GetSummaryListValueForKey("End date"));
             });
@@ -108,9 +108,9 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
             closedAlertsTable.GetElementsByTagName("tbody").Single().GetElementsByTagName("tr"),
             row => Assert.Collection(
                 row.GetElementsByTagName("td"),
-                column => Assert.Equal(alert.AlertType!.Name, column.TextContent),
-                column => Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TextContent),
-                column => Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TextContent),
+                column => Assert.Equal(alert.AlertType!.Name, column.TrimmedText()),
+                column => Assert.Equal(alert.StartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TrimmedText()),
+                column => Assert.Equal(alert.EndDate?.ToString(UiDefaults.DateOnlyDisplayFormat), column.TrimmedText()),
                 column => { }));
     }
 
@@ -362,7 +362,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
         var actionColumn = row.QuerySelectorAll("td").Last();
-        Assert.Equal("", actionColumn.TextContent.Trim());
+        Assert.Equal("", actionColumn.TrimmedText());
     }
 
     [Fact]
@@ -385,7 +385,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
         var actionColumn = row.QuerySelectorAll("td").Last();
-        Assert.Equal("Delete alert", actionColumn.TextContent.Trim());
+        Assert.Equal("Delete alert", actionColumn.TrimmedText());
     }
 
     [Fact]
@@ -409,7 +409,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
         var actionColumn = row.QuerySelectorAll("td").Last();
-        Assert.Equal("", actionColumn.TextContent.Trim());
+        Assert.Equal("", actionColumn.TrimmedText());
     }
 
     [Fact]
@@ -433,7 +433,7 @@ public class AlertsTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.NotNull(closedAlerts);
         var row = closedAlerts.QuerySelectorAll("tbody>tr").First();
         var actionColumn = row.QuerySelectorAll("td").Last();
-        Assert.Equal("Delete alert", actionColumn.TextContent.Trim());
+        Assert.Equal("Delete alert", actionColumn.TrimmedText());
     }
 
     [Fact]

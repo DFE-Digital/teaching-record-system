@@ -22,4 +22,8 @@
     <ProjectReference Include="..\TeachingRecordSystem.WebCommon\TeachingRecordSystem.WebCommon.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\lib\**\*" />
+  </ItemGroup>
+
 </Project>
