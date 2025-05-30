@@ -97,9 +97,9 @@
                                 <govuk-pagination-ellipsis />
                             }
 
-                            <govuk-pagination-item asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@item" asp-route-sortby="@Model.SortBy" is-current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
+                            <govuk-pagination-item asp-page="Index" asp-route-search="@Model.Search" asp-route-pagenumber="@item" asp-route-sortby="@Model.SortBy" current="@(item == Model.PageNumber)">@item</govuk-pagination-item>
                         }
-                    }                    
+                    }
 
                     @if (Model.NextPage.HasValue)
                     {

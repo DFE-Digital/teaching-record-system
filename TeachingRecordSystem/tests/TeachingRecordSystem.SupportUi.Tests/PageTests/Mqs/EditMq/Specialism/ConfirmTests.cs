@@ -65,10 +65,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
-        Assert.Equal(oldMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("current-specialism")!.TextContent);
-        Assert.Equal(newMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("new-specialism")!.TextContent);
-        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TextContent);
-        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
+        Assert.Equal(oldMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("current-specialism")!.TrimmedText());
+        Assert.Equal(newMqSpecialism.GetTitle(), changeSummary.GetElementByTestId("new-specialism")!.TrimmedText());
+        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
         var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
         if (uploadEvidence)
         {
@@ -83,7 +83,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
-        // Arrange        
+        // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(

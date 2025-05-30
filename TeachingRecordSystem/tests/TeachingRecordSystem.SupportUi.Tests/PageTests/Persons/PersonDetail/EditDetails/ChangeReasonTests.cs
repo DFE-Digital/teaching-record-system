@@ -43,7 +43,7 @@ public class ChangeReasonTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("change-reason-caption");
-        Assert.Equal("Alfred The Great", caption!.TextContent);
+        Assert.Equal("Alfred The Great", caption!.TrimmedText());
     }
 
     [Fact]
@@ -68,8 +68,8 @@ public class ChangeReasonTests : TestBase
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
         Assert.Collection(buttons,
-            b => Assert.Equal("Continue", b.TextContent),
-            b => Assert.Equal("Cancel and return to record", b.TextContent));
+            b => Assert.Equal("Continue", b.TrimmedText()),
+            b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(true.ToString(), uploadEvidenceChoices);
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(doc.GetElementByTestId("uploaded-evidence-file-link"));
-        Assert.Equal("evidence.jpg (1.2 KB)", link.TextContent);
+        Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
         Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(doc, "EvidenceFileId"));
@@ -142,7 +142,7 @@ public class ChangeReasonTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         var reasonChoicesLegend = doc.GetElementByTestId("change-reason-options-legend");
-        Assert.Equal("Why are you changing this record?", reasonChoicesLegend!.TextContent);
+        Assert.Equal("Why are you changing this record?", reasonChoicesLegend!.TrimmedText());
         var reasonChoices = doc.GetElementByTestId("change-reason-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -150,7 +150,7 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(expectedChoices, reasonChoices);
 
         var uploadEvidenceChoicesLegend = doc.GetElementByTestId("upload-evidence-options-legend");
-        Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TextContent);
+        Assert.Equal("Do you want to upload evidence?", uploadEvidenceChoicesLegend!.TrimmedText());
         var uploadEvidenceChoices = doc.GetElementByTestId("upload-evidence-options")!
             .QuerySelectorAll<IHtmlInputElement>("input[type='radio']")
             .Where(i => i.IsChecked == false)
@@ -322,7 +322,7 @@ public class ChangeReasonTests : TestBase
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
-        Assert.Equal("validfile.png (1.2 KB)", link.TextContent);
+        Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
         Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
@@ -365,7 +365,7 @@ public class ChangeReasonTests : TestBase
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
         var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(html.GetElementByTestId("uploaded-evidence-file-link"));
-        Assert.Equal("testfile.jpg (3 KB)", link.TextContent);
+        Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal("http://test.com/file", link.Href);
 
         Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));

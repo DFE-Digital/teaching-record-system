@@ -119,13 +119,13 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         var item = doc.GetElementByTestId("timeline-item-details-updated-event");
         Assert.NotNull(item);
-        Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+        Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
         if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.AnyNameChange))
         {
-            Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", item.GetElementByTestId("details-name")?.TextContent.Trim());
-            Assert.Equal($"{oldFirstName} {oldMiddleName} {oldLastName}", item.GetElementByTestId("old-details-name")?.TextContent.Trim());
+            Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", item.GetElementByTestId("details-name")?.TrimmedText());
+            Assert.Equal($"{oldFirstName} {oldMiddleName} {oldLastName}", item.GetElementByTestId("old-details-name")?.TrimmedText());
         }
         else
         {
@@ -135,8 +135,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
-            Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("details-dob")?.TextContent.Trim());
-            Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-details-dob")?.TextContent.Trim());
+            Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("details-dob")?.TrimmedText());
+            Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-details-dob")?.TrimmedText());
         }
         else
         {
@@ -146,8 +146,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, item.GetElementByTestId("details-email")?.TextContent.Trim());
-            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, item.GetElementByTestId("old-details-email")?.TextContent.Trim());
+            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, item.GetElementByTestId("details-email")?.TrimmedText());
+            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, item.GetElementByTestId("old-details-email")?.TrimmedText());
         }
         else
         {
@@ -157,8 +157,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber))
         {
-            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : mobileNumber, item.GetElementByTestId("details-mobile")?.TextContent.Trim());
-            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldMobileNumber, item.GetElementByTestId("old-details-mobile")?.TextContent.Trim());
+            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : mobileNumber, item.GetElementByTestId("details-mobile")?.TrimmedText());
+            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldMobileNumber, item.GetElementByTestId("old-details-mobile")?.TrimmedText());
         }
         else
         {
@@ -168,8 +168,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
         {
-            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, item.GetElementByTestId("details-nino")?.TextContent.Trim());
-            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, item.GetElementByTestId("old-details-nino")?.TextContent.Trim());
+            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, item.GetElementByTestId("details-nino")?.TrimmedText());
+            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, item.GetElementByTestId("old-details-nino")?.TrimmedText());
         }
         else
         {
@@ -177,8 +177,8 @@ public class ChangeLogEditDetailsEventTests : TestBase
             Assert.Null(item.GetElementByTestId("old-details-nino"));
         }
 
-        Assert.Equal(changeReason, item.GetElementByTestId("reason")?.TextContent.Trim());
-        Assert.Equal(changeReasonDetail, item.GetElementByTestId("reason-detail")?.TextContent.Trim());
-        Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("uploaded-evidence-link")?.TextContent);
+        Assert.Equal(changeReason, item.GetElementByTestId("reason")?.TrimmedText());
+        Assert.Equal(changeReasonDetail, item.GetElementByTestId("reason-detail")?.TrimmedText());
+        Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
     }
 }

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <NoWarn>GFA0001</NoWarn>
 
     <IsTestProject Condition="'$(IsTestProject)' == '' and $(MSBuildProjectName.EndsWith('Tests'))">true</IsTestProject>
 

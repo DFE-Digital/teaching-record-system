@@ -235,7 +235,7 @@ public class MergeTests(HostFixture hostFixture) : ResolveApiTrnRequestTestBase(
 
         // Assert
         var doc = await response.GetDocumentAsync();
-        Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TextContent);
+        Assert.Equal(comments, doc.GetElementsByName("Comments").Single().TrimmedText());
     }
 
     [Fact]

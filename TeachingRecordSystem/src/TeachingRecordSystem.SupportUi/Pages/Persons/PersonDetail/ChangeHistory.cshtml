@@ -41,7 +41,7 @@ else
             }
             @foreach (var page in Model.PaginationPages!)
             {
-                <govuk-pagination-item href="@LinkGenerator.PersonChangeHistory(Model.PersonId, page)" is-current="false">@(page)</govuk-pagination-item>
+                <govuk-pagination-item href="@LinkGenerator.PersonChangeHistory(Model.PersonId, page)" current="false">@(page)</govuk-pagination-item>
             }
             @if (Model.GotNextPage)
             {

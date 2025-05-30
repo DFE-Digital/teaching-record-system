@@ -38,8 +38,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-created-event"),
             item =>
             {
-                Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -60,7 +60,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-created-event"),
-            item => Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim()));
+            item => Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText()));
     }
 
     [Fact]
@@ -86,16 +86,16 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
             item =>
             {
-                Assert.Equal($"By {deletedByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
-                Assert.Equal(deletionReason, item.GetElementByTestId("deletion-reason")?.TextContent.Trim());
-                Assert.Equal(deletionReasonDetail, item.GetElementByTestId("deletion-reason-detail")?.TextContent.Trim());
-                Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TextContent);
-                Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TextContent.Trim());
-                Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TextContent.Trim());
-                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim());
-                Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TextContent.Trim());
-                Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TextContent.Trim());
+                Assert.Equal($"By {deletedByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(deletionReason, item.GetElementByTestId("deletion-reason")?.TrimmedText());
+                Assert.Equal(deletionReasonDetail, item.GetElementByTestId("deletion-reason-detail")?.TrimmedText());
+                Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
+                Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
+                Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
+                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TrimmedText());
+                Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
             });
     }
 
@@ -120,15 +120,15 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
             item =>
             {
-                Assert.Equal($"By {deletedByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
-                Assert.Equal(deletionReason, item.GetElementByTestId("deletion-reason")?.TextContent.Trim());
-                Assert.Equal("None", item.GetElementByTestId("deletion-reason-detail")?.TextContent.Trim());
-                Assert.Equal("None", item.GetElementByTestId("provider")?.TextContent.Trim());
-                Assert.Equal("None", item.GetElementByTestId("specialism")?.TextContent.Trim());
-                Assert.Equal("None", item.GetElementByTestId("start-date")?.TextContent.Trim());
-                Assert.Equal("None", item.GetElementByTestId("status")?.TextContent.Trim());
-                Assert.Equal("None", item.GetElementByTestId("end-date")?.TextContent.Trim());
+                Assert.Equal($"By {deletedByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(deletionReason, item.GetElementByTestId("deletion-reason")?.TrimmedText());
+                Assert.Equal("None", item.GetElementByTestId("deletion-reason-detail")?.TrimmedText());
+                Assert.Equal("None", item.GetElementByTestId("provider")?.TrimmedText());
+                Assert.Equal("None", item.GetElementByTestId("specialism")?.TrimmedText());
+                Assert.Equal("None", item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal("None", item.GetElementByTestId("status")?.TrimmedText());
+                Assert.Equal("None", item.GetElementByTestId("end-date")?.TrimmedText());
             });
     }
 
@@ -171,7 +171,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
-            item => Assert.Equal(legacyProvider.dfeta_name, item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Equal(legacyProvider.dfeta_name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-deleted-event"),
-            item => Assert.Equal("None", item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Equal("None", item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -216,13 +216,13 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
             item =>
             {
-                Assert.Equal($"By {deactivatedByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
-                Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TextContent.Trim());
-                Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TextContent.Trim());
-                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim());
-                Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TextContent.Trim());
-                Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TextContent.Trim());
+                Assert.Equal($"By {deactivatedByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedText());
+                Assert.Equal(mq.Specialism!.Value.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText());
+                Assert.Equal(mq.StartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                Assert.Equal(mq.Status!.Value.GetTitle(), item.GetElementByTestId("status")?.TrimmedText());
+                Assert.Equal(mq.EndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText());
             });
     }
 
@@ -245,7 +245,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
-            item => Assert.Equal(legacyProvider.dfeta_name, item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Equal(legacyProvider.dfeta_name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-deactivated-event"),
-            item => Assert.Equal("None", item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Equal("None", item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -290,8 +290,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-imported-event"),
             item =>
             {
-                Assert.Equal($"By {importedByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {importedByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -359,8 +359,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-dqt-reactivated-event"),
             item =>
             {
-                Assert.Equal($"By {dqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {dqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -405,8 +405,8 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
             item =>
             {
-                Assert.Equal($"By {SystemUser.SystemUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {SystemUser.SystemUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -500,7 +500,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
-            item => Assert.Equal(migratedProvider?.Name, item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Equal(migratedProvider?.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -556,7 +556,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-migrated-event"),
-            item => Assert.Equal(migratedSpecialism?.GetTitle(), item.GetElementByTestId("specialism")?.TextContent.Trim()));
+            item => Assert.Equal(migratedSpecialism?.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
     [Fact]
@@ -591,12 +591,12 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
             item =>
             {
-                Assert.Equal($"By {updatedByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
-                Assert.Equal(changeReason, item.GetElementByTestId("change-reason")?.TextContent.Trim());
-                Assert.Equal(changeReasonDetail, item.GetElementByTestId("change-reason-detail")?.TextContent.Trim());
-                Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TextContent);
-                //Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TextContent.Trim());
+                Assert.Equal($"By {updatedByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(changeReason, item.GetElementByTestId("change-reason")?.TrimmedText());
+                Assert.Equal(changeReasonDetail, item.GetElementByTestId("change-reason-detail")?.TrimmedText());
+                Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("evidence")?.TrimmedText());
+                //Assert.Equal(mq.Provider!.Name, item.GetElementByTestId("provider")?.TrimmedTextContent());
             });
     }
 
@@ -626,9 +626,9 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
             item =>
             {
-                Assert.Null(item.GetElementByTestId("change-reason")?.TextContent.Trim());
-                Assert.Null(item.GetElementByTestId("change-reason-detail")?.TextContent.Trim());
-                Assert.Null(item.GetElementByTestId("evidence")?.TextContent);
+                Assert.Null(item.GetElementByTestId("change-reason")?.TrimmedText());
+                Assert.Null(item.GetElementByTestId("change-reason-detail")?.TrimmedText());
+                Assert.Null(item.GetElementByTestId("evidence")?.TrimmedText());
             });
     }
 
@@ -658,7 +658,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldProvider.Name, item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Equal(oldProvider.Name, item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -685,7 +685,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Null(item.GetElementByTestId("provider")?.TextContent.Trim()));
+            item => Assert.Null(item.GetElementByTestId("provider")?.TrimmedText()));
     }
 
     [Fact]
@@ -713,7 +713,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldSpecialism.GetTitle(), item.GetElementByTestId("specialism")?.TextContent.Trim()));
+            item => Assert.Equal(oldSpecialism.GetTitle(), item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
     [Fact]
@@ -740,7 +740,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Null(item.GetElementByTestId("specialism")?.TextContent.Trim()));
+            item => Assert.Null(item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
     [Fact]
@@ -768,7 +768,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim()));
+            item => Assert.Equal(oldStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText()));
     }
 
     [Fact]
@@ -795,7 +795,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Null(item.GetElementByTestId("specialism")?.TextContent.Trim()));
+            item => Assert.Null(item.GetElementByTestId("specialism")?.TrimmedText()));
     }
 
     [Fact]
@@ -827,7 +827,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldStatus.GetTitle(), item.GetElementByTestId("status")?.TextContent.Trim()));
+            item => Assert.Equal(oldStatus.GetTitle(), item.GetElementByTestId("status")?.TrimmedText()));
     }
 
     [Fact]
@@ -854,7 +854,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Null(item.GetElementByTestId("status")?.TextContent.Trim()));
+            item => Assert.Null(item.GetElementByTestId("status")?.TrimmedText()));
     }
 
     [Fact]
@@ -882,7 +882,7 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item-mq-updated-event"),
-            item => Assert.Equal(oldEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TextContent.Trim()));
+            item => Assert.Equal(oldEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("end-date")?.TrimmedText()));
     }
 
     //public async Task Person_WithMandatoryQualificationUpdatedEventWithoutChangedEndDate_DoesNotRenderEndDateRowWithinPreviousData()

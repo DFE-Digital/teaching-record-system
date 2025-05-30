@@ -32,7 +32,7 @@ public class DetailsTests : AddAlertTestBase
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
-        // Arrange        
+        // Arrange
         var personId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 
@@ -92,7 +92,7 @@ public class DetailsTests : AddAlertTestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TextContent);
+        Assert.Equal(journeyInstance.State.Details, doc.GetElementById("Details")?.TrimmedText());
     }
 
     [Theory]
@@ -117,7 +117,7 @@ public class DetailsTests : AddAlertTestBase
     [Fact]
     public async Task Post_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
-        // Arrange        
+        // Arrange
         var personId = Guid.NewGuid();
         var journeyInstance = await CreateJourneyInstanceForCompletedStepAsync(PreviousStep, personId);
 

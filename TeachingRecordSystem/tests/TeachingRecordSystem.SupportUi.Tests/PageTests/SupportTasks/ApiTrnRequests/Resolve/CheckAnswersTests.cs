@@ -114,8 +114,8 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         var allSummaryListRowValues = doc.GetElementsByClassName("govuk-summary-list__row")
             .ToDictionary(
-                row => row.GetElementsByClassName("govuk-summary-list__key").Single().TextContent.Trim(),
-                row => row.GetElementsByClassName("govuk-summary-list__value").Single().TextContent.Trim());
+                row => row.GetElementsByClassName("govuk-summary-list__key").Single().TrimmedText(),
+                row => row.GetElementsByClassName("govuk-summary-list__value").Single().TrimmedText());
 
         foreach (var kvp in allSummaryListRowValues)
         {
@@ -225,7 +225,7 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(comments, doc.GetSummaryListValueElementForKey("Comments")?.TextContent.Trim());
+        Assert.Equal(comments, doc.GetSummaryListValueElementForKey("Comments")?.TrimmedText());
     }
 
     [Fact]

@@ -92,7 +92,7 @@
 
 @if (TempData.TryGetFlashSuccess(out var flashSuccess))
 {
-    <govuk-notification-banner type="Success">
+    <govuk-notification-banner type="NotificationBannerType.Success">
         @if (flashSuccess.Value.Heading is string heading)
         {
             <h3 class="govuk-notification-banner__heading">@heading</h3>

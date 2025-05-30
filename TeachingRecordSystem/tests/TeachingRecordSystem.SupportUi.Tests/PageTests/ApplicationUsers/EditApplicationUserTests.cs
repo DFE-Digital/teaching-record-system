@@ -63,17 +63,17 @@ public class EditApplicationUserTests(HostFixture hostFixture) : TestBase(hostFi
             keyRows,
             row =>
             {
-                var expiry = row.GetElementByTestId("Expiry")?.TextContent?.Trim();
+                var expiry = row.GetElementByTestId("Expiry")?.TrimmedText();
                 Assert.Equal("No expiration", expiry);
             },
             row =>
             {
-                var expiry = row.GetElementByTestId("Expiry")?.TextContent?.Trim();
+                var expiry = row.GetElementByTestId("Expiry")?.TrimmedText();
                 Assert.Equal(apiKeyExpired.Expires!.Value.ToString("dd/MM/yyyy HH:mm"), expiry);
             });
 
         Assert.Equal(applicationUser.OneLoginClientId, doc.GetElementById("OneLoginClientId")?.GetAttribute("value"));
-        Assert.Equal(applicationUser.OneLoginPrivateKeyPem, doc.GetElementById("OneLoginPrivateKeyPem")?.TextContent?.Trim());
+        Assert.Equal(applicationUser.OneLoginPrivateKeyPem, doc.GetElementById("OneLoginPrivateKeyPem")?.TrimmedText()?.Trim());
     }
 
     [Fact]

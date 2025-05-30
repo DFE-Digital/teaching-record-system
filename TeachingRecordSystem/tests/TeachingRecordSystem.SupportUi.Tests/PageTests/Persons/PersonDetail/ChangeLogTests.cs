@@ -5,7 +5,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_PersonDoesNotExist_ReturnsNotFound()
     {
-        // Arrange        
+        // Arrange
         var nonExistentPersonId = Guid.NewGuid().ToString();
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{nonExistentPersonId}/change-history");
@@ -53,12 +53,12 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
             doc.GetAllElementsByTestId("timeline-item"),
             item =>
             {
-                Assert.Equal("Note modified", item.GetElementByTestId("timeline-item-title")?.TextContent.Trim());
-                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TextContent.Trim());
+                Assert.Equal("Note modified", item.GetElementByTestId("timeline-item-title")?.TrimmedText());
+                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TrimmedText());
                 Assert.Null(item.GetElementByTestId("timeline-item-status"));
                 Assert.NotNull(item.GetElementByTestId("timeline-item-time"));
-                Assert.Equal("Note 1 Subject", item.GetElementByTestId("timeline-item-summary")?.TextContent.Trim());
-                Assert.Equal("Note 1 Description", item.GetElementByTestId("timeline-item-description")?.TextContent.Trim());
+                Assert.Equal("Note 1 Subject", item.GetElementByTestId("timeline-item-summary")?.TrimmedText());
+                Assert.Equal("Note 1 Description", item.GetElementByTestId("timeline-item-description")?.TrimmedText());
             });
     }
 
@@ -81,11 +81,11 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
             doc.GetAllElementsByTestId("timeline-item"),
             item =>
             {
-                Assert.Equal("Task modified", item.GetElementByTestId("timeline-item-title")?.TextContent.Trim());
-                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TextContent.Trim());
+                Assert.Equal("Task modified", item.GetElementByTestId("timeline-item-title")?.TrimmedText());
+                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TrimmedText());
                 Assert.NotNull(item.GetElementByTestId("timeline-item-time"));
-                Assert.Equal("Task 1 Subject", item.GetElementByTestId("timeline-item-summary")?.TextContent.Trim());
-                Assert.Equal("Task 1 Description", item.GetElementByTestId("timeline-item-description")?.TextContent.Trim());
+                Assert.Equal("Task 1 Subject", item.GetElementByTestId("timeline-item-summary")?.TrimmedText());
+                Assert.Equal("Task 1 Description", item.GetElementByTestId("timeline-item-description")?.TrimmedText());
             });
     }
 
@@ -106,7 +106,7 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         Assert.Collection(
             doc.GetAllElementsByTestId("timeline-item"),
-            item => Assert.Equal("Overdue", item.GetElementByTestId("timeline-item-status")?.TextContent.Trim()));
+            item => Assert.Equal("Overdue", item.GetElementByTestId("timeline-item-status")?.TrimmedText()));
     }
 
     [Fact]
@@ -128,8 +128,8 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
             doc.GetAllElementsByTestId("timeline-item"),
             item =>
             {
-                Assert.Equal("Task completed", item.GetElementByTestId("timeline-item-title")?.TextContent.Trim());
-                Assert.Equal("Closed", item.GetElementByTestId("timeline-item-status")?.TextContent.Trim());
+                Assert.Equal("Task completed", item.GetElementByTestId("timeline-item-title")?.TrimmedText());
+                Assert.Equal("Closed", item.GetElementByTestId("timeline-item-status")?.TrimmedText());
             });
     }
 
@@ -156,11 +156,11 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
             doc.GetAllElementsByTestId("timeline-item"),
             item =>
             {
-                Assert.Equal("Request to change name case resolved", item.GetElementByTestId("timeline-item-title")?.TextContent.Trim());
-                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TextContent.Trim());
+                Assert.Equal("Request to change name case resolved", item.GetElementByTestId("timeline-item-title")?.TrimmedText());
+                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TrimmedText());
                 Assert.Null(item.GetElementByTestId("timeline-item-status"));
                 Assert.NotNull(item.GetElementByTestId("timeline-item-time"));
-                Assert.Equal(expectedSummaryText, item.GetElementByTestId("timeline-item-summary")?.TextContent.Trim());
+                Assert.Equal(expectedSummaryText, item.GetElementByTestId("timeline-item-summary")?.TrimmedText());
             });
     }
 
@@ -187,11 +187,11 @@ public class ChangeLogTests(HostFixture hostFixture) : TestBase(hostFixture)
             doc.GetAllElementsByTestId("timeline-item"),
             item =>
             {
-                Assert.Equal("Request to change date of birth case resolved", item.GetElementByTestId("timeline-item-title")?.TextContent.Trim());
-                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TextContent.Trim());
+                Assert.Equal("Request to change date of birth case resolved", item.GetElementByTestId("timeline-item-title")?.TrimmedText());
+                Assert.Equal("by Test User", item.GetElementByTestId("timeline-item-user")?.TrimmedText());
                 Assert.Null(item.GetElementByTestId("timeline-item-status"));
                 Assert.NotNull(item.GetElementByTestId("timeline-item-time"));
-                Assert.Equal(expectedSummaryText, item.GetElementByTestId("timeline-item-summary")?.TextContent.Trim());
+                Assert.Equal(expectedSummaryText, item.GetElementByTestId("timeline-item-summary")?.TrimmedText());
             });
     }
 

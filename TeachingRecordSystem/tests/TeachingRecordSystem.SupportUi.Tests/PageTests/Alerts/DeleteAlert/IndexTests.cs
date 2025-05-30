@@ -82,12 +82,12 @@ public class IndexTests : DeleteAlertTestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         AssertCheckedRadioOption("HasAdditionalReasonDetail", bool.TrueString);
-        Assert.Equal(journeyInstance.State.DeleteReasonDetail, doc.GetElementsByName("DeleteReasonDetail")[0].TextContent);
+        Assert.Equal(journeyInstance.State.DeleteReasonDetail, doc.GetElementsByName("DeleteReasonDetail")[0].TrimmedText());
         AssertCheckedRadioOption("UploadEvidence", bool.TrueString);
 
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
         Assert.NotNull(uploadedEvidenceLink);
-        Assert.Equal($"{journeyInstance.State.EvidenceFileName} ({journeyInstance.State.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
+        Assert.Equal($"{journeyInstance.State.EvidenceFileName} ({journeyInstance.State.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TrimmedText());
 
         void AssertCheckedRadioOption(string name, string expectedCheckedValue)
         {

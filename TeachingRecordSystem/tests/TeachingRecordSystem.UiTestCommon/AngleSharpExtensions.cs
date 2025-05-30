@@ -26,7 +26,7 @@ public static class AngleSharpExtensions
 
         foreach (var l in allLabels)
         {
-            if (l.TextContent.Trim() == label)
+            if (l.TrimmedText() == label)
             {
                 var @for = l.GetAttribute("for");
                 return @for is not null ? doc.GetElementById(@for) : null;
@@ -54,7 +54,7 @@ public static class AngleSharpExtensions
         {
             var rowKey = row.QuerySelector(".govuk-summary-list__key");
 
-            if (rowKey.GetCleansedTextContent() == key)
+            if (rowKey?.TrimmedText() == key)
             {
                 count++;
             }
@@ -74,7 +74,7 @@ public static class AngleSharpExtensions
         {
             var rowKey = row.QuerySelector(".govuk-summary-list__key");
 
-            if (rowKey.GetCleansedTextContent() == key)
+            if (rowKey?.TrimmedText() == key)
             {
                 return row;
             }
@@ -87,7 +87,7 @@ public static class AngleSharpExtensions
         doc.Body?.GetSummaryListValueForKey(key);
 
     public static string? GetSummaryListValueForKey(this IElement element, string key) =>
-        GetSummaryListValueElementForKey(element, key)?.GetCleansedTextContent();
+        GetSummaryListValueElementForKey(element, key)?.TrimmedText();
 
     public static IElement? GetSummaryListValueElementForKey(this IDocument doc, string key) =>
         doc.Body?.GetSummaryListValueElementForKey(key);
@@ -99,9 +99,5 @@ public static class AngleSharpExtensions
         return rowValue;
     }
 
-    /// <summary>
-    /// Trims whitespace from an <see cref="INode"/>'s <see cref="INode.TextContent"/> and removes any
-    /// U+00AD (&amp;shy;) characters.
-    /// </summary>
-    private static string? GetCleansedTextContent(this INode? node) => node?.TextContent?.Trim()?.Replace("\u00ad", "");
+    public static string TrimmedText(this INode node) => node.Text().Trim();
 }

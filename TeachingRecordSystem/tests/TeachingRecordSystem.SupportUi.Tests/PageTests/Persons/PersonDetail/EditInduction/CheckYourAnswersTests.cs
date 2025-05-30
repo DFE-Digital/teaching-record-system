@@ -94,10 +94,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
         Assert.NotNull(label);
         var value = label.NextElementSibling;
-        Assert.Equal(inductionStatus.GetTitle(), value!.TextContent);
+        Assert.NotNull(value);
+        Assert.Equal(inductionStatus.GetTitle(), value.TrimmedText());
         if (showChangeLink)
         {
             Assert.NotNull(value.NextElementSibling!.GetElementsByTagName("a").First());
@@ -164,10 +165,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         if (showStartDateRow)
         {
-            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
-            Assert.NotNull(label);
+            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
+            Assert.NotNull(label.NextElementSibling);
             var value = label.NextElementSibling;
-            Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
+            Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TrimmedText());
             if (showChangeLink)
             {
                 Assert.NotNull(value.NextElementSibling!.GetElementsByTagName("a").First());
@@ -179,7 +180,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TextContent == labelContent));
+            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == labelContent));
         }
     }
 
@@ -238,14 +239,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
         if (ShowsCompletedDate)
         {
-            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
+            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
             Assert.NotNull(label);
             var value = label.NextElementSibling;
-            Assert.Equal(completedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TextContent);
+            Assert.Equal(completedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), value!.TrimmedText());
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TextContent == labelContent));
+            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == labelContent));
         }
     }
 
@@ -311,15 +312,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
         if (ShowsExemptionReason)
         {
-            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == labelContent);
+            var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == labelContent);
             Assert.NotNull(label);
-            var reasons = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TextContent.Trim());
+            var reasons = label.NextElementSibling!.QuerySelectorAll("li").Select(d => d.TrimmedText());
             Assert.NotEmpty(reasons);
             Assert.Equal(expectedReasons, reasons);
         }
         else
         {
-            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TextContent == labelContent));
+            Assert.Empty(doc.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == labelContent));
         }
     }
 
@@ -394,20 +395,20 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Reason for changing induction details");
+        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason for changing induction details");
         Assert.NotNull(label);
         var value = label.NextElementSibling;
-        Assert.Equal(InductionChangeReasonOption.AnotherReason.GetDisplayName(), value!.TextContent);
+        Assert.Equal(InductionChangeReasonOption.AnotherReason.GetDisplayName(), value!.TrimmedText());
 
-        var labelDetails = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Reason details");
+        var labelDetails = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Reason details");
         Assert.NotNull(labelDetails);
         var valueDetails = labelDetails.NextElementSibling;
-        Assert.Equal(_changeReasonDetails, valueDetails!.TextContent.Trim());
+        Assert.Equal(_changeReasonDetails, valueDetails!.TrimmedText());
 
-        var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TextContent == "Do you have evidence to upload");
+        var labelFileUpload = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == "Do you have evidence to upload");
         Assert.NotNull(labelFileUpload);
         var valueFileUpload = labelFileUpload.NextElementSibling;
-        Assert.Equal("Not provided", valueFileUpload!.TextContent.Trim());
+        Assert.Equal("Not provided", valueFileUpload!.TrimmedText());
     }
 
     [Fact]
