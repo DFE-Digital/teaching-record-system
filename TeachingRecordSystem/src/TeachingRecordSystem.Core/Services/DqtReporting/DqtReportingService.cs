@@ -457,7 +457,7 @@ public partial class DqtReportingService : BackgroundService
         var slot = await GetReplicationSlotAsync(replicationConn, cancellationToken);
         observer?.OnNext(TrsReplicationStatus.ReplicationSlotEstablished);
 
-        var replicationOptions = new PgOutputReplicationOptions(TrsDbPublicationName, protocolVersion: 1, binary: true);
+        var replicationOptions = new PgOutputReplicationOptions(TrsDbPublicationName, PgOutputProtocolVersion.V1, binary: true);
 
         await foreach (var message in replicationConn.StartReplication(slot, replicationOptions, cancellationToken))
         {

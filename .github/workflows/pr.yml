@@ -23,6 +23,10 @@ jobs:
 
       - uses: extractions/setup-just@v2
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
       - name: Install tools
         run: just install-tools
 
@@ -128,6 +132,10 @@ jobs:
 
       - uses: extractions/setup-just@v2
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
       - name: Install tools
         run: just install-tools
 
@@ -160,7 +168,7 @@ jobs:
       - name: Install Playwright if required
         run: |
           if [[ "$PROJECT_NAME" =~ .*EndToEndTests ]]; then
-            pwsh ./bin/Release/net8.0/playwright.ps1 install chromium
+            pwsh ./bin/Release/net9.0/playwright.ps1 install chromium
           fi
         working-directory: TeachingRecordSystem/tests/${{ matrix.project }}
         env:

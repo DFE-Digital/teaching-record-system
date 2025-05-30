@@ -3,22 +3,25 @@
   "isRoot": true,
   "tools": {
     "dotnet-format": {
-      "version": "8.0.453106",
+      "version": "9.0.520307",
       "commands": [
         "dotnet-format"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-ef": {
-      "version": "8.0.8",
+      "version": "9.0.0",
       "commands": [
         "dotnet-ef"
-      ]
+      ],
+      "rollForward": false
     },
     "microsoft.web.librarymanager.cli": {
       "version": "2.1.175",
       "commands": [
         "libman"
-      ]
+      ],
+      "rollForward": false
     }
   }
 }

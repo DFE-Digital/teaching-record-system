@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.Tokens;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
@@ -166,7 +165,7 @@ public class CheckYourAnswersModel(
             ((QuestionDriverHelper.FieldRequired(route.TrainingCountryRequired, status.GetCountryRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.TrainingCountryId is null) ? NotCompleteError.Country : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.TrainingSubjectsRequired, status.GetSubjectsRequirement()) == FieldRequirement.Mandatory
-                && !JourneyInstance!.State.TrainingSubjectIds.IsNullOrEmpty()) ? NotCompleteError.Subject : NotCompleteError.None) |
+                && JourneyInstance!.State.TrainingSubjectIds.Length > 0) ? NotCompleteError.Subject : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.TrainingProviderRequired, status.GetTrainingProviderRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.TrainingProviderId is null) ? NotCompleteError.Provider : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.InductionExemptionRequired, status.GetInductionExemptionRequirement()) == FieldRequirement.Mandatory

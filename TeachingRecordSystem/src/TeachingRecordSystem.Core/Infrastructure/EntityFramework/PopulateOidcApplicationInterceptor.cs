@@ -16,23 +16,21 @@ internal class PopulateOidcApplicationInterceptor : SaveChangesInterceptor
 
         foreach (var entry in applicationUserEntries.ToArray())
         {
-            if (entry.CurrentValues.GetValue<bool>(nameof(ApplicationUser.IsOidcClient)))
+            var openIddictAppSet = context.Set<OpenIddictEntityFrameworkCoreApplication<Guid>>();
+
+            var existingOpenIddictApp = context.ChangeTracker.Entries<OpenIddictEntityFrameworkCoreApplication<Guid>>()
+                    .SingleOrDefault(e => e.Entity.Id == entry.Entity.UserId)?.Entity
+                ?? await openIddictAppSet.SingleOrDefaultAsync(u => u.Id == entry.Entity.UserId);
+
+            if (existingOpenIddictApp is not null)
             {
-                var openIddictAppSet = context.Set<OpenIddictEntityFrameworkCoreApplication<Guid>>();
-
-                var existingOpenIddictApp = await openIddictAppSet.SingleOrDefaultAsync(u => u.Id == entry.Entity.UserId);
-
-                if (existingOpenIddictApp is not null)
-                {
-                    openIddictAppSet.Remove(existingOpenIddictApp);
-                }
-
-                var newOpenIddictApp = entry.Entity.ToOpenIddictApplication()!;
-                newOpenIddictApp.ConcurrencyToken = existingOpenIddictApp?.ConcurrencyToken;
-
-                var openIddictAppEntry = openIddictAppSet.Attach(newOpenIddictApp);
-
-                openIddictAppEntry.State = existingOpenIddictApp is null ? EntityState.Added : EntityState.Modified;
+                entry.Entity.PopulateOpenIddictApplication(existingOpenIddictApp);
+            }
+            else
+            {
+                var newOpenIddictApp = new OpenIddictEntityFrameworkCoreApplication<Guid>();
+                entry.Entity.PopulateOpenIddictApplication(newOpenIddictApp);
+                openIddictAppSet.Add(newOpenIddictApp);
             }
         }
 
