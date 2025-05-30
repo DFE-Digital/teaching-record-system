@@ -51,6 +51,7 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddGovUkFrontend(options =>
 {
     options.DefaultButtonPreventDoubleClick = true;
+    options.DefaultFileUploadJavaScriptEnhancements = true;
 });
 
 builder.Services.AddCsp(nonceByteAmount: 32);
