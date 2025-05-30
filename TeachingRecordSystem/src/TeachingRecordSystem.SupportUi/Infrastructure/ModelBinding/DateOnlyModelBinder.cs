@@ -1,4 +1,3 @@
-using GovUk.Frontend.AspNetCore.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
