@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace TeachingRecordSystem.SupportUi.TagHelpers;
