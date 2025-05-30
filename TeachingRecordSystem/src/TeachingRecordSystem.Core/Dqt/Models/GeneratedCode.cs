@@ -2464,6 +2464,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_InductionStatus = "dfeta_inductionstatus";
 			public const string dfeta_LastIdentityUpdate = "dfeta_lastidentityupdate";
 			public const string dfeta_loginfailedcounter = "dfeta_loginfailedcounter";
+			public const string dfeta_MergedWith = "dfeta_mergedwith";
 			public const string dfeta_NINumber = "dfeta_ninumber";
 			public const string dfeta_PreviousLastName = "dfeta_previouslastname";
 			public const string dfeta_qtlsdate = "dfeta_qtlsdate";
@@ -2515,6 +2516,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string dfeta_contact_dfeta_qtsregistration1 = "dfeta_contact_dfeta_qtsregistration1";
 			public const string dfeta_contact_dfeta_qualification = "dfeta_contact_dfeta_qualification";
 			public const string dfeta_contact_dfeta_sanction = "dfeta_contact_dfeta_sanction";
+			public const string Referenceddfeta_contact_MergedWith_contact = "Referenceddfeta_contact_MergedWith_contact";
 			public const string dfeta_contact_task_potentialduplicateid = "dfeta_contact_task_potentialduplicateid";
 			public const string incident_customer_contacts = "incident_customer_contacts";
 			public const string business_unit_contacts = "business_unit_contacts";
@@ -2523,6 +2525,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingcontact_master_contact = "contact_master_contact";
 			public const string contact_owning_user = "contact_owning_user";
 			public const string Referencingcontact_parent_contact = "contact_parent_contact";
+			public const string Referencingdfeta_contact_MergedWith_contact = "dfeta_contact_MergedWith_contact";
 			public const string dfeta_dfeta_country_contact1 = "dfeta_dfeta_country_contact1";
 			public const string dfeta_dfeta_qtsregistration_contact = "dfeta_dfeta_qtsregistration_contact";
 			public const string lk_contact_createdonbehalfby = "lk_contact_createdonbehalfby";
@@ -2958,6 +2961,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("dfeta_loginfailedcounter");
 				this.SetAttributeValue("dfeta_loginfailedcounter", value);
 				this.OnPropertyChanged("dfeta_loginfailedcounter");
+			}
+		}
+		
+		/// <summary>
+		/// Merged With
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mergedwith")]
+		public Microsoft.Xrm.Sdk.EntityReference dfeta_MergedWith
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<Microsoft.Xrm.Sdk.EntityReference>("dfeta_mergedwith");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_MergedWith");
+				this.SetAttributeValue("dfeta_mergedwith", value);
+				this.OnPropertyChanged("dfeta_MergedWith");
 			}
 		}
 		
@@ -3997,6 +4020,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		}
 		
 		/// <summary>
+		/// 1:N dfeta_contact_MergedWith_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_MergedWith_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced)]
+		public System.Collections.Generic.IEnumerable<TeachingRecordSystem.Core.Dqt.Models.Contact> Referenceddfeta_contact_MergedWith_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_MergedWith_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referenceddfeta_contact_MergedWith_contact");
+				this.SetRelatedEntities<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_MergedWith_contact", Microsoft.Xrm.Sdk.EntityRole.Referenced, value);
+				this.OnPropertyChanged("Referenceddfeta_contact_MergedWith_contact");
+			}
+		}
+		
+		/// <summary>
 		/// 1:N dfeta_contact_task_potentialduplicateid
 		/// </summary>
 		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_task_potentialduplicateid")]
@@ -4159,6 +4202,27 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("Referencingcontact_parent_contact");
 				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("contact_parent_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
 				this.OnPropertyChanged("Referencingcontact_parent_contact");
+			}
+		}
+		
+		/// <summary>
+		/// N:1 dfeta_contact_MergedWith_contact
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_mergedwith")]
+		[Microsoft.Xrm.Sdk.RelationshipSchemaNameAttribute("dfeta_contact_MergedWith_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing)]
+		public TeachingRecordSystem.Core.Dqt.Models.Contact Referencingdfeta_contact_MergedWith_contact
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_MergedWith_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing);
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("Referencingdfeta_contact_MergedWith_contact");
+				this.SetRelatedEntity<TeachingRecordSystem.Core.Dqt.Models.Contact>("dfeta_contact_MergedWith_contact", Microsoft.Xrm.Sdk.EntityRole.Referencing, value);
+				this.OnPropertyChanged("Referencingdfeta_contact_MergedWith_contact");
 			}
 		}
 		
