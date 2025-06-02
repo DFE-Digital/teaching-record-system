@@ -3,6 +3,7 @@ using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.SupportUi.Infrastructure.ModelBinding;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 using TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests;
+using TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions;
 
 namespace TeachingRecordSystem.SupportUi;
 
@@ -411,6 +412,9 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string ApiTrnRequestMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
+
+    public string IntegrationTransactions(IntegrationTransactionSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Index", routeValues: new { sortBy, sortDirection, pageNumber });
 
     public string ApiTrnRequestMergeCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");

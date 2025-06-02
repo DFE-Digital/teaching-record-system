@@ -1,0 +1,130 @@
+@page "/support-tasks/integration-transactions"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions.IndexModel
+@{
+    ViewBag.Title = "Interfaces";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Integration transactions</span>
+        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    </div>
+
+
+    <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.IntegrationTransactionId ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.IntegrationTransactionId, direction))">
+                        Id
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.InterfaceType ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.InterfaceType, direction))">
+                        Interface
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.CreatedOn ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.CreatedOn, direction))">
+                        Date and time
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.ImportStatus ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.ImportStatus, direction))">
+                        Import Status
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Total ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.Total, direction))">
+                        Total
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Successes ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.Successes, direction))">
+                        Successes
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Failures ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.Failures, direction))">
+                        Failures
+                    </th>
+                    <th scope="col" class="govuk-table__header"
+                        sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Duplicates ? Model.SortDirection : null)"
+                        link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.Duplicates, direction))">
+                        Duplicates
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                @if (Model.Results!.Count == 0)
+                {
+                    <tr class="govuk-table__row" data-testid="no-integration-transactions-message">
+                        <td class="govuk-table__cell" colspan="8">No integration transactions</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var result in Model.Results)
+                    {
+                        <tr class="govuk-table__row" data-testid="integration-transaction:@result.IntegrationTransactionId">
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:id">
+                                @result.IntegrationTransactionId
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:interface">
+                                <a class="govuk-link" href="integration-transactions/@result.IntegrationTransactionId/detail">@result.InterfaceType.GetDisplayName()</a>
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:createdon">
+                                <div class="govuk-\!-text-align-centre">@result.CreatedOn.ToString(UiDefaults.DateOnlyDisplayFormat)</div>
+                                <div>@result.CreatedOn.ToString("hh:mm tt")</div>
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:importstatus">
+                                @if (result.ImportStatus == IntegrationTransactionImportStatus.Success)
+                                {
+                                    <span class="govuk-tag--green govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</span>
+                                }
+                                else @if (result.ImportStatus == IntegrationTransactionImportStatus.InProgress)
+                                {
+                                    <span class="govuk-tag--light-blue govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</span>
+                                }
+                                else
+                                {
+                                    <span class="govuk-tag--red govuk-!-static-padding-1">@result.ImportStatus.GetDisplayName()</span>
+                                }
+                            </td>
+
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:total">
+                                @result.TotalCount
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:successes">
+                                @result.SuccessesCount
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:failures">
+                                @result.FailuresCount
+                            </td>
+                            <td class="govuk-table__cell"
+                                data-testid="integration-transaction:@result.IntegrationTransactionId:duplicates">
+                                @result.DuplicatesCount
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="govuk-grid-column-full">
+        <partial name="_Pagination" model=@Model.Pagination />
+    </div>
+
+</div>
+

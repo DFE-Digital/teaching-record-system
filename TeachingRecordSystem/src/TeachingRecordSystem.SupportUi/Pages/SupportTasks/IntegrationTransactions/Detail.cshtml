@@ -1,0 +1,45 @@
+@page "/support-tasks/integration-transactions/{integrationTransactionId}/detail/{handler?}"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions.DetailModel
+@{
+    ViewBag.Title = "Interfaces";
+}
+
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">Integration transactions</span>
+        <h1 class="govuk-heading-l">Capita Import</h1>
+    </div>
+
+
+</div>
+<govuk-summary-card>
+    <govuk-summary-card-title>Record information</govuk-summary-card-title>
+    <govuk-summary-list>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Date and time</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value>test</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>File name</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Interface ID</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Total count</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Successes</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Failures</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
+        </govuk-summary-list-row>
+    </govuk-summary-list>
+</govuk-summary-card>
