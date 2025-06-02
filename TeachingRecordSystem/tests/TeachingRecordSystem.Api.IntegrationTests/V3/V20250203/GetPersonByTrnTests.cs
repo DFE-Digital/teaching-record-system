@@ -152,7 +152,7 @@ public class GetPersonByTrnTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate));
+            .WithQtlsDateInDqt(qtlsDate));
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/v3/persons/{person.Trn}?include=Induction");
@@ -174,7 +174,7 @@ public class GetPersonByTrnTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate));
+            .WithQtlsDateInDqt(qtlsDate));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
         entity[Contact.Fields.dfeta_qtlsdate] = null;

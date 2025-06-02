@@ -217,7 +217,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithQtlsDate(DateOnly? qtlsDate)
+        public CreatePersonBuilder WithQtlsDateInDqt(DateOnly? qtlsDate)
         {
             EnsureTrn();
 
@@ -243,6 +243,12 @@ public partial class TestData
 
             return this;
         }
+
+        public CreatePersonBuilder WithQtls(DateOnly awardedDate) =>
+            WithProfessionalStatus(p => p
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate)
+                .WithRoute(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
         public CreatePersonBuilder WithTrnRequest(
             Guid applicationUserId,

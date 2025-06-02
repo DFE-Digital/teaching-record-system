@@ -387,7 +387,7 @@ public class InductionImporterTests : IAsyncLifetime
         });
         var person = await TestData.CreatePersonAsync(x =>
         {
-            x.WithQtlsDate(new DateOnly(2024, 01, 01));
+            x.WithQtlsDateInDqt(new DateOnly(2024, 01, 01));
         });
         var row = GetDefaultRow(x =>
         {
