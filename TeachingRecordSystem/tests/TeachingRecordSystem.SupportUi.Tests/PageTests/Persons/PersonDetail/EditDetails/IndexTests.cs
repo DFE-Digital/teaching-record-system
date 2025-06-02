@@ -123,7 +123,6 @@ public class IndexTests : TestBase
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithEmail("invalid")
-            .WithMobileNumber("invalid")
             .WithNationalInsuranceNumber("invalid"));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person));
@@ -141,11 +140,9 @@ public class IndexTests : TestBase
 
         var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
         var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
-        var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
 
         Assert.Equal("invalid", emailAddress.Value.Trim());
-        Assert.Equal("invalid", mobileNumber.Value.Trim());
         Assert.Equal("invalid", nationalInsuranceNumber.Value.Trim());
     }
 
