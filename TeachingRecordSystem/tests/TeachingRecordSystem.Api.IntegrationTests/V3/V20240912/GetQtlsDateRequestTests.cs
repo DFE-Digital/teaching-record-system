@@ -71,7 +71,7 @@ public class GetQtlsDateRequestTests : TestBase
         var qtlsDate = new DateOnly(2020, 01, 01);
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate));
+            .WithQtls(qtlsDate));
         var request = new HttpRequestMessage(HttpMethod.Get, $"v3/persons/{person.Trn}/qtls");
 
         // Act

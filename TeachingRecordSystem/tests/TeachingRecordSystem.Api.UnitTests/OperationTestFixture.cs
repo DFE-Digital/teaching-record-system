@@ -9,6 +9,8 @@ namespace TeachingRecordSystem.Api.UnitTests;
 public class OperationTestFixture
 {
     private readonly ICurrentUserProvider _currentUserProvider;
+    private readonly object _createdApplicationUserLock = new();
+    private bool _applicationUserCreated;
 
     public OperationTestFixture(
         IServiceProvider serviceProvider,
@@ -38,12 +40,6 @@ public class OperationTestFixture
             Clock,
             new FakeTrnGenerator(),
             TestDataSyncConfiguration.Sync(syncHelper));
-
-        var applicationUser = TestData.CreateApplicationUserAsync().GetAwaiter().GetResult();
-
-        Mock.Get(_currentUserProvider)
-            .Setup(mock => mock.GetCurrentApplicationUser())
-            .Returns((applicationUser.UserId, applicationUser.Name));
     }
 
     public TestableClock Clock { get; }
@@ -55,4 +51,23 @@ public class OperationTestFixture
     public TestData TestData { get; }
 
     public Mock<IFileService> BlobStorageFileService { get; } = new Mock<IFileService>();
+
+    public void EnsureApplicationUser()
+    {
+        lock (_createdApplicationUserLock)
+        {
+            if (_applicationUserCreated)
+            {
+                return;
+            }
+
+            var applicationUser = TestData.CreateApplicationUserAsync().GetAwaiter().GetResult();
+
+            Mock.Get(_currentUserProvider)
+                .Setup(mock => mock.GetCurrentApplicationUser())
+                .Returns((applicationUser.UserId, applicationUser.Name));
+
+            _applicationUserCreated = true;
+        }
+    }
 }

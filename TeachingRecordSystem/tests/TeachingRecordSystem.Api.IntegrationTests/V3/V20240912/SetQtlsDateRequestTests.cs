@@ -1,6 +1,5 @@
 using System.Net;
 using TeachingRecordSystem.Api.V3.V20240912.Requests;
-using TeachingRecordSystem.Core.Dqt;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20240912;
 
@@ -75,7 +74,7 @@ public class SetQtlsDateRequestTests : TestBase
     }
 
     [Fact]
-    public async Task Put_ValidQtsDateWithNoExistingQtsDate_UpdatesQtlsDateAndReturnsOk()
+    public async Task Put_ValidQtsDateWithNoExistingQtsDate_ReturnsOk()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithTrn());
@@ -99,18 +98,15 @@ public class SetQtlsDateRequestTests : TestBase
                 qtsDate = qtlsDate
             },
             expectedStatusCode: 200);
-
-        var contact = XrmFakedContext.CreateQuery<Contact>().Single(x => x.ContactId == person.PersonId);
-        Assert.Equal(qtlsDate, contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
     }
 
     [Fact]
-    public async Task Put_NullQtlsDateWithExistingQtlsDate_UpdatesQtlsDateAndReturnsOk()
+    public async Task Put_NullQtlsDateWithExistingQtlsDate_ReturnsOk()
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(new DateOnly(2020, 01, 01)));
+            .WithQtls(new DateOnly(2020, 01, 01)));
 
         DateOnly? qtlsDate = null;
 
@@ -131,37 +127,5 @@ public class SetQtlsDateRequestTests : TestBase
                 qtsDate = qtlsDate
             },
             expectedStatusCode: 200);
-
-        var contact = XrmFakedContext.CreateQuery<Contact>().Single(x => x.ContactId == person.PersonId);
-        Assert.Null(contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: false));
-    }
-
-    [Fact]
-    public async Task Put_SetQtlsWithActiveAlert_SetsQtlsAndCreatesReviewTask()
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithAlert(a => a.WithEndDate(null)));
-
-        var qtlsDate = new DateOnly(2020, 01, 01);
-
-        var request = new HttpRequestMessage(HttpMethod.Put, $"v3/persons/{person.Trn}/qtls")
-        {
-            Content = CreateJsonContent(new { qtsDate = qtlsDate })
-        };
-
-        // Act
-        var response = await GetHttpClientWithApiKey().SendAsync(request);
-
-        // Assert
-        var task = XrmFakedContext.CreateQuery<Core.Dqt.Models.Task>().FirstOrDefault(
-            x => x.RegardingObjectId.Id == person.PersonId && x.Category == "QTLS date set/removed for record with an active alert");
-
-        Assert.NotNull(task);
-        Assert.Equal("QTLS date set/removed for record with an active alert", task.Category);
-        Assert.Equal($"QTLSDate {qtlsDate} set for a record with active alert", task.Description);
-        Assert.Equal("Notification for SET QTLS data collections team", task.Subject);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }

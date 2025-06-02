@@ -2,7 +2,7 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.SupportUi.Services.AzureActiveDirectory;
-using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.SupportUi.Tests;
 

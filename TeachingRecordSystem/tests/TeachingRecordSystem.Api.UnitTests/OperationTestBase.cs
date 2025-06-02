@@ -2,6 +2,7 @@ using FakeXrmEasy.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -13,7 +14,9 @@ public abstract class OperationTestBase
     {
         OperationTestFixture = operationTestFixture;
 
-        _testServices = TestScopedServices.Reset();
+        _testServices = TestScopedServices.Reset(operationTestFixture.Services);
+        OperationTestFixture.EnsureApplicationUser();
+        EventObserver.Clear();
     }
 
     public OperationTestFixture OperationTestFixture { get; }
@@ -31,6 +34,10 @@ public abstract class OperationTestBase
     public IXrmFakedContext XrmFakedContext => OperationTestFixture.Services.GetRequiredService<IXrmFakedContext>();
 
     public Mock<IGetAnIdentityApiClient> GetAnIdentityApiClientMock => Mock.Get(OperationTestFixture.Services.GetRequiredService<IGetAnIdentityApiClient>());
+
+    public CaptureEventObserver EventObserver => _testServices.EventObserver;
+
+    public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 
     public T AssertSuccess<T>(ApiResult<T> result) where T : notnull
     {
