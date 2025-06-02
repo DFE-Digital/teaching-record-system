@@ -1706,7 +1706,7 @@ public class TrsDataSyncHelper(
             DateOfBirth = c.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             EmailAddress = c.EMailAddress1.NormalizeString(),
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
-            MobileNumber = c.MobilePhone.NormalizeString(),
+            MobileNumber = c.MobilePhone.NormalizeMobileNumber(),
             QtsDate = c.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EytsDate = c.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             DqtContactId = c.Id,
@@ -2086,4 +2086,7 @@ file static class Extensions
     /// Returns <c>null</c> if <paramref name="value"/> is empty or whitespace.
     /// </summary>
     public static string? NormalizeString(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    public static string? NormalizeMobileNumber(this string? value) =>
+        MobileNumber.TryParse(value, out var mobileNumber) ? mobileNumber.ToString() : null;
 }
