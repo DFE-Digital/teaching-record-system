@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -38,6 +39,8 @@ public class InductionModel(
 
     public IEnumerable<string>? ExemptionReasonValues { get; set; }
 
+    public IEnumerable<ProfessionalStatus>? InductionExemptionsFromRoutes { get; set; }
+
     public string InductionIsManagedByCpdWarning => Status switch
     {
         InductionStatus.RequiredToComplete => InductionWarnings.InductionIsManagedByCpdWarningRequiredToComplete,
@@ -57,6 +60,7 @@ public class InductionModel(
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons
+            .Include(p => p.Qualifications)
             .SingleAsync(q => q.PersonId == PersonId);
 
         GetActiveContactDetailByIdQuery query = new(
@@ -74,6 +78,11 @@ public class InductionModel(
 
         var allExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync();
         ExemptionReasonValues = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId)).Select(r => r.Name);
+
+        InductionExemptionsFromRoutes = dbContext.ProfessionalStatuses
+            .Include(p => p.RouteToProfessionalStatus)
+            .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
+            .Where(p => p.PersonId == person.PersonId && p.RouteToProfessionalStatus != null && p.RouteToProfessionalStatus.InductionExemptionReason != null);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;

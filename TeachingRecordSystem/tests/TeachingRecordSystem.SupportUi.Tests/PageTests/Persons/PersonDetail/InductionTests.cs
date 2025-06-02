@@ -51,6 +51,40 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("induction-card"));
     }
 
+    [Fact]
+    public async Task Get_WithPersonIdForPersonWithRouteInductionExemption_DisplaysExpectedContent()
+    {
+        // Arrange
+        var awardedDate = Clock.Today;
+        var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ApplyforQtsId)
+            .Single();
+        var routeWithoutExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithProfessionalStatus(r => r
+                .WithRoute(routeWithExemption.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate))
+            .WithProfessionalStatus(r => r
+                .WithRoute(routeWithoutExemption.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Deferred)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var expected = $"{routeWithExemption.InductionExemptionReason?.Name} - {routeWithExemption.Name}";
+        var routeExemptionRowValue = doc.GetSummaryListValueElementForKey("Route induction exemption reason");
+        Assert.Equal(expected, routeExemptionRowValue?.TextContent);
+    }
+
     [Theory]
     [InlineData(InductionStatus.Exempt)]
     [InlineData(InductionStatus.RequiredToComplete)]

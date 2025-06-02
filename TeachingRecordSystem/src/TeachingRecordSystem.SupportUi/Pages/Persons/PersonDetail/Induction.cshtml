@@ -82,6 +82,16 @@
                     }
                 </govuk-summary-list-row>
             }
+            @if(Model.InductionExemptionsFromRoutes is not null)
+            {
+                foreach (var exemptedRoute in Model.InductionExemptionsFromRoutes)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Route induction exemption reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@($"{exemptedRoute.RouteToProfessionalStatus?.InductionExemptionReason?.Name} - {exemptedRoute.RouteToProfessionalStatus?.Name}")</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+            }
         </govuk-summary-list>
     </govuk-summary-card>
 }
