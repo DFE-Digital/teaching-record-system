@@ -31,15 +31,15 @@ public class InductionModel(
 
     public DateOnly? CompletedDate { get; set; }
 
-    public Guid[]? ExemptionReasonIds { get; set; }
+    public Guid[]? PersonLevelExemptionReasonIds { get; set; }
 
     public bool ShowStartDate => Status.RequiresStartDate();
 
     public bool ShowCompletedDate => Status.RequiresCompletedDate();
 
-    public IEnumerable<string>? ExemptionReasonValues { get; set; }
+    public IEnumerable<string>? ExemptionReasonNames { get; set; }
 
-    public IEnumerable<ProfessionalStatus>? InductionExemptionsFromRoutes { get; set; }
+    public IEnumerable<ProfessionalStatus>? InductionExemptedRoutes { get; set; }
 
     public string InductionIsManagedByCpdWarning => Status switch
     {
@@ -72,17 +72,18 @@ public class InductionModel(
         Status = person.InductionStatus;
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
-        ExemptionReasonIds = person.InductionExemptionReasonIds;
+        PersonLevelExemptionReasonIds = person.InductionExemptionReasonIds;
+        ExemptionReasonNames = (await referenceDataCache
+            .GetInductionExemptionReasonsAsync())
+            .Where(i => PersonLevelExemptionReasonIds.Contains(i.InductionExemptionReasonId))
+            .Select(i => i.Name);
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         HasQts = result!.Contact.dfeta_QTSDate is not null;
 
-        var allExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync();
-        ExemptionReasonValues = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId)).Select(r => r.Name);
-
-        InductionExemptionsFromRoutes = dbContext.ProfessionalStatuses
+        InductionExemptedRoutes = dbContext.ProfessionalStatuses
             .Include(p => p.RouteToProfessionalStatus)
             .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
-            .Where(p => p.PersonId == person.PersonId && p.RouteToProfessionalStatus != null && p.RouteToProfessionalStatus.InductionExemptionReason != null);
+            .Where(p => p.PersonId == PersonId && p.RouteToProfessionalStatus != null && p.RouteToProfessionalStatus.InductionExemptionReason != null);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;

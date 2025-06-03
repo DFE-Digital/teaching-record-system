@@ -21,6 +21,32 @@ public class ExemptionReasonModel(
 
     public InductionExemptionReason[] ExemptionReasons { get; set; } = [];
 
+    public IEnumerable<ProfessionalStatus>? ExemptedRoutes;
+
+    public bool ShowInductionExemptionReasonNotAvailableMessage => ExemptedRoutes?
+        .Any(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId || r.RouteToProfessionalStatusId == RouteToProfessionalStatus.NiRId) ?? false;
+
+    public string[]? InductionExemptionReasonNotAvailableMessages
+    {
+        get
+        {
+            if (!ShowInductionExemptionReasonNotAvailableMessage)
+            {
+                return null;
+            }
+            else
+            {
+                List<string> messages = new();
+                foreach (var exemptedRoute in ExemptedRoutes!.Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId || r.RouteToProfessionalStatusId == RouteToProfessionalStatus.NiRId))
+                {
+                    messages.Add($"To add/remove the Induction exemption reason of: \"{exemptedRoute.RouteToProfessionalStatus?.InductionExemptionReason?.Name}\" please modify the \"{exemptedRoute.RouteToProfessionalStatus?.Name}\" route");
+                }
+                return messages.ToArray();
+            }
+        }
+    }
+
+
     public InductionJourneyPage NextPage
     {
         get
@@ -89,6 +115,13 @@ public class ExemptionReasonModel(
             return;
         }
 
-        ExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
+        ExemptedRoutes = DbContext.ProfessionalStatuses
+            .Include(p => p.RouteToProfessionalStatus)
+            .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
+            .Where(p => p.PersonId == PersonId && p.RouteToProfessionalStatus != null && p.RouteToProfessionalStatus.InductionExemptionReason != null);
+
+        ExemptionReasons = (await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+            .Where(e => !ExemptedRoutes?.Select(r => r.RouteToProfessionalStatus?.InductionExemptionReasonId).Contains(e.InductionExemptionReasonId) ?? true) // CML TODO check / tidy
+            .ToArray();
     }
 }

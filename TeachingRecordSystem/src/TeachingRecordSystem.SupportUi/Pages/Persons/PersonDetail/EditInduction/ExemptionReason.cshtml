@@ -12,6 +12,13 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
+            @if (Model.InductionExemptionReasonNotAvailableMessages is not null)
+            {
+                foreach (var message in Model.InductionExemptionReasonNotAvailableMessages)
+                {
+                    <govuk-inset-text data-testid="inset-text-exemption-reason-warning">@message</govuk-inset-text>
+                }
+            }
             <govuk-checkboxes asp-for="ExemptionReasonIds">
                 <govuk-checkboxes-fieldset>
                     <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true"/>
@@ -21,7 +28,10 @@
                         <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@category.GetDisplayName()</govuk-checkboxes-divider>
                         @foreach (var exemptionReasonId in ExemptionReasonCategories.GetExemptionReasonIdsForCategory(category))
                         {
-                            <govuk-checkboxes-item value="@exemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReasonId)">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
+                            if (@Model.ExemptionReasons.Where(e => e.InductionExemptionReasonId == exemptionReasonId).Count() > 0)
+                            {
+                                <govuk-checkboxes-item value="@exemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReasonId)">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
+                            }
                         }
                     }
                 </govuk-checkboxes-fieldset>

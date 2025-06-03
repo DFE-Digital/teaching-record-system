@@ -31,15 +31,15 @@
                 }
             </govuk-summary-list-row>
 
-            @if (Model.ExemptionReasonIds!.Length > 0)
+            @if (Model.PersonLevelExemptionReasonIds!.Length > 0)
             {
                 <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
-                        @if (Model.ExemptionReasonValues is not null)
+                        @if (Model.ExemptionReasonNames is not null)
                         {
                             <ul class="govuk-list">
-                                @foreach (var exemptionReason in Model.ExemptionReasonValues)
+                                @foreach (var exemptionReason in Model.ExemptionReasonNames)
                                 {
                                     <li>@exemptionReason</li>
                                 }
@@ -82,9 +82,9 @@
                     }
                 </govuk-summary-list-row>
             }
-            @if(Model.InductionExemptionsFromRoutes is not null)
+            @if(Model.InductionExemptedRoutes is not null)
             {
-                foreach (var exemptedRoute in Model.InductionExemptionsFromRoutes)
+                foreach (var exemptedRoute in Model.InductionExemptedRoutes)
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Route induction exemption reason</govuk-summary-list-row-key>

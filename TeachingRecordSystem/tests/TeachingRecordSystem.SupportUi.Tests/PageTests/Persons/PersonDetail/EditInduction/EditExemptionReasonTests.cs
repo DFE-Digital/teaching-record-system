@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -64,6 +65,54 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
             Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
             Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
         });
+    }
+
+    [Fact]
+    public async Task Get_PersonHasInductionExemptionFromARoute_ShowsExpectedContent()
+    {
+        // Arrange
+        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteToProfessionalStatus.ScotlandRId);
+        var awardedDate = Clock.Today;
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+            .ToArray();
+        var exemptionReasonsForDisplay = allGuidsToDisplay
+            .Where(guid => guid != route.InductionExemptionReason?.InductionExemptionReasonId) // exclude the awarded route exemption reason 
+            .Join(exemptionReasons,
+                guid => guid,
+                exemption => exemption.InductionExemptionReasonId,
+                (guid, exemption) => new { guid, exemption.Name })
+
+            .ToArray();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithProfessionalStatus(r => r
+                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate)));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var exemptionReasonsElements = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
+        Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElements.Count());
+        Assert.All(exemptionReasonsElements, checkbox =>
+        {
+            Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
+            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
+        });
+
+        var expectedMessage = $"To add/remove the Induction exemption reason of: \"{route.InductionExemptionReason?.Name}\" please modify the \"{route.Name}\" route";
+        Assert.Equal(expectedMessage, doc.GetElementByTestId("inset-text-exemption-reason-warning")?.TextContent.Trim());
     }
 
     [Fact]

@@ -9,8 +9,7 @@ public enum ExemptionReasonCategory
     [Display(Name = "Exemptions for historical qualification routes")]
     HistoricalQualificationRoute = 2,
     [Display(Name = "Induction completed outside England")]
-    InductionCompletedOutsideEngland = 3,
-    None = 4
+    InductionCompletedOutsideEngland = 3
 }
 
 public static class ExemptionReasonCategories
