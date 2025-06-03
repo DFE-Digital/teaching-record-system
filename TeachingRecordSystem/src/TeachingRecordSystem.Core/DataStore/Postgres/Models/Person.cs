@@ -45,7 +45,7 @@ public class Person
     public DateOnly? EytsDate { get; internal set; }
     public bool HasEyps { get; internal set; }
     public DateOnly? PqtsDate { get; internal set; }
-    public ICollection<Qualification>? Qualifications { get; }
+    public ICollection<Qualification>? Qualifications { get; protected set; }
     public ICollection<Alert>? Alerts { get; }
     public ICollection<PreviousName>? PreviousNames { get; }
 
@@ -201,6 +201,21 @@ public class Person
         };
     }
 
+    // This should be used for testing only
+    public void UnsafeSetInductionStatus(
+        InductionStatus status,
+        InductionStatus statusWithoutExemption,
+        DateOnly? startDate,
+        DateOnly? completedDate,
+        Guid[] exemptionReasonIds)
+    {
+        InductionStatus = status;
+        InductionStatusWithoutExemption = statusWithoutExemption;
+        InductionStartDate = startDate;
+        InductionCompletedDate = completedDate;
+        InductionExemptionReasonIds = exemptionReasonIds;
+    }
+
     public void SetInductionStatus(
         InductionStatus status,
         DateOnly? startDate,
@@ -338,7 +353,9 @@ public class Person
         InductionExemptionReasonIds = InductionExemptionReasonIds.Except([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
 
-        if (InductionStatus is InductionStatus.Exempt && (InductionExemptionReasonIds.Length == 0 && !InductionExemptWithoutReason))
+        var allExemptionReasonIds = GetAllInductionExemptionReasonIds();
+
+        if (InductionStatus is InductionStatus.Exempt && (allExemptionReasonIds.Count == 0 && !InductionExemptWithoutReason))
         {
             InductionStatus = InductionStatusWithoutExemption;
             changes |= PersonInductionUpdatedEventChanges.InductionStatus;
@@ -477,6 +494,90 @@ public class Person
         return (CpdInductionModifiedOn is not null && (InductionCompletedDate is null || InductionCompletedDate > sevenYearsAgo));
     }
 
+    public (EventModels.Induction NewInduction, EventModels.Induction OldInduction, bool Changed) RefreshInductionStatusForQtsProfessionalStatusChanged(
+        DateTime now,
+        IEnumerable<ProfessionalStatus>? professionalStatusesHint = null)
+    {
+        var oldInduction = EventModels.Induction.FromModel(this);
+
+        var currentStatus = InductionStatus;
+
+        var professionalStatuses = professionalStatusesHint ??
+            Qualifications?
+                .OfType<ProfessionalStatus>()
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("Professional statuses not loaded.");
+
+        var awardedOrApprovedQtsProfessionalStatuses = professionalStatuses
+            .Where(p => p.RouteToProfessionalStatus!.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
+                p.Status is ProfessionalStatusStatus.Awarded or ProfessionalStatusStatus.Approved)
+            .ToArray();
+
+        var awardedBeforeInduction = awardedOrApprovedQtsProfessionalStatuses.Any(p => p.AwardedDate < EarliestInductionStartDate);
+        var requiredToComplete = awardedOrApprovedQtsProfessionalStatuses.Any() && !awardedBeforeInduction;
+
+        if (!requiredToComplete &&
+            currentStatus is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed)
+        {
+            throw new InvalidOperationException($"Cannot remove the induction requirement for a person who is '{InductionStatus}'.");
+        }
+
+        var exemptViaRoute = awardedOrApprovedQtsProfessionalStatuses.Any(p => p.ExemptFromInduction == true);
+        var routeDerivedStatus = exemptViaRoute ? InductionStatus.Exempt :
+            requiredToComplete ? InductionStatus.RequiredToComplete :
+            InductionStatus.None;
+
+        var newStatus = routeDerivedStatus.IsHigherPriorityThan(currentStatus) || currentStatus is InductionStatus.RequiredToComplete ?
+            routeDerivedStatus :
+            currentStatus;
+        var changed = newStatus != currentStatus;
+
+        if (awardedBeforeInduction && !InductionExemptionReasonIds.Contains(InductionExemptionReason.QualifiedBefore7thMay2000Id))
+        {
+            InductionExemptionReasonIds = InductionExemptionReasonIds.Append(InductionExemptionReason.QualifiedBefore7thMay2000Id).ToArray();
+
+            if (InductionStatus.Exempt.IsHigherPriorityThan(newStatus))
+            {
+                newStatus = InductionStatus.Exempt;
+            }
+
+            changed = true;
+        }
+        else if (!awardedBeforeInduction && InductionExemptionReasonIds.Contains(InductionExemptionReason.QualifiedBefore7thMay2000Id))
+        {
+            InductionExemptionReasonIds = InductionExemptionReasonIds.Except([InductionExemptionReason.QualifiedBefore7thMay2000Id]).ToArray();
+
+            if (currentStatus is InductionStatus.Exempt && InductionExemptionReasonIds.Length == 0 && !InductionExemptWithoutReason && !exemptViaRoute)
+            {
+                newStatus = routeDerivedStatus.IsHigherPriorityThan(InductionStatusWithoutExemption) ? routeDerivedStatus : InductionStatusWithoutExemption;
+            }
+
+            changed = true;
+        }
+
+        if (changed)
+        {
+            InductionStatus = newStatus;
+            InductionModifiedOn = now;
+            changed = true;
+        }
+
+        if (requiredToComplete && InductionStatus.RequiredToComplete.IsHigherPriorityThan(InductionStatusWithoutExemption))
+        {
+            InductionStatusWithoutExemption = InductionStatus.RequiredToComplete;
+            changed = true;
+        }
+        else if (!requiredToComplete && InductionStatusWithoutExemption == InductionStatus.RequiredToComplete)
+        {
+            InductionStatusWithoutExemption = InductionStatus.None;
+            changed = true;
+        }
+
+        var newInduction = EventModels.Induction.FromModel(this);
+
+        return (newInduction, oldInduction, changed);
+    }
+
     public bool RefreshProfessionalStatusAttributes(
         ProfessionalStatusType professionalStatusType,
         IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
@@ -484,9 +585,9 @@ public class Person
     {
         var professionalStatuses = professionalStatusesHint ??
             Qualifications?
-                .OfType<ProfessionalStatus>()?
+                .OfType<ProfessionalStatus>()
                 .Where(p => p.DeletedOn is null) ??
-            throw new InvalidOperationException("No professional statuses.");
+            throw new InvalidOperationException("Professional statuses not loaded.");
 
         var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusId, r => r.ProfessionalStatusType);
 
@@ -539,5 +640,22 @@ public class Person
         {
             Debug.Fail(error);
         }
+    }
+
+    private IReadOnlyCollection<Guid> GetAllInductionExemptionReasonIds(
+        IEnumerable<ProfessionalStatus>? professionalStatusesHint = null)
+    {
+        var professionalStatuses = professionalStatusesHint ??
+            Qualifications?
+                .OfType<ProfessionalStatus>()
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("Professional statuses not loaded.");
+
+        var routeLevelExemptionIds = professionalStatuses
+            .Where(s => s.Status is ProfessionalStatusStatus.Awarded or ProfessionalStatusStatus.Approved &&
+                s.ExemptFromInduction == true)
+            .Select(s => s.RouteToProfessionalStatus!.InductionExemptionReasonId!.Value);
+
+        return routeLevelExemptionIds.Concat(InductionExemptionReasonIds).Distinct().AsReadOnly();
     }
 }
