@@ -59,7 +59,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
 
             EventObserver.AssertEventsSaved(e =>
             {
-                var deletedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+                var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
                 Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, deletedEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, deletedEvent.RaisedBy);
@@ -87,12 +87,12 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             var route = await GetQtlsRoute(person.PersonId);
             Assert.NotNull(route);
             Assert.Equal(qtlsDate, route.AwardedDate);
-            Assert.Equal(ProfessionalStatusStatus.Awarded, route.Status);
+            Assert.Equal(RouteToProfessionalStatusStatus.Awarded, route.Status);
             Assert.Equal(Clock.UtcNow, route.CreatedOn);
 
             EventObserver.AssertEventsSaved(e =>
             {
-                var createdEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+                var createdEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, createdEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, createdEvent.RaisedBy);
@@ -142,16 +142,16 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             var route = await GetQtlsRoute(person.PersonId);
             Assert.NotNull(route);
             Assert.Equal(newQtlsDate, route.AwardedDate);
-            Assert.Equal(ProfessionalStatusStatus.Awarded, route.Status);
+            Assert.Equal(RouteToProfessionalStatusStatus.Awarded, route.Status);
             Assert.Equal(Clock.UtcNow, route.UpdatedOn);
 
             EventObserver.AssertEventsSaved(e =>
             {
-                var updatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
+                var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, updatedEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, updatedEvent.RaisedBy);
-                Assert.True(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.AwardedDate));
+                Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.AwardedDate));
             });
         });
 

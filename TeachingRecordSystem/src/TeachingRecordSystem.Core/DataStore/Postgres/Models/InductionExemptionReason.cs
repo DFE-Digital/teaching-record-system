@@ -7,6 +7,7 @@ public class InductionExemptionReason
     public static Guid HasOrIsEligibleForFullRegistrationInScotlandId { get; } = new("a112e691-1694-46a7-8f33-5ec5b845c181");
     public static Guid PassedInWalesId { get; } = new("39550fa9-3147-489d-b808-4feea7f7f979");
     public static Guid QtlsId { get; } = new("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db");
+    public static Guid QualifiedBefore7thMay2000Id { get; } = new("5a80cee8-98a8-426b-8422-b0e81cb49b36");
 
     public required Guid InductionExemptionReasonId { get; init; }
     public required string Name { get; init; }

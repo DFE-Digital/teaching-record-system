@@ -15,7 +15,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(CountryCode)
             .Build();
 
@@ -52,7 +52,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(CountryCode)
             .Build();
 
@@ -183,7 +183,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.InTraining)
+            .WithStatus(RouteToProfessionalStatusStatus.InTraining)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithTrainingCountryId(CountryCode)
@@ -257,7 +257,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         await WithDbContext(async dbContext =>
         {
-            var addedProfessionalStatusRecord = await dbContext.ProfessionalStatuses.FirstOrDefaultAsync(p => p.PersonId == person.PersonId);
+            var addedProfessionalStatusRecord = await dbContext.RouteToProfessionalStatuses.FirstOrDefaultAsync(p => p.PersonId == person.PersonId);
             Assert.NotNull(addedProfessionalStatusRecord);
             Assert.Equal(journeyInstance.State.IsExemptFromInduction, addedProfessionalStatusRecord.ExemptFromInduction);
             Assert.Equal(journeyInstance.State.Status, addedProfessionalStatusRecord.Status);
@@ -276,7 +276,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualCreatedEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
             Assert.Equal(Clock.UtcNow, actualCreatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualCreatedEvent.PersonId);
@@ -320,7 +320,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualCreatedEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
             Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.QtsDate);
             Assert.Null(actualCreatedEvent.OldPersonAttributes.QtsDate);
@@ -351,7 +351,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualCreatedEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
             Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.EytsDate);
             Assert.Null(actualCreatedEvent.OldPersonAttributes.EytsDate);
@@ -382,7 +382,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualCreatedEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
             Assert.True(actualCreatedEvent.PersonAttributes.HasEyps);
             Assert.False(actualCreatedEvent.OldPersonAttributes.HasEyps);
@@ -413,7 +413,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         EventPublisher.AssertEventsSaved(e =>
         {
-            var actualCreatedEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+            var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
             Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.PqtsDate);
             Assert.Null(actualCreatedEvent.OldPersonAttributes.PqtsDate);
@@ -436,7 +436,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713"),  // Apply for QTS
-                Status = ProfessionalStatusStatus.Approved,
+                Status = RouteToProfessionalStatusStatus.Approved,
                 AwardedDate = new(2024, 10, 10),
                 TrainingStartDate = null,
                 TrainingEndDate = null,
@@ -453,7 +453,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("D9EEF3F8-FDE6-4A3F-A361-F6655A42FA1E"), // Early Years ITT Assessment Only
-                Status = ProfessionalStatusStatus.Awarded,
+                Status = RouteToProfessionalStatusStatus.Awarded,
                 AwardedDate = new(2024, 10, 10),
                 TrainingStartDate = new(2023, 9, 1),
                 TrainingEndDate = new(2024, 5, 1),
@@ -470,7 +470,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("8F5C0431-D006-4EDA-9336-16DFC6A26A78"),  // EYPS
-                Status = ProfessionalStatusStatus.Awarded,
+                Status = RouteToProfessionalStatusStatus.Awarded,
                 AwardedDate = new(2024, 10, 10),
                 TrainingStartDate = null,
                 TrainingEndDate = null,
@@ -487,7 +487,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("EC95C276-25D9-491F-99A2-8D92F10E1E94"),  // European Recognition - PQTS
-                Status = ProfessionalStatusStatus.Awarded,
+                Status = RouteToProfessionalStatusStatus.Awarded,
                 AwardedDate = new(2024, 10, 10),
                 TrainingStartDate = null,
                 TrainingEndDate = null,

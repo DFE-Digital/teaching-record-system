@@ -21,11 +21,11 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -66,7 +66,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
 
         var editRouteState = new EditRouteStateBuilder()

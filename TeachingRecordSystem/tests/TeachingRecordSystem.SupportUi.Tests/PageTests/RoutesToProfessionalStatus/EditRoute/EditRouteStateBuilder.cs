@@ -7,8 +7,8 @@ public class EditRouteStateBuilder()
 {
     private QualificationType? _qualificationType;
     private Guid? _routeToProfessionalStatusId;
-    private ProfessionalStatusStatus? _status;
-    private ProfessionalStatusStatus? _currentStatus;
+    private RouteToProfessionalStatusStatus? _status;
+    private RouteToProfessionalStatusStatus? _currentStatus;
     private DateOnly? _awardedDate;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
@@ -46,7 +46,7 @@ public class EditRouteStateBuilder()
         _trainingStartDate = clock.Today.AddYears(-1);
         _trainingEndDate = clock.Today.AddDays(-1);
         _awardedDate = clock.Today;
-        _status = ProfessionalStatusStatus.Awarded;
+        _status = RouteToProfessionalStatusStatus.Awarded;
         return this;
     }
 
@@ -62,14 +62,14 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithStatus(ProfessionalStatusStatus status)
+    public EditRouteStateBuilder WithStatus(RouteToProfessionalStatusStatus status)
     {
         _status = status;
         _currentStatus = status;
         return this;
     }
 
-    public EditRouteStateBuilder WithCurrentStatus(ProfessionalStatusStatus status)
+    public EditRouteStateBuilder WithCurrentStatus(RouteToProfessionalStatusStatus status)
     {
         _currentStatus = status;
         return this;
@@ -222,13 +222,13 @@ public class EditRouteStateBuilder()
 
 public class EditRouteStatusStateBuilder
 {
-    private ProfessionalStatusStatus _status;
+    private RouteToProfessionalStatusStatus _status;
     private DateOnly? _awardedDate;
     private DateOnly? _trainingEndDate;
     private bool? _inductionExemption;
     private bool _routeImplicitExemption;
 
-    public EditRouteStatusStateBuilder WithStatus(ProfessionalStatusStatus status)
+    public EditRouteStatusStateBuilder WithStatus(RouteToProfessionalStatusStatus status)
     {
         _status = status;
         return this;

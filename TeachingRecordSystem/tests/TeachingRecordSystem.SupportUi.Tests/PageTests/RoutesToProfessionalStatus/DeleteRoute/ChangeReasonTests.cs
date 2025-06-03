@@ -14,7 +14,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
@@ -65,7 +65,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
@@ -117,7 +117,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -154,7 +154,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -181,7 +181,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -215,7 +215,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -249,7 +249,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -290,7 +290,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState();
 

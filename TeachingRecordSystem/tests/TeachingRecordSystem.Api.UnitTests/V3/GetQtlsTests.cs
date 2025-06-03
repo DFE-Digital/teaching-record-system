@@ -48,7 +48,7 @@ public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : O
                 .WithTrn()
                 .WithProfessionalStatus(s => s
                     .WithRoute(RouteToProfessionalStatusType.QtlsAndSetMembershipId)
-                    .WithStatus(ProfessionalStatusStatus.Awarded)
+                    .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                     .WithAwardedDate(qtlsDate)));
 
             var command = new GetQtlsCommand(person.Trn!);

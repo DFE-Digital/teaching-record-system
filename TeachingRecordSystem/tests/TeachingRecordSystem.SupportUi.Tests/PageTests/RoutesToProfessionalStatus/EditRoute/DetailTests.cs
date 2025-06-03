@@ -14,11 +14,11 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -56,11 +56,11 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Deferred)));
+                .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithValidChangeReasonOption()
             .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
@@ -155,7 +155,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsHaveFieldRequirementAsync(FieldRequirement.Optional);
-        var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == ProfessionalStatusStatus.InTraining).RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == RouteToProfessionalStatusStatus.InTraining).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
@@ -207,7 +207,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -231,9 +231,9 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(ProfessionalStatusStatus.Awarded, true, "Yes")]
-    [InlineData(ProfessionalStatusStatus.Awarded, false, "No")]
-    public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(ProfessionalStatusStatus status, bool? hasExemption, string expectedContent)
+    [InlineData(RouteToProfessionalStatusStatus.Awarded, true, "Yes")]
+    [InlineData(RouteToProfessionalStatusStatus.Awarded, false, "No")]
+    public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(RouteToProfessionalStatusStatus status, bool? hasExemption, string expectedContent)
     {
         // Arrange
         var startDate = Clock.Today.AddYears(-1);

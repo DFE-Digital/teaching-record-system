@@ -36,7 +36,7 @@ public static class TestDataHelper
             .RandomOne();
     }
 
-    public static ProfessionalStatusStatus GetRouteStatusWhereAllFieldsApply()
+    public static RouteToProfessionalStatusStatus GetRouteStatusWhereAllFieldsApply()
     {
         return ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
