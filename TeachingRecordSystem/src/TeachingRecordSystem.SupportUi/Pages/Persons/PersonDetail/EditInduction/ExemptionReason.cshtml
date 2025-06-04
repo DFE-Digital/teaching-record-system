@@ -12,16 +12,24 @@
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <form action="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
+            <h1 class="govuk-heading-l">Why are they exempt from induction?</h1>
+            @if (Model.InductionExemptionFromRoutesMessages is not null)
+            {
+                foreach (var message in Model.InductionExemptionFromRoutesMessages)
+                {
+                    <govuk-inset-text>@message</govuk-inset-text>
+                }
+            }
             @if (Model.InductionExemptionReasonNotAvailableMessages is not null)
             {
                 foreach (var message in Model.InductionExemptionReasonNotAvailableMessages)
                 {
-                    <govuk-inset-text data-testid="inset-text-exemption-reason-warning">@message</govuk-inset-text>
+                    <govuk-inset-text>@message</govuk-inset-text>
                 }
             }
             <govuk-checkboxes asp-for="ExemptionReasonIds">
                 <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend class="govuk-fieldset__legend--l" is-page-heading="true"/>
+                    <govuk-checkboxes-fieldset-legend class="trs-hidden" />
                     <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
                     @foreach (var category in ExemptionReasonCategories.All)
                     {
