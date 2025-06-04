@@ -76,8 +76,8 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> MapAsync()
     const int pageSize = 1000;
 
     var columns = new ColumnSet(Contact.Fields.dfeta_qtlsdate);
-    var contactFilter = new FilterExpression();
-    contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, Guid.Parse("0148c9cd-e5ae-e311-b8ed-005056822391"));
+    ////var contactFilter = new FilterExpression();
+    ////contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, Guid.Parse("0148c9cd-e5ae-e311-b8ed-005056822391"));
     ////contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, Guid.Parse("0e341031-f54e-4ae5-b790-c0b9dac2af7d"));
     ////ff5f0542-08af-e311-b8ed-005056822391 - has EYTS (training) and QTS
     ////05946d87-05af-e311-b8ed-005056822391 - has EYPS and a deffered QTS (not training)
@@ -96,7 +96,7 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> MapAsync()
             Count = pageSize,
             PageNumber = 1
         },
-        Criteria = contactFilter
+        ////Criteria = contactFilter
     };    
 
     var ittLink = query.AddLink(
