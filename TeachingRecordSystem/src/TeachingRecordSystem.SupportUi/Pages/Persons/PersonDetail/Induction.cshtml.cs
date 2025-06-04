@@ -83,7 +83,7 @@ public class InductionModel(
         InductionExemptedRoutes = dbContext.ProfessionalStatuses
             .Include(p => p.RouteToProfessionalStatus)
             .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
-            .Where(p => p.PersonId == PersonId && p.RouteToProfessionalStatus != null && p.RouteToProfessionalStatus.InductionExemptionReason != null);
+            .Where(p => p.PersonId == PersonId && p.RouteToProfessionalStatus != null && p.ExemptFromInduction == true);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;
