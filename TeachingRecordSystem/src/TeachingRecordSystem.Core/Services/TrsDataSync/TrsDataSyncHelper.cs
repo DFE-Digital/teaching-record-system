@@ -2923,6 +2923,7 @@ public class TrsDataSyncHelper(
                 if (teacherStatus?.dfeta_Value == "77" && ittProgrammeType == dfeta_ITTProgrammeType.Core)
                 {
                     precendenceOrder = [RouteMappingPrecedence.ProgrammeType];
+                    return true;
                 }
 
                 string[] combo1TeacherStatuses = ["72", "79", "89", "82", "92", "99" ];
