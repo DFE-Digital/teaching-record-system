@@ -56,9 +56,9 @@ public class IndexModel(
     public string? NationalInsuranceNumber { get; set; }
 
     public bool NameChanged =>
-        FirstName != JourneyInstance!.State.OriginalFirstName ||
-        MiddleName != JourneyInstance!.State.OriginalMiddleName ||
-        LastName != JourneyInstance!.State.OriginalLastName;
+        (FirstName ?? "") != JourneyInstance!.State.OriginalFirstName ||
+        (MiddleName ?? "") != JourneyInstance!.State.OriginalMiddleName ||
+        (LastName ?? "") != JourneyInstance!.State.OriginalLastName;
 
     public bool OtherDetailsChanged =>
         DateOfBirth != JourneyInstance!.State.OriginalDateOfBirth ||
@@ -100,7 +100,7 @@ public class IndexModel(
     {
         if (!NameChanged && !OtherDetailsChanged)
         {
-            ModelState.AddModelError(nameof(FirstName), "Please change one or more of the person\u2019s details");
+            ModelState.AddModelError("", "Please change one or more of the person\u2019s details");
         }
 
         if (DateOfBirth.HasValue && DateOfBirth.Value > clock.Today)
@@ -135,13 +135,32 @@ public class IndexModel(
 
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.FirstName = FirstName;
-            state.MiddleName = MiddleName;
-            state.LastName = LastName;
+            state.FirstName = FirstName ?? "";
+            state.MiddleName = MiddleName ?? "";
+            state.LastName = LastName ?? "";
             state.DateOfBirth = DateOfBirth;
-            state.EmailAddress = new(EmailAddress, emailAddress);
-            state.MobileNumber = new(MobileNumber, mobileNumber);
-            state.NationalInsuranceNumber = new(NationalInsuranceNumber, nationalInsuranceNumber);
+            state.EmailAddress = new(EmailAddress ?? "", emailAddress);
+            state.MobileNumber = new(MobileNumber ?? "", mobileNumber);
+            state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
+
+            if (!NameChanged && state.NameChangeReason is not null)
+            {
+                state.NameChangeReason = null;
+                state.NameChangeUploadEvidence = null;
+                state.NameChangeEvidenceFileId = null;
+                state.NameChangeEvidenceFileName = null;
+                state.NameChangeEvidenceFileSizeDescription = null;
+            }
+
+            if (!OtherDetailsChanged && state.OtherDetailsChangeReason is not null)
+            {
+                state.OtherDetailsChangeReason = null;
+                state.OtherDetailsChangeReasonDetail = null;
+                state.OtherDetailsChangeUploadEvidence = null;
+                state.OtherDetailsChangeEvidenceFileId = null;
+                state.OtherDetailsChangeEvidenceFileName = null;
+                state.OtherDetailsChangeEvidenceFileSizeDescription = null;
+            }
         });
 
         return Redirect(nextPage);

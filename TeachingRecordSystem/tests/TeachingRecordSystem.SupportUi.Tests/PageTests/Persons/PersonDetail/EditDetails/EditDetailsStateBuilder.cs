@@ -5,17 +5,17 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.Ed
 
 public class EditDetailsStateBuilder
 {
-    public string? FirstName { get; set; }
-    public string? MiddleName { get; set; }
-    public string? LastName { get; set; }
+    public string FirstName { get; set; } = "";
+    public string MiddleName { get; set; } = "";
+    public string LastName { get; set; } = "";
     public DateOnly? DateOfBirth { get; set; }
     public string? EmailAddress { get; set; }
     public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
 
-    public string? OriginalFirstName { get; set; }
-    public string? OriginalMiddleName { get; set; }
-    public string? OriginalLastName { get; set; }
+    public string OriginalFirstName { get; set; } = "";
+    public string OriginalMiddleName { get; set; } = "";
+    public string OriginalLastName { get; set; } = "";
     public DateOnly? OriginalDateOfBirth { get; set; }
     public string? OriginalEmailAddress { get; set; }
     public string? OriginalMobileNumber { get; set; }
@@ -60,9 +60,9 @@ public class EditDetailsStateBuilder
 
     public EditDetailsStateBuilder WithName(string? firstName, string? middleName, string? lastName)
     {
-        FirstName = firstName;
-        MiddleName = middleName;
-        LastName = lastName;
+        FirstName = firstName ?? "";
+        MiddleName = middleName ?? "";
+        LastName = lastName ?? "";
         return this;
     }
 

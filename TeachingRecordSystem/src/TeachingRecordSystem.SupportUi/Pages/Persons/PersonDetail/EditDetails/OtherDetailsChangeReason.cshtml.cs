@@ -49,6 +49,8 @@ public class OtherDetailsChangeReasonModel(
     [BindProperty]
     public string? OtherDetailsChangeUploadedEvidenceFileUrl { get; set; }
 
+    public bool IsAlsoChangingName => JourneyInstance!.State.NameChangeReason is not null;
+
     public string BackLink => GetPageLink(
         FromCheckAnswers
             ? EditDetailsJourneyPage.CheckAnswers

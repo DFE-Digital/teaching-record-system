@@ -31,6 +31,17 @@ public static partial class AssertEx
         Assert.Equal(expectedMessage, errorMessage);
     }
 
+    public static void HtmlDocumentHasSummaryError(IHtmlDocument doc, string expectedMessage)
+    {
+        var errorElement = doc.QuerySelectorAll(".govuk-error-summary .govuk-error-summary__list li")
+            .SingleOrDefault(item => item.TrimmedText() == expectedMessage);
+
+        if (errorElement == null)
+        {
+            throw new XunitException($"Error message '{expectedMessage}' was not found within the error summary.");
+        }
+    }
+
     public static void HtmlDocumentHasFlashSuccess(IHtmlDocument doc, string? expectedHeading = null, string? expectedMessage = null)
     {
         var banner = doc.GetElementsByClassName("govuk-notification-banner--success").SingleOrDefault();
@@ -63,6 +74,15 @@ public static partial class AssertEx
     {
         var doc = await HtmlResponseAsync(response, expectedStatusCode);
         HtmlDocumentHasError(doc, fieldName, expectedMessage);
+    }
+
+    public static async Task HtmlResponseHasSummaryErrorAsync(
+        HttpResponseMessage response,
+        string expectedMessage,
+        int expectedStatusCode = 400)
+    {
+        var doc = await HtmlResponseAsync(response, expectedStatusCode);
+        HtmlDocumentHasSummaryError(doc, expectedMessage);
     }
 
     public static void AssertRowContentMatches(this IHtmlDocument doc, string keyContent, string expected)

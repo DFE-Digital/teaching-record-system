@@ -730,7 +730,7 @@ public class IndexTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(IndexModel.FirstName), "Please change one or more of the person\u2019s details");
+        await AssertEx.HtmlResponseHasSummaryErrorAsync(response, "Please change one or more of the person\u2019s details");
     }
 
     [Fact]
@@ -775,6 +775,148 @@ public class IndexTests : TestBase
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+    }
+
+    [Fact]
+    public async Task Post_WhenNamePreviouslyChangedInSameJourney_AndNameUpdatedToOriginalValue_RemovesNameChangeReasonFromState()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("original@email.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var nameEvidenceFileId = Guid.NewGuid();
+        var otherEvidenceFileId = Guid.NewGuid();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Megan", "Thee", "Stallion")
+                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                .WithEmail("new@email.com")
+                .WithMobileNumber("447987654321")
+                .WithNationalInsuranceNumber("AB654321D")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new FormUrlEncodedContent(
+                new EditDetailsPostRequestBuilder()
+                    .WithFirstName("Alfred")
+                    .WithMiddleName("The")
+                    .WithLastName("Great")
+                    .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                    .WithEmailAddress("new@email.com")
+                    .WithMobileNumber("447987654321")
+                    .WithNationalInsuranceNumber("AB654321D")
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+
+        // Assert
+        Assert.Equal("Alfred", journeyInstance.State.FirstName);
+        Assert.Equal("The", journeyInstance.State.MiddleName);
+        Assert.Equal("Great", journeyInstance.State.LastName);
+        Assert.Null(journeyInstance.State.NameChangeReason);
+        Assert.Null(journeyInstance.State.NameChangeUploadEvidence);
+        Assert.Null(journeyInstance.State.NameChangeEvidenceFileId);
+        Assert.Null(journeyInstance.State.NameChangeEvidenceFileName);
+        Assert.Null(journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+
+        Assert.Equal(DateOnly.Parse("3 Aug 1999"), journeyInstance.State.DateOfBirth);
+        Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
+        Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
+        Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Equal("Some reason", journeyInstance.State.OtherDetailsChangeReasonDetail);
+        Assert.Equal(true, journeyInstance.State.OtherDetailsChangeUploadEvidence);
+        Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidenceFileId);
+        Assert.Equal("other-evidence.png", journeyInstance.State.OtherDetailsChangeEvidenceFileName);
+        Assert.Equal("1.3 KB", journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
+    }
+
+    [Fact]
+    public async Task Post_WhenOtherDetailsPreviouslyChangedInSameJourney_AndOtherDetailsUpdatedToOriginalValues_RemovesOtherDetailsChangeReasonFromState()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("original@email.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var nameEvidenceFileId = Guid.NewGuid();
+        var otherEvidenceFileId = Guid.NewGuid();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Megan", "Thee", "Stallion")
+                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                .WithEmail("new@email.com")
+                .WithMobileNumber("447987654321")
+                .WithNationalInsuranceNumber("AB654321D")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeUploadEvidenceChoice(true, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new FormUrlEncodedContent(
+                new EditDetailsPostRequestBuilder()
+                    .WithFirstName("Megan")
+                    .WithMiddleName("Thee")
+                    .WithLastName("Stallion")
+                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                    .WithEmailAddress("original@email.com")
+                    .WithMobileNumber("447891234567")
+                    .WithNationalInsuranceNumber("AB123456C")
+                    .Build())
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+
+        // Assert
+        Assert.Equal("Megan", journeyInstance.State.FirstName);
+        Assert.Equal("Thee", journeyInstance.State.MiddleName);
+        Assert.Equal("Stallion", journeyInstance.State.LastName);
+        Assert.Equal(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership, journeyInstance.State.NameChangeReason);
+        Assert.Equal(true, journeyInstance.State.NameChangeUploadEvidence);
+        Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidenceFileId);
+        Assert.Equal("name-evidence.pdf", journeyInstance.State.NameChangeEvidenceFileName);
+        Assert.Equal("2.4 MB", journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+
+        Assert.Equal(DateOnly.Parse("1 Feb 1980"), journeyInstance.State.DateOfBirth);
+        Assert.Equal("original@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
+        Assert.Equal("447891234567", journeyInstance.State.MobileNumber.Parsed?.ToString());
+        Assert.Equal("AB123456C", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Null(journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeReasonDetail);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeUploadEvidence);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileId);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileName);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person) =>

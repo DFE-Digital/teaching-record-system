@@ -180,6 +180,40 @@ public class OtherDetailsChangeReasonTests : TestBase
     }
 
     [Fact]
+    public async Task Get_WhenNameAlsoChanged_PageTitleChangesAccordingly()
+    {
+        // Arrange
+        var expectedChoices = Enum.GetValues<EditDetailsOtherDetailsChangeReasonOption>().Select(s => s.ToString());
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Megan", "Thee", "Stallion")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeUploadEvidenceChoice(false)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var reasonChoicesLegend = doc.GetElementByTestId("change-reason-options-legend");
+        Assert.Equal("Why are you changing the other personal details on this record?", reasonChoicesLegend!.TrimmedText());
+    }
+
+    [Fact]
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
