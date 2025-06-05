@@ -11,6 +11,27 @@
     <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
 }
 
+@if (ModelState.ErrorCount > 0)
+{
+    //Re-implement the form error summary to handle validation errors that do not apply to a specific field
+    <govuk-error-summary>
+        @foreach (var item in ModelState)
+        {
+            foreach (var error in item.Value.Errors)
+            {
+                @if (!string.IsNullOrEmpty(item.Key))
+                {
+                    <govuk-error-summary-item href="#@item.Key">@error.ErrorMessage</govuk-error-summary-item>
+                }
+                else
+                {
+                    <govuk-error-summary-item>@error.ErrorMessage</govuk-error-summary-item>
+                }
+            }
+        }
+    </govuk-error-summary>
+}
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <form action=@LinkGenerator.EditDetailsIndex(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
