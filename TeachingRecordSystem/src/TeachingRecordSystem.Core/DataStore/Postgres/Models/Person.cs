@@ -44,6 +44,7 @@ public class Person
     /// </summary>
     public DateTime? CpdInductionCpdModifiedOn { get; private set; }
     public DateOnly? QtsDate { get; internal set; }
+    public QtlsStatus QtlsStatus { get; private set; }
     public DateOnly? EytsDate { get; internal set; }
     public bool HasEyps { get; internal set; }
     public DateOnly? PqtsDate { get; internal set; }
