@@ -116,22 +116,90 @@ public static partial class AssertEx
 
     public static void AssertSummaryListValue(this IHtmlDocument doc, string keyContent, Action<IElement> valueAssertion)
     {
-        AssertSummaryListValue<IElement>(doc, keyContent, valueAssertion);
+        doc.AssertSummaryListValueCore(null, keyContent, valueAssertion);
     }
 
-    public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string keyContent)
+    public static void AssertSummaryListValue(this IHtmlDocument doc, string? containerTestId, string keyContent, Action<IElement> valueAssertion)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
-        Assert.Null(label);
+        doc.AssertSummaryListValueCore(containerTestId, keyContent, valueAssertion);
     }
 
     public static void AssertSummaryListValue<T>(this IHtmlDocument doc, string keyContent, Action<T> valueAssertion)
     {
-        var label = doc.QuerySelectorAll(".govuk-summary-list__key").Single(e => e.TrimmedText() == keyContent);
+        doc.AssertSummaryListValueCore(null, keyContent, valueAssertion);
+    }
+
+    public static void AssertSummaryListValue<T>(this IHtmlDocument doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
+    {
+        doc.AssertSummaryListValueCore(containerTestId, keyContent, valueAssertion);
+    }
+
+    public static void AssertSummaryListValues(this IHtmlDocument doc, string keyContent, params Action<IElement>[] valueAssertions)
+    {
+        doc.AssertSummaryListValuesCore(null, keyContent, valueAssertions);
+    }
+
+    public static void AssertSummaryListValues(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<IElement>[] valueAssertions)
+    {
+        doc.AssertSummaryListValuesCore(containerTestId, keyContent, valueAssertions);
+    }
+
+    public static void AssertSummaryListValues<T>(this IHtmlDocument doc, string keyContent, params Action<T>[] valueAssertions)
+    {
+        doc.AssertSummaryListValuesCore(null, keyContent, valueAssertions);
+    }
+
+    public static void AssertSummaryListValues<T>(this IHtmlDocument doc, string containerTestId, string keyContent, params Action<T>[] valueAssertions)
+    {
+        doc.AssertSummaryListValuesCore(containerTestId, keyContent, valueAssertions);
+    }
+
+    public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string keyContent)
+    {
+        doc.AssertSummaryListRowDoesNotExistCore(null, keyContent);
+    }
+
+    public static void AssertSummaryListRowDoesNotExist(this IHtmlDocument doc, string containerTestId, string keyContent)
+    {
+        doc.AssertSummaryListRowDoesNotExistCore(containerTestId, keyContent);
+    }
+
+    private static void AssertSummaryListValueCore<T>(this IHtmlDocument doc, string? containerTestId, string keyContent, Action<T> valueAssertion)
+    {
+        IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
+        Assert.NotNull(container);
+
+        var label = container.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
+        AssertRowValueCore<T>(label, valueAssertion);
+    }
+
+    private static void AssertSummaryListValuesCore<T>(this IHtmlDocument doc, string? containerTestId, string keyContent, params Action<T>[] valueAssertions)
+    {
+        IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
+        Assert.NotNull(container);
+
+        var labels = container.QuerySelectorAll(".govuk-summary-list__key").Where(e => e.TrimmedText() == keyContent);
+        Assert.Collection(labels, valueAssertions
+                .AsEnumerable()
+                .Select<Action<T>, Action<IElement>>(assertion => (label => AssertRowValueCore(label, assertion)))
+                .ToArray());
+    }
+
+    private static void AssertRowValueCore<T>(IElement? label, Action<T> valueAssertion)
+    {
         Assert.NotNull(label);
         var element = label.NextElementSibling;
         Assert.NotNull(element);
         var value = Assert.IsAssignableFrom<T>(element);
         valueAssertion(value);
+    }
+
+    private static void AssertSummaryListRowDoesNotExistCore(this IHtmlDocument doc, string? containerTestId, string keyContent)
+    {
+        IParentNode? container = containerTestId is null ? doc : doc.GetAllElementsByTestId(containerTestId).SingleOrDefault();
+        Assert.NotNull(container);
+
+        var label = container.QuerySelectorAll(".govuk-summary-list__key").SingleOrDefault(e => e.TrimmedText() == keyContent);
+        Assert.Null(label);
     }
 }

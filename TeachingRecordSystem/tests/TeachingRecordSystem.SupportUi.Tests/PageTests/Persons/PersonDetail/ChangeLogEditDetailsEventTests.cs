@@ -1,3 +1,4 @@
+using AngleSharp.Dom;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -55,17 +56,34 @@ public class ChangeLogEditDetailsEventTests : TestBase
         string? mobileNumber = "07890123456";
         string? nationalInsuranceNumber = "XY 98 76 54 A";
 
-        var changeReason = EditDetailsChangeReasonOption.AnotherReason.GetDisplayName();
-        var changeReasonDetail = "Reason detail";
-        var evidenceFile = new EventModels.File
-        {
-            FileId = Guid.NewGuid(),
-            Name = "evidence.jpg"
-        };
-
         var updatedFirstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? firstName : oldFirstName;
         var updatedMiddleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? middleName : oldMiddleName;
         var updatedLastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? lastName : oldLastName;
+
+        var nameChangeReason = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange)
+            ? EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess.GetDisplayName()
+            : null;
+        var nameChangeEvidenceFile = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange)
+            ? new EventModels.File
+            {
+                FileId = Guid.NewGuid(),
+                Name = "name-evidence.jpg"
+            }
+            : null;
+
+        var detailsChangeReason = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange)
+            ? EditDetailsOtherDetailsChangeReasonOption.AnotherReason.GetDisplayName()
+            : null;
+        var detailsChangeReasonDetail = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange)
+            ? "Reason detail"
+            : null;
+        var detailsChangeEvidenceFile = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange)
+            ? new EventModels.File
+            {
+                FileId = Guid.NewGuid(),
+                Name = "other-evidence.jpg"
+            }
+            : null;
 
         var details = new EventModels.PersonDetails
         {
@@ -98,9 +116,11 @@ public class ChangeLogEditDetailsEventTests : TestBase
             Details = details,
             OldDetails = oldDetails,
             Changes = changes,
-            ChangeReason = changeReason,
-            ChangeReasonDetail = changeReasonDetail,
-            EvidenceFile = evidenceFile
+            NameChangeReason = nameChangeReason,
+            NameChangeEvidenceFile = nameChangeEvidenceFile,
+            DetailsChangeReason = detailsChangeReason,
+            DetailsChangeReasonDetail = detailsChangeReasonDetail,
+            DetailsChangeEvidenceFile = detailsChangeEvidenceFile
         };
 
         await WithDbContext(async dbContext =>
@@ -122,63 +142,95 @@ public class ChangeLogEditDetailsEventTests : TestBase
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
-        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.AnyNameChange))
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
         {
-            Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", item.GetElementByTestId("details-name")?.TrimmedText());
-            Assert.Equal($"{oldFirstName} {oldMiddleName} {oldLastName}", item.GetElementByTestId("old-details-name")?.TrimmedText());
+            doc.AssertSummaryListValue("details", "Name", v => Assert.Equal($"{updatedFirstName} {updatedMiddleName} {updatedLastName}", v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "Name", v => Assert.Equal($"{oldFirstName} {oldMiddleName} {oldLastName}", v.TrimmedText()));
         }
         else
         {
-            Assert.Null(item.GetElementByTestId("details-name"));
-            Assert.Null(item.GetElementByTestId("old-details-name"));
+            doc.AssertSummaryListRowDoesNotExist("details", "Name");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Name");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth))
         {
-            Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("details-dob")?.TrimmedText());
-            Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-details-dob")?.TrimmedText());
+            doc.AssertSummaryListValue("details", "Date of birth", v => Assert.Equal(dateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "Date of birth", v => Assert.Equal(oldDateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat), v.TrimmedText()));
         }
         else
         {
-            Assert.Null(item.GetElementByTestId("details-dob"));
-            Assert.Null(item.GetElementByTestId("old-details-dob"));
+            doc.AssertSummaryListRowDoesNotExist("details", "Date of birth");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Date of birth");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, item.GetElementByTestId("details-email")?.TrimmedText());
-            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, item.GetElementByTestId("old-details-email")?.TrimmedText());
+            doc.AssertSummaryListValue("details", "Email", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "Email", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, v.TrimmedText()));
         }
         else
         {
-            Assert.Null(item.GetElementByTestId("details-email"));
-            Assert.Null(item.GetElementByTestId("old-details-email"));
+            doc.AssertSummaryListRowDoesNotExist("details", "Email");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Email");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber))
         {
-            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : mobileNumber, item.GetElementByTestId("details-mobile")?.TrimmedText());
-            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldMobileNumber, item.GetElementByTestId("old-details-mobile")?.TrimmedText());
+            doc.AssertSummaryListValue("details", "Mobile number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : mobileNumber, v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "Mobile number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldMobileNumber, v.TrimmedText()));
         }
         else
         {
-            Assert.Null(item.GetElementByTestId("details-mobile"));
-            Assert.Null(item.GetElementByTestId("old-details-mobile"));
+            doc.AssertSummaryListRowDoesNotExist("details", "Mobile number");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Mobile number");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber))
         {
-            Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, item.GetElementByTestId("details-nino")?.TrimmedText());
-            Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, item.GetElementByTestId("old-details-nino")?.TrimmedText());
+            doc.AssertSummaryListValue("details", "National Insurance number", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : nationalInsuranceNumber, v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "National Insurance number", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldNationalInsuranceNumber, v.TrimmedText()));
         }
         else
         {
-            Assert.Null(item.GetElementByTestId("details-nino"));
-            Assert.Null(item.GetElementByTestId("old-details-nino"));
+            doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
         }
 
-        Assert.Equal(changeReason, item.GetElementByTestId("reason")?.TrimmedText());
-        Assert.Equal(changeReasonDetail, item.GetElementByTestId("reason-detail")?.TrimmedText());
-        Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+        {
+            doc.AssertSummaryListValue("change-reason", "Name change", v => Assert.Equal(nameChangeReason, v.TrimmedText()));
+        }
+        else
+        {
+            doc.AssertSummaryListRowDoesNotExist("change-reason", "Name change");
+        }
+
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
+        {
+            var keyContent = changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange)
+                ? "Other personal details change"
+                : "Personal details change";
+
+            doc.AssertSummaryListValue("change-reason", keyContent, v => Assert.Equal(detailsChangeReason, v.TrimmedText()));
+            doc.AssertSummaryListValue("change-reason", "Reason details", v => Assert.Equal(detailsChangeReasonDetail, v.TrimmedText()));
+        }
+        else
+        {
+            doc.AssertSummaryListRowDoesNotExist("change-reason", "Personal details change");
+            doc.AssertSummaryListRowDoesNotExist("change-reason", "Other personal details change");
+        }
+
+        var assertions = new List<Action<IElement>>();
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+        {
+            assertions.Add(v => Assert.Equal($"{nameChangeEvidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
+        }
+        if (changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.OtherThanNameChange))
+        {
+            assertions.Add(v => Assert.Equal($"{detailsChangeEvidenceFile!.Name} (opens in new tab)", v.TrimmedText()));
+        }
+
+        doc.AssertSummaryListValues("change-reason", "Evidence", assertions.ToArray());
     }
 }

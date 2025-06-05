@@ -45,11 +45,11 @@ public sealed partial class EmailAddress : IEquatable<EmailAddress>, IParsable<E
     public override int GetHashCode() =>
         NormalizedValue.GetHashCode();
 
-    public static bool operator ==(EmailAddress left, EmailAddress right) =>
+    public static bool operator ==(EmailAddress? left, EmailAddress? right) =>
         (left is null && right is null) ||
         (left is not null && right is not null && left.Equals(right));
 
-    public static bool operator !=(EmailAddress left, EmailAddress right) =>
+    public static bool operator !=(EmailAddress? left, EmailAddress? right) =>
         !(left == right);
 
     public static explicit operator EmailAddress?(string? value) =>

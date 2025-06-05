@@ -5,9 +5,9 @@ using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditDetails;
 
 [Collection(nameof(DisableParallelization))]
-public class ChangeReasonTests : TestBase
+public class OtherDetailsChangeReasonTests : TestBase
 {
-    public ChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
+    public OtherDetailsChangeReasonTests(HostFixture hostFixture) : base(hostFixture)
     {
         TestScopedServices.GetCurrent().FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
         FileServiceMock.Invocations.Clear();
@@ -26,13 +26,17 @@ public class ChangeReasonTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithFirstName("Alfred")
             .WithMiddleName("The")
-            .WithLastName("Great"));
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -43,18 +47,24 @@ public class ChangeReasonTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("change-reason-caption");
-        Assert.Equal("Alfred The Great", caption!.TrimmedText());
+        Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
 
     [Fact]
     public async Task Get_ContinueAndCancelButtons_ExistOnPage()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -76,18 +86,24 @@ public class ChangeReasonTests : TestBase
     public async Task Get_WithPreviouslyStoredChoices_ShowsChoices()
     {
         // Arrange
-        var reasonChoice = EditDetailsChangeReasonOption.AnotherReason;
+        var reasonChoice = EditDetailsOtherDetailsChangeReasonOption.AnotherReason;
         var reasonDetail = "A description about why the change typed into the box";
         var evidenceFileId = Guid.NewGuid();
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
 
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
-                .WithChangeReasonChoice(reasonChoice, reasonDetail)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
+                .WithOtherDetailsChangeReasonChoice(reasonChoice, reasonDetail)
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.jpg", "1.2 KB")
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -113,24 +129,29 @@ public class ChangeReasonTests : TestBase
         Assert.Equal("evidence.jpg (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(doc, "EvidenceFileId"));
-        Assert.Equal("evidence.jpg", GetHiddenInputValue(doc, "EvidenceFileName"));
-        Assert.Equal("1.2 KB", GetHiddenInputValue(doc, "EvidenceFileSizeDescription"));
-        Assert.Equal(expectedFileUrl, GetHiddenInputValue(doc, "UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(doc, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId)));
+        Assert.Equal("evidence.jpg", GetHiddenInputValue(doc, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName)));
+        Assert.Equal("1.2 KB", GetHiddenInputValue(doc, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription)));
+        Assert.Equal(expectedFileUrl, GetHiddenInputValue(doc, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl)));
     }
 
     [Fact]
     public async Task Get_ExpectedRadioButtonsExistOnPage()
     {
         // Arrange
-        var expectedChoices = Enum.GetValues<EditDetailsChangeReasonOption>().Select(s => s.ToString());
+        var expectedChoices = Enum.GetValues<EditDetailsOtherDetailsChangeReasonOption>().Select(s => s.ToString());
 
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -162,22 +183,28 @@ public class ChangeReasonTests : TestBase
     public async Task Post_SetValidChangeReasonDetails_PersistsDetails()
     {
         // Arrange
-        var changeReason = EditDetailsChangeReasonOption.AnotherReason;
+        var changeReason = EditDetailsOtherDetailsChangeReasonOption.AnotherReason;
         var changeReasonDetails = "A description about why the change typed into the box";
-        var person = await TestData.CreatePersonAsync();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new FormUrlEncodedContent(
                 new EditDetailsPostRequestBuilder()
-                    .WithChangeReason(changeReason, changeReasonDetails)
-                    .WithNoFileUploadSelection()
+                    .WithOtherDetailsChangeReason(changeReason, changeReasonDetails)
+                    .WithNoOtherDetailsChangeFileUploadSelection()
                     .Build())
         };
 
@@ -186,19 +213,25 @@ public class ChangeReasonTests : TestBase
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.ChangeReason!.GetDisplayName());
-        Assert.Equal(changeReasonDetails, journeyInstance.State.ChangeReasonDetail);
+        Assert.Equal(changeReason.GetDisplayName(), journeyInstance.State.OtherDetailsChangeReason!.GetDisplayName());
+        Assert.Equal(changeReasonDetails, journeyInstance.State.OtherDetailsChangeReasonDetail);
     }
 
     [Fact]
     public async Task Post_NoChoicesAreEntered_ReturnsErrors()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
@@ -207,26 +240,32 @@ public class ChangeReasonTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReason", "Select a reason");
-        await AssertEx.HtmlResponseHasErrorAsync(response, "UploadEvidence", "Select yes if you want to upload evidence");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), "Select a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), "Select yes if you want to upload evidence");
     }
 
     [Fact]
     public async Task Post_AnotherReason_NoDetailAdded_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}")
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new FormUrlEncodedContent(
                 new EditDetailsPostRequestBuilder()
-                    .WithChangeReason(EditDetailsChangeReasonOption.AnotherReason, null)
+                    .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, null)
                     .Build())
         };
 
@@ -234,25 +273,31 @@ public class ChangeReasonTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "ChangeReasonDetail", "Enter a reason");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReasonDetail), "Enter a reason");
     }
 
     [Fact]
     public async Task Post_FileUploadYes_NoFileUploaded_ReturnsError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.NewInformation)
-                .Add("UploadEvidence", true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
                 .Build()
         };
 
@@ -260,26 +305,32 @@ public class ChangeReasonTests : TestBase
         var response = await HttpClient.SendAsync(postRequest);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "Select a file");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), "Select a file");
     }
 
     [Fact]
     public async Task Post_UploadEvidenceSetToYes_ButEvidenceFileIsInvalidType_RendersError()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.NewInformation)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), "invalidfile.cs")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "invalidfile.cs")
                 .Build()
         };
 
@@ -288,26 +339,32 @@ public class ChangeReasonTests : TestBase
 
         // Assert
         Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        await AssertEx.HtmlResponseHasErrorAsync(response, "EvidenceFile", "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), "The selected file must be a BMP, CSV, DOC, DOCX, EML, JPEG, JPG, MBOX, MSG, ODS, ODT, PDF, PNG, TIF, TXT, XLS or XLSX");
     }
 
     [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFileIsSelected_ButOtherFieldsInvalid_ShowsUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.AnotherReason)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
                 .Build()
         };
 
@@ -325,33 +382,40 @@ public class ChangeReasonTests : TestBase
         Assert.Equal("validfile.png (1.2 KB)", link.TrimmedText());
         Assert.Equal(expectedFileUrl, link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
-        Assert.Equal("validfile.png", GetHiddenInputValue(html, "EvidenceFileName"));
-        Assert.Equal("1.2 KB", GetHiddenInputValue(html, "EvidenceFileSizeDescription"));
-        Assert.Equal(expectedFileUrl, GetHiddenInputValue(html, "UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId)));
+        Assert.Equal("validfile.png", GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName)));
+        Assert.Equal("1.2 KB", GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription)));
+        Assert.Equal(expectedFileUrl, GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl)));
     }
 
     [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_ButOtherFieldsInvalid_RemembersUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
+
         var evidenceFileId = Guid.NewGuid();
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.AnotherReason)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFileId", evidenceFileId)
-                .Add("EvidenceFileName", "testfile.jpg")
-                .Add("EvidenceFileSizeDescription", "3 KB")
-                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId), evidenceFileId)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName), "testfile.jpg")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription), "3 KB")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl), "http://test.com/file")
                 .Build()
         };
 
@@ -368,34 +432,41 @@ public class ChangeReasonTests : TestBase
         Assert.Equal("testfile.jpg (3 KB)", link.TrimmedText());
         Assert.Equal("http://test.com/file", link.Href);
 
-        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, "EvidenceFileId"));
-        Assert.Equal("testfile.jpg", GetHiddenInputValue(html, "EvidenceFileName"));
-        Assert.Equal("3 KB", GetHiddenInputValue(html, "EvidenceFileSizeDescription"));
-        Assert.Equal("http://test.com/file", GetHiddenInputValue(html, "UploadedEvidenceFileUrl"));
+        Assert.Equal(evidenceFileId.ToString(), GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId)));
+        Assert.Equal("testfile.jpg", GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName)));
+        Assert.Equal("3 KB", GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription)));
+        Assert.Equal("http://test.com/file", GetHiddenInputValue(html, nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl)));
     }
 
     [Fact]
     public async Task Post_UploadEvidenceSetToYes_AndEvidenceFilePreviouslyUploaded_AndNewFileUploaded_ButOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
+
         var evidenceFileId = Guid.NewGuid();
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.AnotherReason)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFileId", evidenceFileId)
-                .Add("EvidenceFileName", "testfile.jpg")
-                .Add("EvidenceFileSizeDescription", "3 KB")
-                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId), evidenceFileId)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName), "testfile.jpg")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription), "3 KB")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl), "http://test.com/file")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
                 .Build()
         };
 
@@ -412,23 +483,30 @@ public class ChangeReasonTests : TestBase
     public async Task Post_UploadEvidenceSetToNo_ButEvidenceFilePreviouslyUploaded_AndOtherFieldsInvalid_DeletesPreviouslyUploadedFile()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
+
         var evidenceFileId = Guid.NewGuid();
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.AnotherReason)
-                .Add("UploadEvidence", false)
-                .Add("EvidenceFileId", evidenceFileId)
-                .Add("EvidenceFileName", "testfile.jpg")
-                .Add("EvidenceFileSizeDescription", "3 KB")
-                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), false)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId), evidenceFileId)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName), "testfile.jpg")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription), "3 KB")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl), "http://test.com/file")
                 .Build()
         };
 
@@ -445,20 +523,25 @@ public class ChangeReasonTests : TestBase
     public async Task Post_SetValidFileUpload_PersistsDetails()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
 
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.NewInformation)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf")
                 .Build()
         };
 
@@ -469,28 +552,34 @@ public class ChangeReasonTests : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.True(journeyInstance.State.UploadEvidence);
-        Assert.Equal("evidence.pdf", journeyInstance.State.EvidenceFileName);
-        Assert.Equal("1.2 KB", journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.True(journeyInstance.State.OtherDetailsChangeUploadEvidence);
+        Assert.Equal("evidence.pdf", journeyInstance.State.OtherDetailsChangeEvidenceFileName);
+        Assert.Equal("1.2 KB", journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
     }
 
     [Fact]
     public async Task Post_SetValidFileUpload_CallsFileServiceUpload()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.NewInformation)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), "evidence.pdf")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "evidence.pdf")
                 .Build()
         };
 
@@ -507,20 +596,27 @@ public class ChangeReasonTests : TestBase
     {
         // Arrange
         var evidenceFileId = Guid.NewGuid();
-        var person = await TestData.CreatePersonAsync();
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("5 Jun 1999"))
                 .Build());
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
             Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", EditDetailsChangeReasonOption.NewInformation)
-                .Add("ChangeReasonDetail", "A description about why the change typed into the box")
-                .Add("UploadEvidence", false)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), "evidence.pdf")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReasonDetail), "A description about why the change typed into the box")
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), false)
+                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "evidence.pdf")
                 .Build()
         };
 
@@ -533,16 +629,16 @@ public class ChangeReasonTests : TestBase
         FileServiceMock.AssertFileWasNotUploaded();
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(EditDetailsChangeReasonOption.NewInformation, journeyInstance.State.ChangeReason);
-        Assert.Null(journeyInstance.State.ChangeReasonDetail);
-        Assert.False(journeyInstance.State.UploadEvidence);
-        Assert.Null(journeyInstance.State.EvidenceFileId);
-        Assert.Null(journeyInstance.State.EvidenceFileName);
-        Assert.Null(journeyInstance.State.EvidenceFileSizeDescription);
+        Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.NewInformation, journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeReasonDetail);
+        Assert.False(journeyInstance.State.OtherDetailsChangeUploadEvidence);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileId);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileName);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person, JourneyInstance<EditDetailsState> journeyInstance) =>
-        $"/persons/{person.PersonId}/edit-details/change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
+        $"/persons/{person.PersonId}/edit-details/other-details-change-reason?{journeyInstance.GetUniqueIdQueryParameter()}";
 
     private Task<JourneyInstance<EditDetailsState>> CreateJourneyInstanceAsync(Guid personId, EditDetailsState? state = null) =>
         CreateJourneyInstance(

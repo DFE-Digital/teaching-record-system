@@ -55,11 +55,33 @@ public class IndexModel(
     [Display(Name = "National Insurance number (optional)")]
     public string? NationalInsuranceNumber { get; set; }
 
-    public string BackLink =>
-        FromCheckAnswers ? GetPageLink(EditDetailsJourneyPage.CheckAnswers) : LinkGenerator.PersonDetail(PersonId);
+    public bool NameChanged =>
+        FirstName != JourneyInstance!.State.OriginalFirstName ||
+        MiddleName != JourneyInstance!.State.OriginalMiddleName ||
+        LastName != JourneyInstance!.State.OriginalLastName;
 
-    public EditDetailsJourneyPage NextPage =>
-        FromCheckAnswers ? EditDetailsJourneyPage.CheckAnswers : EditDetailsJourneyPage.ChangeReason;
+    public bool OtherDetailsChanged =>
+        DateOfBirth != JourneyInstance!.State.OriginalDateOfBirth ||
+        EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress) != JourneyInstance!.State.OriginalEmailAddress ||
+        EditDetailsFieldState<MobileNumber>.FromRawValue(MobileNumber) != JourneyInstance!.State.OriginalMobileNumber ||
+        EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != JourneyInstance!.State.OriginalNationalInsuranceNumber;
+
+    public string BackLink => GetPageLink(
+        FromCheckAnswers
+            ? EditDetailsJourneyPage.CheckAnswers
+            : null);
+
+    public string NextPage => GetPageLink(
+        FromCheckAnswers
+            ? !JourneyInstance!.State.NameChanged && NameChanged
+                ? EditDetailsJourneyPage.NameChangeReason
+                : !JourneyInstance!.State.OtherDetailsChanged && OtherDetailsChanged
+                    ? EditDetailsJourneyPage.OtherDetailsChangeReason
+                    : EditDetailsJourneyPage.CheckAnswers
+            : NameChanged
+                ? EditDetailsJourneyPage.NameChangeReason
+                : EditDetailsJourneyPage.OtherDetailsChangeReason,
+        FromCheckAnswers is true ? true : null);
 
     public IActionResult OnGet()
     {
@@ -76,6 +98,11 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!NameChanged && !OtherDetailsChanged)
+        {
+            ModelState.AddModelError(nameof(FirstName), "Please change one or more of the person\u2019s details");
+        }
+
         if (DateOfBirth.HasValue && DateOfBirth.Value > clock.Today)
         {
             ModelState.AddModelError(nameof(DateOfBirth), "Person\u2019s date of birth must be in the past");
@@ -104,6 +131,8 @@ public class IndexModel(
             return this.PageWithErrors();
         }
 
+        var nextPage = NextPage;
+
         await JourneyInstance!.UpdateStateAsync(state =>
         {
             state.FirstName = FirstName;
@@ -115,13 +144,11 @@ public class IndexModel(
             state.NationalInsuranceNumber = new(NationalInsuranceNumber, nationalInsuranceNumber);
         });
 
-        return Redirect(GetPageLink(NextPage));
+        return Redirect(nextPage);
     }
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
         _person = await DbContext.Persons.SingleOrDefaultAsync(u => u.PersonId == PersonId);
 
         if (_person is null)

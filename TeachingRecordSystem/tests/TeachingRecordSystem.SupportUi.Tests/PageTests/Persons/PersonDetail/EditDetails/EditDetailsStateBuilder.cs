@@ -12,19 +12,29 @@ public class EditDetailsStateBuilder
     public string? EmailAddress { get; set; }
     public string? MobileNumber { get; set; }
     public string? NationalInsuranceNumber { get; set; }
-    public EditDetailsChangeReasonOption? ChangeReason { get; set; }
-    public string? ChangeReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    private bool Initialized { get; set; }
 
-    public EditDetailsStateBuilder WithInitializedState()
-    {
-        Initialized = true;
-        return this;
-    }
+    public string? OriginalFirstName { get; set; }
+    public string? OriginalMiddleName { get; set; }
+    public string? OriginalLastName { get; set; }
+    public DateOnly? OriginalDateOfBirth { get; set; }
+    public string? OriginalEmailAddress { get; set; }
+    public string? OriginalMobileNumber { get; set; }
+    public string? OriginalNationalInsuranceNumber { get; set; }
+
+    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public bool? NameChangeUploadEvidence { get; set; }
+    public Guid? NameChangeEvidenceFileId { get; set; }
+    public string? NameChangeEvidenceFileName { get; set; }
+    public string? NameChangeEvidenceFileSizeDescription { get; set; }
+
+    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public string? OtherDetailsChangeReasonDetail { get; set; }
+    public bool? OtherDetailsChangeUploadEvidence { get; set; }
+    public Guid? OtherDetailsChangeEvidenceFileId { get; set; }
+    public string? OtherDetailsChangeEvidenceFileName { get; set; }
+    public string? OtherDetailsChangeEvidenceFileSizeDescription { get; set; }
+
+    private bool Initialized { get; set; }
 
     public EditDetailsStateBuilder WithInitializedState(CreatePersonResult person)
     {
@@ -36,6 +46,15 @@ public class EditDetailsStateBuilder
         EmailAddress = person.Email;
         MobileNumber = person.MobileNumber;
         NationalInsuranceNumber = person.NationalInsuranceNumber;
+
+        OriginalFirstName = person.FirstName;
+        OriginalMiddleName = person.MiddleName;
+        OriginalLastName = person.LastName;
+        OriginalDateOfBirth = person.DateOfBirth;
+        OriginalEmailAddress = person.Email;
+        OriginalMobileNumber = person.MobileNumber;
+        OriginalNationalInsuranceNumber = person.NationalInsuranceNumber;
+
         return this;
     }
 
@@ -71,21 +90,39 @@ public class EditDetailsStateBuilder
         return this;
     }
 
-    public EditDetailsStateBuilder WithChangeReasonChoice(EditDetailsChangeReasonOption option, string? detailText = null)
+    public EditDetailsStateBuilder WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption option)
     {
-        ChangeReason = option;
-        ChangeReasonDetail = detailText;
+        NameChangeReason = option;
         return this;
     }
 
-    public EditDetailsStateBuilder WithUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
+    public EditDetailsStateBuilder WithNameChangeUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
     {
-        UploadEvidence = uploadEvidence;
+        NameChangeUploadEvidence = uploadEvidence;
         if (evidenceFileId.HasValue)
         {
-            EvidenceFileId = evidenceFileId;
-            EvidenceFileName = evidenceFileName;
-            EvidenceFileSizeDescription = evidenceFileSizeDescription;
+            NameChangeEvidenceFileId = evidenceFileId;
+            NameChangeEvidenceFileName = evidenceFileName;
+            NameChangeEvidenceFileSizeDescription = evidenceFileSizeDescription;
+        }
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption option, string? detailText = null)
+    {
+        OtherDetailsChangeReason = option;
+        OtherDetailsChangeReasonDetail = detailText;
+        return this;
+    }
+
+    public EditDetailsStateBuilder WithOtherDetailsChangeUploadEvidenceChoice(bool uploadEvidence, Guid? evidenceFileId = null, string? evidenceFileName = "evidence.jpeg", string evidenceFileSizeDescription = "5MB")
+    {
+        OtherDetailsChangeUploadEvidence = uploadEvidence;
+        if (evidenceFileId.HasValue)
+        {
+            OtherDetailsChangeEvidenceFileId = evidenceFileId;
+            OtherDetailsChangeEvidenceFileName = evidenceFileName;
+            OtherDetailsChangeEvidenceFileSizeDescription = evidenceFileSizeDescription;
         }
         return this;
     }
@@ -98,15 +135,30 @@ public class EditDetailsStateBuilder
             MiddleName = MiddleName,
             LastName = LastName,
             DateOfBirth = DateOfBirth,
-            EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress),
-            MobileNumber = EditDetailsFieldState<MobileNumber>.FromRawValue(MobileNumber),
-            NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
-            ChangeReason = ChangeReason,
-            ChangeReasonDetail = ChangeReasonDetail,
-            UploadEvidence = UploadEvidence,
-            EvidenceFileId = EvidenceFileId,
-            EvidenceFileName = EvidenceFileName,
-            EvidenceFileSizeDescription = EvidenceFileSizeDescription,
+            EmailAddress = EditDetailsFieldState<Core.EmailAddress>.FromRawValue(EmailAddress),
+            MobileNumber = EditDetailsFieldState<Core.MobileNumber>.FromRawValue(MobileNumber),
+            NationalInsuranceNumber = EditDetailsFieldState<Core.NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber),
+
+            OriginalFirstName = OriginalFirstName,
+            OriginalMiddleName = OriginalMiddleName,
+            OriginalLastName = OriginalLastName,
+            OriginalDateOfBirth = OriginalDateOfBirth,
+            OriginalEmailAddress = EditDetailsFieldState<Core.EmailAddress>.FromRawValue(OriginalEmailAddress),
+            OriginalMobileNumber = EditDetailsFieldState<Core.MobileNumber>.FromRawValue(OriginalMobileNumber),
+            OriginalNationalInsuranceNumber = EditDetailsFieldState<Core.NationalInsuranceNumber>.FromRawValue(OriginalNationalInsuranceNumber),
+
+            NameChangeReason = NameChangeReason,
+            NameChangeUploadEvidence = NameChangeUploadEvidence,
+            NameChangeEvidenceFileId = NameChangeEvidenceFileId,
+            NameChangeEvidenceFileName = NameChangeEvidenceFileName,
+            NameChangeEvidenceFileSizeDescription = NameChangeEvidenceFileSizeDescription,
+            OtherDetailsChangeReason = OtherDetailsChangeReason,
+            OtherDetailsChangeReasonDetail = OtherDetailsChangeReasonDetail,
+            OtherDetailsChangeUploadEvidence = OtherDetailsChangeUploadEvidence,
+            OtherDetailsChangeEvidenceFileId = OtherDetailsChangeEvidenceFileId,
+            OtherDetailsChangeEvidenceFileName = OtherDetailsChangeEvidenceFileName,
+            OtherDetailsChangeEvidenceFileSizeDescription = OtherDetailsChangeEvidenceFileSizeDescription,
+
             Initialized = Initialized
         };
     }

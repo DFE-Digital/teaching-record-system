@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
@@ -18,33 +18,77 @@ public class EditDetailsState : IRegisterJourney
     public EditDetailsFieldState<EmailAddress> EmailAddress { get; set; } = new(null, null);
     public EditDetailsFieldState<MobileNumber> MobileNumber { get; set; } = new(null, null);
     public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new(null, null);
-    public EditDetailsChangeReasonOption? ChangeReason { get; set; }
-    public string? ChangeReasonDetail { get; set; }
-    public bool? UploadEvidence { get; set; }
-    public Guid? EvidenceFileId { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? OriginalFirstName { get; set; }
+    public string? OriginalMiddleName { get; set; }
+    public string? OriginalLastName { get; set; }
+    public DateOnly? OriginalDateOfBirth { get; set; }
+    public EditDetailsFieldState<EmailAddress> OriginalEmailAddress { get; set; } = new(null, null);
+    public EditDetailsFieldState<MobileNumber> OriginalMobileNumber { get; set; } = new(null, null);
+    public EditDetailsFieldState<NationalInsuranceNumber> OriginalNationalInsuranceNumber { get; set; } = new(null, null);
+
+    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public bool? NameChangeUploadEvidence { get; set; }
+    public Guid? NameChangeEvidenceFileId { get; set; }
+    public string? NameChangeEvidenceFileName { get; set; }
+    public string? NameChangeEvidenceFileSizeDescription { get; set; }
+
+    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public string? OtherDetailsChangeReasonDetail { get; set; }
+    public bool? OtherDetailsChangeUploadEvidence { get; set; }
+    public Guid? OtherDetailsChangeEvidenceFileId { get; set; }
+    public string? OtherDetailsChangeEvidenceFileName { get; set; }
+    public string? OtherDetailsChangeEvidenceFileSizeDescription { get; set; }
 
     public bool Initialized { get; set; }
 
     [JsonIgnore]
-    public bool IsComplete =>
+    public bool NameChanged =>
+        FirstName != OriginalFirstName ||
+        MiddleName != OriginalMiddleName ||
+        LastName != OriginalLastName;
+
+    [JsonIgnore]
+    public bool OtherDetailsChanged =>
+        DateOfBirth != OriginalDateOfBirth ||
+        EmailAddress != OriginalEmailAddress ||
+        MobileNumber != OriginalMobileNumber ||
+        NationalInsuranceNumber != OriginalNationalInsuranceNumber;
+
+    [JsonIgnore]
+    public bool IsIndexComplete =>
         FirstName is not null &&
         LastName is not null &&
         DateOfBirth.HasValue &&
-        ChangeReason.HasValue &&
-        (ChangeReason.Value is not EditDetailsChangeReasonOption.AnotherReason || ChangeReasonDetail is not null) &&
-        UploadEvidence.HasValue &&
-        (UploadEvidence.Value is not true || EvidenceFileId.HasValue);
+        (NameChanged || OtherDetailsChanged);
 
-    public async Task EnsureInitializedAsync(TrsDbContext dbContext, Guid personId)
+    [JsonIgnore]
+    public bool IsNameChangeReasonComplete =>
+        !NameChanged ||
+            NameChangeReason.HasValue &&
+            NameChangeUploadEvidence.HasValue &&
+            NameChangeUploadEvidence.Value is not true || NameChangeEvidenceFileId.HasValue;
+
+    [JsonIgnore]
+    public bool IsOtherDetailsChangeReasonComplete =>
+        !OtherDetailsChanged ||
+            OtherDetailsChangeReason.HasValue &&
+            (OtherDetailsChangeReason.Value is not EditDetailsOtherDetailsChangeReasonOption.AnotherReason || OtherDetailsChangeReasonDetail is not null) &&
+            OtherDetailsChangeUploadEvidence.HasValue &&
+            (OtherDetailsChangeUploadEvidence.Value is not true || OtherDetailsChangeEvidenceFileId.HasValue);
+
+    [JsonIgnore]
+    public bool IsComplete =>
+        IsIndexComplete &&
+        IsNameChangeReasonComplete &&
+        IsOtherDetailsChangeReasonComplete;
+
+    public void EnsureInitialized(Person person)
     {
         if (Initialized)
         {
             return;
         }
-
-        var person = await dbContext.Persons.SingleAsync(q => q.PersonId == personId);
 
         FirstName = person.FirstName;
         MiddleName = person.MiddleName;
@@ -53,6 +97,14 @@ public class EditDetailsState : IRegisterJourney
         EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
         MobileNumber = EditDetailsFieldState<MobileNumber>.FromRawValue(person.MobileNumber);
         NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
+
+        OriginalFirstName = FirstName;
+        OriginalMiddleName = MiddleName;
+        OriginalLastName = LastName;
+        OriginalDateOfBirth = DateOfBirth;
+        OriginalEmailAddress = EmailAddress;
+        OriginalMobileNumber = MobileNumber;
+        OriginalNationalInsuranceNumber = NationalInsuranceNumber;
 
         Initialized = true;
     }

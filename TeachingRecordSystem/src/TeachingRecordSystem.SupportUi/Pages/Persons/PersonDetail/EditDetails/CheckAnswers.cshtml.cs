@@ -26,23 +26,33 @@ public class CheckAnswersModel(
     public EmailAddress? EmailAddress { get; set; }
     public MobileNumber? MobileNumber { get; set; }
     public NationalInsuranceNumber? NationalInsuranceNumber { get; set; }
-    public EditDetailsChangeReasonOption? ChangeReason { get; set; }
-    public string? ChangeReasonDetail { get; set; }
-    public string? EvidenceFileName { get; set; }
-    public string? EvidenceFileSizeDescription { get; set; }
-    public string? UploadedEvidenceFileUrl { get; set; }
+    public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    public Guid? NameChangeEvidenceFileId { get; set; }
+    public string? NameChangeEvidenceFileName { get; set; }
+    public string? NameChangeEvidenceFileSizeDescription { get; set; }
+    public string? NameChangeUploadedEvidenceFileUrl { get; set; }
+    public EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    public Guid? OtherDetailsChangeEvidenceFileId { get; set; }
+    public string? OtherDetailsChangeReasonDetail { get; set; }
+    public string? OtherDetailsChangeEvidenceFileName { get; set; }
+    public string? OtherDetailsChangeEvidenceFileSizeDescription { get; set; }
+    public string? OtherDetailsChangeUploadedEvidenceFileUrl { get; set; }
 
     public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
-    public string PreviousName => StringHelper.JoinNonEmpty(' ', _person!.FirstName, _person!.MiddleName, _person!.LastName);
-    public bool NameChanged => Name != PreviousName;
 
     public string? ChangePersonalDetailsLink =>
         GetPageLink(EditDetailsJourneyPage.Index, true);
 
-    public string? ChangeChangeReasonLink =>
-        GetPageLink(EditDetailsJourneyPage.ChangeReason, true);
+    public string? ChangeNameChangeReasonLink =>
+        GetPageLink(EditDetailsJourneyPage.NameChangeReason, true);
 
-    public string BackLink => GetPageLink(EditDetailsJourneyPage.ChangeReason);
+    public string? ChangeDetailsChangeReasonLink =>
+        GetPageLink(EditDetailsJourneyPage.OtherDetailsChangeReason, true);
+
+    public string BackLink => GetPageLink(
+        OtherDetailsChangeReason is not null
+            ? EditDetailsJourneyPage.OtherDetailsChangeReason
+            : EditDetailsJourneyPage.NameChangeReason);
 
     public void OnGet()
     {
@@ -50,31 +60,51 @@ public class CheckAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var now = clock.UtcNow;
         _person!.UpdateDetails(
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
             LastName ?? string.Empty,
             DateOfBirth,
-            (string?)EmailAddress,
-            (string?)MobileNumber,
-            (string?)NationalInsuranceNumber,
-            ChangeReason!.GetDisplayName()!,
-            ChangeReasonDetail!,
-            JourneyInstance!.State.EvidenceFileId is Guid fileId
+            EmailAddress,
+            MobileNumber,
+            NationalInsuranceNumber,
+            NameChangeReason?.GetDisplayName(),
+            NameChangeEvidenceFileId is Guid nameFileId
                 ? new EventModels.File()
                 {
-                    FileId = fileId,
-                    Name = JourneyInstance.State.EvidenceFileName!
+                    FileId = nameFileId,
+                    Name = NameChangeEvidenceFileName!
+                }
+                : null,
+            OtherDetailsChangeReason?.GetDisplayName(),
+            OtherDetailsChangeReasonDetail,
+            OtherDetailsChangeEvidenceFileId is Guid detailsFileId
+                ? new EventModels.File()
+                {
+                    FileId = detailsFileId,
+                    Name = OtherDetailsChangeEvidenceFileName!
                 }
                 : null,
             User.GetUserId(),
-            clock.UtcNow,
-            out var previousName,
+            now,
             out var updatedEvent);
 
-        if (previousName is not null)
+        if (updatedEvent != null &&
+            updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange) &&
+            (NameChangeReason == EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership ||
+             NameChangeReason == EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess))
         {
-            DbContext.PreviousNames.Add(previousName);
+            DbContext.PreviousNames.Add(new PreviousName
+            {
+                PreviousNameId = Guid.NewGuid(),
+                PersonId = PersonId,
+                FirstName = updatedEvent.OldDetails.FirstName ?? string.Empty,
+                MiddleName = updatedEvent.OldDetails.MiddleName ?? string.Empty,
+                LastName = updatedEvent.OldDetails.LastName ?? string.Empty,
+                CreatedOn = now,
+                UpdatedOn = now
+            });
         }
 
         if (updatedEvent is not null)
@@ -92,11 +122,9 @@ public class CheckAnswersModel(
 
     protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        await base.OnPageHandlerExecutingAsync(context);
-
-        if (!JourneyInstance!.State.IsComplete)
+        if (!JourneyInstance!.State.IsComplete && NextIncompletePage < EditDetailsJourneyPage.CheckAnswers)
         {
-            context.Result = Redirect(GetPageLink(EditDetailsJourneyPage.Index));
+            context.Result = Redirect(GetPageLink(NextIncompletePage));
             return;
         }
 
@@ -109,18 +137,25 @@ public class CheckAnswersModel(
         }
 
         Trn = _person.Trn;
-        FirstName = JourneyInstance.State.FirstName;
+        FirstName = JourneyInstance!.State.FirstName;
         MiddleName = JourneyInstance.State.MiddleName;
         LastName = JourneyInstance.State.LastName;
         DateOfBirth = JourneyInstance.State.DateOfBirth;
         MobileNumber = JourneyInstance.State.MobileNumber.Parsed;
         EmailAddress = JourneyInstance.State.EmailAddress.Parsed;
         NationalInsuranceNumber = JourneyInstance.State.NationalInsuranceNumber.Parsed;
-        ChangeReason = JourneyInstance.State.ChangeReason;
-        ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        EvidenceFileName = JourneyInstance.State.EvidenceFileName;
-        UploadedEvidenceFileUrl = JourneyInstance.State.EvidenceFileId is not null ?
-            await FileService.GetFileUrlAsync(JourneyInstance.State.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+        NameChangeReason = JourneyInstance.State.NameChangeReason;
+        NameChangeEvidenceFileId = JourneyInstance.State.NameChangeEvidenceFileId;
+        NameChangeEvidenceFileName = JourneyInstance.State.NameChangeEvidenceFileName;
+        NameChangeUploadedEvidenceFileUrl = JourneyInstance.State.NameChangeEvidenceFileId is not null ?
+            await FileService.GetFileUrlAsync(JourneyInstance.State.NameChangeEvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
+        OtherDetailsChangeReason = JourneyInstance.State.OtherDetailsChangeReason;
+        OtherDetailsChangeReasonDetail = JourneyInstance.State.OtherDetailsChangeReasonDetail;
+        OtherDetailsChangeEvidenceFileId = JourneyInstance.State.OtherDetailsChangeEvidenceFileId;
+        OtherDetailsChangeEvidenceFileName = JourneyInstance.State.OtherDetailsChangeEvidenceFileName;
+        OtherDetailsChangeUploadedEvidenceFileUrl = JourneyInstance.State.OtherDetailsChangeEvidenceFileId is not null ?
+            await FileService.GetFileUrlAsync(JourneyInstance.State.OtherDetailsChangeEvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
     }
 }

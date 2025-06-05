@@ -12,12 +12,16 @@ public class EditDetailsPostRequestBuilder
     private string? EmailAddress { get; set; }
     private string? MobileNumber { get; set; }
     private string? NationalInsuranceNumber { get; set; }
-    private EditDetailsChangeReasonOption? ChangeReason { get; set; }
-    private string? ChangeReasonDetail { get; set; }
-    private bool? UploadEvidence { get; set; }
+    private EditDetailsOtherDetailsChangeReasonOption? OtherDetailsChangeReason { get; set; }
+    private string? OtherDetailsChangeReasonDetail { get; set; }
+    private bool? OtherDetailsChangeUploadEvidence { get; set; }
+    private EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
+    private bool? NameChangeUploadEvidence { get; set; }
 
-    private string? _evidenceFileName;
-    private HttpContent? _evidenceFileContent;
+    private string? _otherDetailsChangeEvidenceFileName;
+    private HttpContent? _otherDetailsChangeEvidenceFileContent;
+    private string? _nameChangeEvidenceFileName;
+    private HttpContent? _nameChangeEvidenceFileContent;
 
     public EditDetailsPostRequestBuilder WithFirstName(string? firstName)
     {
@@ -68,24 +72,44 @@ public class EditDetailsPostRequestBuilder
         return this;
     }
 
-    public EditDetailsPostRequestBuilder WithChangeReason(EditDetailsChangeReasonOption changeReason, string? detail = null)
+    public EditDetailsPostRequestBuilder WithNameChangeReason(EditDetailsNameChangeReasonOption nameChangeReason)
     {
-        ChangeReason = changeReason;
-        ChangeReasonDetail = detail;
+        NameChangeReason = nameChangeReason;
         return this;
     }
 
-    public EditDetailsPostRequestBuilder WithNoFileUploadSelection()
+    public EditDetailsPostRequestBuilder WithNoNameChangeFileUploadSelection()
     {
-        UploadEvidence = false;
+        NameChangeUploadEvidence = false;
         return this;
     }
 
-    public EditDetailsPostRequestBuilder WithFileUploadSelection(HttpContent binaryFileContent, string filename)
+    public EditDetailsPostRequestBuilder WithNameChangeFileUploadSelection(HttpContent binaryFileContent, string filename)
     {
-        UploadEvidence = true;
-        _evidenceFileName = filename;
-        _evidenceFileContent = binaryFileContent;
+        NameChangeUploadEvidence = true;
+        _nameChangeEvidenceFileName = filename;
+        _nameChangeEvidenceFileContent = binaryFileContent;
+        return this;
+    }
+
+    public EditDetailsPostRequestBuilder WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption otherDetailsChangeReason, string? detail = null)
+    {
+        OtherDetailsChangeReason = otherDetailsChangeReason;
+        OtherDetailsChangeReasonDetail = detail;
+        return this;
+    }
+
+    public EditDetailsPostRequestBuilder WithNoOtherDetailsChangeFileUploadSelection()
+    {
+        OtherDetailsChangeUploadEvidence = false;
+        return this;
+    }
+
+    public EditDetailsPostRequestBuilder WithOtherDetailsChangeFileUploadSelection(HttpContent binaryFileContent, string filename)
+    {
+        OtherDetailsChangeUploadEvidence = true;
+        _otherDetailsChangeEvidenceFileName = filename;
+        _otherDetailsChangeEvidenceFileContent = binaryFileContent;
         return this;
     }
 
