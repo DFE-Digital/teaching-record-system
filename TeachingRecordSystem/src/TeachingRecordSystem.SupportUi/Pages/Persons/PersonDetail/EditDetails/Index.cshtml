@@ -1,6 +1,7 @@
 @page "/persons/{personId}/edit-details"
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @using TeachingRecordSystem.SupportUi.Pages.Shared
+@using Microsoft.AspNetCore.Mvc.ModelBinding
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails.IndexModel
 @{
     Layout = "_Layout";
@@ -15,20 +16,17 @@
 {
     //Re-implement the form error summary to handle validation errors that do not apply to a specific field
     <govuk-error-summary>
-        @foreach (var item in ModelState)
+        @if (ModelState.ContainsKey("") && ModelState[""] is ModelStateEntry entry && entry.Errors.Count > 0)
         {
-            foreach (var error in item.Value.Errors)
-            {
-                @if (!string.IsNullOrEmpty(item.Key))
-                {
-                    <govuk-error-summary-item href="#@item.Key">@error.ErrorMessage</govuk-error-summary-item>
-                }
-                else
-                {
-                    <govuk-error-summary-item>@error.ErrorMessage</govuk-error-summary-item>
-                }
-            }
+            <govuk-error-summary-item>@entry.Errors.First().ErrorMessage</govuk-error-summary-item>
         }
+        <govuk-error-summary-item for="FirstName" />
+        <govuk-error-summary-item for="MiddleName" />
+        <govuk-error-summary-item for="LastName" />
+        <govuk-error-summary-item for="DateOfBirth" />
+        <govuk-error-summary-item for="EmailAddress" />
+        <govuk-error-summary-item for="MobileNumber" />
+        <govuk-error-summary-item for="NationalInsuranceNumber" />
     </govuk-error-summary>
 }
 
