@@ -1389,7 +1389,8 @@ public class TrsDataSyncHelper(
             "dqt_middle_name",
             "dqt_last_name",
             "qts_date",
-            "eyts_date"
+            "eyts_date",
+            "qtls_status"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -1435,7 +1436,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_qtlsdate,
             Contact.Fields.dfeta_QTSDate,
             Contact.Fields.dfeta_EYTSDate,
-            Contact.Fields.dfeta_MergedWith
+            Contact.Fields.dfeta_MergedWith,
+            Contact.Fields.dfeta_QtlsDateHasBeenSet
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -1462,6 +1464,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.QtsDate, NpgsqlDbType.Date);
             writer.WriteValueOrNull(person.EytsDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull((int)person.QtlsStatus, NpgsqlDbType.Integer);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -1719,7 +1722,10 @@ public class TrsDataSyncHelper(
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty
+            DqtLastName = c.LastName ?? string.Empty,
+            QtlsStatus = c.dfeta_qtlsdate is not null ? QtlsStatus.Active :
+                c.dfeta_QtlsDateHasBeenSet == true ? QtlsStatus.Expired :
+                QtlsStatus.None
         })
         .ToList();
 
@@ -2008,6 +2014,7 @@ public class TrsDataSyncHelper(
         public required string? DqtFirstName { get; init; }
         public required string? DqtMiddleName { get; init; }
         public required string? DqtLastName { get; init; }
+        public required QtlsStatus QtlsStatus { get; init; }
     }
 
     private record InductionInfo

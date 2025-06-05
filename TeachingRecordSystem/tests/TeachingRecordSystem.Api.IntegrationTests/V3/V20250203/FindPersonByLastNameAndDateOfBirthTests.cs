@@ -1,4 +1,4 @@
-using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
 
 namespace TeachingRecordSystem.Api.IntegrationTests.V3.V20250203;
 
