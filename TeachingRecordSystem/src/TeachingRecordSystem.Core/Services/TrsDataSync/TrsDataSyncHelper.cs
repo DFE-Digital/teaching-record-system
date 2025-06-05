@@ -1372,6 +1372,7 @@ public class TrsDataSyncHelper(
             "created_on",
             "updated_on",
             "status",
+            "merged_with_person_id",
             "trn",
             "first_name",
             "middle_name",
@@ -1433,7 +1434,8 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
             Contact.Fields.dfeta_QTSDate,
-            Contact.Fields.dfeta_EYTSDate
+            Contact.Fields.dfeta_EYTSDate,
+            Contact.Fields.dfeta_MergedWith
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -1442,6 +1444,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.UpdatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull((int)person.Status, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(person.MergedWithPersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.Trn, NpgsqlDbType.Char);
             writer.WriteValueOrNull(person.FirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.MiddleName, NpgsqlDbType.Varchar);
@@ -1699,6 +1702,7 @@ public class TrsDataSyncHelper(
             CreatedOn = c.CreatedOn!.Value,
             UpdatedOn = c.ModifiedOn!.Value,
             Status = c.StateCode == ContactState.Active ? PersonStatus.Active : PersonStatus.Inactive,
+            MergedWithPersonId = c.dfeta_MergedWith?.Id,
             Trn = c.dfeta_TRN,
             FirstName = (c.HasStatedNames() ? c.dfeta_StatedFirstName : c.FirstName) ?? string.Empty,
             MiddleName = (c.HasStatedNames() ? c.dfeta_StatedMiddleName : c.MiddleName) ?? string.Empty,
@@ -1986,6 +1990,7 @@ public class TrsDataSyncHelper(
         public required DateTime? CreatedOn { get; init; }
         public required DateTime? UpdatedOn { get; init; }
         public required PersonStatus Status { get; init; }
+        public required Guid? MergedWithPersonId { get; init; }
         public required string? Trn { get; init; }
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
