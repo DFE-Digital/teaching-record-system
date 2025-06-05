@@ -33,8 +33,8 @@ public class CheckAnswersTests : TestBase
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
                 .WithName("A", "New", "Name")
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .WithUploadEvidenceChoice(false)
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -44,8 +44,8 @@ public class CheckAnswersTests : TestBase
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        var caption = doc.GetElementByTestId("check-answers-caption");
-        Assert.Equal("Alfred The Great", caption!.TrimmedText());
+        var caption = doc.GetElementByTestId("edit-details-caption");
+        Assert.Equal("Change personal details - Alfred The Great", caption!.TrimmedText());
     }
 
     [Fact]
@@ -57,8 +57,9 @@ public class CheckAnswersTests : TestBase
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .WithUploadEvidenceChoice(false)
+                .WithName("A", "New", "Name")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -76,43 +77,6 @@ public class CheckAnswersTests : TestBase
             b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
-    public static IEnumerable<object[]> GetInvalidStateData()
-    {
-        yield return new object[] {
-            new EditDetailsStateBuilder()
-                .WithInitializedState()
-                .WithName(null, "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .Build()
-        };
-        yield return new object[] {
-            new EditDetailsStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason)
-                .Build()
-        };
-    }
-
-    [Theory]
-    [MemberData(nameof(GetInvalidStateData))]
-    public async Task Get_WithInvalidJourneyState_RedirectsToIndex(EditDetailsState state)
-    {
-        // Arrange
-        var person = await TestData.CreatePersonAsync();
-        var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state);
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/persons/{person.PersonId}/edit-details?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
     [Fact]
     public async Task Get_ShowsPersonalDetails_AsExpected()
     {
@@ -123,14 +87,16 @@ public class CheckAnswersTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
                 .WithMobileNumber("07891 234567")
                 .WithNationalInsuranceNumber("AB 12 34 56 C")
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .WithUploadEvidenceChoice(false)
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false)
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -141,79 +107,11 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
-        doc.AssertSummaryListValue("Teacher reference number (TRN)", v => Assert.Equal(person.Trn!, v.TrimmedText()));
+        doc.AssertSummaryListValue("Full name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
         doc.AssertSummaryListValue("Date of birth", v => Assert.Equal("1 February 1980", v.TrimmedText()));
-        doc.AssertSummaryListValue("Email", v => Assert.Equal("test@test.com", v.TrimmedText()));
+        doc.AssertSummaryListValue("Email address", v => Assert.Equal("test@test.com", v.TrimmedText()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("07891234567", v.TrimmedText()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("AB 12 34 56 C", v.TrimmedText()));
-    }
-
-    [Fact]
-    public async Task Get_WhenAnyNameFieldNotChanged_DoesNotShowPreviousName()
-    {
-        // Arrange
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great"));
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState()
-                .WithName("Alfred", "The", "Great")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .WithUploadEvidenceChoice(false)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
-        doc.AssertSummaryListRowDoesNotExist("Previous name");
-    }
-
-    [Theory]
-    [InlineData("Alfred", "The", "OK")]
-    [InlineData("Alfred", "A", "Great")]
-    [InlineData("Jimmy", "The", "Great")]
-    public async Task Get_WhenAnyNameFieldChanged_ShowsPreviousName(string firstName, string middleName, string lastName)
-    {
-        // Arrange
-
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithFirstName("Alfred")
-            .WithMiddleName("The")
-            .WithLastName("Great"));
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            new EditDetailsStateBuilder()
-                .WithInitializedState()
-                .WithName(firstName, middleName, lastName)
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .WithUploadEvidenceChoice(false)
-                .Build());
-
-        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-
-        doc.AssertSummaryListValue("Name", v => Assert.Equal($"{firstName} {middleName} {lastName}", v.TrimmedText()));
-        doc.AssertSummaryListValue("Previous name", v => Assert.Equal("Alfred The Great", v.TrimmedText()));
     }
 
     [Fact]
@@ -226,11 +124,13 @@ public class CheckAnswersTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("Alfred", null, "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
-                .WithUploadEvidenceChoice(false)
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false)
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeUploadEvidenceChoice(false)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -241,15 +141,14 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
-        doc.AssertSummaryListValue("Teacher reference number (TRN)", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("Email", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Full name", v => Assert.Equal("Alfred Great", v.TrimmedText()));
+        doc.AssertSummaryListValue("Email address", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("Mobile number", v => Assert.Equal("Not provided", v.TrimmedText()));
         doc.AssertSummaryListValue("National Insurance number", v => Assert.Equal("Not provided", v.TrimmedText()));
     }
 
     [Fact]
-    public async Task Get_ShowsChangeReasonAndEvidenceFile_AsExpected()
+    public async Task Get_WhenNameFieldChanged_ShowsNameChangeReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
         var evidenceFileId = Guid.NewGuid();
@@ -260,8 +159,9 @@ public class CheckAnswersTests : TestBase
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
+                .WithName("Alfred", "The", "Great")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -272,19 +172,23 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for changing record", v => Assert.Equal("Another reason", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
         var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
-        doc.AssertSummaryListValue("Do you have evidence to upload", v =>
+        doc.AssertSummaryListValues("Evidence uploaded", v =>
         {
             var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
             Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
             Assert.Equal(expectedFileUrl, link.Href);
         });
+
+        doc.AssertSummaryListRowDoesNotExist("Personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason details");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
     [Fact]
-    public async Task Get_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
+    public async Task Get_WhenOtherDetailsFieldChanged_ShowsDetailsChangeReasonAndEvidenceFile_AsExpected()
     {
         // Arrange
         var evidenceFileId = Guid.NewGuid();
@@ -295,8 +199,9 @@ public class CheckAnswersTests : TestBase
             person.PersonId,
             new EditDetailsStateBuilder()
                 .WithInitializedState(person)
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.IncompleteDetails)
-                .WithUploadEvidenceChoice(false)
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "evidence.pdf", "1.2 MB")
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
@@ -307,34 +212,146 @@ public class CheckAnswersTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertSummaryListValue("Reason for changing record", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
-        doc.AssertSummaryListValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
-        doc.AssertSummaryListValue("Do you have evidence to upload", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason for personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        doc.AssertSummaryListValue("Evidence uploaded", v =>
+        {
+            var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
+            Assert.Equal("evidence.pdf (opens in new tab)", link.TrimmedText());
+            Assert.Equal(expectedFileUrl, link.Href);
+        });
+
+        doc.AssertSummaryListRowDoesNotExist("Reason for name change");
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
-    public static IEnumerable<object[]> GetFieldChangeData()
+    [Fact]
+    public async Task Get_WhenNameAndOtherFieldsChanged_ShowsNameChangeReasonAndOtherChangeReasonAndEvidenceFiles_AsExpected()
     {
-        yield return new object[] { new FieldChange[] { new FirstNameChange("Jim") } };
-        yield return new object[] { new FieldChange[] { new MiddleNameChange("A") } };
-        yield return new object[] { new FieldChange[] { new LastNameChange("Person") } };
-        yield return new object[] { new FieldChange[] { new DobChange(DateOnly.Parse("3 July 1990")) } };
-        yield return new object[] { new FieldChange[] { new EmailChange("new@email.com") } };
-        yield return new object[] { new FieldChange[] { new MobileChange("447654321987") } };
-        yield return new object[] { new FieldChange[] { new NinoChange("JK987654D") } };
-        yield return new object[] { new FieldChange[] {
-            new FirstNameChange("Jim"),
-            new MiddleNameChange("A"),
-            new LastNameChange("Person"),
-            new DobChange(DateOnly.Parse("3 July 1990")),
-            new EmailChange("new@email.com"),
-            new MobileChange("447654321987"),
-            new NinoChange("JK987654D")
-        } };
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeUploadEvidenceChoice(true, evidenceFileId, "name-evidence.pdf", "2.4 MB")
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, evidenceFileId, "other-evidence.pdf", "1.2 MB")
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertSummaryListValue("Other personal details change", v => Assert.Equal("Another reason", v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason details", v => Assert.Equal(_changeReasonDetails, v.TrimmedText()));
+        var expectedFileUrl = $"{TestScopedServices.FakeBlobStorageFileUrlBase}{evidenceFileId}";
+        doc.AssertSummaryListValues("Evidence", v =>
+        {
+            var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
+            Assert.Equal("name-evidence.pdf (opens in new tab)", link.TrimmedText());
+            Assert.Equal(expectedFileUrl, link.Href);
+        }, v =>
+        {
+            var link = Assert.IsAssignableFrom<IHtmlAnchorElement>(v.QuerySelector("a"));
+            Assert.Equal("other-evidence.pdf (opens in new tab)", link.TrimmedText());
+            Assert.Equal(expectedFileUrl, link.Href);
+        });
+
+        doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
+    }
+
+    [Fact]
+    public async Task Get_WhenNameFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Alfred", "The", "Great")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)
+                .WithNameChangeUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Reason for name change", v => Assert.Equal("Name has changed by deed poll or another legal process", v.TrimmedText()));
+        doc.AssertSummaryListValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason for personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason details");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
+    }
+
+    [Fact]
+    public async Task Get_WhenOtherDetailsFieldChanged_ShowsMissingAdditionalDetailAndEvidenceFile_AsNotProvided()
+    {
+        // Arrange
+        var evidenceFileId = Guid.NewGuid();
+
+        var person = await TestData.CreatePersonAsync();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        doc.AssertSummaryListValue("Reason for personal details change", v => Assert.Equal("Data loss or incomplete information", v.TrimmedText()));
+        doc.AssertSummaryListValue("Reason details", v => Assert.Equal("Not provided", v.TrimmedText()));
+        doc.AssertSummaryListValues("Evidence uploaded", v => Assert.Equal("Not provided", v.TrimmedText()));
+
+        doc.AssertSummaryListRowDoesNotExist("Other personal details change");
+        doc.AssertSummaryListRowDoesNotExist("Reason for name change");
+        doc.AssertSummaryListRowDoesNotExist("Evidence");
     }
 
     [Theory]
-    [MemberData(nameof(GetFieldChangeData))]
-    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(FieldChange[] fieldChanges)
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.MiddleName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.LastName)]
+    [InlineData(PersonDetailsUpdatedEventChanges.DateOfBirth)]
+    [InlineData(PersonDetailsUpdatedEventChanges.EmailAddress)]
+    [InlineData(PersonDetailsUpdatedEventChanges.MobileNumber)]
+    [InlineData(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    [InlineData(PersonDetailsUpdatedEventChanges.FirstName | PersonDetailsUpdatedEventChanges.MiddleName | PersonDetailsUpdatedEventChanges.LastName | PersonDetailsUpdatedEventChanges.DateOfBirth | PersonDetailsUpdatedEventChanges.EmailAddress | PersonDetailsUpdatedEventChanges.MobileNumber | PersonDetailsUpdatedEventChanges.NationalInsuranceNumber)]
+    public async Task Post_Confirm_UpdatesPersonEditDetailsCreatesEventCompletesJourneyAndRedirectsWithFlashMessage(PersonDetailsUpdatedEventChanges changes)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
@@ -346,26 +363,30 @@ public class CheckAnswersTests : TestBase
             .WithMobileNumber("447891234567")
             .WithNationalInsuranceNumber("AB123456C"));
 
-        var firstName = fieldChanges.OfType<FirstNameChange>().FirstOrDefault()?.NewValue ?? person.FirstName;
-        var middleName = fieldChanges.OfType<MiddleNameChange>().FirstOrDefault()?.NewValue ?? person.MiddleName;
-        var lastName = fieldChanges.OfType<LastNameChange>().FirstOrDefault()?.NewValue ?? person.LastName;
-        var dateOfBirth = fieldChanges.OfType<DobChange>().FirstOrDefault()?.NewValue ?? person.DateOfBirth;
-        var emailAddress = fieldChanges.OfType<EmailChange>().FirstOrDefault()?.NewValue ?? person.Email;
-        var mobileNumber = fieldChanges.OfType<MobileChange>().FirstOrDefault()?.NewValue ?? person.MobileNumber;
-        var nationalInsuranceNumber = fieldChanges.OfType<NinoChange>().FirstOrDefault()?.NewValue ?? person.NationalInsuranceNumber;
+        var firstName = changes.HasFlag(PersonDetailsUpdatedEventChanges.FirstName) ? "Jim" : person.FirstName;
+        var middleName = changes.HasFlag(PersonDetailsUpdatedEventChanges.MiddleName) ? "A" : person.MiddleName;
+        var lastName = changes.HasFlag(PersonDetailsUpdatedEventChanges.LastName) ? "Person" : person.LastName;
+        var dateOfBirth = changes.HasFlag(PersonDetailsUpdatedEventChanges.DateOfBirth) ? DateOnly.Parse("3 July 1990") : person.DateOfBirth;
+        var emailAddress = changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress) ? "new@email.com" : person.Email;
+        var mobileNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber) ? "447654321987" : person.MobileNumber;
+        var nationalInsuranceNumber = changes.HasFlag(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber) ? "JK987654D" : person.NationalInsuranceNumber;
 
-        var evidenceFileId = Guid.NewGuid();
+        var nameEvidenceFileId = Guid.NewGuid();
+        var otherEvidenceFileId = Guid.NewGuid();
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName(firstName, middleName, lastName)
                 .WithDateOfBirth(dateOfBirth)
                 .WithEmail(emailAddress)
                 .WithMobileNumber(mobileNumber)
                 .WithNationalInsuranceNumber(nationalInsuranceNumber)
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
-                .WithUploadEvidenceChoice(true, evidenceFileId, "evidencefile.png")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, _changeReasonDetails)
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png")
                 .Build());
 
         EventPublisher.Clear();
@@ -411,12 +432,14 @@ public class CheckAnswersTests : TestBase
             Assert.Equal(emailAddress, actualEvent.Details.EmailAddress);
             Assert.Equal(mobileNumber, actualEvent.Details.MobileNumber);
             Assert.Equal(nationalInsuranceNumber, actualEvent.Details.NationalInsuranceNumber);
-            Assert.Equal("Another reason", actualEvent.ChangeReason);
-            Assert.Equal(_changeReasonDetails, actualEvent.ChangeReasonDetail);
-            Assert.Equal(evidenceFileId, actualEvent.EvidenceFile!.FileId);
-            Assert.Equal("evidencefile.png", actualEvent.EvidenceFile.Name);
-            var expectedChanges = fieldChanges.Aggregate(PersonDetailsUpdatedEventChanges.None, (acc, c) => acc | c.Change);
-            Assert.Equal(expectedChanges, actualEvent.Changes);
+            Assert.Equal("Correcting an error", actualEvent.NameChangeReason);
+            Assert.Equal(nameEvidenceFileId, actualEvent.NameChangeEvidenceFile!.FileId);
+            Assert.Equal("name-evidence.pdf", actualEvent.NameChangeEvidenceFile.Name);
+            Assert.Equal("Another reason", actualEvent.DetailsChangeReason);
+            Assert.Equal(_changeReasonDetails, actualEvent.DetailsChangeReasonDetail);
+            Assert.Equal(otherEvidenceFileId, actualEvent.DetailsChangeEvidenceFile!.FileId);
+            Assert.Equal("other-evidence.png", actualEvent.DetailsChangeEvidenceFile.Name);
+            Assert.Equal(changes, actualEvent.Changes);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
@@ -424,7 +447,7 @@ public class CheckAnswersTests : TestBase
     }
 
     [Fact]
-    public async Task Post_Confirm_WhenAnyNameFieldChanged_UpdatesPersonPreviousNames()
+    public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsCorrectingAnError_DoesNotUpdatePersonPreviousNames()
     {
         // Arrange
         var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();
@@ -439,11 +462,64 @@ public class CheckAnswersTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
+                .WithName("Alfrede", "Thee", "Greate")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeUploadEvidenceChoice(false)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/persons/{person.PersonId}", response.Headers.Location?.OriginalString);
+
+        var redirectResponse = await response.FollowRedirectAsync(HttpClient);
+        var redirectDoc = await redirectResponse.GetDocumentAsync();
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: "Personal details have been updated successfully.");
+
+        await WithDbContext(async dbContext =>
+        {
+            var updatedPersonRecord = await dbContext.Persons
+                .Include(p => p.PreviousNames)
+                .SingleAsync(p => p.PersonId == person.PersonId);
+
+            Assert.Equal(Clock.UtcNow, updatedPersonRecord.UpdatedOn);
+            Assert.Equal("Alfrede", updatedPersonRecord.FirstName);
+            Assert.Equal("Thee", updatedPersonRecord.MiddleName);
+            Assert.Equal("Greate", updatedPersonRecord.LastName);
+
+            Assert.Collection(updatedPersonRecord.PreviousNames!.OrderByDescending(pn => pn.CreatedOn),
+                pn => Assert.Equal(("Conan", "The", "Barbarian", conanDate, conanDate), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)),
+                pn => Assert.Equal(("Ethelred", "The", "Unready", ethelredDate, ethelredDate), (pn.FirstName, pn.MiddleName, pn.LastName, pn.CreatedOn, pn.UpdatedOn)));
+        });
+    }
+
+    [Theory]
+    [InlineData(EditDetailsNameChangeReasonOption.DeedPollOrOtherLegalProcess)]
+    [InlineData(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)]
+    public async Task Post_Confirm_WhenAnyNameFieldChanged_AndNameChangeReasonIsFormalNameChange_UpdatesPersonPreviousNames(EditDetailsNameChangeReasonOption reason)
+    {
+        // Arrange
+        var ethelredDate = DateTime.Parse("1 Jan 1990").ToUniversalTime();
+        var conanDate = DateTime.Parse("1 Jan 1991").ToUniversalTime();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithPreviousNames([("Ethelred", "The", "Unready", ethelredDate), ("Conan", "The", "Barbarian", conanDate)])
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980")));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
                 .WithName("Megan", "Thee", "Stallion")
-                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                .WithChangeReasonChoice(EditDetailsChangeReasonOption.NewInformation)
-                .WithUploadEvidenceChoice(false)
+                .WithNameChangeReasonChoice(reason)
+                .WithNameChangeUploadEvidenceChoice(false)
                 .Build());
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance));
@@ -485,13 +561,4 @@ public class CheckAnswersTests : TestBase
             JourneyNames.EditDetails,
             state ?? new EditDetailsState(),
             new KeyValuePair<string, object>("personId", personId));
-
-    public record FieldChange(PersonDetailsUpdatedEventChanges Change);
-    public record FirstNameChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.FirstName);
-    public record MiddleNameChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.MiddleName);
-    public record LastNameChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.LastName);
-    public record DobChange(DateOnly? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.DateOfBirth);
-    public record EmailChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.EmailAddress);
-    public record MobileChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.MobileNumber);
-    public record NinoChange(string? NewValue) : FieldChange(PersonDetailsUpdatedEventChanges.NationalInsuranceNumber);
 }
