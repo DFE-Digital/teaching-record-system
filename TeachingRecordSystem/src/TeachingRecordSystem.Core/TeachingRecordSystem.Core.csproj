@@ -249,8 +249,4 @@
     <PackageReference Include="System.Reactive" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ApiSchema\V3\VNext\Dtos\" />
-  </ItemGroup>
-
 </Project>
