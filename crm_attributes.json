@@ -83,7 +83,8 @@
     "dfeta_AllowIDSignInWithProhibitions",
     "dfeta_qtlsdate",
     "dfeta_qtlsdatehasbeenset",
-    "dfeta_dateofdeath"
+    "dfeta_dateofdeath",
+    "dfeta_mergedwith"
   ],
   "dfeta_businesseventaudit":[
     "createdon",
