@@ -1,14 +1,14 @@
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
-public class EditDetailsFieldState<T>(string? raw, T? parsed) where T : class, IParsable<T>
+public class EditDetailsFieldState<T>(string raw, T? parsed) where T : class, IParsable<T>
 {
-    public string? Raw { get; } = raw;
+    public string Raw { get; } = raw;
     public T? Parsed { get; } = parsed;
 
     public static EditDetailsFieldState<T> FromRawValue(string? rawValue)
     {
-        return new(rawValue, T.TryParse(rawValue, null, out var parsed) ? (T?)parsed : null);
+        return new(rawValue ?? "", T.TryParse(rawValue, null, out var parsed) ? (T?)parsed : null);
     }
 
     public override bool Equals(object? obj)

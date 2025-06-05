@@ -11,21 +11,21 @@ public class EditDetailsState : IRegisterJourney
         requestDataKeys: ["personId"],
         appendUniqueKey: true);
 
-    public string? FirstName { get; set; }
-    public string? MiddleName { get; set; }
-    public string? LastName { get; set; }
-    public DateOnly? DateOfBirth { get; set; }
-    public EditDetailsFieldState<EmailAddress> EmailAddress { get; set; } = new(null, null);
-    public EditDetailsFieldState<MobileNumber> MobileNumber { get; set; } = new(null, null);
-    public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new(null, null);
-
-    public string? OriginalFirstName { get; set; }
-    public string? OriginalMiddleName { get; set; }
-    public string? OriginalLastName { get; set; }
+    public string OriginalFirstName { get; set; } = "";
+    public string OriginalMiddleName { get; set; } = "";
+    public string OriginalLastName { get; set; } = "";
     public DateOnly? OriginalDateOfBirth { get; set; }
-    public EditDetailsFieldState<EmailAddress> OriginalEmailAddress { get; set; } = new(null, null);
-    public EditDetailsFieldState<MobileNumber> OriginalMobileNumber { get; set; } = new(null, null);
-    public EditDetailsFieldState<NationalInsuranceNumber> OriginalNationalInsuranceNumber { get; set; } = new(null, null);
+    public EditDetailsFieldState<EmailAddress> OriginalEmailAddress { get; set; } = new("", null);
+    public EditDetailsFieldState<MobileNumber> OriginalMobileNumber { get; set; } = new("", null);
+    public EditDetailsFieldState<NationalInsuranceNumber> OriginalNationalInsuranceNumber { get; set; } = new("", null);
+
+    public string FirstName { get; set; } = "";
+    public string MiddleName { get; set; } = "";
+    public string LastName { get; set; } = "";
+    public DateOnly? DateOfBirth { get; set; }
+    public EditDetailsFieldState<EmailAddress> EmailAddress { get; set; } = new("", null);
+    public EditDetailsFieldState<MobileNumber> MobileNumber { get; set; } = new("", null);
+    public EditDetailsFieldState<NationalInsuranceNumber> NationalInsuranceNumber { get; set; } = new("", null);
 
     public EditDetailsNameChangeReasonOption? NameChangeReason { get; set; }
     public bool? NameChangeUploadEvidence { get; set; }
@@ -90,21 +90,21 @@ public class EditDetailsState : IRegisterJourney
             return;
         }
 
-        FirstName = person.FirstName;
-        MiddleName = person.MiddleName;
-        LastName = person.LastName;
-        DateOfBirth = person.DateOfBirth;
-        EmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
-        MobileNumber = EditDetailsFieldState<MobileNumber>.FromRawValue(person.MobileNumber);
-        NationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
+        OriginalFirstName = person.FirstName;
+        OriginalMiddleName = person.MiddleName;
+        OriginalLastName = person.LastName;
+        OriginalDateOfBirth = person.DateOfBirth;
+        OriginalEmailAddress = EditDetailsFieldState<EmailAddress>.FromRawValue(person.EmailAddress);
+        OriginalMobileNumber = EditDetailsFieldState<MobileNumber>.FromRawValue(person.MobileNumber);
+        OriginalNationalInsuranceNumber = EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(person.NationalInsuranceNumber);
 
-        OriginalFirstName = FirstName;
-        OriginalMiddleName = MiddleName;
-        OriginalLastName = LastName;
-        OriginalDateOfBirth = DateOfBirth;
-        OriginalEmailAddress = EmailAddress;
-        OriginalMobileNumber = MobileNumber;
-        OriginalNationalInsuranceNumber = NationalInsuranceNumber;
+        FirstName = OriginalFirstName;
+        MiddleName = OriginalMiddleName;
+        LastName = OriginalLastName;
+        DateOfBirth = OriginalDateOfBirth;
+        EmailAddress = OriginalEmailAddress;
+        MobileNumber = OriginalMobileNumber;
+        NationalInsuranceNumber = OriginalNationalInsuranceNumber;
 
         Initialized = true;
     }
