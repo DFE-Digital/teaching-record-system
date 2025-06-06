@@ -53,16 +53,15 @@ public class CommonPageTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithInductionStatus(inductionStatus)
-                    .WithExemptionReasonIds(exemptionReasonIds)
-                    .WithStartDate(Clock.Today.AddDays(-1))
-                    .WithCompletedDate(Clock.Today)
-                    .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
-                    .WithChangeReasonDetailSelections(false)
-                    .WithNoFileUploadSelection()
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(Clock.Today.AddDays(-1))
+                .WithCompletedDate(Clock.Today)
+                .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                .WithChangeReasonDetailSelections(false)
+                .WithEvidence(false)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -196,12 +195,12 @@ public class CommonPageTests : TestBase
                 .Build());
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
+            Content = new EditInductionPostRequestContentBuilder()
                 .WithInductionStatus(inductionStatus)
                 .WithStartDate(Clock.Today.AddDays(-1))
                 .WithCompletedDate(Clock.Today)
                 .WithExemptionReasonIds(exemptionReasonIds)
-                .Build())
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -352,16 +351,15 @@ public class CommonPageTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{page}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithInductionStatus(inductionStatus)
-                    .WithExemptionReasonIds(exemptionReasonIds)
-                    .WithStartDate(startDate)
-                    .WithCompletedDate(completedDate)
-                    .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
-                    .WithChangeReasonDetailSelections(false)
-                    .WithNoFileUploadSelection()
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithExemptionReasonIds(exemptionReasonIds)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                .WithChangeReasonDetailSelections(false)
+                .WithEvidence(false)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -400,15 +398,14 @@ public class CommonPageTests : TestBase
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/{fromPage}?FromCheckAnswers={JourneyFromCheckYourAnswersPage.CheckYourAnswers}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithInductionStatus(inductionStatus)
-                    .WithStartDate(startDate)
-                    .WithCompletedDate(completedDate)
-                    .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
-                    .WithChangeReasonDetailSelections(false)
-                    .WithNoFileUploadSelection()
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(inductionStatus)
+                .WithStartDate(startDate)
+                .WithCompletedDate(completedDate)
+                .WithChangeReason(InductionChangeReasonOption.IncompleteDetails)
+                .WithChangeReasonDetailSelections(false)
+                .WithEvidence(false)
+                .BuildFormUrlEncoded()
         };
 
         // Act
