@@ -97,7 +97,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithCompletedDate(dateValid).Build())
+            Content = new EditInductionPostRequestContentBuilder().WithCompletedDate(dateValid).BuildFormUrlEncoded()
         };
 
         // Act
@@ -146,7 +146,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithCompletedDate(dateTomorrow).Build())
+            Content = new EditInductionPostRequestContentBuilder().WithCompletedDate(dateTomorrow).BuildFormUrlEncoded()
         };
 
         // Act
@@ -173,7 +173,7 @@ public class EditCompletedDateTests(HostFixture hostFixture) : TestBase(hostFixt
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/date-completed?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithCompletedDate(completedDate).Build())
+            Content = new EditInductionPostRequestContentBuilder().WithCompletedDate(completedDate).BuildFormUrlEncoded()
         };
 
         // Act

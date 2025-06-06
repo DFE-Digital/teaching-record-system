@@ -206,12 +206,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName(null)
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName(null)
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -234,12 +234,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("   ")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("   ")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -262,12 +262,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName(string.Join("", Enumerable.Repeat('x', 101)))
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName(string.Join("", Enumerable.Repeat('x', 101)))
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -290,12 +290,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName(string.Join("", Enumerable.Repeat('x', 101)))
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName(string.Join("", Enumerable.Repeat('x', 101)))
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -318,12 +318,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName(null)
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName(null)
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -346,12 +346,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("    ")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("    ")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -374,12 +374,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName(string.Join("", Enumerable.Repeat('x', 101)))
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName(string.Join("", Enumerable.Repeat('x', 101)))
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -402,12 +402,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(null)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(null)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -430,12 +430,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 2030"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 2030"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -458,13 +458,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithEmailAddress($"test@{string.Join(".", Enumerable.Repeat("test", 20))}.com")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithEmailAddress($"test@{string.Join(".", Enumerable.Repeat("test", 20))}.com")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -498,13 +498,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithEmailAddress(emailAddress)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress(emailAddress)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -550,13 +550,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithMobileNumber(mobileNumber)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithMobileNumber(mobileNumber)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -626,13 +626,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithNationalInsuranceNumber(niNumber)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithNationalInsuranceNumber(niNumber)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -671,13 +671,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithNationalInsuranceNumber(niNumber)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithNationalInsuranceNumber(niNumber)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -715,15 +715,15 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithEmailAddress("test@test.com")
-                    .WithMobileNumber("447891234567")
-                    .WithNationalInsuranceNumber("AB123456C")
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("test@test.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -751,16 +751,15 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Jimmy")
-                    .WithMiddleName("A")
-                    .WithLastName("Person")
-                    .WithDateOfBirth(DateOnly.Parse("2 Mar 1981"))
-                    .WithEmailAddress("new@email.com")
-                    .WithMobileNumber("07987 654321")
-                    .WithNationalInsuranceNumber("AB 65 43 21 D")
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Jimmy")
+                .WithMiddleName("A")
+                .WithLastName("Person")
+                .WithDateOfBirth(DateOnly.Parse("2 Mar 1981"))
+                .WithEmailAddress("new@email.com")
+                .WithMobileNumber("07987 654321")
+                .WithNationalInsuranceNumber("AB 65 43 21 D")
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -810,16 +809,15 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
-                    .WithEmailAddress("new@email.com")
-                    .WithMobileNumber("447987654321")
-                    .WithNationalInsuranceNumber("AB654321D")
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                .WithEmailAddress("new@email.com")
+                .WithMobileNumber("447987654321")
+                .WithNationalInsuranceNumber("AB654321D")
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -881,16 +879,15 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Megan")
-                    .WithMiddleName("Thee")
-                    .WithLastName("Stallion")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithEmailAddress("original@email.com")
-                    .WithMobileNumber("447891234567")
-                    .WithNationalInsuranceNumber("AB123456C")
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Megan")
+                .WithMiddleName("Thee")
+                .WithLastName("Stallion")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("original@email.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .BuildFormUrlEncoded()
         };
 
         // Act

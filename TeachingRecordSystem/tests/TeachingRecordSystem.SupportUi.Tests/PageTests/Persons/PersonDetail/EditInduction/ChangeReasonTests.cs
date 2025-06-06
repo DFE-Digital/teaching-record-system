@@ -119,12 +119,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithChangeReason(changeReason)
-                    .WithChangeReasonDetailSelections(true, changeReasonDetails)
-                    .WithNoFileUploadSelection()
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(changeReason)
+                .WithChangeReasonDetailSelections(true, changeReasonDetails)
+                .WithEvidence(false)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -173,11 +172,10 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithChangeReason(InductionChangeReasonOption.AnotherReason)
-                    .WithChangeReasonDetailSelections(true, null)
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReasonDetailSelections(true, null)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -202,11 +200,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", changeReason)
-                .Add("HasAdditionalReasonDetail", false)
-                .Add("UploadEvidence", true)
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(changeReason)
+                .WithChangeReasonDetailSelections(false)
+                .WithEvidence(true)
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -230,13 +228,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
-                .Add("HasAdditionalReasonDetail", true)
-                .Add("ChangeReasonDetail", "")
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReasonDetailSelections(true, "")
+                .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -274,16 +270,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
-                .Add("HasAdditionalReasonDetail", true)
-                .Add("ChangeReasonDetail", "")
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFileId", evidenceFileId)
-                .Add("EvidenceFileName", "testfile.jpg")
-                .Add("EvidenceFileSizeDescription", "3 KB")
-                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReasonDetailSelections(true, "")
+                .WithEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -320,17 +311,12 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
-                .Add("HasAdditionalReasonDetail", true)
-                .Add("ChangeReasonDetail", "")
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFileId", evidenceFileId)
-                .Add("EvidenceFileName", "testfile.jpg")
-                .Add("EvidenceFileSizeDescription", "3 KB")
-                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReasonDetailSelections(true, "")
+                .WithEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -357,16 +343,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", InductionChangeReasonOption.AnotherReason)
-                .Add("HasAdditionalReasonDetail", true)
-                .Add("ChangeReasonDetail", "")
-                .Add("UploadEvidence", false)
-                .Add("EvidenceFileId", evidenceFileId)
-                .Add("EvidenceFileName", "testfile.jpg")
-                .Add("EvidenceFileSizeDescription", "3 KB")
-                .Add("UploadedEvidenceFileUrl", "http://test.com/file")
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(InductionChangeReasonOption.AnotherReason)
+                .WithChangeReasonDetailSelections(true, "")
+                .WithEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -395,12 +376,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", changeReason)
-                .Add("HasAdditionalReasonDetail", false)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName)
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(changeReason)
+                .WithChangeReasonDetailSelections(false)
+                .WithEvidence(true, (CreateEvidenceFileBinaryContent(), evidenceFileName))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -430,13 +410,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", changeReason)
-                .Add("HasAdditionalReasonDetail", true)
-                .Add("ChangeReasonDetail", changeReasonDetails)
-                .Add("UploadEvidence", true)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), evidenceFileName)
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(changeReason)
+                .WithChangeReasonDetailSelections(true, changeReasonDetails)
+                .WithEvidence(true, (CreateEvidenceFileBinaryContent(), evidenceFileName))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -461,13 +439,11 @@ public class ChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add("ChangeReason", InductionChangeReasonOption.NewInformation)
-                .Add("HasAdditionalReasonDetail", false)
-                .Add("ChangeReasonDetail", "A description about why the change typed into the box")
-                .Add("UploadEvidence", false)
-                .Add("EvidenceFile", CreateEvidenceFileBinaryContent(), "evidence.pdf")
-                .Build()
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithChangeReason(InductionChangeReasonOption.NewInformation)
+                .WithChangeReasonDetailSelections(false, "A description about why the change typed into the box")
+                .WithEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act

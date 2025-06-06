@@ -288,8 +288,7 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state.Build());
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}{fromPage}?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
+            Content = new EditDetailsPostRequestContentBuilder()
                     .WithFirstName(firstName)
                     .WithMiddleName(middleName)
                     .WithLastName(lastName)
@@ -298,10 +297,10 @@ public class CommonPageTests : TestBase
                     .WithMobileNumber(mobileNumber)
                     .WithNationalInsuranceNumber(nationalInsuranceNumber)
                     .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                    .WithNoNameChangeFileUploadSelection()
+                    .WithNameChangeEvidence(false)
                     .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
-                    .WithNoOtherDetailsChangeFileUploadSelection()
-                    .Build())
+                    .WithOtherDetailsChangeEvidence(false)
+                    .BuildFormUrlEncoded()
         };
 
         // Act
@@ -540,20 +539,19 @@ public class CommonPageTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(person.PersonId, state.Build());
         var request = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}{page}?fromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithFirstName(newFirstName)
-                    .WithMiddleName(newMiddleName)
-                    .WithLastName(newLastName)
-                    .WithDateOfBirth(newDateOfBirth)
-                    .WithEmailAddress(newEmailAddress)
-                    .WithMobileNumber(newMobileNumber)
-                    .WithNationalInsuranceNumber(newNationalInsuranceNumber)
-                    .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
-                    .WithNoNameChangeFileUploadSelection()
-                    .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
-                    .WithNoOtherDetailsChangeFileUploadSelection()
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName(newFirstName)
+                .WithMiddleName(newMiddleName)
+                .WithLastName(newLastName)
+                .WithDateOfBirth(newDateOfBirth)
+                .WithEmailAddress(newEmailAddress)
+                .WithMobileNumber(newMobileNumber)
+                .WithNationalInsuranceNumber(newNationalInsuranceNumber)
+                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeEvidence(false)
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.IncompleteDetails)
+                .WithOtherDetailsChangeEvidence(false)
+                .BuildFormUrlEncoded()
         };
 
         // Act

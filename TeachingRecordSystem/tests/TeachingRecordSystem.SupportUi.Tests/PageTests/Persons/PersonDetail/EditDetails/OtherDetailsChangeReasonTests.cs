@@ -235,11 +235,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithOtherDetailsChangeReason(changeReason, changeReasonDetails)
-                    .WithNoOtherDetailsChangeFileUploadSelection()
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(changeReason, changeReasonDetails)
+                .WithOtherDetailsChangeEvidence(false)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -297,10 +296,9 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, null)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, null)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -329,10 +327,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithOtherDetailsChangeEvidence(true)
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -361,11 +359,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "invalidfile.cs")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithOtherDetailsChangeEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -395,11 +392,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithOtherDetailsChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -443,14 +439,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId), evidenceFileId)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName), "testfile.jpg")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription), "3 KB")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl), "http://test.com/file")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithOtherDetailsChangeEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -493,15 +485,11 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId), evidenceFileId)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName), "testfile.jpg")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription), "3 KB")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl), "http://test.com/file")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithOtherDetailsChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .WithOtherDetailsChangeEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -534,14 +522,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), false)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileId), evidenceFileId)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileName), "testfile.jpg")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFileSizeDescription), "3 KB")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadedEvidenceFileUrl), "http://test.com/file")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.AnotherReason)
+                .WithOtherDetailsChangeEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -572,11 +556,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithOtherDetailsChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -610,11 +593,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), true)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "evidence.pdf")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation)
+                .WithOtherDetailsChangeEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -646,12 +628,10 @@ public class OtherDetailsChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReason), EditDetailsOtherDetailsChangeReasonOption.NewInformation)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeReasonDetail), "A description about why the change typed into the box")
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeUploadEvidence), false)
-                .Add(nameof(OtherDetailsChangeReasonModel.OtherDetailsChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "evidence.pdf")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithOtherDetailsChangeReason(EditDetailsOtherDetailsChangeReasonOption.NewInformation, "A description about why the change typed into the box")
+                .WithOtherDetailsChangeEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act

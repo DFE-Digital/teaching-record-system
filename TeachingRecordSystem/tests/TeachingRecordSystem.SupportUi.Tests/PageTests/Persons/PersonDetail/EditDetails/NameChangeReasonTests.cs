@@ -214,10 +214,10 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeReason), EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeEvidence(true)
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -245,11 +245,10 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeReason), EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "invalidfile.cs")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(), "invalidfile.cs"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -278,10 +277,9 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -324,13 +322,9 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileId), evidenceFileId)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileName), "testfile.jpg")
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription), "3 KB")
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl), "http://test.com/file")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -372,14 +366,10 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileId), evidenceFileId)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileName), "testfile.jpg")
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription), "3 KB")
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl), "http://test.com/file")
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeEvidence(true, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "validfile.png"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -411,13 +401,9 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), false)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileId), evidenceFileId)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileName), "testfile.jpg")
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFileSizeDescription), "3 KB")
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadedEvidenceFileUrl), "http://test.com/file")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeEvidence(false, evidenceFileId, "testfile.jpg", "3 KB", "http://test.com/file")
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -447,11 +433,10 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeReason), EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFile), CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(new byte[1230]), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -484,11 +469,10 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeReason), EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), true)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "evidence.pdf")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeEvidence(true, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act
@@ -518,11 +502,10 @@ public class NameChangeReasonTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new MultipartFormDataContentBuilder()
-                .Add(nameof(NameChangeReasonModel.NameChangeReason), EditDetailsNameChangeReasonOption.CorrectingAnError)
-                .Add(nameof(NameChangeReasonModel.NameChangeUploadEvidence), false)
-                .Add(nameof(NameChangeReasonModel.NameChangeEvidenceFile), CreateEvidenceFileBinaryContent(), "evidence.pdf")
-                .Build()
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithNameChangeReason(EditDetailsNameChangeReasonOption.CorrectingAnError)
+                .WithNameChangeEvidence(false, (CreateEvidenceFileBinaryContent(), "evidence.pdf"))
+                .BuildMultipartFormData()
         };
 
         // Act
