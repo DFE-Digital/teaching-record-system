@@ -1,38 +1,19 @@
-resource "kubernetes_job" "migrations" {
-  metadata {
-    name      = "${var.service_name}-${local.app_name_suffix}-migrations"
-    namespace = var.namespace
-  }
 
-  spec {
-    template {
-      metadata {}
-      spec {
-        container {
-          name    = "cli"
-          image   = var.docker_image
-          command = ["trscli"]
-          args    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+module "migrations" {
+  source = "./vendor/modules/aks//aks/job_configuration"
 
-          env {
-            name  = "CONNECTION_STRING"
-            value = module.postgres.dotnet_connection_string
-          }
-        }
+  namespace    = var.namespace
+  environment  = local.app_name_suffix
+  service_name = var.service_name
+  docker_image = var.docker_image
+  commands     = ["trscli"]
+  arguments    = ["migrate-db", "--connection-string", "$(CONNECTION_STRING)"]
+  job_name     = "migrations"
+  enable_logit = var.enable_logit
 
-        restart_policy = "Never"
-      }
-    }
-
-    backoff_limit = 0
-  }
-
-  wait_for_completion = true
-
-  timeouts {
-    create = "15m"
-    update = "15m"
-  }
+  config_map_ref = module.api_application_configuration.kubernetes_config_map_name
+  secret_ref     = module.api_application_configuration.kubernetes_secret_name
+  cpu            = module.cluster_data.configuration_map.cpu_min
 }
 
 module "api_application_configuration" {
@@ -65,7 +46,7 @@ module "api_application_configuration" {
 module "api_application" {
   source = "./vendor/modules/aks//aks/application"
 
-  depends_on = [kubernetes_job.migrations]
+  depends_on = [module.migrations]
 
   name   = "api"
   is_web = true
@@ -118,7 +99,7 @@ module "authz_application_configuration" {
 module "authz_application" {
   source = "./vendor/modules/aks//aks/application"
 
-  depends_on = [kubernetes_job.migrations]
+  depends_on = [module.migrations]
 
   name   = "authz"
   is_web = true
@@ -170,7 +151,7 @@ module "ui_application_configuration" {
 module "ui_application" {
   source = "./vendor/modules/aks//aks/application"
 
-  depends_on = [kubernetes_job.migrations]
+  depends_on = [module.migrations]
 
   name   = "ui"
   is_web = true
@@ -223,7 +204,7 @@ module "worker_application_configuration" {
 module "worker_application" {
   source = "./vendor/modules/aks//aks/application"
 
-  depends_on = [kubernetes_job.migrations]
+  depends_on = [module.migrations]
 
   name   = "worker"
   is_web = false
