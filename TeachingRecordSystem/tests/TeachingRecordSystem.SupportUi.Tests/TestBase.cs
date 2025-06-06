@@ -10,8 +10,8 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
-using TeachingRecordSystem.SupportUi.Tests.Infrastructure;
 using TeachingRecordSystem.SupportUi.Tests.Infrastructure.Security;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 using TeachingRecordSystem.WebCommon.FormFlow.State;
 
 namespace TeachingRecordSystem.SupportUi.Tests;

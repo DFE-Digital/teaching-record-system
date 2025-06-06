@@ -41,7 +41,7 @@ public class SetQtlsDateTests : IAsyncLifetime
         var qtlsDate = new DateOnly(2021, 01, 01);
         var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
-            x.WithQtlsDate(qtlsDate);
+            x.WithQtlsDateInDqt(qtlsDate);
         });
 
         // Act

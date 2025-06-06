@@ -72,7 +72,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qtlsDate = new DateOnly(2020, 01, 01);
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate));
+            .WithQtlsDateInDqt(qtlsDate));
 
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, "/v3/person");
@@ -112,7 +112,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var qtlsDate = new DateOnly(2020, 01, 01);
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDate(qtlsDate));
+            .WithQtlsDateInDqt(qtlsDate));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
         entity[Contact.Fields.dfeta_qtlsdate] = null;
@@ -142,7 +142,7 @@ public class GetPersonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQts(qtsDate)
-            .WithQtlsDate(qtlsDate));
+            .WithQtlsDateInDqt(qtlsDate));
         var status = await ReferenceCache.GetTeacherStatusByValueAsync("71"); //qualified teacher
         var qtsRegistration = new dfeta_qtsregistration() { dfeta_QTSDate = qtsDate.ToDateTime(), dfeta_TeacherStatusId = status.ToEntityReference() };
         DataverseAdapterMock.Setup(x => x.GetQtsRegistrationsByTeacherAsync(It.IsAny<Guid>(), It.IsAny<string[]>())).ReturnsAsync(new[] { qtsRegistration });
