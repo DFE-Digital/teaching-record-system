@@ -31,52 +31,41 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 
         var query = dbContext.IntegrationTransactions.AsQueryable();
 
-        query = (sortBy, sortDirection) switch
+        if (sortBy == IntegrationTransactionSortByOption.CreatedOn)
         {
-            (IntegrationTransactionSortByOption.IntegrationTransactionId, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.IntegrationTransactionId),
-            (IntegrationTransactionSortByOption.IntegrationTransactionId, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.IntegrationTransactionId),
-
-            (IntegrationTransactionSortByOption.Interface, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.InterfaceTypeId),
-            (IntegrationTransactionSortByOption.Interface, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.InterfaceTypeId),
-
-            (IntegrationTransactionSortByOption.CreatedOn, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.CreatedDate),
-            (IntegrationTransactionSortByOption.CreatedOn, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.CreatedDate),
-
-            (IntegrationTransactionSortByOption.ImportStatus, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.ImportStatus),
-            (IntegrationTransactionSortByOption.ImportStatus, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.ImportStatus),
-
-            (IntegrationTransactionSortByOption.Total, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.TotalCount),
-            (IntegrationTransactionSortByOption.Total, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.TotalCount),
-
-            (IntegrationTransactionSortByOption.Successes, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.SuccessCount),
-            (IntegrationTransactionSortByOption.Successes, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.SuccessCount),
-
-            (IntegrationTransactionSortByOption.Failures, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.FailureCount),
-            (IntegrationTransactionSortByOption.Failures, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.FailureCount),
-
-            (IntegrationTransactionSortByOption.Duplicates, SupportUi.SortDirection.Ascending) =>
-                query.OrderBy(x => x.DuplicateCount),
-            (IntegrationTransactionSortByOption.Duplicates, SupportUi.SortDirection.Descending) =>
-                query.OrderByDescending(x => x.DuplicateCount),
-
-            _ => query.OrderByDescending(x => x.CreatedDate)
-        };
+            query = query.OrderBy(sortDirection, t => t.CreatedDate!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.Duplicates)
+        {
+            query = query.OrderBy(sortDirection, t => t.DuplicateCount!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.Failures)
+        {
+            query = query.OrderBy(sortDirection, t => t.FailureCount!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.ImportStatus)
+        {
+            query = query.OrderBy(sortDirection, t => t.ImportStatus!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.IntegrationTransactionId)
+        {
+            query = query.OrderBy(sortDirection, t => t.IntegrationTransactionId!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.Interface)
+        {
+            query = query.OrderBy(sortDirection, t => t.InterfaceTypeId!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.Total)
+        {
+            query = query.OrderBy(sortDirection, t => t.TotalCount!);
+        }
+        else if (sortBy == IntegrationTransactionSortByOption.Successes)
+        {
+            query = query.OrderBy(sortDirection, t => t.SuccessCount!);
+        }
 
         Results = await query
+            .Include( x=> x.IntegrationTransactionRecords)
             .Select(x => new ItResult(
                 x.IntegrationTransactionId,
                 x.InterfaceTypeId,
