@@ -8,6 +8,6 @@ public record EytsInfo
 
 public record EytsInfoAwardedRoute
 {
-    public required RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }
+    public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
     public required DateOnly AwardedDate { get; init; }
 }
