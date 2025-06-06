@@ -1,4 +1,6 @@
-namespace TeachingRecordSystem.SupportUi;
+using Microsoft.Extensions.Configuration;
+
+namespace TeachingRecordSystem.Core;
 
 public interface IFeatureProvider
 {

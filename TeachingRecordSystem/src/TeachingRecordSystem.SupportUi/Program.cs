@@ -167,7 +167,6 @@ builder.Services
     .AddFormFlowJourneyDescriptors(typeof(Program).Assembly)
     .AddFileService()
     .AddTransient<TrsLinkGenerator>()
-    .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
     .AddTransient<CheckUserExistsFilter>()
