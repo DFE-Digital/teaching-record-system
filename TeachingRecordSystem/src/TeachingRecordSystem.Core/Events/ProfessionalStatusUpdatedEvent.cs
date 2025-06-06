@@ -8,12 +8,14 @@ public record ProfessionalStatusUpdatedEvent : EventBase, IEventWithPersonId, IE
     public required Guid PersonId { get; init; }
     public required ProfessionalStatus ProfessionalStatus { get; init; }
     public required ProfessionalStatus OldProfessionalStatus { get; init; }
-    public required ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
-    public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }
     public required string? ChangeReason { get; init; }
     public required string? ChangeReasonDetail { get; init; }
     public required File? EvidenceFile { get; init; }
     public required ProfessionalStatusUpdatedEventChanges Changes { get; init; }
+    public required ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
+    public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }
+    public required Induction Induction { get; init; }
+    public required Induction OldInduction { get; init; }
 }
 
 [Flags]
@@ -33,8 +35,12 @@ public enum ProfessionalStatusUpdatedEventChanges
     TrainingProvider = 1 << 10,
     ExemptFromInduction = 1 << 11,
     DegreeType = 1 << 12,
-    PersonQtsDate = 1 << 13,
-    PersonEytsDate = 1 << 14,
-    PersonHasEyps = 1 << 15,
-    PersonPqtsDate = 1 << 16
+    // Keep the following options aligned with other ProfessionalStatus events
+    PersonQtsDate = 1 << 25,
+    PersonEytsDate = 1 << 26,
+    PersonHasEyps = 1 << 27,
+    PersonPqtsDate = 1 << 28,
+    PersonInductionStatus = 1 << 29,
+    InductionExemptionReasons = 1 << 30,
+    PersonInductionStatusWithoutExemption = 1 << 31
 }

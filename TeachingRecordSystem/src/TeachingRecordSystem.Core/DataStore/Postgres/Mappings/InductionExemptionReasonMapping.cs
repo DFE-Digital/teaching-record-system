@@ -11,7 +11,7 @@ public class InductionExemptionReasonMapping : IEntityTypeConfiguration<Inductio
         builder.Property(x => x.IsActive).IsRequired();
 
         builder.HasData(
-            new InductionExemptionReason { InductionExemptionReasonId = new("5a80cee8-98a8-426b-8422-b0e81cb49b36"), Name = "Qualified before 07 May 2000", IsActive = true, RouteImplicitExemption = false },
+            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBefore7thMay2000Id, Name = "Qualified before 07 May 2000", IsActive = true, RouteImplicitExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = new("15014084-2d8d-4f51-9198-b0e1881f8896"), Name = "Qualified between 07 May 1999 and 01 Apr 2003. First post was in Wales and lasted a minimum of two terms.", IsActive = true, RouteImplicitExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = new("0997ab13-7412-4560-8191-e51ed4d58d2a"), Name = "Qualified through Further Education route between 1 Sep 2001 and 1 Sep 2004", IsActive = true, RouteImplicitExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = new("fea2db23-93e0-49af-96fd-83c815c17c0b"), Name = "Passed induction in Guernsey", IsActive = true, RouteImplicitExemption = false },

@@ -14,7 +14,7 @@ public class ProfessionalStatus : Qualification
     public required Guid RouteToProfessionalStatusId { get; set; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }
-    public RouteToProfessionalStatus? RouteToProfessionalStatus { get; }
+    public RouteToProfessionalStatus? RouteToProfessionalStatus { get; protected set; }
     public required ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public required DateOnly? TrainingStartDate { get; set; }
@@ -86,8 +86,9 @@ public class ProfessionalStatus : Qualification
 
         var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == routeToProfessionalStatusId);
         var professionalStatusType = route.ProfessionalStatusType;
-        var allProfessionalStatuses = person.Qualifications.OfType<ProfessionalStatus>().Append(professionalStatus);
+        var allProfessionalStatuses = person.Qualifications.OfType<ProfessionalStatus>().Append(professionalStatus).ToArray();
         var personAttributesUpdated = person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes, allProfessionalStatuses);
+        var (induction, oldInduction, _) = person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allProfessionalStatuses);
 
         var changes = ProfessionalStatusCreatedEventChanges.None |
             (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
@@ -101,6 +102,12 @@ public class ProfessionalStatus : Qualification
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
                 ? ProfessionalStatusCreatedEventChanges.PersonPqtsDate
+                : 0) |
+            (induction.Status != oldInduction.Status
+                ? ProfessionalStatusCreatedEventChanges.PersonInductionStatus
+                : 0) |
+            (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption
+                ? ProfessionalStatusCreatedEventChanges.PersonInductionStatusWithoutExemption
                 : 0);
 
         @event = new ProfessionalStatusCreatedEvent
@@ -112,6 +119,8 @@ public class ProfessionalStatus : Qualification
             ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(professionalStatus),
             PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
             OldPersonAttributes = oldPersonAttributes,
+            Induction = induction,
+            OldInduction = oldInduction,
             Changes = changes
         };
 
@@ -147,6 +156,7 @@ public class ProfessionalStatus : Qualification
         }
 
         var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+        var (induction, oldInduction, _) = Person.RefreshInductionStatusForQtsProfessionalStatusChanged(now);
 
         var changes = ProfessionalStatusUpdatedEventChanges.None |
             (RouteToProfessionalStatus!.RouteToProfessionalStatusId != oldEventModel.RouteToProfessionalStatusId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
@@ -165,7 +175,9 @@ public class ProfessionalStatus : Qualification
             (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonQtsDate : 0) |
             (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonEytsDate : 0) |
             (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonHasEyps : 0) |
-            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonPqtsDate : 0);
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonPqtsDate : 0) |
+            (induction.Status != oldInduction.Status ? ProfessionalStatusUpdatedEventChanges.PersonInductionStatus : 0) |
+            (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption ? ProfessionalStatusUpdatedEventChanges.PersonInductionStatusWithoutExemption : 0);
 
         if (changes == ProfessionalStatusUpdatedEventChanges.None)
         {
@@ -186,9 +198,11 @@ public class ProfessionalStatus : Qualification
             ChangeReason = changeReason,
             ChangeReasonDetail = changeReasonDetail,
             EvidenceFile = evidenceFile,
+            Changes = changes,
             PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
             OldPersonAttributes = oldPersonAttributes,
-            Changes = changes,
+            Induction = induction,
+            OldInduction = oldInduction
         };
     }
 
@@ -213,15 +227,13 @@ public class ProfessionalStatus : Qualification
         DeletedOn = now;
         UpdatedOn = now;
 
-        var oldEventModel = EventModels.ProfessionalStatus.FromModel(this);
         var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
-        var oldRoute = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
-        var oldProfessionalStatusType = oldRoute.ProfessionalStatusType;
 
         var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatusId);
         var professionalStatusType = route.ProfessionalStatusType;
 
         var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+        var (induction, oldInduction, _) = Person.RefreshInductionStatusForQtsProfessionalStatusChanged(now);
 
         var changes = ProfessionalStatusDeletedEventChanges.None |
             (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
@@ -235,6 +247,12 @@ public class ProfessionalStatus : Qualification
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
                 ? ProfessionalStatusDeletedEventChanges.PersonPqtsDate
+                : 0) |
+            (induction.Status != oldInduction.Status
+                ? ProfessionalStatusDeletedEventChanges.PersonInductionStatus
+                : 0) |
+            (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption
+                ? ProfessionalStatusDeletedEventChanges.PersonInductionStatusWithoutExemption
                 : 0);
 
         @event = new ProfessionalStatusDeletedEvent()
@@ -244,12 +262,14 @@ public class ProfessionalStatus : Qualification
             RaisedBy = deletedBy,
             PersonId = PersonId,
             ProfessionalStatus = EventModels.ProfessionalStatus.FromModel(this),
-            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
-            OldPersonAttributes = oldPersonAttributes,
             DeletionReason = deletionReason,
             DeletionReasonDetail = deletionReasonDetail,
             EvidenceFile = evidenceFile,
-            Changes = changes
+            Changes = changes,
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
+            OldPersonAttributes = oldPersonAttributes,
+            Induction = induction,
+            OldInduction = oldInduction
         };
     }
 }

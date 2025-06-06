@@ -113,7 +113,9 @@ public partial class TestData
                 Changes = _changes ?? ProfessionalStatusUpdatedEventChanges.None,
                 ChangeReason = _changeReason,
                 ChangeReasonDetail = _changeReasonDetail,
-                EvidenceFile = null
+                EvidenceFile = null,
+                Induction = null!,  // FIXME
+                OldInduction = null!  // FIXME
             };
 
             await testData.WithDbContextAsync(async dbContext =>
@@ -240,7 +242,9 @@ public partial class TestData
                 Changes = _changes ?? ProfessionalStatusDeletedEventChanges.None,
                 DeletionReason = _changeReason,
                 DeletionReasonDetail = _changeReasonDetail,
-                EvidenceFile = null
+                EvidenceFile = null,
+                Induction = null!,  // FIXME
+                OldInduction = null!  // FIXME
             };
 
             await testData.WithDbContextAsync(async dbContext =>
