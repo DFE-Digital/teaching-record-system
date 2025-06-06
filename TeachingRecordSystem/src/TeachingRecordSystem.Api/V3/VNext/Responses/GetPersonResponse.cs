@@ -36,15 +36,15 @@ public record GetPersonResponse
 [AutoMap(typeof(GetPersonResultMandatoryQualification))]
 public record GetPersonResponseMandatoryQualification
 {
-    public required Guid QualificationId { get; init; }
+    public required Guid MandatoryQualificationId { get; init; }
     public required DateOnly EndDate { get; init; }
     public required string Specialism { get; init; }
 }
 
 public record GetPersonResponseRouteToProfessionalStatus
 {
-    public required Guid QualificationId { get; init; }
-    public required RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }
+    public required Guid RouteToProfessionalStatusId { get; init; }
+    public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
     public required ProfessionalStatusStatus Status { get; init; }
     public required DateOnly? AwardedDate { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
@@ -54,4 +54,5 @@ public record GetPersonResponseRouteToProfessionalStatus
     public required TrainingCountry? TrainingCountry { get; init; }
     public required TrainingProvider? TrainingProvider { get; init; }
     public required DegreeType? DegreeType { get; init; }
+    public required InductionExemptionReason? InductionExemption { get; set; }
 }
