@@ -413,8 +413,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string ApiTrnRequestMerge(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId);
 
-    public string IntegrationTransactions(IntegrationTransactionSortByOption? sortBy = null, SortDirection? sortDirection = null, int? page = null) =>
-        GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Index", routeValues: new {sortBy, sortDirection, page });
+    public string IntegrationTransactions(IntegrationTransactionSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
+        GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Index", routeValues: new {sortBy, sortDirection, pageNumber });
 
     public string ApiTrnRequestMergeCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");

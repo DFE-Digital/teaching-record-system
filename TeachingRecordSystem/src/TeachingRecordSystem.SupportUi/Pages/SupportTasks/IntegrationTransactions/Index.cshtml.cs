@@ -21,7 +21,6 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
     public IntegrationTransactionSortByOption? SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    [FromQuery(Name = "page")]
     public int? PageNumber { get; set; }
 
     public async Task<IActionResult> OnGet()
