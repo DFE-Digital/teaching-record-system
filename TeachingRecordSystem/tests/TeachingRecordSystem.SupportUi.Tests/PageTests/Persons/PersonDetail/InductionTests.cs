@@ -62,7 +62,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
     [Theory]
     [MemberData(nameof(InductionExemptedRoutes))]
-    public async Task Get_ForPersonWithRouteInductionExemption_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
+    public async Task Get_ForPersonWithRouteInductionExemption_RoutesFeatureFlagOn_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
