@@ -96,7 +96,7 @@ public class IndexTests : TestBase
 
         var dateOfBirthResults = searchResults!.GetAllElementsByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthResults);
-        Assert.All(dateOfBirthResults.Select(r => r.TextContent), t => Assert.Equal(search, t));
+        Assert.All(dateOfBirthResults.Select(r => r.TrimmedText()), t => Assert.Equal(search, t));
     }
 
     [Fact]
@@ -122,13 +122,13 @@ public class IndexTests : TestBase
 
         var nameResults = searchResults!.GetAllElementsByTestId("name");
         Assert.NotNull(nameResults);
-        Assert.All(nameResults.Select(r => r.TextContent), t => Assert.Contains(search, t.ToLower()));
+        Assert.All(nameResults.Select(r => r.TrimmedText()), t => Assert.Contains(search, t.ToLower()));
     }
 
     [Fact]
     public async Task Get_WithSearchThatLooksLikeATrn_DisplaysMatchOnTrn()
     {
-        // Arrange                
+        // Arrange
         var person1 = await TestData.CreatePersonAsync(b => b.WithTrn());
         var person2 = await TestData.CreatePersonAsync(b => b.WithTrn());
         var person3 = await TestData.CreatePersonAsync(b => b.WithTrn());
@@ -147,6 +147,6 @@ public class IndexTests : TestBase
 
         var nameResults = searchResults!.GetAllElementsByTestId("trn");
         Assert.Single(nameResults);
-        Assert.Contains(search!, nameResults.Single().TextContent);
+        Assert.Contains(search!, nameResults.Single().TrimmedText());
     }
 }

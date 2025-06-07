@@ -33,7 +33,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("induction-status-caption");
-        Assert.Equal(expectedCaption, caption!.TextContent);
+        Assert.Equal(expectedCaption, caption!.TrimmedText());
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.Contains($"/persons/{person.PersonId}/edit-induction/status", form.Action);
         var buttons = form.GetElementsByTagName("button").Select(button => button as IHtmlButtonElement);
         Assert.Equal(2, buttons.Count());
-        Assert.Equal("Continue", buttons.ElementAt(0)!.TextContent);
-        Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TextContent);
+        Assert.Equal("Continue", buttons.ElementAt(0)!.TrimmedText());
+        Assert.Equal("Cancel and return to record", buttons.ElementAt(1)!.TrimmedText());
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("What is their induction status?", statusChoicesLegend!.TextContent);
+        Assert.Equal("What is their induction status?", statusChoicesLegend!.TrimmedText());
         Assert.Equal(expectedChoices, statusChoices);
     }
 
@@ -135,7 +135,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         var doc = await AssertEx.HtmlResponseAsync(response);
         var statusChoices = doc.QuerySelectorAll<IHtmlInputElement>("[type=radio]").Select(r => r.Value);
         var statusChoicesLegend = doc.GetElementByTestId("status-choices-legend");
-        Assert.Equal("What is their induction status?", statusChoicesLegend!.TextContent);
+        Assert.Equal("What is their induction status?", statusChoicesLegend!.TrimmedText());
         Assert.Equal(expectedChoices, statusChoices);
     }
 
@@ -232,10 +232,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithInductionStatus(InductionStatus.Exempt)
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(InductionStatus.Exempt)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -260,9 +259,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
-                    .WithInductionStatus(InductionStatus.None)
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(InductionStatus.None)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -298,9 +297,9 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/status?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder()
-                    .WithInductionStatus(InductionStatus.None)
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithInductionStatus(InductionStatus.None)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -363,7 +362,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Contains(statusSpecificText, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TextContent);
+        Assert.Contains(statusSpecificText, doc!.GetElementByTestId("induction-status-warning")!.Children[1].TrimmedText());
     }
 
     [Theory]

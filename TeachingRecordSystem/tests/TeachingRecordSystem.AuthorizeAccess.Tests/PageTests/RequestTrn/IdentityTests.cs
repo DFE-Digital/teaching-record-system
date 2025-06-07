@@ -60,7 +60,7 @@ public class IdentityTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var uploadedEvidenceLink = doc.GetElementByTestId("uploaded-evidence-link");
         Assert.NotNull(uploadedEvidenceLink);
-        Assert.Equal($"{state.EvidenceFileName} ({state.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TextContent);
+        Assert.Equal($"{state.EvidenceFileName} ({state.EvidenceFileSizeDescription})", uploadedEvidenceLink!.TrimmedText());
     }
 
     [Fact]

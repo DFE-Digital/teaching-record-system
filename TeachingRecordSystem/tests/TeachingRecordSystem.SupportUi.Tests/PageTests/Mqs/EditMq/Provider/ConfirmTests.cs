@@ -8,7 +8,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Get_MissingDataInJourneyState_Redirects()
     {
-        // Arrange        
+        // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -65,10 +65,10 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
         var doc = await AssertEx.HtmlResponseAsync(response);
         var changeSummary = doc.GetElementByTestId("change-summary");
         Assert.NotNull(changeSummary);
-        Assert.Equal(oldProvider.Name, changeSummary.GetElementByTestId("current-provider")!.TextContent);
-        Assert.Equal(newProvider.Name, changeSummary.GetElementByTestId("new-provider")!.TextContent);
-        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TextContent);
-        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TextContent);
+        Assert.Equal(oldProvider.Name, changeSummary.GetElementByTestId("current-provider")!.TrimmedText());
+        Assert.Equal(newProvider.Name, changeSummary.GetElementByTestId("new-provider")!.TrimmedText());
+        Assert.Equal(changeReason.GetDisplayName(), changeSummary.GetElementByTestId("change-reason")!.TrimmedText());
+        Assert.Equal(!string.IsNullOrEmpty(changeReasonDetail) ? changeReasonDetail : "None", changeSummary.GetElementByTestId("change-reason-detail")!.TrimmedText());
         var uploadedEvidenceLink = changeSummary.GetElementByTestId("uploaded-evidence-link");
         if (uploadEvidence)
         {
@@ -83,7 +83,7 @@ public class ConfirmTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Post_MissingDataInJourneyState_Redirects()
     {
-        // Arrange        
+        // Arrange
         var person = await TestData.CreatePersonAsync(b => b.WithMandatoryQualification());
         var qualificationId = person.MandatoryQualifications.Single().QualificationId;
         var journeyInstance = await CreateJourneyInstanceAsync(

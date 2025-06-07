@@ -73,7 +73,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithStartDate(dateValid).Build())
+            Content = new EditInductionPostRequestContentBuilder().WithStartDate(dateValid).BuildFormUrlEncoded()
         };
 
         // Act
@@ -120,7 +120,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithStartDate(dateTomorrow).Build())
+            Content = new EditInductionPostRequestContentBuilder().WithStartDate(dateTomorrow).BuildFormUrlEncoded()
         };
 
         // Act
@@ -145,7 +145,7 @@ public class EditStartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/start-date?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(new EditInductionPostRequestBuilder().WithStartDate(dateTooEarly).Build())
+            Content = new EditInductionPostRequestContentBuilder().WithStartDate(dateTooEarly).BuildFormUrlEncoded()
         };
 
         // Act

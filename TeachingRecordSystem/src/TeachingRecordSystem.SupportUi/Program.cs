@@ -51,6 +51,7 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddGovUkFrontend(options =>
 {
     options.DefaultButtonPreventDoubleClick = true;
+    options.DefaultFileUploadJavaScriptEnhancements = true;
 });
 
 builder.Services.AddCsp(nonceByteAmount: 32);
@@ -166,7 +167,6 @@ builder.Services
     .AddFormFlowJourneyDescriptors(typeof(Program).Assembly)
     .AddFileService()
     .AddTransient<TrsLinkGenerator>()
-    .AddSingleton<IFeatureProvider, ConfigurationFeatureProvider>()
     .AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>()
     .AddTransient<CheckMandatoryQualificationExistsFilter>()
     .AddTransient<CheckUserExistsFilter>()

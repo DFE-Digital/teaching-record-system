@@ -97,6 +97,8 @@
     <None Remove="Services\DqtReporting\Migrations\0062_TrsPreviousNames.sql" />
     <None Remove="Services\DqtReporting\Migrations\0063_TrsPersonStatus.sql" />
     <None Remove="Services\DqtReporting\Migrations\0064_TrsPersonStatus.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0065_TrsPersonMergedWith.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -193,6 +195,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0062_TrsPreviousNames.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0063_TrsPersonStatus.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0064_TrsPersonStatus.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0065_TrsPersonMergedWith.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -247,10 +251,6 @@
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="SerilogTimings" />
     <PackageReference Include="System.Reactive" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ApiSchema\V3\VNext\Dtos\" />
   </ItemGroup>
 
 </Project>

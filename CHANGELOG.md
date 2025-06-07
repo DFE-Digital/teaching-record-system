@@ -2,6 +2,16 @@
 
 ## vNext
 
+### `GET /v3/persons/<trn>` and `GET /v3/person` changes
+- The `awarded` property in each member of `mandatoryQualifications` has been renamed to `endDate`.
+- A `qualificationId` property has been added to each member of `mandatoryQualifications`.
+- `NpqQualifications` and `InitialTeacherTraining` can no longer be requested in the `include` query parameter.
+- `RoutesToProfessionalStatuses` can be requested in the `include` query parameter.
+- An `exemptions` property has been added to the `induction` property.
+
+### `GET /v3/persons?findBy=LastNameAndDateOfBirth` and `GET /v3/persons/find`
+- The `inductionStatus` property has been replaced by an `induction` object.
+
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.
 

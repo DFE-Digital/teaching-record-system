@@ -344,8 +344,11 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
     public string EditDetailsIndex(Guid personId, JourneyInstanceId? journeyInstanceId = null, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/Index", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
-    public string EditDetailsChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/ChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string EditDetailsNameChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/NameChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+
+    public string EditDetailsOtherDetailsChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/OtherDetailsChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
 
     public string EditDetailsCheckAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/Persons/PersonDetail/EditDetails/CheckAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);

@@ -84,17 +84,17 @@ public class CheckAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(provider.Name, doc.GetElementByTestId("provider")!.TextContent);
-        Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TextContent);
-        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("start-date")!.TextContent);
-        Assert.Equal(status.GetTitle(), doc.GetElementByTestId("status")!.TextContent);
+        Assert.Equal(provider.Name, doc.GetElementByTestId("provider")!.TrimmedText());
+        Assert.Equal(specialism.GetTitle(), doc.GetElementByTestId("specialism")!.TrimmedText());
+        Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("start-date")!.TrimmedText());
+        Assert.Equal(status.GetTitle(), doc.GetElementByTestId("status")!.TrimmedText());
         if (status == MandatoryQualificationStatus.Passed)
         {
-            Assert.Equal(endDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("end-date")!.TextContent);
+            Assert.Equal(endDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetElementByTestId("end-date")!.TrimmedText());
         }
         else
         {
-            Assert.Equal("None", doc.GetElementByTestId("end-date")!.TextContent);
+            Assert.Equal("None", doc.GetElementByTestId("end-date")!.TrimmedText());
         }
     }
 

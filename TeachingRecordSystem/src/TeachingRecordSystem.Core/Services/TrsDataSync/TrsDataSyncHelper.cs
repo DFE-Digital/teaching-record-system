@@ -1372,6 +1372,7 @@ public class TrsDataSyncHelper(
             "created_on",
             "updated_on",
             "status",
+            "merged_with_person_id",
             "trn",
             "first_name",
             "middle_name",
@@ -1388,7 +1389,8 @@ public class TrsDataSyncHelper(
             "dqt_middle_name",
             "dqt_last_name",
             "qts_date",
-            "eyts_date"
+            "eyts_date",
+            "qtls_status"
         };
 
         var columnsToUpdate = columnNames.Except(new[] { "person_id", "dqt_contact_id" }).ToArray();
@@ -1433,7 +1435,9 @@ public class TrsDataSyncHelper(
             Contact.Fields.dfeta_InductionStatus,
             Contact.Fields.dfeta_qtlsdate,
             Contact.Fields.dfeta_QTSDate,
-            Contact.Fields.dfeta_EYTSDate
+            Contact.Fields.dfeta_EYTSDate,
+            Contact.Fields.dfeta_MergedWith,
+            Contact.Fields.dfeta_QtlsDateHasBeenSet
         };
 
         Action<NpgsqlBinaryImporter, PersonInfo> writeRecord = (writer, person) =>
@@ -1442,6 +1446,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.CreatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull(person.UpdatedOn, NpgsqlDbType.TimestampTz);
             writer.WriteValueOrNull((int)person.Status, NpgsqlDbType.Integer);
+            writer.WriteValueOrNull(person.MergedWithPersonId, NpgsqlDbType.Uuid);
             writer.WriteValueOrNull(person.Trn, NpgsqlDbType.Char);
             writer.WriteValueOrNull(person.FirstName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.MiddleName, NpgsqlDbType.Varchar);
@@ -1459,6 +1464,7 @@ public class TrsDataSyncHelper(
             writer.WriteValueOrNull(person.DqtLastName, NpgsqlDbType.Varchar);
             writer.WriteValueOrNull(person.QtsDate, NpgsqlDbType.Date);
             writer.WriteValueOrNull(person.EytsDate, NpgsqlDbType.Date);
+            writer.WriteValueOrNull((int)person.QtlsStatus, NpgsqlDbType.Integer);
         };
 
         return new ModelTypeSyncInfo<PersonInfo>()
@@ -1699,6 +1705,7 @@ public class TrsDataSyncHelper(
             CreatedOn = c.CreatedOn!.Value,
             UpdatedOn = c.ModifiedOn!.Value,
             Status = c.StateCode == ContactState.Active ? PersonStatus.Active : PersonStatus.Inactive,
+            MergedWithPersonId = c.dfeta_MergedWith?.Id,
             Trn = c.dfeta_TRN,
             FirstName = (c.HasStatedNames() ? c.dfeta_StatedFirstName : c.FirstName) ?? string.Empty,
             MiddleName = (c.HasStatedNames() ? c.dfeta_StatedMiddleName : c.MiddleName) ?? string.Empty,
@@ -1706,7 +1713,7 @@ public class TrsDataSyncHelper(
             DateOfBirth = c.BirthDate.ToDateOnlyWithDqtBstFix(isLocalTime: false),
             EmailAddress = c.EMailAddress1.NormalizeString(),
             NationalInsuranceNumber = c.dfeta_NINumber.NormalizeString(),
-            MobileNumber = c.MobilePhone.NormalizeString(),
+            MobileNumber = c.MobilePhone.NormalizeMobileNumber(),
             QtsDate = c.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             EytsDate = c.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
             DqtContactId = c.Id,
@@ -1715,7 +1722,10 @@ public class TrsDataSyncHelper(
             DqtModifiedOn = c.ModifiedOn!.Value,
             DqtFirstName = c.FirstName ?? string.Empty,
             DqtMiddleName = c.MiddleName ?? string.Empty,
-            DqtLastName = c.LastName ?? string.Empty
+            DqtLastName = c.LastName ?? string.Empty,
+            QtlsStatus = c.dfeta_qtlsdate is not null ? QtlsStatus.Active :
+                c.dfeta_QtlsDateHasBeenSet == true ? QtlsStatus.Expired :
+                QtlsStatus.None
         })
         .ToList();
 
@@ -1986,6 +1996,7 @@ public class TrsDataSyncHelper(
         public required DateTime? CreatedOn { get; init; }
         public required DateTime? UpdatedOn { get; init; }
         public required PersonStatus Status { get; init; }
+        public required Guid? MergedWithPersonId { get; init; }
         public required string? Trn { get; init; }
         public required string FirstName { get; init; }
         public required string MiddleName { get; init; }
@@ -2003,6 +2014,7 @@ public class TrsDataSyncHelper(
         public required string? DqtFirstName { get; init; }
         public required string? DqtMiddleName { get; init; }
         public required string? DqtLastName { get; init; }
+        public required QtlsStatus QtlsStatus { get; init; }
     }
 
     private record InductionInfo
@@ -2086,4 +2098,7 @@ file static class Extensions
     /// Returns <c>null</c> if <paramref name="value"/> is empty or whitespace.
     /// </summary>
     public static string? NormalizeString(this string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
+
+    public static string? NormalizeMobileNumber(this string? value) =>
+        MobileNumber.TryParse(value, out var mobileNumber) ? mobileNumber.ToString() : null;
 }

@@ -29,7 +29,7 @@ public class ColoredTagHelper : TagHelper
 
         var colorClass = _tagClasses[
             Math.Abs(
-                BitConverter.ToInt64(MD5.HashData(Encoding.UTF8.GetBytes(content.ToHtmlString()))[..^8])
+                BitConverter.ToInt64(MD5.HashData(Encoding.UTF8.GetBytes(content.ToHtmlString(HtmlEncoder.Default)))[..^8])
                 % _tagClasses.Length)];
 
         output.TagMode = TagMode.StartTagAndEndTag;

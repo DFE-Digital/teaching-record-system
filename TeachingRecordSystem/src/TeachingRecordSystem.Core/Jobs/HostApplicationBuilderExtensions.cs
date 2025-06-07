@@ -235,8 +235,12 @@ public static class HostApplicationBuilderExtensions
                 recurringJobManager.AddOrUpdate<AppendTrainingProvidersFromCrmJob>(
                     nameof(AppendTrainingProvidersFromCrmJob),
                     job => job.ExecuteAsync(CancellationToken.None),
-                    Cron.Never
-                    );
+                    Cron.Never);
+
+                recurringJobManager.AddOrUpdate<ResyncAllPersonsJob>(
+                    nameof(ResyncAllPersonsJob),
+                    job => job.ExecuteAsync(new DateTime(2025, 6, 6, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
+                    Cron.Never);
 
                 return Task.CompletedTask;
             });

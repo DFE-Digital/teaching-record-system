@@ -1,4 +1,5 @@
 using Microsoft.Xrm.Sdk.Messages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -65,26 +66,42 @@ public partial class TestData
                     await testData.WithDbContextAsync(async dbContext =>
                     {
                         var person = await dbContext.Persons.SingleOrDefaultAsync(p => p.PersonId == _personId.Value);
+                        var now = testData.Clock.UtcNow;
                         person!.UpdateDetails(
                             _updatedName.Value.FirstName,
                             _updatedName.Value.MiddleName ?? string.Empty,
                             _updatedName.Value.LastName,
                             person.DateOfBirth,
-                            person.EmailAddress,
-                            person.MobileNumber,
-                            person.NationalInsuranceNumber,
-                            changeReason: "Test",
-                            changeReasonDetail: "",
-                            evidenceFile: null,
+                            (EmailAddress?)person.EmailAddress,
+                            (MobileNumber?)person.MobileNumber,
+                            (NationalInsuranceNumber?)person.NationalInsuranceNumber,
+                            nameChangeReason: "Test",
+                            nameChangeEvidenceFile: null,
+                            detailsChangeReason: "Test",
+                            detailsChangeReasonDetail: "",
+                            detailsChangeEvidenceFile: null,
                             updatedBy: Core.DataStore.Postgres.Models.SystemUser.SystemUserId,
-                            testData.Clock.UtcNow,
-                            out var previousName,
-                            out var _);
+                            now,
+                            out var updatedEvent);
 
-                        dbContext.PreviousNames.Add(previousName!);
+                        if (updatedEvent != null &&
+                            updatedEvent.Changes.HasAnyFlag(PersonDetailsUpdatedEventChanges.NameChange))
+                        {
+                            dbContext.PreviousNames.Add(new PreviousName
+                            {
+                                PreviousNameId = Guid.NewGuid(),
+                                PersonId = _personId.Value,
+                                FirstName = updatedEvent.OldDetails.FirstName ?? string.Empty,
+                                MiddleName = updatedEvent.OldDetails.MiddleName ?? string.Empty,
+                                LastName = updatedEvent.OldDetails.LastName ?? string.Empty,
+                                CreatedOn = now,
+                                UpdatedOn = now
+                            });
+                        }
+
                         await dbContext.SaveChangesAsync();
 
-                        return previousName;
+                        return;
                     });
                 }
                 else

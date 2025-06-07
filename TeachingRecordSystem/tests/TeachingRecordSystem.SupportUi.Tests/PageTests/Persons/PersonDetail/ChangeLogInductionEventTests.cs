@@ -76,11 +76,11 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-dqt-induction-created-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (populatedFields.HasFlag(DqtInductionFields.StartDate))
                 {
-                    Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim());
+                    Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                 }
                 else
                 {
@@ -88,7 +88,7 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (populatedFields.HasFlag(DqtInductionFields.CompletionDate))
                 {
-                    Assert.Equal(completionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completion-date")?.TextContent.Trim());
+                    Assert.Equal(completionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completion-date")?.TrimmedText());
                 }
                 else
                 {
@@ -96,7 +96,7 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (populatedFields.HasFlag(DqtInductionFields.Status))
                 {
-                    Assert.Equal(inductionStatus?.ToString(), item.GetElementByTestId("induction-status")?.TextContent.Trim());
+                    Assert.Equal(inductionStatus?.ToString(), item.GetElementByTestId("induction-status")?.TrimmedText());
                 }
                 else
                 {
@@ -104,7 +104,7 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (populatedFields.HasFlag(DqtInductionFields.ExemptionReason))
                 {
-                    Assert.Equal(inductionExemptionReason?.ToString(), item.GetElementByTestId("exemption-reason")?.TextContent.Trim());
+                    Assert.Equal(inductionExemptionReason?.ToString(), item.GetElementByTestId("exemption-reason")?.TrimmedText());
                 }
                 else
                 {
@@ -158,8 +158,8 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-dqt-induction-imported-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -207,8 +207,8 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-dqt-induction-deactivated-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -256,8 +256,8 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-dqt-induction-reactivated-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
             });
     }
 
@@ -348,12 +348,12 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-dqt-induction-updated-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (changes.HasFlag(DqtInductionUpdatedEventChanges.StartDate))
                 {
-                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TextContent.Trim());
+                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TrimmedText());
                 }
                 else
                 {
@@ -362,8 +362,8 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (changes.HasFlag(DqtInductionUpdatedEventChanges.CompletionDate))
                 {
-                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : completionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completion-date")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldCompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-completion-date")?.TextContent.Trim());
+                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : completionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completion-date")?.TrimmedText());
+                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldCompletionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-completion-date")?.TrimmedText());
                 }
                 else
                 {
@@ -372,8 +372,8 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (changes.HasFlag(DqtInductionUpdatedEventChanges.Status))
                 {
-                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : inductionStatus?.ToString(), item.GetElementByTestId("induction-status")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldInductionStatus?.ToString(), item.GetElementByTestId("old-induction-status")?.TextContent.Trim());
+                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : inductionStatus?.ToString(), item.GetElementByTestId("induction-status")?.TrimmedText());
+                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldInductionStatus?.ToString(), item.GetElementByTestId("old-induction-status")?.TrimmedText());
                 }
                 else
                 {
@@ -382,8 +382,8 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (changes.HasFlag(DqtInductionUpdatedEventChanges.ExemptionReason))
                 {
-                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : inductionExemptionReason?.ToString(), item.GetElementByTestId("exemption-reason")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldInductionExemptionReason?.ToString(), item.GetElementByTestId("old-exemption-reason")?.TextContent.Trim());
+                    Assert.Equal(newValueIsNull ? UiDefaults.EmptyDisplayContent : inductionExemptionReason?.ToString(), item.GetElementByTestId("exemption-reason")?.TrimmedText());
+                    Assert.Equal(previousValueIsNull ? UiDefaults.EmptyDisplayContent : oldInductionExemptionReason?.ToString(), item.GetElementByTestId("old-exemption-reason")?.TrimmedText());
                 }
                 else
                 {
@@ -458,11 +458,11 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-induction-migrated-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (populatedFields.HasFlag(DqtInductionFields.StartDate))
                 {
-                    Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim());
+                    Assert.Equal(startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
                 }
                 else
                 {
@@ -470,18 +470,18 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (populatedFields.HasFlag(DqtInductionFields.CompletionDate))
                 {
-                    Assert.Equal(completionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completed-date")?.TextContent.Trim());
+                    Assert.Equal(completionDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completed-date")?.TrimmedText());
                 }
                 else
                 {
                     Assert.Null(item.GetElementByTestId("completed-date"));
                 }
-                Assert.Equal(migratedInductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TextContent.Trim());
-                //Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("dqt-induction-status")?.TextContent.Trim());
+                Assert.Equal(migratedInductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TrimmedText());
+                //Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("dqt-induction-status")?.TrimmedTextContent());
                 if (populatedFields.HasFlag(DqtInductionFields.ExemptionReason))
                 {
-                    Assert.Equal(exemptionReason.Name, item.GetElementByTestId("exemption-reason")?.TextContent.Trim());
-                    Assert.Equal(inductionExemptionReason.ToString(), item.GetElementByTestId("dqt-exemption-reason")?.TextContent.Trim());
+                    Assert.Equal(exemptionReason.Name, item.GetElementByTestId("exemption-reason")?.TrimmedText());
+                    Assert.Equal(inductionExemptionReason.ToString(), item.GetElementByTestId("dqt-exemption-reason")?.TrimmedText());
                 }
                 else
                 {
@@ -528,10 +528,10 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-dqt-contact-induction-status-changed-event"),
             item =>
             {
-                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
-                Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("induction-status")?.TextContent.Trim());
-                Assert.Equal(oldInductionStatus.ToString(), item.GetElementByTestId("old-induction-status")?.TextContent.Trim());
+                Assert.Equal($"By {createdByDqtUser.DqtUserName} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
+                Assert.Equal(inductionStatus.ToString(), item.GetElementByTestId("induction-status")?.TrimmedText());
+                Assert.Equal(oldInductionStatus.ToString(), item.GetElementByTestId("old-induction-status")?.TrimmedText());
             });
     }
 
@@ -639,12 +639,12 @@ public class ChangeLogInductionEventTests : TestBase
             doc.GetAllElementsByTestId("timeline-item-person-induction-updated-event"),
             item =>
             {
-                Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TextContent.Trim());
-                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TextContent.Trim());
+                Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
+                Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
                 if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStartDate))
                 {
-                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TextContent.Trim());
+                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : startDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("start-date")?.TrimmedText());
+                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-start-date")?.TrimmedText());
                 }
                 else
                 {
@@ -653,8 +653,8 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionCompletedDate))
                 {
-                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : completedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completed-date")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldCompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-completed-date")?.TextContent.Trim());
+                    Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : completedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("completed-date")?.TrimmedText());
+                    Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldCompletedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), item.GetElementByTestId("old-completed-date")?.TrimmedText());
                 }
                 else
                 {
@@ -663,8 +663,8 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (changes.HasFlag(PersonInductionUpdatedEventChanges.InductionStatus))
                 {
-                    Assert.Equal(newValueIsDefault ? InductionStatus.None.GetTitle() : inductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TextContent.Trim());
-                    Assert.Equal(previousValueIsDefault ? InductionStatus.None.GetTitle() : oldInductionStatus.GetTitle(), item.GetElementByTestId("old-induction-status")?.TextContent.Trim());
+                    Assert.Equal(newValueIsDefault ? InductionStatus.None.GetTitle() : inductionStatus.GetTitle(), item.GetElementByTestId("induction-status")?.TrimmedText());
+                    Assert.Equal(previousValueIsDefault ? InductionStatus.None.GetTitle() : oldInductionStatus.GetTitle(), item.GetElementByTestId("old-induction-status")?.TrimmedText());
                 }
                 else
                 {
@@ -675,24 +675,24 @@ public class ChangeLogInductionEventTests : TestBase
                 {
                     if (newValueIsDefault)
                     {
-                        Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("exemption-reason")?.TextContent.Trim());
+                        Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("exemption-reason")?.TrimmedText());
                     }
                     else
                     {
                         var exemptionReasons = item.GetElementByTestId("exemption-reason")?.QuerySelectorAll("li");
                         Assert.Single(exemptionReasons!);
-                        Assert.Equal(exemptionReasonNames[0], exemptionReasons![0].TextContent.Trim());
+                        Assert.Equal(exemptionReasonNames[0], exemptionReasons![0].TrimmedText());
                     }
 
                     if (previousValueIsDefault)
                     {
-                        Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("old-exemption-reason")?.TextContent.Trim());
+                        Assert.Equal(UiDefaults.EmptyDisplayContent, item.GetElementByTestId("old-exemption-reason")?.TrimmedText());
                     }
                     else
                     {
                         var oldExemptionReasonItems = item.GetElementByTestId("old-exemption-reason")?.QuerySelectorAll("li");
                         Assert.Equal(2, oldExemptionReasons!.Length);
-                        var oldExemptionReasonNamesActual = oldExemptionReasonItems!.Select(e => e.TextContent.Trim()).ToArray();
+                        var oldExemptionReasonNamesActual = oldExemptionReasonItems!.Select(e => e.TrimmedText()).ToArray();
                         Assert.Contains(oldExemptionReasonNames[0], oldExemptionReasonNamesActual);
                         Assert.Contains(oldExemptionReasonNames[1], oldExemptionReasonNamesActual);
                     }
@@ -704,7 +704,7 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (induction.CpdCpdModifiedOn.HasValue)
                 {
-                    Assert.Equal(cpdModifiedOn.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("cpd-modified-on")?.TextContent.Trim());
+                    Assert.Equal(cpdModifiedOn.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("cpd-modified-on")?.TrimmedText());
                 }
                 else
                 {
@@ -712,16 +712,95 @@ public class ChangeLogInductionEventTests : TestBase
                 }
                 if (oldInduction.CpdCpdModifiedOn.HasValue)
                 {
-                    Assert.Equal(oldCpdModifiedOn.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("old-cpd-modified-on")?.TextContent.Trim());
+                    Assert.Equal(oldCpdModifiedOn.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("old-cpd-modified-on")?.TrimmedText());
                 }
                 else
                 {
                     Assert.Null(item.GetElementByTestId("old-cpd-modified-on"));
                 }
-                Assert.Equal(changeReason, item.GetElementByTestId("reason")?.TextContent.Trim());
-                Assert.Equal(changeReasonDetail, item.GetElementByTestId("reason-detail")?.TextContent.Trim());
-                Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("uploaded-evidence-link")?.TextContent);
+                Assert.Equal(changeReason, item.GetElementByTestId("reason")?.TrimmedText());
+                Assert.Equal(changeReasonDetail, item.GetElementByTestId("reason-detail")?.TrimmedText());
+                Assert.Equal($"{evidenceFile.Name} (opens in new tab)", item.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
             });
+    }
+
+    [Fact]
+
+    public async Task Person_WithPersonInductionUpdatedEvent_ChangesNotRelevant_EventNotRendered()
+    {
+        // Arrange
+        var changes = PersonInductionUpdatedEventChanges.InductionExemptWithoutReason;
+        var createdByUser = await TestData.CreateUserAsync();
+        var person = await TestData.CreatePersonAsync();
+
+        DateOnly? oldStartDate = Clock.Today.AddYears(-1);
+        DateOnly? oldCompletedDate = Clock.Today.AddDays(-10);
+        InductionStatus oldInductionStatus = InductionStatus.Exempt;
+        Guid[] oldExemptionReasons = [Guid.Parse("5a80cee8-98a8-426b-8422-b0e81cb49b36")];
+        string[] oldExemptionReasonNames = ["Qualified before 07 May 2000"];
+        var oldCpdModifiedOn = Clock.UtcNow.AddDays(-2);
+
+        DateOnly? startDate = oldStartDate;
+        DateOnly? completedDate = oldCompletedDate;
+        InductionStatus inductionStatus = oldInductionStatus;
+        Guid[] exemptionReasons = oldExemptionReasons;
+        string[] exemptionReasonNames = oldExemptionReasonNames;
+        var cpdModifiedOn = Clock.UtcNow;
+
+        var changeReason = InductionChangeReasonOption.AnotherReason.GetDisplayName();
+        var changeReasonDetail = "Reason detail";
+
+        var induction = new EventModels.Induction
+        {
+            StartDate = null,
+            CompletedDate = null,
+            Status = InductionStatus.None,
+            StatusWithoutExemption = InductionStatus.Passed,
+            ExemptionReasonIds = [],
+            CpdCpdModifiedOn = Option.None<DateTime>(),
+            InductionExemptWithoutReason = false
+        };
+
+        var oldInduction = new EventModels.Induction
+        {
+            StartDate = null,
+            CompletedDate = null,
+            Status = InductionStatus.None,
+            StatusWithoutExemption = InductionStatus.Passed,
+            ExemptionReasonIds = [],
+            CpdCpdModifiedOn = Option.None<DateTime>(),
+            InductionExemptWithoutReason = true
+        };
+
+        var updatedEvent = new PersonInductionUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = Clock.UtcNow,
+            RaisedBy = createdByUser.UserId,
+            PersonId = person.PersonId,
+            Induction = induction,
+            OldInduction = oldInduction,
+            Changes = changes,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            EvidenceFile = null
+        };
+
+        await WithDbContext(async dbContext =>
+        {
+            dbContext.AddEventWithoutBroadcast(updatedEvent);
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Empty(doc.GetAllElementsByTestId("timeline-item-person-induction-updated-event"));
     }
 
     [Flags]

@@ -104,14 +104,14 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
+        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
 
         var firstNameRow = doc.GetElementByTestId("first-name");
         if (hasNewFirstName)
         {
             Assert.NotNull(firstNameRow);
-            Assert.Equal(createPersonResult.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TextContent);
-            Assert.Equal(createIncidentResult.NewFirstName, firstNameRow.GetElementByTestId("first-name-new")!.TextContent);
+            Assert.Equal(createPersonResult.FirstName, firstNameRow.GetElementByTestId("first-name-current")!.TrimmedText());
+            Assert.Equal(createIncidentResult.NewFirstName, firstNameRow.GetElementByTestId("first-name-new")!.TrimmedText());
         }
         else
         {
@@ -122,8 +122,8 @@ public class IndexTests : TestBase
         if (hasNewMiddleName)
         {
             Assert.NotNull(middleNameRow);
-            Assert.Equal(createPersonResult.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TextContent);
-            Assert.Equal(createIncidentResult.NewMiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TextContent);
+            Assert.Equal(createPersonResult.MiddleName, middleNameRow.GetElementByTestId("middle-name-current")!.TrimmedText());
+            Assert.Equal(createIncidentResult.NewMiddleName, middleNameRow.GetElementByTestId("middle-name-new")!.TrimmedText());
         }
         else
         {
@@ -134,8 +134,8 @@ public class IndexTests : TestBase
         if (hasNewLastName)
         {
             Assert.NotNull(lastNameRow);
-            Assert.Equal(createPersonResult.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TextContent);
-            Assert.Equal(createIncidentResult.NewLastName, lastNameRow.GetElementByTestId("last-name-new")!.TextContent);
+            Assert.Equal(createPersonResult.LastName, lastNameRow.GetElementByTestId("last-name-current")!.TrimmedText());
+            Assert.Equal(createIncidentResult.NewLastName, lastNameRow.GetElementByTestId("last-name-new")!.TrimmedText());
         }
         else
         {
@@ -163,12 +163,12 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TextContent);
+        Assert.Equal($"{createIncidentResult.SubjectTitle} - {createPersonResult.FirstName} {createPersonResult.LastName}", doc.GetElementByTestId("heading-caption")!.TrimmedText());
 
         var dateOfBirthRow = doc.GetElementByTestId("date-of-birth");
         Assert.NotNull(dateOfBirthRow);
-        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TextContent);
-        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TextContent);
+        Assert.Equal(createPersonResult.DateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-current")!.TrimmedText());
+        Assert.Equal(createIncidentResult.NewDateOfBirth.ToString(UiDefaults.DateOnlyDisplayFormat), dateOfBirthRow.GetElementByTestId("date-of-birth-new")!.TrimmedText());
 
         var imageDocument = doc.GetElementByTestId($"image-{createIncidentResult.Evidence.DocumentId}");
         Assert.NotNull(imageDocument);

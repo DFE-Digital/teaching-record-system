@@ -15,7 +15,7 @@
         <form action="@LinkGenerator.AddUserConfirm(Model.UserId!)" method="post">
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
-            <govuk-input asp-for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled />
+            <govuk-input asp-for="Email" input-class="govuk-!-width-two-thirds" type="email" disabled="true" />
 
             <govuk-input asp-for="Name" input-class="govuk-!-width-two-thirds" />
 
@@ -29,7 +29,7 @@
                         <govuk-radios-divider>
                             <table class="govuk-table">
                                 <caption class="govuk-table__caption govuk-table__caption--s">Permissions</caption>
-                     
+
                                 <thead class="govuk-table__head">
                                     <tr class="govuk-table__row">
                                         @foreach (var permission in role.Permissions)

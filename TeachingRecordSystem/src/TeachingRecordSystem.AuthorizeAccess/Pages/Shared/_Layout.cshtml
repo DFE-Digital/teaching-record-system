@@ -159,7 +159,7 @@
 }
 
 @section BodyEnd {
-    @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce(), appendVersion: true)
+    @Html.GovUkFrontendScriptImports(cspNonce: NonceService.GetNonce())
     <script src="~/Scripts/service-header.js" asp-add-nonce="true" asp-append-version="true"></script>
     <script src="~/Scripts/init-service-header.js" asp-add-nonce="true" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)

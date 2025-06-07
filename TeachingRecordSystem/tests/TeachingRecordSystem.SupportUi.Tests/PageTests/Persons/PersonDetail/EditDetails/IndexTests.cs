@@ -29,7 +29,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("A", "New", "Name")
                 .Build());
 
@@ -41,7 +41,7 @@ public class IndexTests : TestBase
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var caption = doc.GetElementByTestId("edit-details-caption");
-        Assert.Equal("Alfred The Great", caption!.TextContent);
+        Assert.Equal("Alfred The Great", caption!.TrimmedText());
     }
 
     [Fact]
@@ -66,8 +66,8 @@ public class IndexTests : TestBase
         Assert.NotNull(form);
         var buttons = form.GetElementsByTagName("button").OfType<IHtmlButtonElement>();
         Assert.Collection(buttons,
-            b => Assert.Equal("Continue", b.TextContent),
-            b => Assert.Equal("Cancel and return to record", b.TextContent));
+            b => Assert.Equal("Continue", b.TrimmedText()),
+            b => Assert.Equal("Cancel and return to record", b.TrimmedText()));
     }
 
     [Fact]
@@ -122,8 +122,8 @@ public class IndexTests : TestBase
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithEmail("invalid")
             .WithMobileNumber("invalid")
+            .WithEmail("invalid")
             .WithNationalInsuranceNumber("invalid"));
 
         var request = new HttpRequestMessage(HttpMethod.Get, GetRequestPath(person));
@@ -140,12 +140,13 @@ public class IndexTests : TestBase
         Assert.Equal(StatusCodes.Status200OK, (int)redirectResponse.StatusCode);
 
         var doc = await AssertEx.HtmlResponseAsync(redirectResponse);
-        var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
         var mobileNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-mobile-number", "input");
+        var emailAddress = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-email-address", "input");
         var nationalInsuranceNumber = GetChildElementOfTestId<IHtmlInputElement>(doc, "edit-details-national-insurance-number", "input");
 
+        // Mobile number is normalized during TRS Sync process so invalid numbers are converted to null
+        Assert.Equal("", mobileNumber.Value.Trim());
         Assert.Equal("invalid", emailAddress.Value.Trim());
-        Assert.Equal("invalid", mobileNumber.Value.Trim());
         Assert.Equal("invalid", nationalInsuranceNumber.Value.Trim());
     }
 
@@ -157,7 +158,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
@@ -205,12 +206,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName(null)
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName(null)
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -233,12 +234,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("   ")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("   ")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -261,12 +262,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName(string.Join("", Enumerable.Repeat('x', 101)))
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName(string.Join("", Enumerable.Repeat('x', 101)))
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -289,12 +290,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName(string.Join("", Enumerable.Repeat('x', 101)))
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName(string.Join("", Enumerable.Repeat('x', 101)))
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -317,12 +318,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName(null)
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName(null)
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -345,12 +346,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("    ")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("    ")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -373,12 +374,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName(string.Join("", Enumerable.Repeat('x', 101)))
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName(string.Join("", Enumerable.Repeat('x', 101)))
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -401,12 +402,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(null)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(null)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -429,12 +430,12 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 2030"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 2030"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -457,13 +458,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithEmailAddress($"test@{string.Join(".", Enumerable.Repeat("test", 20))}.com")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithEmailAddress($"test@{string.Join(".", Enumerable.Repeat("test", 20))}.com")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -497,13 +498,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithEmailAddress(emailAddress)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress(emailAddress)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -549,13 +550,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithMobileNumber(mobileNumber)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithMobileNumber(mobileNumber)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -625,13 +626,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithNationalInsuranceNumber(niNumber)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithNationalInsuranceNumber(niNumber)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -670,13 +671,13 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Alfred")
-                    .WithMiddleName("The")
-                    .WithLastName("Great")
-                    .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
-                    .WithNationalInsuranceNumber(niNumber)
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithNationalInsuranceNumber(niNumber)
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -694,6 +695,45 @@ public class IndexTests : TestBase
     }
 
     [Fact]
+    public async Task Post_NoDetailsChanged_ShowsPageError()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("test@test.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("test@test.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        await AssertEx.HtmlResponseHasSummaryErrorAsync(response, "Please change one or more of the person\u2019s details");
+    }
+
+    [Fact]
     public async Task Post_DetailsChanged_PersistsDetails()
     {
         // Arrange
@@ -701,7 +741,7 @@ public class IndexTests : TestBase
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditDetailsStateBuilder()
-                .WithInitializedState()
+                .WithInitializedState(person)
                 .WithName("Alfred", "The", "Great")
                 .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
                 .WithEmail("test@test.com")
@@ -711,16 +751,15 @@ public class IndexTests : TestBase
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
         {
-            Content = new FormUrlEncodedContent(
-                new EditDetailsPostRequestBuilder()
-                    .WithFirstName("Jimmy")
-                    .WithMiddleName("A")
-                    .WithLastName("Person")
-                    .WithDateOfBirth(DateOnly.Parse("2 Mar 1981"))
-                    .WithEmailAddress("new@email.com")
-                    .WithMobileNumber("07987 654321")
-                    .WithNationalInsuranceNumber("AB 65 43 21 D")
-                    .Build())
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Jimmy")
+                .WithMiddleName("A")
+                .WithLastName("Person")
+                .WithDateOfBirth(DateOnly.Parse("2 Mar 1981"))
+                .WithEmailAddress("new@email.com")
+                .WithMobileNumber("07987 654321")
+                .WithNationalInsuranceNumber("AB 65 43 21 D")
+                .BuildFormUrlEncoded()
         };
 
         // Act
@@ -735,6 +774,146 @@ public class IndexTests : TestBase
         Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
         Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
         Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+    }
+
+    [Fact]
+    public async Task Post_WhenNamePreviouslyChangedInSameJourney_AndNameUpdatedToOriginalValue_RemovesNameChangeReasonFromState()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("original@email.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var nameEvidenceFileId = Guid.NewGuid();
+        var otherEvidenceFileId = Guid.NewGuid();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Megan", "Thee", "Stallion")
+                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                .WithEmail("new@email.com")
+                .WithMobileNumber("447987654321")
+                .WithNationalInsuranceNumber("AB654321D")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeUploadEvidenceChoice(false, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Alfred")
+                .WithMiddleName("The")
+                .WithLastName("Great")
+                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                .WithEmailAddress("new@email.com")
+                .WithMobileNumber("447987654321")
+                .WithNationalInsuranceNumber("AB654321D")
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+
+        // Assert
+        Assert.Equal("Alfred", journeyInstance.State.FirstName);
+        Assert.Equal("The", journeyInstance.State.MiddleName);
+        Assert.Equal("Great", journeyInstance.State.LastName);
+        Assert.Null(journeyInstance.State.NameChangeReason);
+        Assert.Null(journeyInstance.State.NameChangeUploadEvidence);
+        Assert.Null(journeyInstance.State.NameChangeEvidenceFileId);
+        Assert.Null(journeyInstance.State.NameChangeEvidenceFileName);
+        Assert.Null(journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+
+        Assert.Equal(DateOnly.Parse("3 Aug 1999"), journeyInstance.State.DateOfBirth);
+        Assert.Equal("new@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
+        Assert.Equal("447987654321", journeyInstance.State.MobileNumber.Parsed?.ToString());
+        Assert.Equal("AB654321D", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Equal(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Equal("Some reason", journeyInstance.State.OtherDetailsChangeReasonDetail);
+        Assert.Equal(true, journeyInstance.State.OtherDetailsChangeUploadEvidence);
+        Assert.Equal(otherEvidenceFileId, journeyInstance.State.OtherDetailsChangeEvidenceFileId);
+        Assert.Equal("other-evidence.png", journeyInstance.State.OtherDetailsChangeEvidenceFileName);
+        Assert.Equal("1.3 KB", journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
+    }
+
+    [Fact]
+    public async Task Post_WhenOtherDetailsPreviouslyChangedInSameJourney_AndOtherDetailsUpdatedToOriginalValues_RemovesOtherDetailsChangeReasonFromState()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithFirstName("Alfred")
+            .WithMiddleName("The")
+            .WithLastName("Great")
+            .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+            .WithEmail("original@email.com")
+            .WithMobileNumber("447891234567")
+            .WithNationalInsuranceNumber("AB123456C"));
+
+        var nameEvidenceFileId = Guid.NewGuid();
+        var otherEvidenceFileId = Guid.NewGuid();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditDetailsStateBuilder()
+                .WithInitializedState(person)
+                .WithName("Megan", "Thee", "Stallion")
+                .WithDateOfBirth(DateOnly.Parse("3 Aug 1999"))
+                .WithEmail("new@email.com")
+                .WithMobileNumber("447987654321")
+                .WithNationalInsuranceNumber("AB654321D")
+                .WithNameChangeReasonChoice(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership)
+                .WithNameChangeUploadEvidenceChoice(true, nameEvidenceFileId, "name-evidence.pdf", "2.4 MB")
+                .WithOtherDetailsChangeReasonChoice(EditDetailsOtherDetailsChangeReasonOption.AnotherReason, "Some reason")
+                .WithOtherDetailsChangeUploadEvidenceChoice(true, otherEvidenceFileId, "other-evidence.png", "1.3 KB")
+                .Build());
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(person, journeyInstance))
+        {
+            Content = new EditDetailsPostRequestContentBuilder()
+                .WithFirstName("Megan")
+                .WithMiddleName("Thee")
+                .WithLastName("Stallion")
+                .WithDateOfBirth(DateOnly.Parse("1 Feb 1980"))
+                .WithEmailAddress("original@email.com")
+                .WithMobileNumber("447891234567")
+                .WithNationalInsuranceNumber("AB123456C")
+                .BuildFormUrlEncoded()
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+
+        // Assert
+        Assert.Equal("Megan", journeyInstance.State.FirstName);
+        Assert.Equal("Thee", journeyInstance.State.MiddleName);
+        Assert.Equal("Stallion", journeyInstance.State.LastName);
+        Assert.Equal(EditDetailsNameChangeReasonOption.MarriageOrCivilPartnership, journeyInstance.State.NameChangeReason);
+        Assert.Equal(true, journeyInstance.State.NameChangeUploadEvidence);
+        Assert.Equal(nameEvidenceFileId, journeyInstance.State.NameChangeEvidenceFileId);
+        Assert.Equal("name-evidence.pdf", journeyInstance.State.NameChangeEvidenceFileName);
+        Assert.Equal("2.4 MB", journeyInstance.State.NameChangeEvidenceFileSizeDescription);
+
+        Assert.Equal(DateOnly.Parse("1 Feb 1980"), journeyInstance.State.DateOfBirth);
+        Assert.Equal("original@email.com", journeyInstance.State.EmailAddress.Parsed?.ToString());
+        Assert.Equal("447891234567", journeyInstance.State.MobileNumber.Parsed?.ToString());
+        Assert.Equal("AB123456C", journeyInstance.State.NationalInsuranceNumber.Parsed?.ToString());
+        Assert.Null(journeyInstance.State.OtherDetailsChangeReason);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeReasonDetail);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeUploadEvidence);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileId);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileName);
+        Assert.Null(journeyInstance.State.OtherDetailsChangeEvidenceFileSizeDescription);
     }
 
     private string GetRequestPath(TestData.CreatePersonResult person) =>

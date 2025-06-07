@@ -3911,6 +3911,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnName("last_name")
                         .UseCollation("case_insensitive");
 
+                    b.Property<Guid?>("MergedWithPersonId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("merged_with_person_id");
+
                     b.Property<string>("MiddleName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -3932,6 +3936,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<DateOnly?>("PqtsDate")
                         .HasColumnType("date")
                         .HasColumnName("pqts_date");
+
+                    b.Property<int>("QtlsStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("qtls_status");
 
                     b.Property<DateOnly?>("QtsDate")
                         .HasColumnType("date")
@@ -17495,6 +17503,16 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasConstraintName("fk_one_login_users_application_users_verified_by_application_u");
 
                     b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", b =>
+                {
+                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "MergedWithPerson")
+                        .WithMany()
+                        .HasForeignKey("MergedWithPersonId")
+                        .HasConstraintName("fk_persons_persons_merged_with_person_id");
+
+                    b.Navigation("MergedWithPerson");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.PreviousName", b =>

@@ -372,10 +372,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
-            Content = new FormUrlEncodedContent(
-                new EditInductionPostRequestBuilder()
-                    .WithExemptionReasonIds(randomExemptionReasonIds)
-                    .Build())
+            Content = new EditInductionPostRequestContentBuilder()
+                .WithExemptionReasonIds(randomExemptionReasonIds)
+                .BuildFormUrlEncoded()
         };
 
         // Act
