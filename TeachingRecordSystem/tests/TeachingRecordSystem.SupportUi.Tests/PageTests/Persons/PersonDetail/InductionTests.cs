@@ -51,6 +51,82 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Null(doc.GetElementByTestId("induction-card"));
     }
 
+    public static IEnumerable<object[]> InductionExemptedRoutes()
+    {
+        yield return new object[] { RouteToProfessionalStatus.ScotlandRId, true };
+        yield return new object[] { RouteToProfessionalStatus.NiRId, true };
+        yield return new object[] { RouteToProfessionalStatus.QtlsAndSetMembershipId, true };
+        yield return new object[] { RouteToProfessionalStatus.ScotlandRId, false };
+        yield return new object[] { RouteToProfessionalStatus.NiRId, false };
+        yield return new object[] { RouteToProfessionalStatus.QtlsAndSetMembershipId, false };
+    }
+    [Theory]
+    [MemberData(nameof(InductionExemptedRoutes))]
+    public async Task Get_ForPersonWithRouteInductionExemption_RoutesFeatureFlagOn_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var awardedDate = Clock.Today;
+        var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.RouteToProfessionalStatusId == routeId)
+            .Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(InductionStatus.Exempt)
+            .WithProfessionalStatus(r => r
+                .WithRoute(routeWithExemption.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate)
+                .WithInductionExemption(hasExemption)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        if (hasExemption)
+        {
+            var expected = $"{routeWithExemption.InductionExemptionReason?.Name} - {routeWithExemption.Name}";
+            var routeExemptionRowValue = doc.GetSummaryListValueElementForKey("Route induction exemption reason");
+            Assert.Equal(expected, routeExemptionRowValue?.TextContent);
+        }
+        else
+        {
+            Assert.Null(doc.GetSummaryListValueElementForKey("Route induction exemption reason"));
+        }
+    }
+
+    [Fact]
+    public async Task Get_ForPersonWithRouteInductionExemption_FeatureFlagOff_NoDisplay()
+    {
+        // Arrange
+        var awardedDate = Clock.Today;
+        var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId)
+            .Single();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(InductionStatus.Exempt)
+            .WithProfessionalStatus(r => r
+                .WithRoute(routeWithExemption.RouteToProfessionalStatusId)
+                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithAwardedDate(awardedDate)
+                .WithInductionExemption(true)));
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        Assert.Null(doc.GetSummaryListValueElementForKey("Route induction exemption reason"));
+    }
+
     [Theory]
     [InlineData(InductionStatus.Exempt)]
     [InlineData(InductionStatus.RequiredToComplete)]
