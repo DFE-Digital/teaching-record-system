@@ -28,21 +28,15 @@
                 }
             }
             <govuk-checkboxes asp-for="ExemptionReasonIds">
-                <govuk-checkboxes-fieldset>
-                    <govuk-checkboxes-fieldset-legend class="trs-hidden" />
-                    <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
-                    @foreach (var category in ExemptionReasonCategories.All)
+                <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
+                @foreach (var headingGroup in Model.ExemptionReasons)
+                {
+                    <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@headingGroup.Key.GetDisplayName()</govuk-checkboxes-divider>
+                    @foreach (var exemptionReason in headingGroup.Value)
                     {
-                        <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@category.GetDisplayName()</govuk-checkboxes-divider>
-                        @foreach (var exemptionReasonId in ExemptionReasonCategories.GetExemptionReasonIdsForCategory(category))
-                        {
-                            if (@Model.ExemptionReasons.Where(e => e.InductionExemptionReasonId == exemptionReasonId).Count() > 0)
-                            {
-                                <govuk-checkboxes-item value="@exemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReasonId)">@Model.ExemptionReasons.Single(e => e.InductionExemptionReasonId == exemptionReasonId).Name</govuk-checkboxes-item>
-                            }
-                        }
+                        <govuk-checkboxes-item value="@exemptionReason.InductionExemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReason.InductionExemptionReasonId)">@exemptionReason.Name</govuk-checkboxes-item>
                     }
-                </govuk-checkboxes-fieldset>
+                }
             </govuk-checkboxes>
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>

@@ -81,9 +81,9 @@ public class InductionModel(
         HasQts = result!.Contact.dfeta_QTSDate is not null;
 
         InductionExemptedRoutes = dbContext.ProfessionalStatuses
-            .Include(p => p.RouteToProfessionalStatus)
+            .Include(r => r.RouteToProfessionalStatus)
             .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
-            .Where(p => p.PersonId == PersonId && p.RouteToProfessionalStatus != null && p.ExemptFromInduction == true);
+            .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatus != null && r.ExemptFromInduction == true);
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;

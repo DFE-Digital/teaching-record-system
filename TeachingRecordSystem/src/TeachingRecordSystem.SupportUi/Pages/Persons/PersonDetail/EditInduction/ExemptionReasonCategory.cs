@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
@@ -36,13 +37,31 @@ public static class ExemptionReasonCategories
             new Guid("fea2db23-93e0-49af-96fd-83c815c17c0b")} }
     };
 
+    public static Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>> CreateFilteredDictionaryFromIds(InductionExemptionReason[] exemptionReasons)
+    {
+        return ExemptionReasonCategoryMap
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => exemptionReasons.Where(r => kvp.Value.Contains(r.InductionExemptionReasonId))
+            )
+            .Where(kvp => kvp.Value.Any())
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+
+    public static IEnumerable<Guid> ExemptionsToBeExcludedIfRouteQualificationIsHeld =>
+        new List<Guid>() {
+            InductionExemptionReason.PassedInductionInNorthernIrelandId,
+            InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId
+        };
+
+    public static IEnumerable<Guid> ExemptionReasonIds =>
+        ExemptionReasonCategoryMap.Values.SelectMany(g => g);
+
     public static IEnumerable<Guid> GetExemptionReasonIdsForCategory(ExemptionReasonCategory category)
     {
         return ExemptionReasonCategoryMap.ContainsKey(category) ? ExemptionReasonCategoryMap[category] : new List<Guid>();
     }
-
-    public static IEnumerable<Guid> ExemptionReasonIds =>
-        ExemptionReasonCategoryMap.Values.SelectMany(g => g);
 
     public static IEnumerable<ExemptionReasonCategory> All => Enum.GetValues(typeof(ExemptionReasonCategory)).Cast<ExemptionReasonCategory>();
 }
