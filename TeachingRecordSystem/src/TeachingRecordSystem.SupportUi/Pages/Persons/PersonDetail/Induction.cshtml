@@ -82,7 +82,7 @@
                     }
                 </govuk-summary-list-row>
             }
-            @if (FeatureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus) && Model.InductionExemptedRoutes is not null)
+            @if (Model.InductionExemptedRoutes is not null)
             {
                 foreach (var exemptedRoute in Model.InductionExemptedRoutes)
                 {

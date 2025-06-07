@@ -14,7 +14,8 @@ public class InductionModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     IClock clock,
     ReferenceDataCache referenceDataCache,
-    IAuthorizationService authorizationService) : PageModel
+    IAuthorizationService authorizationService,
+    IFeatureProvider featureProvider) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
     private bool _statusIsManagedByCpd;
@@ -80,10 +81,13 @@ public class InductionModel(
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         HasQts = result!.Contact.dfeta_QTSDate is not null;
 
-        InductionExemptedRoutes = dbContext.ProfessionalStatuses
-            .Include(r => r.RouteToProfessionalStatus)
-            .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
-            .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatus != null && r.ExemptFromInduction == true);
+        if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
+        {
+            InductionExemptedRoutes = dbContext.ProfessionalStatuses
+                .Include(r => r.RouteToProfessionalStatus)
+                .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
+                .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatus != null && r.ExemptFromInduction == true);
+        }
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;
