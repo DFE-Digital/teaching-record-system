@@ -579,6 +579,12 @@ public partial class DqtReportingService : BackgroundService
 
     private async Task UpsertRowFromTrsAsync(string targetTableName, string idColumnName, object id, IReadOnlyDictionary<string, object?> columnValues)
     {
+        // Console.WriteLine(targetTableName);
+        // foreach (var kvp in columnValues)
+        // {
+        //     Console.WriteLine($"{kvp.Key}: {kvp.Value} ({kvp.Value?.GetType().Name}");
+        // }
+
         var parameters = new List<SqlParameter>();
         var columnNames = new List<string>();
 
@@ -622,12 +628,20 @@ public partial class DqtReportingService : BackgroundService
         parameters.Add(new SqlParameter(nowParameterName, _clock.UtcNow));
         parameters.Add(new SqlParameter(idParameterName, id));
 
-        using var conn = new SqlConnection(_options.ReportingDbConnectionString);
-        await conn.OpenAsync();
+        try
+        {
+            using var conn = new SqlConnection(_options.ReportingDbConnectionString);
+            await conn.OpenAsync();
 
-        using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddRange(parameters.ToArray());
-        await cmd.ExecuteNonQueryAsync();
+            using var cmd = new SqlCommand(sql, conn);
+            cmd.Parameters.AddRange(parameters.ToArray());
+            await cmd.ExecuteNonQueryAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     private async Task DeleteRowFromTrsAsync(string targetTableName, string idColumnName, object id)
