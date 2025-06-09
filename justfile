@@ -98,7 +98,11 @@ watch-worker:
 
 # Build the Docker image
 docker-build *ARGS: install-tools restore
-  @cd {{solution-root}} && dotnet publish -c Release --no-restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Api" }} && dotnet publish -c Release --no-restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess" }} && dotnet publish -c Release --no-restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Cli" }} && dotnet publish -c Release --no-restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet publish -c Release --no-restore
+  @cd {{solution-root / "src" / "TeachingRecordSystem.Worker" }} && dotnet publish -c Release --no-restore
   @cd {{solution-root}} && docker build . {{ARGS}}
 
 # Set a configuration entry in user secrets for running the apps

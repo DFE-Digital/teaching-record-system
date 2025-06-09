@@ -149,7 +149,7 @@ public class RouteToProfessionalStatus : Qualification
         var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
 
         var changes = ProfessionalStatusUpdatedEventChanges.None |
-            (RouteToProfessionalStatusType!.RouteToProfessionalStatusTypeId != oldEventModel.RouteToProfessionalStatusTypeId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
+            (RouteToProfessionalStatusTypeId != oldEventModel.RouteToProfessionalStatusTypeId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
             (Status != oldEventModel.Status ? ProfessionalStatusUpdatedEventChanges.Status : ProfessionalStatusUpdatedEventChanges.None) |
             (AwardedDate != oldEventModel.AwardedDate ? ProfessionalStatusUpdatedEventChanges.AwardedDate : ProfessionalStatusUpdatedEventChanges.None) |
             (TrainingStartDate != oldEventModel.TrainingStartDate ? ProfessionalStatusUpdatedEventChanges.StartDate : ProfessionalStatusUpdatedEventChanges.None) |

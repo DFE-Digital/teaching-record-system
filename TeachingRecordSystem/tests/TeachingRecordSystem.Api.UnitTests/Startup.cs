@@ -7,6 +7,8 @@ using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
 using TeachingRecordSystem.Core.Services.TrnGeneration;
+using TeachingRecordSystem.Core.Services.Webhooks;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.UnitTests;
 
@@ -17,6 +19,7 @@ public class Startup
         hostBuilder
             .ConfigureHostConfiguration(builder => builder
                 .AddUserSecrets<Startup>(optional: true)
+                .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables())
             .ConfigureServices((context, services) =>
             {
@@ -27,6 +30,9 @@ public class Startup
                 }.ConnectionString;
 
                 DbHelper.ConfigureDbServices(services, pgConnectionString);
+
+                // Publish events synchronously
+                PublishEventsDbCommandInterceptor.ConfigureServices(services);
 
                 services
                     .AddSingleton<DbFixture>()
@@ -43,8 +49,20 @@ public class Startup
                             TestScopedServices.TryGetCurrent(out var tss) ? tss.CrmQueryDispatcherSpy : new()))
                     .AddSingleton<ICurrentUserProvider>(Mock.Of<ICurrentUserProvider>())
                     .AddNameSynonyms()
-                    .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object);
+                    .AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClient.Object)
+                    .AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider)
+                    .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
+                    .AddSingleton<WebhookMessageFactory>()
+                    .AddSingleton<EventMapperRegistry>()
+                    .AddMemoryCache();
             });
+    }
+
+    // IEventObserver needs to be a singleton but we want it to resolve to a test-scoped CaptureEventObserver.
+    // This provides a wrapper that can be registered as a singleton that delegates to the test-scoped IEventObserver instance.
+    private class ForwardToTestScopedEventObserver : IEventObserver
+    {
+        public void OnEventCreated(EventBase @event) => TestScopedServices.GetCurrent().EventObserver.OnEventCreated(@event);
     }
 }
 

@@ -17,7 +17,7 @@ public class GetPersonByTrnTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQts()
-            .WithQtlsDate(Clock.Today));
+            .WithQtlsDateInDqt(Clock.Today));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,

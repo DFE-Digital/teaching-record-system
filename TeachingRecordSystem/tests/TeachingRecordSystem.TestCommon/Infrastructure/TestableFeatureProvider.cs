@@ -1,4 +1,6 @@
-namespace TeachingRecordSystem.SupportUi.Tests.Infrastructure;
+using Microsoft.Extensions.Configuration;
+
+namespace TeachingRecordSystem.TestCommon.Infrastructure;
 
 public class TestableFeatureProvider(IConfiguration configuration) : IFeatureProvider
 {

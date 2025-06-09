@@ -9,7 +9,7 @@ namespace TeachingRecordSystem.Core.Events.Models;
 /// Contains either a TRS user ID or the DQT user ID and name.
 /// </summary>
 [JsonConverter(typeof(RaisedByUserInfoJsonConverter))]
-public sealed class RaisedByUserInfo
+public sealed class RaisedByUserInfo : IEquatable<RaisedByUserInfo>
 {
     private RaisedByUserInfo() { }
 
@@ -34,6 +34,31 @@ public sealed class RaisedByUserInfo
         DqtUserId = dqtUserId,
         DqtUserName = dqtUserName
     };
+
+    public bool Equals(RaisedByUserInfo? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Nullable.Equals(UserId, other.UserId) && Nullable.Equals(DqtUserId, other.DqtUserId) && DqtUserName == other.DqtUserName;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is RaisedByUserInfo other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(UserId, DqtUserId, DqtUserName);
+    }
 }
 
 public class RaisedByUserInfoJsonConverter : JsonConverter<RaisedByUserInfo>
