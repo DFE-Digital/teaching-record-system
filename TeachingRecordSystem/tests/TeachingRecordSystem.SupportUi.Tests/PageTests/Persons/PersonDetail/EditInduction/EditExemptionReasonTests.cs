@@ -71,6 +71,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_PersonHasRouteWithInductionExemption_ShowsExemptionReasonsList()
     {
         // Arrange
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(RouteToProfessionalStatus.ApplyforQtsId);
         var awardedDate = Clock.Today;
@@ -271,7 +272,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
     [Theory]
     [MemberData(nameof(InductionExemptedRoutesRequiringRouteExemptionMessageData))]
-    public async Task Get_RoutesFeatureFlagOff_PersonHasInductionExemptionFromRoute_ShowsExpectedNoMessage(Guid routeId, bool hasExemption)
+    public async Task Get_RoutesFeatureFlagOff_PersonHasInductionExemptionFromRoute_DoesntShowMessage(Guid routeId, bool hasExemption)
     {
         // Arrange
         FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
@@ -306,9 +307,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     [Fact]
     public async Task Get_WithExemptionReasonsSelected_ShowsExpected()
     {
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true)).ToArray();
-        var selectedExemptionReasonIds = exemptionReasons
-            .Select(e => e.InductionExemptionReasonId)
+        var selectedExemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
             .RandomSelection(2)
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
@@ -358,9 +357,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .Select(e => e.InductionExemptionReasonId);
-        var randomExemptionReasonIds = exemptionReasons
+        var exemptionReasonIds = ExemptionReasonCategories.ExemptionReasonIds
             .RandomSelection(2)
             .ToArray();
 
@@ -373,7 +370,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new EditInductionPostRequestContentBuilder()
-                .WithExemptionReasonIds(randomExemptionReasonIds)
+                .WithExemptionReasonIds(exemptionReasonIds)
                 .BuildFormUrlEncoded()
         };
 
@@ -382,7 +379,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(randomExemptionReasonIds, journeyInstance.State.ExemptionReasonIds);
+        Assert.Equal(exemptionReasonIds, journeyInstance.State.ExemptionReasonIds);
     }
 
     private Task<JourneyInstance<EditInductionState>> CreateJourneyInstanceAsync(Guid personId, EditInductionState? state = null) =>

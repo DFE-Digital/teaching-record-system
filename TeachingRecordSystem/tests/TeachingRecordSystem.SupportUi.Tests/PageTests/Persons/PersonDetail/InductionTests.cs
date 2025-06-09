@@ -100,7 +100,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Get_ForPersonWithRouteInductionExemption_FeatureFlagOff_NoDisplay()
+    public async Task Get_ForPersonWithRouteInductionExemption_FeatureFlagOff_RouteInductionExemptionNotDisplayed()
     {
         // Arrange
         var awardedDate = Clock.Today;

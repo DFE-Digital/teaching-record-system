@@ -90,9 +90,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionStatusExempt_NavigateBack()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .Select(e => e.InductionExemptionReasonId)
-            .RandomOne();
+        var exemptionReasonId = InductionExemptionReason.ExemptDataLossOrErrorCriteriaId;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()
@@ -500,9 +498,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionExemptionReason_NavigateBack()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .Select(e => e.InductionExemptionReasonId)
-            .RandomOne();
+        var exemptionReasonId = InductionExemptionReason.PassedInductionInIsleOfManId;
 
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
