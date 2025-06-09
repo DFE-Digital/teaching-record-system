@@ -122,7 +122,6 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_RoutesFeatureFlagOn_PersonHasSomeSpecificRoutes_ShowsFilteredExceptionReasonsAndEditOnRouteMessage(Guid routeId)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(routeId);
         var awardedDate = Clock.Today;
@@ -232,7 +231,6 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     public async Task Get_RoutesFeatureFlagOn_PersonHasInductionExemptionFromRoute_ShowsExpectedMessageContent(Guid routeId, bool hasExemption)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(routeId);
         var awardedDate = Clock.Today;

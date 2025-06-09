@@ -65,7 +65,6 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ForPersonWithRouteInductionExemption_RoutesFeatureFlagOn_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
     {
         // Arrange
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var awardedDate = Clock.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.RouteToProfessionalStatusId == routeId)
@@ -103,6 +102,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ForPersonWithRouteInductionExemption_FeatureFlagOff_RouteInductionExemptionNotDisplayed()
     {
         // Arrange
+        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
         var awardedDate = Clock.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
             .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId)
