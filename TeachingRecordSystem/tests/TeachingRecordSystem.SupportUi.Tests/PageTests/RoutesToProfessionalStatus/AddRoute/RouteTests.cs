@@ -9,7 +9,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_WithPreviouslyStoredRoute_ShowsSelectedRoute()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .RandomOne()
@@ -17,7 +17,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -32,14 +32,14 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(route.RouteToProfessionalStatusId.ToString(), ((IHtmlSelectElement)doc.GetElementById("RouteId")!).Value);
+        Assert.Equal(route.RouteToProfessionalStatusTypeId.ToString(), ((IHtmlSelectElement)doc.GetElementById("RouteId")!).Value);
     }
 
     [Fact(Skip = "Waiting for archived routes")]
     public async Task Get_WithPreviouslyStoredArchivedRoute_ShowsSelectedRoute()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => !r.IsActive)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -48,7 +48,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -63,14 +63,14 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(route.RouteToProfessionalStatusId.ToString(), ((IHtmlSelectElement)doc.GetElementById("ArchivedRouteId")!).Value);
+        Assert.Equal(route.RouteToProfessionalStatusTypeId.ToString(), ((IHtmlSelectElement)doc.GetElementById("ArchivedRouteId")!).Value);
     }
 
     [Fact]
     public async Task Post_NoRouteSelected_ShowsError()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync();
@@ -99,9 +99,9 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_TwoRoutesSelected_ShowsError()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .RandomOne();
-        var archivedRoute = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var archivedRoute = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => !r.IsActive)
             .RandomOne();
 
@@ -116,8 +116,8 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "RouteId", route.RouteToProfessionalStatusId.ToString() },
-                { "ArchivedRouteId", archivedRoute.RouteToProfessionalStatusId.ToString() }
+                { "RouteId", route.RouteToProfessionalStatusTypeId.ToString() },
+                { "ArchivedRouteId", archivedRoute.RouteToProfessionalStatusTypeId.ToString() }
             }
         };
 
@@ -132,7 +132,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SelectRoute_PersistsSelection()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync();
@@ -146,7 +146,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Routeid", route.RouteToProfessionalStatusId }
+                { "Routeid", route.RouteToProfessionalStatusTypeId }
             }
         };
 
@@ -155,14 +155,14 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(route.RouteToProfessionalStatusId, journeyInstance.State.RouteToProfessionalStatusId);
+        Assert.Equal(route.RouteToProfessionalStatusTypeId, journeyInstance.State.RouteToProfessionalStatusId);
     }
 
     [Fact]
     public async Task Post_WhenRouteIsEntered_RedirectsToStatus()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync();
@@ -176,7 +176,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "Routeid", route.RouteToProfessionalStatusId }
+                { "Routeid", route.RouteToProfessionalStatusTypeId }
             }
         };
 
@@ -192,7 +192,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_DeletesJourneyStateAndRedirectsToQualifications()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync();

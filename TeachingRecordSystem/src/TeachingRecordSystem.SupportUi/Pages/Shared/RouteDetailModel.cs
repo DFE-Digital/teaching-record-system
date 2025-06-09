@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
 public class RouteDetailModel()
 {
-    public required RouteToProfessionalStatus RouteToProfessionalStatus { get; set; }
+    public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; set; }
     public ProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
@@ -26,15 +26,15 @@ public class RouteDetailModel()
     public string[]? TrainingSubjects { get; set; }
     public JourneyInstanceId JourneyInstanceId { get; set; }
 
-    public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingStartDateRequired, Status.GetStartDateRequirement());
-    public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingEndDateRequired, Status.GetEndDateRequirement());
-    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.AwardDateRequired, Status.GetAwardDateRequirement());
-    public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
-    public FieldRequirement TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
-    public FieldRequirement AgeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement());
-    public FieldRequirement TrainingCountryRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingCountryRequired, Status.GetCountryRequirement());
-    public FieldRequirement HasInductionExemptionRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.InductionExemptionRequired, Status.GetInductionExemptionRequirement());
-    public FieldRequirement TrainingSubjectsRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus.TrainingSubjectsRequired, Status.GetSubjectsRequirement());
+    public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingStartDateRequired, Status.GetStartDateRequirement());
+    public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingEndDateRequired, Status.GetEndDateRequirement());
+    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.AwardDateRequired, Status.GetAwardDateRequirement());
+    public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
+    public FieldRequirement TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
+    public FieldRequirement AgeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement());
+    public FieldRequirement TrainingCountryRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingCountryRequired, Status.GetCountryRequirement());
+    public FieldRequirement HasInductionExemptionRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.InductionExemptionRequired, Status.GetInductionExemptionRequirement());
+    public FieldRequirement TrainingSubjectsRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingSubjectsRequired, Status.GetSubjectsRequirement());
 
     public bool FromCheckAnswers { get; set; }
 }

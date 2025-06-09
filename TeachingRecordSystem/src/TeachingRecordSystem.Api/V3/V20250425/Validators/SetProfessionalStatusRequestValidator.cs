@@ -19,10 +19,10 @@ public class SetProfessionalStatusRequestValidator : AbstractValidator<SetProfes
             .When(r => !r.RouteTypeId.IsOverseas(), ApplyConditionTo.CurrentValidator)
             .WithMessage(r => $"Status cannot be 'Approved' when route type is '{r.RouteTypeId}'.")
             .Must(s => s != ProfessionalStatusStatus.InTraining)
-            .When(r => r.RouteTypeId == RouteToProfessionalStatus.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
-            .WithMessage($"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatus.AssessmentOnlyRouteId}'.")
+            .When(r => r.RouteTypeId == RouteToProfessionalStatusType.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
+            .WithMessage($"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatusType.AssessmentOnlyRouteId}'.")
             .Must(s => s != ProfessionalStatusStatus.UnderAssessment)
-            .When(r => r.RouteTypeId != RouteToProfessionalStatus.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
+            .When(r => r.RouteTypeId != RouteToProfessionalStatusType.AssessmentOnlyRouteId, ApplyConditionTo.CurrentValidator)
             .WithMessage(r => $"Status cannot be 'UnderAssessment' when route type is '{r.RouteTypeId}'.");
 
         RuleFor(r => r.AwardedDate)
@@ -74,17 +74,17 @@ public class SetProfessionalStatusRequestValidator : AbstractValidator<SetProfes
                 .Must(c => !invalidOverseasCountries.Contains(c))
                 .WithMessage(r => $"Training country reference cannot be '{r.TrainingCountryReference}' when route type is '{r.RouteTypeId}'.")
                 .Equal("GB-SCT")
-                .When(r => r.RouteTypeId == RouteToProfessionalStatus.ScotlandRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatus.ScotlandRId}'.")
+                .When(r => r.RouteTypeId == RouteToProfessionalStatusType.ScotlandRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatusType.ScotlandRId}'.")
                 .NotEqual("GB-SCT")
-                .When(r => r.RouteTypeId != RouteToProfessionalStatus.ScotlandRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatus.ScotlandRId}'.")
+                .When(r => r.RouteTypeId != RouteToProfessionalStatusType.ScotlandRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatusType.ScotlandRId}'.")
                 .Equal("GB-NIR")
-                .When(r => r.RouteTypeId == RouteToProfessionalStatus.NiRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatus.NiRId}'.")
+                .When(r => r.RouteTypeId == RouteToProfessionalStatusType.NiRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatusType.NiRId}'.")
                 .NotEqual("GB-NIR")
-                .When(r => r.RouteTypeId != RouteToProfessionalStatus.NiRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatus.NiRId}'.");
+                .When(r => r.RouteTypeId != RouteToProfessionalStatusType.NiRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatusType.NiRId}'.");
         })
         .Otherwise(() =>
         {
@@ -92,15 +92,15 @@ public class SetProfessionalStatusRequestValidator : AbstractValidator<SetProfes
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
                 .WithMessage(r => $"Training country reference must be specified when route type is '{r.RouteTypeId}'.")
-                .When(r => r.RouteTypeId == RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
+                .When(r => r.RouteTypeId == RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
                 .Must(c => c == "GB-WLS" || c == "GB-CYM")
-                .When(r => r.RouteTypeId == RouteToProfessionalStatus.WelshRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage($"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatus.WelshRId}'.")
+                .When(r => r.RouteTypeId == RouteToProfessionalStatusType.WelshRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage($"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatusType.WelshRId}'.")
                 .Must(c => c != "GB-WLS" && c != "GB-CYM")
-                .When(r => r.RouteTypeId != RouteToProfessionalStatus.WelshRId, ApplyConditionTo.CurrentValidator)
-                .WithMessage(r => $"Training country reference cannot be '{r.TrainingCountryReference}' when route type is not '{RouteToProfessionalStatus.WelshRId}'.")
+                .When(r => r.RouteTypeId != RouteToProfessionalStatusType.WelshRId, ApplyConditionTo.CurrentValidator)
+                .WithMessage(r => $"Training country reference cannot be '{r.TrainingCountryReference}' when route type is not '{RouteToProfessionalStatusType.WelshRId}'.")
                 .Equal("GB")
-                .When(r => r.RouteTypeId != RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
+                .When(r => r.RouteTypeId != RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId, ApplyConditionTo.CurrentValidator)
                 .WithMessage(r => $"Training country reference must be 'GB' when route type is '{r.RouteTypeId}'.");
         });
 

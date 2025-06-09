@@ -5,8 +5,8 @@
 @model TimelineItem<TimelineEvent<ProfessionalStatusDeletedEvent>>
 @{
     var deletedEvent = Model.ItemModel.Event;
-    var professionalStatus = deletedEvent.ProfessionalStatus;
-    var routeType = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(professionalStatus.RouteToProfessionalStatusId);
+    var professionalStatus = deletedEvent.RouteToProfessionalStatus;
+    var routeType = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(professionalStatus.RouteToProfessionalStatusTypeId);
     var trainingProvider = professionalStatus.TrainingProviderId.HasValue ? await ReferenceDataCache.GetTrainingProviderByIdAsync(professionalStatus.TrainingProviderId.Value) : null;
     var country = !string.IsNullOrEmpty(professionalStatus.TrainingCountryId) ? await ReferenceDataCache.GetTrainingCountryByIdAsync(professionalStatus.TrainingCountryId) : null;
     var degreeType = professionalStatus.DegreeTypeId.HasValue ? await ReferenceDataCache.GetDegreeTypeByIdAsync(professionalStatus.DegreeTypeId.Value) : null;

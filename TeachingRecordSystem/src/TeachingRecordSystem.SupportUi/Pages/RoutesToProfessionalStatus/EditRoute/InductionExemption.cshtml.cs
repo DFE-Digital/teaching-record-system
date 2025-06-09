@@ -13,7 +13,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-    public RouteToProfessionalStatus Route { get; set; } = null!;
+    public RouteToProfessionalStatusType Route { get; set; } = null!;
 
     [FromQuery]
     public bool FromCheckAnswers { get; set; }
@@ -72,7 +72,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
         var professionalStatusFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        Route = professionalStatusFeature!.ProfessionalStatus.RouteToProfessionalStatus!;
+        Route = professionalStatusFeature!.RouteToProfessionalStatus.RouteToProfessionalStatusType!;
 
         if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
         || Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption)

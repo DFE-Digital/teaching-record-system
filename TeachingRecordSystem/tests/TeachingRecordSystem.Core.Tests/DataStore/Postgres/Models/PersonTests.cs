@@ -655,8 +655,8 @@ public class PersonTests
         // Arrange
         var person = CreatePerson();
 
-        var allRoutes = new List<RouteToProfessionalStatus>();
-        var professionalStatuses = new List<ProfessionalStatus>();
+        var allRoutes = new List<RouteToProfessionalStatusType>();
+        var professionalStatuses = new List<RouteToProfessionalStatus>();
 
         DateOnly? existingRouteAwarded = Clock.Today.AddDays(-10);
         ProfessionalStatusStatus existingRouteStatus =
@@ -761,10 +761,10 @@ public class PersonTests
                 person.PqtsDate);
         }
 
-        static RouteToProfessionalStatus CreateRouteForProfessionalStatusType(ProfessionalStatusType professionalStatusType) =>
-            new RouteToProfessionalStatus()
+        static RouteToProfessionalStatusType CreateRouteForProfessionalStatusType(ProfessionalStatusType professionalStatusType) =>
+            new RouteToProfessionalStatusType()
             {
-                RouteToProfessionalStatusId = Guid.NewGuid(),
+                RouteToProfessionalStatusTypeId = Guid.NewGuid(),
                 Name = $"A {professionalStatusType} route",
                 ProfessionalStatusType = professionalStatusType,
                 IsActive = true,
@@ -780,15 +780,15 @@ public class PersonTests
                 InductionExemptionReasonId = null
             };
 
-        ProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatus route, ProfessionalStatusStatus status, DateOnly? awardedDate) =>
-            new ProfessionalStatus()
+        RouteToProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatusType route, ProfessionalStatusStatus status, DateOnly? awardedDate) =>
+            new RouteToProfessionalStatus()
             {
                 QualificationId = Guid.NewGuid(),
                 CreatedOn = Clock.UtcNow,
                 UpdatedOn = Clock.UtcNow,
                 DeletedOn = null,
                 PersonId = person.PersonId,
-                RouteToProfessionalStatusId = route.RouteToProfessionalStatusId,
+                RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
                 SourceApplicationUserId = null,
                 SourceApplicationReference = null,
                 Status = status,

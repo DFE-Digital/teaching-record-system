@@ -14,9 +14,9 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public string? PersonName { get; set; }
 
-    public RouteToProfessionalStatus[] Routes { get; set; } = [];
+    public RouteToProfessionalStatusType[] Routes { get; set; } = [];
 
-    public RouteToProfessionalStatus[] ArchivedRoutes { get; set; } = [];
+    public RouteToProfessionalStatusType[] ArchivedRoutes { get; set; } = [];
 
     [FromQuery]
     public Guid PersonId { get; set; }
@@ -68,7 +68,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Routes = await referenceDataCache.GetRoutesToProfessionalStatusAsync();
+        Routes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         ArchivedRoutes = Routes.Where(r => !r.IsActive).ToArray();
         var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
         if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))

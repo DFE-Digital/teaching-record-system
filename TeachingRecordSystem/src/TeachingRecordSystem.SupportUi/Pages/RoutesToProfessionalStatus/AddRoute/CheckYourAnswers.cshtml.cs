@@ -37,12 +37,12 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             .Include(p => p.Qualifications)
             .SingleAsync();
 
-        var allRoutes = await ReferenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+        var allRoutes = await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
 
-        var professionalStatus = ProfessionalStatus.Create(
+        var professionalStatus = RouteToProfessionalStatus.Create(
             person,
             allRoutes,
-            Route.RouteToProfessionalStatusId,
+            Route.RouteToProfessionalStatusTypeId,
             Status,
             JourneyInstance!.State.AwardedDate,
             JourneyInstance!.State.TrainingStartDate,
@@ -82,13 +82,13 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
 
         var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         RouteDetail = new RouteDetailViewModel
         {
-            RouteToProfessionalStatus = Route,
+            RouteToProfessionalStatusType = Route,
             Status = JourneyInstance!.State.Status.Value,
             AwardedDate = JourneyInstance!.State.AwardedDate,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,

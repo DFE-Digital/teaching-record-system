@@ -111,12 +111,12 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
         DateOnly awardedDate = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r =>
             {
-                r.WithRoute(route.RouteToProfessionalStatusId);
+                r.WithRoute(route.RouteToProfessionalStatusTypeId);
                 r.WithStatus(status);
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);
@@ -163,11 +163,11 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
         DateOnly awardedDate = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r =>
             {
-                r.WithRoute(route.RouteToProfessionalStatusId);
+                r.WithRoute(route.RouteToProfessionalStatusTypeId);
                 r.WithStatus(status);
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);

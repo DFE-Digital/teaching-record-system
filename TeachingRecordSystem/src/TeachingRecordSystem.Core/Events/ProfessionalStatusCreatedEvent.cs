@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.Core.Events;
 public record ProfessionalStatusCreatedEvent : EventBase, IEventWithPersonId, IEventWithProfessionalStatus
 {
     public required Guid PersonId { get; init; }
-    public required ProfessionalStatus ProfessionalStatus { get; init; }
+    public required RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }
     public required ProfessionalStatusCreatedEventChanges Changes { get; init; }
     public required ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
     public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }

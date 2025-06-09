@@ -21,7 +21,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
     public ContactSearchSortByOption? SortBy { get; set; }
 
     public MandatoryQualification[]? MandatoryQualifications { get; set; }
-    public ProfessionalStatus[]? ProfessionalStatuses { get; set; }
+    public RouteToProfessionalStatus[]? ProfessionalStatuses { get; set; }
     public Dictionary<Guid, string>? TrainingSubjects { get; set; }
 
     public async Task OnGetAsync()
@@ -29,7 +29,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
         ProfessionalStatuses = await dbContext.ProfessionalStatuses
             .Include(q => q.TrainingProvider)
             .Include(q => q.TrainingCountry)
-            .Include(q => q.RouteToProfessionalStatus)
+            .Include(q => q.RouteToProfessionalStatusType)
             .Include(q => q.DegreeType)
             .Where(x => x.PersonId == PersonId)
             .OrderBy(x => x.CreatedOn)

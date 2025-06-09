@@ -48,8 +48,8 @@ public class CheckYourAnswersModel(
         {
             return Redirect(linkGenerator.DeleteRouteChangeReason(QualificationId, JourneyInstance!.InstanceId, fromCheckAnswers: true));
         }
-        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus;
+        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
 
         // ... or adapt the current all-in-one method
         professionalStatus.Delete(
@@ -100,20 +100,20 @@ public class CheckYourAnswersModel(
         var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
         RouteDetail = new RouteDetailViewModel()
         {
-            RouteToProfessionalStatus = routeInfo.ProfessionalStatus.RouteToProfessionalStatus!,
-            AwardedDate = routeInfo.ProfessionalStatus.AwardedDate,
-            DegreeTypeId = routeInfo.ProfessionalStatus.DegreeTypeId,
-            IsExemptFromInduction = routeInfo.ProfessionalStatus.ExemptFromInduction,
-            Status = routeInfo.ProfessionalStatus.Status,
-            QualificationId = routeInfo.ProfessionalStatus.QualificationId,
-            TrainingAgeSpecialismType = routeInfo.ProfessionalStatus.TrainingAgeSpecialismType,
-            TrainingAgeSpecialismRangeFrom = routeInfo.ProfessionalStatus.TrainingAgeSpecialismRangeFrom,
-            TrainingAgeSpecialismRangeTo = routeInfo.ProfessionalStatus.TrainingAgeSpecialismRangeTo,
-            TrainingCountryId = routeInfo.ProfessionalStatus.TrainingCountryId,
-            TrainingEndDate = routeInfo.ProfessionalStatus.TrainingEndDate,
-            TrainingProviderId = routeInfo.ProfessionalStatus.TrainingProviderId,
-            TrainingStartDate = routeInfo.ProfessionalStatus.TrainingStartDate,
-            TrainingSubjectIds = routeInfo.ProfessionalStatus.TrainingSubjectIds
+            RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType!,
+            AwardedDate = routeInfo.RouteToProfessionalStatus.AwardedDate,
+            DegreeTypeId = routeInfo.RouteToProfessionalStatus.DegreeTypeId,
+            IsExemptFromInduction = routeInfo.RouteToProfessionalStatus.ExemptFromInduction,
+            Status = routeInfo.RouteToProfessionalStatus.Status,
+            QualificationId = routeInfo.RouteToProfessionalStatus.QualificationId,
+            TrainingAgeSpecialismType = routeInfo.RouteToProfessionalStatus.TrainingAgeSpecialismType,
+            TrainingAgeSpecialismRangeFrom = routeInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = routeInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo,
+            TrainingCountryId = routeInfo.RouteToProfessionalStatus.TrainingCountryId,
+            TrainingEndDate = routeInfo.RouteToProfessionalStatus.TrainingEndDate,
+            TrainingProviderId = routeInfo.RouteToProfessionalStatus.TrainingProviderId,
+            TrainingStartDate = routeInfo.RouteToProfessionalStatus.TrainingStartDate,
+            TrainingSubjectIds = routeInfo.RouteToProfessionalStatus.TrainingSubjectIds
         };
 
         ChangeReason = JourneyInstance!.State.ChangeReason;

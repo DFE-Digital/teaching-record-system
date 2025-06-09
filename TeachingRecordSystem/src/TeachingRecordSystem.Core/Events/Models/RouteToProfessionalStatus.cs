@@ -1,8 +1,8 @@
 namespace TeachingRecordSystem.Core.Events.Models;
 
-public record ProfessionalStatus
+public record RouteToProfessionalStatus
 {
-    public required Guid RouteToProfessionalStatusId { get; init; }
+    public required Guid RouteToProfessionalStatusTypeId { get; init; }
     public required ProfessionalStatusStatus Status { get; init; }
     public required DateOnly? AwardedDate { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
@@ -13,12 +13,12 @@ public record ProfessionalStatus
     public required int? TrainingAgeSpecialismRangeTo { get; init; }
     public required string? TrainingCountryId { get; init; }
     public required Guid? TrainingProviderId { get; init; }
-    public bool? ExemptFromInduction { get; set; }
+    public required bool? ExemptFromInduction { get; set; }
     public required Guid? DegreeTypeId { get; init; }
 
-    public static ProfessionalStatus FromModel(DataStore.Postgres.Models.ProfessionalStatus model) => new()
+    public static RouteToProfessionalStatus FromModel(DataStore.Postgres.Models.RouteToProfessionalStatus model) => new()
     {
-        RouteToProfessionalStatusId = model.RouteToProfessionalStatusId,
+        RouteToProfessionalStatusTypeId = model.RouteToProfessionalStatusTypeId,
         Status = model.Status,
         AwardedDate = model.AwardedDate,
         TrainingStartDate = model.TrainingStartDate,

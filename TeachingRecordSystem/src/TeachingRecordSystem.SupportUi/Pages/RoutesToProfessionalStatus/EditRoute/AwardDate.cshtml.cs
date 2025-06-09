@@ -22,7 +22,7 @@ public class AwardDateModel(
 
     public Guid PersonId { get; set; }
 
-    public RouteToProfessionalStatus? RouteToProfessionalStatus { get; set; }
+    public RouteToProfessionalStatusType? RouteToProfessionalStatus { get; set; }
 
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Award date")]
@@ -87,7 +87,7 @@ public class AwardDateModel(
         PersonId = personInfo.PersonId;
 
         var routeFeature = context.HttpContext.GetCurrentProfessionalStatusFeature();
-        RouteToProfessionalStatus = routeFeature.ProfessionalStatus.RouteToProfessionalStatus;
+        RouteToProfessionalStatus = routeFeature.RouteToProfessionalStatus.RouteToProfessionalStatusType;
         var inductionexemptionReason = RouteToProfessionalStatus!.InductionExemptionReason;
         base.OnPageHandlerExecuting(context);
     }

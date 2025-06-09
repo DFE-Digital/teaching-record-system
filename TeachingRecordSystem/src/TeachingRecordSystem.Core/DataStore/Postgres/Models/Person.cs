@@ -471,19 +471,19 @@ public class Person
 
     public bool RefreshProfessionalStatusAttributes(
         ProfessionalStatusType professionalStatusType,
-        IReadOnlyCollection<RouteToProfessionalStatus> allRoutes,
-        IEnumerable<ProfessionalStatus>? professionalStatusesHint = null)
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        IEnumerable<RouteToProfessionalStatus>? professionalStatusesHint = null)
     {
         var professionalStatuses = professionalStatusesHint ??
             Qualifications?
-                .OfType<ProfessionalStatus>()?
+                .OfType<RouteToProfessionalStatus>()?
                 .Where(p => p.DeletedOn is null) ??
             throw new InvalidOperationException("No professional statuses.");
 
-        var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusId, r => r.ProfessionalStatusType);
+        var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusTypeId, r => r.ProfessionalStatusType);
 
         var awardedOrApproved = professionalStatuses
-            .Where(ps => professionalStatusTypeByRouteId[ps.RouteToProfessionalStatusId] == professionalStatusType &&
+            .Where(ps => professionalStatusTypeByRouteId[ps.RouteToProfessionalStatusTypeId] == professionalStatusType &&
                 ps.Status is ProfessionalStatusStatus.Approved or ProfessionalStatusStatus.Awarded)
             .ToArray();
 

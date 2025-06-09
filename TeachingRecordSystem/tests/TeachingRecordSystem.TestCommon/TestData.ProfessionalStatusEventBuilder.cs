@@ -18,8 +18,8 @@ public partial class TestData
         public DateTime? _createdUtc;
         public RaisedByUserInfo? _createdByUser;
         Guid? _personId;
-        Core.Events.Models.ProfessionalStatus? _professionalStatus;
-        Core.Events.Models.ProfessionalStatus? _oldProfessionalStatus;
+        Core.Events.Models.RouteToProfessionalStatus? _professionalStatus;
+        Core.Events.Models.RouteToProfessionalStatus? _oldProfessionalStatus;
         Person? _person;
         ProfessionalStatusPersonAttributes? _personAttributes;
         ProfessionalStatusPersonAttributes? _oldPersonAttributes;
@@ -44,15 +44,15 @@ public partial class TestData
             _personId = person.PersonId;
             return this;
         }
-        public UpdateProfessionalStatusEventBuilder WithProfessionalStatus(Core.DataStore.Postgres.Models.ProfessionalStatus professionalStatus)
+        public UpdateProfessionalStatusEventBuilder WithProfessionalStatus(Core.DataStore.Postgres.Models.RouteToProfessionalStatus routeToProfessionalStatus)
         {
-            _professionalStatus = Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus);
+            _professionalStatus = Core.Events.Models.RouteToProfessionalStatus.FromModel(routeToProfessionalStatus);
             return this;
         }
 
-        public UpdateProfessionalStatusEventBuilder WithOldProfessionalStatus(Core.Events.Models.ProfessionalStatus oldProfessionalStatus)
+        public UpdateProfessionalStatusEventBuilder WithOldProfessionalStatus(Core.Events.Models.RouteToProfessionalStatus oldRouteToProfessionalStatus)
         {
-            _oldProfessionalStatus = oldProfessionalStatus;
+            _oldProfessionalStatus = oldRouteToProfessionalStatus;
             return this;
         }
 
@@ -106,8 +106,8 @@ public partial class TestData
                 CreatedUtc = _createdUtc!.Value,
                 RaisedBy = _createdByUser!,
                 PersonId = _personId!.Value,
-                ProfessionalStatus = _professionalStatus,
-                OldProfessionalStatus = _oldProfessionalStatus,
+                RouteToProfessionalStatus = _professionalStatus,
+                OldRouteToProfessionalStatus = _oldProfessionalStatus,
                 OldPersonAttributes = _oldPersonAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 PersonAttributes = _personAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 Changes = _changes ?? ProfessionalStatusUpdatedEventChanges.None,
@@ -139,7 +139,7 @@ public partial class TestData
         public DateTime? _createdUtc;
         public RaisedByUserInfo? _createdByUser;
         Guid? _personId;
-        Core.Events.Models.ProfessionalStatus? _professionalStatus;
+        Core.Events.Models.RouteToProfessionalStatus? _professionalStatus;
         Person? _person;
         ProfessionalStatusPersonAttributes? _personAttributes;
         ProfessionalStatusPersonAttributes? _oldPersonAttributes;
@@ -163,9 +163,9 @@ public partial class TestData
             _personId = person.PersonId;
             return this;
         }
-        public DeleteProfessionalStatusEventBuilder WithProfessionalStatus(Core.DataStore.Postgres.Models.ProfessionalStatus professionalStatus)
+        public DeleteProfessionalStatusEventBuilder WithProfessionalStatus(Core.DataStore.Postgres.Models.RouteToProfessionalStatus routeToProfessionalStatus)
         {
-            _professionalStatus = Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus);
+            _professionalStatus = Core.Events.Models.RouteToProfessionalStatus.FromModel(routeToProfessionalStatus);
             return this;
         }
 
@@ -234,7 +234,7 @@ public partial class TestData
                 CreatedUtc = _createdUtc!.Value,
                 RaisedBy = _createdByUser!,
                 PersonId = _personId!.Value,
-                ProfessionalStatus = _professionalStatus,
+                RouteToProfessionalStatus = _professionalStatus,
                 OldPersonAttributes = _oldPersonAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 PersonAttributes = _personAttributes ?? new ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null },
                 Changes = _changes ?? ProfessionalStatusDeletedEventChanges.None,

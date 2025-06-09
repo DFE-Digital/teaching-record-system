@@ -21,7 +21,7 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
 
     public string? PersonName { get; set; }
 
-    public RouteToProfessionalStatus Route { get; set; } = null!;
+    public RouteToProfessionalStatusType Route { get; set; } = null!;
     public ProfessionalStatusStatus Status { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -57,7 +57,7 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         Status = JourneyInstance!.State.Status!.Value;
         await next();
     }

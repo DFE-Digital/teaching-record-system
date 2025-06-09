@@ -13,18 +13,18 @@ public static class RouteToProfessionalStatusIdExtensions
 
     public static bool IsOverseas(this Guid routeToProfessionalStatusId)
     {
-        return routeToProfessionalStatusId == RouteToProfessionalStatus.ApplyforQtsId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.EuropeanRecognitionId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.NiRId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId;
+        return routeToProfessionalStatusId == RouteToProfessionalStatusType.ApplyForQtsId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.EuropeanRecognitionId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.NiRId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.ScotlandRId;
     }
 
     public static bool CanBeExemptFromInduction(this Guid routeToProfessionalStatusId)
     {
-        return routeToProfessionalStatusId == RouteToProfessionalStatus.ApplyforQtsId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.NiRId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId
-            || routeToProfessionalStatusId == RouteToProfessionalStatus.QtlsAndSetMembershipId;
+        return routeToProfessionalStatusId == RouteToProfessionalStatusType.ApplyForQtsId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.NiRId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.ScotlandRId
+            || routeToProfessionalStatusId == RouteToProfessionalStatusType.QtlsAndSetMembershipId;
     }
 }

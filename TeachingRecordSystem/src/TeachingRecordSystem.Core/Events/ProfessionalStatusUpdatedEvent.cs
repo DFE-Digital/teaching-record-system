@@ -6,8 +6,8 @@ namespace TeachingRecordSystem.Core.Events;
 public record ProfessionalStatusUpdatedEvent : EventBase, IEventWithPersonId, IEventWithProfessionalStatus
 {
     public required Guid PersonId { get; init; }
-    public required ProfessionalStatus ProfessionalStatus { get; init; }
-    public required ProfessionalStatus OldProfessionalStatus { get; init; }
+    public required RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }
+    public required RouteToProfessionalStatus OldRouteToProfessionalStatus { get; init; }
     public required ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
     public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }
     public required string? ChangeReason { get; init; }
@@ -31,7 +31,7 @@ public enum ProfessionalStatusUpdatedEventChanges
     TrainingAgeSpecialismRangeTo = 1 << 8,
     TrainingCountry = 1 << 9,
     TrainingProvider = 1 << 10,
-    ExemptFromInduction = 1 << 11,
+    InductionExemptionReasons = 1 << 11,
     DegreeType = 1 << 12,
     PersonQtsDate = 1 << 13,
     PersonEytsDate = 1 << 14,

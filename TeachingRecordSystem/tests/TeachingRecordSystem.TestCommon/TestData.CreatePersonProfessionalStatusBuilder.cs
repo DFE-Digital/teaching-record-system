@@ -1,6 +1,5 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using ProfessionalStatus = TeachingRecordSystem.Core.DataStore.Postgres.Models.ProfessionalStatus;
 
 namespace TeachingRecordSystem.TestCommon;
 
@@ -135,9 +134,9 @@ public partial class TestData
             }
 
             var personId = createPersonBuilder.PersonId;
-            var allRoutes = await testData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync();
+            var allRoutes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
 
-            var professionalStatus = ProfessionalStatus.Create(
+            var professionalStatus = RouteToProfessionalStatus.Create(
                 person,
                 allRoutes,
                 _routeToProfessionalStatusId!.Value,

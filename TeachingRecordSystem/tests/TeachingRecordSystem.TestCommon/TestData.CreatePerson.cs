@@ -630,7 +630,7 @@ public partial class TestData
 
                 async Task<IReadOnlyCollection<Guid>> AddAwardedProfessionalStatusRoutesAsync()
                 {
-                    var allRoutes = await testData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+                    var allRoutes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
                     var allSubjects = await testData.ReferenceDataCache.GetTrainingSubjectsAsync();
                     var allCountries = await testData.ReferenceDataCache.GetTrainingCountriesAsync();
                     var allProviders = await testData.ReferenceDataCache.GetTrainingProvidersAsync();
@@ -642,10 +642,10 @@ public partial class TestData
                     {
                         var route = allRoutes.Where(r => r.ProfessionalStatusType == professionalStatusType).RandomOne();
 
-                        var professionalStatus = ProfessionalStatus.Create(
+                        var professionalStatus = RouteToProfessionalStatus.Create(
                                 person,
                                 allRoutes,
-                                route.RouteToProfessionalStatusId,
+                                route.RouteToProfessionalStatusTypeId,
                                 ProfessionalStatusStatus.Awarded,
                                 testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
                                 route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
@@ -1256,7 +1256,7 @@ public partial class TestData
         public required DateOnly? EytsDate { get; init; }
         public required IReadOnlyCollection<MandatoryQualification> MandatoryQualifications { get; init; }
         public required IReadOnlyCollection<Alert> Alerts { get; init; }
-        public required IReadOnlyCollection<ProfessionalStatus> ProfessionalStatuses { get; init; }
+        public required IReadOnlyCollection<RouteToProfessionalStatus> ProfessionalStatuses { get; init; }
         public required IReadOnlyCollection<PreviousName> PreviousNames { get; init; }
         public required AuditDetail? DqtContactAuditDetail { get; init; }
     }
