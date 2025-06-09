@@ -8,7 +8,7 @@ public partial class TestData
     public class CreatePersonProfessionalStatusBuilder
     {
         private Guid? _personId = null;
-        private Guid? _routeToProfessionalStatusId;
+        private Guid? _routeToProfessionalStatusTypeId;
         private ProfessionalStatusStatus _status;
         private DateOnly? _awardedDate;
         private DateOnly? _trainingStartDate;
@@ -82,9 +82,9 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithRoute(Guid routeId)
+        public CreatePersonProfessionalStatusBuilder WithRouteType(Guid routeTypeId)
         {
-            _routeToProfessionalStatusId = routeId;
+            _routeToProfessionalStatusTypeId = routeTypeId;
             return this;
         }
 
@@ -124,7 +124,7 @@ public partial class TestData
             TestData testData,
             TrsDbContext dbContext)
         {
-            if (_routeToProfessionalStatusId is null)
+            if (_routeToProfessionalStatusTypeId is null)
             {
                 throw new InvalidOperationException("RouteToProfessionalStatusId has not been set");
             }
@@ -139,7 +139,7 @@ public partial class TestData
             var professionalStatus = RouteToProfessionalStatus.Create(
                 person,
                 allRoutes,
-                _routeToProfessionalStatusId!.Value,
+                _routeToProfessionalStatusTypeId!.Value,
                 _status,
                 _awardedDate,
                 _trainingStartDate,

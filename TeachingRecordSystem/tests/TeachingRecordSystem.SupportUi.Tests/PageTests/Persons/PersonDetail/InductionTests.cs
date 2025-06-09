@@ -73,7 +73,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithQts()
             .WithInductionStatus(InductionStatus.Exempt)
             .WithProfessionalStatus(r => r
-                .WithRoute(routeWithExemption.RouteToProfessionalStatusTypeId)
+                .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));
@@ -111,7 +111,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithQts()
             .WithInductionStatus(InductionStatus.Exempt)
             .WithProfessionalStatus(r => r
-                .WithRoute(routeWithExemption.RouteToProfessionalStatusTypeId)
+                .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));

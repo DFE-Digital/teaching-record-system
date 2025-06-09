@@ -22,7 +22,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q => q
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
@@ -74,7 +74,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(ProfessionalStatusStatus.Awarded);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);
@@ -123,7 +123,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
@@ -228,7 +228,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
@@ -313,7 +313,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithInductionExemption(true);
                 q.WithAwardedDate(awardDate);
@@ -369,7 +369,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);
@@ -440,7 +440,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);

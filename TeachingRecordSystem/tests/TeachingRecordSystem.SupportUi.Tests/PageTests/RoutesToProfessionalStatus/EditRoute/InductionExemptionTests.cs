@@ -20,7 +20,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -59,7 +59,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -103,7 +103,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -156,7 +156,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -197,7 +197,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;

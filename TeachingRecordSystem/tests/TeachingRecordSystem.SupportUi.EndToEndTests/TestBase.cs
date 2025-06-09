@@ -1,6 +1,7 @@
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.EndToEndTests.Infrastructure.Security;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests;
 
@@ -16,6 +17,8 @@ public abstract class TestBase
     public HostFixture HostFixture { get; }
 
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
+
+    public TestableFeatureProvider TestFeatureProvider => (TestableFeatureProvider)HostFixture.Services.GetRequiredService<IFeatureProvider>();
 
     public virtual async Task<T> WithDbContext<T>(Func<TrsDbContext, Task<T>> action)
     {

@@ -47,7 +47,7 @@ public partial class GetQtlsTests(OperationTestFixture operationTestFixture) : O
             var person = await TestData.CreatePersonAsync(p => p
                 .WithTrn()
                 .WithProfessionalStatus(s => s
-                    .WithRoute(RouteToProfessionalStatusType.QtlsAndSetMembershipId)
+                    .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId)
                     .WithStatus(ProfessionalStatusStatus.Awarded)
                     .WithAwardedDate(qtlsDate)));
 

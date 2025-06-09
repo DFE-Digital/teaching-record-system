@@ -116,7 +116,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r =>
             {
-                r.WithRoute(route.RouteToProfessionalStatusTypeId);
+                r.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 r.WithStatus(status);
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);
@@ -167,7 +167,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r =>
             {
-                r.WithRoute(route.RouteToProfessionalStatusTypeId);
+                r.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 r.WithStatus(status);
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);

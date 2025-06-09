@@ -86,7 +86,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
@@ -137,7 +137,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
@@ -189,7 +189,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
@@ -238,7 +238,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));
@@ -281,7 +281,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));

@@ -15,7 +15,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -49,7 +49,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -90,7 +90,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -132,7 +132,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var newStatus = ProfessionalStatusStatus.UnderAssessment;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
@@ -186,7 +186,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -228,7 +228,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -269,7 +269,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()

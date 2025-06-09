@@ -20,7 +20,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -65,7 +65,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
 
@@ -105,7 +105,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status.Value)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
@@ -146,7 +146,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
