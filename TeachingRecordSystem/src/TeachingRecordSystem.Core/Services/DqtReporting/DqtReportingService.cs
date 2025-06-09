@@ -500,12 +500,26 @@ public partial class DqtReportingService : BackgroundService
 
                 if (message is InsertMessage or UpdateMessage)
                 {
-                    await UpsertRowFromTrsAsync(targetTableName, idColumn.ColumnName, id, columnValues);
+                    try
+                    {
+                        await UpsertRowFromTrsAsync(targetTableName, idColumn.ColumnName, id, columnValues);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Failed upserting row into {targetTableName}.", ex);
+                    }
                 }
                 else
                 {
                     Debug.Assert(message is DeleteMessage);
-                    await DeleteRowFromTrsAsync(targetTableName, idColumn.ColumnName, id);
+                    try
+                    {
+                        await DeleteRowFromTrsAsync(targetTableName, idColumn.ColumnName, id);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Failed deleting row from {targetTableName}.", ex);
+                    }
                 }
 
                 replicationConn.SetReplicationStatus(message.WalEnd);
