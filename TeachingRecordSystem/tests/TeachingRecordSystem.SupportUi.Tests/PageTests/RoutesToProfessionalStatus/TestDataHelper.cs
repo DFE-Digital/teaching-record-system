@@ -4,11 +4,11 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public static class TestDataHelper
 {
-    public static async Task<RouteToProfessionalStatus> GetRouteWhereAllFieldsApplyAsync(
+    public static async Task<RouteToProfessionalStatusType> GetRouteWhereAllFieldsApplyAsync(
         this ReferenceDataCache referenceDataCache,
         ProfessionalStatusType? professionalStatusType = null)
     {
-        return (await referenceDataCache.GetRoutesToProfessionalStatusAsync())
+        return (await referenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired != FieldRequirement.NotApplicable
                 && r.TrainingProviderRequired != FieldRequirement.NotApplicable
@@ -22,9 +22,9 @@ public static class TestDataHelper
             .RandomOne();
     }
 
-    public static async Task<RouteToProfessionalStatus> GetRouteWhereAllFieldsHaveFieldRequirementAsync(this ReferenceDataCache referenceDataCache, FieldRequirement fieldRequirement)
+    public static async Task<RouteToProfessionalStatusType> GetRouteWhereAllFieldsHaveFieldRequirementAsync(this ReferenceDataCache referenceDataCache, FieldRequirement fieldRequirement)
     {
-        return (await referenceDataCache.GetRoutesToProfessionalStatusAsync())
+        return (await referenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == fieldRequirement
                 && r.TrainingCountryRequired == fieldRequirement
                 && r.TrainingProviderRequired == fieldRequirement

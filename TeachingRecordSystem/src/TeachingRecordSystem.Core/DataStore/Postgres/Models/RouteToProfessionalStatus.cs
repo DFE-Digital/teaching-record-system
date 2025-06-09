@@ -1,37 +1,252 @@
+using System.Diagnostics;
+
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
-public class RouteToProfessionalStatus
+public class RouteToProfessionalStatus : Qualification
 {
-    public const string InductionExemptionReasonIdIndexName = "ix_route_to_professional_status_induction_exemption_reason_id";
-    public const string InductionExemptionReasonForeignKeyName = "fk_route_to_professional_status_induction_exemption_reason";
+    public const int SourceApplicationReferenceMaxLength = 200;
 
-    public static Guid ApplyforQtsId { get; } = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713");
-    public static Guid AssessmentOnlyRouteId { get; } = new("57B86CEF-98E2-4962-A74A-D47C7A34B838");
-    public static Guid EuropeanRecognitionId { get; } = new("2B106B9D-BA39-4E2D-A42E-0CE827FDC324");
-    public static Guid HeiProgrammeTypeId { get; } = new("10078157-E8C3-42F7-A050-D8B802E83F7B");
-    public static Guid SchoolDirectTrainingProgrammeId { get; } = new("D9490E58-ACDC-4A38-B13E-5A5C21417737");
-    public static Guid InternationalQualifiedTeacherStatusId { get; } = new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1");
-    public static Guid NiRId { get; } = new("3604EF30-8F11-4494-8B52-A2F9C5371E03");
-    public static Guid OverseasTrainedTeacherRecognitionId { get; } = new("CE61056E-E681-471E-AF48-5FFBF2653500");
-    public static Guid QtlsAndSetMembershipId { get; } = new("BE6EAF8C-92DD-4EFF-AAD3-1C89C4BEC18C");
-    public static Guid ScotlandRId { get; } = new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB");
-    public static Guid EarlyYearsIttGraduateEntryId { get; } = new("DBC4125B-9235-41E4-ABD2-BAABBF63F829");
-    public static Guid EarlyYearsIttUndergraduateId { get; } = new("C97C0FD2-FD84-4949-97C7-B0E2422FB3C8");
-    public static Guid WelshRId { get; } = new("877ba701-fe26-4951-9f15-171f3755d50d");
+    public RouteToProfessionalStatus()
+    {
+        QualificationType = QualificationType.RouteToProfessionalStatus;
+    }
 
-    public required Guid RouteToProfessionalStatusId { get; init; }
-    public required string Name { get; init; }
-    public required ProfessionalStatusType ProfessionalStatusType { get; init; }
-    public required bool IsActive { get; set; }
-    public required FieldRequirement TrainingStartDateRequired { get; init; }
-    public required FieldRequirement TrainingEndDateRequired { get; init; }
-    public required FieldRequirement AwardDateRequired { get; init; }
-    public required FieldRequirement InductionExemptionRequired { get; init; }
-    public required FieldRequirement TrainingProviderRequired { get; init; }
-    public required FieldRequirement DegreeTypeRequired { get; init; }
-    public required FieldRequirement TrainingCountryRequired { get; init; }
-    public required FieldRequirement TrainingAgeSpecialismTypeRequired { get; init; }
-    public required FieldRequirement TrainingSubjectsRequired { get; init; }
-    public InductionExemptionReason? InductionExemptionReason { get; }
-    public required Guid? InductionExemptionReasonId { get; init; }
+    public required Guid RouteToProfessionalStatusTypeId { get; set; }
+    public Guid? SourceApplicationUserId { get; init; }
+    public string? SourceApplicationReference { get; init; }
+    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; }
+    public required ProfessionalStatusStatus Status { get; set; }
+    public DateOnly? AwardedDate { get; set; }
+    public required DateOnly? TrainingStartDate { get; set; }
+    public required DateOnly? TrainingEndDate { get; set; }
+    public required Guid[] TrainingSubjectIds { get; set; } = [];
+    public required TrainingAgeSpecialismType? TrainingAgeSpecialismType { get; set; }
+    public required int? TrainingAgeSpecialismRangeFrom { get; set; }
+    public required int? TrainingAgeSpecialismRangeTo { get; set; }
+    public required string? TrainingCountryId { get; set; }
+    public Country? TrainingCountry { get; }
+    public required Guid? TrainingProviderId { get; set; }
+    public TrainingProvider? TrainingProvider { get; }
+    public required bool? ExemptFromInduction { get; set; }
+    public required Guid? DegreeTypeId { get; set; }
+    public DegreeType? DegreeType { get; }
+    public string? DqtTeacherStatusName { get; init; }
+    public string? DqtTeacherStatusValue { get; init; }
+    public string? DqtEarlyYearsStatusName { get; init; }
+    public string? DqtEarlyYearsStatusValue { get; init; }
+    public Guid? DqtInitialTeacherTrainingId { get; init; }
+    public Guid? DqtQtsRegistrationId { get; init; }
+
+    public static RouteToProfessionalStatus Create(
+        Person person,
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        Guid routeToProfessionalStatusTypeId,
+        ProfessionalStatusStatus status,
+        DateOnly? awardedDate,
+        DateOnly? trainingStartDate,
+        DateOnly? trainingEndDate,
+        Guid[]? trainingSubjectIds,
+        TrainingAgeSpecialismType? trainingAgeSpecialismType,
+        int? trainingAgeSpecialismRangeFrom,
+        int? trainingAgeSpecialismRangeTo,
+        string? trainingCountryId,
+        Guid? trainingProviderId,
+        Guid? degreeTypeId,
+        bool? isExemptFromInduction,
+        EventModels.RaisedByUserInfo createdBy,
+        DateTime now,
+        out ProfessionalStatusCreatedEvent @event)
+    {
+        Debug.Assert(person.Qualifications is not null);
+
+        var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeToProfessionalStatusTypeId);
+        var qualificationId = Guid.NewGuid();
+
+        var professionalStatus = new RouteToProfessionalStatus()
+        {
+            QualificationId = qualificationId,
+            CreatedOn = now,
+            UpdatedOn = now,
+            PersonId = person.PersonId,
+            RouteToProfessionalStatusTypeId = routeToProfessionalStatusTypeId,
+            Status = status,
+            DegreeTypeId = degreeTypeId,
+            ExemptFromInduction = isExemptFromInduction,
+            TrainingStartDate = trainingStartDate,
+            TrainingEndDate = trainingEndDate,
+            TrainingAgeSpecialismRangeFrom = trainingAgeSpecialismRangeFrom,
+            TrainingAgeSpecialismRangeTo = trainingAgeSpecialismRangeTo,
+            TrainingAgeSpecialismType = trainingAgeSpecialismType,
+            TrainingCountryId = trainingCountryId,
+            TrainingProviderId = trainingProviderId,
+            TrainingSubjectIds = trainingSubjectIds ?? [],
+            AwardedDate = awardedDate
+        };
+
+        var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person);
+
+        var professionalStatusType = route.ProfessionalStatusType;
+        var allProfessionalStatuses = person.Qualifications.OfType<RouteToProfessionalStatus>().Append(professionalStatus);
+        var personAttributesUpdated = person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes, allProfessionalStatuses);
+
+        var changes = ProfessionalStatusCreatedEventChanges.None |
+            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusCreatedEventChanges.PersonQtsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusCreatedEventChanges.PersonEytsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
+                ? ProfessionalStatusCreatedEventChanges.PersonHasEyps
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusCreatedEventChanges.PersonPqtsDate
+                : 0);
+
+        @event = new ProfessionalStatusCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            PersonId = person.PersonId,
+            RaisedBy = createdBy,
+            RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(professionalStatus),
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
+            OldPersonAttributes = oldPersonAttributes,
+            Changes = changes
+        };
+
+        return professionalStatus;
+    }
+
+    public void Update(
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        Action<RouteToProfessionalStatus> updateAction,
+        string? changeReason,
+        string? changeReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now,
+        out ProfessionalStatusUpdatedEvent? @event)
+    {
+        Debug.Assert(Person is not null);
+        Debug.Assert(Person.Qualifications is not null);
+
+        var oldEventModel = EventModels.RouteToProfessionalStatus.FromModel(this);
+        var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
+        var oldRoute = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
+        var oldProfessionalStatusType = oldRoute.ProfessionalStatusType;
+
+        updateAction(this);
+
+        var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
+        var professionalStatusType = route.ProfessionalStatusType;
+
+        if (professionalStatusType != oldProfessionalStatusType)
+        {
+            throw new NotSupportedException($"Cannot change the {nameof(ProfessionalStatusType)} for an existing {nameof(Models.RouteToProfessionalStatus)}.");
+        }
+
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+
+        var changes = ProfessionalStatusUpdatedEventChanges.None |
+            (RouteToProfessionalStatusType!.RouteToProfessionalStatusTypeId != oldEventModel.RouteToProfessionalStatusTypeId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
+            (Status != oldEventModel.Status ? ProfessionalStatusUpdatedEventChanges.Status : ProfessionalStatusUpdatedEventChanges.None) |
+            (AwardedDate != oldEventModel.AwardedDate ? ProfessionalStatusUpdatedEventChanges.AwardedDate : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingStartDate != oldEventModel.TrainingStartDate ? ProfessionalStatusUpdatedEventChanges.StartDate : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingEndDate != oldEventModel.TrainingEndDate ? ProfessionalStatusUpdatedEventChanges.EndDate : ProfessionalStatusUpdatedEventChanges.None) |
+            ((TrainingSubjectIds.Except(oldEventModel.TrainingSubjectIds).Any() || oldEventModel.TrainingSubjectIds.Except(TrainingSubjectIds).Any()) ? ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismType != oldEventModel.TrainingAgeSpecialismType ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismRangeFrom != oldEventModel.TrainingAgeSpecialismRangeFrom ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismRangeTo != oldEventModel.TrainingAgeSpecialismRangeTo ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingCountryId != oldEventModel.TrainingCountryId ? ProfessionalStatusUpdatedEventChanges.TrainingCountry : ProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingProviderId != oldEventModel.TrainingProviderId ? ProfessionalStatusUpdatedEventChanges.TrainingProvider : ProfessionalStatusUpdatedEventChanges.None) |
+            (ExemptFromInduction != oldEventModel.ExemptFromInduction ? ProfessionalStatusUpdatedEventChanges.InductionExemptionReasons : ProfessionalStatusUpdatedEventChanges.None) |
+            (DegreeTypeId != oldEventModel.DegreeTypeId ? ProfessionalStatusUpdatedEventChanges.DegreeType : ProfessionalStatusUpdatedEventChanges.None) |
+            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonQtsDate : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonEytsDate : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonHasEyps : 0) |
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonPqtsDate : 0);
+
+        if (changes == ProfessionalStatusUpdatedEventChanges.None)
+        {
+            @event = null;
+            return;
+        }
+
+        UpdatedOn = now;
+
+        @event = new ProfessionalStatusUpdatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            PersonId = PersonId,
+            RaisedBy = updatedBy,
+            RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(this),
+            OldRouteToProfessionalStatus = oldEventModel,
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            EvidenceFile = evidenceFile,
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
+            OldPersonAttributes = oldPersonAttributes,
+            Changes = changes,
+        };
+    }
+
+    public void Delete(
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        string? deletionReason,
+        string? deletionReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo deletedBy,
+        DateTime now,
+        out ProfessionalStatusDeletedEvent @event)
+    {
+        if (DeletedOn is not null)
+        {
+            throw new InvalidOperationException("Professional status is already deleted.");
+        }
+        if (Person is null)
+        {
+            throw new InvalidOperationException("Professional status is not linked to a person and cannot be deleted");
+        }
+
+        DeletedOn = now;
+        UpdatedOn = now;
+
+        var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
+
+        var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
+        var professionalStatusType = route.ProfessionalStatusType;
+
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+
+        var changes = ProfessionalStatusDeletedEventChanges.None |
+            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonQtsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonEytsDate
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonHasEyps
+                : 0) |
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
+                ? ProfessionalStatusDeletedEventChanges.PersonPqtsDate
+                : 0);
+
+        @event = new ProfessionalStatusDeletedEvent()
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = deletedBy,
+            PersonId = PersonId,
+            RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(this),
+            PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
+            OldPersonAttributes = oldPersonAttributes,
+            DeletionReason = deletionReason,
+            DeletionReasonDetail = deletionReasonDetail,
+            EvidenceFile = evidenceFile,
+            Changes = changes
+        };
+    }
 }

@@ -9,10 +9,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
@@ -52,10 +52,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
@@ -97,7 +97,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
@@ -147,10 +147,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Get_ShowsChangeReasonAnswers_AsExpected()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var deleteRouteState = new DeleteRouteState()
@@ -182,11 +182,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [Fact]
     public async Task Post_Confirm_DeletesRecordCreatesEventCompletesJourneyAndRedirectsWithFlashMessage()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).RandomOne();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.InTraining)));
         EventPublisher.Clear();
 
@@ -240,7 +240,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [Fact]
     public async Task Post_Confirm_WithAwardedQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .RandomOne();
         var status = ProfessionalStatusStatus.Awarded;
@@ -248,7 +248,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts(qtsDate)
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(qtsDate)));
         EventPublisher.Clear();
@@ -296,7 +296,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     [Fact]
     public async Task Post_Confirm_WithAwardedQtsRouteType_UpdatesPersonQtsDateWithOlderRouteDateAndHasChangesInEvent()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .RandomOne();
         var awardedDateEarliest = Clock.Today.AddYears(-1);
@@ -304,11 +304,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts(awardedDateEarliest)
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDateEarliest))
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDateLatest)));
         EventPublisher.Clear();

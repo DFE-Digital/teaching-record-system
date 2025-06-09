@@ -421,19 +421,19 @@ public class SetProfessionalStatusHandler(
 
         var teacherStatusValue = routeTypeId switch
         {
-            var guid when guid == RouteToProfessionalStatus.ApplyforQtsId => "104", // Apply for QTS -> Qualified Teacher (by virtue of non-UK teaching qualifications)
-            var guid when guid == RouteToProfessionalStatus.EuropeanRecognitionId => "223",  // European Recognition -> Qualified Teacher (by virtue of European teaching qualifications)
-            var guid when guid == RouteToProfessionalStatus.NiRId => "69",  // NI R -> Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
-            var guid when guid == RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId => "103",  // Overseas Trained Teacher Recognition -> Qualified Teacher: By virtue of overseas qualifications
-            var guid when guid == RouteToProfessionalStatus.ScotlandRId => "68",  // Scotland R -> Qualified Teacher: Teachers trained/registered in Scotland
-            var guid when guid == RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId =>
+            var guid when guid == RouteToProfessionalStatusType.ApplyForQtsId => "104", // Apply for QTS -> Qualified Teacher (by virtue of non-UK teaching qualifications)
+            var guid when guid == RouteToProfessionalStatusType.EuropeanRecognitionId => "223",  // European Recognition -> Qualified Teacher (by virtue of European teaching qualifications)
+            var guid when guid == RouteToProfessionalStatusType.NiRId => "69",  // NI R -> Qualified Teacher: Teachers trained/recognised by the Department of Education for Northern Ireland (DENI)
+            var guid when guid == RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId => "103",  // Overseas Trained Teacher Recognition -> Qualified Teacher: By virtue of overseas qualifications
+            var guid when guid == RouteToProfessionalStatusType.ScotlandRId => "68",  // Scotland R -> Qualified Teacher: Teachers trained/registered in Scotland
+            var guid when guid == RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId =>
                 status switch
                 {
                     ProfessionalStatusStatus.Awarded => "90", // International Qualified Teacher Status (Awarded) -> Qualified teacher: by virtue of achieving international qualified teacher status
                     ProfessionalStatusStatus.Withdrawn => null, // International Qualified Teacher Status (Withdrawn) -> null
                     _ => "211" // International Qualified Teacher Status (Not Awarded) -> Trainee Teacher
                 },
-            var guid when guid == RouteToProfessionalStatus.AssessmentOnlyRouteId =>
+            var guid when guid == RouteToProfessionalStatusType.AssessmentOnlyRouteId =>
                 status switch
                 {
                     ProfessionalStatusStatus.Awarded => "100",  // Assessment Only Route (Awarded) -> Qualified Teacher: Assessment Only Route
@@ -485,11 +485,11 @@ public class SetProfessionalStatusHandler(
     {
         var ittProviderName = routeTypeId switch
         {
-            var guid when guid == RouteToProfessionalStatus.ApplyforQtsId => "Non-UK establishment", // Apply for QTS
-            var guid when guid == RouteToProfessionalStatus.EuropeanRecognitionId => "Non-UK establishment", // European Recognition
-            var guid when guid == RouteToProfessionalStatus.NiRId => "UK establishment (Scotland/Northern Ireland)", // NI R
-            var guid when guid == RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId => "Non-UK establishment",  // Overseas Trained Teacher Recognition
-            var guid when guid == RouteToProfessionalStatus.ScotlandRId => "UK establishment (Scotland/Northern Ireland)", // Scotland R
+            var guid when guid == RouteToProfessionalStatusType.ApplyForQtsId => "Non-UK establishment", // Apply for QTS
+            var guid when guid == RouteToProfessionalStatusType.EuropeanRecognitionId => "Non-UK establishment", // European Recognition
+            var guid when guid == RouteToProfessionalStatusType.NiRId => "UK establishment (Scotland/Northern Ireland)", // NI R
+            var guid when guid == RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId => "Non-UK establishment",  // Overseas Trained Teacher Recognition
+            var guid when guid == RouteToProfessionalStatusType.ScotlandRId => "UK establishment (Scotland/Northern Ireland)", // Scotland R
             _ => throw new ArgumentException($"Unknown route type ID: '{routeTypeId}'.", nameof(routeTypeId))
         };
 
@@ -499,10 +499,10 @@ public class SetProfessionalStatusHandler(
 
     public Guid? DeriveInductionExemptionId(Guid routeTypeId) => routeTypeId switch
     {
-        var guid when guid == RouteToProfessionalStatus.ApplyforQtsId => InductionExemptionReason.OverseasTrainedTeacherId, // Apply for QTS -> Overseas Trained Teacher
-        var guid when guid == RouteToProfessionalStatus.NiRId => InductionExemptionReason.PassedInductionInNorthernIrelandId, // NI R -> Passed induction in Northern Ireland
-        var guid when guid == RouteToProfessionalStatus.ScotlandRId => InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId, // Scotland R -> Has, or is eligible for, full registration in Scotland
-        var guid when guid == RouteToProfessionalStatus.QtlsAndSetMembershipId => InductionExemptionReason.QtlsId, // QTLS and SET Membership -> Exempt through QTLS status provided they maintain membership of The Society of Education and Training
+        var guid when guid == RouteToProfessionalStatusType.ApplyForQtsId => InductionExemptionReason.OverseasTrainedTeacherId, // Apply for QTS -> Overseas Trained Teacher
+        var guid when guid == RouteToProfessionalStatusType.NiRId => InductionExemptionReason.PassedInductionInNorthernIrelandId, // NI R -> Passed induction in Northern Ireland
+        var guid when guid == RouteToProfessionalStatusType.ScotlandRId => InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId, // Scotland R -> Has, or is eligible for, full registration in Scotland
+        var guid when guid == RouteToProfessionalStatusType.QtlsAndSetMembershipId => InductionExemptionReason.QtlsId, // QTLS and SET Membership -> Exempt through QTLS status provided they maintain membership of The Society of Education and Training
         _ => null
     };
 

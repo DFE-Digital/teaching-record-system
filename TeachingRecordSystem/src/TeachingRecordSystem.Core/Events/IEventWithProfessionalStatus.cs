@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.Core.Events;
 
 public interface IEventWithProfessionalStatus
 {
-    ProfessionalStatus ProfessionalStatus { get; }
+    RouteToProfessionalStatus RouteToProfessionalStatus { get; }
     ProfessionalStatusPersonAttributes PersonAttributes { get; }
     ProfessionalStatusPersonAttributes OldPersonAttributes { get; }
 }

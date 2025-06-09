@@ -5,7 +5,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     [Fact]
     public async Task Route_BackLink_QualificationPage()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .Single(r => r.Name == "Apprenticeship");
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
@@ -97,7 +97,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     [Fact]
     public async Task Route_AddJourney()
     {
-        var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+        var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .Single(r => r.Name == "Apprenticeship");
         var status = ProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
@@ -161,7 +161,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     [Fact]
     public async Task Route_Add_AwardedJourney()
     {
-        var setRoute = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync(true))
+        var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionReason is not null
                 && r.InductionExemptionReason.RouteImplicitExemption == false

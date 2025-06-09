@@ -11,7 +11,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -20,7 +20,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .Build();
@@ -48,7 +48,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -57,7 +57,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
 
@@ -90,7 +90,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenNoStartDateIsEntered_ReturnsError()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -100,7 +100,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
 
@@ -128,7 +128,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddDays(1);
         var newStartDate = endDate.AddDays(1);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -138,7 +138,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
@@ -172,7 +172,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -181,7 +181,7 @@ public class StartDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
 

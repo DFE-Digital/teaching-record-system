@@ -27,7 +27,7 @@ public class ReferenceDataCache(
     private Task<AlertCategory[]>? _alertCategoriesTask;
     private Task<AlertType[]>? _alertTypesTask;
     private Task<InductionExemptionReason[]>? _inductionExemptionReasonsTask;
-    private Task<RouteToProfessionalStatus[]>? _routesToProfessionalStatusTask;
+    private Task<RouteToProfessionalStatusType[]>? _routesTypesTask;
     private Task<TrainingSubject[]>? _trainingSubjectsTask;
     private Task<Country[]>? _countriesTask;
     private Task<TrainingProvider[]>? _trainingProvidersTask;
@@ -245,16 +245,16 @@ public class ReferenceDataCache(
         return inductionExemptionReasons.Single(er => er.InductionExemptionReasonId == id, $"Could not find induction exemption reason with ID: '{id}'.");
     }
 
-    public async Task<RouteToProfessionalStatus[]> GetRoutesToProfessionalStatusAsync(bool activeOnly = false)
+    public async Task<RouteToProfessionalStatusType[]> GetRouteToProfessionalStatusTypesAsync(bool activeOnly = false)
     {
-        var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
-        return routesToProfessionalStatuses.Where(e => !activeOnly || e.IsActive).OrderBy(x => x.Name).ToArray();
+        var routeTypes = await EnsureRouteToProfessionalStatusTypesAsync();
+        return routeTypes.Where(e => !activeOnly || e.IsActive).OrderBy(x => x.Name).ToArray();
     }
 
-    public async Task<RouteToProfessionalStatus> GetRouteToProfessionalStatusByIdAsync(Guid id)
+    public async Task<RouteToProfessionalStatusType> GetRouteToProfessionalStatusTypeByIdAsync(Guid id)
     {
-        var routesToProfessionalStatuses = await EnsureRoutesToProfessionalStatusAsync();
-        return routesToProfessionalStatuses.Single(r => r.RouteToProfessionalStatusId == id, $"Could not find route to professional status with ID: '{id}'.");
+        var routeTypes = await EnsureRouteToProfessionalStatusTypesAsync();
+        return routeTypes.Single(r => r.RouteToProfessionalStatusTypeId == id, $"Could not find route to professional status with ID: '{id}'.");
     }
 
     public async Task<TrainingSubject[]> GetTrainingSubjectsAsync(bool activeOnly = false)
@@ -390,9 +390,9 @@ public class ReferenceDataCache(
                 return await dbContext.InductionExemptionReasons.AsNoTracking().ToArrayAsync();
             });
 
-    private Task<RouteToProfessionalStatus[]> EnsureRoutesToProfessionalStatusAsync() =>
+    private Task<RouteToProfessionalStatusType[]> EnsureRouteToProfessionalStatusTypesAsync() =>
         LazyInitializer.EnsureInitialized(
-            ref _routesToProfessionalStatusTask,
+            ref _routesTypesTask,
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
@@ -455,7 +455,7 @@ public class ReferenceDataCache(
         await EnsureAlertCategoriesAsync();
         await EnsureAlertTypesAsync();
         await EnsureInductionExemptionReasonsAsync();
-        await EnsureRoutesToProfessionalStatusAsync();
+        await EnsureRouteToProfessionalStatusTypesAsync();
         await EnsureTrainingCountriesAsync();
         await EnsureTrainingSubjectsAsync();
         await EnsureTrainingProvidersAsync();

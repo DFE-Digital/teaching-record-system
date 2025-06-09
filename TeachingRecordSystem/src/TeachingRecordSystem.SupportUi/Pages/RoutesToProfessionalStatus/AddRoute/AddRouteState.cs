@@ -31,19 +31,19 @@ public class AddRouteState : IRegisterJourney
             return;
         }
 
-        RouteToProfessionalStatusId = professionalStatusInfo.ProfessionalStatus.RouteToProfessionalStatusId;
-        Status = professionalStatusInfo.ProfessionalStatus.Status;
-        AwardedDate = professionalStatusInfo.ProfessionalStatus.AwardedDate;
-        TrainingStartDate = professionalStatusInfo.ProfessionalStatus.TrainingStartDate;
-        TrainingEndDate = professionalStatusInfo.ProfessionalStatus.TrainingEndDate;
-        TrainingSubjectIds = professionalStatusInfo.ProfessionalStatus.TrainingSubjectIds;
-        TrainingAgeSpecialismType = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismType;
-        TrainingAgeSpecialismRangeFrom = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismRangeFrom;
-        TrainingAgeSpecialismRangeTo = professionalStatusInfo.ProfessionalStatus.TrainingAgeSpecialismRangeTo;
-        TrainingCountryId = professionalStatusInfo.ProfessionalStatus.TrainingCountryId;
-        TrainingProviderId = professionalStatusInfo.ProfessionalStatus.TrainingProviderId;
-        IsExemptFromInduction = professionalStatusInfo.ProfessionalStatus.ExemptFromInduction;
-        DegreeTypeId = professionalStatusInfo.ProfessionalStatus.DegreeTypeId;
+        RouteToProfessionalStatusId = professionalStatusInfo.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId;
+        Status = professionalStatusInfo.RouteToProfessionalStatus.Status;
+        AwardedDate = professionalStatusInfo.RouteToProfessionalStatus.AwardedDate;
+        TrainingStartDate = professionalStatusInfo.RouteToProfessionalStatus.TrainingStartDate;
+        TrainingEndDate = professionalStatusInfo.RouteToProfessionalStatus.TrainingEndDate;
+        TrainingSubjectIds = professionalStatusInfo.RouteToProfessionalStatus.TrainingSubjectIds;
+        TrainingAgeSpecialismType = professionalStatusInfo.RouteToProfessionalStatus.TrainingAgeSpecialismType;
+        TrainingAgeSpecialismRangeFrom = professionalStatusInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom;
+        TrainingAgeSpecialismRangeTo = professionalStatusInfo.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo;
+        TrainingCountryId = professionalStatusInfo.RouteToProfessionalStatus.TrainingCountryId;
+        TrainingProviderId = professionalStatusInfo.RouteToProfessionalStatus.TrainingProviderId;
+        IsExemptFromInduction = professionalStatusInfo.RouteToProfessionalStatus.ExemptFromInduction;
+        DegreeTypeId = professionalStatusInfo.RouteToProfessionalStatus.DegreeTypeId;
         Initialized = true;
     }
 }

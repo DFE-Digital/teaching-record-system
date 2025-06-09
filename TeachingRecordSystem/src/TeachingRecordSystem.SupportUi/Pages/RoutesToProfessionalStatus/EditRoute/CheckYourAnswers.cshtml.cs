@@ -47,15 +47,15 @@ public class CheckYourAnswersModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus;
-        var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+        var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus;
+        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
 
         professionalStatus.Update(
             allRoutes,
             s =>
             {
                 s.Status = RouteDetail.Status;
-                s.RouteToProfessionalStatusId = RouteDetail.RouteToProfessionalStatus.RouteToProfessionalStatusId;
+                s.RouteToProfessionalStatusTypeId = RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId;
                 s.AwardedDate = RouteDetail.AwardedDate;
                 s.TrainingStartDate = RouteDetail.TrainingStartDate;
                 s.TrainingEndDate = RouteDetail.TrainingEndDate;
@@ -102,7 +102,7 @@ public class CheckYourAnswersModel(
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         var status = JourneyInstance!.State.Status;
 
         if (!IsComplete(route, status) || !JourneyInstance!.State.ChangeReasonIsComplete)
@@ -120,7 +120,7 @@ public class CheckYourAnswersModel(
         var hasImplicitExemption = route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         RouteDetail = new RouteDetailViewModel
         {
-            RouteToProfessionalStatus = route,
+            RouteToProfessionalStatusType = route,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
@@ -149,7 +149,7 @@ public class CheckYourAnswersModel(
             null;
     }
 
-    private bool IsComplete(RouteToProfessionalStatus route, ProfessionalStatusStatus status)
+    private bool IsComplete(RouteToProfessionalStatusType route, ProfessionalStatusStatus status)
     {
         var errors = NotCompleteError.None |
             ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory

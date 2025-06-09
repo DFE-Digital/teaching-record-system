@@ -9,7 +9,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -18,7 +18,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
             .Build();
 
@@ -51,7 +51,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task NoCountrySelected_ShowsError()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -61,7 +61,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -82,7 +82,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_SelectCountry_PersistsSelection()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -92,7 +92,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -120,7 +120,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenCountryIsEntered_RedirectsToAgeRangePage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -130,7 +130,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(

@@ -10,16 +10,16 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ShowsExistingStatus()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -44,16 +44,16 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusIsNotAwardedOrApprovedStatus_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
 
@@ -84,17 +84,17 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusMovesToAwarded_PersistsDataAndRedirectsToEndDate()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithCurrentStatus(ProfessionalStatusStatus.UnderAssessment)
             .Build();
@@ -127,18 +127,18 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var awardedDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var newStatus = ProfessionalStatusStatus.UnderAssessment;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(ProfessionalStatusStatus.Awarded)
             .WithAwardedDate(awardedDate)
             .WithInductionExemption(true)
@@ -171,7 +171,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_StatusMovesToAwarded_RouteHasImplictExemption_ExemptionSetToTrue()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId.HasValue)
             .Join(
                 (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption),
@@ -186,11 +186,11 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.UnderAssessment)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithCurrentStatus(ProfessionalStatusStatus.UnderAssessment)
             .Build();
@@ -223,17 +223,17 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var awardDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.Awarded;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithAwardedDate(awardDate)
             .Build();
@@ -264,16 +264,16 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithCurrentStatus(status)
             .Build();
