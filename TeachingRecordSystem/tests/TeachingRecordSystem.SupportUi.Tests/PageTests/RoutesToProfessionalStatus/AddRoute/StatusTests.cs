@@ -12,7 +12,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
-        var status = ProfessionalStatusStatus.InTraining;
+        var status = RouteToProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
@@ -38,10 +38,10 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("Apprenticeship", ProfessionalStatusStatus.InTraining, "start-date")]
-    [InlineData("Apply for QTS", ProfessionalStatusStatus.Approved, "award-date")]
-    [InlineData("Apprenticeship", ProfessionalStatusStatus.Failed, "country")]
-    public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, ProfessionalStatusStatus status, string expected)
+    [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-date")]
+    [InlineData("Apply for QTS", RouteToProfessionalStatusStatus.Approved, "award-date")]
+    [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.Failed, "country")]
+    public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, RouteToProfessionalStatusStatus status, string expected)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())

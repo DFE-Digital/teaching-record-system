@@ -5,7 +5,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using ProfessionalStatusStatus = TeachingRecordSystem.Core.Models.ProfessionalStatusStatus;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -54,9 +53,9 @@ public class SetQtlsHandler(
             {
                 var professionalStatus = PostgresModels.RouteToProfessionalStatus.Create(
                     person,
-                    allRoutes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                    allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
                     routeToProfessionalStatusTypeId: qtlsRouteId,
-                    status: ProfessionalStatusStatus.Awarded,
+                    status: RouteToProfessionalStatusStatus.Awarded,
                     awardedDate: command.QtsDate,
                     trainingStartDate: null,
                     trainingEndDate: null,
@@ -78,7 +77,7 @@ public class SetQtlsHandler(
             else
             {
                 existingQualification.Update(
-                    allRoutes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                    allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
                     ps => ps.AwardedDate = command.QtsDate,
                     changeReason: null,
                     changeReasonDetail: null,
@@ -96,7 +95,7 @@ public class SetQtlsHandler(
         else if (existingQualification is not null)
         {
             existingQualification.Delete(
-                allRoutes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
                 deletionReason: null,
                 deletionReasonDetail: null,
                 evidenceFile: null,

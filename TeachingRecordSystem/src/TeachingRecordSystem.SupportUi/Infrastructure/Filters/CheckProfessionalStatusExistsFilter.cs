@@ -23,7 +23,7 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
             return;
         }
 
-        var request = dbContext.ProfessionalStatuses
+        var request = dbContext.RouteToProfessionalStatuses
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update") // https://github.com/dotnet/efcore/issues/26042
             .Include(ps => ps.Person)
             .ThenInclude(p => p!.Qualifications)

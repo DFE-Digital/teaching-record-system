@@ -9,7 +9,7 @@ public partial class TestData
     {
         private Guid? _personId = null;
         private Guid? _routeToProfessionalStatusId;
-        private ProfessionalStatusStatus _status;
+        private RouteToProfessionalStatusStatus _status;
         private DateOnly? _awardedDate;
         private DateOnly? _trainingStartDate;
         private DateOnly? _trainingEndDate;
@@ -34,7 +34,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithStatus(ProfessionalStatusStatus status)
+        public CreatePersonProfessionalStatusBuilder WithStatus(RouteToProfessionalStatusStatus status)
         {
             _status = status;
             return this;
@@ -134,11 +134,11 @@ public partial class TestData
             }
 
             var personId = createPersonBuilder.PersonId;
-            var allRoutes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
+            var allRouteTypes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
 
             var professionalStatus = RouteToProfessionalStatus.Create(
                 person,
-                allRoutes,
+                allRouteTypes,
                 _routeToProfessionalStatusId!.Value,
                 _status,
                 _awardedDate,
@@ -154,10 +154,9 @@ public partial class TestData
                 _exemptFromInduction,
                 _createdByUser,
                 DateTime.UtcNow,
-                out var @createdEvent
-                );
+                out var @createdEvent);
 
-            dbContext.ProfessionalStatuses.Add(professionalStatus);
+            dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
             dbContext.AddEventWithoutBroadcast(createdEvent);
 
             return (professionalStatus.QualificationId, [createdEvent]);

@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class AddRouteStateBuilder()
 {
     private Guid? _routeToProfessionalStatusId;
-    private ProfessionalStatusStatus? _status;
+    private RouteToProfessionalStatusStatus? _status;
     private DateOnly? _awardedDate;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
@@ -40,7 +40,7 @@ public class AddRouteStateBuilder()
         _trainingStartDate = clock.Today.AddYears(-1);
         _trainingEndDate = clock.Today.AddDays(-1);
         _awardedDate = clock.Today;
-        _status = ProfessionalStatusStatus.Awarded;
+        _status = RouteToProfessionalStatusStatus.Awarded;
         return this;
     }
 
@@ -50,7 +50,7 @@ public class AddRouteStateBuilder()
         return this;
     }
 
-    public AddRouteStateBuilder WithStatus(ProfessionalStatusStatus status)
+    public AddRouteStateBuilder WithStatus(RouteToProfessionalStatusStatus status)
     {
         _status = status;
         return this;

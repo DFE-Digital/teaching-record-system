@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 public class RouteDetailModel()
 {
     public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; set; }
-    public ProfessionalStatusStatus Status { get; set; }
+    public RouteToProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }

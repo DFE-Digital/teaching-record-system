@@ -108,7 +108,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "alert_types",
                     "alert_categories",
                     "induction_exemption_reasons",
-                    "routes_to_professional_status",
+                    "route_to_professional_status_types",
                     "countries",
                     "training_subjects",
                     "degree_types"

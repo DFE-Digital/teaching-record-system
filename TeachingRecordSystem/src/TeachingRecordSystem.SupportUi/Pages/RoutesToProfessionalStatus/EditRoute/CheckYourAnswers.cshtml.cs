@@ -52,21 +52,21 @@ public class CheckYourAnswersModel(
 
         professionalStatus.Update(
             allRoutes,
-            s =>
+            r =>
             {
-                s.Status = RouteDetail.Status;
-                s.RouteToProfessionalStatusTypeId = RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId;
-                s.AwardedDate = RouteDetail.AwardedDate;
-                s.TrainingStartDate = RouteDetail.TrainingStartDate;
-                s.TrainingEndDate = RouteDetail.TrainingEndDate;
-                s.TrainingSubjectIds = RouteDetail.TrainingSubjectIds ?? [];
-                s.TrainingAgeSpecialismType = RouteDetail.TrainingAgeSpecialismType;
-                s.TrainingAgeSpecialismRangeFrom = RouteDetail.TrainingAgeSpecialismRangeFrom;
-                s.TrainingAgeSpecialismRangeTo = RouteDetail.TrainingAgeSpecialismRangeTo;
-                s.TrainingCountryId = RouteDetail.TrainingCountryId;
-                s.TrainingProviderId = RouteDetail.TrainingProviderId;
-                s.ExemptFromInduction = RouteDetail.IsExemptFromInduction;
-                s.DegreeTypeId = RouteDetail.DegreeTypeId;
+                r.Status = RouteDetail.Status;
+                r.RouteToProfessionalStatusTypeId = RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId;
+                r.AwardedDate = RouteDetail.AwardedDate;
+                r.TrainingStartDate = RouteDetail.TrainingStartDate;
+                r.TrainingEndDate = RouteDetail.TrainingEndDate;
+                r.TrainingSubjectIds = RouteDetail.TrainingSubjectIds ?? [];
+                r.TrainingAgeSpecialismType = RouteDetail.TrainingAgeSpecialismType;
+                r.TrainingAgeSpecialismRangeFrom = RouteDetail.TrainingAgeSpecialismRangeFrom;
+                r.TrainingAgeSpecialismRangeTo = RouteDetail.TrainingAgeSpecialismRangeTo;
+                r.TrainingCountryId = RouteDetail.TrainingCountryId;
+                r.TrainingProviderId = RouteDetail.TrainingProviderId;
+                r.ExemptFromInduction = RouteDetail.IsExemptFromInduction;
+                r.DegreeTypeId = RouteDetail.DegreeTypeId;
             },
             changeReason: ChangeReason?.GetDisplayName(),
             ChangeReasonDetail.ChangeReasonDetail,
@@ -149,7 +149,7 @@ public class CheckYourAnswersModel(
             null;
     }
 
-    private bool IsComplete(RouteToProfessionalStatusType route, ProfessionalStatusStatus status)
+    private bool IsComplete(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status)
     {
         var errors = NotCompleteError.None |
             ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory

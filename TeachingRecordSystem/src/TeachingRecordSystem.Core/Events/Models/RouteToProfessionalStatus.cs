@@ -3,7 +3,7 @@ namespace TeachingRecordSystem.Core.Events.Models;
 public record RouteToProfessionalStatus
 {
     public required Guid RouteToProfessionalStatusTypeId { get; init; }
-    public required ProfessionalStatusStatus Status { get; init; }
+    public required RouteToProfessionalStatusStatus Status { get; init; }
     public required DateOnly? AwardedDate { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
     public required DateOnly? TrainingEndDate { get; init; }
@@ -15,6 +15,7 @@ public record RouteToProfessionalStatus
     public required Guid? TrainingProviderId { get; init; }
     public required bool? ExemptFromInduction { get; set; }
     public required Guid? DegreeTypeId { get; init; }
+    public required bool? ExemptFromInductionDueToQtsDate { get; init; }
 
     public static RouteToProfessionalStatus FromModel(DataStore.Postgres.Models.RouteToProfessionalStatus model) => new()
     {
@@ -30,6 +31,7 @@ public record RouteToProfessionalStatus
         TrainingCountryId = model.TrainingCountryId,
         TrainingProviderId = model.TrainingProviderId,
         ExemptFromInduction = model.ExemptFromInduction,
+        ExemptFromInductionDueToQtsDate = model.ExemptFromInductionDueToQtsDate,
         DegreeTypeId = model.DegreeTypeId
     };
 }

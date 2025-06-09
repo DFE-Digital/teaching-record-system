@@ -11,7 +11,7 @@ public class AddRouteState : IRegisterJourney
     public bool Initialized { get; set; }
 
     public Guid? RouteToProfessionalStatusId { get; set; }
-    public ProfessionalStatusStatus? Status { get; set; }
+    public RouteToProfessionalStatusStatus? Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }

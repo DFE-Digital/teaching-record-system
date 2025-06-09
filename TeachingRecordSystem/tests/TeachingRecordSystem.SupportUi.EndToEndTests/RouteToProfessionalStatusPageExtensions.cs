@@ -10,7 +10,7 @@ public static class RouteToProfessionalStatusPageExtensions
         return checkbox.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
-    public static Task SelectStatusAsync(this IPage page, ProfessionalStatusStatus status)
+    public static Task SelectStatusAsync(this IPage page, RouteToProfessionalStatusStatus status)
     {
         var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();

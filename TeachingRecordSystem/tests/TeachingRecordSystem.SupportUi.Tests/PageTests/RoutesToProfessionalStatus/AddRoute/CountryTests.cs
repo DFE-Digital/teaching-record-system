@@ -19,7 +19,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Deferred)
+            .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(

@@ -107,7 +107,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
-        var status = ProfessionalStatusStatus.InTraining;
+        var status = RouteToProfessionalStatusStatus.InTraining;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
         DateOnly awardedDate = new DateOnly(2024, 01, 01);
@@ -153,10 +153,10 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     }
 
     [Theory]
-    [InlineData(ProfessionalStatusStatus.Approved, false, "No")]
-    [InlineData(ProfessionalStatusStatus.Approved, true, "Yes")]
-    [InlineData(ProfessionalStatusStatus.InTraining, null, "Not provided")]
-    public async Task Get_PersonWithRouteToProfessionalStatus_RouteAllowsInductionExemption_DisplaysExpectedContent(ProfessionalStatusStatus status, bool? isExempt, string expectedContent)
+    [InlineData(RouteToProfessionalStatusStatus.Approved, false, "No")]
+    [InlineData(RouteToProfessionalStatusStatus.Approved, true, "Yes")]
+    [InlineData(RouteToProfessionalStatusStatus.InTraining, null, "Not provided")]
+    public async Task Get_PersonWithRouteToProfessionalStatus_RouteAllowsInductionExemption_DisplaysExpectedContent(RouteToProfessionalStatusStatus status, bool? isExempt, string expectedContent)
     {
         // Arrange
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);

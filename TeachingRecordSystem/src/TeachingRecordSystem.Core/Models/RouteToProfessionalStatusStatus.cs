@@ -2,8 +2,7 @@ using System.Reflection;
 
 namespace TeachingRecordSystem.Core.Models;
 
-
-public enum ProfessionalStatusStatus
+public enum RouteToProfessionalStatusStatus
 {
     [ProfessionalStatusStatusInfo("In training",
         startDate: FieldRequirement.Mandatory,
@@ -16,6 +15,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     InTraining = 0,
+
     [ProfessionalStatusStatusInfo("Awarded",
         startDate: FieldRequirement.Mandatory,
         endDate: FieldRequirement.Mandatory,
@@ -27,6 +27,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     Awarded = 1,
+
     [ProfessionalStatusStatusInfo("Deferred",
         startDate: FieldRequirement.NotApplicable,
         endDate: FieldRequirement.NotApplicable,
@@ -38,6 +39,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     Deferred = 2,
+
     [ProfessionalStatusStatusInfo("Deferred for skills tests",
         startDate: FieldRequirement.NotApplicable,
         endDate: FieldRequirement.NotApplicable,
@@ -49,6 +51,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     DeferredForSkillsTest = 3,
+
     [ProfessionalStatusStatusInfo("Failed",
         startDate: FieldRequirement.NotApplicable,
         endDate: FieldRequirement.NotApplicable,
@@ -60,6 +63,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     Failed = 4,
+
     [ProfessionalStatusStatusInfo("Withdrawn",
         startDate: FieldRequirement.NotApplicable,
         endDate: FieldRequirement.NotApplicable,
@@ -71,6 +75,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.NotApplicable,
         subjects: FieldRequirement.NotApplicable)]
     Withdrawn = 5,
+
     [ProfessionalStatusStatusInfo("Under assessment",
         startDate: FieldRequirement.Mandatory,
         endDate: FieldRequirement.Mandatory,
@@ -82,6 +87,7 @@ public enum ProfessionalStatusStatus
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
     UnderAssessment = 6,
+
     [ProfessionalStatusStatusInfo("Approved",
         startDate: FieldRequirement.Mandatory,
         endDate: FieldRequirement.Mandatory,
@@ -97,40 +103,40 @@ public enum ProfessionalStatusStatus
 
 public static class ProfessionalStatusStatusRegistry
 {
-    private static readonly IReadOnlyDictionary<ProfessionalStatusStatus, ProfessionalStatusStatusInfo> _info =
-        Enum.GetValues<ProfessionalStatusStatus>().ToDictionary(s => s, GetInfo);
+    private static readonly IReadOnlyDictionary<RouteToProfessionalStatusStatus, ProfessionalStatusStatusInfo> _info =
+        Enum.GetValues<RouteToProfessionalStatusStatus>().ToDictionary(s => s, GetInfo);
 
     public static IReadOnlyCollection<ProfessionalStatusStatusInfo> All => _info.Values.OrderBy(s => s.Name).ToArray();
 
-    public static string GetName(this ProfessionalStatusStatus status) => _info[status].Name;
+    public static string GetName(this RouteToProfessionalStatusStatus status) => _info[status].Name;
 
-    public static string GetTitle(this ProfessionalStatusStatus status) => _info[status].Title;
+    public static string GetTitle(this RouteToProfessionalStatusStatus status) => _info[status].Title;
 
-    public static FieldRequirement GetStartDateRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingStartDateRequired;
+    public static FieldRequirement GetStartDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingStartDateRequired;
 
-    public static FieldRequirement GetEndDateRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingEndDateRequired;
+    public static FieldRequirement GetEndDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingEndDateRequired;
 
-    public static FieldRequirement GetAwardDateRequirement(this ProfessionalStatusStatus status) => _info[status].AwardDateRequired;
+    public static FieldRequirement GetAwardDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].AwardDateRequired;
 
-    public static FieldRequirement GetInductionExemptionRequirement(this ProfessionalStatusStatus status) => _info[status].InductionExemptionRequired;
+    public static FieldRequirement GetInductionExemptionRequirement(this RouteToProfessionalStatusStatus status) => _info[status].InductionExemptionRequired;
 
-    public static FieldRequirement GetTrainingProviderRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingProviderRequired;
+    public static FieldRequirement GetTrainingProviderRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingProviderRequired;
 
-    public static FieldRequirement GetDegreeTypeRequirement(this ProfessionalStatusStatus status) => _info[status].DegreeTypeRequired;
+    public static FieldRequirement GetDegreeTypeRequirement(this RouteToProfessionalStatusStatus status) => _info[status].DegreeTypeRequired;
 
-    public static FieldRequirement GetCountryRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingCountryRequired;
+    public static FieldRequirement GetCountryRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingCountryRequired;
 
-    public static FieldRequirement GetAgeSpecialismRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingAgeSpecialismTypeRequired;
+    public static FieldRequirement GetAgeSpecialismRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingAgeSpecialismTypeRequired;
 
-    public static FieldRequirement GetSubjectsRequirement(this ProfessionalStatusStatus status) => _info[status].TrainingSubjectsRequired;
+    public static FieldRequirement GetSubjectsRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingSubjectsRequired;
 
-    private static ProfessionalStatusStatusInfo GetInfo(ProfessionalStatusStatus status)
+    private static ProfessionalStatusStatusInfo GetInfo(RouteToProfessionalStatusStatus status)
     {
         var attr = status.GetType()
                .GetMember(status.ToString())
                .Single()
                .GetCustomAttribute<ProfessionalStatusStatusInfoAttribute>() ??
-           throw new Exception($"{nameof(ProfessionalStatusStatus)}.{status} is missing the {nameof(ProfessionalStatusStatusInfoAttribute)} attribute.");
+           throw new Exception($"{nameof(RouteToProfessionalStatusStatus)}.{status} is missing the {nameof(ProfessionalStatusStatusInfoAttribute)} attribute.");
 
         return new ProfessionalStatusStatusInfo(
             status, attr.Name, attr.StartDate, attr.EndDate, attr.AwardDate, attr.InductionExemption, attr.TrainingProvider, attr.DegreeType, attr.Country, attr.AgeRange, attr.Subjects);
@@ -138,7 +144,7 @@ public static class ProfessionalStatusStatusRegistry
 }
 
 public sealed record ProfessionalStatusStatusInfo(
-    ProfessionalStatusStatus Value,
+    RouteToProfessionalStatusStatus Value,
     string Name,
     FieldRequirement TrainingStartDateRequired,
     FieldRequirement TrainingEndDateRequired,
