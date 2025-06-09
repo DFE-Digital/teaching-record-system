@@ -67,7 +67,8 @@ public class ExemptionReasonModel(
             else
             {
                 List<string> messages = new();
-                foreach (var route in RoutesWithInductionExemptions!.Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId || r.RouteToProfessionalStatusId == RouteToProfessionalStatus.NiRId))
+                foreach (var route in RoutesWithInductionExemptions!
+                    .Where(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)))
                 {
                     messages.Add($"To add/remove the induction exemption reason of: \"{route.InductionExemptionReasonName}\" please modify the \"{route.RouteToProfessionalStatusName}\" route.");
                 }
@@ -150,19 +151,19 @@ public class ExemptionReasonModel(
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
             RoutesWithInductionExemptions = DbContext.ProfessionalStatuses
-                .Include(p => p.RouteToProfessionalStatus)
+                .Include(p => p.RouteToProfessionalStatusType)
                 .ThenInclude(r => r!.InductionExemptionReason)
                 .Where(
                     p => p.PersonId == PersonId &&
-                    p.RouteToProfessionalStatus != null &&
+                    p.RouteToProfessionalStatusType != null &&
                     p.ExemptFromInduction == true &&
-                    p.RouteToProfessionalStatus.InductionExemptionReason != null)
+                    p.RouteToProfessionalStatusType.InductionExemptionReason != null)
                 .Select(r => new RouteWithExemption()
                 {
-                    InductionExemptionReasonId = r.RouteToProfessionalStatus!.InductionExemptionReasonId!.Value,
-                    RouteToProfessionalStatusId = r.RouteToProfessionalStatusId,
-                    InductionExemptionReasonName = r.RouteToProfessionalStatus.InductionExemptionReason!.Name,
-                    RouteToProfessionalStatusName = r.RouteToProfessionalStatus.Name
+                    InductionExemptionReasonId = r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value,
+                    RouteToProfessionalStatusId = r.RouteToProfessionalStatusTypeId,
+                    InductionExemptionReasonName = r.RouteToProfessionalStatusType.InductionExemptionReason!.Name,
+                    RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
                 });
         }
         if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any())

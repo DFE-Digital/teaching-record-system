@@ -88,7 +88,7 @@
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Route induction exemption reason</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value>@($"{exemptedRoute.RouteToProfessionalStatus?.InductionExemptionReason?.Name} - {exemptedRoute.RouteToProfessionalStatus?.Name}")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value>@($"{exemptedRoute.RouteToProfessionalStatusType?.InductionExemptionReason?.Name} - {exemptedRoute.RouteToProfessionalStatusType?.Name}")</govuk-summary-list-row-value>
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action href="@LinkGenerator.RouteEditDetail(exemptedRoute.QualificationId, null, fromInductions: true)">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>

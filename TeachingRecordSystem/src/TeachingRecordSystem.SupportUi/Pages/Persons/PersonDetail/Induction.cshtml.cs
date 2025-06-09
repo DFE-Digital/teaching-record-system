@@ -40,7 +40,7 @@ public class InductionModel(
 
     public IEnumerable<string>? ExemptionReasonNames { get; set; }
 
-    public IEnumerable<ProfessionalStatus>? InductionExemptedRoutes { get; set; }
+    public IEnumerable<RouteToProfessionalStatus>? InductionExemptedRoutes { get; set; }
 
     public string InductionIsManagedByCpdWarning => Status switch
     {
@@ -84,9 +84,9 @@ public class InductionModel(
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
             InductionExemptedRoutes = dbContext.ProfessionalStatuses
-                .Include(r => r.RouteToProfessionalStatus)
+                .Include(r => r.RouteToProfessionalStatusType)
                 .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
-                .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatus != null && r.ExemptFromInduction == true);
+                .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);
         }
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))

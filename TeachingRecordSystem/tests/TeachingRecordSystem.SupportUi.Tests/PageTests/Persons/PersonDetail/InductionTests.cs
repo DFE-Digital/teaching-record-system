@@ -53,12 +53,12 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     public static IEnumerable<object[]> InductionExemptedRoutes()
     {
-        yield return new object[] { RouteToProfessionalStatus.ScotlandRId, true };
-        yield return new object[] { RouteToProfessionalStatus.NiRId, true };
-        yield return new object[] { RouteToProfessionalStatus.QtlsAndSetMembershipId, true };
-        yield return new object[] { RouteToProfessionalStatus.ScotlandRId, false };
-        yield return new object[] { RouteToProfessionalStatus.NiRId, false };
-        yield return new object[] { RouteToProfessionalStatus.QtlsAndSetMembershipId, false };
+        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, true };
+        yield return new object[] { RouteToProfessionalStatusType.NiRId, true };
+        yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, true };
+        yield return new object[] { RouteToProfessionalStatusType.ScotlandRId, false };
+        yield return new object[] { RouteToProfessionalStatusType.NiRId, false };
+        yield return new object[] { RouteToProfessionalStatusType.QtlsAndSetMembershipId, false };
     }
     [Theory]
     [MemberData(nameof(InductionExemptedRoutes))]
@@ -66,14 +66,14 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var awardedDate = Clock.Today;
-        var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.RouteToProfessionalStatusId == routeId)
+        var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.RouteToProfessionalStatusTypeId == routeId)
             .Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithInductionStatus(InductionStatus.Exempt)
             .WithProfessionalStatus(r => r
-                .WithRoute(routeWithExemption.RouteToProfessionalStatusId)
+                .WithRoute(routeWithExemption.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));
@@ -104,14 +104,14 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
         var awardedDate = Clock.Today;
-        var routeWithExemption = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId)
+        var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
             .Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithInductionStatus(InductionStatus.Exempt)
             .WithProfessionalStatus(r => r
-                .WithRoute(routeWithExemption.RouteToProfessionalStatusId)
+                .WithRoute(routeWithExemption.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
