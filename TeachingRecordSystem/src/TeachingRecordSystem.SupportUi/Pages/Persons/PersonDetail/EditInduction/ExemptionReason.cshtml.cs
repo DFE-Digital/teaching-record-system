@@ -16,17 +16,25 @@ public class ExemptionReasonModel(
     IFeatureProvider featureProvider)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
+    protected class RouteWithExemption
+    {
+        public required Guid RouteToProfessionalStatusId { get; init; }
+        public required Guid InductionExemptionReasonId { get; init; }
+        public required string RouteToProfessionalStatusName { get; init; }
+        public required string InductionExemptionReasonName { get; init; }
+    }
+
     [BindProperty]
     [Display(Name = "Why are they exempt from induction?")]
     public Guid[] ExemptionReasonIds { get; set; } = [];
 
     public Dictionary<ExemptionReasonCategory, IEnumerable<InductionExemptionReason>> ExemptionReasons { get; set; } = new();
 
-    public IEnumerable<ProfessionalStatus>? RoutesWithInductionExemptions;
+    protected IEnumerable<RouteWithExemption>? RoutesWithInductionExemptions;
 
     public bool ShowInductionExemptionReasonNotAvailableMessage => featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus) &&
         (RoutesWithInductionExemptions?
-        .Any(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId || r.RouteToProfessionalStatusId == RouteToProfessionalStatus.NiRId) ?? false);
+        .Any(r => ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld.Contains(r.InductionExemptionReasonId)) ?? false);
 
     public string[]? InductionExemptionFromRoutesMessages
     {
@@ -41,7 +49,7 @@ public class ExemptionReasonModel(
                 List<string> messages = new();
                 foreach (var route in RoutesWithInductionExemptions!)
                 {
-                    messages.Add($"This person has an induction exemption \"{route.RouteToProfessionalStatus?.InductionExemptionReason?.Name}\" on the \"{route.RouteToProfessionalStatus?.Name}\" route.");
+                    messages.Add($"This person has an induction exemption \"{route.InductionExemptionReasonName}\" on the \"{route.RouteToProfessionalStatusName}\" route.");
                 }
                 return messages.ToArray();
             }
@@ -61,7 +69,7 @@ public class ExemptionReasonModel(
                 List<string> messages = new();
                 foreach (var route in RoutesWithInductionExemptions!.Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.ScotlandRId || r.RouteToProfessionalStatusId == RouteToProfessionalStatus.NiRId))
                 {
-                    messages.Add($"To add/remove the induction exemption reason of: \"{route.RouteToProfessionalStatus?.InductionExemptionReason?.Name}\" please modify the \"{route.RouteToProfessionalStatus?.Name}\" route.");
+                    messages.Add($"To add/remove the induction exemption reason of: \"{route.InductionExemptionReasonName}\" please modify the \"{route.RouteToProfessionalStatusName}\" route.");
                 }
                 return messages.ToArray();
             }
@@ -147,15 +155,23 @@ public class ExemptionReasonModel(
                 .Where(
                     p => p.PersonId == PersonId &&
                     p.RouteToProfessionalStatus != null &&
-                    p.ExemptFromInduction == true);
+                    p.ExemptFromInduction == true &&
+                    p.RouteToProfessionalStatus.InductionExemptionReason != null)
+                .Select(r => new RouteWithExemption()
+                {
+                    InductionExemptionReasonId = r.RouteToProfessionalStatus!.InductionExemptionReasonId!.Value,
+                    RouteToProfessionalStatusId = r.RouteToProfessionalStatusId,
+                    InductionExemptionReasonName = r.RouteToProfessionalStatus.InductionExemptionReason!.Name,
+                    RouteToProfessionalStatusName = r.RouteToProfessionalStatus.Name
+                });
         }
         if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any())
         {
             var exemptionReasonIdsToExclude = ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld
                 .Join(RoutesWithInductionExemptions,
                     guid => guid,
-                    r => r.RouteToProfessionalStatus!.InductionExemptionReasonId,
-                    (guid, route) => route.RouteToProfessionalStatus!.InductionExemptionReasonId);
+                    r => r.InductionExemptionReasonId,
+                    (guid, route) => route.InductionExemptionReasonId);
 
             var exemptionReasonsToDisplay = ExemptionReasonCategories.ExemptionReasonIds
                 .Where(id => !exemptionReasonIdsToExclude.Contains(id))
@@ -178,10 +194,5 @@ public class ExemptionReasonModel(
 
             ExemptionReasons = ExemptionReasonCategories.CreateFilteredDictionaryFromIds(exemptionReasonsToDisplay);
         }
-
-        //ExemptionReasons = (await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-        //    .Where(e => !RoutesWithInductionExemptions?.Select(r =>
-        //        r.RouteToProfessionalStatus?.InductionExemptionReasonId).Contains(e.InductionExemptionReasonId) ?? true) // CML TODO check / tidy
-        //    .ToArray();
     }
 }

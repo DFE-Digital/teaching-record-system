@@ -29,10 +29,10 @@
             }
             <govuk-checkboxes asp-for="ExemptionReasonIds">
                 <govuk-checkboxes-hint class="trs-checkboxes_hint">Select all that apply</govuk-checkboxes-hint>
-                @foreach (var headingGroup in Model.ExemptionReasons)
+                @foreach (var category in Model.ExemptionReasons)
                 {
-                    <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@headingGroup.Key.GetDisplayName()</govuk-checkboxes-divider>
-                    @foreach (var exemptionReason in headingGroup.Value)
+                    <govuk-checkboxes-divider class="trs-checkboxes__divider--heading-s">@category.Key.GetDisplayName()</govuk-checkboxes-divider>
+                    @foreach (var exemptionReason in category.Value)
                     {
                         <govuk-checkboxes-item value="@exemptionReason.InductionExemptionReasonId" checked="@Model.ExemptionReasonIds.Contains(exemptionReason.InductionExemptionReasonId)">@exemptionReason.Name</govuk-checkboxes-item>
                     }

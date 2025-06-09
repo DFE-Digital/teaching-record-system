@@ -1,3 +1,4 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
@@ -55,9 +56,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionStatus_InductionStatusExempt()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .Select(e => e.InductionExemptionReasonId)
-            .RandomOne();
+        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReason.ExemptId)).InductionExemptionReasonId;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()

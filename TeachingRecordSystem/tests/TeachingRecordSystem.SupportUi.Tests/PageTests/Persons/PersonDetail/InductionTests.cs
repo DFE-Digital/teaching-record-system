@@ -91,7 +91,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             var expected = $"{routeWithExemption.InductionExemptionReason?.Name} - {routeWithExemption.Name}";
             var routeExemptionRowValue = doc.GetSummaryListValueElementForKey("Route induction exemption reason");
-            Assert.Equal(expected, routeExemptionRowValue?.TextContent);
+            Assert.Equal(expected, routeExemptionRowValue?.TextContent.Trim());
         }
         else
         {
