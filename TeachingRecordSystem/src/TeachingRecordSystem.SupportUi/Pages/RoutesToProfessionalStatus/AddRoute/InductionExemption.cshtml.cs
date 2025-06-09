@@ -45,7 +45,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
             return;
         }
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
             || (Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption))
         {

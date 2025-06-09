@@ -11,10 +11,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(CountryCode)
             .Build();
@@ -48,10 +48,10 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_RedirectsToExpectedPage()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "NI R").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(ProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(CountryCode)
             .Build();
@@ -87,7 +87,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
@@ -133,7 +133,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var endDate = Clock.Today;
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
@@ -143,7 +143,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status.Value)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
@@ -175,14 +175,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today;
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync()).Where(r => r.Name == "Apprenticeship").Single();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "Apprenticeship").Single();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync())
             .RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync())
             .RandomOne();
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(ProfessionalStatusStatus.InTraining)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
@@ -227,7 +227,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithAwardedStatusFields(Clock)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
@@ -261,7 +261,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.NotNull(addedProfessionalStatusRecord);
             Assert.Equal(journeyInstance.State.IsExemptFromInduction, addedProfessionalStatusRecord.ExemptFromInduction);
             Assert.Equal(journeyInstance.State.Status, addedProfessionalStatusRecord.Status);
-            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, addedProfessionalStatusRecord.RouteToProfessionalStatusId);
+            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, addedProfessionalStatusRecord.RouteToProfessionalStatusTypeId);
             Assert.Equal(journeyInstance.State.TrainingStartDate, addedProfessionalStatusRecord.TrainingStartDate);
             Assert.Equal(journeyInstance.State.TrainingEndDate, addedProfessionalStatusRecord.TrainingEndDate);
             Assert.Equal(journeyInstance.State.AwardedDate, addedProfessionalStatusRecord.AwardedDate);
@@ -280,16 +280,16 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
             Assert.Equal(Clock.UtcNow, actualCreatedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, actualCreatedEvent.PersonId);
-            Assert.Equal(journeyInstance.State.Status, actualCreatedEvent.ProfessionalStatus.Status);
-            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualCreatedEvent.ProfessionalStatus.RouteToProfessionalStatusId);
-            Assert.Equal(journeyInstance.State.TrainingStartDate, actualCreatedEvent.ProfessionalStatus.TrainingStartDate);
-            Assert.Equal(journeyInstance.State.TrainingEndDate, actualCreatedEvent.ProfessionalStatus.TrainingEndDate);
-            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.ProfessionalStatus.AwardedDate);
-            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualCreatedEvent.ProfessionalStatus.TrainingAgeSpecialismType);
-            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualCreatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeFrom);
-            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualCreatedEvent.ProfessionalStatus.TrainingAgeSpecialismRangeTo);
-            Assert.Equal(journeyInstance.State.TrainingSubjectIds, actualCreatedEvent.ProfessionalStatus.TrainingSubjectIds);
-            Assert.Equal(journeyInstance.State.IsExemptFromInduction, actualCreatedEvent.ProfessionalStatus.ExemptFromInduction);
+            Assert.Equal(journeyInstance.State.Status, actualCreatedEvent.RouteToProfessionalStatus.Status);
+            Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualCreatedEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
+            Assert.Equal(journeyInstance.State.TrainingStartDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingStartDate);
+            Assert.Equal(journeyInstance.State.TrainingEndDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingEndDate);
+            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.RouteToProfessionalStatus.AwardedDate);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismType);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom);
+            Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo);
+            Assert.Equal(journeyInstance.State.TrainingSubjectIds, actualCreatedEvent.RouteToProfessionalStatus.TrainingSubjectIds);
+            Assert.Equal(journeyInstance.State.IsExemptFromInduction, actualCreatedEvent.RouteToProfessionalStatus.ExemptFromInduction);
         });
 
         journeyInstance = await ReloadJourneyInstance(journeyInstance);

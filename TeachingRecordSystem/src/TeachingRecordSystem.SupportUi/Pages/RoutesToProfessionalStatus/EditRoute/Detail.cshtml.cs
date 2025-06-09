@@ -47,14 +47,14 @@ public class DetailModel(
     {
         if (!JourneyInstance!.State.Initialized)
         {
-            await JourneyInstance.UpdateStateAsync(state => state.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().ProfessionalStatus));
+            await JourneyInstance.UpdateStateAsync(state => state.EnsureInitialized(context.HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus));
         }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        var route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        var route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
 
         var hasImplicitExemption = route.InductionExemptionReasonId.HasValue ?
             (await referenceDataCache.GetInductionExemptionReasonByIdAsync(route.InductionExemptionReasonId!.Value)).RouteImplicitExemption
@@ -62,7 +62,7 @@ public class DetailModel(
 
         RouteDetail = new RouteDetailViewModel()
         {
-            RouteToProfessionalStatus = route,
+            RouteToProfessionalStatusType = route,
             Status = JourneyInstance!.State.Status,
             AwardedDate = JourneyInstance!.State.AwardedDate,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,

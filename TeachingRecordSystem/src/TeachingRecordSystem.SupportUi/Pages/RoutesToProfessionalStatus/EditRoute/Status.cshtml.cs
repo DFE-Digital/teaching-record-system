@@ -15,7 +15,7 @@ public class StatusModel(
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
-    public RouteToProfessionalStatus Route { get; set; } = null!;
+    public RouteToProfessionalStatusType Route { get; set; } = null!;
 
     public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
 
@@ -89,7 +89,7 @@ public class StatusModel(
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
-        Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
+        Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId);
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;

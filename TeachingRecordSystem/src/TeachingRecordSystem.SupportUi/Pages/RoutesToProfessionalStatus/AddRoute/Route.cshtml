@@ -54,7 +54,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var route in Model.Routes)
                 {
-                    <govuk-select-item value="@route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
+                    <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
                 }
             </govuk-select>
             <govuk-details open="false">
@@ -65,7 +65,7 @@
                         <govuk-select-item value=""></govuk-select-item>
                         @foreach (var route in Model.ArchivedRoutes)
                         {
-                            <govuk-select-item value="@route.RouteToProfessionalStatusId">@route.Name</govuk-select-item>
+                            <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
                         }
                         </govuk-select>
                     </govuk-details-text>

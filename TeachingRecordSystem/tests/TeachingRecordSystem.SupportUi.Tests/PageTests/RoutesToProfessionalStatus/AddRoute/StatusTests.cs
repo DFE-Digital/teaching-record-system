@@ -10,13 +10,13 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ShowsExistingStatus()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -44,12 +44,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, ProfessionalStatusStatus status, string expected)
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Single(r => r.Name == routeName);
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -79,12 +79,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NoStatusSelected_ShowsError()
     {
         // Arrange
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Single(r => r.Name == "Apprenticeship");
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
@@ -103,12 +103,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var person = await TestData.CreatePersonAsync();
 
         var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusId)
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,

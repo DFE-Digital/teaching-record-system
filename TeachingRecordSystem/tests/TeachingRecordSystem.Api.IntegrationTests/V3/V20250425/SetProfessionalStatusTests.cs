@@ -70,7 +70,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.ApplyforQtsId,
+                RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = status
             });
 
@@ -78,7 +78,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status must be 'Approved' when route type is '{RouteToProfessionalStatus.ApplyforQtsId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status must be 'Approved' when route type is '{RouteToProfessionalStatusType.ApplyForQtsId}'.");
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.Approved
             });
 
@@ -100,7 +100,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'Approved' when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'Approved' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.AssessmentOnlyRouteId,
+                RouteTypeId = RouteToProfessionalStatusType.AssessmentOnlyRouteId,
                 Status = ProfessionalStatusStatus.InTraining
             });
 
@@ -122,7 +122,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatus.AssessmentOnlyRouteId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'InTraining' when route type is '{RouteToProfessionalStatusType.AssessmentOnlyRouteId}'.");
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.UnderAssessment
             });
 
@@ -144,7 +144,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'UnderAssessment' when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.Status)}", $"Status cannot be 'UnderAssessment' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -161,7 +161,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = isOverseasRouteType ? RouteToProfessionalStatus.ApplyforQtsId : RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = isOverseasRouteType ? RouteToProfessionalStatusType.ApplyForQtsId : RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = status
             });
 
@@ -189,7 +189,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = status,
                 AwardedDate = Clock.Today
             });
@@ -212,7 +212,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.Awarded,
                 AwardedDate = Clock.Today.AddDays(1)
             });
@@ -235,7 +235,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingStartDate = null
             });
@@ -258,7 +258,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingEndDate = null
             });
@@ -281,7 +281,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingStartDate = Clock.Today.AddMonths(-1),
                 TrainingEndDate = Clock.Today.AddMonths(-2)
@@ -305,7 +305,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingSubjectReferences = Option.Some(new[] { "100343", "100300", "100301", "100302" })
             });
@@ -328,7 +328,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingAgeSpecialism = new SetProfessionalStatusRequestTrainingAgeSpecialism
                 {
@@ -356,7 +356,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingAgeSpecialism = new SetProfessionalStatusRequestTrainingAgeSpecialism
                 {
@@ -384,7 +384,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingAgeSpecialism = new SetProfessionalStatusRequestTrainingAgeSpecialism
                 {
@@ -412,7 +412,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingAgeSpecialism = new SetProfessionalStatusRequestTrainingAgeSpecialism
                 {
@@ -446,7 +446,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingCountryReference = "FR"
             });
@@ -455,7 +455,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB' when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB' when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -488,7 +488,7 @@ public class SetProfessionalStatusTests : TestBase
     {
         // Arrange
         var slugId = "123456789";
-        var routeTypeId = RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId;
+        var routeTypeId = RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId;
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithSlugId(slugId));
@@ -543,7 +543,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.ScotlandRId,
+                RouteTypeId = RouteToProfessionalStatusType.ScotlandRId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingCountryReference = "PT"
@@ -553,7 +553,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatus.ScotlandRId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-SCT' when route type is '{RouteToProfessionalStatusType.ScotlandRId}'.");
     }
 
     [Fact]
@@ -567,7 +567,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.ApplyforQtsId,
+                RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingCountryReference = "GB-SCT"
@@ -577,7 +577,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatus.ScotlandRId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-SCT' when route type is not '{RouteToProfessionalStatusType.ScotlandRId}'.");
     }
 
     [Fact]
@@ -591,7 +591,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.NiRId,
+                RouteTypeId = RouteToProfessionalStatusType.NiRId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingCountryReference = "PT"
@@ -601,7 +601,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatus.NiRId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-NIR' when route type is '{RouteToProfessionalStatusType.NiRId}'.");
     }
 
     [Fact]
@@ -615,7 +615,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.ApplyforQtsId,
+                RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingCountryReference = "GB-NIR"
@@ -625,7 +625,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatus.NiRId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be 'GB-NIR' when route type is not '{RouteToProfessionalStatusType.NiRId}'.");
     }
 
     [Fact]
@@ -639,7 +639,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.WelshRId,
+                RouteTypeId = RouteToProfessionalStatusType.WelshRId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingCountryReference = "PT"
@@ -649,7 +649,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatus.WelshRId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference must be 'GB-WLS' or 'GB-CYM' when route type is '{RouteToProfessionalStatusType.WelshRId}'.");
     }
 
     [Theory]
@@ -665,7 +665,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingCountryReference = trainingCountryReference
             });
@@ -674,7 +674,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be '{trainingCountryReference}' when route type is not '{RouteToProfessionalStatus.WelshRId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingCountryReference)}", $"Training country reference cannot be '{trainingCountryReference}' when route type is not '{RouteToProfessionalStatusType.WelshRId}'.");
     }
 
     [Fact]
@@ -688,7 +688,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingProviderUkprn = null
             });
@@ -697,7 +697,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingProviderUkprn)}", $"Training provider UKPRN must be specified when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.TrainingProviderUkprn)}", $"Training provider UKPRN must be specified when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Theory]
@@ -741,7 +741,7 @@ public class SetProfessionalStatusTests : TestBase
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingCountryReference = trainingCountryReference,
-                TrainingProviderUkprn = routeTypeId == RouteToProfessionalStatus.QtlsAndSetMembershipId ? "10044534" : null
+                TrainingProviderUkprn = routeTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId ? "10044534" : null
             });
 
         // Act
@@ -762,7 +762,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 IsExemptFromInduction = true
             });
 
@@ -770,7 +770,7 @@ public class SetProfessionalStatusTests : TestBase
         var response = await GetHttpClientWithApiKey().PutAsync($"/v3/persons/{person.Trn}/professional-statuses/{slugId}", request);
 
         // Assert
-        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.IsExemptFromInduction)}", $"Is exempt from induction cannot be specified when route type is '{RouteToProfessionalStatus.HeiProgrammeTypeId}'.");
+        await AssertEx.JsonResponseHasValidationErrorForPropertyAsync(response, $"{nameof(SetProfessionalStatusRequest.IsExemptFromInduction)}", $"Is exempt from induction cannot be specified when route type is '{RouteToProfessionalStatusType.HeiProgrammeTypeId}'.");
     }
 
     [Fact]
@@ -809,7 +809,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 TrainingSubjectReferences = Option.Some(new[] { subject1, subject2, subject3 })
             });
 
@@ -831,7 +831,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.ApplyforQtsId,
+                RouteTypeId = RouteToProfessionalStatusType.ApplyForQtsId,
                 Status = ProfessionalStatusStatus.Approved,
                 AwardedDate = Clock.Today,
                 TrainingProviderUkprn = null,
@@ -857,7 +857,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = ProfessionalStatusStatus.InTraining,
                 TrainingProviderUkprn = "12345678"
             });
@@ -880,7 +880,7 @@ public class SetProfessionalStatusTests : TestBase
         var request = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 DegreeTypeId = Guid.NewGuid()
             });
 
@@ -1086,7 +1086,7 @@ public class SetProfessionalStatusTests : TestBase
         var requestJson = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId
+                RouteTypeId = RouteToProfessionalStatusType.EarlyYearsIttGraduateEntryId
             });
 
         // Create existing non early years ITT record
@@ -1214,7 +1214,7 @@ public class SetProfessionalStatusTests : TestBase
         var requestJson = CreateJsonContent(
             CreateRequest() with
             {
-                RouteTypeId = status == ProfessionalStatusStatus.UnderAssessment ? RouteToProfessionalStatus.AssessmentOnlyRouteId : RouteToProfessionalStatus.HeiProgrammeTypeId,
+                RouteTypeId = status == ProfessionalStatusStatus.UnderAssessment ? RouteToProfessionalStatusType.AssessmentOnlyRouteId : RouteToProfessionalStatusType.HeiProgrammeTypeId,
                 Status = status
             });
 
@@ -1383,7 +1383,7 @@ public class SetProfessionalStatusTests : TestBase
     private SetProfessionalStatusRequest CreateRequest() =>
         new SetProfessionalStatusRequest
         {
-            RouteTypeId = RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteTypeId = RouteToProfessionalStatusType.HeiProgrammeTypeId,
             Status = ProfessionalStatusStatus.InTraining,
             AwardedDate = null,
             TrainingStartDate = Clock.Today.AddMonths(-1),
@@ -1429,7 +1429,7 @@ public class SetProfessionalStatusTests : TestBase
     public static TheoryData<Guid, ProfessionalStatusStatus, SetProfessionalStatusRequestTrainingAgeSpecialism?, dfeta_ITTResult, string?, string?, dfeta_AgeRange?, dfeta_AgeRange?> NonOverseasRouteTypeCreateData { get; } = new()
     {
         {
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             ProfessionalStatusStatus.InTraining,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1444,7 +1444,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange._07
         },
         {
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             ProfessionalStatusStatus.Awarded,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1459,7 +1459,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange._07
         },
         {
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1472,7 +1472,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage4
         },
         {
-            RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId,
+            RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId,
             ProfessionalStatusStatus.InTraining,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1485,7 +1485,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage2
         },
         {
-            RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId,
+            RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId,
             ProfessionalStatusStatus.Awarded,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1498,7 +1498,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage2
         },
         {
-            RouteToProfessionalStatus.InternationalQualifiedTeacherStatusId,
+            RouteToProfessionalStatusType.InternationalQualifiedTeacherStatusId,
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1511,7 +1511,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage2
         },
         {
-            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            RouteToProfessionalStatusType.AssessmentOnlyRouteId,
             ProfessionalStatusStatus.UnderAssessment,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1524,7 +1524,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage3
         },
         {
-            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            RouteToProfessionalStatusType.AssessmentOnlyRouteId,
             ProfessionalStatusStatus.Awarded,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1537,7 +1537,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage4
         },
         {
-            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            RouteToProfessionalStatusType.AssessmentOnlyRouteId,
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1550,7 +1550,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange.KeyStage4
         },
         {
-            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,
+            RouteToProfessionalStatusType.EarlyYearsIttGraduateEntryId,
             ProfessionalStatusStatus.InTraining,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1565,7 +1565,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange._05
         },
         {
-            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,
+            RouteToProfessionalStatusType.EarlyYearsIttGraduateEntryId,
             ProfessionalStatusStatus.Awarded,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1580,7 +1580,7 @@ public class SetProfessionalStatusTests : TestBase
             dfeta_AgeRange._05
         },
         {
-            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,
+            RouteToProfessionalStatusType.EarlyYearsIttGraduateEntryId,
             ProfessionalStatusStatus.Withdrawn,
             new SetProfessionalStatusRequestTrainingAgeSpecialism
             {
@@ -1599,7 +1599,7 @@ public class SetProfessionalStatusTests : TestBase
     public static TheoryData<Guid, string, bool?, string, string, string, Guid?> OverseasRouteTypeCreateData { get; } = new()
     {
         {
-            RouteToProfessionalStatus.ApplyforQtsId,            // RouteTypeId
+            RouteToProfessionalStatusType.ApplyForQtsId,            // RouteTypeId
             "PT",                                               // TrainingCountryReference
             true,                                               // IsExemptFromInduction
             "Portugal",                                         // ExpectedTrainingCountryName
@@ -1608,7 +1608,7 @@ public class SetProfessionalStatusTests : TestBase
             InductionExemptionReason.OverseasTrainedTeacherId   // ExpectedInductionExemptionReasonId
         },
         {
-            RouteToProfessionalStatus.EuropeanRecognitionId,
+            RouteToProfessionalStatusType.EuropeanRecognitionId,
             "FR",
             null,
             "France",
@@ -1617,7 +1617,7 @@ public class SetProfessionalStatusTests : TestBase
             null
         },
         {
-            RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId,
+            RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId,
             "ES",
             null,
             "Spain",
@@ -1626,7 +1626,7 @@ public class SetProfessionalStatusTests : TestBase
             null
         },
         {
-            RouteToProfessionalStatus.NiRId,
+            RouteToProfessionalStatusType.NiRId,
             "GB-NIR",
             true,
             "Northern Ireland",
@@ -1635,7 +1635,7 @@ public class SetProfessionalStatusTests : TestBase
             InductionExemptionReason.PassedInductionInNorthernIrelandId
         },
         {
-            RouteToProfessionalStatus.ScotlandRId,
+            RouteToProfessionalStatusType.ScotlandRId,
             "GB-SCT",
             true,
             "Scotland",
@@ -1648,38 +1648,38 @@ public class SetProfessionalStatusTests : TestBase
     public static TheoryData<Guid> OverseasRouteTypeData { get; } = new()
     {
         {
-            RouteToProfessionalStatus.ApplyforQtsId
+            RouteToProfessionalStatusType.ApplyForQtsId
         },
         {
-            RouteToProfessionalStatus.EuropeanRecognitionId
+            RouteToProfessionalStatusType.EuropeanRecognitionId
         },
         {
-            RouteToProfessionalStatus.OverseasTrainedTeacherRecognitionId
+            RouteToProfessionalStatusType.OverseasTrainedTeacherRecognitionId
         },
         {
-            RouteToProfessionalStatus.NiRId
+            RouteToProfessionalStatusType.NiRId
         },
         {
-            RouteToProfessionalStatus.ScotlandRId
+            RouteToProfessionalStatusType.ScotlandRId
         }
     };
 
     public static TheoryData<Guid, string?> RouteTypeWhichCanHaveInductionExemptionData { get; } = new()
     {
         {
-            RouteToProfessionalStatus.ApplyforQtsId,
+            RouteToProfessionalStatusType.ApplyForQtsId,
             "PT"
         },
         {
-            RouteToProfessionalStatus.QtlsAndSetMembershipId,
+            RouteToProfessionalStatusType.QtlsAndSetMembershipId,
             null
         },
         {
-            RouteToProfessionalStatus.ScotlandRId,
+            RouteToProfessionalStatusType.ScotlandRId,
             "GB-SCT"
         },
         {
-            RouteToProfessionalStatus.NiRId,
+            RouteToProfessionalStatusType.NiRId,
             "GB-NIR"
         }
     };
@@ -1687,27 +1687,27 @@ public class SetProfessionalStatusTests : TestBase
     public static TheoryData<Guid, string?, string?> ExistingQtsData { get; } = new()
     {
         {
-            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,
+            RouteToProfessionalStatusType.EarlyYearsIttGraduateEntryId,
             null,
             "220"
         },
         {
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             "211",
             null
         },
         {
-            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            RouteToProfessionalStatusType.AssessmentOnlyRouteId,
             "212",
             null
         },
         {
-            RouteToProfessionalStatus.EarlyYearsIttGraduateEntryId,
+            RouteToProfessionalStatusType.EarlyYearsIttGraduateEntryId,
             null,
             null
         },
         {
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             null,
             null
         }
@@ -1720,7 +1720,7 @@ public class SetProfessionalStatusTests : TestBase
             null,                                                       // ExistingTeacherStatusValue
             "220",                                                      // ExistingEarlyYearsStatusValue
             dfeta_ITTResult.InTraining,                                 // ExistingIttResult
-            RouteToProfessionalStatus.EarlyYearsIttUndergraduateId,     // RouteTypeId
+            RouteToProfessionalStatusType.EarlyYearsIttUndergraduateId,     // RouteTypeId
             dfeta_ITTProgrammeType.EYITTUndergraduate,                  // ExpectedIttProgrammeType
             ProfessionalStatusStatus.Awarded,                           // Status
             dfeta_ITTResult.Pass,                                       // ExpectedIttResult
@@ -1732,7 +1732,7 @@ public class SetProfessionalStatusTests : TestBase
             "211",
             null,
             dfeta_ITTResult.InTraining,
-            RouteToProfessionalStatus.SchoolDirectTrainingProgrammeId,
+            RouteToProfessionalStatusType.SchoolDirectTrainingProgrammeId,
             dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme,
             ProfessionalStatusStatus.Awarded,
             dfeta_ITTResult.Pass,
@@ -1744,7 +1744,7 @@ public class SetProfessionalStatusTests : TestBase
             "212",
             null,
             dfeta_ITTResult.UnderAssessment,
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             dfeta_ITTProgrammeType.HEI,
             ProfessionalStatusStatus.Awarded,
             dfeta_ITTResult.Pass,
@@ -1756,7 +1756,7 @@ public class SetProfessionalStatusTests : TestBase
             "212",
             null,
             dfeta_ITTResult.UnderAssessment,
-            RouteToProfessionalStatus.HeiProgrammeTypeId,
+            RouteToProfessionalStatusType.HeiProgrammeTypeId,
             dfeta_ITTProgrammeType.HEI,
             ProfessionalStatusStatus.InTraining,
             dfeta_ITTResult.InTraining,
@@ -1768,7 +1768,7 @@ public class SetProfessionalStatusTests : TestBase
             "211",
             null,
             dfeta_ITTResult.InTraining,
-            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            RouteToProfessionalStatusType.AssessmentOnlyRouteId,
             dfeta_ITTProgrammeType.AssessmentOnlyRoute,
             ProfessionalStatusStatus.UnderAssessment,
             dfeta_ITTResult.UnderAssessment,
@@ -1780,7 +1780,7 @@ public class SetProfessionalStatusTests : TestBase
             null,
             null,
             dfeta_ITTResult.InTraining,
-            RouteToProfessionalStatus.EarlyYearsIttUndergraduateId,
+            RouteToProfessionalStatusType.EarlyYearsIttUndergraduateId,
             dfeta_ITTProgrammeType.EYITTUndergraduate,
             ProfessionalStatusStatus.Awarded,
             dfeta_ITTResult.Pass,
@@ -1792,7 +1792,7 @@ public class SetProfessionalStatusTests : TestBase
             null,
             null,
             dfeta_ITTResult.Withdrawn,
-            RouteToProfessionalStatus.SchoolDirectTrainingProgrammeId,
+            RouteToProfessionalStatusType.SchoolDirectTrainingProgrammeId,
             dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme,
             ProfessionalStatusStatus.Awarded,
             dfeta_ITTResult.Pass,
@@ -1804,7 +1804,7 @@ public class SetProfessionalStatusTests : TestBase
             null,
             null,
             dfeta_ITTResult.Withdrawn,
-            RouteToProfessionalStatus.SchoolDirectTrainingProgrammeId,
+            RouteToProfessionalStatusType.SchoolDirectTrainingProgrammeId,
             dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme,
             ProfessionalStatusStatus.Withdrawn,
             dfeta_ITTResult.Withdrawn,
@@ -1816,7 +1816,7 @@ public class SetProfessionalStatusTests : TestBase
             "211",
             null,
             dfeta_ITTResult.Fail,
-            RouteToProfessionalStatus.AssessmentOnlyRouteId,
+            RouteToProfessionalStatusType.AssessmentOnlyRouteId,
             dfeta_ITTProgrammeType.AssessmentOnlyRoute,
             ProfessionalStatusStatus.Failed,
             dfeta_ITTResult.Fail,

@@ -4,7 +4,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 public static class PageDriver
 {
-    public static AddRoutePage? NextPage(RouteToProfessionalStatus route, ProfessionalStatusStatus status, AddRoutePage currentPage)
+    public static AddRoutePage? NextPage(RouteToProfessionalStatusType route, ProfessionalStatusStatus status, AddRoutePage currentPage)
     {
         var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
             .Cast<AddRoutePage>()
@@ -33,7 +33,7 @@ public static class PageDriver
         return null;
     }
 
-    public static AddRoutePage? PreviousPage(RouteToProfessionalStatus route, ProfessionalStatusStatus status, AddRoutePage currentPage)
+    public static AddRoutePage? PreviousPage(RouteToProfessionalStatusType route, ProfessionalStatusStatus status, AddRoutePage currentPage)
     {
         var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
             .Cast<AddRoutePage>()
@@ -72,7 +72,7 @@ public static class PageDriver
         return lastPage == currentPage;
     }
 
-    public static FieldRequirement FieldRequirementForPage(this AddRoutePage page, RouteToProfessionalStatus Route, ProfessionalStatusStatus Status)
+    public static FieldRequirement FieldRequirementForPage(this AddRoutePage page, RouteToProfessionalStatusType Route, ProfessionalStatusStatus Status)
     {
         return page switch
         {

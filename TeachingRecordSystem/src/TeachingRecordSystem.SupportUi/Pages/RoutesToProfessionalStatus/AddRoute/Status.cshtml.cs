@@ -19,7 +19,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
         public string? PersonName { get; set; }
 
-        public RouteToProfessionalStatus Route { get; set; } = null!;
+        public RouteToProfessionalStatusType Route { get; set; } = null!;
 
         public ProfessionalStatusStatusInfo[] Statuses { get; set; } = [];
 
@@ -74,7 +74,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
             }
 
             Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
-            Route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+            Route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
             var personInfo = context.HttpContext.GetCurrentPersonFeature();
             PersonName = personInfo.Name;
             PersonId = personInfo.PersonId;

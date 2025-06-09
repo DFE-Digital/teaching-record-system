@@ -15,7 +15,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditEachField_Cya_ShowsEditedContent()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.Awarded;
@@ -33,7 +33,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -139,7 +139,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task Details_BackLink_QualificationPage()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
 
@@ -150,7 +150,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -175,7 +175,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditEndDate_ToCya_EditEndDate_Continue()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -186,7 +186,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -233,7 +233,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditStartDate_ToCya_EditStartDate_Continue()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -244,7 +244,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -293,7 +293,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditStartDate_InvalidatesEndDate_GoesToEndDate_Continue()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -303,7 +303,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -338,7 +338,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditEndDate_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -349,7 +349,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -401,7 +401,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditStartDate_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -412,7 +412,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -464,7 +464,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditAwardDate_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.Approved;
@@ -475,7 +475,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -531,7 +531,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditDegreeType_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -539,7 +539,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -573,7 +573,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditCountry_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -582,7 +582,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -616,14 +616,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditAgeRangeSpecialism_IncompleteInformation_ShowsError()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -668,7 +668,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditTrainingProvider_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -676,7 +676,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusId)
+                    .WithRoute(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -710,7 +710,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditSubjectSpecialisms_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
         var status = ProfessionalStatusStatus.InTraining;
@@ -720,7 +720,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
@@ -773,7 +773,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditInductionExemption_BackLinks()
     {
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "NI R")
             .First();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
@@ -783,7 +783,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
@@ -838,7 +838,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditStatus_Awarded_Continue_Exemption_Continue()
     {
         var awardDate = new DateOnly(2021, 1, 1);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId.HasValue)
             .Join(
                 (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
@@ -853,7 +853,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
             ));
         var personId = person.PersonId;
@@ -890,7 +890,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditStatusRouteWithImplicitExemption_Awarded_Continue_Cya_EditStatus_Continue_Cya()
     {
         var awardDate = new DateOnly(2021, 1, 1);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption == true)
             .RandomOne();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
@@ -901,7 +901,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
@@ -960,13 +960,13 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditStatus_StatusAlreadyAwarded_Continue_Details(string status)
     {
         var awardedDate = new DateOnly(2021, 1, 1);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(ProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
             ));
@@ -995,7 +995,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditStatus_Awarded_Continue_Exemption_Back()
     {
         var awardDate = new DateOnly(2021, 1, 1);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId.HasValue)
             .Join(
                 (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync()).Where(e => e.RouteImplicitExemption == false),
@@ -1010,7 +1010,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
             ));
         var personId = person.PersonId;

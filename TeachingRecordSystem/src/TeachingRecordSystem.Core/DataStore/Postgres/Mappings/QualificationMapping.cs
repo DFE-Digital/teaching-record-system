@@ -12,7 +12,7 @@ public class QualificationMapping : IEntityTypeConfiguration<Qualification>
         builder.HasQueryFilter(q => EF.Property<DateTime?>(q, nameof(Qualification.DeletedOn)) == null);
         builder.HasDiscriminator(q => q.QualificationType)
             .HasValue<MandatoryQualification>(QualificationType.MandatoryQualification)
-            .HasValue<ProfessionalStatus>(QualificationType.ProfessionalStatus);
+            .HasValue<RouteToProfessionalStatus>(QualificationType.RouteToProfessionalStatus);
         builder.HasOne<Person>(q => q.Person).WithMany(p => p.Qualifications).HasForeignKey(q => q.PersonId).HasConstraintName(Qualification.PersonForeignKeyName);
         builder.HasIndex(q => q.PersonId);
     }

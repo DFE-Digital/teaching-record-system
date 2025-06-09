@@ -22,7 +22,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var createdByUser = await TestData.CreateUserAsync();
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q => q
-                .WithRoute(route.RouteToProfessionalStatusId)
+                .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
@@ -68,13 +68,13 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         // Arrange
         var awardDate = Clock.Today;
         var oldAwardDate = awardDate.AddDays(1);
-        var route = (await ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsTeacherStatus)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusId);
+                q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(ProfessionalStatusStatus.Awarded);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);
@@ -123,7 +123,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusId);
+                q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
@@ -137,9 +137,9 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithInductionExemption(true);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
-        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus) with
+        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.RouteToProfessionalStatus.FromModel(professionalStatus) with
         {
             AwardedDate = oldAwardDate,
             DegreeTypeId = oldDegreeType.DegreeTypeId,
@@ -168,7 +168,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 | ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType
                 | ProfessionalStatusUpdatedEventChanges.TrainingCountry
                 | ProfessionalStatusUpdatedEventChanges.TrainingProvider
-                | ProfessionalStatusUpdatedEventChanges.ExemptFromInduction)
+                | ProfessionalStatusUpdatedEventChanges.InductionExemptionReasons)
             ) as ProfessionalStatusUpdatedEvent;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
@@ -228,7 +228,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusId);
+                q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
@@ -242,8 +242,8 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithInductionExemption(true);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
-        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus) with
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.RouteToProfessionalStatus.FromModel(professionalStatus) with
         {
             Status = oldStatus
         };
@@ -313,14 +313,14 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusId);
+                q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithInductionExemption(true);
                 q.WithAwardedDate(awardDate);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
-        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.ProfessionalStatus.FromModel(professionalStatus) with
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.RouteToProfessionalStatus.FromModel(professionalStatus) with
         {
             Status = oldStatus
         };
@@ -369,7 +369,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusId);
+                q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);
@@ -384,7 +384,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithInductionExemption(true);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var createdByUser = await TestData.CreateUserAsync();
         var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
         var professionalStatusDeletedEvent = await TestData.CreateProfessionalStatusDeletedEventAsync(e => e
@@ -440,7 +440,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusId);
+                q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);
@@ -455,7 +455,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 q.WithInductionExemption(true);
             }));
 
-        var professionalStatus = person.Person.Qualifications!.OfType<ProfessionalStatus>().Single();
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var createdByUser = await TestData.CreateUserAsync();
         var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
         var professionalStatusDeletedEvent = await TestData.CreateProfessionalStatusDeletedEventAsync(e => e

@@ -56,4 +56,4 @@ public record CurrentSupportTaskFeature(SupportTask SupportTask);
 
 public record CurrentAlertFeature(Alert Alert);
 
-public record CurrentProfessionalStatusFeature(ProfessionalStatus ProfessionalStatus);
+public record CurrentProfessionalStatusFeature(RouteToProfessionalStatus RouteToProfessionalStatus);

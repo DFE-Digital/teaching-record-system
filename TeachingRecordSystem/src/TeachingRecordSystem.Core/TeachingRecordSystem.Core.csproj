@@ -99,6 +99,7 @@
     <None Remove="Services\DqtReporting\Migrations\0064_TrsPersonStatus.sql" />
     <None Remove="Services\DqtReporting\Migrations\0065_TrsPersonMergedWith.sql" />
     <None Remove="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
+    <None Remove="Services\DqtReporting\Migrations\0067_TrsRoutesModelChanges.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -197,6 +198,7 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0064_TrsPersonStatus.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0065_TrsPersonMergedWith.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0067_TrsRoutesModelChanges.sql" />
   </ItemGroup>
 
   <ItemGroup>

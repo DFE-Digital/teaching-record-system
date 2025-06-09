@@ -29,7 +29,7 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
             .ThenInclude(p => p!.Qualifications)
             .Include(ps => ps.TrainingProvider)
             .Include(ps => ps.TrainingCountry)
-            .Include(ps => ps.RouteToProfessionalStatus)
+            .Include(ps => ps.RouteToProfessionalStatusType)
             .ThenInclude(r => r!.InductionExemptionReason)
             .Include(ps => ps.DegreeType);
 
