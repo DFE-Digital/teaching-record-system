@@ -2,12 +2,11 @@ namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 
 public record QtsInfo
 {
-    public required DateOnly AwardedDate { get; init; }
-    public required IReadOnlyCollection<QtsInfoAwardedRoute> AwardedRoutes { get; init; }
+    public required DateOnly QtsDate { get; init; }
+    public required IReadOnlyCollection<QtsInfoRoute> Routes { get; init; }
 }
 
-public record QtsInfoAwardedRoute
+public record QtsInfoRoute
 {
     public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
-    public required DateOnly AwardedDate { get; init; }
 }
