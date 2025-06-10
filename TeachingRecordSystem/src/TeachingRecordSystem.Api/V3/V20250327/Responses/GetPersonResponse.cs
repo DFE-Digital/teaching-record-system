@@ -87,14 +87,12 @@ public record GetPersonResponseInitialTeacherTrainingSubject
     public required string Name { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultNpqQualification))]
 public record GetPersonResponseNpqQualification
 {
     public required DateOnly Awarded { get; init; }
     public required GetPersonResponseNpqQualificationType Type { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultNpqQualificationType))]
 public record GetPersonResponseNpqQualificationType
 {
     public required NpqQualificationType Code { get; init; }

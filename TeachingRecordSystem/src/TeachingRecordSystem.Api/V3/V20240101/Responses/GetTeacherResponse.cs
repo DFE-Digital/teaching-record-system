@@ -125,7 +125,6 @@ public record GetTeacherResponseInitialTeacherTrainingSubject
     public required string Name { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultNpqQualification))]
 public record GetTeacherResponseNpqQualification
 {
     public required DateOnly Awarded { get; init; }
@@ -133,7 +132,6 @@ public record GetTeacherResponseNpqQualification
     public required string CertificateUrl { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultNpqQualificationType))]
 public record GetTeacherResponseNpqQualificationType
 {
     public required NpqQualificationType Code { get; init; }
@@ -147,7 +145,6 @@ public record GetTeacherResponseMandatoryQualification
     public required string Specialism { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultHigherEducationQualification))]
 public record GetTeacherResponseHigherEducationQualification
 {
     public required string? Name { get; init; }
@@ -155,7 +152,6 @@ public record GetTeacherResponseHigherEducationQualification
     public required IReadOnlyCollection<GetTeacherResponseHigherEducationQualificationSubject> Subjects { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultHigherEducationQualificationSubject))]
 public record GetTeacherResponseHigherEducationQualificationSubject
 {
     public required string Code { get; init; }
