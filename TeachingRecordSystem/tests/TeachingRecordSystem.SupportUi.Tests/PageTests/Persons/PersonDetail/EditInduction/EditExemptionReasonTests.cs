@@ -85,9 +85,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -136,9 +136,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -188,9 +188,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
             .ToArray();
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -237,9 +237,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -280,9 +280,9 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));
         var journeyInstance = await CreateJourneyInstanceAsync(

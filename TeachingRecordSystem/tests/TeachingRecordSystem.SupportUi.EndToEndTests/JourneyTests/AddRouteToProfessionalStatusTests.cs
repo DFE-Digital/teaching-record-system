@@ -7,7 +7,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .Single(r => r.Name == "Apprenticeship");
-        var status = ProfessionalStatusStatus.InTraining;
+        var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
@@ -99,7 +99,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .Single(r => r.Name == "Apprenticeship");
-        var status = ProfessionalStatusStatus.InTraining;
+        var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddMonths(1);
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
@@ -169,7 +169,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
                 && r.DegreeTypeRequired == FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
-        var status = ProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Awarded;
         var awardedDate = new DateOnly(2021, 1, 1);
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne()

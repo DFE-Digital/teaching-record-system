@@ -22,7 +22,7 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
     public string? PersonName { get; set; }
 
     public RouteToProfessionalStatusType Route { get; set; } = null!;
-    public ProfessionalStatusStatus Status { get; set; }
+    public RouteToProfessionalStatusStatus Status { get; set; }
 
     public async Task<IActionResult> OnPostCancelAsync()
     {

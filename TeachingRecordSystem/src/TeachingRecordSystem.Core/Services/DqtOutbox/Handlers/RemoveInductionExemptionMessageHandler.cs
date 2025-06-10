@@ -8,7 +8,9 @@ public class RemoveInductionExemptionMessageHandler(TrsDbContext dbContext, IClo
 {
     public async Task HandleMessageAsync(RemoveInductionExemptionMessage message)
     {
-        var person = await dbContext.Persons.SingleAsync(p => p.PersonId == message.PersonId);
+        var person = await dbContext.Persons
+            .Include(p => p.Qualifications)
+            .SingleAsync(p => p.PersonId == message.PersonId);
 
         var updatedBy = message.DqtUserId is not null && message.DqtUserName is not null
             ? EventModels.RaisedByUserInfo.FromDqtUser(message.DqtUserId.Value, message.DqtUserName)

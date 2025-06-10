@@ -1,6 +1,6 @@
 ﻿@using TeachingRecordSystem.Core.Events
 @inject ReferenceDataCache ReferenceDataCache
-@model TimelineItem<TimelineEvent<ProfessionalStatusCreatedEvent>>
+@model TimelineItem<TimelineEvent<RouteToProfessionalStatusCreatedEvent>>
 @{
     var createdEvent = Model.ItemModel.Event;
     var professionalStatus = createdEvent.RouteToProfessionalStatus;
@@ -28,28 +28,28 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonHasEyps))
+            @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonHasEyps))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="has-eyps">@createdEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonEytsDate))
+            @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@createdEvent.PersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonPqtsDate))
+            @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@createdEvent.PersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonQtsDate))
+            @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
@@ -108,34 +108,34 @@
                 <govuk-summary-list-row-value data-testid="subjects"><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
             </govuk-summary-list-row>
         </govuk-summary-list>
-        @if(createdEvent.Changes != ProfessionalStatusCreatedEventChanges.None)
+        @if(createdEvent.Changes != RouteToProfessionalStatusCreatedEventChanges.None)
         {
             <govuk-details class="govuk-!-margin-bottom-2">
                 <govuk-details-summary>Previous data</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
-                        @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonHasEyps))
+                        @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonHasEyps))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
                                     <govuk-summary-list-row-value data-testid="old-has-eyps">@(createdEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                        @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonEytsDate))
+                        @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
                                     <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                        @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonPqtsDate))
+                        @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
                                     <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                        @if (createdEvent.Changes.HasFlag(ProfessionalStatusCreatedEventChanges.PersonQtsDate))
+                        @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>

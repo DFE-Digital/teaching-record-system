@@ -28,7 +28,7 @@ public class StatusModel(
     [BindProperty]
     [Display(Name = "Select the route status")]
     [Required(ErrorMessage = "Select a route status")]
-    public ProfessionalStatusStatus Status { get; set; }
+    public RouteToProfessionalStatusStatus Status { get; set; }
 
     public void OnGet()
     {
@@ -102,16 +102,16 @@ public class StatusModel(
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
-    private string NextCompletingRoutePage(ProfessionalStatusStatus status)
+    private string NextCompletingRoutePage(RouteToProfessionalStatusStatus status)
     {
         return (QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, status.GetEndDateRequirement()) != FieldRequirement.NotApplicable) ?
             linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId);
     }
 
-    private bool CompletingRoute => Status == ProfessionalStatusStatus.Awarded && (JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Awarded && JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Approved)
-        || Status == ProfessionalStatusStatus.Approved && (JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Approved && JourneyInstance!.State.CurrentStatus != ProfessionalStatusStatus.Awarded);
+    private bool CompletingRoute => Status == RouteToProfessionalStatusStatus.Awarded && (JourneyInstance!.State.CurrentStatus != RouteToProfessionalStatusStatus.Awarded && JourneyInstance!.State.CurrentStatus != RouteToProfessionalStatusStatus.Approved)
+        || Status == RouteToProfessionalStatusStatus.Approved && (JourneyInstance!.State.CurrentStatus != RouteToProfessionalStatusStatus.Approved && JourneyInstance!.State.CurrentStatus != RouteToProfessionalStatusStatus.Awarded);
 
-    public bool NotCompletedRoute => Status != ProfessionalStatusStatus.Approved && Status != ProfessionalStatusStatus.Awarded;
+    public bool NotCompletedRoute => Status != RouteToProfessionalStatusStatus.Approved && Status != RouteToProfessionalStatusStatus.Awarded;
 
 }

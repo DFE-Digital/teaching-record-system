@@ -26,7 +26,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
         [BindProperty]
         [Required(ErrorMessage = "Select a route status")]
         [Display(Name = "Select the route status")]
-        public ProfessionalStatusStatus? Status { get; set; }
+        public RouteToProfessionalStatusStatus? Status { get; set; }
 
         public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
@@ -48,7 +48,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
                 x =>
                 {
                     x.Status = Status;
-                    x.IsExemptFromInduction = (Status == ProfessionalStatusStatus.Awarded || Status == ProfessionalStatusStatus.Approved) ?
+                    x.IsExemptFromInduction = (Status == RouteToProfessionalStatusStatus.Awarded || Status == RouteToProfessionalStatusStatus.Approved) ?
                         Route.InductionExemptionReason?.RouteImplicitExemption
                         : null;
                 });

@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<ProfessionalStatusUpdatedEvent>>
+@model TimelineItem<TimelineEvent<RouteToProfessionalStatusUpdatedEvent>>
 @{
     var updatedEvent = Model.ItemModel.Event;
     var oldDetails = Model.ItemModel.Event.OldRouteToProfessionalStatus;
@@ -43,105 +43,105 @@
     </p>
     <div class="moj-timeline__description">
         <govuk-summary-list>
-            @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonHasEyps))
+            @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="has-eyps">@(Model.ItemModel.Event.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonEytsDate))
+            @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@Model.ItemModel.Event.PersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
+            @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@Model.ItemModel.Event.PersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonQtsDate))
+            @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@Model.ItemModel.Event.PersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.Status))
+            @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="status" use-empty-fallback>@professionalStatus.Status.GetDisplayName()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.StartDate))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.StartDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="start-date" use-empty-fallback>@professionalStatus.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.EndDate))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.AwardedDate))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.AwardedDate))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Professional Status award date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.InductionExemptionReasons))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingProvider))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingProvider))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="training-provider" use-empty-fallback>@trainingProvider?.Name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.DegreeType))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.DegreeType))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="degree-type" use-empty-fallback>@degreeType?.Name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingCountry))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingCountry))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Country</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="country" use-empty-fallback>@country?.Name</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="age-range" use-empty-fallback>@ageRangeFromTo</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="age-range-type" use-empty-fallback>@ageRangeType?.GetDisplayName()</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
-            @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
+            @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
             {
                 <govuk-summary-list-row>
                     <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>
@@ -190,105 +190,105 @@
             <govuk-details-summary>Previous data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonHasEyps))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-has-eyps">@(Model.ItemModel.Event.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonEytsDate))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@Model.ItemModel.Event.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
+                    @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@Model.ItemModel.Event.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.PersonQtsDate))
+                    @if(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@Model.ItemModel.Event.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.Status))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-status" use-empty-fallback>@oldDetails.Status.GetDisplayName()</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.StartDate))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.StartDate))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-start-date" use-empty-fallback>@oldDetails.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.EndDate))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.EndDate))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-end-date" use-empty-fallback>@oldDetails.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.AwardedDate))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.AwardedDate))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Professional Status award date</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-award-date" use-empty-fallback>@oldDetails.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.InductionExemptionReasons))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-exemption" use-empty-fallback>@(oldDetails.ExemptFromInduction.HasValue ? oldDetails.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingProvider))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingProvider))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-training-provider" use-empty-fallback>@oldTrainingProvider?.Name</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.DegreeType))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.DegreeType))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-degree-type" use-empty-fallback>@oldDegreeType?.Name</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingCountry))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingCountry))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Country</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-country" use-empty-fallback>@oldCountry?.Name</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom) || updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-age-range" use-empty-fallback>@oldAgeRangeFromTo</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-age-range-type" use-empty-fallback>@oldAgeRangeType?.GetDisplayName()</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
-                    @if (updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
+                    @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds))
                     {
                         <govuk-summary-list-row>
                             <govuk-summary-list-row-key>Subjects </govuk-summary-list-row-key>

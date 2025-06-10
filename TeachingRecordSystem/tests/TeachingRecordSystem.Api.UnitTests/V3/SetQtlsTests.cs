@@ -37,7 +37,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         });
 
     [Fact]
-    public Task HandleAsync_NullQtsDateAndExistingQtlsRoute_DeletesRoute() =>
+    public Task HandleAsync_NullQtsDateAndExistingQtlsRoute_DeletesRouteAndSetsQtlsStatusToExpired() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
             // Arrange
@@ -57,9 +57,12 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             var route = await GetQtlsRoute(person.PersonId);
             Assert.Equal(Clock.UtcNow, route?.DeletedOn);
 
+            var qtlsStatus = await GetQtlsStatus(person.PersonId);
+            Assert.Equal(QtlsStatus.Expired, qtlsStatus);
+
             EventObserver.AssertEventsSaved(e =>
             {
-                var deletedEvent = Assert.IsType<ProfessionalStatusDeletedEvent>(e);
+                var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
                 Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, deletedEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, deletedEvent.RaisedBy);
@@ -67,7 +70,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         });
 
     [Fact]
-    public Task HandleAsync_NonNullQtsDateAndNoExistingRoute_CreatesRoute() =>
+    public Task HandleAsync_NonNullQtsDateAndNoExistingRoute_CreatesRouteAndSetsQtlsStatusToActive() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
             // Arrange
@@ -87,12 +90,15 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             var route = await GetQtlsRoute(person.PersonId);
             Assert.NotNull(route);
             Assert.Equal(qtlsDate, route.AwardedDate);
-            Assert.Equal(ProfessionalStatusStatus.Awarded, route.Status);
+            Assert.Equal(RouteToProfessionalStatusStatus.Awarded, route.Status);
             Assert.Equal(Clock.UtcNow, route.CreatedOn);
+
+            var qtlsStatus = await GetQtlsStatus(person.PersonId);
+            Assert.Equal(QtlsStatus.Active, qtlsStatus);
 
             EventObserver.AssertEventsSaved(e =>
             {
-                var createdEvent = Assert.IsType<ProfessionalStatusCreatedEvent>(e);
+                var createdEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, createdEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, createdEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, createdEvent.RaisedBy);
@@ -142,16 +148,16 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
             var route = await GetQtlsRoute(person.PersonId);
             Assert.NotNull(route);
             Assert.Equal(newQtlsDate, route.AwardedDate);
-            Assert.Equal(ProfessionalStatusStatus.Awarded, route.Status);
+            Assert.Equal(RouteToProfessionalStatusStatus.Awarded, route.Status);
             Assert.Equal(Clock.UtcNow, route.UpdatedOn);
 
             EventObserver.AssertEventsSaved(e =>
             {
-                var updatedEvent = Assert.IsType<ProfessionalStatusUpdatedEvent>(e);
+                var updatedEvent = Assert.IsType<RouteToProfessionalStatusUpdatedEvent>(e);
                 Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, updatedEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, updatedEvent.RaisedBy);
-                Assert.True(updatedEvent.Changes.HasFlag(ProfessionalStatusUpdatedEventChanges.AwardedDate));
+                Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.AwardedDate));
             });
         });
 
@@ -161,4 +167,11 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
                 .OfType<RouteToProfessionalStatus>()
                 .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(q => q.PersonId == personId && q.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId));
+
+    private Task<QtlsStatus> GetQtlsStatus(Guid personId) =>
+        DbFixture.WithDbContextAsync(dbContext =>
+            dbContext.Persons
+                .Where(p => p.PersonId == personId)
+                .Select(p => p.QtlsStatus)
+                .SingleAsync());
 }

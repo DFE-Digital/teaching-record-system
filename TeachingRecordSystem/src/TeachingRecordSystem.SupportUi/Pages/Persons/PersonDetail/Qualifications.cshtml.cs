@@ -26,7 +26,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
 
     public async Task OnGetAsync()
     {
-        ProfessionalStatuses = await dbContext.ProfessionalStatuses
+        ProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
             .Include(q => q.TrainingProvider)
             .Include(q => q.TrainingCountry)
             .Include(q => q.RouteToProfessionalStatusType)

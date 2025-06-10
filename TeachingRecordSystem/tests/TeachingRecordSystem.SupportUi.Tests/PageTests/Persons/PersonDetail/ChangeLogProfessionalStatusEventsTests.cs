@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 using TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus;
+using ProfessionalStatusType = TeachingRecordSystem.Core.Models.ProfessionalStatusType;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
@@ -13,15 +15,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today.AddDays(-1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ProfessionalStatusStatus.InTraining;
+        var status = RouteToProfessionalStatusStatus.InTraining;
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
         var createdByUser = await TestData.CreateUserAsync();
+
         var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q => q
+            .WithRouteToProfessionalStatus(q => q
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
@@ -31,8 +34,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
                 .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
                 .WithTrainingAgeSpecialismType(ageRange)
                 .WithDegreeTypeId(degreeType.DegreeTypeId)
-                .WithCreatedByUser(EventModels.RaisedByUserInfo.FromUserId(createdByUser.UserId))
-                    ));
+                .WithCreatedByUser(EventModels.RaisedByUserInfo.FromUserId(createdByUser.UserId))));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -67,15 +69,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     {
         // Arrange
         var awardDate = Clock.Today;
-        var oldAwardDate = awardDate.AddDays(1);
+
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.EarlyYearsTeacherStatus)
             .RandomOne();
+
         var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
-                q.WithStatus(ProfessionalStatusStatus.Awarded);
+                q.WithStatus(RouteToProfessionalStatusStatus.Awarded);
                 q.WithAwardedDate(Clock.Today);
                 q.WithInductionExemption(true);
             }));
@@ -111,7 +114,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var oldDegreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var oldCountry = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var oldAgeRange = TrainingAgeSpecialismType.FoundationStage;
-        var awardDate = oldAwardDate.AddDays(1);
+        var awardedDate = oldAwardDate.AddDays(1);
         var startDate = oldStartDate.AddDays(1);
         var endDate = oldEndDate.AddDays(1);
         var route = oldRoute;
@@ -120,56 +123,58 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).Where(x => x.DegreeTypeId != oldDegreeType.DegreeTypeId).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Where(x => x.CountryId != oldCountry.CountryId).RandomOne();
         var ageRange = TrainingAgeSpecialismType.KeyStage1;
+        var oldExemptFromInduction = false;
+        var exemptFromInduction = true;
+
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
-                q.WithInductionExemption(true);
-                q.WithTrainingStartDate(startDate);
-                q.WithTrainingEndDate(endDate);
-                q.WithAwardedDate(awardDate);
-                q.WithTrainingProviderId(trainingProvider.TrainingProviderId);
-                q.WithTrainingCountryId(country.CountryId);
-                q.WithTrainingSubjectIds(new List<Guid>() { subject.TrainingSubjectId }.ToArray());
-                q.WithTrainingAgeSpecialismType(ageRange);
-                q.WithDegreeTypeId(degreeType.DegreeTypeId);
-                q.WithInductionExemption(true);
+                q.WithInductionExemption(oldExemptFromInduction);
+                q.WithTrainingStartDate(oldStartDate);
+                q.WithTrainingEndDate(oldEndDate);
+                q.WithAwardedDate(oldAwardDate);
+                q.WithTrainingProviderId(oldTrainingProvider.TrainingProviderId);
+                q.WithTrainingCountryId(oldCountry.CountryId);
+                q.WithTrainingSubjectIds([oldSubject.TrainingSubjectId]);
+                q.WithTrainingAgeSpecialismType(oldAgeRange);
+                q.WithDegreeTypeId(oldDegreeType.DegreeTypeId);
             }));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
 
-        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.RouteToProfessionalStatus.FromModel(professionalStatus) with
+        var updatedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
         {
-            AwardedDate = oldAwardDate,
-            DegreeTypeId = oldDegreeType.DegreeTypeId,
-            ExemptFromInduction = false,
-            TrainingCountryId = oldCountry.CountryId,
-            TrainingEndDate = oldEndDate,
-            TrainingStartDate = oldStartDate,
-            TrainingProviderId = oldTrainingProvider.TrainingProviderId,
-            TrainingSubjectIds = new List<Guid>() { oldSubject.TrainingSubjectId }.ToArray(),
-            TrainingAgeSpecialismType = oldAgeRange
-        };
-        var createdByUser = await TestData.CreateUserAsync();
-        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
-        var professionalStatusUpdatedEvent = await TestData.CreateProfessionalStatusUpdatedEventAsync(e => e
-            .ForPerson(person.Person)
-            .WithProfessionalStatus(professionalStatus)
-            .WithOldProfessionalStatus(oldProfessionalStatus)
-            .WithCreatedByUser(raisedByUser)
-            .WithCreatedUtc(Clock.UtcNow)
-            .WithChanges(
-                ProfessionalStatusUpdatedEventChanges.AwardedDate
-                | ProfessionalStatusUpdatedEventChanges.StartDate
-                | ProfessionalStatusUpdatedEventChanges.EndDate
-                | ProfessionalStatusUpdatedEventChanges.DegreeType
-                | ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds
-                | ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType
-                | ProfessionalStatusUpdatedEventChanges.TrainingCountry
-                | ProfessionalStatusUpdatedEventChanges.TrainingProvider
-                | ProfessionalStatusUpdatedEventChanges.InductionExemptionReasons)
-            ) as ProfessionalStatusUpdatedEvent;
+            professionalStatus.Update(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                r =>
+                {
+                    r.AwardedDate = awardedDate;
+                    r.TrainingStartDate = startDate;
+                    r.TrainingEndDate = endDate;
+                    r.DegreeTypeId = degreeType.DegreeTypeId;
+                    r.TrainingSubjectIds = [subject.TrainingSubjectId];
+                    r.TrainingProviderId = trainingProvider.TrainingProviderId;
+                    r.TrainingAgeSpecialismType = ageRange;
+                    r.TrainingCountryId = country.CountryId;
+                    r.ExemptFromInduction = exemptFromInduction;
+                },
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
+                updatedBy: updatedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+
+            Debug.Assert(@event is not null);
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -181,14 +186,10 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
-        Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("qts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
         Assert.Null(timelineItem.GetElementByTestId("status"));
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
+        Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(startDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("start-date")!.TrimmedText());
         Assert.Equal(endDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("end-date")!.TrimmedText());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("exemption")?.TrimmedText());
@@ -214,50 +215,56 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusUpdatedEvent_StatusChanged_PersonQtsChanged_RendersExpectedContent()
     {
         // Arrange
-        var oldStatus = ProfessionalStatusStatus.InTraining;
+        var oldStatus = RouteToProfessionalStatusStatus.InTraining;
         var startDate = Clock.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Awarded;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.KeyStage1;
+
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
-                q.WithStatus(status);
+                q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
                 q.WithTrainingEndDate(endDate);
                 q.WithAwardedDate(awardDate);
                 q.WithTrainingProviderId(trainingProvider.TrainingProviderId);
                 q.WithTrainingCountryId(country.CountryId);
-                q.WithTrainingSubjectIds(new List<Guid>() { subject.TrainingSubjectId }.ToArray());
+                q.WithTrainingSubjectIds([subject.TrainingSubjectId]);
                 q.WithTrainingAgeSpecialismType(ageRange);
                 q.WithDegreeTypeId(degreeType.DegreeTypeId);
                 q.WithInductionExemption(true);
             }));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
-        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.RouteToProfessionalStatus.FromModel(professionalStatus) with
+
+        var updatedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
         {
-            Status = oldStatus
-        };
-        var createdByUser = await TestData.CreateUserAsync();
-        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
-        var professionalStatusUpdatedEvent = await TestData.CreateProfessionalStatusUpdatedEventAsync(e => e
-            .ForPerson(person.Person)
-            .WithProfessionalStatus(professionalStatus)
-            .WithOldProfessionalStatus(oldProfessionalStatus)
-            .WithCreatedByUser(raisedByUser)
-            .WithCreatedUtc(Clock.UtcNow)
-            .WithPersonAttributes(new Core.Events.Models.ProfessionalStatusPersonAttributes() { EytsDate = awardDate, HasEyps = false, PqtsDate = null, QtsDate = null })
-            .WithChanges(ProfessionalStatusUpdatedEventChanges.Status | ProfessionalStatusUpdatedEventChanges.PersonEytsDate)
-            ) as ProfessionalStatusUpdatedEvent;
+            professionalStatus.Update(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                r => r.Status = status,
+                changeReason: null,
+                changeReasonDetail: null,
+                evidenceFile: null,
+                updatedBy: updatedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+            Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -269,12 +276,12 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal($"By {updatedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
-        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+        Assert.Equal(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("qts-date"));
+        Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
         Assert.Null(timelineItem.GetElementByTestId("award-date"));
         Assert.Null(timelineItem.GetElementByTestId("start-date"));
@@ -287,7 +294,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Null(timelineItem.GetElementByTestId("subjects"));
 
         Assert.Equal(oldStatus.GetDisplayName(), timelineItem.GetElementByTestId("old-status")?.TrimmedText());
-        Assert.Equal("Not provided", timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
+        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("old-start-date"));
         Assert.Null(timelineItem.GetElementByTestId("old-end-date"));
         Assert.Null(timelineItem.GetElementByTestId("old-exemption"));
@@ -302,41 +309,45 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusUpdatedEvent_RendersExpectedChangeReasonContent()
     {
         // Arrange
-        var oldStatus = ProfessionalStatusStatus.InTraining;
+        var oldStatus = RouteToProfessionalStatusStatus.InTraining;
         var startDate = Clock.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = ProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Awarded;
         var changeReason = "Text from change reason selection";
-        var changeReasonDetails = TestData.GenerateLoremIpsum();
+        var changeReasonDetail = TestData.GenerateLoremIpsum();
+
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
-                q.WithStatus(status);
+                q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithAwardedDate(awardDate);
             }));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
-        var oldProfessionalStatus = TeachingRecordSystem.Core.Events.Models.RouteToProfessionalStatus.FromModel(professionalStatus) with
-        {
-            Status = oldStatus
-        };
 
-        var createdByUser = await TestData.CreateUserAsync();
-        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
-        var professionalStatusUpdatedEvent = await TestData.CreateProfessionalStatusUpdatedEventAsync(e => e
-            .ForPerson(person.Person)
-            .WithProfessionalStatus(professionalStatus)
-            .WithOldProfessionalStatus(oldProfessionalStatus)
-            .WithCreatedByUser(raisedByUser)
-            .WithCreatedUtc(Clock.UtcNow)
-            .WithChanges(ProfessionalStatusUpdatedEventChanges.Status)
-            .WithChangeReason(changeReason)
-            .WithChangeReasonDetails(changeReasonDetails)
-            ) as ProfessionalStatusUpdatedEvent;
+        var updatedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            professionalStatus.Update(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                r => r.Status = status,
+                changeReason: changeReason,
+                changeReasonDetail: changeReasonDetail,
+                evidenceFile: null,
+                updatedBy: updatedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+            Debug.Assert(@event is not null && @event.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.Status));
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -349,7 +360,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var timelineItem = doc.GetElementByTestId("timeline-item-route-updated-event");
         Assert.NotNull(timelineItem);
         Assert.Equal(changeReason, timelineItem.GetElementByTestId("reason")?.TrimmedText());
-        Assert.Equal(changeReasonDetails, timelineItem.GetElementByTestId("reason-detail")?.TrimmedText());
+        Assert.Equal(changeReasonDetail, timelineItem.GetElementByTestId("reason-detail")?.TrimmedText());
     }
 
     [Fact]
@@ -359,15 +370,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today.AddDays(-1);
         var awardedDate = endDate.AddDays(1);
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync(ProfessionalStatusType.QualifiedTeacherStatus);
+        var status = RouteToProfessionalStatusStatus.Awarded;
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
+
         var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
@@ -385,14 +397,23 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             }));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
-        var createdByUser = await TestData.CreateUserAsync();
-        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
-        var professionalStatusDeletedEvent = await TestData.CreateProfessionalStatusDeletedEventAsync(e => e
-            .ForPerson(person.Person)
-            .WithProfessionalStatus(professionalStatus)
-            .WithCreatedByUser(raisedByUser)
-            .WithCreatedUtc(Clock.UtcNow)
-            ) as ProfessionalStatusDeletedEvent;
+        var deletedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            professionalStatus.Delete(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                deletionReason: null,
+                deletionReasonDetail: null,
+                evidenceFile: null,
+                deletedBy: deletedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -404,11 +425,11 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
         Assert.NotNull(timelineItem);
-        Assert.Equal($"By {createdByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
+        Assert.Equal($"By {deletedByUser.Name} on", timelineItem.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), timelineItem.GetElementByTestId("timeline-item-time")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
         Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("qts-date"));
+        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("has-eyps"));
         Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("award-date")?.TrimmedText());
         Assert.Equal(status.GetDisplayName(), timelineItem.GetElementByTestId("status")?.TrimmedText());
@@ -424,49 +445,29 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     }
 
     [Fact]
-    public async Task ProfessionalStatusDeletedEvent_AffectsPersonProfessionalStatus_RendersExpectedContent()
+    public async Task ProfessionalStatusDeletedEvent_AffectsPersonQts_RendersExpectedContent()
     {
         // Arrange
-        var startDate = Clock.Today.AddYears(-1);
-        var endDate = Clock.Today.AddDays(-1);
-        var awardedDate = endDate.AddDays(1);
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
-        var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
-        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).Take(1);
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
-        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
-        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
-        var ageRange = TrainingAgeSpecialismType.FoundationStage;
-        var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q =>
-            {
-                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
-                q.WithStatus(status);
-                q.WithAwardedDate(Clock.Today);
-                q.WithInductionExemption(true);
-                q.WithTrainingStartDate(startDate);
-                q.WithTrainingEndDate(endDate);
-                q.WithAwardedDate(awardedDate);
-                q.WithTrainingProviderId(trainingProvider.TrainingProviderId);
-                q.WithTrainingCountryId(country.CountryId);
-                q.WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray());
-                q.WithTrainingAgeSpecialismType(ageRange);
-                q.WithDegreeTypeId(degreeType.DegreeTypeId);
-                q.WithInductionExemption(true);
-            }));
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
-        var createdByUser = await TestData.CreateUserAsync();
-        var raisedByUser = TeachingRecordSystem.Core.Events.Models.RaisedByUserInfo.FromUserId(createdByUser.UserId);
-        var professionalStatusDeletedEvent = await TestData.CreateProfessionalStatusDeletedEventAsync(e => e
-            .ForPerson(person.Person)
-            .WithProfessionalStatus(professionalStatus)
-            .WithPersonAttributes(new Core.Events.Models.ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = false, PqtsDate = null, QtsDate = null })
-            .WithOldPersonAttributes(new Core.Events.Models.ProfessionalStatusPersonAttributes() { EytsDate = null, HasEyps = true, PqtsDate = null, QtsDate = null })
-            .WithCreatedByUser(raisedByUser)
-            .WithCreatedUtc(Clock.UtcNow)
-            .WithChanges(ProfessionalStatusDeletedEventChanges.PersonHasEyps)
-            ) as ProfessionalStatusDeletedEvent;
+        var deletedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            professionalStatus.Delete(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                deletionReason: null,
+                deletionReasonDetail: null,
+                evidenceFile: null,
+                deletedBy: deletedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
 
@@ -478,9 +479,123 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
         Assert.NotNull(timelineItem);
-        Assert.Null(timelineItem.GetElementByTestId("eyts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("pqts-date"));
-        Assert.Null(timelineItem.GetElementByTestId("qts-date"));
+        Assert.Equal(professionalStatus.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-qts-date")?.TrimmedText());
+        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("qts-date")?.TrimmedText());
+    }
+
+    [Fact]
+    public async Task ProfessionalStatusDeletedEvent_AffectsPersonEyts_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var deletedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            professionalStatus.Delete(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                deletionReason: null,
+                deletionReasonDetail: null,
+                evidenceFile: null,
+                deletedBy: deletedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal(professionalStatus.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-eyts-date")?.TrimmedText());
+        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("eyts-date")?.TrimmedText());
+    }
+
+    [Fact]
+    public async Task ProfessionalStatusDeletedEvent_AffectsPersonPqts_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
+
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var deletedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            professionalStatus.Delete(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                deletionReason: null,
+                deletionReasonDetail: null,
+                evidenceFile: null,
+                deletedBy: deletedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal(professionalStatus.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-pqts-date")?.TrimmedText());
+        Assert.Equal(UiDefaults.EmptyDisplayContent, timelineItem.GetElementByTestId("pqts-date")?.TrimmedText());
+    }
+
+    [Fact]
+    public async Task ProfessionalStatusDeletedEvent_AffectsPersonEyps_RendersExpectedContent()
+    {
+        // Arrange
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
+
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+        var deletedByUser = await TestData.CreateUserAsync();
+
+        await WithDbContext(async dbContext =>
+        {
+            professionalStatus.Delete(
+                allRouteTypes: await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
+                deletionReason: null,
+                deletionReasonDetail: null,
+                evidenceFile: null,
+                deletedBy: deletedByUser.UserId,
+                Clock.UtcNow,
+                out var @event);
+
+            dbContext.AddEventWithoutBroadcast(@event);
+
+            await dbContext.SaveChangesAsync();
+        });
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-deleted-event");
+        Assert.NotNull(timelineItem);
         Assert.Equal("No", timelineItem.GetElementByTestId("has-eyps")?.TrimmedText());
         Assert.Equal("Yes", timelineItem.GetElementByTestId("old-has-eyps")?.TrimmedText());
     }

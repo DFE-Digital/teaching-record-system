@@ -2,7 +2,7 @@
 @using TeachingRecordSystem.Core.Services.Files
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
-@model TimelineItem<TimelineEvent<ProfessionalStatusDeletedEvent>>
+@model TimelineItem<TimelineEvent<RouteToProfessionalStatusDeletedEvent>>
 @{
     var deletedEvent = Model.ItemModel.Event;
     var professionalStatus = deletedEvent.RouteToProfessionalStatus;
@@ -67,34 +67,34 @@
                 </govuk-summary-list>
             </govuk-details-text>
         </govuk-details>
-        @if (deletedEvent.Changes != ProfessionalStatusDeletedEventChanges.None)
+        @if (deletedEvent.Changes != RouteToProfessionalStatusDeletedEventChanges.None)
         {
             <govuk-details class="govuk-!-margin-bottom-2">
                 <govuk-details-summary>Person professional status updated as a result of the route deletion</govuk-details-summary>
                 <govuk-details-text>
                     <govuk-summary-list>
-                        @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonHasEyps))
+                        @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value data-testid="has-eyps">@(deletedEvent.PersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                        @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonEytsDate))
+                        @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@deletedEvent.PersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                        @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonPqtsDate))
+                        @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
                                 <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@deletedEvent.PersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
-                        @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonQtsDate))
+                        @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
                         {
                             <govuk-summary-list-row>
                                 <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
@@ -109,28 +109,28 @@
         <govuk-details-summary>Deleted data</govuk-details-summary>
             <govuk-details-text>
                 <govuk-summary-list>
-                @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonHasEyps))
+                @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps))
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Person has Eyps</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="old-has-eyps">@(deletedEvent.OldPersonAttributes.HasEyps ? "Yes" : "No")</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonEytsDate))
+                @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate))
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonPqtsDate))
+                @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate))
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@deletedEvent.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                @if (deletedEvent.Changes.HasFlag(ProfessionalStatusDeletedEventChanges.PersonQtsDate))
+                @if (deletedEvent.Changes.HasFlag(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate))
                 {
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>

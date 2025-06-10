@@ -137,7 +137,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithProfessionalStatus(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
+        public CreatePersonBuilder WithRouteToProfessionalStatus(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
         {
             EnsureTrn();
 
@@ -148,7 +148,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithAwardedProfessionalStatus(ProfessionalStatusType professionalStatusType)
+        public CreatePersonBuilder WithAwardedRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
         {
             EnsureTrn();
             _awardedProfessionalStatuses.Add(professionalStatusType);
@@ -245,8 +245,8 @@ public partial class TestData
         }
 
         public CreatePersonBuilder WithQtls(DateOnly awardedDate) =>
-            WithProfessionalStatus(p => p
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+            WithRouteToProfessionalStatus(p => p
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
@@ -592,7 +592,8 @@ public partial class TestData
                     .Where(p => p.PersonId == contact.Id)
                     .ToArrayAsync();
 
-                var personProfessionalStatuses = await dbContext.ProfessionalStatuses
+                var personProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
+                    .Include(r => r.RouteToProfessionalStatusType)
                     .Where(p => p.PersonId == PersonId)
                     .ToArrayAsync();
 
@@ -652,7 +653,7 @@ public partial class TestData
                                 person,
                                 allRoutes,
                                 route.RouteToProfessionalStatusTypeId,
-                                ProfessionalStatusStatus.Awarded,
+                                RouteToProfessionalStatusStatus.Awarded,
                                 testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
                                 route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
                                 route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
@@ -671,7 +672,7 @@ public partial class TestData
                                 out var @createdEvent
                                 );
 
-                        dbContext.ProfessionalStatuses.Add(professionalStatus);
+                        dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
                         dbContext.AddEventWithoutBroadcast(createdEvent);
 
                         createdProfessionalStatusIds.Add(professionalStatus.QualificationId);

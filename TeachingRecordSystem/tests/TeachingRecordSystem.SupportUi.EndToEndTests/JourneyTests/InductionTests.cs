@@ -509,9 +509,9 @@ public class InductionTests : TestBase
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.Exempt)
                     .WithExemptionReasons(exemptionReasonId))
-                .WithProfessionalStatus(r => r
+                .WithRouteToProfessionalStatus(r => r
                     .WithRouteType(routeType.RouteToProfessionalStatusTypeId)
-                    .WithStatus(ProfessionalStatusStatus.Approved)
+                    .WithStatus(RouteToProfessionalStatusStatus.Approved)
                     .WithInductionExemption(true)
                     .WithAwardedDate(awardedDate))
                 );
@@ -539,9 +539,9 @@ public class InductionTests : TestBase
                 .WithInductionStatus(inductionBuilder => inductionBuilder
                     .WithStatus(InductionStatus.Exempt)
                     .WithExemptionReasons(exemptionReasonId))
-                .WithProfessionalStatus(r => r
+                .WithRouteToProfessionalStatus(r => r
                     .WithRouteType(routeType.RouteToProfessionalStatusTypeId)
-                    .WithStatus(ProfessionalStatusStatus.Approved)
+                    .WithStatus(RouteToProfessionalStatusStatus.Approved)
                     .WithInductionExemption(true)
                     .WithAwardedDate(awardedDate))
                 );

@@ -199,6 +199,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0065_TrsPersonMergedWith.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0066_TrsPersonQtlsStatus.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0067_TrsRoutesModelChanges.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0068_TrsQualificationsTrainingCountryId.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0069_TrsQualificationsDegreeTypeId.sql" />
   </ItemGroup>
 
   <ItemGroup>

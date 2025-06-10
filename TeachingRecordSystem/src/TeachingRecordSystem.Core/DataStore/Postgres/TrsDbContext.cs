@@ -117,7 +117,7 @@ public class TrsDbContext : DbContext
 
     public DbSet<OutboxMessageProcessorMetadata> OutboxMessageProcessorMetadata => Set<OutboxMessageProcessorMetadata>();
 
-    public DbSet<RouteToProfessionalStatus> ProfessionalStatuses => Set<RouteToProfessionalStatus>();
+    public DbSet<RouteToProfessionalStatus> RouteToProfessionalStatuses => Set<RouteToProfessionalStatus>();
 
     public DbSet<DegreeType> DegreeTypes => Set<DegreeType>();
 

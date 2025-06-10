@@ -1,0 +1,2 @@
+alter table trs_qualifications drop column degree_type_id
+alter table trs_qualifications add degree_type_id uniqueidentifier

@@ -20,7 +20,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardedDate)));
@@ -64,7 +64,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -101,9 +101,9 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(ProfessionalStatusStatus.Approved)]
-    [InlineData(ProfessionalStatusStatus.Awarded)]
-    public async Task Post_StatusAwardedJourney_RouteAllowsExemption_TrainingAwardedDateIsEntered_SavesDateAndRedirectsToInductionExemptionPage(ProfessionalStatusStatus status)
+    [InlineData(RouteToProfessionalStatusStatus.Approved)]
+    [InlineData(RouteToProfessionalStatusStatus.Awarded)]
+    public async Task Post_StatusAwardedJourney_RouteAllowsExemption_TrainingAwardedDateIsEntered_SavesDateAndRedirectsToInductionExemptionPage(RouteToProfessionalStatusStatus status)
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -113,9 +113,9 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.Name == "NI R") // an induction exemption route that requires the exemption question
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -154,9 +154,9 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(ProfessionalStatusStatus.Approved)]
-    [InlineData(ProfessionalStatusStatus.Awarded)]
-    public async Task Post_StatusAwardedJourney_RouteHasImplictExemption_TrainingAwardedDateIsEntered_SavesDateAndExemptionAndRedirectsToDetailPage(ProfessionalStatusStatus status)
+    [InlineData(RouteToProfessionalStatusStatus.Approved)]
+    [InlineData(RouteToProfessionalStatusStatus.Awarded)]
+    public async Task Post_StatusAwardedJourney_RouteHasImplictExemption_TrainingAwardedDateIsEntered_SavesDateAndExemptionAndRedirectsToDetailPage(RouteToProfessionalStatusStatus status)
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -172,9 +172,9 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             )
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -225,13 +225,13 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Awarded)
+            .WithStatus(RouteToProfessionalStatusStatus.Awarded)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .Build();
@@ -263,13 +263,13 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.InTraining)));
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(ProfessionalStatusStatus.Awarded)
+            .WithStatus(RouteToProfessionalStatusStatus.Awarded)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
             .WithValidChangeReasonOption()

@@ -48,7 +48,7 @@ public class Person
     public DateOnly? EytsDate { get; internal set; }
     public bool HasEyps { get; internal set; }
     public DateOnly? PqtsDate { get; internal set; }
-    public ICollection<Qualification>? Qualifications { get; }
+    public ICollection<Qualification>? Qualifications { get; protected set; }
     public ICollection<Alert>? Alerts { get; }
     public ICollection<PreviousName>? PreviousNames { get; }
 
@@ -193,6 +193,21 @@ public class Person
         };
     }
 
+    // This should be used for testing only
+    public void UnsafeSetInductionStatus(
+        InductionStatus status,
+        InductionStatus statusWithoutExemption,
+        DateOnly? startDate,
+        DateOnly? completedDate,
+        Guid[] exemptionReasonIds)
+    {
+        InductionStatus = status;
+        InductionStatusWithoutExemption = statusWithoutExemption;
+        InductionStartDate = startDate;
+        InductionCompletedDate = completedDate;
+        InductionExemptionReasonIds = exemptionReasonIds;
+    }
+
     public void SetInductionStatus(
         InductionStatus status,
         DateOnly? startDate,
@@ -330,7 +345,9 @@ public class Person
         InductionExemptionReasonIds = InductionExemptionReasonIds.Except([exemptionReasonId]).ToArray();
         InductionModifiedOn = now;
 
-        if (InductionStatus is InductionStatus.Exempt && (InductionExemptionReasonIds.Length == 0 && !InductionExemptWithoutReason))
+        var allExemptionReasonIds = GetAllInductionExemptionReasonIds();
+
+        if (InductionStatus is InductionStatus.Exempt && (allExemptionReasonIds.Count == 0 && !InductionExemptWithoutReason))
         {
             InductionStatus = InductionStatusWithoutExemption;
             changes |= PersonInductionUpdatedEventChanges.InductionStatus;
@@ -469,22 +486,84 @@ public class Person
         return (CpdInductionModifiedOn is not null && (InductionCompletedDate is null || InductionCompletedDate > sevenYearsAgo));
     }
 
+    public (EventModels.Induction NewInduction, EventModels.Induction OldInduction, bool Changed) RefreshInductionStatusForQtsProfessionalStatusChanged(
+        DateTime now,
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
+        IEnumerable<RouteToProfessionalStatus>? routesHint = null)
+    {
+        var oldInduction = EventModels.Induction.FromModel(this);
+
+        var currentStatus = InductionStatus;
+
+        var routes = routesHint ??
+            Qualifications?
+                .OfType<RouteToProfessionalStatus>()
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("Routes not loaded.");
+
+        var awardedOrApprovedQtsProfessionalStatuses = routes
+            .Where(p => allRouteTypes.Single(rt => rt.RouteToProfessionalStatusTypeId == p.RouteToProfessionalStatusTypeId).ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
+                p.Status is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved)
+            .ToArray();
+
+        var awardedBeforeInduction = awardedOrApprovedQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
+        var requiredToComplete = awardedOrApprovedQtsProfessionalStatuses.Any() && !awardedBeforeInduction;
+
+        if (!requiredToComplete &&
+            currentStatus is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed)
+        {
+            throw new InvalidOperationException($"Cannot remove the induction requirement for a person who is '{InductionStatus}'.");
+        }
+
+        var exemptViaRoute = awardedBeforeInduction || awardedOrApprovedQtsProfessionalStatuses.Any(p => p.ExemptFromInduction == true);
+        var routeDerivedStatus = exemptViaRoute ? InductionStatus.Exempt :
+            requiredToComplete ? InductionStatus.RequiredToComplete :
+            InductionStatus.None;
+
+        var newStatus = routeDerivedStatus.IsHigherPriorityThan(currentStatus) || currentStatus is InductionStatus.RequiredToComplete ?
+            routeDerivedStatus :
+            currentStatus;
+        var changed = newStatus != currentStatus;
+
+        if (changed)
+        {
+            InductionStatus = newStatus;
+            InductionModifiedOn = now;
+            changed = true;
+        }
+
+        if (requiredToComplete && InductionStatus.RequiredToComplete.IsHigherPriorityThan(InductionStatusWithoutExemption))
+        {
+            InductionStatusWithoutExemption = InductionStatus.RequiredToComplete;
+            changed = true;
+        }
+        else if (!requiredToComplete && InductionStatusWithoutExemption == InductionStatus.RequiredToComplete)
+        {
+            InductionStatusWithoutExemption = InductionStatus.None;
+            changed = true;
+        }
+
+        var newInduction = EventModels.Induction.FromModel(this);
+
+        return (newInduction, oldInduction, changed);
+    }
+
     public bool RefreshProfessionalStatusAttributes(
         ProfessionalStatusType professionalStatusType,
-        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
-        IEnumerable<RouteToProfessionalStatus>? professionalStatusesHint = null)
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
+        IEnumerable<RouteToProfessionalStatus>? routesHint = null)
     {
-        var professionalStatuses = professionalStatusesHint ??
+        var routes = routesHint ??
             Qualifications?
-                .OfType<RouteToProfessionalStatus>()?
+                .OfType<RouteToProfessionalStatus>()
                 .Where(p => p.DeletedOn is null) ??
-            throw new InvalidOperationException("No professional statuses.");
+            throw new InvalidOperationException("Routes not loaded.");
 
-        var professionalStatusTypeByRouteId = allRoutes.ToDictionary(r => r.RouteToProfessionalStatusTypeId, r => r.ProfessionalStatusType);
+        var professionalStatusTypeByRouteId = allRouteTypes.ToDictionary(r => r.RouteToProfessionalStatusTypeId, r => r.ProfessionalStatusType);
 
-        var awardedOrApproved = professionalStatuses
+        var awardedOrApproved = routes
             .Where(ps => professionalStatusTypeByRouteId[ps.RouteToProfessionalStatusTypeId] == professionalStatusType &&
-                ps.Status is ProfessionalStatusStatus.Approved or ProfessionalStatusStatus.Awarded)
+                ps.Status is RouteToProfessionalStatusStatus.Approved or RouteToProfessionalStatusStatus.Awarded)
             .ToArray();
 
         // We don't have awarded dates for EYPS
@@ -521,6 +600,37 @@ public class Person
         }
     }
 
+    public bool RefreshQtlsStatus(IEnumerable<RouteToProfessionalStatus>? routesHint = null)
+    {
+        var routes = routesHint ??
+            Qualifications?
+                .OfType<RouteToProfessionalStatus>()
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("Routes not loaded.");
+
+        var qtlsRoutes = routes
+            .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId &&
+                r.Status is RouteToProfessionalStatusStatus.Awarded &&
+                r.DeletedOn is null)
+            .ToArray();
+
+        var currentStatus = QtlsStatus;
+
+        if (qtlsRoutes.Length > 0 && currentStatus is not QtlsStatus.Active)
+        {
+            QtlsStatus = QtlsStatus.Active;
+            return true;
+        }
+
+        if (qtlsRoutes.Length == 0 && currentStatus is QtlsStatus.Active)
+        {
+            QtlsStatus = QtlsStatus.Expired;
+            return true;
+        }
+
+        return false;
+    }
+
     private static void AssertInductionChangeIsValid(
         InductionStatus status,
         DateOnly? startDate,
@@ -531,5 +641,28 @@ public class Person
         {
             Debug.Fail(error);
         }
+    }
+
+    private IReadOnlyCollection<Guid> GetAllInductionExemptionReasonIds(
+        IEnumerable<RouteToProfessionalStatus>? routesHint = null)
+    {
+        var routes = routesHint ??
+            Qualifications?
+                .OfType<RouteToProfessionalStatus>()
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("Routes not loaded.");
+
+        var awardedOrApprovedRoutes = routes
+            .Where(s => s.Status is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved)
+            .ToArray();
+
+        var routeLevelExemptionIds = awardedOrApprovedRoutes
+            .Where(r => r.ExemptFromInduction == true)
+            .Select(r => r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value)
+            .Concat(awardedOrApprovedRoutes
+                .Where(r => r.ExemptFromInductionDueToQtsDate == true)
+                .Select(_ => InductionExemptionReason.QualifiedBefore07May2000Id));
+
+        return routeLevelExemptionIds.Concat(InductionExemptionReasonIds).Distinct().AsReadOnly();
     }
 }

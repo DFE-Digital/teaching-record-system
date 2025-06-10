@@ -648,6 +648,30 @@ public class PersonTests
         Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
     }
 
+    [Fact]
+    public void RemoveInductionExemptionReason_PersonIsAlsoExemptThroughRoute_DoesNotChangeStatus()
+    {
+        // Arrange
+        var exemptionReasonId = Guid.NewGuid();
+
+        var person = CreatePersonWithInductionStatus(
+            InductionStatus.Exempt,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [exemptionReasonId]);
+
+        person.Qualifications!.Add(CreateAwardedProfessionalStatus(person, exemptFromInduction: true));
+
+        // Act
+        person.RemoveInductionExemptionReason(
+            exemptionReasonId,
+            updatedBy: SystemUser.SystemUserId,
+            now: Clock.UtcNow,
+            out _);
+
+        // Assert
+        Assert.Equal(InductionStatus.Exempt, person.InductionStatus);
+    }
+
     [Theory]
     [MemberData(nameof(GetRefreshProfessionalStatusAttributesData))]
     public void RefreshProfessionalStatusAttributes(RefreshProfessionalStatusAttributesTestCaseData testCaseData)
@@ -659,11 +683,11 @@ public class PersonTests
         var professionalStatuses = new List<RouteToProfessionalStatus>();
 
         DateOnly? existingRouteAwarded = Clock.Today.AddDays(-10);
-        ProfessionalStatusStatus existingRouteStatus =
-            testCaseData.ExistingRouteIsAwardedOrApproved ? ProfessionalStatusStatus.Awarded : ProfessionalStatusStatus.InTraining;
+        RouteToProfessionalStatusStatus existingRouteStatus =
+            testCaseData.ExistingRouteIsAwardedOrApproved ? RouteToProfessionalStatusStatus.Awarded : RouteToProfessionalStatusStatus.InTraining;
         DateOnly? newRouteAwardedDate = testCaseData.NewAwardedDateIsAfterExistingAwardedDate ? Clock.Today.AddDays(-1) : Clock.Today.AddDays(-20);
-        ProfessionalStatusStatus newRouteStatus =
-            testCaseData.NewRouteIsAwardedOrApproved ? ProfessionalStatusStatus.Awarded : ProfessionalStatusStatus.InTraining;
+        RouteToProfessionalStatusStatus newRouteStatus =
+            testCaseData.NewRouteIsAwardedOrApproved ? RouteToProfessionalStatusStatus.Awarded : RouteToProfessionalStatusStatus.InTraining;
 
         if (testCaseData.HaveExistingRouteForStatus)
         {
@@ -690,7 +714,7 @@ public class PersonTests
             }
             else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
             {
-                person.HasEyps = existingProfessionalStatus.Status is ProfessionalStatusStatus.Approved or ProfessionalStatusStatus.Awarded;
+                person.HasEyps = existingProfessionalStatus.Status is RouteToProfessionalStatusStatus.Approved or RouteToProfessionalStatusStatus.Awarded;
             }
         }
 
@@ -742,8 +766,8 @@ public class PersonTests
             Assert.Equal(
                 testCaseData.ExpectedAttributeValue switch
                 {
-                    ExpectedAttributeValue.NewRouteAwarded => newRouteStatus is ProfessionalStatusStatus.Awarded or ProfessionalStatusStatus.Approved,
-                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteStatus is ProfessionalStatusStatus.Awarded or ProfessionalStatusStatus.Approved,
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteStatus is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteStatus is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved,
                     _ => false
                 },
                 person.HasEyps);
@@ -780,8 +804,8 @@ public class PersonTests
                 InductionExemptionReasonId = null
             };
 
-        RouteToProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatusType route, ProfessionalStatusStatus status, DateOnly? awardedDate) =>
-            new RouteToProfessionalStatus()
+        RouteToProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, DateOnly? awardedDate) =>
+            new TestableRouteToProfessionalStatus()
             {
                 QualificationId = Guid.NewGuid(),
                 CreatedOn = Clock.UtcNow,
@@ -789,6 +813,7 @@ public class PersonTests
                 DeletedOn = null,
                 PersonId = person.PersonId,
                 RouteToProfessionalStatusTypeId = route.RouteToProfessionalStatusTypeId,
+                RouteToProfessionalStatusType = route,
                 SourceApplicationUserId = null,
                 SourceApplicationReference = null,
                 Status = status,
@@ -812,16 +837,53 @@ public class PersonTests
             };
     }
 
-    private Person CreatePerson() => new Person
+    [Fact]
+    public void RefreshInductionStatusForQtsProfessionalStatusChanged_NoQtsRoutesAndNoPersonLevelExemptions_SetsInductionStatusToNone()
+    {
+        // Arrange
+        var person = CreatePerson();
+        Debug.Assert(person.InductionExemptionReasonIds.Length == 0);
+
+        // Act
+        person.RefreshInductionStatusForQtsProfessionalStatusChanged(
+            Clock.UtcNow,
+            []);
+
+        // Assert
+        Assert.Equal(InductionStatus.None, person.InductionStatus);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetGetRefreshInductionStatusForQtsProfessionalStatusChangedDataData))]
+    public void RefreshInductionStatusForQtsProfessionalStatusChanged(
+        Person person,
+        IReadOnlyCollection<RouteToProfessionalStatus> newRoutes,
+        InductionStatus expectedInductionStatus,
+        InductionStatus expectedInductionStatusWithoutExemption)
+    {
+        // Arrange
+        var allRouteTypes = newRoutes
+            .Select(r => r.RouteToProfessionalStatusType!)
+            .ToArray();
+
+        // Act
+        person.RefreshInductionStatusForQtsProfessionalStatusChanged(Clock.UtcNow, allRouteTypes, newRoutes);
+
+        // Assert
+        Assert.Equal(expectedInductionStatus, person.InductionStatus);
+        Assert.Equal(expectedInductionStatusWithoutExemption, person.InductionStatusWithoutExemption);
+    }
+
+    private Person CreatePerson() => new TestablePerson()
     {
         PersonId = Guid.NewGuid(),
-        CreatedOn = Clock.UtcNow,
-        UpdatedOn = Clock.UtcNow,
         Trn = "1234567",
         FirstName = "Joe",
         MiddleName = "",
         LastName = "Bloggs",
         DateOfBirth = new DateOnly(1990, 1, 1),
+        CreatedOn = DateTime.UtcNow,
+        UpdatedOn = DateTime.UtcNow
     };
 
     public static TheoryData<RefreshProfessionalStatusAttributesTestCaseData> GetRefreshProfessionalStatusAttributesData()
@@ -849,7 +911,7 @@ public class PersonTests
                 ExpectedAttributeValue: ExpectedAttributeValue.Null,
                 ExpectedResult: false));
 
-            // No existing routes, new route added but not awarded or approved status
+            // No existing routes, new route added but not-awarded or approved status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: false,
@@ -860,7 +922,7 @@ public class PersonTests
                 ExpectedAttributeValue: ExpectedAttributeValue.Null,
                 ExpectedResult: false));
 
-            // Existing route but not awarded or approved, new route added but not awarded or approved status
+            // Existing route but not-awarded or approved, new route added but not-awarded or approved status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: true,
@@ -871,7 +933,7 @@ public class PersonTests
                 ExpectedAttributeValue: ExpectedAttributeValue.Null,
                 ExpectedResult: false));
 
-            // Existing route but not awarded or approved, new route added at awarded or approved status
+            // Existing route but not-awarded or approved, new route added at awarded or approved status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: true,
@@ -882,7 +944,7 @@ public class PersonTests
                 ExpectedAttributeValue: ExpectedAttributeValue.NewRouteAwarded,
                 ExpectedResult: true));
 
-            // Existing route at awarded or approved, new route added but not awarded or approved status
+            // Existing route at awarded or approved, new route added but not-awarded or approved status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: true,
@@ -922,6 +984,340 @@ public class PersonTests
         return data;
     }
 
+    public static TheoryData<Person, IReadOnlyCollection<RouteToProfessionalStatus>, InductionStatus, InductionStatus>
+        GetGetRefreshInductionStatusForQtsProfessionalStatusChangedDataData()
+    {
+        var data = new TheoryData<Person, IReadOnlyCollection<RouteToProfessionalStatus>, InductionStatus, InductionStatus>();
+
+        // Person with 'None' status then QTS route added but not-awarded should stay at 'None'
+        WithPerson(
+            InductionStatus.None,
+            InductionStatus.None,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateNotAwardedProfessionalStatus(person)],
+                InductionStatus.None,
+                InductionStatus.None));
+
+        // Person with 'None' status then QTS route added and Awarded goes to 'RequiredToComplete'
+        WithPerson(
+            InductionStatus.None,
+            InductionStatus.None,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person)],
+                InductionStatus.RequiredToComplete,
+                InductionStatus.RequiredToComplete));
+
+        // Person with 'RequiredToComplete' then QTS route removed goes to 'None'
+        WithPerson(
+            InductionStatus.RequiredToComplete,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [],
+                InductionStatus.None,
+                InductionStatus.None));
+
+        // Person with 'RequiredToComplete' then route status amended from Awarded goes to 'None'
+        WithPerson(
+            InductionStatus.RequiredToComplete,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateNotAwardedProfessionalStatus(person)],
+                InductionStatus.None,
+                InductionStatus.None));
+
+        // Person with 'None' then not-awarded route added with exemption stays at 'None'
+        WithPerson(
+            InductionStatus.None,
+            InductionStatus.None,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateNotAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.None,
+                InductionStatus.None));
+
+        // Person with 'None' then awarded route with exemption added goes to 'Exempt'
+        WithPerson(
+            InductionStatus.None,
+            InductionStatus.None,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Exempt,
+                InductionStatus.RequiredToComplete));
+
+        // Person with 'RequiredToComplete' then not-awarded route added with exemption stays 'RequiredToComplete'
+        WithPerson(
+            InductionStatus.RequiredToComplete,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateNotAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.RequiredToComplete,
+                InductionStatus.RequiredToComplete));
+
+        // Person with 'RequiredToComplete' then awarded route with exemption added goes to 'Exempt'
+        WithPerson(
+            InductionStatus.RequiredToComplete,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Exempt,
+                InductionStatus.RequiredToComplete));
+
+        // Person with 'InProgress' then not-awarded route with exemption stays 'RequiredToComplete'
+        WithPerson(
+            InductionStatus.InProgress,
+            InductionStatus.InProgress,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateNotAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.InProgress,
+                InductionStatus.InProgress));
+
+        // Person with 'InProgress' then awarded route with exemption added goes to 'Exempt'
+        WithPerson(
+            InductionStatus.InProgress,
+            InductionStatus.InProgress,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Exempt,
+                InductionStatus.InProgress));
+
+        // Person with 'Passed' then not-awarded route with exemption added stays 'Passed'
+        WithPerson(
+            InductionStatus.Passed,
+            InductionStatus.Passed,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateNotAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Passed,
+                InductionStatus.Passed));
+
+        // Person with 'Passed' then awarded route with exemption added stays 'Passed'
+        WithPerson(
+            InductionStatus.Passed,
+            InductionStatus.Passed,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Passed,
+                InductionStatus.Passed));
+
+        // Person with 'Failed' then not-awarded route with exemption added stays 'Failed'
+        WithPerson(
+            InductionStatus.Failed,
+            InductionStatus.Failed,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateNotAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Failed,
+                InductionStatus.Failed));
+
+        // Person with 'Failed' then awarded route with exemption added stays 'Failed'
+        WithPerson(
+            InductionStatus.Failed,
+            InductionStatus.Failed,
+            exemptionReasonIds: [],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person), CreateAwardedProfessionalStatus(person, exemptFromInduction: true)],
+                InductionStatus.Failed,
+                InductionStatus.Failed));
+
+        // Person with 'Exempt' (and person-level exemption) then QTS route added but not-awarded stays 'Exempt'
+        WithPerson(
+            InductionStatus.Exempt,
+            InductionStatus.None,
+            exemptionReasonIds: [Guid.NewGuid()],
+            person => data.Add(
+                person,
+                [CreateNotAwardedProfessionalStatus(person)],
+                InductionStatus.Exempt,
+                InductionStatus.None));
+
+        // Person with 'Exempt' (and person-level exemption) then awarded QTS route added stays 'Exempt'
+        WithPerson(
+            InductionStatus.Exempt,
+            InductionStatus.None,
+            exemptionReasonIds: [Guid.NewGuid()],
+            person => data.Add(
+                person,
+                [CreateAwardedProfessionalStatus(person)],
+                InductionStatus.Exempt,
+                InductionStatus.RequiredToComplete));
+
+        // Person with 'Exempt' at person-level and route-level then QTS route removed stays 'Exempt'
+        WithPerson(
+            InductionStatus.Exempt,
+            InductionStatus.RequiredToComplete,
+            exemptionReasonIds: [Guid.NewGuid()],
+            person => data.Add(
+                person,
+                [],
+                InductionStatus.Exempt,
+                InductionStatus.None));
+
+        return data;
+
+        static void WithPerson(
+            InductionStatus status,
+            InductionStatus statusWithoutExemption,
+            Guid[] exemptionReasonIds,
+            Action<Person> action)
+        {
+            var person = CreatePersonWithInductionStatus(status, statusWithoutExemption, exemptionReasonIds);
+            action(person);
+        }
+    }
+
+    private static RouteToProfessionalStatus CreateAwardedProfessionalStatus(Person person, bool exemptFromInduction = false)
+    {
+        var routeId = Guid.NewGuid();
+
+        return new TestableRouteToProfessionalStatus()
+        {
+            RouteToProfessionalStatusTypeId = routeId,
+            RouteToProfessionalStatusType = new RouteToProfessionalStatusType()
+            {
+                RouteToProfessionalStatusTypeId = routeId,
+                Name = "Test route",
+                ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus,
+                IsActive = true,
+                TrainingStartDateRequired = FieldRequirement.Optional,
+                TrainingEndDateRequired = FieldRequirement.Optional,
+                AwardDateRequired = FieldRequirement.Optional,
+                InductionExemptionRequired = FieldRequirement.Optional,
+                TrainingProviderRequired = FieldRequirement.Optional,
+                DegreeTypeRequired = FieldRequirement.Optional,
+                TrainingCountryRequired = FieldRequirement.Optional,
+                TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional,
+                TrainingSubjectsRequired = FieldRequirement.Optional,
+                InductionExemptionReasonId = exemptFromInduction ? Guid.NewGuid() : null
+            },
+            SourceApplicationUserId = null,
+            SourceApplicationReference = null,
+            Status = RouteToProfessionalStatusStatus.Awarded,
+            AwardedDate = new(2023, 1, 1),
+            TrainingStartDate = null,
+            TrainingEndDate = null,
+            TrainingSubjectIds = [],
+            TrainingAgeSpecialismType = null,
+            TrainingAgeSpecialismRangeFrom = null,
+            TrainingAgeSpecialismRangeTo = null,
+            TrainingCountryId = null,
+            TrainingProviderId = null,
+            ExemptFromInduction = exemptFromInduction,
+            DegreeTypeId = null,
+            DqtTeacherStatusName = null,
+            DqtTeacherStatusValue = null,
+            DqtEarlyYearsStatusName = null,
+            DqtEarlyYearsStatusValue = null,
+            DqtInitialTeacherTrainingId = null,
+            DqtQtsRegistrationId = null,
+            QualificationId = Guid.NewGuid(),
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            PersonId = person.PersonId
+        };
+    }
+
+    private static RouteToProfessionalStatus CreateNotAwardedProfessionalStatus(Person person, bool exemptFromInduction = false)
+    {
+        var routeId = Guid.NewGuid();
+
+        return new TestableRouteToProfessionalStatus()
+        {
+            RouteToProfessionalStatusTypeId = routeId,
+            RouteToProfessionalStatusType = new RouteToProfessionalStatusType()
+            {
+                RouteToProfessionalStatusTypeId = routeId,
+                Name = "Test route",
+                ProfessionalStatusType = ProfessionalStatusType.QualifiedTeacherStatus,
+                IsActive = true,
+                TrainingStartDateRequired = FieldRequirement.Optional,
+                TrainingEndDateRequired = FieldRequirement.Optional,
+                AwardDateRequired = FieldRequirement.Optional,
+                InductionExemptionRequired = FieldRequirement.Optional,
+                TrainingProviderRequired = FieldRequirement.Optional,
+                DegreeTypeRequired = FieldRequirement.Optional,
+                TrainingCountryRequired = FieldRequirement.Optional,
+                TrainingAgeSpecialismTypeRequired = FieldRequirement.Optional,
+                TrainingSubjectsRequired = FieldRequirement.Optional,
+                InductionExemptionReasonId = null
+            },
+            SourceApplicationUserId = null,
+            SourceApplicationReference = null,
+            Status = RouteToProfessionalStatusStatus.InTraining,
+            AwardedDate = null,
+            TrainingStartDate = null,
+            TrainingEndDate = null,
+            TrainingSubjectIds = [],
+            TrainingAgeSpecialismType = null,
+            TrainingAgeSpecialismRangeFrom = null,
+            TrainingAgeSpecialismRangeTo = null,
+            TrainingCountryId = null,
+            TrainingProviderId = null,
+            ExemptFromInduction = exemptFromInduction,
+            DegreeTypeId = null,
+            DqtTeacherStatusName = null,
+            DqtTeacherStatusValue = null,
+            DqtEarlyYearsStatusName = null,
+            DqtEarlyYearsStatusValue = null,
+            DqtInitialTeacherTrainingId = null,
+            DqtQtsRegistrationId = null,
+            QualificationId = Guid.NewGuid(),
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            PersonId = person.PersonId
+        };
+    }
+
+    private static TestablePerson CreatePersonWithInductionStatus(
+        InductionStatus status,
+        InductionStatus statusWithoutExemption,
+        Guid[] exemptionReasonIds)
+    {
+        var person = new TestablePerson()
+        {
+            PersonId = Guid.NewGuid(),
+            CreatedOn = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            UpdatedOn = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+            Trn = "1234567",
+            FirstName = "Joe",
+            MiddleName = "",
+            LastName = "Bloggs",
+            DateOfBirth = new DateOnly(1990, 1, 1)
+        };
+
+        person.UnsafeSetInductionStatus(
+            status,
+            statusWithoutExemption,
+            startDate: status is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed ? new(2024, 1, 1) : null,
+            completedDate: status is InductionStatus.Passed ? new(2025, 1, 1) : null,
+            exemptionReasonIds: status is InductionStatus.Exempt ? exemptionReasonIds : []);
+
+        return person;
+    }
+
     public enum ExpectedAttributeValue { Null, ExistingRouteAwarded, NewRouteAwarded }
 
     public record RefreshProfessionalStatusAttributesTestCaseData(
@@ -933,4 +1329,27 @@ public class PersonTests
         bool NewAwardedDateIsAfterExistingAwardedDate,
         ExpectedAttributeValue ExpectedAttributeValue,
         bool ExpectedResult);
+
+    private class TestablePerson : Person
+    {
+        public TestablePerson()
+        {
+            Qualifications = [];
+        }
+    }
+
+    private class TestableRouteToProfessionalStatus : RouteToProfessionalStatus
+    {
+        public new DateOnly? AwardedDate
+        {
+            get => base.AwardedDate;
+            set => base.AwardedDate = value;
+        }
+
+        public new required RouteToProfessionalStatusType RouteToProfessionalStatusType
+        {
+            get => base.RouteToProfessionalStatusType!;
+            set => base.RouteToProfessionalStatusType = value;
+        }
+    }
 }

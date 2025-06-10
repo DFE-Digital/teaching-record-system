@@ -14,8 +14,8 @@ public class RouteToProfessionalStatus : Qualification
     public required Guid RouteToProfessionalStatusTypeId { get; set; }
     public Guid? SourceApplicationUserId { get; init; }
     public string? SourceApplicationReference { get; init; }
-    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; }
-    public required ProfessionalStatusStatus Status { get; set; }
+    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; protected set; }
+    public required RouteToProfessionalStatusStatus Status { get; set; }
     public DateOnly? AwardedDate { get; set; }
     public required DateOnly? TrainingStartDate { get; set; }
     public required DateOnly? TrainingEndDate { get; set; }
@@ -28,6 +28,7 @@ public class RouteToProfessionalStatus : Qualification
     public required Guid? TrainingProviderId { get; set; }
     public TrainingProvider? TrainingProvider { get; }
     public required bool? ExemptFromInduction { get; set; }
+    public bool? ExemptFromInductionDueToQtsDate { get; private set; }
     public required Guid? DegreeTypeId { get; set; }
     public DegreeType? DegreeType { get; }
     public string? DqtTeacherStatusName { get; init; }
@@ -39,9 +40,9 @@ public class RouteToProfessionalStatus : Qualification
 
     public static RouteToProfessionalStatus Create(
         Person person,
-        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
         Guid routeToProfessionalStatusTypeId,
-        ProfessionalStatusStatus status,
+        RouteToProfessionalStatusStatus status,
         DateOnly? awardedDate,
         DateOnly? trainingStartDate,
         DateOnly? trainingEndDate,
@@ -55,14 +56,14 @@ public class RouteToProfessionalStatus : Qualification
         bool? isExemptFromInduction,
         EventModels.RaisedByUserInfo createdBy,
         DateTime now,
-        out ProfessionalStatusCreatedEvent @event)
+        out RouteToProfessionalStatusCreatedEvent @event)
     {
         Debug.Assert(person.Qualifications is not null);
 
-        var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeToProfessionalStatusTypeId);
+        var routeType = allRouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == routeToProfessionalStatusTypeId);
         var qualificationId = Guid.NewGuid();
 
-        var professionalStatus = new RouteToProfessionalStatus()
+        var route = new RouteToProfessionalStatus()
         {
             QualificationId = qualificationId,
             CreatedOn = now,
@@ -70,6 +71,7 @@ public class RouteToProfessionalStatus : Qualification
             PersonId = person.PersonId,
             RouteToProfessionalStatusTypeId = routeToProfessionalStatusTypeId,
             Status = status,
+            AwardedDate = awardedDate,
             DegreeTypeId = degreeTypeId,
             ExemptFromInduction = isExemptFromInduction,
             TrainingStartDate = trainingStartDate,
@@ -79,95 +81,113 @@ public class RouteToProfessionalStatus : Qualification
             TrainingAgeSpecialismType = trainingAgeSpecialismType,
             TrainingCountryId = trainingCountryId,
             TrainingProviderId = trainingProviderId,
-            TrainingSubjectIds = trainingSubjectIds ?? [],
-            AwardedDate = awardedDate
+            TrainingSubjectIds = trainingSubjectIds ?? []
         };
+        route.RefreshExemptFromInductionDueToQtsDate(routeType.ProfessionalStatusType);
 
         var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person);
 
-        var professionalStatusType = route.ProfessionalStatusType;
-        var allProfessionalStatuses = person.Qualifications.OfType<RouteToProfessionalStatus>().Append(professionalStatus);
-        var personAttributesUpdated = person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes, allProfessionalStatuses);
+        var professionalStatusType = routeType.ProfessionalStatusType;
+        var allRoutes = person.Qualifications.OfType<RouteToProfessionalStatus>().Append(route).ToArray();
+        var personAttributesUpdated = person.RefreshProfessionalStatusAttributes(professionalStatusType, allRouteTypes, allRoutes);
+        var qtlsStatusUpdated = person.RefreshQtlsStatus(allRoutes);
+        var (induction, oldInduction, _) = person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes, allRoutes);
 
-        var changes = ProfessionalStatusCreatedEventChanges.None |
+        var changes = RouteToProfessionalStatusCreatedEventChanges.None |
             (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
-                ? ProfessionalStatusCreatedEventChanges.PersonQtsDate
+                ? RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
-                ? ProfessionalStatusCreatedEventChanges.PersonEytsDate
+                ? RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
-                ? ProfessionalStatusCreatedEventChanges.PersonHasEyps
+                ? RouteToProfessionalStatusCreatedEventChanges.PersonHasEyps
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
-                ? ProfessionalStatusCreatedEventChanges.PersonPqtsDate
-                : 0);
+                ? RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate
+                : 0) |
+            (induction.Status != oldInduction.Status
+                ? RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatus
+                : 0) |
+            (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption
+                ? RouteToProfessionalStatusCreatedEventChanges.PersonInductionStatusWithoutExemption
+                : 0) |
+            (qtlsStatusUpdated ? RouteToProfessionalStatusCreatedEventChanges.PersonQtlsStatus : 0);
 
-        @event = new ProfessionalStatusCreatedEvent
+        @event = new RouteToProfessionalStatusCreatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
             PersonId = person.PersonId,
             RaisedBy = createdBy,
-            RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(professionalStatus),
+            RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
             PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
             OldPersonAttributes = oldPersonAttributes,
-            Changes = changes
+            Changes = changes,
+            Induction = induction,
+            OldInduction = oldInduction
         };
 
-        return professionalStatus;
+        return route;
     }
 
     public void Update(
-        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
         Action<RouteToProfessionalStatus> updateAction,
         string? changeReason,
         string? changeReasonDetail,
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        out ProfessionalStatusUpdatedEvent? @event)
+        out RouteToProfessionalStatusUpdatedEvent? @event)
     {
         Debug.Assert(Person is not null);
         Debug.Assert(Person.Qualifications is not null);
 
         var oldEventModel = EventModels.RouteToProfessionalStatus.FromModel(this);
         var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
-        var oldRoute = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
+        var oldRoute = allRouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
         var oldProfessionalStatusType = oldRoute.ProfessionalStatusType;
 
-        updateAction(this);
+        var routeType = allRouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
+        var professionalStatusType = routeType.ProfessionalStatusType;
 
-        var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
-        var professionalStatusType = route.ProfessionalStatusType;
+        updateAction(this);
+        RefreshExemptFromInductionDueToQtsDate(professionalStatusType);
 
         if (professionalStatusType != oldProfessionalStatusType)
         {
-            throw new NotSupportedException($"Cannot change the {nameof(ProfessionalStatusType)} for an existing {nameof(Models.RouteToProfessionalStatus)}.");
+            throw new NotSupportedException($"Cannot change the {nameof(ProfessionalStatusType)} for an existing {nameof(RouteToProfessionalStatus)}.");
         }
 
-        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRouteTypes);
+        var qtlsStatusUpdated = Person.RefreshQtlsStatus();
+        var (induction, oldInduction, _) = Person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes);
 
-        var changes = ProfessionalStatusUpdatedEventChanges.None |
-            (RouteToProfessionalStatusTypeId != oldEventModel.RouteToProfessionalStatusTypeId ? ProfessionalStatusUpdatedEventChanges.Route : ProfessionalStatusUpdatedEventChanges.None) |
-            (Status != oldEventModel.Status ? ProfessionalStatusUpdatedEventChanges.Status : ProfessionalStatusUpdatedEventChanges.None) |
-            (AwardedDate != oldEventModel.AwardedDate ? ProfessionalStatusUpdatedEventChanges.AwardedDate : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingStartDate != oldEventModel.TrainingStartDate ? ProfessionalStatusUpdatedEventChanges.StartDate : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingEndDate != oldEventModel.TrainingEndDate ? ProfessionalStatusUpdatedEventChanges.EndDate : ProfessionalStatusUpdatedEventChanges.None) |
-            ((TrainingSubjectIds.Except(oldEventModel.TrainingSubjectIds).Any() || oldEventModel.TrainingSubjectIds.Except(TrainingSubjectIds).Any()) ? ProfessionalStatusUpdatedEventChanges.TrainingSubjectIds : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingAgeSpecialismType != oldEventModel.TrainingAgeSpecialismType ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingAgeSpecialismRangeFrom != oldEventModel.TrainingAgeSpecialismRangeFrom ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingAgeSpecialismRangeTo != oldEventModel.TrainingAgeSpecialismRangeTo ? ProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingCountryId != oldEventModel.TrainingCountryId ? ProfessionalStatusUpdatedEventChanges.TrainingCountry : ProfessionalStatusUpdatedEventChanges.None) |
-            (TrainingProviderId != oldEventModel.TrainingProviderId ? ProfessionalStatusUpdatedEventChanges.TrainingProvider : ProfessionalStatusUpdatedEventChanges.None) |
-            (ExemptFromInduction != oldEventModel.ExemptFromInduction ? ProfessionalStatusUpdatedEventChanges.InductionExemptionReasons : ProfessionalStatusUpdatedEventChanges.None) |
-            (DegreeTypeId != oldEventModel.DegreeTypeId ? ProfessionalStatusUpdatedEventChanges.DegreeType : ProfessionalStatusUpdatedEventChanges.None) |
-            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonQtsDate : 0) |
-            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonEytsDate : 0) |
-            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonHasEyps : 0) |
-            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated ? ProfessionalStatusUpdatedEventChanges.PersonPqtsDate : 0);
+        var changes = RouteToProfessionalStatusUpdatedEventChanges.None |
+            (RouteToProfessionalStatusTypeId != oldEventModel.RouteToProfessionalStatusTypeId ? RouteToProfessionalStatusUpdatedEventChanges.Route : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (Status != oldEventModel.Status ? RouteToProfessionalStatusUpdatedEventChanges.Status : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (AwardedDate != oldEventModel.AwardedDate ? RouteToProfessionalStatusUpdatedEventChanges.AwardedDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingStartDate != oldEventModel.TrainingStartDate ? RouteToProfessionalStatusUpdatedEventChanges.StartDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingEndDate != oldEventModel.TrainingEndDate ? RouteToProfessionalStatusUpdatedEventChanges.EndDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            ((TrainingSubjectIds.Except(oldEventModel.TrainingSubjectIds).Any() || oldEventModel.TrainingSubjectIds.Except(TrainingSubjectIds).Any()) ? RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismType != oldEventModel.TrainingAgeSpecialismType ? RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismType : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismRangeFrom != oldEventModel.TrainingAgeSpecialismRangeFrom ? RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeFrom : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingAgeSpecialismRangeTo != oldEventModel.TrainingAgeSpecialismRangeTo ? RouteToProfessionalStatusUpdatedEventChanges.TrainingAgeSpecialismRangeTo : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingCountryId != oldEventModel.TrainingCountryId ? RouteToProfessionalStatusUpdatedEventChanges.TrainingCountry : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (TrainingProviderId != oldEventModel.TrainingProviderId ? RouteToProfessionalStatusUpdatedEventChanges.TrainingProvider : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (ExemptFromInduction != oldEventModel.ExemptFromInduction ? RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (DegreeTypeId != oldEventModel.DegreeTypeId ? RouteToProfessionalStatusUpdatedEventChanges.DegreeType : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (ExemptFromInductionDueToQtsDate != oldEventModel.ExemptFromInductionDueToQtsDate ? RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInductionDueToQtsDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated ? RouteToProfessionalStatusUpdatedEventChanges.PersonQtsDate : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated ? RouteToProfessionalStatusUpdatedEventChanges.PersonEytsDate : 0) |
+            (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated ? RouteToProfessionalStatusUpdatedEventChanges.PersonHasEyps : 0) |
+            (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated ? RouteToProfessionalStatusUpdatedEventChanges.PersonPqtsDate : 0) |
+            (induction.Status != oldInduction.Status ? RouteToProfessionalStatusUpdatedEventChanges.PersonInductionStatus : 0) |
+            (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption ? RouteToProfessionalStatusUpdatedEventChanges.PersonInductionStatusWithoutExemption : 0) |
+            (qtlsStatusUpdated ? RouteToProfessionalStatusUpdatedEventChanges.PersonQtlsStatus : 0);
 
-        if (changes == ProfessionalStatusUpdatedEventChanges.None)
+        if (changes == RouteToProfessionalStatusUpdatedEventChanges.None)
         {
             @event = null;
             return;
@@ -175,7 +195,7 @@ public class RouteToProfessionalStatus : Qualification
 
         UpdatedOn = now;
 
-        @event = new ProfessionalStatusUpdatedEvent
+        @event = new RouteToProfessionalStatusUpdatedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -189,17 +209,19 @@ public class RouteToProfessionalStatus : Qualification
             PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person),
             OldPersonAttributes = oldPersonAttributes,
             Changes = changes,
+            Induction = induction,
+            OldInduction = oldInduction
         };
     }
 
     public void Delete(
-        IReadOnlyCollection<RouteToProfessionalStatusType> allRoutes,
+        IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
         string? deletionReason,
         string? deletionReasonDetail,
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo deletedBy,
         DateTime now,
-        out ProfessionalStatusDeletedEvent @event)
+        out RouteToProfessionalStatusDeletedEvent @event)
     {
         if (DeletedOn is not null)
         {
@@ -215,26 +237,35 @@ public class RouteToProfessionalStatus : Qualification
 
         var oldPersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(Person);
 
-        var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
+        var route = allRouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusTypeId);
         var professionalStatusType = route.ProfessionalStatusType;
 
-        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRoutes);
+        var personAttributesUpdated = Person.RefreshProfessionalStatusAttributes(professionalStatusType, allRouteTypes);
+        var qtlsStatusUpdated = Person.RefreshQtlsStatus();
+        var (induction, oldInduction, _) = Person.RefreshInductionStatusForQtsProfessionalStatusChanged(now, allRouteTypes);
 
-        var changes = ProfessionalStatusDeletedEventChanges.None |
+        var changes = RouteToProfessionalStatusDeletedEventChanges.None |
             (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus && personAttributesUpdated
-                ? ProfessionalStatusDeletedEventChanges.PersonQtsDate
+                ? RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && personAttributesUpdated
-                ? ProfessionalStatusDeletedEventChanges.PersonEytsDate
+                ? RouteToProfessionalStatusDeletedEventChanges.PersonEytsDate
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus && personAttributesUpdated
-                ? ProfessionalStatusDeletedEventChanges.PersonHasEyps
+                ? RouteToProfessionalStatusDeletedEventChanges.PersonHasEyps
                 : 0) |
             (professionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus && personAttributesUpdated
-                ? ProfessionalStatusDeletedEventChanges.PersonPqtsDate
-                : 0);
+                ? RouteToProfessionalStatusDeletedEventChanges.PersonPqtsDate
+                : 0) |
+            (induction.Status != oldInduction.Status
+                ? RouteToProfessionalStatusDeletedEventChanges.PersonInductionStatus
+                : 0) |
+            (induction.StatusWithoutExemption != oldInduction.StatusWithoutExemption
+                ? RouteToProfessionalStatusDeletedEventChanges.PersonInductionStatusWithoutExemption
+                : 0) |
+            (qtlsStatusUpdated ? RouteToProfessionalStatusDeletedEventChanges.PersonQtlsStatus : 0);
 
-        @event = new ProfessionalStatusDeletedEvent()
+        @event = new RouteToProfessionalStatusDeletedEvent()
         {
             EventId = Guid.NewGuid(),
             CreatedUtc = now,
@@ -246,7 +277,20 @@ public class RouteToProfessionalStatus : Qualification
             DeletionReason = deletionReason,
             DeletionReasonDetail = deletionReasonDetail,
             EvidenceFile = evidenceFile,
-            Changes = changes
+            Changes = changes,
+            Induction = induction,
+            OldInduction = oldInduction
         };
+    }
+
+    private void RefreshExemptFromInductionDueToQtsDate(ProfessionalStatusType professionalStatusType)
+    {
+        if (professionalStatusType != ProfessionalStatusType.QualifiedTeacherStatus || AwardedDate is null)
+        {
+            ExemptFromInductionDueToQtsDate = null;
+            return;
+        }
+
+        ExemptFromInductionDueToQtsDate = AwardedDate < new DateOnly(2000, 5, 7);
     }
 }

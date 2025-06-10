@@ -83,7 +83,7 @@ public class InductionModel(
 
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
-            InductionExemptedRoutes = dbContext.ProfessionalStatuses
+            InductionExemptedRoutes = dbContext.RouteToProfessionalStatuses
                 .Include(r => r.RouteToProfessionalStatusType)
                 .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
                 .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);

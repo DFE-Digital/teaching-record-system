@@ -72,9 +72,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithInductionStatus(InductionStatus.Exempt)
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(hasExemption)));
 
@@ -110,9 +110,9 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts()
             .WithInductionStatus(InductionStatus.Exempt)
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
-                .WithStatus(ProfessionalStatusStatus.Awarded)
+                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithInductionExemption(true)));
 

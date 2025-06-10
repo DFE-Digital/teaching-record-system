@@ -7,7 +7,7 @@ public class EditRoutePostRequestBuilder
 {
     private DateOnly? TrainingStartDate { get; set; }
     private DateOnly? TrainingEndDate { get; set; }
-    private ProfessionalStatusStatus? RouteStatus { get; set; }
+    private RouteToProfessionalStatusStatus? RouteStatus { get; set; }
     private Guid[]? ExemptionReasonIds { get; set; }
     private ChangeReasonOption? ChangeReason { get; set; }
     private bool? HasAdditionalReasonDetail { get; set; }
@@ -29,7 +29,7 @@ public class EditRoutePostRequestBuilder
         return this;
     }
 
-    public EditRoutePostRequestBuilder WithRouteStatus(ProfessionalStatusStatus status)
+    public EditRoutePostRequestBuilder WithRouteStatus(RouteToProfessionalStatusStatus status)
     {
         RouteStatus = status;
         return this;

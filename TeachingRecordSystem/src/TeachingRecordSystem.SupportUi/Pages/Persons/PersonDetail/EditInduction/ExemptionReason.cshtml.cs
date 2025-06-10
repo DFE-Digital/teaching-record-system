@@ -150,7 +150,7 @@ public class ExemptionReasonModel(
 
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
-            RoutesWithInductionExemptions = DbContext.ProfessionalStatuses
+            RoutesWithInductionExemptions = DbContext.RouteToProfessionalStatuses
                 .Include(p => p.RouteToProfessionalStatusType)
                 .ThenInclude(r => r!.InductionExemptionReason)
                 .Where(
