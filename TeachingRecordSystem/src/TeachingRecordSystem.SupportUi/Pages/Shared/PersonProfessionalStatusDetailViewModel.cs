@@ -1,6 +1,6 @@
 namespace TeachingRecordSystem.SupportUi.Pages.Shared;
 
-public class PersonStatusDetailViewModel
+public class PersonProfessionalStatusDetailViewModel
 {
     public required InductionStatusInfo InductionStatusInfo { get; set; }
     public required DateOnly? QtsDate { get; set; }

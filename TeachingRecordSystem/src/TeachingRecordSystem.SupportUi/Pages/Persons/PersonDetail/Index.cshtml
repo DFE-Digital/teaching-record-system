@@ -35,16 +35,16 @@
 @await Html.PartialAsync("_PersonDetail", personDetailModel)
 
 @{
-    if (Model.PersonStatus is not null)
+    if (Model.PersonProfessionalStatus is not null)
     {
-        var personStatusDetailModel = new PersonStatusDetailViewModel()
+        var personStatusDetailModel = new PersonProfessionalStatusDetailViewModel()
         {
-            EytsDate = Model.PersonStatus.EytsDate,
-            HasEyps = Model.PersonStatus.HasEyps,
-            InductionStatusInfo = InductionStatusRegistry.All.Single(s => s.Value == Model.PersonStatus.InductionStatus),
-            PqtsDate = Model.PersonStatus.PqtsDate,
-            QtsDate = Model.PersonStatus.QtsDate
+            EytsDate = Model.PersonProfessionalStatus.EytsDate,
+            HasEyps = Model.PersonProfessionalStatus.HasEyps,
+            InductionStatusInfo = InductionStatusRegistry.All.Single(s => s.Value == Model.PersonProfessionalStatus.InductionStatus),
+            PqtsDate = Model.PersonProfessionalStatus.PqtsDate,
+            QtsDate = Model.PersonProfessionalStatus.QtsDate
         };
-        @await Html.PartialAsync("_PersonStatusDetail", personStatusDetailModel)
+        @await Html.PartialAsync("_PersonProfessionalStatusDetail", personStatusDetailModel)
     }
 }

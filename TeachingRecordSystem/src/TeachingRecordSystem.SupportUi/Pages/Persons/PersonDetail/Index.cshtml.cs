@@ -25,17 +25,17 @@ public class IndexModel(
     public ContactSearchSortByOption? SortBy { get; set; }
 
     public PersonInfo? Person { get; set; }
-    public PersonStatusInfo? PersonStatus { get; set; }
+    public PersonProfessionalStatusInfo? PersonProfessionalStatus { get; set; }
 
     public bool HasOpenAlert { get; set; }
 
     public async Task OnGetAsync()
     {
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
-        (Person, PersonStatus) = await GetPersonInfoAsync();
+        (Person, PersonProfessionalStatus) = await GetPersonInfoAsync();
     }
 
-    private async Task<PersonStatusInfo?> BuildPersonStatusInfoAsync()
+    private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
     {
         var person = await dbContext.Persons
                 .SingleOrDefaultAsync(p => p.PersonId == PersonId);
@@ -46,7 +46,7 @@ public class IndexModel(
         }
         else
         {
-            return new PersonStatusInfo
+            return new PersonProfessionalStatusInfo
             {
                 EytsDate = person.EytsDate,
                 HasEyps = person.HasEyps,
@@ -123,7 +123,7 @@ public class IndexModel(
         }
     }
 
-    private async Task<(PersonInfo, PersonStatusInfo?)> GetPersonInfoAsync()
+    private async Task<(PersonInfo, PersonProfessionalStatusInfo?)> GetPersonInfoAsync()
     {
         return (
             await BuildPersonInfoAsync(),
@@ -146,7 +146,7 @@ public class IndexModel(
         public required string[] PreviousNames { get; init; }
     }
 
-    public record PersonStatusInfo
+    public record PersonProfessionalStatusInfo
     {
         public required InductionStatus InductionStatus { get; init; }
         public required DateOnly? QtsDate { get; init; }
