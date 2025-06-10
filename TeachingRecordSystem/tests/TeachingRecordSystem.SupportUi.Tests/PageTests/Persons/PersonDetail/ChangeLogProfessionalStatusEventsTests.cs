@@ -24,7 +24,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var createdByUser = await TestData.CreateUserAsync();
 
         var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q => q
+            .WithRouteToProfessionalStatus(q => q
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
@@ -75,7 +75,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(RouteToProfessionalStatusStatus.Awarded);
@@ -127,7 +127,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var exemptFromInduction = true;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
@@ -228,7 +228,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var ageRange = TrainingAgeSpecialismType.KeyStage1;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
@@ -319,7 +319,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var changeReasonDetail = TestData.GenerateLoremIpsum();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
@@ -379,7 +379,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var ageRange = TrainingAgeSpecialismType.FoundationStage;
 
         var person = await TestData.CreatePersonAsync(b => b
-            .WithProfessionalStatus(q =>
+            .WithRouteToProfessionalStatus(q =>
             {
                 q.WithRoute(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
@@ -448,7 +448,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonQts_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithAwardedProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
@@ -487,7 +487,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonEyts_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithAwardedProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
@@ -526,7 +526,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonPqts_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithAwardedProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();
@@ -565,7 +565,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     public async Task ProfessionalStatusDeletedEvent_AffectsPersonEyps_RendersExpectedContent()
     {
         // Arrange
-        var person = await TestData.CreatePersonAsync(b => b.WithAwardedProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
+        var person = await TestData.CreatePersonAsync(b => b.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
 
         var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
         var deletedByUser = await TestData.CreateUserAsync();

@@ -12,7 +12,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -54,7 +54,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -97,7 +97,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
@@ -157,7 +157,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsHaveFieldRequirementAsync(FieldRequirement.Optional);
         var status = ProfessionalStatusStatusRegistry.All.Where(s => s.Value == RouteToProfessionalStatusStatus.InTraining).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status.Value)
                 .WithTrainingStartDate(startDate)
@@ -205,7 +205,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
@@ -244,7 +244,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));
@@ -292,7 +292,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardDate)));

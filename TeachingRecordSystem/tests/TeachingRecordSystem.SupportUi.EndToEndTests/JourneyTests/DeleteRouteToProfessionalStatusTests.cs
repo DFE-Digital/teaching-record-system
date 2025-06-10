@@ -8,7 +8,7 @@ public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : Tes
     public async Task DeleteRouteToProfessionalStatus()
     {
         var deletionReason = ChangeReasonOption.CreatedInError;
-        var person = await TestData.CreatePersonAsync(p => p.WithAwardedProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
+        var person = await TestData.CreatePersonAsync(p => p.WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
 

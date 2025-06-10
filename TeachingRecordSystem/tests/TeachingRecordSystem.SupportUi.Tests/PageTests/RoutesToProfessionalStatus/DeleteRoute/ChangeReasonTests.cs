@@ -12,7 +12,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -63,7 +63,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -115,7 +115,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -152,7 +152,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -179,7 +179,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var changeReason = ChangeReasonOption.CreatedInError;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -213,7 +213,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -247,7 +247,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
         var evidenceFileName = "evidence.pdf";
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -288,7 +288,7 @@ public class ChangeReasonTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;

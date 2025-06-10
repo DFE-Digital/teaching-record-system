@@ -17,7 +17,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -61,7 +61,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;

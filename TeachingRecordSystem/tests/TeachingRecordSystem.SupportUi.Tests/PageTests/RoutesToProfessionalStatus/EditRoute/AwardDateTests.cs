@@ -20,7 +20,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithAwardedDate(awardedDate)));
@@ -64,7 +64,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -113,7 +113,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.Name == "NI R") // an induction exemption route that requires the exemption question
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -172,7 +172,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             )
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -225,7 +225,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -263,7 +263,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;

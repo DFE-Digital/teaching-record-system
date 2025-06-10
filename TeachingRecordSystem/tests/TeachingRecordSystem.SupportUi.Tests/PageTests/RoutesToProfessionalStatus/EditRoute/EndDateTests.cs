@@ -22,7 +22,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -72,7 +72,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -119,7 +119,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -171,7 +171,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -212,7 +212,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;

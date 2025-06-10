@@ -19,7 +19,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -65,7 +65,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -106,7 +106,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -148,7 +148,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;

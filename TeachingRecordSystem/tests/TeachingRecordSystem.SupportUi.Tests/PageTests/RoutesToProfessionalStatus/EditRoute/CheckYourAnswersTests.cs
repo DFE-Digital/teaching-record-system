@@ -15,7 +15,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -58,7 +58,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -100,7 +100,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
@@ -163,7 +163,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var exemptionReason = (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).RandomOne();
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status.Value)
                 .WithAwardedDate(endDate)));
@@ -210,7 +210,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync())
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
 
@@ -255,7 +255,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -298,7 +298,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         EventPublisher.Clear();
@@ -388,7 +388,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithAwardedProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
+            .WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.QualifiedTeacherStatus));
         EventPublisher.Clear();
 
         var qualification = person.ProfessionalStatuses.First();
@@ -422,7 +422,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithAwardedProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+            .WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
         EventPublisher.Clear();
 
         var qualification = person.ProfessionalStatuses.First();
@@ -458,7 +458,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     {
         // Arrange
         var person = await TestData.CreatePersonAsync(p => p
-            .WithAwardedProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
+            .WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
         EventPublisher.Clear();
 
         var qualification = person.ProfessionalStatuses.First();

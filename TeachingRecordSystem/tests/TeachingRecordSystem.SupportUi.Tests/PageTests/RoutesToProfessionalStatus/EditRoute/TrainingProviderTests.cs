@@ -19,7 +19,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -64,7 +64,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -104,7 +104,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status.Value)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -145,7 +145,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r => r
+            .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
