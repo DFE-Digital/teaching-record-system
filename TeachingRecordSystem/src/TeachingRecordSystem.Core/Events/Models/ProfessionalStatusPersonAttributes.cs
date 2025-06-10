@@ -8,12 +8,14 @@ public record ProfessionalStatusPersonAttributes
     public required DateOnly? EytsDate { get; init; }
     public required bool HasEyps { get; init; }
     public required DateOnly? PqtsDate { get; init; }
+    public required QtlsStatus QtlsStatus { get; init; }
 
     public static ProfessionalStatusPersonAttributes FromModel(Person person) => new()
     {
         QtsDate = person.QtsDate,
         EytsDate = person.EytsDate,
         HasEyps = person.HasEyps,
-        PqtsDate = person.PqtsDate
+        PqtsDate = person.PqtsDate,
+        QtlsStatus = person.QtlsStatus
     };
 }
