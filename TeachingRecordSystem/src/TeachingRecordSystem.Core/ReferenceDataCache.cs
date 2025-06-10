@@ -349,7 +349,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.AlertCategories.AsNoTracking().Include(c => c.AlertTypes).ToArrayAsync();
+                return await dbContext.AlertCategories.AsNoTracking().Include(c => c.AlertTypes).IgnoreAutoIncludes().ToArrayAsync();
             });
 
     private Task<AlertType[]> EnsureAlertTypesAsync() =>
@@ -358,7 +358,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.AlertTypes.AsNoTracking().Include(at => at.AlertCategory).ToArrayAsync();
+                return await dbContext.AlertTypes.AsNoTracking().Include(t => t.AlertCategory).IgnoreAutoIncludes().ToArrayAsync();
             });
 
     private Task<dfeta_country[]> EnsureCountriesAsync() =>
@@ -396,7 +396,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.RoutesToProfessionalStatus.Include(r => r.InductionExemptionReason).AsNoTracking().ToArrayAsync();
+                return await dbContext.RoutesToProfessionalStatus.AsNoTracking().ToArrayAsync();
             });
 
     private Task<Country[]> EnsureTrainingCountriesAsync() =>

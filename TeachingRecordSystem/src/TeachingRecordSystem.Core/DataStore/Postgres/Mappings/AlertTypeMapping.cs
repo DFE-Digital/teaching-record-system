@@ -17,6 +17,7 @@ public class AlertTypeMapping : IEntityTypeConfiguration<AlertType>
         builder.HasIndex(x => x.AlertCategoryId).HasDatabaseName(AlertType.AlertCategoryIdIndexName);
         builder.HasIndex(x => new { x.AlertCategoryId, x.DisplayOrder }).HasDatabaseName(AlertType.DisplayOrderIndexName).IsUnique().HasFilter("display_order is not null and is_active = true");
         builder.HasOne<AlertCategory>(x => x.AlertCategory).WithMany(c => c.AlertTypes).HasForeignKey(x => x.AlertCategoryId).HasConstraintName(AlertType.AlertCategoryForeignKeyName);
+        builder.Navigation(x => x.AlertCategory).AutoInclude();
         builder.HasData(
             new AlertType { AlertTypeId = new Guid("2ca98658-1d5b-49d5-b05f-cc08c8b8502c"), AlertCategoryId = new Guid("ee78d44d-abf8-44a9-b22b-87a821f8d3c9"), Name = "Teacher sanctioned in other EEA member state", DqtSanctionCode = "T8", ProhibitionLevel = ProhibitionLevel.Notify, InternalOnly = true, IsActive = true, DisplayOrder = 1 },
             new AlertType { AlertTypeId = new Guid("9fafaa80-f9f8-44a0-b7b3-cffedcbe0298"), AlertCategoryId = new Guid("0ae0707b-1503-477d-bc0f-1505ed95dbdf"), Name = "Failed induction", DqtSanctionCode = "C2", ProhibitionLevel = ProhibitionLevel.Teaching, InternalOnly = false, IsActive = true, DisplayOrder = 1 },

@@ -343,7 +343,7 @@ public class GetPersonHandler(
             null;
 
         var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            WithTrsDbLockAsync(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at!.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
+            WithTrsDbLockAsync(() => dbContext.Alerts.Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
             null;
 
         IEnumerable<NameInfo> previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)

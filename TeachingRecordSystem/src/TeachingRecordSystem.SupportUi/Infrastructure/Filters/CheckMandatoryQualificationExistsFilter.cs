@@ -25,7 +25,6 @@ public class CheckMandatoryQualificationExistsFilter(TrsDbContext dbContext) : I
 
         var currentMq = await dbContext.MandatoryQualifications
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update")  // https://github.com/dotnet/efcore/issues/26042
-            .Include(mq => mq.Provider)
             .Include(mq => mq.Person)
             .SingleOrDefaultAsync();
 
