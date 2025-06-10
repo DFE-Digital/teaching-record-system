@@ -495,37 +495,6 @@ public class InductionTests : TestBase
     }
 
     [Fact]
-    public async Task PersonHasRouteInductionExemption_RouteFeatureFlagOff_ExemptionNotShown()
-    {
-        TestFeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
-        var awardedDate = new DateOnly(2024, 1, 1);
-        var exemptionReasonId = InductionExemptionReason.PassedInductionInNorthernIrelandId;
-        var routeType = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.InductionExemptionReasonId == exemptionReasonId)
-            .Single();
-        var person = await TestData.CreatePersonAsync(
-                personBuilder => personBuilder
-                .WithQts()
-                .WithInductionStatus(inductionBuilder => inductionBuilder
-                    .WithStatus(InductionStatus.Exempt)
-                    .WithExemptionReasons(exemptionReasonId))
-                .WithRouteToProfessionalStatus(r => r
-                    .WithRouteType(routeType.RouteToProfessionalStatusTypeId)
-                    .WithStatus(RouteToProfessionalStatusStatus.Approved)
-                    .WithInductionExemption(true)
-                    .WithAwardedDate(awardedDate))
-                );
-        var personId = person.ContactId;
-
-        await using var context = await HostFixture.CreateBrowserContext();
-        var page = await context.NewPageAsync();
-
-        await page.GoToPersonInductionPageAsync(personId);
-
-        await page.AssertNoListElementAsync("Route induction exemption reason");
-    }
-
-    [Fact]
     public async Task PersonHasRouteInductionExemption_Edit_NavigateBack()
     {
         var awardedDate = new DateOnly(2024, 1, 1);
