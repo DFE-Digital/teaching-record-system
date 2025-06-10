@@ -15,6 +15,7 @@ public class AlertMapping : IEntityTypeConfiguration<Alert>
         builder.Property(x => x.Details);
         builder.HasIndex(x => x.AlertTypeId).HasDatabaseName(Alert.AlertTypeIdIndexName);
         builder.HasOne<AlertType>(x => x.AlertType).WithMany().HasForeignKey(x => x.AlertTypeId).HasConstraintName(Alert.AlertTypeForeignKeyName);
+        builder.Navigation(x => x.AlertType).AutoInclude();
         builder.HasIndex(x => x.PersonId).HasDatabaseName(Alert.PersonIdIndexName);
         builder.HasOne<Person>(x => x.Person).WithMany(p => p.Alerts).HasForeignKey(x => x.PersonId).HasConstraintName(Alert.PersonForeignKeyName);
         builder.Ignore(x => x.IsOpen);

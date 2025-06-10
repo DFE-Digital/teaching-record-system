@@ -8,9 +8,13 @@ public class RouteToProfessionalStatusMapping : IEntityTypeConfiguration<RouteTo
     public void Configure(EntityTypeBuilder<RouteToProfessionalStatus> builder)
     {
         builder.HasOne(q => q.RouteToProfessionalStatusType).WithMany().HasForeignKey(q => q.RouteToProfessionalStatusTypeId);
+        builder.Navigation(q => q.RouteToProfessionalStatusType).AutoInclude();
         builder.HasOne(q => q.TrainingCountry).WithMany().HasForeignKey(q => q.TrainingCountryId);
+        builder.Navigation(q => q.TrainingCountry).AutoInclude();
         builder.HasOne(q => q.TrainingProvider).WithMany().HasForeignKey(q => q.TrainingProviderId);
+        builder.Navigation(q => q.TrainingProvider).AutoInclude();
         builder.HasOne(q => q.DegreeType).WithMany().HasForeignKey(q => q.DegreeTypeId);
+        builder.Navigation(q => q.DegreeType).AutoInclude();
         builder.HasOne<ApplicationUser>().WithMany().HasForeignKey(q => q.SourceApplicationUserId);
         builder
             .Property(q => q.SourceApplicationReference)
