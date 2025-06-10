@@ -40,7 +40,7 @@ public record TrnRequestMetadata
             EmailAddress = model.EmailAddress,
             OneLoginUserSubject = model.OneLoginUserSubject,
             FirstName = model.FirstName,
-            MiddleName = model.LastName,
+            MiddleName = model.MiddleName,
             LastName = model.LastName,
             PreviousFirstName = model.PreviousFirstName,
             PreviousLastName = model.PreviousLastName,

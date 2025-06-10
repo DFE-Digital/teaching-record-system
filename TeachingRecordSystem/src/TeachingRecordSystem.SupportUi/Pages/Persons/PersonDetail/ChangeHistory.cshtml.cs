@@ -74,9 +74,9 @@ public class ChangeHistoryModel(
             nameof(DqtContactInductionStatusChangedEvent),
             nameof(PersonInductionUpdatedEvent),
             nameof(PersonDetailsUpdatedEvent),
-            nameof(ProfessionalStatusCreatedEvent),
-            nameof(ProfessionalStatusUpdatedEvent),
-            nameof(ProfessionalStatusDeletedEvent),
+            nameof(RouteToProfessionalStatusCreatedEvent),
+            nameof(RouteToProfessionalStatusUpdatedEvent),
+            nameof(RouteToProfessionalStatusDeletedEvent),
             nameof(ApiTrnRequestSupportTaskUpdatedEvent)
         };
 
@@ -103,7 +103,9 @@ public class ChangeHistoryModel(
                     e.event_name,
                     e.payload as event_payload,
                     u.name as trs_user_name,
-                    e.payload #>> Array['RaisedBy','DqtUserName'] as dqt_user_name
+                    e.payload #>> Array['RaisedBy','DqtUserName'] as dqt_user_name,
+                    a.name as application_user_name,
+                    a.short_name as application_user_short_name
                 FROM
                         events as e
                     LEFT JOIN
@@ -114,6 +116,8 @@ public class ChangeHistoryModel(
                                 ELSE
                                     null
                             END = u.user_id
+                    LEFT JOIN
+                        users as a ON ((e.payload #>> Array['RequestData','ApplicationUserId']) :: uuid) = a.user_id
                 WHERE
                     e.person_id = {PersonId}
                     AND e.event_name = any ({eventTypes})
@@ -175,13 +179,19 @@ public class ChangeHistoryModel(
     {
         var @event = EventBase.Deserialize(eventWithUser.EventPayload, eventWithUser.EventName);
 
-        RaisedByUserInfo raiseByUser = new()
+        RaisedByUserInfo raisedByUser = new()
         {
             Name = eventWithUser.TrsUserName ?? eventWithUser.DqtUserName!
         };
 
+        ApplicationUserInfo? applicationUser = eventWithUser.ApplicationUserName == null ? null : new()
+        {
+            Name = eventWithUser.ApplicationUserName,
+            ShortName = eventWithUser.ApplicationUserShortName ?? eventWithUser.ApplicationUserName
+        };
+
         var timelineEventType = typeof(TimelineEvent<>).MakeGenericType(@event.GetType()!);
-        var timelineEvent = (TimelineEvent)Activator.CreateInstance(timelineEventType, @event, raiseByUser)!;
+        var timelineEvent = (TimelineEvent)Activator.CreateInstance(timelineEventType, @event, raisedByUser, applicationUser)!;
         var timelineItemType = typeof(TimelineItem<>).MakeGenericType(timelineEventType);
         return (TimelineItem)Activator.CreateInstance(timelineItemType, TimelineItemType.Event, timelineEvent.Event.CreatedUtc.ToLocal(), timelineEvent)!;
     }
@@ -195,5 +205,7 @@ public class ChangeHistoryModel(
         public required string EventPayload { get; init; }
         public required string? TrsUserName { get; set; }
         public required string? DqtUserName { get; set; }
+        public required string? ApplicationUserName { get; set; }
+        public required string? ApplicationUserShortName { get; set; }
     }
 }

@@ -62,7 +62,7 @@
                 @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
                 {
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value use-empty-fallback>@email</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
@@ -165,7 +165,7 @@
                     @if (updatedEvent.Changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Email</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback>@oldEmail</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }

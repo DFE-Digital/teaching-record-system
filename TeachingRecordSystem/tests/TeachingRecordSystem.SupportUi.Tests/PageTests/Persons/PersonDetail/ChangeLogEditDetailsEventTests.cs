@@ -166,13 +166,13 @@ public class ChangeLogEditDetailsEventTests : TestBase
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.EmailAddress))
         {
-            doc.AssertSummaryListValue("details", "Email", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, v.TrimmedText()));
-            doc.AssertSummaryListValue("previous-details", "Email", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, v.TrimmedText()));
+            doc.AssertSummaryListValue("details", "Email address", v => Assert.Equal(newValueIsDefault ? UiDefaults.EmptyDisplayContent : emailAddress, v.TrimmedText()));
+            doc.AssertSummaryListValue("previous-details", "Email address", v => Assert.Equal(previousValueIsDefault ? UiDefaults.EmptyDisplayContent : oldEmailAddress, v.TrimmedText()));
         }
         else
         {
-            doc.AssertSummaryListRowDoesNotExist("details", "Email");
-            doc.AssertSummaryListRowDoesNotExist("previous-details", "Email");
+            doc.AssertSummaryListRowDoesNotExist("details", "Email address");
+            doc.AssertSummaryListRowDoesNotExist("previous-details", "Email address");
         }
 
         if (changes.HasFlag(PersonDetailsUpdatedEventChanges.MobileNumber))
