@@ -494,7 +494,7 @@ public class InductionTests : TestBase
         await page.AssertOnEditInductionCheckYourAnswersPageAsync(person.PersonId);
     }
 
-    [Fact(Skip = "temporary skip")]
+    [Fact]
     public async Task PersonHasRouteInductionExemption_RouteFeatureFlagOff_ExemptionNotShown()
     {
         TestFeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
