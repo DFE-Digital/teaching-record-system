@@ -137,7 +137,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithProfessionalStatus(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
+        public CreatePersonBuilder WithRouteToProfessionalStatus(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
         {
             EnsureTrn();
 
@@ -148,7 +148,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithAwardedProfessionalStatus(ProfessionalStatusType professionalStatusType)
+        public CreatePersonBuilder WithAwardedRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
         {
             EnsureTrn();
             _awardedProfessionalStatuses.Add(professionalStatusType);
@@ -245,7 +245,7 @@ public partial class TestData
         }
 
         public CreatePersonBuilder WithQtls(DateOnly awardedDate) =>
-            WithProfessionalStatus(p => p
+            WithRouteToProfessionalStatus(p => p
                 .WithStatus(RouteToProfessionalStatusStatus.Awarded)
                 .WithAwardedDate(awardedDate)
                 .WithRoute(RouteToProfessionalStatusType.QtlsAndSetMembershipId));

@@ -114,7 +114,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r =>
+            .WithRouteToProfessionalStatus(r =>
             {
                 r.WithRoute(route.RouteToProfessionalStatusTypeId);
                 r.WithStatus(status);
@@ -165,7 +165,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         DateOnly awardedDate = new DateOnly(2024, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
-            .WithProfessionalStatus(r =>
+            .WithRouteToProfessionalStatus(r =>
             {
                 r.WithRoute(route.RouteToProfessionalStatusTypeId);
                 r.WithStatus(status);

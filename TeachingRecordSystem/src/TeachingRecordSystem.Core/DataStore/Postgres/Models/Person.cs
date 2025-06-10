@@ -499,7 +499,7 @@ public class Person
             Qualifications?
                 .OfType<RouteToProfessionalStatus>()
                 .Where(p => p.DeletedOn is null) ??
-            throw new InvalidOperationException("Professional statuses not loaded.");
+            throw new InvalidOperationException("Routes not loaded.");
 
         var awardedOrApprovedQtsProfessionalStatuses = routes
             .Where(p => allRouteTypes.Single(rt => rt.RouteToProfessionalStatusTypeId == p.RouteToProfessionalStatusTypeId).ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
@@ -553,15 +553,15 @@ public class Person
         IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
         IEnumerable<RouteToProfessionalStatus>? routesHint = null)
     {
-        var professionalStatuses = routesHint ??
+        var routes = routesHint ??
             Qualifications?
-                .OfType<RouteToProfessionalStatus>()?
+                .OfType<RouteToProfessionalStatus>()
                 .Where(p => p.DeletedOn is null) ??
-            throw new InvalidOperationException("Professional statuses not loaded.");
+            throw new InvalidOperationException("Routes not loaded.");
 
         var professionalStatusTypeByRouteId = allRouteTypes.ToDictionary(r => r.RouteToProfessionalStatusTypeId, r => r.ProfessionalStatusType);
 
-        var awardedOrApproved = professionalStatuses
+        var awardedOrApproved = routes
             .Where(ps => professionalStatusTypeByRouteId[ps.RouteToProfessionalStatusTypeId] == professionalStatusType &&
                 ps.Status is RouteToProfessionalStatusStatus.Approved or RouteToProfessionalStatusStatus.Awarded)
             .ToArray();
@@ -600,6 +600,37 @@ public class Person
         }
     }
 
+    public bool RefreshQtlsStatus(IEnumerable<RouteToProfessionalStatus>? routesHint = null)
+    {
+        var routes = routesHint ??
+            Qualifications?
+                .OfType<RouteToProfessionalStatus>()
+                .Where(p => p.DeletedOn is null) ??
+            throw new InvalidOperationException("Routes not loaded.");
+
+        var qtlsRoutes = routes
+            .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId &&
+                r.Status is RouteToProfessionalStatusStatus.Awarded &&
+                r.DeletedOn is null)
+            .ToArray();
+
+        var currentStatus = QtlsStatus;
+
+        if (qtlsRoutes.Length > 0 && currentStatus is not QtlsStatus.Active)
+        {
+            QtlsStatus = QtlsStatus.Active;
+            return true;
+        }
+
+        if (qtlsRoutes.Length == 0 && currentStatus is QtlsStatus.Active)
+        {
+            QtlsStatus = QtlsStatus.Expired;
+            return true;
+        }
+
+        return false;
+    }
+
     private static void AssertInductionChangeIsValid(
         InductionStatus status,
         DateOnly? startDate,
@@ -619,7 +650,7 @@ public class Person
             Qualifications?
                 .OfType<RouteToProfessionalStatus>()
                 .Where(p => p.DeletedOn is null) ??
-            throw new InvalidOperationException("Professional statuses not loaded.");
+            throw new InvalidOperationException("Routes not loaded.");
 
         var awardedOrApprovedRoutes = routes
             .Where(s => s.Status is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved)

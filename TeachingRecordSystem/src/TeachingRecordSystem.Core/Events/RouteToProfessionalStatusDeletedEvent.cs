@@ -22,6 +22,7 @@ public enum RouteToProfessionalStatusDeletedEventChanges
 {
     None = 0,
     // Keep the following options aligned with other ProfessionalStatus events
+    PersonQtlsStatus = 1 << 24,
     PersonQtsDate = 1 << 25,
     PersonEytsDate = 1 << 26,
     PersonHasEyps = 1 << 27,
