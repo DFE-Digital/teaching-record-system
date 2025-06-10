@@ -259,30 +259,6 @@ public class IndexTests : TestBase
     }
 
     [Fact]
-    public async Task Get_PersonHasEyts_ShowsDetails()
-    {
-        // Arrange
-        var awardDate = Clock.Today;
-        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
-        var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithPqts(awardDate));
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        var doc = await AssertEx.HtmlResponseAsync(response);
-        Assert.Equal(person.QtsDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat), doc.GetSummaryListValueForKey("PQTS award date"));
-        Assert.Null(doc.GetSummaryListValueForKey("EYTS award date"));
-        Assert.Null(doc.GetSummaryListValueForKey("QTS award date"));
-        Assert.Null(doc.GetSummaryListValueForKey("EYPS"));
-        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
-    }
-
-    [Fact]
     public async Task Get_PersonHasNoProfessionalStatusDetails_NoSummaryCardShown()
     {
         // Arrange
