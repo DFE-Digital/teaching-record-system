@@ -212,14 +212,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     }
 
     [Fact]
-    public async Task ProfessionalStatusUpdatedEvent_StatusChanged_PersonQtsChanged_RendersExpectedContent()
+    public async Task ProfessionalStatusUpdatedEvent_StatusChangedToHolds_PersonQtsChanged_RendersExpectedContent()
     {
         // Arrange
         var oldStatus = RouteToProfessionalStatusStatus.InTraining;
         var startDate = Clock.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .RandomOne();
         var status = RouteToProfessionalStatusStatus.Awarded;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
