@@ -24,10 +24,8 @@ public enum GetPersonCommandIncludes
     None = 0,
     Induction = 1 << 0,
     InitialTeacherTraining = 1 << 1,
-    NpqQualifications = 1 << 2,
     MandatoryQualifications = 1 << 3,
     PendingDetailChanges = 1 << 4,
-    HigherEducationQualifications = 1 << 5,
     Sanctions = 1 << 6,
     Alerts = 1 << 7,
     PreviousNames = 1 << 8,
@@ -50,9 +48,7 @@ public record GetPersonResult
     public required Option<GetPersonResultInduction> Induction { get; init; }
     public required Option<GetPersonResultDqtInduction?> DqtInduction { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultInitialTeacherTraining>> InitialTeacherTraining { get; init; }
-    public required Option<IReadOnlyCollection<GetPersonResultNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
-    public required Option<IReadOnlyCollection<GetPersonResultHigherEducationQualification>> HigherEducationQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
     public required Option<IReadOnlyCollection<NameInfo>> PreviousNames { get; init; }
@@ -123,36 +119,10 @@ public record GetPersonResultInitialTeacherTrainingSubject
     public required string Name { get; init; }
 }
 
-public record GetPersonResultNpqQualification
-{
-    public required DateOnly Awarded { get; init; }
-    public required GetPersonResultNpqQualificationType Type { get; init; }
-    public required string CertificateUrl { get; init; }
-}
-
-public record GetPersonResultNpqQualificationType
-{
-    public required NpqQualificationType Code { get; init; }
-    public required string Name { get; init; }
-}
-
 public record GetPersonResultMandatoryQualification
 {
     public required DateOnly Awarded { get; init; }
     public required string Specialism { get; init; }
-}
-
-public record GetPersonResultHigherEducationQualification
-{
-    public required string? Name { get; init; }
-    public required DateOnly? Awarded { get; init; }
-    public required IReadOnlyCollection<GetPersonResultHigherEducationQualificationSubject> Subjects { get; init; }
-}
-
-public record GetPersonResultHigherEducationQualificationSubject
-{
-    public required string Code { get; init; }
-    public required string Name { get; init; }
 }
 
 public class GetPersonHandler(
@@ -310,18 +280,6 @@ public class GetPersonHandler(
             WithTrsDbLockAsync(() => dbContext.MandatoryQualifications.Where(q => q.PersonId == personId).ToArrayAsync()) :
             null;
 
-        var getQualificationsTask = (command.Include & (GetPersonCommandIncludes.NpqQualifications | GetPersonCommandIncludes.HigherEducationQualifications)) != 0 ?
-            crmQueryDispatcher.ExecuteQueryAsync(
-                new GetQualificationsByContactIdQuery(
-                    contact.Id,
-                    new ColumnSet(
-                        dfeta_qualification.PrimaryIdAttribute,
-                        dfeta_qualification.Fields.dfeta_CompletionorAwardDate,
-                        dfeta_qualification.Fields.dfeta_Type,
-                        dfeta_qualification.Fields.StateCode),
-                    IncludeHigherEducationDetails: command.Include.HasFlag(GetPersonCommandIncludes.HigherEducationQualifications))) :
-            null;
-
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
             var nameChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Name");
@@ -343,7 +301,7 @@ public class GetPersonHandler(
             null;
 
         var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            WithTrsDbLockAsync(() => dbContext.Alerts.Include(a => a.AlertType).ThenInclude(at => at!.AlertCategory).Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
+            WithTrsDbLockAsync(() => dbContext.Alerts.Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
             null;
 
         IEnumerable<NameInfo> previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
@@ -406,14 +364,8 @@ public class GetPersonHandler(
             InitialTeacherTraining = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
                 Option.Some(MapInitialTeacherTraining((await getIttTask!), command.ApplyAppropriateBodyUserRestrictions)) :
                 default,
-            NpqQualifications = command.Include.HasFlag(GetPersonCommandIncludes.NpqQualifications) ?
-                Option.Some(MapNpqQualifications(await getQualificationsTask!)) :
-                default,
             MandatoryQualifications = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
                 Option.Some(MapMandatoryQualifications((await getMqsTask!))) :
-                default,
-            HigherEducationQualifications = command.Include.HasFlag(GetPersonCommandIncludes.HigherEducationQualifications) ?
-                Option.Some(MapHigherEducationQualifications((await getQualificationsTask!))) :
                 default,
             Sanctions = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) ?
                 Option.Some((await getAlertsTask!)
@@ -639,39 +591,6 @@ public class GetPersonHandler(
         return subjects;
     }
 
-    private static IReadOnlyCollection<GetPersonResultNpqQualification> MapNpqQualifications(dfeta_qualification[] qualifications) =>
-        qualifications
-            .Where(q => q.dfeta_Type.HasValue
-                && q.dfeta_Type.Value.IsNpq()
-                && q.StateCode == dfeta_qualificationState.Active
-                && q.dfeta_CompletionorAwardDate.HasValue)
-            .Select(q => new GetPersonResultNpqQualification()
-            {
-                Awarded = q.dfeta_CompletionorAwardDate!.Value.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                Type = new GetPersonResultNpqQualificationType()
-                {
-                    Code = MapNpqQualificationType(q.dfeta_Type!.Value),
-                    Name = q.dfeta_Type.Value.GetName(),
-                },
-                CertificateUrl = $"/v3/certificates/npq/{q.Id}"
-            })
-            .ToArray();
-
-    private static NpqQualificationType MapNpqQualificationType(dfeta_qualification_dfeta_Type qualificationType) =>
-        qualificationType switch
-        {
-            dfeta_qualification_dfeta_Type.NPQEL => NpqQualificationType.NPQEL,
-            dfeta_qualification_dfeta_Type.NPQEYL => NpqQualificationType.NPQEYL,
-            dfeta_qualification_dfeta_Type.NPQH => NpqQualificationType.NPQH,
-            dfeta_qualification_dfeta_Type.NPQLBC => NpqQualificationType.NPQLBC,
-            dfeta_qualification_dfeta_Type.NPQLL => NpqQualificationType.NPQLL,
-            dfeta_qualification_dfeta_Type.NPQLT => NpqQualificationType.NPQLT,
-            dfeta_qualification_dfeta_Type.NPQLTD => NpqQualificationType.NPQLTD,
-            dfeta_qualification_dfeta_Type.NPQML => NpqQualificationType.NPQML,
-            dfeta_qualification_dfeta_Type.NPQSL => NpqQualificationType.NPQSL,
-            _ => throw new ArgumentException($"Unrecognized qualification type: '{qualificationType}'.", nameof(qualificationType))
-        };
-
     private static IReadOnlyCollection<GetPersonResultMandatoryQualification> MapMandatoryQualifications(PostgresModels.MandatoryQualification[] qualifications) =>
         qualifications
             .Where(q => q.EndDate.HasValue && q.Specialism.HasValue)
@@ -679,58 +598,6 @@ public class GetPersonHandler(
             {
                 Awarded = mq.EndDate!.Value,
                 Specialism = mq.Specialism!.Value.GetTitle()
-            })
-            .ToArray();
-
-    private static IReadOnlyCollection<GetPersonResultHigherEducationQualification> MapHigherEducationQualifications(dfeta_qualification[] qualifications) =>
-        qualifications
-            .Where(q =>
-                q.dfeta_Type.HasValue &&
-                q.dfeta_Type.Value == dfeta_qualification_dfeta_Type.HigherEducation &&
-                q.StateCode == dfeta_qualificationState.Active)
-            .Select(q =>
-            {
-                var heQualification = q.Extract<dfeta_hequalification>();
-
-                var heSubject1 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}1", dfeta_hesubject.PrimaryIdAttribute);
-                var heSubject2 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}2", dfeta_hesubject.PrimaryIdAttribute);
-                var heSubject3 = q.Extract<dfeta_hesubject>($"{nameof(dfeta_hesubject)}3", dfeta_hesubject.PrimaryIdAttribute);
-
-                var heSubjects = new List<GetPersonResultHigherEducationQualificationSubject>();
-
-                if (heSubject1 != null)
-                {
-                    heSubjects.Add(new GetPersonResultHigherEducationQualificationSubject()
-                    {
-                        Code = heSubject1.dfeta_Value,
-                        Name = heSubject1.dfeta_name,
-                    });
-                }
-
-                if (heSubject2 != null)
-                {
-                    heSubjects.Add(new GetPersonResultHigherEducationQualificationSubject()
-                    {
-                        Code = heSubject2.dfeta_Value,
-                        Name = heSubject2.dfeta_name,
-                    });
-                }
-
-                if (heSubject3 != null)
-                {
-                    heSubjects.Add(new GetPersonResultHigherEducationQualificationSubject()
-                    {
-                        Code = heSubject3.dfeta_Value,
-                        Name = heSubject3.dfeta_name,
-                    });
-                }
-
-                return new GetPersonResultHigherEducationQualification()
-                {
-                    Name = heQualification?.dfeta_name,
-                    Awarded = q.dfeta_CompletionorAwardDate?.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    Subjects = heSubjects.ToArray()
-                };
             })
             .ToArray();
 }

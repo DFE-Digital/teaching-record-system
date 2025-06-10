@@ -27,15 +27,11 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
     public async Task OnGetAsync()
     {
         ProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
-            .Include(q => q.TrainingProvider)
-            .Include(q => q.TrainingCountry)
-            .Include(q => q.RouteToProfessionalStatusType)
-            .Include(q => q.DegreeType)
             .Where(x => x.PersonId == PersonId)
             .OrderBy(x => x.CreatedOn)
             .ToArrayAsync();
         var uniqueSubjectIds = ProfessionalStatuses
-            .SelectMany(x => x.TrainingSubjectIds ?? Array.Empty<Guid>())
+            .SelectMany(x => x.TrainingSubjectIds)
             .Distinct()
             .ToArray();
         var trainingSubjectsLookup = (await referenceDataCache.GetTrainingSubjectsAsync())
@@ -46,7 +42,6 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
         );
 
         MandatoryQualifications = await dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
             .Where(q => q.PersonId == PersonId)
             .ToArrayAsync();
     }
