@@ -21,5 +21,6 @@ public enum ApiTrnRequestSupportTaskUpdatedEventChanges
     PersonLastName = 1 << 3,
     PersonDateOfBirth = 1 << 4,
     PersonEmailAddress = 1 << 5,
-    PersonNationalInsuranceNumber = 1 << 6
+    PersonNationalInsuranceNumber = 1 << 6,
+    PersonNameChange = PersonFirstName | PersonMiddleName | PersonLastName
 }

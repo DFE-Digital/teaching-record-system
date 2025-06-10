@@ -1,0 +1,92 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<ApiTrnRequestSupportTaskUpdatedEvent>>
+@{
+    var updatedEvent = Model.ItemModel.Event;
+    var attributes = updatedEvent.PersonAttributes;
+    var oldAttributes = updatedEvent.OldPersonAttributes;
+    var name = StringHelper.JoinNonEmpty(' ', attributes.FirstName, attributes.MiddleName, attributes.LastName);
+    var oldName = oldAttributes != null 
+        ? StringHelper.JoinNonEmpty(' ', oldAttributes.FirstName, oldAttributes.MiddleName, oldAttributes.LastName)
+        : null;
+}
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-details-updated-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">TRN Request support task updated</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <div data-testid="details">
+            <govuk-summary-list>
+                @if (updatedEvent.Changes.HasAnyFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNameChange)) {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth)) {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.DateOfBirth</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress)) {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.EmailAddress</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+                @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber)) {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@attributes.NationalInsuranceNumber</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                }
+            </govuk-summary-list>
+        </div>
+
+        @if (oldAttributes != null)
+        {
+            <govuk-details class="govuk-!-margin-bottom-2" data-testid="previous-details">
+                <govuk-details-summary>Previous details</govuk-details-summary>
+                <govuk-details-text>
+                    <govuk-summary-list>
+                        @if (updatedEvent.Changes.HasAnyFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNameChange))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>@oldName</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonDateOfBirth))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>oldAttributes.DateOfBirth</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonEmailAddress))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>oldAttributes.EmailAddress</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                        @if (updatedEvent.Changes.HasFlag(ApiTrnRequestSupportTaskUpdatedEventChanges.PersonNationalInsuranceNumber))
+                        {
+                            <govuk-summary-list-row>
+                                <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-value use-empty-fallback>oldAttributes.NationalInsuranceNumber</govuk-summary-list-row-value>
+                            </govuk-summary-list-row>
+                        }
+                    </govuk-summary-list>
+                </govuk-details-text>
+            </govuk-details>
+        }
+    </div>
+</div>
