@@ -15,7 +15,7 @@ using ProfessionalStatusStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
-public record SetProfessionalStatusCommand(
+public record SetRouteToProfessionalStatusCommand(
     string Trn,
     string SourceApplicationReference,
     Guid RouteTypeId,
@@ -24,20 +24,20 @@ public record SetProfessionalStatusCommand(
     DateOnly? TrainingStartDate,
     DateOnly? TrainingEndDate,
     string[]? TrainingSubjectReferences,
-    SetProfessionalStatusCommandTrainingAgeSpecialism? TrainingAgeSpecialism,
+    SetRouteToProfessionalStatusCommandTrainingAgeSpecialism? TrainingAgeSpecialism,
     string? TrainingCountryReference,
     string? TrainingProviderUkprn,
     Guid? DegreeTypeId,
     bool? IsExemptFromInduction);
 
-public record SetProfessionalStatusCommandTrainingAgeSpecialism(
+public record SetRouteToProfessionalStatusCommandTrainingAgeSpecialism(
     TrainingAgeSpecialismType Type,
     int? From,
     int? To);
 
-public record SetProfessionalStatusResult;
+public record SetRouteToProfessionalStatusResult;
 
-public class SetProfessionalStatusHandler(
+public class SetRouteToProfessionalStatusHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     TrsDataSyncHelper syncHelper,
@@ -47,7 +47,7 @@ public class SetProfessionalStatusHandler(
 {
     private static readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 
-    public async Task<ApiResult<SetProfessionalStatusResult>> HandleAsync(SetProfessionalStatusCommand command)
+    public async Task<ApiResult<SetRouteToProfessionalStatusResult>> HandleAsync(SetRouteToProfessionalStatusCommand command)
     {
         await using var trnLock = await distributedLockProvider.AcquireLockAsync(DistributedLockKeys.Trn(command.Trn), _lockTimeout);
 
@@ -351,7 +351,7 @@ public class SetProfessionalStatusHandler(
 
         await crmQueryDispatcher.ExecuteQueryAsync(setQuery);
 
-        return new SetProfessionalStatusResult();
+        return new SetRouteToProfessionalStatusResult();
 
         Task<Person?> GetPersonAsync() => dbContext.Persons.SingleOrDefaultAsync(p => p.Trn == command.Trn);
     }
@@ -367,7 +367,7 @@ public class SetProfessionalStatusHandler(
         // Find an active QTS registration entity where either
         //   programme type is Early Years and the Early Years Status is 220 ('Early Years Trainee') *OR*
         //   programme type is AssessmentOnly and the Teacher Status is 212 ('AOR Candidate') *OR*
-        //   programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS') *OR*        
+        //   programme type is neither Early Years nor Assessment Only and Teacher Status is 211 ('Trainee Teacher:DMS') *OR*
         var matching = new List<dfeta_qtsregistration>();
 
         foreach (var qts in qtsRecords)
@@ -567,9 +567,9 @@ public class SetProfessionalStatusHandler(
     }
 }
 
-public static class SetProfessionalStatusCommandTrainingAgeSpecialismExtensions
+public static class SetRouteToProfessionalStatusCommandTrainingAgeSpecialismExtensions
 {
-    public static (dfeta_AgeRange, dfeta_AgeRange)? ConvertToAgeRange(this SetProfessionalStatusCommandTrainingAgeSpecialism input)
+    public static (dfeta_AgeRange, dfeta_AgeRange)? ConvertToAgeRange(this SetRouteToProfessionalStatusCommandTrainingAgeSpecialism input)
     {
         if (!input.TryConvertToAgeRange(out var result))
         {
@@ -579,7 +579,7 @@ public static class SetProfessionalStatusCommandTrainingAgeSpecialismExtensions
         return result;
     }
 
-    public static bool TryConvertToAgeRange(this SetProfessionalStatusCommandTrainingAgeSpecialism input, out (dfeta_AgeRange, dfeta_AgeRange)? result)
+    public static bool TryConvertToAgeRange(this SetRouteToProfessionalStatusCommandTrainingAgeSpecialism input, out (dfeta_AgeRange, dfeta_AgeRange)? result)
     {
         var mapped = input.Type switch
         {
