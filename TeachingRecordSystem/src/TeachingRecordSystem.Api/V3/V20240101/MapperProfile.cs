@@ -1,3 +1,7 @@
+using OneOf;
+using TeachingRecordSystem.Api.Infrastructure.Mapping;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
+using TeachingRecordSystem.Api.V3.V20240101.Responses;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.V20240101;
@@ -9,6 +13,11 @@ public class MapperProfile : Profile
         CreateMap<Implementation.Dtos.Alert, AlertInfo>().ConvertUsing<AlertInfoTypeConverter>();
         CreateMap<Implementation.Dtos.NameInfo, NameInfo>();
         CreateMap<Implementation.Dtos.SanctionInfo, SanctionInfo>();
+        CreateMap<OneOf<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody>,
+                GetTeacherResponseInitialTeacherTraining>()
+            .ConvertUsing(
+                new FromOneOfT0TypeConverter<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody,
+                    GetTeacherResponseInitialTeacherTraining>());
     }
 }
 

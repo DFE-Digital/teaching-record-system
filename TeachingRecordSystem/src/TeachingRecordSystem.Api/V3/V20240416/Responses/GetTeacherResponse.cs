@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using AutoMapper.Configuration.Annotations;
 using Optional;
-using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
@@ -80,22 +79,14 @@ public record GetTeacherResponseInductionPeriodAppropriateBody
 [AutoMap(typeof(GetPersonResultInitialTeacherTraining))]
 public record GetTeacherResponseInitialTeacherTraining
 {
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingQualification, GetTeacherResponseInitialTeacherTrainingQualification>))]
     public required GetTeacherResponseInitialTeacherTrainingQualification? Qualification { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<DateOnly?>))]
     public required DateOnly? StartDate { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<DateOnly?>))]
     public required DateOnly? EndDate { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<TeachingRecordSystem.Api.V3.Implementation.Dtos.IttProgrammeType?, IttProgrammeType?>))]
     public required IttProgrammeType? ProgrammeType { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<string?>))]
     public required string? ProgrammeTypeDescription { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<TeachingRecordSystem.Api.V3.Implementation.Dtos.IttOutcome?, IttOutcome?>))]
     public required IttOutcome? Result { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetTeacherResponseInitialTeacherTrainingAgeRange>))]
     public required GetTeacherResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetTeacherResponseInitialTeacherTrainingProvider? Provider { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>, IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject>>))]
     public required IReadOnlyCollection<GetTeacherResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 

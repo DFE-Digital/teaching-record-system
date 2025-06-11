@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610201124_CountryMandatoryOnAllRoutes")]
+    partial class CountryMandatoryOnAllRoutes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -17638,7 +17641,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_trn_request_metadata_application_users_application_user_id");
 
-                    b.OwnsOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata.Matches#TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches", "Matches", b1 =>
+                    b.OwnsOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches", "Matches", b1 =>
                         {
                             b1.Property<Guid>("TrnRequestMetadataApplicationUserId")
                                 .HasColumnType("uuid");
@@ -17648,7 +17651,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                             b1.HasKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId");
 
-                            b1.ToTable("trn_request_metadata", (string)null);
+                            b1.ToTable("trn_request_metadata");
 
                             b1.ToJson("matches");
 
@@ -17656,7 +17659,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                                 .HasForeignKey("TrnRequestMetadataApplicationUserId", "TrnRequestMetadataRequestId")
                                 .HasConstraintName("fk_trn_request_metadata_trn_request_metadata_application_user_");
 
-                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMetadata.Matches#TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatches.MatchedRecords#TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
+                            b1.OwnsMany("TeachingRecordSystem.Core.DataStore.Postgres.Models.TrnRequestMatchedRecord", "MatchedRecords", b2 =>
                                 {
                                     b2.Property<Guid>("TrnRequestMatchesTrnRequestMetadataApplicationUserId")
                                         .HasColumnType("uuid");
@@ -17673,7 +17676,7 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 
                                     b2.HasKey("TrnRequestMatchesTrnRequestMetadataApplicationUserId", "TrnRequestMatchesTrnRequestMetadataRequestId", "Id");
 
-                                    b2.ToTable("trn_request_metadata", (string)null);
+                                    b2.ToTable("trn_request_metadata");
 
                                     b2.ToJson("matches");
 
