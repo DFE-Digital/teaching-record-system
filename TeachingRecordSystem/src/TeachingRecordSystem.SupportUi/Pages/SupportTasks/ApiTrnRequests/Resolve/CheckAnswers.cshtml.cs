@@ -148,6 +148,7 @@ public class CheckAnswers(
                 NationalInsuranceNumber = resolvedPersonAttributes.NationalInsuranceNumber
             },
             OldPersonAttributes = oldPersonAttributes,
+            Comments = state.Comments,
             EventId = Guid.NewGuid(),
             CreatedUtc = clock.UtcNow,
             RaisedBy = User.GetUserId()
