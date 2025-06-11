@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.Pages.Common;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
@@ -49,17 +50,17 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
-        await page.FillAsync($"label:text-is('Enter the training provider for this route')", setProviderName);
+        await page.EnterTrainingProviderAsync(setProviderName);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddDegreeTypePageAsync();
-        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.EnterDegreeTypeAsync(setDegreeType);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteAddCountryAsync();
-        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.EnterCountryAsync(setCountry);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
@@ -155,17 +156,17 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
-        await page.FillAsync($"label:text-is('Enter the training provider for this route')", setProviderName);
+        await page.EnterTrainingProviderAsync(setProviderName);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddDegreeTypePageAsync();
-        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.EnterDegreeTypeAsync(setDegreeType);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteAddCountryAsync();
-        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.EnterCountryAsync(setCountry);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
@@ -234,7 +235,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteAddCountryAsync();
-        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.EnterCountryAsync(setCountry);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
@@ -303,7 +304,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteAddCountryAsync();
-        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.EnterCountryAsync(setCountry);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
@@ -393,17 +394,17 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
-        await page.FillAsync($"label:text-is('Enter the training provider for this route')", setProviderName);
+        await page.EnterTrainingProviderAsync(setProviderName);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddDegreeTypePageAsync();
-        await page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", setDegreeType);
+        await page.EnterDegreeTypeAsync(setDegreeType);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteAddCountryAsync();
-        await page.FillAsync($"label:text-is('Enter the country associated with their route')", setCountry);
+        await page.EnterCountryAsync(setCountry);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
 
@@ -421,40 +422,63 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
 
+        // check each edit link from cya page
+        var editEndDate = endDate.AddDays(1);
+        var editStartDate = startDate.AddDays(1);
+        var editAwardDate = editEndDate.AddDays(1);
+        var editDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("c584eb2f-1419-4870-a230-5d81ae9b5f77"));
+        var editAgeRange = TrainingAgeSpecialismType.KeyStage2;
+        var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
+        var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
+        var editTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
+            .RandomOne();
+
         await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
         await page.AssertOnRouteAddStartDatePageAsync();
+        await page.FillDateInputAsync(editStartDate);
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
         await page.AssertOnRouteAddStartDatePageAsync();
         await page.ClickBackLink();
 
-        await page.ClickLinkForElementWithTestIdAsync("add-end-date-link");
-        await page.AssertOnRouteAddEndDatePageAsync();
-        await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-end-date-link");
         await page.AssertOnRouteAddEndDatePageAsync();
+        await page.FillDateInputAsync(editEndDate);
+        await page.ClickButtonAsync("Continue");
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-end-date-link");
+        await page.AssertOnRouteAddEndDatePageAsync();
         await page.ClickBackLink();
 
+        await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-training-provider-link");
         await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.EnterTrainingProviderAsync(editTrainingProvider.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-training-provider-link");
         await page.AssertOnRouteAddTrainingProviderAsync();
         await page.ClickBackLink();
 
+        await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-degree-type-link");
         await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.EnterDegreeTypeAsync(editDegreeType.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-degree-type-link");
         await page.AssertOnRouteAddDegreeTypePageAsync();
         await page.ClickBackLink();
 
+        await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-country-link");
         await page.AssertOnRouteAddCountryAsync();
+        await page.EnterCountryAsync(editCountry.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-country-link");
@@ -464,6 +488,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-age-range-link");
         await page.AssertOnRouteAddAgeRangeAsync();
+        await page.SelectAgeTypeAsync(editAgeRange);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-age-range-link");
@@ -473,6 +499,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-subjects-link");
         await page.AssertOnRouteAddSubjectsPageAsync();
+        await page.EnterSubjectAsync(editSubject.Name);
+        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-subjects-link");
@@ -480,5 +508,13 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
+
+        await page.AssertContentEquals(editStartDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Start date");
+        await page.AssertContentEquals(editEndDate.ToString(UiDefaults.DateOnlyDisplayFormat), "End date");
+        await page.AssertContentContains(editDegreeType.Name, "Degree type");
+        await page.AssertContentEquals(editAgeRange.GetDisplayName()!, "Age range");
+        await page.AssertContentContains(editCountry.Name, "Country of training");
+        await page.AssertContentContains(editSubject.Name, "Subjects");
+        await page.AssertContentContains(editTrainingProvider.Name, "Training provider");
     }
 }

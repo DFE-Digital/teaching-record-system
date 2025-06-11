@@ -28,6 +28,26 @@ public static class RouteToProfessionalStatusPageExtensions
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
+    public static Task EnterDegreeTypeAsync(this IPage page, string name)
+    {
+        return page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", name);
+    }
+
+    public static Task EnterCountryAsync(this IPage page, string name)
+    {
+        return page.FillAsync("label:text-is('Enter the country associated with their route')", name);
+    }
+
+    public static Task EnterSubjectAsync(this IPage page, string name)
+    {
+        return page.FillAsync("label:text-is('Enter the subject they specialise in teaching')", name);
+    }
+
+    public static Task EnterTrainingProviderAsync(this IPage page, string name)
+    {
+        return page.FillAsync("label:text-is('Enter the training provider for this route')", name);
+    }
+
     public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
