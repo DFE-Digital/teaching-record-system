@@ -8,6 +8,7 @@
 - `NpqQualifications` and `InitialTeacherTraining` can no longer be requested in the `include` query parameter.
 - `RoutesToProfessionalStatuses` can be requested in the `include` query parameter.
 - An `exemptions` property has been added to the `induction` property.
+- The `awarded`, `certificateUrl` and `statusDescription` properties are no longer present on the `qts` and `eyts` objects. In their place is `qtsDate` and `eytsDate` respectively.
 
 ### `GET /v3/persons?findBy=LastNameAndDateOfBirth` and `GET /v3/persons/find`
 - The `inductionStatus` property has been replaced by an `induction` object.
