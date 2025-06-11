@@ -2310,6 +2310,7 @@
           "NSign.SignatureProviders": "[1.1.0, )",
           "Npgsql.DependencyInjection": "[8.0.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[8.0.10, )",
+          "OneOf": "[3.0.271, )",
           "OpenIddict.EntityFrameworkCore": "[5.2.0, )",
           "Optional": "[4.0.0, )",
           "Parquet.Net": "[4.24.0, )",
@@ -2782,6 +2783,12 @@
         "dependencies": {
           "NSign.Abstractions": "1.1.0"
         }
+      },
+      "OneOf": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.271, )",
+        "resolved": "3.0.271",
+        "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
       },
       "OpenIddict.EntityFrameworkCore": {
         "type": "CentralTransitive",

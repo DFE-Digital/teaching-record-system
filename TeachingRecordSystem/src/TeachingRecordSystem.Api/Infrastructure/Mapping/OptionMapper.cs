@@ -1,5 +1,5 @@
+using OneOf;
 using Optional;
-using Optional.Unsafe;
 
 namespace TeachingRecordSystem.Api.Infrastructure.Mapping;
 
@@ -21,14 +21,20 @@ public class WrapWithOptionValueConverter<T> : IValueConverter<T, Option<T>>
         Option.Some(sourceMember);
 }
 
-public class UnwrapFromOptionValueConverter<TSource, TDestination> : IValueConverter<Option<TSource>, TDestination>
+public class OneOfToOneOfTypeConverter<T0Source, T1Source, T0Destination, T1Destination> : ITypeConverter<OneOf<T0Source, T1Source>, OneOf<T0Destination, T1Destination>>
 {
-    public TDestination Convert(Option<TSource> sourceMember, ResolutionContext context) =>
-        context.Mapper.Map<TDestination>(sourceMember.ValueOrFailure());
+    public OneOf<T0Destination, T1Destination> Convert(OneOf<T0Source, T1Source> source, OneOf<T0Destination, T1Destination> destination, ResolutionContext context)
+    {
+        return source.Match(
+            v => OneOf<T0Destination, T1Destination>.FromT0(context.Mapper.Map<T0Destination>(v)),
+            v => OneOf<T0Destination, T1Destination>.FromT1(context.Mapper.Map<T1Destination>(v)));
+    }
 }
 
-public class UnwrapFromOptionValueConverter<T> : IValueConverter<Option<T>, T>
+public class FromOneOfT0TypeConverter<T0Source, T1Source, TDestination> : ITypeConverter<OneOf<T0Source, T1Source>, TDestination>
 {
-    public T Convert(Option<T> sourceMember, ResolutionContext context) =>
-        sourceMember.ValueOrFailure();
+    public TDestination Convert(OneOf<T0Source, T1Source> source, TDestination destination, ResolutionContext context)
+    {
+        return context.Mapper.Map<TDestination>(source.AsT0);
+    }
 }

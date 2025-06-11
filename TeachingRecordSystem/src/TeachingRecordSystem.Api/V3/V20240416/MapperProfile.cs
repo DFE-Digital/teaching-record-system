@@ -1,20 +1,18 @@
 using OneOf;
 using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
-using TeachingRecordSystem.Api.V3.V20240606.Responses;
-using TeachingRecordSystem.Core.ApiSchema.V3.V20240606.Dtos;
+using TeachingRecordSystem.Api.V3.V20240416.Responses;
 
-namespace TeachingRecordSystem.Api.V3.V20240606;
+namespace TeachingRecordSystem.Api.V3.V20240416;
 
 public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
         CreateMap<OneOf<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody>,
-                GetPersonResponseInitialTeacherTraining>()
+                GetTeacherResponseInitialTeacherTraining>()
             .ConvertUsing(
                 new FromOneOfT0TypeConverter<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody,
-                    GetPersonResponseInitialTeacherTraining>());
+                    GetTeacherResponseInitialTeacherTraining>());
     }
 }

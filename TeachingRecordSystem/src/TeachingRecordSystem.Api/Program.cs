@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.Endpoints;
 using TeachingRecordSystem.Api.Endpoints.IdentityWebHooks;
@@ -129,13 +130,14 @@ public class Program
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new OneOfJsonConverterFactory());
 
             options.JsonSerializerOptions.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
             {
                 Modifiers =
-                    {
-                        Modifiers.OptionProperties
-                    }
+                {
+                    Modifiers.OptionProperties
+                }
             };
         });
 
@@ -148,11 +150,10 @@ public class Program
             {
                 cfg.AddMaps(typeof(Program).Assembly);
                 cfg.CreateMap(typeof(Option<>), typeof(Option<>)).ConvertUsing(typeof(OptionToOptionTypeConverter<,>));
+                cfg.CreateMap(typeof(OneOf<,>), typeof(OneOf<,>)).ConvertUsing(typeof(OneOfToOneOfTypeConverter<,,,>));
             })
             .AddTransient(typeof(WrapWithOptionValueConverter<>))
-            .AddTransient(typeof(WrapWithOptionValueConverter<,>))
-            .AddTransient(typeof(UnwrapFromOptionValueConverter<>))
-            .AddTransient(typeof(UnwrapFromOptionValueConverter<,>));
+            .AddTransient(typeof(WrapWithOptionValueConverter<,>));
 
         services.Scan(scan =>
         {
