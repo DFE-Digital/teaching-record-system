@@ -133,6 +133,7 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             OldSupportTask = oldSupportTask,
             RequestData = requestData,
             Changes = changes,
+            Comments = "Some comments"
         };
 
         await WithDbContext(async dbContext =>
@@ -151,6 +152,9 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
 
         var item = doc.GetElementByTestId("timeline-item-details-updated-event");
         Assert.NotNull(item);
+        var title = item.QuerySelector(".moj-timeline__title");
+        Assert.NotNull(title);
+        Assert.Equal("TRN request from Apply for QTS - records merged", title.TrimmedText());
         Assert.Equal($"By {createdByUser.Name} on", item.GetElementByTestId("raised-by")?.TrimmedText());
         Assert.Equal(Clock.NowGmt.ToString(TimelineItem.TimestampFormat), item.GetElementByTestId("timeline-item-time")?.TrimmedText());
 
@@ -197,6 +201,9 @@ public class ChangeLogApiTrnRequestSupportTaskUpdatedEventTests : TestBase
             doc.AssertSummaryListRowDoesNotExist("details", "National Insurance number");
             doc.AssertSummaryListRowDoesNotExist("previous-details", "National Insurance number");
         }
+
+        doc.AssertSummaryListValue("change-reason", "Reason", v => Assert.Equal("Identified as same person during task resolution", v.TrimmedText()));
+        doc.AssertSummaryListValue("change-reason", "Comments", v => Assert.Equal("Some comments", v.TrimmedText()));
 
         doc.AssertSummaryListValue("request-data", "Source", v => Assert.Equal("AfQTS", v.TrimmedText()));
         doc.AssertSummaryListValue("request-data", "Request ID", v => Assert.Equal("TEST-TRN-1", v.TrimmedText()));

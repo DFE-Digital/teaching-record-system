@@ -9,6 +9,7 @@ public record ApiTrnRequestSupportTaskUpdatedEvent : EventBase, IEventWithPerson
     public required ApiTrnRequestSupportTaskUpdatedEventChanges Changes { get; init; }
     public required EventModels.TrnRequestPersonAttributes PersonAttributes { get; init; }
     public required EventModels.TrnRequestPersonAttributes? OldPersonAttributes { get; init; }
+    public required string? Comments { get; init; }
 }
 
 [Flags]

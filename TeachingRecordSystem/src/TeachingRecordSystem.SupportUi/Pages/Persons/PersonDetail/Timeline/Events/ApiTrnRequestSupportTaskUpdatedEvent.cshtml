@@ -59,12 +59,24 @@
                         <govuk-summary-list-row-value use-empty-fallback>@attributes.NationalInsuranceNumber</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                 }
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Reason for change</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value>Identified as same person during task resolution</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
             </govuk-summary-list>
         </div>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="change-reason">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>Identified as same person during task resolution</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Comments</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.Comments</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
 
         <govuk-details class="govuk-!-margin-bottom-2" data-testid="request-data">
             <govuk-details-summary>TRN request data</govuk-details-summary>
