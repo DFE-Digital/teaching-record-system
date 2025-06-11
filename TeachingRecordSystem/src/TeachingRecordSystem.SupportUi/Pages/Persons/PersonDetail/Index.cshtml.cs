@@ -38,7 +38,7 @@ public class IndexModel(
     private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
     {
         var person = await dbContext.Persons
-                .SingleOrDefaultAsync(p => p.PersonId == PersonId);
+                .SingleAsync(p => p.PersonId == PersonId);
 
         if (person is null || (person.EytsDate is null && person.QtsDate is null && person.PqtsDate is null && !person.HasEyps && person.InductionStatus == InductionStatus.None))
         {
