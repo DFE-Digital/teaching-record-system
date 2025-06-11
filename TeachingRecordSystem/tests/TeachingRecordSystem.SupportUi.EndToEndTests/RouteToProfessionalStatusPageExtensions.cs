@@ -148,6 +148,16 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync("/route/add/subjects");
     }
 
+    public static Task AssertOnRouteAddChangeReasonPage(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("/route/add/change-reason");
+    }
+
+    public static Task AssertOnRouteAddCheckYourAnswersPage(this IPage page)
+    {
+        return page.WaitForUrlPathAsync("route/add/check-answers");
+    }
+
     public static Task AssertOnRouteDeleteChangeReasonPage(this IPage page, Guid qualificationId)
     {
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/delete/change-reason");

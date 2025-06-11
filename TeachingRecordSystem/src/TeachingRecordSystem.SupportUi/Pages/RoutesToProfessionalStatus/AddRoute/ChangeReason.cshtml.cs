@@ -1,0 +1,135 @@
+using System.ComponentModel.DataAnnotations;
+using Humanizer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.Core.Services.Files;
+using TeachingRecordSystem.SupportUi.Infrastructure.DataAnnotations;
+
+namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
+
+[Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
+public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
+    ReferenceDataCache referenceDataCache,
+    IFileService fileService) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+{
+    [FromRoute]
+    public Guid QualificationId { get; set; }
+
+    [BindProperty]
+    [Required(ErrorMessage = "Select a reason")]
+    [Display(Name = "Why are you adding this route?")]
+    public ChangeReasonOption? ChangeReason { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Do you want to provide more information?")]
+    [Required(ErrorMessage = "Select yes if you want to add more information about why you\u2019re adding this route")]
+    public bool? HasAdditionalReasonDetail { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Add more information")]
+    [MaxLength(FileUploadDefaults.DetailMaxCharacterCount, ErrorMessage = $"Additional detail {FileUploadDefaults.DetailMaxCharacterCountErrorMessage}")]
+    public string? ChangeReasonDetail { get; set; }
+
+    [BindProperty]
+    [Display(Name = "Do you want to upload evidence?")]
+    [Required(ErrorMessage = "Select yes if you want to upload evidence")]
+    public bool? UploadEvidence { get; set; }
+
+    [BindProperty]
+    [EvidenceFile]
+    [FileSize(FileUploadDefaults.MaxFileUploadSizeMb * 1024 * 1024, ErrorMessage = $"The selected file {FileUploadDefaults.MaxFileUploadSizeErrorMessage}")]
+    public IFormFile? EvidenceFile { get; set; }
+
+    public Guid? EvidenceFileId { get; set; }
+
+    public string? EvidenceFileName { get; set; }
+
+    public string? EvidenceFileSizeDescription { get; set; }
+
+    public string? UploadedEvidenceFileUrl { get; set; }
+
+    public string BackLink => FromCheckAnswers == true
+        ? LinkGenerator.RouteAddCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
+        : LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.ChangeReason) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+
+    public async Task OnGetAsync()
+    {
+        ChangeReason = JourneyInstance!.State.ChangeReason;
+        HasAdditionalReasonDetail = JourneyInstance!.State.ChangeReasonDetail.HasAdditionalReasonDetail;
+        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail.ChangeReasonDetail;
+        UploadEvidence = JourneyInstance?.State.ChangeReasonDetail.UploadEvidence;
+        UploadedEvidenceFileUrl = JourneyInstance?.State.ChangeReasonDetail.EvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(JourneyInstance.State.ChangeReasonDetail.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (HasAdditionalReasonDetail == true && ChangeReasonDetail is null)
+        {
+            ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
+        }
+        if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
+        {
+            ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
+        }
+        if (!ModelState.IsValid)
+        {
+            return this.PageWithErrors();
+        }
+        if (UploadEvidence == true)
+        {
+            if (EvidenceFile is not null)
+            {
+                if (EvidenceFileId is not null)
+                {
+                    await fileService.DeleteFileAsync(EvidenceFileId.Value);
+                }
+
+                using var stream = EvidenceFile.OpenReadStream();
+                var evidenceFileId = await fileService.UploadFileAsync(stream, EvidenceFile.ContentType);
+                await JourneyInstance!.UpdateStateAsync(state =>
+                {
+                    state.ChangeReasonDetail.EvidenceFileId = evidenceFileId;
+                    state.ChangeReasonDetail.EvidenceFileName = EvidenceFile.FileName;
+                    state.ChangeReasonDetail.EvidenceFileSizeDescription = EvidenceFile.Length.Bytes().Humanize();
+                });
+            }
+        }
+        else if (EvidenceFileId is not null)
+        {
+            await fileService.DeleteFileAsync(EvidenceFileId.Value);
+            await JourneyInstance!.UpdateStateAsync(state =>
+            {
+                state.ChangeReasonDetail.EvidenceFileId = null;
+                state.ChangeReasonDetail.EvidenceFileName = null;
+                state.ChangeReasonDetail.EvidenceFileSizeDescription = null;
+            });
+        }
+
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            state.ChangeReason = ChangeReason;
+            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+            state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
+            state.ChangeReasonDetail.UploadEvidence = UploadEvidence;
+            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+        });
+
+        return Redirect(FromCheckAnswers ?
+            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
+            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.ChangeReason) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+    }
+
+    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        var personInfo = context.HttpContext.GetCurrentPersonFeature();
+        PersonId = personInfo.PersonId;
+        PersonName = personInfo.Name;
+        EvidenceFileId = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
+        EvidenceFileName = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
+
+        return next();
+    }
+}

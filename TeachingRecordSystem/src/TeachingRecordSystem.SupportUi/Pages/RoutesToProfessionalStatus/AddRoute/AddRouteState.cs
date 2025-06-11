@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 public class AddRouteState : IRegisterJourney
@@ -23,6 +25,11 @@ public class AddRouteState : IRegisterJourney
     public Guid? TrainingProviderId { get; set; }
     public bool? IsExemptFromInduction { get; set; }
     public Guid? DegreeTypeId { get; set; }
+    public ChangeReasonOption? ChangeReason { get; set; }
+    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
+
+    [JsonIgnore]
+    public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
 
     public void EnsureInitialized(CurrentProfessionalStatusFeature professionalStatusInfo)
     {

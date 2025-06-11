@@ -13,5 +13,6 @@ public enum AddRoutePage
     Country,
     AgeRangeSpecialism,
     SubjectSpecialisms,
+    ChangeReason,
     CheckYourAnswers
 }
