@@ -10,6 +10,7 @@ using static TeachingRecordSystem.SupportUi.Pages.SupportTasks.ApiTrnRequests.Re
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.SupportTasks.ApiTrnRequests.Resolve;
 
+[Collection(nameof(DisableParallelization))]
 public class CheckAnswersTests : ResolveApiTrnRequestTestBase
 {
     public CheckAnswersTests(HostFixture hostFixture) : base(hostFixture)
