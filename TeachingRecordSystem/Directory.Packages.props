@@ -70,6 +70,7 @@
     <PackageVersion Include="NSign.AspNetCore" Version="1.1.0" />
     <PackageVersion Include="NSign.Client" Version="1.1.0" />
     <PackageVersion Include="NSign.SignatureProviders" Version="1.1.0" />
+    <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="5.2.0" />
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />
     <PackageVersion Include="Optional" Version="4.0.0" />

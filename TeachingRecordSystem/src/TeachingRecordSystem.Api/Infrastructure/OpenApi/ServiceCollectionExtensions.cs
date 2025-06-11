@@ -76,6 +76,7 @@ public static class ServiceCollectionExtensions
         });
 
         services.Decorate<ISerializerDataContractResolver, UnwrapOptionSerializerDataContractResolver>();
+        services.Decorate<ISerializerDataContractResolver, OneOfSerializerDataContractResolver>();
 
         services.AddSingleton<IStartupFilter, OpenApiEndpointsStartupFilter>();
 

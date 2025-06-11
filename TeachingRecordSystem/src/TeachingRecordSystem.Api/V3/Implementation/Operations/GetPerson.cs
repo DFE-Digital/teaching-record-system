@@ -6,6 +6,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
+using IttResult = OneOf.OneOf<TeachingRecordSystem.Api.V3.Implementation.Operations.GetPersonResultInitialTeacherTraining, TeachingRecordSystem.Api.V3.Implementation.Operations.GetPersonResultInitialTeacherTrainingForAppropriateBody>;
 using QtlsStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.QtlsStatus;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -47,7 +48,7 @@ public record GetPersonResult
     public required EytsInfo? Eyts { get; init; }
     public required Option<GetPersonResultInduction> Induction { get; init; }
     public required Option<GetPersonResultDqtInduction?> DqtInduction { get; init; }
-    public required Option<IReadOnlyCollection<GetPersonResultInitialTeacherTraining>> InitialTeacherTraining { get; init; }
+    public required Option<IReadOnlyCollection<IttResult>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
@@ -84,17 +85,26 @@ public record GetPersonResultInductionPeriodAppropriateBody
     public required string Name { get; init; }
 }
 
+/// <summary>
+/// The subset of <see cref="GetPersonResultInitialTeacherTraining"/> that contains only the information
+/// AppropriateBody users are permitted to see.
+/// </summary>
+public record GetPersonResultInitialTeacherTrainingForAppropriateBody
+{
+    public required GetPersonResultInitialTeacherTrainingProvider? Provider { get; init; }
+}
+
 public record GetPersonResultInitialTeacherTraining
 {
-    public required Option<GetPersonResultInitialTeacherTrainingQualification?> Qualification { get; init; }
-    public required Option<DateOnly?> StartDate { get; init; }
-    public required Option<DateOnly?> EndDate { get; init; }
-    public required Option<IttProgrammeType?> ProgrammeType { get; init; }
-    public required Option<string?> ProgrammeTypeDescription { get; init; }
-    public required Option<IttOutcome?> Result { get; init; }
-    public required Option<GetPersonResultInitialTeacherTrainingAgeRange?> AgeRange { get; init; }
+    public required GetPersonResultInitialTeacherTrainingQualification? Qualification { get; init; }
+    public required DateOnly? StartDate { get; init; }
+    public required DateOnly? EndDate { get; init; }
+    public required IttProgrammeType? ProgrammeType { get; init; }
+    public required string? ProgrammeTypeDescription { get; init; }
+    public required IttOutcome? Result { get; init; }
+    public required GetPersonResultInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetPersonResultInitialTeacherTrainingProvider? Provider { get; init; }
-    public required Option<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>> Subjects { get; init; }
+    public required IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
 public record GetPersonResultInitialTeacherTrainingQualification
@@ -362,7 +372,7 @@ public class GetPersonHandler(
             Induction = induction,
             DqtInduction = dqtInduction,
             InitialTeacherTraining = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
-                Option.Some(MapInitialTeacherTraining((await getIttTask!), command.ApplyAppropriateBodyUserRestrictions)) :
+                Option.Some(ApplyRoleBasedResponseFilters(MapInitialTeacherTraining((await getIttTask!)), command.ApplyAppropriateBodyUserRestrictions)) :
                 default,
             MandatoryQualifications = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
                 Option.Some(MapMandatoryQualifications((await getMqsTask!))) :
@@ -463,58 +473,35 @@ public class GetPersonHandler(
         return (dqtInduction, inductionInfo);
     }
 
-    private static IReadOnlyCollection<GetPersonResultInitialTeacherTraining> MapInitialTeacherTraining(
-        dfeta_initialteachertraining[] itt,
-        bool userHasAppropriateBodyRole)
-    {
-        if (userHasAppropriateBodyRole)
-        {
-            return itt
-                .SelectMany(i =>
+    private static IReadOnlyCollection<IttResult> ApplyRoleBasedResponseFilters(
+        IEnumerable<GetPersonResultInitialTeacherTraining> itt,
+        bool userIsAppropriateBody) =>
+        (userIsAppropriateBody
+            ? itt
+                .Where(i => i.Provider is not null)
+                .Select(i => IttResult.FromT1(new GetPersonResultInitialTeacherTrainingForAppropriateBody()
                 {
-                    var provider = MapIttProvider(i);
-                    if (provider is null)
-                    {
-                        return Array.Empty<GetPersonResultInitialTeacherTraining>();
-                    }
+                    Provider = new GetPersonResultInitialTeacherTrainingProvider() { Name = i.Provider!.Name, Ukprn = i.Provider.Ukprn }
+                }))
+            : itt.Select(IttResult.FromT0))
+        .AsReadOnly();
 
-                    return
-                    [
-                        new GetPersonResultInitialTeacherTraining
-                        {
-                            Provider = provider,
-                            Qualification = default,
-                            StartDate = default,
-                            EndDate = default,
-                            ProgrammeType = default,
-                            ProgrammeTypeDescription = default,
-                            Result = default,
-                            AgeRange = default,
-                            Subjects = default,
-                        }
-                    ];
-                })
-                .AsReadOnly();
-        }
-
-        IEnumerable<GetPersonResultInitialTeacherTraining> mapped = itt
+    private static IEnumerable<GetPersonResultInitialTeacherTraining> MapInitialTeacherTraining(dfeta_initialteachertraining[] itt) =>
+        itt
             .Select(i => new GetPersonResultInitialTeacherTraining()
             {
-                Qualification = Option.Some(MapIttQualification(i)),
-                ProgrammeType = Option.Some(i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>()),
-                ProgrammeTypeDescription = Option.Some(
-                    i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription()),
-                StartDate = Option.Some(i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)),
-                EndDate = Option.Some(i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)),
-                Result = Option.Some(i.dfeta_Result?.ConvertFromITTResult()),
-                AgeRange = Option.Some(MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo)),
+                Qualification = MapIttQualification(i),
+                ProgrammeType = i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>(),
+                ProgrammeTypeDescription =
+                    i.dfeta_ProgrammeType?.ConvertToEnumByValue<dfeta_ITTProgrammeType, IttProgrammeType>().GetDescription(),
+                StartDate = i.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                EndDate = i.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                Result = i.dfeta_Result?.ConvertFromITTResult(),
+                AgeRange = MapAgeRange(i.dfeta_AgeRangeFrom, i.dfeta_AgeRangeTo),
                 Provider = MapIttProvider(i),
-                Subjects = Option.Some(MapSubjects(i))
+                Subjects = MapSubjects(i)
             })
             .OrderByDescending(i => i.StartDate);
-
-        return mapped.AsReadOnly();
-    }
 
     private static GetPersonResultInitialTeacherTrainingQualification? MapIttQualification(dfeta_initialteachertraining initialTeacherTraining)
     {

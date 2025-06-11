@@ -416,6 +416,12 @@
           "NSign.Abstractions": "1.1.0"
         }
       },
+      "OneOf": {
+        "type": "Direct",
+        "requested": "[3.0.271, )",
+        "resolved": "3.0.271",
+        "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
+      },
       "OpenIddict.EntityFrameworkCore": {
         "type": "Direct",
         "requested": "[5.2.0, )",

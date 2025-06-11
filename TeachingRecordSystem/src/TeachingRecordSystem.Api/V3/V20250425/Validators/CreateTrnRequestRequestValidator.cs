@@ -30,7 +30,7 @@ public class CreateTrnRequestRequestValidator : AbstractValidator<CreateTrnReque
             .NotEmpty()
             .Custom((value, ctx) =>
             {
-                if (value >= DateOnly.FromDateTime(clock.UtcNow) || value < new DateOnly(1940, 1, 1))
+                if (value >= clock.Today || value < new DateOnly(1940, 1, 1))
                 {
                     ctx.AddFailure(ctx.PropertyName, StringResources.ErrorMessages_BirthDateIsOutOfRange);
                 }
