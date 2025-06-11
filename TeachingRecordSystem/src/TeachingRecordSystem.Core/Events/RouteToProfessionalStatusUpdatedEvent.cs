@@ -26,7 +26,7 @@ public enum RouteToProfessionalStatusUpdatedEventChanges
     Status = 1 << 1,
     StartDate = 1 << 2,
     EndDate = 1 << 3,
-    AwardedDate = 1 << 4,
+    HoldsFrom = 1 << 4,
     TrainingSubjectIds = 1 << 5,
     TrainingAgeSpecialismType = 1 << 6,
     TrainingAgeSpecialismRangeFrom = 1 << 7,

@@ -501,13 +501,13 @@ public class Person
                 .Where(p => p.DeletedOn is null) ??
             throw new InvalidOperationException("Routes not loaded.");
 
-        var awardedOrApprovedQtsProfessionalStatuses = routes
+        var holdsQtsProfessionalStatuses = routes
             .Where(p => allRouteTypes.Single(rt => rt.RouteToProfessionalStatusTypeId == p.RouteToProfessionalStatusTypeId).ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus &&
-                p.Status is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved)
+                p.Status is RouteToProfessionalStatusStatus.Holds)
             .ToArray();
 
-        var awardedBeforeInduction = awardedOrApprovedQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
-        var requiredToComplete = awardedOrApprovedQtsProfessionalStatuses.Any() && !awardedBeforeInduction;
+        var awardedBeforeInduction = holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInductionDueToQtsDate == true);
+        var requiredToComplete = holdsQtsProfessionalStatuses.Any() && !awardedBeforeInduction;
 
         if (!requiredToComplete &&
             currentStatus is InductionStatus.InProgress or InductionStatus.Passed or InductionStatus.Failed)
@@ -515,7 +515,7 @@ public class Person
             throw new InvalidOperationException($"Cannot remove the induction requirement for a person who is '{InductionStatus}'.");
         }
 
-        var exemptViaRoute = awardedBeforeInduction || awardedOrApprovedQtsProfessionalStatuses.Any(p => p.ExemptFromInduction == true);
+        var exemptViaRoute = awardedBeforeInduction || holdsQtsProfessionalStatuses.Any(p => p.ExemptFromInduction == true);
         var routeDerivedStatus = exemptViaRoute ? InductionStatus.Exempt :
             requiredToComplete ? InductionStatus.RequiredToComplete :
             InductionStatus.None;
@@ -561,23 +561,23 @@ public class Person
 
         var professionalStatusTypeByRouteId = allRouteTypes.ToDictionary(r => r.RouteToProfessionalStatusTypeId, r => r.ProfessionalStatusType);
 
-        var awardedOrApproved = routes
+        var holds = routes
             .Where(ps => professionalStatusTypeByRouteId[ps.RouteToProfessionalStatusTypeId] == professionalStatusType &&
-                ps.Status is RouteToProfessionalStatusStatus.Approved or RouteToProfessionalStatusStatus.Awarded)
+                ps.Status is RouteToProfessionalStatusStatus.Holds)
             .ToArray();
 
         // We don't have awarded dates for EYPS
         if (professionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
         {
-            var awarded = awardedOrApproved.Any();
+            var awarded = holds.Any();
 
             var changed = HasEyps != awarded;
             HasEyps = awarded;
             return changed;
         }
 
-        Debug.Assert(awardedOrApproved.All(ps => ps.AwardedDate is not null));
-        var awardedDate = awardedOrApproved.Length > 0 ? awardedOrApproved.Min(ps => ps.AwardedDate) : null;
+        Debug.Assert(holds.All(ps => ps.HoldsFrom is not null));
+        var awardedDate = holds.Length > 0 ? holds.Min(ps => ps.HoldsFrom) : null;
 
         if (professionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus)
         {
@@ -610,7 +610,7 @@ public class Person
 
         var qtlsRoutes = routes
             .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.QtlsAndSetMembershipId &&
-                r.Status is RouteToProfessionalStatusStatus.Awarded &&
+                r.Status is RouteToProfessionalStatusStatus.Holds &&
                 r.DeletedOn is null)
             .ToArray();
 
@@ -652,14 +652,14 @@ public class Person
                 .Where(p => p.DeletedOn is null) ??
             throw new InvalidOperationException("Routes not loaded.");
 
-        var awardedOrApprovedRoutes = routes
-            .Where(s => s.Status is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved)
+        var holdsRoutes = routes
+            .Where(s => s.Status is RouteToProfessionalStatusStatus.Holds)
             .ToArray();
 
-        var routeLevelExemptionIds = awardedOrApprovedRoutes
+        var routeLevelExemptionIds = holdsRoutes
             .Where(r => r.ExemptFromInduction == true)
             .Select(r => r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value)
-            .Concat(awardedOrApprovedRoutes
+            .Concat(holdsRoutes
                 .Where(r => r.ExemptFromInductionDueToQtsDate == true)
                 .Select(_ => InductionExemptionReason.QualifiedBefore7thMay2000Id));
 

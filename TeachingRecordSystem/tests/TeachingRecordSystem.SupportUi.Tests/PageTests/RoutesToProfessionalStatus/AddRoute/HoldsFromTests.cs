@@ -12,19 +12,19 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = startDate.AddMonths(1);
-        var awardDate = endDate.AddDays(1);
+        var holdsFrom = endDate.AddDays(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.AwardDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(holdsFrom)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -32,7 +32,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/award-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
@@ -40,24 +40,24 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
         var displayedDate = doc.QuerySelectorAll<IHtmlInputElement>("[type=text]");
-        Assert.Equal(awardDate.Day.ToString(), displayedDate.ElementAt(0).Value);
-        Assert.Equal(awardDate.Month.ToString(), displayedDate.ElementAt(1).Value);
-        Assert.Equal(awardDate.Year.ToString(), displayedDate.ElementAt(2).Value);
+        Assert.Equal(holdsFrom.Day.ToString(), displayedDate.ElementAt(0).Value);
+        Assert.Equal(holdsFrom.Month.ToString(), displayedDate.ElementAt(1).Value);
+        Assert.Equal(holdsFrom.Year.ToString(), displayedDate.ElementAt(2).Value);
     }
 
     [Fact]
     public async Task Post_WhenAwardDateIsEntered_SavesDateAndRedirectsToInductionExemptionPage()
     {
         // Arrange
-        var awardDate = new DateOnly(2024, 01, 01);
+        var holdsFrom = new DateOnly(2024, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionReason is not null
                 && r.InductionExemptionReason.RouteImplicitExemption == false)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.AwardDateRequired == FieldRequirement.Mandatory && s.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory && s.InductionExemptionRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -71,13 +71,13 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/award-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "AwardedDate.Day", $"{awardDate:%d}" },
-                { "AwardedDate.Month", $"{awardDate:%M}" },
-                { "AwardedDate.Year", $"{awardDate:yyyy}" },
+                { "HoldsFrom.Day", $"{holdsFrom:%d}" },
+                { "HoldsFrom.Month", $"{holdsFrom:%M}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
             }
         };
 
@@ -88,19 +88,19 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/induction-exemption?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(awardDate, journeyInstance.State.AwardedDate);
+        Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
 
     [Fact]
     public async Task Post_ImplicitExemptionRoute_WhenAwardDateIsEntered_SavesDateAndRedirectsToNextPage()
     {
         // Arrange
-        var awardDate = new DateOnly(2024, 01, 01);
+        var holdsFrom = new DateOnly(2024, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.AwardDateRequired == FieldRequirement.Mandatory && s.InductionExemptionRequired == FieldRequirement.Mandatory)
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory && s.InductionExemptionRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -114,13 +114,13 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/award-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "AwardedDate.Day", $"{awardDate:%d}" },
-                { "AwardedDate.Month", $"{awardDate:%M}" },
-                { "AwardedDate.Year", $"{awardDate:yyyy}" },
+                { "HoldsFrom.Day", $"{holdsFrom:%d}" },
+                { "HoldsFrom.Month", $"{holdsFrom:%M}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
             }
         };
 
@@ -131,27 +131,27 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(awardDate, journeyInstance.State.AwardedDate);
+        Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
 
     [Fact]
     public async Task Post_FromCya_WhenAwardDateIsEntered_RedirectsToCya()
     {
         // Arrange
-        var awardDate = new DateOnly(2024, 01, 01);
-        var newAwardDate = awardDate.AddMonths(1);
+        var holdsFrom = new DateOnly(2024, 01, 01);
+        var newAwardDate = holdsFrom.AddMonths(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.AwardDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(holdsFrom)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -159,13 +159,13 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/award-date?personId={person.PersonId}&FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/holds-from?personId={person.PersonId}&FromCheckAnswers=True&{journeyInstance.GetUniqueIdQueryParameter()}")
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { "AwardedDate.Day", $"{newAwardDate:%d}" },
-                { "AwardedDate.Month", $"{newAwardDate:%M}" },
-                { "AwardedDate.Year", $"{newAwardDate:yyyy}" },
+                { "HoldsFrom.Day", $"{newAwardDate:%d}" },
+                { "HoldsFrom.Month", $"{newAwardDate:%M}" },
+                { "HoldsFrom.Year", $"{newAwardDate:yyyy}" },
             }
         };
 
@@ -176,7 +176,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(newAwardDate, journeyInstance.State.AwardedDate);
+        Assert.Equal(newAwardDate, journeyInstance.State.HoldsFrom);
     }
 
     [Fact]
@@ -184,10 +184,10 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.AwardDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.AwardDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();
@@ -202,13 +202,13 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/award-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "AwardedDate", "Enter the professional status award date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the professional status award date");
     }
 
     [Fact]
@@ -233,7 +233,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             addRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/award-date?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);

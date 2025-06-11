@@ -9,7 +9,7 @@ public class EditRouteStateBuilder()
     private Guid? _routeToProfessionalStatusId;
     private RouteToProfessionalStatusStatus? _status;
     private RouteToProfessionalStatusStatus? _currentStatus;
-    private DateOnly? _awardedDate;
+    private DateOnly? _holdsFrom;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
     private Guid[] _trainingSubjectIds = [];
@@ -28,7 +28,7 @@ public class EditRouteStateBuilder()
     {
         _status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
-                && s.AwardDateRequired != FieldRequirement.NotApplicable
+                && s.HoldsFromRequired != FieldRequirement.NotApplicable
                 && s.TrainingCountryRequired != FieldRequirement.NotApplicable
                 && s.DegreeTypeRequired != FieldRequirement.NotApplicable
                 && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
@@ -41,12 +41,12 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithAwardedStatusFields(IClock clock)
+    public EditRouteStateBuilder WithHoldsStatusFields(IClock clock)
     {
         _trainingStartDate = clock.Today.AddYears(-1);
         _trainingEndDate = clock.Today.AddDays(-1);
-        _awardedDate = clock.Today;
-        _status = RouteToProfessionalStatusStatus.Awarded;
+        _holdsFrom = clock.Today;
+        _status = RouteToProfessionalStatusStatus.Holds;
         return this;
     }
 
@@ -75,9 +75,9 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithAwardedDate(DateOnly awardedDate)
+    public EditRouteStateBuilder WithHoldsFrom(DateOnly holdsFrom)
     {
-        _awardedDate = awardedDate;
+        _holdsFrom = holdsFrom;
         return this;
     }
 
@@ -193,7 +193,7 @@ public class EditRouteStateBuilder()
             RouteToProfessionalStatusId = _routeToProfessionalStatusId!.Value,
             Status = _status!.Value,
             CurrentStatus = _currentStatus!.Value,
-            AwardedDate = _awardedDate,
+            HoldsFrom = _holdsFrom,
             TrainingStartDate = _trainingStartDate,
             TrainingEndDate = _trainingEndDate,
             TrainingSubjectIds = _trainingSubjectIds,
@@ -223,7 +223,7 @@ public class EditRouteStateBuilder()
 public class EditRouteStatusStateBuilder
 {
     private RouteToProfessionalStatusStatus _status;
-    private DateOnly? _awardedDate;
+    private DateOnly? _holdsFrom;
     private DateOnly? _trainingEndDate;
     private bool? _inductionExemption;
     private bool _routeImplicitExemption;
@@ -234,9 +234,9 @@ public class EditRouteStatusStateBuilder
         return this;
     }
 
-    public EditRouteStatusStateBuilder WithAwardedDate(DateOnly awardDate)
+    public EditRouteStatusStateBuilder WithHoldsFrom(DateOnly holdsFrom)
     {
-        _awardedDate = awardDate;
+        _holdsFrom = holdsFrom;
         return this;
     }
 
@@ -262,7 +262,7 @@ public class EditRouteStatusStateBuilder
     {
         return new EditRouteStatusState
         {
-            AwardedDate = _awardedDate,
+            HoldsFrom = _holdsFrom,
             InductionExemption = _inductionExemption,
             RouteImplicitExemption = _routeImplicitExemption,
             Status = _status,

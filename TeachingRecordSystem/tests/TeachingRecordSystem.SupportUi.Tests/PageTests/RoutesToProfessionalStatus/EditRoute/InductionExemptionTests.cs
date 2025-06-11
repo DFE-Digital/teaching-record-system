@@ -22,13 +22,13 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithInductionExemption(isExempt: false)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -61,13 +61,13 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .WithInductionExemption(isExempt: true)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -92,8 +92,8 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
     public async Task Post_WhenExemptionEntered_SavesDataAndRedirectsToDetail()
     {
         // Arrange
-        var awardDate = Clock.Today;
-        var endDate = awardDate.AddDays(-1);
+        var holdsFrom = Clock.Today;
+        var endDate = holdsFrom.AddDays(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "NI R")
             .First();
@@ -105,7 +105,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(holdsFrom)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -113,7 +113,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
                 .WithEditRouteStatusState(builder => builder
                 .WithStatus(status)
                 .WithEndDate(endDate)
-                .WithAwardedDate(awardDate)
+                .WithHoldsFrom(holdsFrom)
                 .WithHasInductionExemption(true))
             .Build();
 
@@ -139,7 +139,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
         Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
-        Assert.Equal(awardDate, journeyInstance.State.AwardedDate);
+        Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
     }
 
     [Fact]
@@ -158,12 +158,12 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -199,12 +199,12 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(

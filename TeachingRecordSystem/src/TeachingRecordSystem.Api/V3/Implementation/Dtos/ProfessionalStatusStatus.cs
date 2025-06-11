@@ -16,17 +16,17 @@ public enum ProfessionalStatusStatus
 
 public static class ProfessionalStatusStatusExtensions
 {
-    public static ProfessionalStatusStatus ConvertFromProfessionalStatusStatus(this Core.Models.RouteToProfessionalStatusStatus input)
+    public static ProfessionalStatusStatus ConvertFromProfessionalStatusStatus(this RouteToProfessionalStatusStatus input)
     {
         if (!input.TryConvertFromProfessionalStatusStatus(out var result))
         {
-            throw new FormatException($"Unknown {typeof(Core.Models.RouteToProfessionalStatusStatus).Name}: '{input}'.");
+            throw new FormatException($"Unknown {typeof(RouteToProfessionalStatusStatus).Name}: '{input}'.");
         }
 
         return result;
     }
 
-    public static Core.Models.RouteToProfessionalStatusStatus ConvertToProfessionalStatusStatus(this ProfessionalStatusStatus input)
+    public static RouteToProfessionalStatusStatus ConvertToProfessionalStatusStatus(this ProfessionalStatusStatus input)
     {
         if (!input.TryConvertToProfessionalStatusStatus(out var result))
         {
@@ -36,18 +36,17 @@ public static class ProfessionalStatusStatusExtensions
         return result;
     }
 
-    public static bool TryConvertFromProfessionalStatusStatus(this Core.Models.RouteToProfessionalStatusStatus input, out ProfessionalStatusStatus result)
+    public static bool TryConvertFromProfessionalStatusStatus(this RouteToProfessionalStatusStatus input, out ProfessionalStatusStatus result)
     {
         var mapped = input switch
         {
-            Core.Models.RouteToProfessionalStatusStatus.InTraining => ProfessionalStatusStatus.InTraining,
-            Core.Models.RouteToProfessionalStatusStatus.Awarded => ProfessionalStatusStatus.Awarded,
-            Core.Models.RouteToProfessionalStatusStatus.Deferred => ProfessionalStatusStatus.Deferred,
-            Core.Models.RouteToProfessionalStatusStatus.DeferredForSkillsTest => ProfessionalStatusStatus.DeferredForSkillsTest,
-            Core.Models.RouteToProfessionalStatusStatus.Failed => ProfessionalStatusStatus.Failed,
-            Core.Models.RouteToProfessionalStatusStatus.Withdrawn => ProfessionalStatusStatus.Withdrawn,
-            Core.Models.RouteToProfessionalStatusStatus.UnderAssessment => ProfessionalStatusStatus.UnderAssessment,
-            Core.Models.RouteToProfessionalStatusStatus.Approved => ProfessionalStatusStatus.Approved,
+            RouteToProfessionalStatusStatus.InTraining => ProfessionalStatusStatus.InTraining,
+            RouteToProfessionalStatusStatus.Holds => ProfessionalStatusStatus.Awarded,
+            RouteToProfessionalStatusStatus.Deferred => ProfessionalStatusStatus.Deferred,
+            RouteToProfessionalStatusStatus.DeferredForSkillsTest => ProfessionalStatusStatus.DeferredForSkillsTest,
+            RouteToProfessionalStatusStatus.Failed => ProfessionalStatusStatus.Failed,
+            RouteToProfessionalStatusStatus.Withdrawn => ProfessionalStatusStatus.Withdrawn,
+            RouteToProfessionalStatusStatus.UnderAssessment => ProfessionalStatusStatus.UnderAssessment,
             _ => (ProfessionalStatusStatus?)null
         };
 
@@ -63,19 +62,19 @@ public static class ProfessionalStatusStatusExtensions
         }
     }
 
-    public static bool TryConvertToProfessionalStatusStatus(this ProfessionalStatusStatus input, out Core.Models.RouteToProfessionalStatusStatus result)
+    public static bool TryConvertToProfessionalStatusStatus(this ProfessionalStatusStatus input, out RouteToProfessionalStatusStatus result)
     {
         var mapped = input switch
         {
-            ProfessionalStatusStatus.InTraining => Core.Models.RouteToProfessionalStatusStatus.InTraining,
-            ProfessionalStatusStatus.Awarded => Core.Models.RouteToProfessionalStatusStatus.Awarded,
-            ProfessionalStatusStatus.Deferred => Core.Models.RouteToProfessionalStatusStatus.Deferred,
-            ProfessionalStatusStatus.DeferredForSkillsTest => Core.Models.RouteToProfessionalStatusStatus.DeferredForSkillsTest,
-            ProfessionalStatusStatus.Failed => Core.Models.RouteToProfessionalStatusStatus.Failed,
-            ProfessionalStatusStatus.Withdrawn => Core.Models.RouteToProfessionalStatusStatus.Withdrawn,
-            ProfessionalStatusStatus.UnderAssessment => Core.Models.RouteToProfessionalStatusStatus.UnderAssessment,
-            ProfessionalStatusStatus.Approved => Core.Models.RouteToProfessionalStatusStatus.Approved,
-            _ => (Core.Models.RouteToProfessionalStatusStatus?)null
+            ProfessionalStatusStatus.InTraining => RouteToProfessionalStatusStatus.InTraining,
+            ProfessionalStatusStatus.Awarded => RouteToProfessionalStatusStatus.Holds,
+            ProfessionalStatusStatus.Approved => RouteToProfessionalStatusStatus.Holds,
+            ProfessionalStatusStatus.Deferred => RouteToProfessionalStatusStatus.Deferred,
+            ProfessionalStatusStatus.DeferredForSkillsTest => RouteToProfessionalStatusStatus.DeferredForSkillsTest,
+            ProfessionalStatusStatus.Failed => RouteToProfessionalStatusStatus.Failed,
+            ProfessionalStatusStatus.Withdrawn => RouteToProfessionalStatusStatus.Withdrawn,
+            ProfessionalStatusStatus.UnderAssessment => RouteToProfessionalStatusStatus.UnderAssessment,
+            _ => (RouteToProfessionalStatusStatus?)null
         };
 
         if (mapped.HasValue)

@@ -29,9 +29,9 @@
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Award date</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>@Model.AwardedDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-award-date-link" href="@LinkGenerator.RouteAddAwardDate(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="award date">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-holds-from-link" href="@LinkGenerator.RouteAddHoldsFrom(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="award date">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }

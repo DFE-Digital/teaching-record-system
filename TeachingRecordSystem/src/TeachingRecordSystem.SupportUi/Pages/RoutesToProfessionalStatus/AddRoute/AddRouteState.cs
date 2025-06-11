@@ -12,7 +12,7 @@ public class AddRouteState : IRegisterJourney
 
     public Guid? RouteToProfessionalStatusId { get; set; }
     public RouteToProfessionalStatusStatus? Status { get; set; }
-    public DateOnly? AwardedDate { get; set; }
+    public DateOnly? HoldsFrom { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }
     public Guid[] TrainingSubjectIds { get; set; } = [];
@@ -33,7 +33,7 @@ public class AddRouteState : IRegisterJourney
 
         RouteToProfessionalStatusId = professionalStatusInfo.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId;
         Status = professionalStatusInfo.RouteToProfessionalStatus.Status;
-        AwardedDate = professionalStatusInfo.RouteToProfessionalStatus.AwardedDate;
+        HoldsFrom = professionalStatusInfo.RouteToProfessionalStatus.HoldsFrom;
         TrainingStartDate = professionalStatusInfo.RouteToProfessionalStatus.TrainingStartDate;
         TrainingEndDate = professionalStatusInfo.RouteToProfessionalStatus.TrainingEndDate;
         TrainingSubjectIds = professionalStatusInfo.RouteToProfessionalStatus.TrainingSubjectIds;

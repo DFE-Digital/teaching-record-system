@@ -81,6 +81,6 @@ public class EndDateModel(
 
     private string NextCompletingRoutePage()
     {
-        return linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId);
+        return linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
     }
 }

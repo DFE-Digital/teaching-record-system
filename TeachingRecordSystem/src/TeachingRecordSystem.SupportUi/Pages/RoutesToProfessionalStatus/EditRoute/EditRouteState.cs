@@ -19,7 +19,7 @@ public class EditRouteState : IRegisterJourney
     public Guid RouteToProfessionalStatusId { get; set; }
     public RouteToProfessionalStatusStatus CurrentStatus { get; set; }
     public RouteToProfessionalStatusStatus Status { get; set; }
-    public DateOnly? AwardedDate { get; set; }
+    public DateOnly? HoldsFrom { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }
     public Guid[] TrainingSubjectIds { get; set; } = [];
@@ -38,7 +38,7 @@ public class EditRouteState : IRegisterJourney
     public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
 
     [JsonIgnore]
-    public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to awarded / approved 
+    public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to awarded / approved
 
     public void EnsureInitialized(RouteToProfessionalStatus routeToProfessionalStatus)
     {
@@ -51,7 +51,7 @@ public class EditRouteState : IRegisterJourney
         RouteToProfessionalStatusId = routeToProfessionalStatus.RouteToProfessionalStatusTypeId;
         CurrentStatus = routeToProfessionalStatus.Status;
         Status = routeToProfessionalStatus.Status;
-        AwardedDate = routeToProfessionalStatus.AwardedDate;
+        HoldsFrom = routeToProfessionalStatus.HoldsFrom;
         TrainingStartDate = routeToProfessionalStatus.TrainingStartDate;
         TrainingEndDate = routeToProfessionalStatus.TrainingEndDate;
         TrainingSubjectIds = routeToProfessionalStatus.TrainingSubjectIds;

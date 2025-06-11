@@ -15,7 +15,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -61,7 +61,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -101,7 +101,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
@@ -141,7 +141,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
