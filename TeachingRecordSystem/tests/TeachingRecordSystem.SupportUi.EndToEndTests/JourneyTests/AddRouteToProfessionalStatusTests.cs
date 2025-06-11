@@ -421,6 +421,14 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
 
+        await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
+        await page.AssertOnRouteAddStartDatePageAsync();
+        await page.ClickButtonAsync("Continue");
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
+        await page.AssertOnRouteAddStartDatePageAsync();
+        await page.ClickBackLink();
+
         await page.ClickLinkForElementWithTestIdAsync("add-end-date-link");
         await page.AssertOnRouteAddEndDatePageAsync();
         await page.ClickButtonAsync("Continue");
@@ -429,13 +437,46 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnRouteAddEndDatePageAsync();
         await page.ClickBackLink();
 
+        await page.ClickLinkForElementWithTestIdAsync("add-training-provider-link");
+        await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-training-provider-link");
+        await page.AssertOnRouteAddTrainingProviderAsync();
+        await page.ClickBackLink();
+
+        await page.ClickLinkForElementWithTestIdAsync("add-degree-type-link");
+        await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.ClickButtonAsync("Continue");
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-degree-type-link");
+        await page.AssertOnRouteAddDegreeTypePageAsync();
+        await page.ClickBackLink();
+
         await page.ClickLinkForElementWithTestIdAsync("add-country-link");
         await page.AssertOnRouteAddCountryAsync();
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-country-link");
         await page.AssertOnRouteAddCountryAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-age-range-link");
+        await page.AssertOnRouteAddAgeRangeAsync();
+        await page.ClickButtonAsync("Continue");
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-age-range-link");
+        await page.AssertOnRouteAddAgeRangeAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-subjects-link");
+        await page.AssertOnRouteAddSubjectsPageAsync();
+        await page.ClickButtonAsync("Continue");
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickLinkForElementWithTestIdAsync("add-subjects-link");
+        await page.AssertOnRouteAddSubjectsPageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddCheckYourAnswersPage();

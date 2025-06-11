@@ -86,7 +86,7 @@
     {
         <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-age-range-type-link" href="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-age-range-link" href="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
         }
     </govuk-summary-list-row>
