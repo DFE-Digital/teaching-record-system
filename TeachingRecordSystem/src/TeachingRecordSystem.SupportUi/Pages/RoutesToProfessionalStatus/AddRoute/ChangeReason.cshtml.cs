@@ -12,9 +12,6 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache,
     IFileService fileService) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    [FromRoute]
-    public Guid QualificationId { get; set; }
-
     [BindProperty]
     [Required(ErrorMessage = "Select a reason")]
     [Display(Name = "Why are you adding this route?")]
@@ -49,7 +46,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
     public string? UploadedEvidenceFileUrl { get; set; }
 
     public string BackLink => FromCheckAnswers == true
-        ? LinkGenerator.RouteAddCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
+        ? LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
         : LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.ChangeReason) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
@@ -123,13 +120,10 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonId = personInfo.PersonId;
-        PersonName = personInfo.Name;
         EvidenceFileId = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
         EvidenceFileName = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
         EvidenceFileSizeDescription = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
 
-        return next();
+        return base.OnPageHandlerExecutionAsync(context, next);
     }
 }

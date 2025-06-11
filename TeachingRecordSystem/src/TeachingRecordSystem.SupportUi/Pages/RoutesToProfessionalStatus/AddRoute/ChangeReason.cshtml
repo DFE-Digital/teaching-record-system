@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteAddChangeReason(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
+        <form action="@LinkGenerator.RouteAddChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post" enctype="multipart/form-data">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-radios asp-for="ChangeReason" data-testid="reason-options">
                 <govuk-radios-fieldset>
@@ -71,7 +71,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.DeleteRouteChangeReasonCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteAddChangeReasonCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

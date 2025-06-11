@@ -155,7 +155,7 @@ public static class RouteToProfessionalStatusPageExtensions
 
     public static Task AssertOnRouteAddCheckYourAnswersPage(this IPage page)
     {
-        return page.WaitForUrlPathAsync("route/add/check-answers");
+        return page.WaitForUrlPathAsync("/route/add/check-answers");
     }
 
     public static Task AssertOnRouteDeleteChangeReasonPage(this IPage page, Guid qualificationId)

@@ -87,6 +87,7 @@ public static class PageDriver
             AddRoutePage.Country => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement()),
             AddRoutePage.AgeRangeSpecialism => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement()),
             AddRoutePage.SubjectSpecialisms => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement()),
+            AddRoutePage.ChangeReason => FieldRequirement.Mandatory,
             AddRoutePage.CheckYourAnswers => FieldRequirement.Mandatory,
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
