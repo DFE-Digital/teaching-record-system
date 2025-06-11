@@ -91,7 +91,7 @@ public record GetPersonResultInductionPeriodAppropriateBody
 /// </summary>
 public record GetPersonResultInitialTeacherTrainingForAppropriateBody
 {
-    public required GetPersonResultInitialTeacherTrainingProvider? Provider { get; init; }
+    public required GetPersonResultInitialTeacherTrainingProvider Provider { get; init; }
 }
 
 public record GetPersonResultInitialTeacherTraining

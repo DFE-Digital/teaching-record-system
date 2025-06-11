@@ -78,7 +78,7 @@ public record GetPersonResponseInitialTeacherTraining
 [AutoMap(typeof(GetPersonResultInitialTeacherTrainingForAppropriateBody))]
 public record GetPersonResponseInitialTeacherTrainingForAppropriateBody
 {
-    public required GetPersonResponseInitialTeacherTrainingProvider? Provider { get; init; }
+    public required GetPersonResponseInitialTeacherTrainingProvider Provider { get; init; }
 }
 
 [AutoMap(typeof(GetPersonResultInitialTeacherTrainingQualification))]
