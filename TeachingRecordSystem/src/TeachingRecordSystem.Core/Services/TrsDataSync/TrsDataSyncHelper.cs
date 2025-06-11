@@ -123,7 +123,7 @@ public class TrsDataSyncHelper(
         "itt result updated to pass or approved as a part of tq data query exercise. the result was one of 102668 results corrected by a data fix run on 09 january 2009",
         "manpay1205 letter suppressed",
         "name amended in error by tp update, name corrected to previous entry held by gtc",
-        "�",
+        "\u00A3", //£
         "0 day letter",
         "anomoly",
         "apology as previous letter had an incorrect details due to file creation error",
