@@ -38,7 +38,7 @@ public class GetQtlsHandler(
         return new QtlsResult()
         {
             Trn = command.Trn,
-            QtsDate = qtlsQualification?.AwardedDate
+            QtsDate = qtlsQualification?.HoldsFrom
         };
     }
 

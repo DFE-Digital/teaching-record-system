@@ -267,7 +267,7 @@ public class IndexTests : TestBase
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -292,7 +292,7 @@ public class IndexTests : TestBase
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsProfessionalStatus));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 
@@ -317,7 +317,7 @@ public class IndexTests : TestBase
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithAwardedRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
+            .WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.PartialQualifiedTeacherStatus));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
 

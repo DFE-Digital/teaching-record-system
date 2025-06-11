@@ -15,7 +15,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -61,7 +61,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -102,7 +102,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -144,7 +144,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

@@ -100,7 +100,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -108,7 +108,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingCountryId(country.CountryId)
@@ -191,7 +191,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("Award date", "AwardDateRequired")]
+    [InlineData("Awarded date", "HoldsFromRequired")]
     [InlineData("Has exemption", "InductionExemptionRequired")]
     public async Task Get_FieldNotApplicable_FieldNotShown(string elementText, string propertySelector)
     {
@@ -231,8 +231,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData(RouteToProfessionalStatusStatus.Awarded, true, "Yes")]
-    [InlineData(RouteToProfessionalStatusStatus.Awarded, false, "No")]
+    [InlineData(RouteToProfessionalStatusStatus.Holds, true, "Yes")]
+    [InlineData(RouteToProfessionalStatusStatus.Holds, false, "No")]
     public async Task Get_RouteAndStatusWithExemptionInduction_ShowsFieldAndChangeLink(RouteToProfessionalStatusStatus status, bool? hasExemption, string expectedContent)
     {
         // Arrange
@@ -247,7 +247,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -255,7 +255,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .WithInductionExemption(isExempt: hasExemption)
             .Build();
 
@@ -295,7 +295,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithRouteToProfessionalStatus(r => r
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
 
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -303,7 +303,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .WithInductionExemption(true)
             .Build();
 

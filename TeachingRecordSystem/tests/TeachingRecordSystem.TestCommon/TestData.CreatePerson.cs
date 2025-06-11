@@ -148,7 +148,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithAwardedRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
+        public CreatePersonBuilder WithHoldsRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
         {
             EnsureTrn();
             _awardedProfessionalStatuses.Add(professionalStatusType);
@@ -244,10 +244,10 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithQtls(DateOnly awardedDate) =>
+        public CreatePersonBuilder WithQtls(DateOnly holdsFrom) =>
             WithRouteToProfessionalStatus(p => p
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFrom)
                 .WithRoute(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
         public CreatePersonBuilder WithTrnRequest(
@@ -649,7 +649,7 @@ public partial class TestData
                                 person,
                                 allRoutes,
                                 route.RouteToProfessionalStatusTypeId,
-                                RouteToProfessionalStatusStatus.Awarded,
+                                RouteToProfessionalStatusStatus.Holds,
                                 testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
                                 route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
                                 route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,

@@ -48,7 +48,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
                 x =>
                 {
                     x.Status = Status;
-                    x.IsExemptFromInduction = (Status == RouteToProfessionalStatusStatus.Awarded || Status == RouteToProfessionalStatusStatus.Approved) ?
+                    x.IsExemptFromInduction = Status is RouteToProfessionalStatusStatus.Holds ?
                         Route.InductionExemptionReason?.RouteImplicitExemption
                         : null;
                 });

@@ -682,12 +682,12 @@ public class PersonTests
         var allRoutes = new List<RouteToProfessionalStatusType>();
         var professionalStatuses = new List<RouteToProfessionalStatus>();
 
-        DateOnly? existingRouteAwarded = Clock.Today.AddDays(-10);
+        DateOnly? existingRouteHoldsFrom = Clock.Today.AddDays(-10);
         RouteToProfessionalStatusStatus existingRouteStatus =
-            testCaseData.ExistingRouteIsAwardedOrApproved ? RouteToProfessionalStatusStatus.Awarded : RouteToProfessionalStatusStatus.InTraining;
-        DateOnly? newRouteAwardedDate = testCaseData.NewAwardedDateIsAfterExistingAwardedDate ? Clock.Today.AddDays(-1) : Clock.Today.AddDays(-20);
+            testCaseData.ExistingRouteIsHoldsStatus ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
+        DateOnly? newRouteHoldsFrom = testCaseData.NewHoldsFromIsAfterExistingHoldsFrom ? Clock.Today.AddDays(-1) : Clock.Today.AddDays(-20);
         RouteToProfessionalStatusStatus newRouteStatus =
-            testCaseData.NewRouteIsAwardedOrApproved ? RouteToProfessionalStatusStatus.Awarded : RouteToProfessionalStatusStatus.InTraining;
+            testCaseData.NewRouteIsHoldsStatus ? RouteToProfessionalStatusStatus.Holds : RouteToProfessionalStatusStatus.InTraining;
 
         if (testCaseData.HaveExistingRouteForStatus)
         {
@@ -697,24 +697,24 @@ public class PersonTests
             var existingProfessionalStatus = CreateProfessionalStatus(
                 anotherRoute,
                 status: existingRouteStatus,
-                awardedDate: testCaseData.ExistingRouteIsAwardedOrApproved && testCaseData.ProfessionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus ? existingRouteAwarded : null);
+                holdsFrom: testCaseData.ExistingRouteIsHoldsStatus && testCaseData.ProfessionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus ? existingRouteHoldsFrom : null);
             professionalStatuses.Add(existingProfessionalStatus);
 
             if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.QualifiedTeacherStatus)
             {
-                person.QtsDate = existingProfessionalStatus.AwardedDate;
+                person.QtsDate = existingProfessionalStatus.HoldsFrom;
             }
             else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus)
             {
-                person.EytsDate = existingProfessionalStatus.AwardedDate;
+                person.EytsDate = existingProfessionalStatus.HoldsFrom;
             }
             else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.PartialQualifiedTeacherStatus)
             {
-                person.PqtsDate = existingProfessionalStatus.AwardedDate;
+                person.PqtsDate = existingProfessionalStatus.HoldsFrom;
             }
             else if (testCaseData.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsProfessionalStatus)
             {
-                person.HasEyps = existingProfessionalStatus.Status is RouteToProfessionalStatusStatus.Approved or RouteToProfessionalStatusStatus.Awarded;
+                person.HasEyps = existingProfessionalStatus.Status is RouteToProfessionalStatusStatus.Holds;
             }
         }
 
@@ -726,7 +726,7 @@ public class PersonTests
             var newProfessionalStatus = CreateProfessionalStatus(
                 route,
                 status: newRouteStatus,
-                awardedDate: testCaseData.NewRouteIsAwardedOrApproved && testCaseData.ProfessionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus ? newRouteAwardedDate : null);
+                holdsFrom: testCaseData.NewRouteIsHoldsStatus && testCaseData.ProfessionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus ? newRouteHoldsFrom : null);
             professionalStatuses.Add(newProfessionalStatus);
         }
 
@@ -744,8 +744,8 @@ public class PersonTests
             Assert.Equal(
                 testCaseData.ExpectedAttributeValue switch
                 {
-                    ExpectedAttributeValue.NewRouteAwarded => newRouteAwardedDate,
-                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteAwarded,
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteHoldsFrom,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteHoldsFrom,
                     _ => null
                 },
                 person.QtsDate);
@@ -755,8 +755,8 @@ public class PersonTests
             Assert.Equal(
                 testCaseData.ExpectedAttributeValue switch
                 {
-                    ExpectedAttributeValue.NewRouteAwarded => newRouteAwardedDate,
-                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteAwarded,
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteHoldsFrom,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteHoldsFrom,
                     _ => null
                 },
                 person.EytsDate);
@@ -766,8 +766,8 @@ public class PersonTests
             Assert.Equal(
                 testCaseData.ExpectedAttributeValue switch
                 {
-                    ExpectedAttributeValue.NewRouteAwarded => newRouteStatus is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved,
-                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteStatus is RouteToProfessionalStatusStatus.Awarded or RouteToProfessionalStatusStatus.Approved,
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteStatus is RouteToProfessionalStatusStatus.Holds,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteStatus is RouteToProfessionalStatusStatus.Holds,
                     _ => false
                 },
                 person.HasEyps);
@@ -778,8 +778,8 @@ public class PersonTests
             Assert.Equal(
                 testCaseData.ExpectedAttributeValue switch
                 {
-                    ExpectedAttributeValue.NewRouteAwarded => newRouteAwardedDate,
-                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteAwarded,
+                    ExpectedAttributeValue.NewRouteAwarded => newRouteHoldsFrom,
+                    ExpectedAttributeValue.ExistingRouteAwarded => existingRouteHoldsFrom,
                     _ => null
                 },
                 person.PqtsDate);
@@ -794,7 +794,7 @@ public class PersonTests
                 IsActive = true,
                 TrainingStartDateRequired = FieldRequirement.Optional,
                 TrainingEndDateRequired = FieldRequirement.Optional,
-                AwardDateRequired = FieldRequirement.Optional,
+                HoldsFromRequired = FieldRequirement.Optional,
                 InductionExemptionRequired = FieldRequirement.Optional,
                 TrainingProviderRequired = FieldRequirement.Optional,
                 DegreeTypeRequired = FieldRequirement.Optional,
@@ -804,7 +804,7 @@ public class PersonTests
                 InductionExemptionReasonId = null
             };
 
-        RouteToProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, DateOnly? awardedDate) =>
+        RouteToProfessionalStatus CreateProfessionalStatus(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, DateOnly? holdsFrom) =>
             new TestableRouteToProfessionalStatus()
             {
                 QualificationId = Guid.NewGuid(),
@@ -817,7 +817,7 @@ public class PersonTests
                 SourceApplicationUserId = null,
                 SourceApplicationReference = null,
                 Status = status,
-                AwardedDate = awardedDate,
+                HoldsFrom = holdsFrom,
                 TrainingStartDate = null,
                 TrainingEndDate = null,
                 TrainingSubjectIds = [],
@@ -904,78 +904,78 @@ public class PersonTests
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: false,
-                ExistingRouteIsAwardedOrApproved: false,
+                ExistingRouteIsHoldsStatus: false,
                 HaveNewRouteForStatus: false,
-                NewRouteIsAwardedOrApproved: false,
-                NewAwardedDateIsAfterExistingAwardedDate: false,
+                NewRouteIsHoldsStatus: false,
+                NewHoldsFromIsAfterExistingHoldsFrom: false,
                 ExpectedAttributeValue: ExpectedAttributeValue.Null,
                 ExpectedResult: false));
 
-            // No existing routes, new route added but not-awarded or approved status
+            // No existing routes, new route added but not holds status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: false,
-                ExistingRouteIsAwardedOrApproved: false,
+                ExistingRouteIsHoldsStatus: false,
                 HaveNewRouteForStatus: true,
-                NewRouteIsAwardedOrApproved: false,
-                NewAwardedDateIsAfterExistingAwardedDate: false,
+                NewRouteIsHoldsStatus: false,
+                NewHoldsFromIsAfterExistingHoldsFrom: false,
                 ExpectedAttributeValue: ExpectedAttributeValue.Null,
                 ExpectedResult: false));
 
-            // Existing route but not-awarded or approved, new route added but not-awarded or approved status
+            // Existing route but not holds, new route added but not holds status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: true,
-                ExistingRouteIsAwardedOrApproved: false,
+                ExistingRouteIsHoldsStatus: false,
                 HaveNewRouteForStatus: true,
-                NewRouteIsAwardedOrApproved: false,
-                NewAwardedDateIsAfterExistingAwardedDate: false,
+                NewRouteIsHoldsStatus: false,
+                NewHoldsFromIsAfterExistingHoldsFrom: false,
                 ExpectedAttributeValue: ExpectedAttributeValue.Null,
                 ExpectedResult: false));
 
-            // Existing route but not-awarded or approved, new route added at awarded or approved status
+            // Existing route but not holds, new route added at holds status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: true,
-                ExistingRouteIsAwardedOrApproved: false,
+                ExistingRouteIsHoldsStatus: false,
                 HaveNewRouteForStatus: true,
-                NewRouteIsAwardedOrApproved: true,
-                NewAwardedDateIsAfterExistingAwardedDate: false,
+                NewRouteIsHoldsStatus: true,
+                NewHoldsFromIsAfterExistingHoldsFrom: false,
                 ExpectedAttributeValue: ExpectedAttributeValue.NewRouteAwarded,
                 ExpectedResult: true));
 
-            // Existing route at awarded or approved, new route added but not-awarded or approved status
+            // Existing route at holds, new route added but not holds status
             data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                 professionalStatusType,
                 HaveExistingRouteForStatus: true,
-                ExistingRouteIsAwardedOrApproved: true,
+                ExistingRouteIsHoldsStatus: true,
                 HaveNewRouteForStatus: true,
-                NewRouteIsAwardedOrApproved: false,
-                NewAwardedDateIsAfterExistingAwardedDate: false,
+                NewRouteIsHoldsStatus: false,
+                NewHoldsFromIsAfterExistingHoldsFrom: false,
                 ExpectedAttributeValue: ExpectedAttributeValue.ExistingRouteAwarded,
                 ExpectedResult: false));
 
             if (professionalStatusType is not ProfessionalStatusType.EarlyYearsProfessionalStatus)
             {
-                // Existing route at awarded or approved with awarded date before new route, new route added at awarded or approved status
+                // Existing route at holds with awarded date before new route, new route added at holds status
                 data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                     professionalStatusType,
                     HaveExistingRouteForStatus: true,
-                    ExistingRouteIsAwardedOrApproved: true,
+                    ExistingRouteIsHoldsStatus: true,
                     HaveNewRouteForStatus: true,
-                    NewRouteIsAwardedOrApproved: true,
-                    NewAwardedDateIsAfterExistingAwardedDate: true,
+                    NewRouteIsHoldsStatus: true,
+                    NewHoldsFromIsAfterExistingHoldsFrom: true,
                     ExpectedAttributeValue: ExpectedAttributeValue.ExistingRouteAwarded,
                     ExpectedResult: false));
 
-                // Existing route at awarded or approved with after date before new route, new route added at awarded or approved status
+                // Existing route at holds with after date before new route, new route added at holds status
                 data.Add(new RefreshProfessionalStatusAttributesTestCaseData(
                     professionalStatusType,
                     HaveExistingRouteForStatus: true,
-                    ExistingRouteIsAwardedOrApproved: true,
+                    ExistingRouteIsHoldsStatus: true,
                     HaveNewRouteForStatus: true,
-                    NewRouteIsAwardedOrApproved: true,
-                    NewAwardedDateIsAfterExistingAwardedDate: false,
+                    NewRouteIsHoldsStatus: true,
+                    NewHoldsFromIsAfterExistingHoldsFrom: false,
                     ExpectedAttributeValue: ExpectedAttributeValue.NewRouteAwarded,
                     ExpectedResult: true));
             }
@@ -1204,7 +1204,7 @@ public class PersonTests
                 IsActive = true,
                 TrainingStartDateRequired = FieldRequirement.Optional,
                 TrainingEndDateRequired = FieldRequirement.Optional,
-                AwardDateRequired = FieldRequirement.Optional,
+                HoldsFromRequired = FieldRequirement.Optional,
                 InductionExemptionRequired = FieldRequirement.Optional,
                 TrainingProviderRequired = FieldRequirement.Optional,
                 DegreeTypeRequired = FieldRequirement.Optional,
@@ -1215,8 +1215,8 @@ public class PersonTests
             },
             SourceApplicationUserId = null,
             SourceApplicationReference = null,
-            Status = RouteToProfessionalStatusStatus.Awarded,
-            AwardedDate = new(2023, 1, 1),
+            Status = RouteToProfessionalStatusStatus.Holds,
+            HoldsFrom = new(2023, 1, 1),
             TrainingStartDate = null,
             TrainingEndDate = null,
             TrainingSubjectIds = [],
@@ -1255,7 +1255,7 @@ public class PersonTests
                 IsActive = true,
                 TrainingStartDateRequired = FieldRequirement.Optional,
                 TrainingEndDateRequired = FieldRequirement.Optional,
-                AwardDateRequired = FieldRequirement.Optional,
+                HoldsFromRequired = FieldRequirement.Optional,
                 InductionExemptionRequired = FieldRequirement.Optional,
                 TrainingProviderRequired = FieldRequirement.Optional,
                 DegreeTypeRequired = FieldRequirement.Optional,
@@ -1267,7 +1267,7 @@ public class PersonTests
             SourceApplicationUserId = null,
             SourceApplicationReference = null,
             Status = RouteToProfessionalStatusStatus.InTraining,
-            AwardedDate = null,
+            HoldsFrom = null,
             TrainingStartDate = null,
             TrainingEndDate = null,
             TrainingSubjectIds = [],
@@ -1323,10 +1323,10 @@ public class PersonTests
     public record RefreshProfessionalStatusAttributesTestCaseData(
         ProfessionalStatusType ProfessionalStatusType,
         bool HaveExistingRouteForStatus,
-        bool ExistingRouteIsAwardedOrApproved,
+        bool ExistingRouteIsHoldsStatus,
         bool HaveNewRouteForStatus,
-        bool NewRouteIsAwardedOrApproved,
-        bool NewAwardedDateIsAfterExistingAwardedDate,
+        bool NewRouteIsHoldsStatus,
+        bool NewHoldsFromIsAfterExistingHoldsFrom,
         ExpectedAttributeValue ExpectedAttributeValue,
         bool ExpectedResult);
 
@@ -1340,10 +1340,10 @@ public class PersonTests
 
     private class TestableRouteToProfessionalStatus : RouteToProfessionalStatus
     {
-        public new DateOnly? AwardedDate
+        public new DateOnly? HoldsFrom
         {
-            get => base.AwardedDate;
-            set => base.AwardedDate = value;
+            get => base.HoldsFrom;
+            set => base.HoldsFrom = value;
         }
 
         public new required RouteToProfessionalStatusType RouteToProfessionalStatusType

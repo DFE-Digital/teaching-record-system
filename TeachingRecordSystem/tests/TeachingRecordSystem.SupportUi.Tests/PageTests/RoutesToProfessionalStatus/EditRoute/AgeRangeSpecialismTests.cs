@@ -13,7 +13,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -57,7 +57,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

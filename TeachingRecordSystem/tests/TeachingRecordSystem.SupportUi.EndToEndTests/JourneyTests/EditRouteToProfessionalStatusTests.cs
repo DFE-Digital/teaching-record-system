@@ -18,12 +18,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = RouteToProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
         var setEndDate = endDate.AddDays(1);
         var setStartDate = startDate.AddDays(1);
-        var setAwardDate = setEndDate.AddDays(1);
+        var setHoldsFrom = setEndDate.AddDays(1);
         var setDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("2f7a914f-f95f-421a-a55e-60ed88074cf2"));
         var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
         var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
@@ -38,7 +38,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
                     .WithTrainingCountryId(setCountry.CountryId)
-                    .WithAwardedDate(endDate)
+                    .WithHoldsFrom(endDate)
                     .WithInductionExemption(true)
                 ));
 
@@ -68,10 +68,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.ClickLinkForElementWithTestIdAsync("edit-award-date-link");
+        await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
-        await page.FillDateInputAsync(setAwardDate);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.FillDateInputAsync(setHoldsFrom);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
@@ -462,15 +462,15 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task EditAwardDate_BackLinks()
+    public async Task EditHoldsFrom_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-        var status = RouteToProfessionalStatusStatus.Approved;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(30);
-        var setAwardDate = endDate.AddDays(1);
+        var setHoldsFrom = endDate.AddDays(1);
         var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
@@ -479,7 +479,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
-                    .WithAwardedDate(setAwardDate)
+                    .WithHoldsFrom(setHoldsFrom)
                     .WithTrainingCountryId(country.CountryId)
                     .WithInductionExemption(false)
                 ));
@@ -495,16 +495,16 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync($"edit-route-link-{qualificationId}");
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.ClickLinkForElementWithTestIdAsync("edit-award-date-link");
+        await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
         await page.ClickBackLink();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.ClickLinkForElementWithTestIdAsync("edit-award-date-link");
+        await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
-        await page.FillDateInputAsync(setAwardDate);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.FillDateInputAsync(setHoldsFrom);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
@@ -517,9 +517,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickLinkForElementWithTestIdAsync("edit-award-date-link");
+        await page.ClickLinkForElementWithTestIdAsync("edit-holds-from-link");
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
@@ -724,7 +724,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
-                .WithAwardedDate(new DateOnly(2021, 2, 2))
+                .WithHoldsFrom(new DateOnly(2021, 2, 2))
                 .WithTrainingCountryId(country.CountryId)
             ));
         var personId = person.PersonId;
@@ -778,7 +778,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
             .First();
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
-        var status = RouteToProfessionalStatusStatus.Approved;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var newSubject = (await TestData.ReferenceDataCache.GetTrainingSubjectsAsync()).RandomOne();
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
@@ -787,7 +787,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
-                .WithAwardedDate(new DateOnly(2021, 2, 2))
+                .WithHoldsFrom(new DateOnly(2021, 2, 2))
                 .WithTrainingCountryId(country.CountryId)
             ));
         var personId = person.PersonId;
@@ -835,9 +835,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task EditStatus_Awarded_Continue_Exemption_Continue()
+    public async Task EditStatus_Holds_Continue_Exemption_Continue()
     {
-        var awardDate = new DateOnly(2021, 1, 1);
+        var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId.HasValue)
             .Join(
@@ -871,11 +871,11 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
 
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
-        await page.ClickRadioAsync("Awarded");
+        await page.ClickRadioAsync("Holds");
         await page.ClickContinueButtonAsync();
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
-        await page.FillDateInputAsync(awardDate);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.FillDateInputAsync(holdsFrom);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
@@ -887,9 +887,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task EditStatusRouteWithImplicitExemption_Awarded_Continue_Cya_EditStatus_Continue_Cya()
+    public async Task EditStatusRouteWithImplicitExemption_Holds_Continue_Cya_EditStatus_Continue_Cya()
     {
-        var awardDate = new DateOnly(2021, 1, 1);
+        var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption == true)
             .RandomOne();
@@ -905,7 +905,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
-                .WithAwardedDate(new DateOnly(2021, 2, 2))
+                .WithHoldsFrom(new DateOnly(2021, 2, 2))
                 .WithTrainingCountryId(country.CountryId)
                 .WithTrainingProviderId(provider.TrainingProviderId)
             ));
@@ -924,11 +924,11 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
 
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
-        await page.ClickRadioAsync("Awarded");
+        await page.ClickRadioAsync("Holds");
         await page.ClickContinueButtonAsync();
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
-        await page.FillDateInputAsync(awardDate);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.FillDateInputAsync(holdsFrom);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
@@ -941,7 +941,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEquals(awardDate.ToString(UiDefaults.DateOnlyDisplayFormat), "Award date");
+        await page.AssertContentEquals(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), "Award date");
         await page.AssertContentEquals("Yes", "Has exemption");
 
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
@@ -956,10 +956,10 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
     [Theory]
     [InlineData("Deferred")]
-    [InlineData("Awarded")]
-    public async Task EditStatus_StatusAlreadyAwarded_Continue_Details(string status)
+    [InlineData("Holds")]
+    public async Task EditStatus_StatusAlreadyHolds_Continue_Details(string status)
     {
-        var awardedDate = new DateOnly(2021, 1, 1);
+        var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionRequired == FieldRequirement.NotApplicable)
             .RandomOne();
@@ -967,8 +967,8 @@ public class EditRouteToProfessionalStatusTests : TestBase
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
                 .WithRoute(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFrom)
             ));
         var personId = person.PersonId;
         var qualificationId = person.ProfessionalStatuses.Single().QualificationId;
@@ -994,7 +994,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditStatus_Awarded_Continue_Exemption_Back()
     {
-        var awardDate = new DateOnly(2021, 1, 1);
+        var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId.HasValue)
             .Join(
@@ -1028,17 +1028,17 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
 
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
-        await page.ClickRadioAsync("Awarded");
+        await page.ClickRadioAsync("Holds");
         await page.ClickContinueButtonAsync();
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
-        await page.FillDateInputAsync(awardDate);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.FillDateInputAsync(holdsFrom);
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
         await page.ClickBackLink();
 
-        await page.AssertOnRouteEditAwardDatePageAsync(qualificationId);
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
         await page.ClickBackLink();
 
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
