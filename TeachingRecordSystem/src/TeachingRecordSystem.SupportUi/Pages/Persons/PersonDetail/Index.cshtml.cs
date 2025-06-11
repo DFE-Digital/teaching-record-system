@@ -25,19 +25,41 @@ public class IndexModel(
     public ContactSearchSortByOption? SortBy { get; set; }
 
     public PersonInfo? Person { get; set; }
+    public PersonProfessionalStatusInfo? PersonProfessionalStatus { get; set; }
 
     public bool HasOpenAlert { get; set; }
 
     public async Task OnGetAsync()
     {
         HasOpenAlert = await dbContext.Alerts.AnyAsync(a => a.PersonId == PersonId && a.IsOpen);
-        Person = await GetPersonInfoAsync();
+        (Person, PersonProfessionalStatus) = await GetPersonInfoAsync();
     }
 
-    private async Task<PersonInfo> GetPersonInfoAsync()
+    private async Task<PersonProfessionalStatusInfo?> BuildPersonStatusInfoAsync()
+    {
+        var person = await dbContext.Persons
+                .SingleAsync(p => p.PersonId == PersonId);
+
+        if (person is null || (person.EytsDate is null && person.QtsDate is null && person.PqtsDate is null && !person.HasEyps && person.InductionStatus == InductionStatus.None))
+        {
+            return null;
+        }
+        else
+        {
+            return new PersonProfessionalStatusInfo
+            {
+                EytsDate = person.EytsDate,
+                HasEyps = person.HasEyps,
+                InductionStatus = person.InductionStatus,
+                PqtsDate = person.PqtsDate,
+                QtsDate = person.QtsDate
+            };
+        }
+    }
+
+    private async Task<PersonInfo> BuildPersonInfoAsync()
     {
         var hasActiveAlert = await dbContext.Alerts.Where(a => a.PersonId == PersonId && a.IsOpen).AnyAsync();
-
         if (featureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
             var person = await dbContext.Persons
@@ -101,6 +123,16 @@ public class IndexModel(
         }
     }
 
+    private async Task<(PersonInfo, PersonProfessionalStatusInfo?)> GetPersonInfoAsync()
+    {
+        return (
+            await BuildPersonInfoAsync(),
+            featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus) ?
+                await BuildPersonStatusInfoAsync()
+                : null
+            );
+    }
+
     public record PersonInfo
     {
         public required string Name { get; init; }
@@ -112,5 +144,14 @@ public class IndexModel(
         public required string? Gender { get; init; }
         public required bool HasActiveAlert { get; init; }
         public required string[] PreviousNames { get; init; }
+    }
+
+    public record PersonProfessionalStatusInfo
+    {
+        public required InductionStatus InductionStatus { get; init; }
+        public required DateOnly? QtsDate { get; init; }
+        public required DateOnly? EytsDate { get; init; }
+        public required bool HasEyps { get; init; }
+        public required DateOnly? PqtsDate { get; init; }
     }
 }
