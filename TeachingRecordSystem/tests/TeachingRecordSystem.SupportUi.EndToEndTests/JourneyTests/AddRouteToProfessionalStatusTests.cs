@@ -189,7 +189,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     }
 
     [Fact]
-    public async Task Route_Add_AwardedJourney()
+    public async Task Route_Add_HoldsJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
             .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
@@ -199,8 +199,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
                 && r.DegreeTypeRequired == FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
-        var status = RouteToProfessionalStatusStatus.Awarded;
-        var awardedDate = new DateOnly(2021, 1, 1);
+        var status = RouteToProfessionalStatusStatus.Holds;
+        var holdsFrom = new DateOnly(2021, 1, 1);
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne()
             .Name;
@@ -225,8 +225,8 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.SelectStatusAsync(status);
         await page.ClickButtonAsync("Continue");
 
-        await page.AssertOnRouteAddAwardedDatePageAsync();
-        await page.FillDateInputAsync(awardedDate);
+        await page.AssertOnRouteAddHoldsFromPageAsync();
+        await page.FillDateInputAsync(holdsFrom);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddInductionExemptionPageAsync();

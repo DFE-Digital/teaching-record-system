@@ -7,7 +7,7 @@ public class RouteDetailModel()
 {
     public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; set; }
     public RouteToProfessionalStatusStatus Status { get; set; }
-    public DateOnly? AwardedDate { get; set; }
+    public DateOnly? HoldsFrom { get; set; }
     public DateOnly? TrainingStartDate { get; set; }
     public DateOnly? TrainingEndDate { get; set; }
     public Guid[]? TrainingSubjectIds { get; set; }
@@ -28,7 +28,7 @@ public class RouteDetailModel()
 
     public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingStartDateRequired, Status.GetStartDateRequirement());
     public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingEndDateRequired, Status.GetEndDateRequirement());
-    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.AwardDateRequired, Status.GetAwardDateRequirement());
+    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.HoldsFromRequired, Status.GetAwardDateRequirement());
     public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
     public FieldRequirement TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
     public FieldRequirement AgeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement());

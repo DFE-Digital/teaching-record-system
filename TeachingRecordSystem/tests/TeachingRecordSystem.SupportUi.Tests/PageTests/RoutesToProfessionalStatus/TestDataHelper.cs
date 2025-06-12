@@ -17,7 +17,7 @@ public static class TestDataHelper
                 && r.InductionExemptionRequired != FieldRequirement.NotApplicable
                 && r.TrainingStartDateRequired != FieldRequirement.NotApplicable
                 && r.TrainingEndDateRequired != FieldRequirement.NotApplicable
-                && r.AwardDateRequired != FieldRequirement.NotApplicable)
+                && r.HoldsFromRequired != FieldRequirement.NotApplicable)
             .Where(r => professionalStatusType is null || professionalStatusType == r.ProfessionalStatusType)
             .RandomOne();
     }
@@ -40,7 +40,7 @@ public static class TestDataHelper
     {
         return ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
-                && s.AwardDateRequired != FieldRequirement.NotApplicable
+                && s.HoldsFromRequired != FieldRequirement.NotApplicable
                 && s.TrainingCountryRequired != FieldRequirement.NotApplicable
                 && s.DegreeTypeRequired != FieldRequirement.NotApplicable
                 && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
@@ -59,7 +59,7 @@ public static class TestDataHelper
             var property = typeof(T).GetProperty(propertyName);
             if (property is null)
             {
-                throw new InvalidOperationException($"Property {propertyName} not found on type RouteToProfessionalStatus");
+                throw new InvalidOperationException($"Property '{propertyName}' not found on type {typeof(T).Name}.");
             }
             var actualValue = property.GetValue(item);
             return actualValue?.Equals(expectedValue) ?? false;

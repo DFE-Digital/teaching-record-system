@@ -16,7 +16,7 @@ public class RouteToProfessionalStatus : Qualification
     public string? SourceApplicationReference { get; init; }
     public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; protected set; }
     public required RouteToProfessionalStatusStatus Status { get; set; }
-    public DateOnly? AwardedDate { get; set; }
+    public DateOnly? HoldsFrom { get; set; }
     public required DateOnly? TrainingStartDate { get; set; }
     public required DateOnly? TrainingEndDate { get; set; }
     public required Guid[] TrainingSubjectIds { get; set; } = [];
@@ -43,7 +43,7 @@ public class RouteToProfessionalStatus : Qualification
         IReadOnlyCollection<RouteToProfessionalStatusType> allRouteTypes,
         Guid routeToProfessionalStatusTypeId,
         RouteToProfessionalStatusStatus status,
-        DateOnly? awardedDate,
+        DateOnly? holdsFrom,
         DateOnly? trainingStartDate,
         DateOnly? trainingEndDate,
         Guid[]? trainingSubjectIds,
@@ -71,7 +71,7 @@ public class RouteToProfessionalStatus : Qualification
             PersonId = person.PersonId,
             RouteToProfessionalStatusTypeId = routeToProfessionalStatusTypeId,
             Status = status,
-            AwardedDate = awardedDate,
+            HoldsFrom = holdsFrom,
             DegreeTypeId = degreeTypeId,
             ExemptFromInduction = isExemptFromInduction,
             TrainingStartDate = trainingStartDate,
@@ -167,7 +167,7 @@ public class RouteToProfessionalStatus : Qualification
         var changes = RouteToProfessionalStatusUpdatedEventChanges.None |
             (RouteToProfessionalStatusTypeId != oldEventModel.RouteToProfessionalStatusTypeId ? RouteToProfessionalStatusUpdatedEventChanges.Route : RouteToProfessionalStatusUpdatedEventChanges.None) |
             (Status != oldEventModel.Status ? RouteToProfessionalStatusUpdatedEventChanges.Status : RouteToProfessionalStatusUpdatedEventChanges.None) |
-            (AwardedDate != oldEventModel.AwardedDate ? RouteToProfessionalStatusUpdatedEventChanges.AwardedDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
+            (HoldsFrom != oldEventModel.HoldsFrom ? RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom : RouteToProfessionalStatusUpdatedEventChanges.None) |
             (TrainingStartDate != oldEventModel.TrainingStartDate ? RouteToProfessionalStatusUpdatedEventChanges.StartDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
             (TrainingEndDate != oldEventModel.TrainingEndDate ? RouteToProfessionalStatusUpdatedEventChanges.EndDate : RouteToProfessionalStatusUpdatedEventChanges.None) |
             ((TrainingSubjectIds.Except(oldEventModel.TrainingSubjectIds).Any() || oldEventModel.TrainingSubjectIds.Except(TrainingSubjectIds).Any()) ? RouteToProfessionalStatusUpdatedEventChanges.TrainingSubjectIds : RouteToProfessionalStatusUpdatedEventChanges.None) |
@@ -285,12 +285,12 @@ public class RouteToProfessionalStatus : Qualification
 
     private void RefreshExemptFromInductionDueToQtsDate(ProfessionalStatusType professionalStatusType)
     {
-        if (professionalStatusType != ProfessionalStatusType.QualifiedTeacherStatus || AwardedDate is null)
+        if (professionalStatusType != ProfessionalStatusType.QualifiedTeacherStatus || HoldsFrom is null)
         {
             ExemptFromInductionDueToQtsDate = null;
             return;
         }
 
-        ExemptFromInductionDueToQtsDate = AwardedDate < new DateOnly(2000, 5, 7);
+        ExemptFromInductionDueToQtsDate = HoldsFrom < new DateOnly(2000, 5, 7);
     }
 }

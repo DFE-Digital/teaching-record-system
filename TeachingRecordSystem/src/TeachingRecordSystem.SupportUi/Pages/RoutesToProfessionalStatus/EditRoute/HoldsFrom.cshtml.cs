@@ -7,8 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class AwardDateModel(
-    TrsLinkGenerator linkGenerator) : PageModel
+public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -28,11 +27,11 @@ public class AwardDateModel(
     [DateInput(ErrorMessagePrefix = "Award date")]
     [Required(ErrorMessage = "Enter an award date")]
     [Display(Name = "Enter the professional status award date")]
-    public DateOnly? AwardedDate { get; set; }
+    public DateOnly? HoldsFrom { get; set; }
 
     public void OnGet()
     {
-        AwardedDate = JourneyInstance!.State.AwardedDate;
+        HoldsFrom = JourneyInstance!.State.HoldsFrom;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -56,19 +55,19 @@ public class AwardDateModel(
                 {
                     s.Status = s.EditStatusState!.Status;
                     s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
-                    s.AwardedDate = AwardedDate;
+                    s.HoldsFrom = HoldsFrom;
                     s.IsExemptFromInduction = s.EditStatusState.InductionExemption;
                     s.EditStatusState = null;
                 });
             }
             else // there are more pages to come - store the data in the temporary journey state
             {
-                await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.AwardedDate = AwardedDate);
+                await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.HoldsFrom = HoldsFrom);
             }
         }
         else // user is editing the awarded date on an already-completed route
         {
-            await JourneyInstance!.UpdateStateAsync(s => s.AwardedDate = AwardedDate);
+            await JourneyInstance!.UpdateStateAsync(s => s.HoldsFrom = HoldsFrom);
         }
 
         return Redirect(nextPage);

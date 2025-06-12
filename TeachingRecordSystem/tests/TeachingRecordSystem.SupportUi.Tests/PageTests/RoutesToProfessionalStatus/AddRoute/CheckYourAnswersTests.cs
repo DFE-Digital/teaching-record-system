@@ -78,7 +78,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today.AddDays(-1);
-        var awardedDate = endDate.AddDays(1);
+        var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
@@ -91,7 +91,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStatus(status)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithAwardedDate(awardedDate)
+            .WithHoldsFrom(holdsFrom)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithTrainingCountryId(country.CountryId)
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
@@ -117,7 +117,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Status", status.GetTitle());
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Award date", awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Award date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
@@ -147,7 +147,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithStatus(status.Value)
             .WithTrainingStartDate(startDate)
             .WithTrainingEndDate(endDate)
-            .WithAwardedDate(endDate)
+            .WithHoldsFrom(endDate)
             .WithTrainingCountryId(country.CountryId)
             .WithInductionExemption(true)
             .Build();
@@ -229,7 +229,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithAwardedStatusFields(Clock)
+            .WithHoldsStatusFields(Clock)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
             .WithTrainingCountryId(country.CountryId)
@@ -264,7 +264,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, addedProfessionalStatusRecord.RouteToProfessionalStatusTypeId);
             Assert.Equal(journeyInstance.State.TrainingStartDate, addedProfessionalStatusRecord.TrainingStartDate);
             Assert.Equal(journeyInstance.State.TrainingEndDate, addedProfessionalStatusRecord.TrainingEndDate);
-            Assert.Equal(journeyInstance.State.AwardedDate, addedProfessionalStatusRecord.AwardedDate);
+            Assert.Equal(journeyInstance.State.HoldsFrom, addedProfessionalStatusRecord.HoldsFrom);
             Assert.Equal(journeyInstance.State.TrainingProviderId, addedProfessionalStatusRecord.TrainingProviderId);
             Assert.Equal(journeyInstance.State.TrainingCountryId, addedProfessionalStatusRecord.TrainingCountryId);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, addedProfessionalStatusRecord.TrainingAgeSpecialismType);
@@ -284,7 +284,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             Assert.Equal(journeyInstance.State.RouteToProfessionalStatusId, actualCreatedEvent.RouteToProfessionalStatus.RouteToProfessionalStatusTypeId);
             Assert.Equal(journeyInstance.State.TrainingStartDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingStartDate);
             Assert.Equal(journeyInstance.State.TrainingEndDate, actualCreatedEvent.RouteToProfessionalStatus.TrainingEndDate);
-            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.RouteToProfessionalStatus.AwardedDate);
+            Assert.Equal(journeyInstance.State.HoldsFrom, actualCreatedEvent.RouteToProfessionalStatus.HoldsFrom);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismType, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismType);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeFrom, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeFrom);
             Assert.Equal(journeyInstance.State.TrainingAgeSpecialismRangeTo, actualCreatedEvent.RouteToProfessionalStatus.TrainingAgeSpecialismRangeTo);
@@ -316,13 +316,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
-        Assert.Equal(journeyInstance.State.AwardedDate, updatedPerson.QtsDate);
+        Assert.Equal(journeyInstance.State.HoldsFrom, updatedPerson.QtsDate);
 
         EventPublisher.AssertEventsSaved(e =>
         {
             var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
-            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.QtsDate);
+            Assert.Equal(journeyInstance.State.HoldsFrom, actualCreatedEvent.PersonAttributes.QtsDate);
             Assert.Null(actualCreatedEvent.OldPersonAttributes.QtsDate);
         });
     }
@@ -347,13 +347,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
-        Assert.Equal(journeyInstance.State.AwardedDate, updatedPerson.EytsDate);
+        Assert.Equal(journeyInstance.State.HoldsFrom, updatedPerson.EytsDate);
 
         EventPublisher.AssertEventsSaved(e =>
         {
             var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
-            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.EytsDate);
+            Assert.Equal(journeyInstance.State.HoldsFrom, actualCreatedEvent.PersonAttributes.EytsDate);
             Assert.Null(actualCreatedEvent.OldPersonAttributes.EytsDate);
         });
     }
@@ -409,13 +409,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
 
         var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
-        Assert.Equal(journeyInstance.State.AwardedDate, updatedPerson.PqtsDate);
+        Assert.Equal(journeyInstance.State.HoldsFrom, updatedPerson.PqtsDate);
 
         EventPublisher.AssertEventsSaved(e =>
         {
             var actualCreatedEvent = Assert.IsType<RouteToProfessionalStatusCreatedEvent>(e);
 
-            Assert.Equal(journeyInstance.State.AwardedDate, actualCreatedEvent.PersonAttributes.PqtsDate);
+            Assert.Equal(journeyInstance.State.HoldsFrom, actualCreatedEvent.PersonAttributes.PqtsDate);
             Assert.Null(actualCreatedEvent.OldPersonAttributes.PqtsDate);
         });
     }
@@ -436,8 +436,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713"),  // Apply for QTS
-                Status = RouteToProfessionalStatusStatus.Approved,
-                AwardedDate = new(2024, 10, 10),
+                Status = RouteToProfessionalStatusStatus.Holds,
+                HoldsFrom = new(2024, 10, 10),
                 TrainingStartDate = null,
                 TrainingEndDate = null,
                 TrainingSubjectIds = [],
@@ -453,8 +453,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("D9EEF3F8-FDE6-4A3F-A361-F6655A42FA1E"), // Early Years ITT Assessment Only
-                Status = RouteToProfessionalStatusStatus.Awarded,
-                AwardedDate = new(2024, 10, 10),
+                Status = RouteToProfessionalStatusStatus.Holds,
+                HoldsFrom = new(2024, 10, 10),
                 TrainingStartDate = new(2023, 9, 1),
                 TrainingEndDate = new(2024, 5, 1),
                 TrainingSubjectIds = [],
@@ -470,8 +470,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("8F5C0431-D006-4EDA-9336-16DFC6A26A78"),  // EYPS
-                Status = RouteToProfessionalStatusStatus.Awarded,
-                AwardedDate = new(2024, 10, 10),
+                Status = RouteToProfessionalStatusStatus.Holds,
+                HoldsFrom = new(2024, 10, 10),
                 TrainingStartDate = null,
                 TrainingEndDate = null,
                 TrainingSubjectIds = [],
@@ -487,8 +487,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             {
                 Initialized = true,
                 RouteToProfessionalStatusId = new("EC95C276-25D9-491F-99A2-8D92F10E1E94"),  // European Recognition - PQTS
-                Status = RouteToProfessionalStatusStatus.Awarded,
-                AwardedDate = new(2024, 10, 10),
+                Status = RouteToProfessionalStatusStatus.Holds,
+                HoldsFrom = new(2024, 10, 10),
                 TrainingStartDate = null,
                 TrainingEndDate = null,
                 TrainingSubjectIds = [],

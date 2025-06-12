@@ -43,7 +43,7 @@
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Award date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="award-date-@professionalStatus.QualificationId">@(professionalStatus.AwardedDate.HasValue ? professionalStatus.AwardedDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-value data-testid="award-date-@professionalStatus.QualificationId">@(professionalStatus.HoldsFrom.HasValue ? professionalStatus.HoldsFrom!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>

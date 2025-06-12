@@ -38,10 +38,10 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartDate", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditStartDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartDate", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string RouteEditAwardDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/AwardDate", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteEditAwardDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/AwardDate", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string RouteEditHoldsFrom(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteEditHoldsFromCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
     public string RouteEditEndDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/EndDate", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditEndDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
@@ -91,10 +91,10 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddEndDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/EndDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddAwardDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AwardedDate", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteAddAwardDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AwardedDate", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddHoldsFrom(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/HoldsFrom", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddHoldsFromCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/HoldsFrom", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddInductionExemption(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/InductionExemption", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddInductionExemptionCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
@@ -131,7 +131,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId),
             AddRoutePage.StartDate => RouteAddStartDate(personId, journeyInstanceId),
             AddRoutePage.EndDate => RouteAddEndDate(personId, journeyInstanceId),
-            AddRoutePage.AwardDate => RouteAddAwardDate(personId, journeyInstanceId),
+            AddRoutePage.AwardDate => RouteAddHoldsFrom(personId, journeyInstanceId),
             AddRoutePage.InductionExemption => RouteAddInductionExemption(personId, journeyInstanceId),
             AddRoutePage.TrainingProvider => RouteAddTrainingProvider(personId, journeyInstanceId),
             AddRoutePage.DegreeType => RouteAddDegreeType(personId, journeyInstanceId),

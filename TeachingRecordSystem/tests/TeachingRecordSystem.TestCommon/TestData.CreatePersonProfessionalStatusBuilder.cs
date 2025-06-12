@@ -10,7 +10,7 @@ public partial class TestData
         private Guid? _personId = null;
         private Guid? _routeToProfessionalStatusId;
         private RouteToProfessionalStatusStatus _status;
-        private DateOnly? _awardedDate;
+        private DateOnly? _holdsFrom;
         private DateOnly? _trainingStartDate;
         private DateOnly? _trainingEndDate;
         private Guid[] _trainingSubjectIds = [];
@@ -40,9 +40,9 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithAwardedDate(DateOnly awardedDate)
+        public CreatePersonProfessionalStatusBuilder WithHoldsFrom(DateOnly holdsFrom)
         {
-            _awardedDate = awardedDate;
+            _holdsFrom = holdsFrom;
             return this;
         }
 
@@ -141,7 +141,7 @@ public partial class TestData
                 allRouteTypes,
                 _routeToProfessionalStatusId!.Value,
                 _status,
-                _awardedDate,
+                _holdsFrom,
                 _trainingStartDate,
                 _trainingEndDate,
                 _trainingSubjectIds,

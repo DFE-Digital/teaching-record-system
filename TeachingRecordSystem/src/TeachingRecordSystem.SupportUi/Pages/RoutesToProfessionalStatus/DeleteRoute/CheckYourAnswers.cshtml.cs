@@ -101,7 +101,7 @@ public class CheckYourAnswersModel(
         RouteDetail = new RouteDetailViewModel()
         {
             RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType!,
-            AwardedDate = routeInfo.RouteToProfessionalStatus.AwardedDate,
+            HoldsFrom = routeInfo.RouteToProfessionalStatus.HoldsFrom,
             DegreeTypeId = routeInfo.RouteToProfessionalStatus.DegreeTypeId,
             IsExemptFromInduction = routeInfo.RouteToProfessionalStatus.ExemptFromInduction,
             Status = routeInfo.RouteToProfessionalStatus.Status,
