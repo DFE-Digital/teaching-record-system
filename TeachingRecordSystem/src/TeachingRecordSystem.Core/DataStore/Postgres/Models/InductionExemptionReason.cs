@@ -24,4 +24,5 @@ public class InductionExemptionReason
     public required string Name { get; init; }
     public required bool IsActive { get; set; }
     public required bool RouteImplicitExemption { get; set; }
+    public required bool RouteOnlyExemption { get; init; }
 }

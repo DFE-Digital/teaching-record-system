@@ -233,6 +233,12 @@ public class ReferenceDataCache(
         return ittProviders.SingleOrDefault(p => p.Name == name);
     }
 
+    public async Task<InductionExemptionReason[]> GetPersonLevelInductionExemptionReasonsAsync(bool activeOnly = false)
+    {
+        var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
+        return inductionExemptionReasons.Where(e => !e.RouteOnlyExemption && !activeOnly || e.IsActive).ToArray();
+    }
+
     public async Task<InductionExemptionReason[]> GetInductionExemptionReasonsAsync(bool activeOnly = false)
     {
         var inductionExemptionReasons = await EnsureInductionExemptionReasonsAsync();
