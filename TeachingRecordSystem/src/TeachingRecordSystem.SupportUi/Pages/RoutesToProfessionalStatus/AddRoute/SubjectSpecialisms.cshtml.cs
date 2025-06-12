@@ -8,17 +8,11 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public class TrainingSubjectDisplayInfo
-    {
-        public required Guid Id { get; init; }
-        public required string DisplayName { get; init; }
-    }
-
     public string BackLink => FromCheckAnswers ?
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
         LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
-    public TrainingSubjectDisplayInfo[] Subjects { get; set; } = [];
+    public DisplayInfo[] Subjects { get; set; } = [];
 
     [BindProperty]
     [Display(Name = "Enter the subject they specialise in teaching")]
@@ -56,7 +50,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync(activeOnly: true))
-            .Select(s => new TrainingSubjectDisplayInfo()
+            .Select(s => new DisplayInfo()
             {
                 Id = s.TrainingSubjectId,
                 DisplayName = $"{s.Reference} - {s.Name}"

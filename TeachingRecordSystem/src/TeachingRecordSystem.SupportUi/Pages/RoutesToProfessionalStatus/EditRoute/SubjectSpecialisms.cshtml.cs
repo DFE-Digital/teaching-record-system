@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.SubjectSpecialismsModel;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -20,7 +19,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
     public Guid PersonId { get; private set; }
     public string? PersonName { get; set; }
 
-    public TrainingSubjectDisplayInfo[] Subjects { get; set; } = [];
+    public DisplayInfo[] Subjects { get; set; } = [];
 
     [BindProperty]
     [Required(ErrorMessage = "Enter a subject")]
@@ -69,7 +68,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         PersonId = personInfo.PersonId;
 
         Subjects = (await referenceDataCache.GetTrainingSubjectsAsync(activeOnly: true))
-            .Select(s => new TrainingSubjectDisplayInfo()
+            .Select(s => new DisplayInfo()
             {
                 Id = s.TrainingSubjectId,
                 DisplayName = $"{s.Reference} - {s.Name}"

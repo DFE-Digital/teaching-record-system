@@ -23,20 +23,21 @@
                 const selectElement = document.querySelector(`#${id}`);
                 accessibleAutocomplete.enhanceSelectElement({
                     defaultValue: '',
-                    selectElement: document.querySelector(`#${id}`)
+                    selectElement: selectElement
                 });
 
-                // Get the newly created input element
-                const inputElement = selectElement.parentElement.querySelector("input");
+            setTimeout(() => {
+                const inputElement = selectElement.parentElement.querySelector('input');
 
                 // Clear the select element when the input is cleared
-                inputElement.addEventListener("input", function () {
-                    if (inputElement.value === "") {
-                        selectElement.value = "";
+                inputElement.addEventListener('input', function () {
+                    if (inputElement.value === '') {
+                        selectElement.value = '';
                     }
                 });
             });
-        }
+        }, 0); // 0ms = defer to next event loop tick
+    }
     </script>
 }
 
