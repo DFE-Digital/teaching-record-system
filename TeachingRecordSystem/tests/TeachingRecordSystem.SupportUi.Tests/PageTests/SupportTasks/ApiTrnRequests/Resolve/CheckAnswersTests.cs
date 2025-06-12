@@ -507,9 +507,10 @@ public class CheckAnswersTests : ResolveApiTrnRequestTestBase
         var matchedCrmContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId).Clone();
 
         // Act
-        await HttpClient.SendAsync(request);
+        var response = await HttpClient.SendAsync(request);
 
         // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         var updatedContact = XrmFakedContext.CreateQuery<Contact>().Single(c => c.Id == matchedPerson.ContactId);
 
         static object? FormatValue(object? value) =>
