@@ -97,7 +97,6 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 dotnet_style_allow_multiple_blank_lines_experimental = true
 dotnet_style_allow_statement_immediately_after_block_experimental = true
 
-csharp_style_namespace_declarations = file_scoped:warning
 csharp_style_prefer_unbound_generic_type_in_nameof = true:suggestion
 
 #### C# Coding Conventions ####
@@ -137,7 +136,7 @@ csharp_style_prefer_readonly_struct_member = true:suggestion
 # Code-block preferences
 csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true:suggestion
-csharp_style_namespace_declarations = block_scoped:silent
+csharp_style_namespace_declarations = file_scoped:warning
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_primary_constructors = true:suggestion
 csharp_style_prefer_top_level_statements = true:silent
