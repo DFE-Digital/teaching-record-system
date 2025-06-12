@@ -43,9 +43,9 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/end-date");
     }
 
-    public static Task AssertOnRouteEditAwardDatePageAsync(this IPage page, Guid qualificationId)
+    public static Task AssertOnRouteEditHoldsFromPageAsync(this IPage page, Guid qualificationId)
     {
-        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/award-date");
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/holds-from");
     }
 
     public static Task AssertOnRouteDetailPageAsync(this IPage page, Guid qualificationId)
@@ -118,9 +118,9 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync("/route/add/training-provider");
     }
 
-    public static Task AssertOnRouteAddAwardedDatePageAsync(this IPage page)
+    public static Task AssertOnRouteAddHoldsFromPageAsync(this IPage page)
     {
-        return page.WaitForUrlPathAsync("/route/add/award-date");
+        return page.WaitForUrlPathAsync("/route/add/holds-from");
     }
 
     public static Task AssertOnRouteAddInductionExemptionPageAsync(this IPage page)

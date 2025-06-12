@@ -25,9 +25,9 @@ public class PersonsController(IMapper mapper) : ControllerBase
         [FromRoute] string trn,
         [FromRoute(Name = "reference")] string sourceApplicationReference,
         [FromBody] SetProfessionalStatusRequest request,
-        [FromServices] SetProfessionalStatusHandler handler)
+        [FromServices] SetRouteToProfessionalStatusHandler handler)
     {
-        var command = new SetProfessionalStatusCommand(
+        var command = new SetRouteToProfessionalStatusCommand(
             trn,
             sourceApplicationReference,
             request.RouteTypeId,
@@ -38,7 +38,7 @@ public class PersonsController(IMapper mapper) : ControllerBase
             request.TrainingSubjectReferences.HasValue ? request.TrainingSubjectReferences.ValueOrDefault() : null,
             request.TrainingAgeSpecialism is null
                 ? null
-                : new SetProfessionalStatusCommandTrainingAgeSpecialism(
+                : new SetRouteToProfessionalStatusCommandTrainingAgeSpecialism(
                     request.TrainingAgeSpecialism.Type.ConvertToTrainingAgeSpecialismType(),
                     request.TrainingAgeSpecialism.From,
                     request.TrainingAgeSpecialism.To),

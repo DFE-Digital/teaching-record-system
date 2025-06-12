@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class AwardDateModel : AddRouteCommonPageModel
+public class HoldsFromModel : AddRouteCommonPageModel
 {
-    public AwardDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
+    public HoldsFromModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
     {
     }
 
@@ -14,7 +14,7 @@ public class AwardDateModel : AddRouteCommonPageModel
     [DateInput(ErrorMessagePrefix = "Award date")]
     [Required(ErrorMessage = "Enter the professional status award date")]
     [Display(Name = "Enter an award date")]
-    public DateOnly? AwardedDate { get; set; }
+    public DateOnly? HoldsFrom { get; set; }
 
     public string BackLink => FromCheckAnswers ?
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
@@ -22,7 +22,7 @@ public class AwardDateModel : AddRouteCommonPageModel
 
     public void OnGet()
     {
-        AwardedDate = JourneyInstance!.State.AwardedDate;
+        HoldsFrom = JourneyInstance!.State.HoldsFrom;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -31,7 +31,7 @@ public class AwardDateModel : AddRouteCommonPageModel
         {
             return this.PageWithErrors();
         }
-        await JourneyInstance!.UpdateStateAsync(state => state.AwardedDate = AwardedDate);
+        await JourneyInstance!.UpdateStateAsync(state => state.HoldsFrom = HoldsFrom);
 
         return Redirect(FromCheckAnswers ?
             LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :

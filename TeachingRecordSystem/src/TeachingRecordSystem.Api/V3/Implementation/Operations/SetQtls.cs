@@ -55,8 +55,8 @@ public class SetQtlsHandler(
                     person,
                     allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
                     routeToProfessionalStatusTypeId: qtlsRouteId,
-                    status: RouteToProfessionalStatusStatus.Awarded,
-                    awardedDate: command.QtsDate,
+                    status: RouteToProfessionalStatusStatus.Holds,
+                    holdsFrom: command.QtsDate,
                     trainingStartDate: null,
                     trainingEndDate: null,
                     trainingSubjectIds: null,
@@ -78,7 +78,7 @@ public class SetQtlsHandler(
             {
                 existingQualification.Update(
                     allRouteTypes: await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false),
-                    ps => ps.AwardedDate = command.QtsDate,
+                    ps => ps.HoldsFrom = command.QtsDate,
                     changeReason: null,
                     changeReasonDetail: null,
                     evidenceFile: null,

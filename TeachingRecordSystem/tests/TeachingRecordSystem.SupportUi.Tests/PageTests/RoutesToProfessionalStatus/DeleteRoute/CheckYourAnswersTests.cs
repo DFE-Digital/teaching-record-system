@@ -88,7 +88,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = Clock.Today.AddDays(-1);
-        var awardedDate = endDate.AddDays(1);
+        var holdsFrom = endDate.AddDays(1);
         var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
         var status = TestDataHelper.GetRouteStatusWhereAllFieldsApply();
         var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
@@ -101,7 +101,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
-                .WithAwardedDate(awardedDate)
+                .WithHoldsFrom(holdsFrom)
                 .WithTrainingProviderId(trainingProvider.TrainingProviderId)
                 .WithTrainingCountryId(country.CountryId)
                 .WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray())
@@ -135,7 +135,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Status", status.GetTitle());
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Award date", awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Award date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
@@ -238,19 +238,19 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
-    public async Task Post_Confirm_WithAwardedQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
+    public async Task Post_Confirm_WithHoldsQtsRouteTypeUpdatesPersonQtsDateAndHasChangesInEvent()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .RandomOne();
-        var status = RouteToProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var qtsDate = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p
             .WithQts(qtsDate)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(qtsDate)));
+                .WithHoldsFrom(qtsDate)));
         EventPublisher.Clear();
 
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
@@ -294,27 +294,27 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
-    public async Task Post_Confirm_WithAwardedQtsRouteType_UpdatesPersonQtsDateWithOlderRouteDateAndHasChangesInEvent()
+    public async Task Post_Confirm_WithHoldsQtsRouteType_UpdatesPersonQtsDateWithOlderRouteDateAndHasChangesInEvent()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .RandomOne();
-        var awardedDateEarliest = Clock.Today.AddYears(-1);
-        var awardedDateLatest = awardedDateEarliest.AddMonths(1);
+        var holdsFromEarliest = Clock.Today.AddYears(-1);
+        var holdsFromLatest = holdsFromEarliest.AddMonths(1);
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts(awardedDateEarliest)
+            .WithQts(holdsFromEarliest)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDateEarliest))
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFromEarliest))
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDateLatest)));
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFromLatest)));
         EventPublisher.Clear();
 
-        var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.AwardedDate == awardedDateEarliest).QualificationId;
-        var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.AwardedDate == awardedDateLatest).QualificationId;
+        var qualificationIdEarliestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromEarliest).QualificationId;
+        var qualificationIdLatestDate = person.ProfessionalStatuses.Single(p => p.HoldsFrom == holdsFromLatest).QualificationId;
         var deleteRouteState = new DeleteRouteState()
         {
             ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
@@ -335,15 +335,15 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         var updatedPerson = await WithDbContext(dbContext => dbContext.Persons.SingleAsync(p => p.PersonId == person.PersonId));
-        Assert.Equal(awardedDateLatest, updatedPerson.QtsDate);
+        Assert.Equal(holdsFromLatest, updatedPerson.QtsDate);
 
         EventPublisher.AssertEventsSaved(e =>
         {
             var deletedEvent = Assert.IsType<RouteToProfessionalStatusDeletedEvent>(e);
             Assert.Equal(Clock.UtcNow, deletedEvent.CreatedUtc);
             Assert.Equal(person.PersonId, deletedEvent.PersonId);
-            Assert.Equal(awardedDateEarliest, deletedEvent.OldPersonAttributes.QtsDate);
-            Assert.Equal(awardedDateLatest, deletedEvent.PersonAttributes.QtsDate);
+            Assert.Equal(holdsFromEarliest, deletedEvent.OldPersonAttributes.QtsDate);
+            Assert.Equal(holdsFromLatest, deletedEvent.PersonAttributes.QtsDate);
             Assert.Equal(RouteToProfessionalStatusDeletedEventChanges.PersonQtsDate, deletedEvent.Changes);
         });
 

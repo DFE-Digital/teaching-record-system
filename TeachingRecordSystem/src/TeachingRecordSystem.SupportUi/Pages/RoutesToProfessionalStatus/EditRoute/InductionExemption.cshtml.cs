@@ -7,7 +7,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
 {
     public string? PersonName { get; set; }
@@ -45,7 +45,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
             {
                 s.Status = s.EditStatusState!.Status;
                 s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
-                s.AwardedDate = s.EditStatusState.AwardedDate;
+                s.HoldsFrom = s.EditStatusState.HoldsFrom;
                 s.IsExemptFromInduction = IsExemptFromInduction;
                 s.EditStatusState = null;
             });
@@ -85,6 +85,6 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
     public string BackLink => FromCheckAnswers ?
         linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
         JourneyInstance!.State.IsCompletingRoute ?
-            linkGenerator.RouteEditAwardDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 }

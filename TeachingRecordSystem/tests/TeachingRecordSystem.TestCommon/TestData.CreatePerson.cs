@@ -148,7 +148,7 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithAwardedRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
+        public CreatePersonBuilder WithHoldsRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
         {
             EnsureTrn();
             _awardedProfessionalStatuses.Add(professionalStatusType);
@@ -244,10 +244,10 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithQtls(DateOnly awardedDate) =>
+        public CreatePersonBuilder WithQtls(DateOnly holdsFrom) =>
             WithRouteToProfessionalStatus(p => p
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFrom)
                 .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
         public CreatePersonBuilder WithTrnRequest(
@@ -579,8 +579,7 @@ public partial class TestData
 
                 person = await dbContext.Persons
                     .Include(p => p.Alerts!)
-                    .ThenInclude(a => a.AlertType)
-                    .ThenInclude(at => at!.AlertCategory)
+                    .AsSplitQuery()
                     .Include(p => p.PreviousNames)
                     .AsSplitQuery()
                     .SingleAsync(p => p.PersonId == contact.Id);
@@ -588,12 +587,9 @@ public partial class TestData
                 // Can't include this above https://github.com/dotnet/efcore/issues/7623
                 var personMqs = await dbContext.MandatoryQualifications
                     .Where(q => q.PersonId == PersonId)
-                    .Include(q => q.Provider)
-                    .Where(p => p.PersonId == contact.Id)
                     .ToArrayAsync();
 
                 var personProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
-                    .Include(r => r.RouteToProfessionalStatusType)
                     .Where(p => p.PersonId == PersonId)
                     .ToArrayAsync();
 
@@ -653,7 +649,7 @@ public partial class TestData
                                 person,
                                 allRoutes,
                                 route.RouteToProfessionalStatusTypeId,
-                                RouteToProfessionalStatusStatus.Awarded,
+                                RouteToProfessionalStatusStatus.Holds,
                                 testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
                                 route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
                                 route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,

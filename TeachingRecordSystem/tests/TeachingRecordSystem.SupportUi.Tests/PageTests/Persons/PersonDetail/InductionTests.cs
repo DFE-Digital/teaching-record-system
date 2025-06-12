@@ -65,7 +65,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Get_ForPersonWithRouteInductionExemption_RoutesFeatureFlagOn_DisplaysExpectedRowContent(Guid routeId, bool hasExemption)
     {
         // Arrange
-        var awardedDate = Clock.Today;
+        var holdsFromDate = Clock.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.RouteToProfessionalStatusTypeId == routeId)
             .Single();
@@ -74,8 +74,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithInductionStatus(InductionStatus.Exempt)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFromDate)
                 .WithInductionExemption(hasExemption)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
@@ -103,7 +103,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
-        var awardedDate = Clock.Today;
+        var holdsFromDate = Clock.Today;
         var routeWithExemption = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.ScotlandRId)
             .Single();
@@ -112,8 +112,8 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
             .WithInductionStatus(InductionStatus.Exempt)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(routeWithExemption.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFromDate)
                 .WithInductionExemption(true)));
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");

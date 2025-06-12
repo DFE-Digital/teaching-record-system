@@ -23,8 +23,6 @@ public class AlertsModel(TrsDbContext dbContext, ReferenceDataCache referenceDat
     public async Task OnGetAsync()
     {
         var alerts = await dbContext.Alerts
-            .Include(a => a.AlertType)
-            .ThenInclude(at => at!.AlertCategory)
             .Where(a => a.PersonId == PersonId)
             .ToArrayAsync();
 

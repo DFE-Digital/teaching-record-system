@@ -4,7 +4,7 @@ public record RouteToProfessionalStatus
 {
     public required Guid RouteToProfessionalStatusTypeId { get; init; }
     public required RouteToProfessionalStatusStatus Status { get; init; }
-    public required DateOnly? AwardedDate { get; init; }
+    public required DateOnly? HoldsFrom { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
     public required DateOnly? TrainingEndDate { get; init; }
     public required Guid[] TrainingSubjectIds { get; init; }
@@ -21,7 +21,7 @@ public record RouteToProfessionalStatus
     {
         RouteToProfessionalStatusTypeId = model.RouteToProfessionalStatusTypeId,
         Status = model.Status,
-        AwardedDate = model.AwardedDate,
+        HoldsFrom = model.HoldsFrom,
         TrainingStartDate = model.TrainingStartDate,
         TrainingEndDate = model.TrainingEndDate,
         TrainingSubjectIds = model.TrainingSubjectIds,

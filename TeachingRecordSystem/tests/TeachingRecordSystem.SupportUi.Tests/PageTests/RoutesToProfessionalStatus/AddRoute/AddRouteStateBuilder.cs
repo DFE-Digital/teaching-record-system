@@ -6,7 +6,7 @@ public class AddRouteStateBuilder()
 {
     private Guid? _routeToProfessionalStatusId;
     private RouteToProfessionalStatusStatus? _status;
-    private DateOnly? _awardedDate;
+    private DateOnly? _holdsFrom;
     private DateOnly? _trainingStartDate;
     private DateOnly? _trainingEndDate;
     private Guid[] _trainingSubjectIds = [];
@@ -22,7 +22,7 @@ public class AddRouteStateBuilder()
     {
         _status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable
-                && s.AwardDateRequired != FieldRequirement.NotApplicable
+                && s.HoldsFromRequired != FieldRequirement.NotApplicable
                 && s.TrainingCountryRequired != FieldRequirement.NotApplicable
                 && s.DegreeTypeRequired != FieldRequirement.NotApplicable
                 && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
@@ -35,12 +35,12 @@ public class AddRouteStateBuilder()
         return this;
     }
 
-    public AddRouteStateBuilder WithAwardedStatusFields(IClock clock)
+    public AddRouteStateBuilder WithHoldsStatusFields(IClock clock)
     {
         _trainingStartDate = clock.Today.AddYears(-1);
         _trainingEndDate = clock.Today.AddDays(-1);
-        _awardedDate = clock.Today;
-        _status = RouteToProfessionalStatusStatus.Awarded;
+        _holdsFrom = clock.Today;
+        _status = RouteToProfessionalStatusStatus.Holds;
         return this;
     }
 
@@ -56,9 +56,9 @@ public class AddRouteStateBuilder()
         return this;
     }
 
-    public AddRouteStateBuilder WithAwardedDate(DateOnly awardedDate)
+    public AddRouteStateBuilder WithHoldsFrom(DateOnly holdsFrom)
     {
-        _awardedDate = awardedDate;
+        _holdsFrom = holdsFrom;
         return this;
     }
 
@@ -129,7 +129,7 @@ public class AddRouteStateBuilder()
             Initialized = true,
             RouteToProfessionalStatusId = _routeToProfessionalStatusId,
             Status = _status,
-            AwardedDate = _awardedDate,
+            HoldsFrom = _holdsFrom,
             TrainingStartDate = _trainingStartDate,
             TrainingEndDate = _trainingEndDate,
             TrainingSubjectIds = _trainingSubjectIds,

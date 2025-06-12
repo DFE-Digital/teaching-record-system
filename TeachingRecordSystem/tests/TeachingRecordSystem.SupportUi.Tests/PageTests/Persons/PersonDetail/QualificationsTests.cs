@@ -110,7 +110,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var status = RouteToProfessionalStatusStatus.InTraining;
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
-        DateOnly awardedDate = new DateOnly(2024, 01, 01);
+        DateOnly holdsFrom = new DateOnly(2024, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var ageRange = TrainingAgeSpecialismType.KeyStage3;
         var person = await TestData.CreatePersonAsync(p => p
@@ -125,7 +125,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 r.WithTrainingCountryId(country.CountryId);
                 r.WithTrainingAgeSpecialismType(ageRange);
                 r.WithDegreeTypeId(degreeType.DegreeTypeId);
-                r.WithAwardedDate(awardedDate);
+                r.WithHoldsFrom(holdsFrom);
             })
         );
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
@@ -144,7 +144,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Equal(route.Name, professionalStatus.GetElementByTestId($"training-route-{qualificationid}")!.TrimmedText());
         Assert.Equal(startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"training-start-date-{qualificationid}")!.TrimmedText());
         Assert.Equal(endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"training-end-date-{qualificationid}")!.TrimmedText());
-        Assert.Equal(awardedDate.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TrimmedText());
+        Assert.Equal(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TrimmedText());
         Assert.Equal(trainingProvider.Name, professionalStatus.GetElementByTestId($"training-provider-{qualificationid}")!.TrimmedText());
         Assert.Contains(degreeType.Name, professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TrimmedText());
         Assert.Equal(country.Name, professionalStatus.GetElementByTestId($"training-country-{qualificationid}")!.TrimmedText());
@@ -153,8 +153,6 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
     }
 
     [Theory]
-    [InlineData(RouteToProfessionalStatusStatus.Approved, false, "No")]
-    [InlineData(RouteToProfessionalStatusStatus.Approved, true, "Yes")]
     [InlineData(RouteToProfessionalStatusStatus.InTraining, null, "Not provided")]
     public async Task Get_PersonWithRouteToProfessionalStatus_RouteAllowsInductionExemption_DisplaysExpectedContent(RouteToProfessionalStatusStatus status, bool? isExempt, string expectedContent)
     {
@@ -162,7 +160,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
         DateOnly? startDate = new DateOnly(2022, 01, 01);
         DateOnly? endDate = new DateOnly(2023, 01, 01);
-        DateOnly awardedDate = new DateOnly(2024, 01, 01);
+        DateOnly holdsFrom = new DateOnly(2024, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r =>
@@ -171,7 +169,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
                 r.WithStatus(status);
                 r.WithTrainingStartDate(startDate.Value);
                 r.WithTrainingEndDate(endDate.Value);
-                r.WithAwardedDate(awardedDate);
+                r.WithHoldsFrom(holdsFrom);
                 r.WithInductionExemption(isExempt);
             })
         );

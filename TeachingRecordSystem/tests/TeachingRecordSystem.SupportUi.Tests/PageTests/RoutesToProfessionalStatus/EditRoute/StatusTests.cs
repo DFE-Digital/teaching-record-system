@@ -41,7 +41,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_StatusIsNotAwardedOrApprovedStatus_PersistsDataAndRedirectsToDetail()
+    public async Task Post_StatusIsNotHoldsStatus_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -81,13 +81,13 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_StatusMovesToAwarded_PersistsDataAndRedirectsToEndDate()
+    public async Task Post_StatusMovesToHolds_PersistsDataAndRedirectsToEndDate()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
-        var status = RouteToProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -123,24 +123,24 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_StatusMovesFromAwardedToAnotherStatus_RemovesAwardedDateAndExemptionFlag()
+    public async Task Post_StatusMovesFromHoldsToAnotherStatus_RemovesHoldsFromAndExemptionFlag()
     {
         // Arrange
-        var awardedDate = Clock.Today;
+        var holdsFrom = Clock.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
         var newStatus = RouteToProfessionalStatusStatus.UnderAssessment;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-                .WithAwardedDate(awardedDate)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFrom)
                 .WithInductionExemption(true)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(RouteToProfessionalStatusStatus.Awarded)
-            .WithAwardedDate(awardedDate)
+            .WithStatus(RouteToProfessionalStatusStatus.Holds)
+            .WithHoldsFrom(holdsFrom)
             .WithInductionExemption(true)
             .Build();
 
@@ -163,12 +163,12 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(newStatus, journeyInstance.State.Status);
-        Assert.Null(journeyInstance.State.AwardedDate);
+        Assert.Null(journeyInstance.State.HoldsFrom);
         Assert.Null(journeyInstance.State.IsExemptFromInduction);
     }
 
     [Fact]
-    public async Task Post_StatusMovesToAwarded_RouteHasImplictExemption_ExemptionSetToTrue()
+    public async Task Post_StatusMovesToHolds_RouteHasImplicitExemption_ExemptionSetToTrue()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -183,7 +183,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         var exemptionReasons = await ReferenceDataCache.GetInductionExemptionReasonsAsync();
 
-        var status = RouteToProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
@@ -219,23 +219,23 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_StatusStaysAwarded_PersistsDataAndRedirectsToDetail()
+    public async Task Post_StatusStaysHolds_PersistsDataAndRedirectsToDetail()
     {
         // Arrange
         var awardDate = Clock.Today;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .RandomOne();
-        var status = RouteToProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
-                .WithAwardedDate(awardDate)));
+                .WithHoldsFrom(awardDate)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
-            .WithAwardedDate(awardDate)
+            .WithHoldsFrom(awardDate)
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -247,7 +247,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(StatusModel.Status), RouteToProfessionalStatusStatus.Approved }
+                { nameof(StatusModel.Status), RouteToProfessionalStatusStatus.Holds }
             }
         };
 
@@ -256,7 +256,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(RouteToProfessionalStatusStatus.Approved, journeyInstance.State.Status);
+        Assert.Equal(RouteToProfessionalStatusStatus.Holds, journeyInstance.State.Status);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }

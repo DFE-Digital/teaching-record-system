@@ -16,7 +16,7 @@ public enum RouteToProfessionalStatusStatus
         subjects: FieldRequirement.Optional)]
     InTraining = 0,
 
-    [ProfessionalStatusStatusInfo("Awarded",
+    [ProfessionalStatusStatusInfo("Holds",
         startDate: FieldRequirement.Mandatory,
         endDate: FieldRequirement.Mandatory,
         awardDate: FieldRequirement.Mandatory,
@@ -26,7 +26,7 @@ public enum RouteToProfessionalStatusStatus
         country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
-    Awarded = 1,
+    Holds = 1,
 
     [ProfessionalStatusStatusInfo("Deferred",
         startDate: FieldRequirement.NotApplicable,
@@ -86,19 +86,7 @@ public enum RouteToProfessionalStatusStatus
         country: FieldRequirement.Mandatory,
         ageRange: FieldRequirement.Optional,
         subjects: FieldRequirement.Optional)]
-    UnderAssessment = 6,
-
-    [ProfessionalStatusStatusInfo("Approved",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
-        awardDate: FieldRequirement.Mandatory,
-        inductionExemption: FieldRequirement.Mandatory,
-        trainingProvider: FieldRequirement.Optional,
-        degreeType: FieldRequirement.Optional,
-        country: FieldRequirement.Mandatory,
-        ageRange: FieldRequirement.Optional,
-        subjects: FieldRequirement.Optional)]
-    Approved = 7
+    UnderAssessment = 6
 }
 
 public static class ProfessionalStatusStatusRegistry
@@ -116,7 +104,7 @@ public static class ProfessionalStatusStatusRegistry
 
     public static FieldRequirement GetEndDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingEndDateRequired;
 
-    public static FieldRequirement GetAwardDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].AwardDateRequired;
+    public static FieldRequirement GetAwardDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].HoldsFromRequired;
 
     public static FieldRequirement GetInductionExemptionRequirement(this RouteToProfessionalStatusStatus status) => _info[status].InductionExemptionRequired;
 
@@ -148,7 +136,7 @@ public sealed record ProfessionalStatusStatusInfo(
     string Name,
     FieldRequirement TrainingStartDateRequired,
     FieldRequirement TrainingEndDateRequired,
-    FieldRequirement AwardDateRequired,
+    FieldRequirement HoldsFromRequired,
     FieldRequirement InductionExemptionRequired,
     FieldRequirement TrainingProviderRequired,
     FieldRequirement DegreeTypeRequired,

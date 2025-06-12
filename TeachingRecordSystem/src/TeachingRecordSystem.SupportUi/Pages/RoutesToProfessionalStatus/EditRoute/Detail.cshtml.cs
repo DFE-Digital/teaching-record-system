@@ -5,7 +5,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.EditRouteToProfessionalStatus), ActivatesJourney, RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class DetailModel(
     TrsLinkGenerator linkGenerator,
     ReferenceDataCache referenceDataCache) : PageModel
@@ -64,7 +64,7 @@ public class DetailModel(
         {
             RouteToProfessionalStatusType = route,
             Status = JourneyInstance!.State.Status,
-            AwardedDate = JourneyInstance!.State.AwardedDate,
+            HoldsFrom = JourneyInstance!.State.HoldsFrom,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
             TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
             TrainingSubjectIds = JourneyInstance!.State.TrainingSubjectIds,

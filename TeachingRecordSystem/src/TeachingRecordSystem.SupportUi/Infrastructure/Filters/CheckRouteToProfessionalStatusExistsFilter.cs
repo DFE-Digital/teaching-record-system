@@ -12,7 +12,7 @@ namespace TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 /// <para>Returns a <see cref="StatusCodes.Status404NotFound"/> response if no Professional status with the specified ID exists.</para>
 /// <para>Assigns the <see cref="CurrentProfessionalStatusFeature"/> and <see cref="CurrentPersonFeature"/> on success.</para>
 /// </remarks>
-public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyncResourceFilter
+public class CheckRouteToProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyncResourceFilter
 {
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
@@ -26,12 +26,7 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
         var request = dbContext.RouteToProfessionalStatuses
             .FromSql($"select * from qualifications where qualification_id = {qualificationId} for update") // https://github.com/dotnet/efcore/issues/26042
             .Include(ps => ps.Person)
-            .ThenInclude(p => p!.Qualifications)
-            .Include(ps => ps.TrainingProvider)
-            .Include(ps => ps.TrainingCountry)
-            .Include(ps => ps.RouteToProfessionalStatusType)
-            .ThenInclude(r => r!.InductionExemptionReason)
-            .Include(ps => ps.DegreeType);
+            .ThenInclude(p => p!.Qualifications);
 
         var currentProfessionalStatus = await request
             .SingleOrDefaultAsync();
@@ -49,10 +44,10 @@ public class CheckProfessionalStatusExistsFilter(TrsDbContext dbContext) : IAsyn
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class CheckProfessionalStatusExistsFilterFactory() : Attribute, IFilterFactory
+public class CheckRouteToProfessionalStatusExistsFilterFactory() : Attribute, IFilterFactory
 {
     public bool IsReusable => false;
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider) =>
-        ActivatorUtilities.CreateInstance<CheckProfessionalStatusExistsFilter>(serviceProvider);
+        ActivatorUtilities.CreateInstance<CheckRouteToProfessionalStatusExistsFilter>(serviceProvider);
 }

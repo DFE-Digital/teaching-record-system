@@ -3,7 +3,6 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
-
 public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Theory]
@@ -18,7 +17,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -57,7 +56,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_NotStatusAwardedJourney_TrainingEndDateIsEntered_SavesDateAndRedirectsToDetail()
+    public async Task Post_NotStatusHoldsJourney_TrainingEndDateIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
         var startDate = new DateOnly(2024, 01, 01);
@@ -67,8 +66,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory
-                && s.Value != RouteToProfessionalStatusStatus.Approved
-                && s.Value != RouteToProfessionalStatusStatus.Awarded)
+                && s.Value != RouteToProfessionalStatusStatus.Holds)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
@@ -107,12 +105,11 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
     }
 
-    [Theory]
-    [InlineData(RouteToProfessionalStatusStatus.Approved)]
-    [InlineData(RouteToProfessionalStatusStatus.Awarded)]
-    public async Task Post_StatusAwardedJourney_TrainingEndDateIsEntered_SavesDateAndRedirectsToAwardedDate(RouteToProfessionalStatusStatus status)
+    [Fact]
+    public async Task Post_StatusHoldsJourney_TrainingEndDateIsEntered_SavesDateAndRedirectsToHoldsFromDate()
     {
         // Arrange
+        var status = RouteToProfessionalStatusStatus.Holds;
         var startDate = new DateOnly(2024, 01, 01);
         var endDate = new DateOnly(2025, 01, 01);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -152,7 +149,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationid}/edit/award-date?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/route/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(endDate, journeyInstance.State.EditStatusState!.TrainingEndDate);
     }
@@ -167,7 +164,7 @@ public class EndDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.AwardDateRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p

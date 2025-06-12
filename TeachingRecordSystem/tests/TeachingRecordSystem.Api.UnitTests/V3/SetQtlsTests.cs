@@ -89,8 +89,8 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
 
             var route = await GetQtlsRoute(person.PersonId);
             Assert.NotNull(route);
-            Assert.Equal(qtlsDate, route.AwardedDate);
-            Assert.Equal(RouteToProfessionalStatusStatus.Awarded, route.Status);
+            Assert.Equal(qtlsDate, route.HoldsFrom);
+            Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
             Assert.Equal(Clock.UtcNow, route.CreatedOn);
 
             var qtlsStatus = await GetQtlsStatus(person.PersonId);
@@ -106,7 +106,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         });
 
     [Fact]
-    public Task HandleAsync_NonNullQtsDateAndExistingRouteAwardedDateMatches_DoesNotCreateEvent() =>
+    public Task HandleAsync_NonNullQtsDateAndExistingRouteHoldsFromMatches_DoesNotCreateEvent() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
             // Arrange
@@ -127,7 +127,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
         });
 
     [Fact]
-    public Task HandleAsync_NonNullQtsDateAndExistingRouteAwardedDateDoesNotMatch_UpdatesRoute() =>
+    public Task HandleAsync_NonNullQtsDateAndExistingRouteHoldFromDoesNotMatch_UpdatesRoute() =>
         WithHandler<SetQtlsHandler>(async handler =>
         {
             // Arrange
@@ -147,8 +147,8 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
 
             var route = await GetQtlsRoute(person.PersonId);
             Assert.NotNull(route);
-            Assert.Equal(newQtlsDate, route.AwardedDate);
-            Assert.Equal(RouteToProfessionalStatusStatus.Awarded, route.Status);
+            Assert.Equal(newQtlsDate, route.HoldsFrom);
+            Assert.Equal(RouteToProfessionalStatusStatus.Holds, route.Status);
             Assert.Equal(Clock.UtcNow, route.UpdatedOn);
 
             EventObserver.AssertEventsSaved(e =>
@@ -157,7 +157,7 @@ public partial class SetQtlsTests(OperationTestFixture operationTestFixture) : O
                 Assert.Equal(Clock.UtcNow, updatedEvent.CreatedUtc);
                 Assert.Equal(person.PersonId, updatedEvent.PersonId);
                 Assert.Equal(CurrentUserProvider.GetCurrentApplicationUser().UserId, updatedEvent.RaisedBy);
-                Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.AwardedDate));
+                Assert.True(updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.HoldsFrom));
             });
         });
 

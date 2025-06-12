@@ -8,7 +8,7 @@ namespace TeachingRecordSystem.Core.Infrastructure.Json;
 public static class Modifiers
 {
     /// <summary>
-    /// Only serialize Option<T> properties if they have a value.
+    /// Only serialize Option{T} properties if they have a value.
     /// </summary>
     public static void OptionProperties(JsonTypeInfo typeInfo)
     {
@@ -19,12 +19,12 @@ public static class Modifiers
 
         foreach (var property in typeInfo.Properties)
         {
-            var isOptionType = property.PropertyType?.IsGenericType == true &&
+            var isOptionType = property.PropertyType.IsGenericType &&
                 property.PropertyType.GetGenericTypeDefinition() == typeof(Option<>);
 
             if (isOptionType)
             {
-                var underlyingType = property.PropertyType!.GenericTypeArguments[0];
+                var underlyingType = property.PropertyType.GenericTypeArguments[0];
 
                 property.ShouldSerialize = CreateShouldSerializePredicate(property.PropertyType);
                 property.CustomConverter = (JsonConverter)Activator.CreateInstance(typeof(OptionJsonConverter<>).MakeGenericType(underlyingType))!;

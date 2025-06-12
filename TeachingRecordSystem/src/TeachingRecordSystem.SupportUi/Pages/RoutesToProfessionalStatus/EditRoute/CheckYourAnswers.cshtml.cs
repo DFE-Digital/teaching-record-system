@@ -9,7 +9,7 @@ using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckProfessionalStatusExistsFilterFactory()]
+[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class CheckYourAnswersModel(
     TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
@@ -56,7 +56,7 @@ public class CheckYourAnswersModel(
             {
                 r.Status = RouteDetail.Status;
                 r.RouteToProfessionalStatusTypeId = RouteDetail.RouteToProfessionalStatusType.RouteToProfessionalStatusTypeId;
-                r.AwardedDate = RouteDetail.AwardedDate;
+                r.HoldsFrom = RouteDetail.HoldsFrom;
                 r.TrainingStartDate = RouteDetail.TrainingStartDate;
                 r.TrainingEndDate = RouteDetail.TrainingEndDate;
                 r.TrainingSubjectIds = RouteDetail.TrainingSubjectIds ?? [];
@@ -122,7 +122,7 @@ public class CheckYourAnswersModel(
         {
             RouteToProfessionalStatusType = route,
             Status = JourneyInstance!.State.Status,
-            AwardedDate = JourneyInstance!.State.AwardedDate,
+            HoldsFrom = JourneyInstance!.State.HoldsFrom,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
             TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
             TrainingSubjectIds = JourneyInstance!.State.TrainingSubjectIds,
@@ -156,8 +156,8 @@ public class CheckYourAnswersModel(
                 && JourneyInstance!.State.TrainingEndDate is null) ? NotCompleteError.StartDate : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.TrainingEndDate is null) ? NotCompleteError.EndDate : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.AwardDateRequired, status.GetAwardDateRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.AwardedDate is null) ? NotCompleteError.AwardDate : NotCompleteError.None) |
+            ((QuestionDriverHelper.FieldRequired(route.HoldsFromRequired, status.GetAwardDateRequirement()) == FieldRequirement.Mandatory
+                && JourneyInstance!.State.HoldsFrom is null) ? NotCompleteError.AwardDate : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.DegreeTypeRequired, status.GetDegreeTypeRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.DegreeTypeId is null) ? NotCompleteError.DegreeType : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.TrainingAgeSpecialismTypeRequired, status.GetAgeSpecialismRequirement()) == FieldRequirement.Mandatory

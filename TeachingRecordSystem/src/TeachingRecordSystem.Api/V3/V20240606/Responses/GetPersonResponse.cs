@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using AutoMapper.Configuration.Annotations;
 using Optional;
-using TeachingRecordSystem.Api.Infrastructure.Mapping;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos;
 
@@ -79,22 +78,14 @@ public record GetPersonResponseInductionPeriodAppropriateBody
 [AutoMap(typeof(GetPersonResultInitialTeacherTraining))]
 public record GetPersonResponseInitialTeacherTraining
 {
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingQualification, GetPersonResponseInitialTeacherTrainingQualification>))]
     public required GetPersonResponseInitialTeacherTrainingQualification? Qualification { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<DateOnly?>))]
     public required DateOnly? StartDate { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<DateOnly?>))]
     public required DateOnly? EndDate { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<TeachingRecordSystem.Api.V3.Implementation.Dtos.IttProgrammeType?, IttProgrammeType?>))]
     public required IttProgrammeType? ProgrammeType { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<string?>))]
     public required string? ProgrammeTypeDescription { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<TeachingRecordSystem.Api.V3.Implementation.Dtos.IttOutcome?, IttOutcome?>))]
     public required IttOutcome? Result { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<GetPersonResultInitialTeacherTrainingAgeRange, GetPersonResponseInitialTeacherTrainingAgeRange>))]
     public required GetPersonResponseInitialTeacherTrainingAgeRange? AgeRange { get; init; }
     public required GetPersonResponseInitialTeacherTrainingProvider? Provider { get; init; }
-    [ValueConverter(typeof(UnwrapFromOptionValueConverter<IReadOnlyCollection<GetPersonResultInitialTeacherTrainingSubject>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject>>))]
     public required IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingSubject> Subjects { get; init; }
 }
 
@@ -124,7 +115,6 @@ public record GetPersonResponseInitialTeacherTrainingSubject
     public required string Name { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultNpqQualification))]
 public record GetPersonResponseNpqQualification
 {
     public required DateOnly Awarded { get; init; }
@@ -132,7 +122,6 @@ public record GetPersonResponseNpqQualification
     public required string CertificateUrl { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultNpqQualificationType))]
 public record GetPersonResponseNpqQualificationType
 {
     public required NpqQualificationType Code { get; init; }
@@ -146,7 +135,6 @@ public record GetPersonResponseMandatoryQualification
     public required string Specialism { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultHigherEducationQualification))]
 public record GetPersonResponseHigherEducationQualification
 {
     public required string? Name { get; init; }
@@ -154,7 +142,6 @@ public record GetPersonResponseHigherEducationQualification
     public required IReadOnlyCollection<GetPersonResponseHigherEducationQualificationSubject> Subjects { get; init; }
 }
 
-[AutoMap(typeof(GetPersonResultHigherEducationQualificationSubject))]
 public record GetPersonResponseHigherEducationQualificationSubject
 {
     public required string Code { get; init; }

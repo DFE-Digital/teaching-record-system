@@ -25,7 +25,7 @@ public class RouteToProfessionalStatusType
     public required bool IsActive { get; set; }
     public required FieldRequirement TrainingStartDateRequired { get; init; }
     public required FieldRequirement TrainingEndDateRequired { get; init; }
-    public required FieldRequirement AwardDateRequired { get; init; }
+    public required FieldRequirement HoldsFromRequired { get; init; }
     public required FieldRequirement InductionExemptionRequired { get; init; }
     public required FieldRequirement TrainingProviderRequired { get; init; }
     public required FieldRequirement DegreeTypeRequired { get; init; }

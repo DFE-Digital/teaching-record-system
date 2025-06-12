@@ -4192,13 +4192,13 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("route_to_professional_status_type_id");
 
-                    b.Property<int>("AwardDateRequired")
-                        .HasColumnType("integer")
-                        .HasColumnName("award_date_required");
-
                     b.Property<int>("DegreeTypeRequired")
                         .HasColumnType("integer")
                         .HasColumnName("degree_type_required");
+
+                    b.Property<int>("HoldsFromRequired")
+                        .HasColumnType("integer")
+                        .HasColumnName("holds_from_required");
 
                     b.Property<Guid?>("InductionExemptionReasonId")
                         .HasColumnType("uuid")
@@ -4257,8 +4257,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("6f27bdeb-d00a-4ef9-b0ea-26498ce64713"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionReasonId = new Guid("4c97e211-10d2-4c63-8da9-b0fcebe7f2f9"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
@@ -4274,8 +4274,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("6987240e-966e-485f-b300-23b54937fb3a"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Apprenticeship",
@@ -4290,8 +4290,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("57b86cef-98e2-4962-a74a-d47c7a34b838"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Assessment Only Route",
@@ -4306,8 +4306,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("4b6fc697-be67-43d3-9021-cc662c4a559f"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Authorised Teacher Programme",
@@ -4322,8 +4322,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("4163c2fb-6163-409f-85fd-56e7c70a54dd"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Core - Core Programme Type",
@@ -4338,8 +4338,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("4bd7a9f0-28ca-4977-a044-a7b7828d469b"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Core Flexible",
@@ -4354,8 +4354,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("5748d41d-7b53-4ee6-833a-83080a3bd8ef"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "CTC or CCTA",
@@ -4370,8 +4370,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("d9eef3f8-fde6-4a3f-a361-f6655a42fa1e"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Assessment Only",
@@ -4386,8 +4386,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("4477e45d-c531-4c63-9f4b-e157766366fb"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Graduate Employment Based",
@@ -4402,8 +4402,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("dbc4125b-9235-41e4-abd2-baabbf63f829"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Graduate Entry",
@@ -4418,8 +4418,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("7f09002c-5dad-4839-9693-5e030d037ae9"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT School Direct",
@@ -4434,8 +4434,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("c97c0fd2-fd84-4949-97c7-b0e2422fb3c8"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Early Years ITT Undergraduate",
@@ -4450,8 +4450,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("f4da123b-5c37-4060-ab00-52de4bd3599e"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "EC directive",
@@ -4466,8 +4466,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("2b106b9d-ba39-4e2d-a42e-0ce827fdc324"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "European Recognition",
@@ -4482,8 +4482,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("ec95c276-25d9-491f-99a2-8d92f10e1e94"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "European Recognition - PQTS",
@@ -4498,8 +4498,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("8f5c0431-d006-4eda-9336-16dfc6a26a78"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "EYPS",
@@ -4514,8 +4514,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("eba0b7ae-cbce-44d5-a56f-988d69b03001"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "EYPS ITT Migrated",
@@ -4530,8 +4530,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("5b7d1c4e-fb2b-479c-bdee-5818daaa8a07"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "EYTS ITT Migrated",
@@ -4546,8 +4546,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("45c93b5b-b4dc-4d0f-b0de-d612521e0a13"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "FE Recognition 2000-2004",
@@ -4562,8 +4562,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("700ec96f-6bbf-4080-87bd-94ef65a6a879"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Flexible ITT",
@@ -4578,8 +4578,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("f85962c9-cf0c-415d-9de5-a397f95ae261"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Future Teaching Scholars",
@@ -4594,8 +4594,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("a6431d4b-e4cd-4e59-886b-358221237e75"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Graduate non-trained",
@@ -4610,8 +4610,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("34222549-ed59-4c4a-811d-c0894e78d4c3"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "Graduate Teacher Programme",
@@ -4626,8 +4626,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("10078157-e8c3-42f7-a050-d8b802e83f7b"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "HEI - HEI Programme Type",
@@ -4642,8 +4642,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("32017d68-9da4-43b2-ae91-4f24c68f6f78"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "HEI - Historic",
@@ -4658,8 +4658,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("bfef20b2-5ac4-486d-9493-e5a4538e1be9"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "High Potential ITT",
@@ -4674,8 +4674,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("d0b60864-ab1c-4d49-a5c2-ff4bd9872ee1"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "International Qualified Teacher Status",
@@ -4690,8 +4690,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("4514ec65-20b0-4465-b66f-4718963c5b80"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Legacy ITT",
@@ -4706,8 +4706,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("c80cb763-0d61-4cf1-a749-37c1d0ab85f8"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Legacy Migration",
@@ -4722,8 +4722,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("2b4862ca-bd30-4a3a-bfce-52b57c2946c7"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Licensed Teacher Programme",
@@ -4738,8 +4738,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("fc16290c-ac1e-4830-b7e9-35708f1bded3"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Licensed Teacher Programme - Armed Forces",
@@ -4754,8 +4754,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("d5eb09cc-c64f-45df-a46d-08277a25de7a"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Licensed Teacher Programme - FE",
@@ -4770,8 +4770,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("64c28594-4b63-42b3-8b47-e3f140879e66"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Licensed Teacher Programme - Independent School",
@@ -4786,8 +4786,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("e5c198fa-35f0-4a13-9d07-8b0239b4957a"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Licensed Teacher Programme - Maintained School",
@@ -4802,8 +4802,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("779bd3c6-6b3a-4204-9489-1bbb381b52bf"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Licensed Teacher Programme - OTT",
@@ -4818,8 +4818,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("aa1efd16-d59c-4e18-a496-16e39609b389"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Long Service",
@@ -4834,8 +4834,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("3604ef30-8f11-4494-8b52-a2f9c5371e03"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionReasonId = new Guid("3471ab35-e6e4-4fa9-a72b-b8bd113df591"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
@@ -4851,8 +4851,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("88867b43-897b-49b5-97cc-f4f81a1d5d44"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "Other Qualifications non ITT",
@@ -4867,8 +4867,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("51756384-cfea-4f63-80e5-f193686e0f71"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "Overseas Trained Teacher Programme",
@@ -4883,8 +4883,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("ce61056e-e681-471e-af48-5ffbf2653500"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 0,
                             IsActive = true,
                             Name = "Overseas Trained Teacher Recognition",
@@ -4899,8 +4899,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("f5390be5-8336-4951-b97b-5b45d00b7a76"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "PGATC ITT",
@@ -4915,8 +4915,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("1c626be0-5a64-47ec-8349-75008f52bc2c"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "PGATD ITT",
@@ -4931,8 +4931,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("02a2135c-ac34-4481-a293-8a00aab7ee69"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "PGCE ITT",
@@ -4947,8 +4947,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("7721655f-165f-4737-97d4-17fc6991c18c"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "PGDE ITT",
@@ -4963,14 +4963,14 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("ef46ff51-8dc0-481e-b158-61ccea9943d9"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Primary and secondary postgraduate fee funded",
                             ProfessionalStatusType = 0,
                             TrainingAgeSpecialismTypeRequired = 0,
-                            TrainingCountryRequired = 2,
+                            TrainingCountryRequired = 1,
                             TrainingEndDateRequired = 1,
                             TrainingProviderRequired = 1,
                             TrainingStartDateRequired = 1,
@@ -4979,8 +4979,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("321d5f9a-9581-4936-9f63-cfddd2a95fe2"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Primary and secondary undergraduate fee funded",
@@ -4995,8 +4995,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("002f7c96-f6ae-4e67-8f8b-d2f1c1317273"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "ProfGCE ITT",
@@ -5011,8 +5011,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("9a6f368f-06e7-4a74-b269-6886c48a49da"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "ProfGDE ITT",
@@ -5027,8 +5027,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("97497716-5ac5-49aa-a444-27fa3e2c152a"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Provider led Postgrad",
@@ -5043,8 +5043,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("53a7fbda-25fd-4482-9881-5cf65053888d"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Provider led Undergrad",
@@ -5059,8 +5059,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("be6eaf8c-92dd-4eff-aad3-1c89c4bec18c"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionReasonId = new Guid("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
@@ -5076,8 +5076,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("70368ff2-8d2b-467e-ad23-efe7f79995d7"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Registered Teacher Programme",
@@ -5092,8 +5092,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("abcb0a14-0c21-4598-a42c-a007d4b048ac"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "School Centered ITT",
@@ -5108,8 +5108,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("d9490e58-acdc-4a38-b13e-5a5c21417737"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "School Direct Training Programme",
@@ -5124,8 +5124,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("12a742c3-1cd4-43b7-a2fa-1000bd4cc373"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "School Direct Training Programme Salaried",
@@ -5140,8 +5140,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("97e1811b-d46c-483e-aec3-4a2dd51a55fe"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "School Direct Training Programme Self Funded",
@@ -5156,8 +5156,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("52835b1f-1f2e-4665-abc6-7fb1ef0a80bb"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionReasonId = new Guid("a112e691-1694-46a7-8f33-5ec5b845c181"),
                             InductionExemptionRequired = 1,
                             IsActive = true,
@@ -5173,8 +5173,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("bed14b00-5d08-4580-83b5-86d71a4f1a24"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "TC ITT",
@@ -5189,8 +5189,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("82aa14d3-ef6a-4b46-a10c-dc850ddcef5f"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "TCMH",
@@ -5205,8 +5205,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("5b7f5e90-1ca6-4529-baa0-dfba68e698b8"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Teach First Programme",
@@ -5221,8 +5221,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("50d18f17-ee26-4dad-86ca-1aae3f956bfc"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Troops to Teach",
@@ -5237,8 +5237,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("7c04865f-fa39-458a-bc39-07dd46b88154"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 0,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "UGMT ITT",
@@ -5253,8 +5253,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("20f67e38-f117-4b42-bbfc-5812aa717b94"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 1,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Undergraduate Opt In",
@@ -5269,8 +5269,8 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         new
                         {
                             RouteToProfessionalStatusTypeId = new Guid("877ba701-fe26-4951-9f15-171f3755d50d"),
-                            AwardDateRequired = 1,
                             DegreeTypeRequired = 2,
+                            HoldsFromRequired = 1,
                             InductionExemptionRequired = 2,
                             IsActive = true,
                             Name = "Welsh R",
@@ -17143,10 +17143,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                 {
                     b.HasBaseType("TeachingRecordSystem.Core.DataStore.Postgres.Models.Qualification");
 
-                    b.Property<DateOnly?>("AwardedDate")
-                        .HasColumnType("date")
-                        .HasColumnName("awarded_date");
-
                     b.Property<Guid?>("DegreeTypeId")
                         .HasColumnType("uuid")
                         .HasColumnName("degree_type_id");
@@ -17182,6 +17178,10 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Property<bool?>("ExemptFromInductionDueToQtsDate")
                         .HasColumnType("boolean")
                         .HasColumnName("exempt_from_induction_due_to_qts_date");
+
+                    b.Property<DateOnly?>("HoldsFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("holds_from");
 
                     b.Property<Guid>("RouteToProfessionalStatusTypeId")
                         .HasColumnType("uuid")

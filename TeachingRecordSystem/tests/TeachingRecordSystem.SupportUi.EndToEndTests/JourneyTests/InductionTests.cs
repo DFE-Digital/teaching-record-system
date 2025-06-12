@@ -497,7 +497,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task PersonHasRouteInductionExemption_Edit_NavigateBack()
     {
-        var awardedDate = new DateOnly(2024, 1, 1);
+        var holdsFromDate = new DateOnly(2024, 1, 1);
         var exemptionReasonId = InductionExemptionReason.PassedInductionInNorthernIrelandId;
         var routeType = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId == exemptionReasonId)
@@ -510,9 +510,9 @@ public class InductionTests : TestBase
                     .WithExemptionReasons(exemptionReasonId))
                 .WithRouteToProfessionalStatus(r => r
                     .WithRouteType(routeType.RouteToProfessionalStatusTypeId)
-                    .WithStatus(RouteToProfessionalStatusStatus.Approved)
+                    .WithStatus(RouteToProfessionalStatusStatus.Holds)
                     .WithInductionExemption(true)
-                    .WithAwardedDate(awardedDate))
+                    .WithHoldsFrom(holdsFromDate))
                 );
         var personId = person.ContactId;
 

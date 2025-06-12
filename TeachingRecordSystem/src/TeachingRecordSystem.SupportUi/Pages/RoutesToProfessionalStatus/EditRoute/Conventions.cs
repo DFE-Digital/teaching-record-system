@@ -11,7 +11,7 @@ public class Conventions : IConfigureFolderConventions
             this.GetFolderPathFromNamespace(),
             model =>
             {
-                model.Filters.Add(new CheckProfessionalStatusExistsFilterFactory());
+                model.Filters.Add(new CheckRouteToProfessionalStatusExistsFilterFactory());
             });
     }
 }

@@ -374,7 +374,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         await WithDbContext(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
-                .Include(q => q.Provider)
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
@@ -420,7 +419,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         await WithDbContext(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
-                .Include(q => q.Provider)
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
@@ -464,7 +462,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var migratedProvider = await WithDbContext(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
-                .Include(q => q.Provider)
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
@@ -518,7 +515,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var migratedSpecialism = await WithDbContext(async dbContext =>
         {
             var mq = await dbContext.MandatoryQualifications
-                .Include(q => q.Provider)
                 .Where(q => q.PersonId == person.PersonId)
                 .SingleAsync();
 
@@ -901,7 +897,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             }));
 
         var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(mq.ProviderId.HasValue);
@@ -923,7 +918,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .WithProvider(null)));
 
         var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(!mq.DqtMqEstablishmentId.HasValue);
@@ -943,7 +937,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .WithProvider(null)));
 
         var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(!mq.DqtMqEstablishmentId.HasValue);
@@ -961,7 +954,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
                 .WithDqtMqEstablishment(legacyProvider, mandatoryQualificationProviderId: null)));
 
         var mq = await WithDbContext(dbContext => dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
             .SingleAsync(q => q.QualificationId == person.MandatoryQualifications.Single().QualificationId));
 
         Debug.Assert(mq.DqtMqEstablishmentId.HasValue);
@@ -980,7 +972,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
         var now = Clock.UtcNow;
 
         var qualification = await dbContext.MandatoryQualifications
-            .Include(q => q.Provider)
             .SingleAsync(q => q.QualificationId == qualificationId);
 
         qualification.DeletedOn = now;
@@ -1034,7 +1025,6 @@ public class ChangeLogMandatoryQualificationEventsTests : TestBase
             var now = Clock.UtcNow;
 
             var qualification = await dbContext.MandatoryQualifications
-                .Include(q => q.Provider)
                 .SingleAsync(q => q.QualificationId == qualificationId);
 
             var oldMqEstablishment = qualification.DqtMqEstablishmentId is Guid oldMqEstablishmentId ?
