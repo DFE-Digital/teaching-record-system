@@ -146,7 +146,7 @@ public class ExemptionReasonModel(
             return;
         }
 
-        var exemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true);
+        var exemptionReasons = await referenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
 
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
@@ -166,7 +166,7 @@ public class ExemptionReasonModel(
                     RouteToProfessionalStatusName = r.RouteToProfessionalStatusType.Name
                 });
         }
-        if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any())
+        if (RoutesWithInductionExemptions is not null && RoutesWithInductionExemptions.Any()) // exclude some exemptions from the choices if they apply because of a route
         {
             var exemptionReasonIdsToExclude = ExemptionReasonCategories.ExemptionsToBeExcludedIfRouteQualificationIsHeld
                 .Join(RoutesWithInductionExemptions,
@@ -188,10 +188,10 @@ public class ExemptionReasonModel(
         {
             var exemptionReasonsToDisplay = ExemptionReasonCategories.ExemptionReasonIds
                 .Join(exemptionReasons,
-                    guid => guid,
-                    exemption => exemption.InductionExemptionReasonId,
-                    (guid, exemption) => exemption)
-                .ToArray();
+                        guid => guid,
+                        exemption => exemption.InductionExemptionReasonId,
+                        (guid, exemption) => exemption)
+                    .ToArray();
 
             ExemptionReasons = ExemptionReasonCategories.CreateFilteredDictionaryFromIds(exemptionReasonsToDisplay);
         }

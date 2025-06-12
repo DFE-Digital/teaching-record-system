@@ -29,11 +29,59 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
     }
 
     [Fact]
+    public async Task Get_ReferenceDataExemptionsValuesNotInExemptionReasonCategories_NotShown()
+    {
+        // Arrange
+        var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
+        var referenceDataExemptionReasons = await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true);
+
+        referenceDataExemptionReasons.ToList().Add(new()
+        {
+            InductionExemptionReasonId = new Guid(),
+            IsActive = true,
+            Name = "An exemption reason not allowed for in the page",
+            RouteImplicitExemption = false,
+            RouteOnlyExemption = false
+        });
+
+        var exemptionReasonsForDisplay = allGuidsToDisplay.Join(
+            referenceDataExemptionReasons,
+            guid => guid,
+            exemption => exemption.InductionExemptionReasonId,
+            (guid, exemption) => new { guid, exemption.Name })
+            .ToArray();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithQts()
+            .WithInductionStatus(i => i.
+                WithStatus(InductionStatus.Exempt)));
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            new EditInductionStateBuilder()
+                .WithInitializedState(InductionStatus.Exempt, InductionJourneyPage.Status)
+                .Build());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/edit-induction/exemption-reasons?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var exemptionReasonsElement = doc.QuerySelectorAll<IHtmlInputElement>("[type=checkbox]");
+        Assert.Equal(exemptionReasonsForDisplay.Length, exemptionReasonsElement.Count());
+        Assert.All(exemptionReasonsElement, checkbox =>
+        {
+            Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
+            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
+        });
+    }
+
+    [Fact]
     public async Task Get_ShowsExemptionReasonsList()
     {
         // Arrange
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay.Join(
             exemptionReasons,
@@ -75,7 +123,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(RouteToProfessionalStatusType.ApplyForQtsId);
         var holdsFromDate = Clock.Today;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
             .Join(exemptionReasons,
@@ -125,7 +173,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
         var holdsFromDate = Clock.Today;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
             .Where(guid => guid != route.InductionExemptionReason?.InductionExemptionReasonId) // exclude the awarded route exemption reason 
@@ -178,7 +226,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var allGuidsToDisplay = ExemptionReasonCategories.ExemptionReasonIds;
         var route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(routeId);
         var holdsFromDate = Clock.Today;
-        var exemptionReasons = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+        var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
             .Join(exemptionReasons,

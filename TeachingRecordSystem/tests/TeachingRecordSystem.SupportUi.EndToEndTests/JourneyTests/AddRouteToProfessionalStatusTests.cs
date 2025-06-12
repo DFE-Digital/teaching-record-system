@@ -211,6 +211,5 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
 
         await page.AssertOnRouteAddAgeRangeAsync();
         await page.ClickButtonAsync("Continue");
-
     }
 }
