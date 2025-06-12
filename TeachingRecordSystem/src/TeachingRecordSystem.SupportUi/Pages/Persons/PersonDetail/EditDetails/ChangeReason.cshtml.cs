@@ -27,7 +27,10 @@ public class ChangeReasonModel(
     public string? ChangeReasonDetail { get; set; }
 
     [BindProperty]
-    public UploadEvidenceViewModel? UploadEvidence { get; set; }
+    public UploadEvidenceViewModel? UploadEvidence1 { get; set; }
+
+    [BindProperty]
+    public UploadEvidenceViewModel? UploadEvidence2 { get; set; }
 
     public string BackLink =>
         GetPageLink(FromCheckAnswers ? EditDetailsJourneyPage.CheckAnswers : EditDetailsJourneyPage.Index);
@@ -39,7 +42,8 @@ public class ChangeReasonModel(
     {
         ChangeReason = JourneyInstance!.State.ChangeReason;
         ChangeReasonDetail = JourneyInstance.State.ChangeReasonDetail;
-        UploadEvidence = JourneyInstance.State.UploadEvidence;
+        UploadEvidence1 = JourneyInstance.State.UploadEvidence ?? new UploadEvidenceViewModel();
+        UploadEvidence2 = JourneyInstance.State.UploadEvidence ?? new UploadEvidenceViewModel();
 
         return Task.CompletedTask;
     }
@@ -51,6 +55,8 @@ public class ChangeReasonModel(
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter a reason");
         }
 
+        await UploadEvidence2!.ValidateAsync(nameof(UploadEvidence2), ModelState, FileService);
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -60,7 +66,7 @@ public class ChangeReasonModel(
         {
             state.ChangeReason = ChangeReason;
             state.ChangeReasonDetail = ChangeReason is EditDetailsChangeReasonOption.AnotherReason ? ChangeReasonDetail : null;
-            state.UploadEvidence = UploadEvidence;
+            state.UploadEvidence = UploadEvidence1;
         });
 
         return Redirect(GetPageLink(EditDetailsJourneyPage.CheckAnswers));

@@ -33,7 +33,39 @@
                 </govuk-radios-fieldset>
             </govuk-radios>
 
-            @await Component.InvokeAsync("UploadEvidence", new { model = Model.UploadEvidence, prefix = ViewData.TemplateInfo.GetFullHtmlFieldName("Model.UploadEvidence") })
+            <govuk-radios asp-for="UploadEvidence1!.UploadEvidence" data-testid="upload-evidence-options">
+                <govuk-radios-fieldset>
+                    <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />
+                    <govuk-radios-item value="@true">
+                        Yes
+                        <govuk-radios-item-conditional>
+                            @if (Model.UploadEvidence1!.EvidenceFileId is not null)
+                            {
+                                <span class="govuk-caption-m">Currently uploaded file</span>
+                                <p class="govuk-body">
+                                    <a href="@Model.UploadEvidence1!.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@($"{Model.UploadEvidence1!.EvidenceFileName} ({Model.UploadEvidence1!.EvidenceFileSizeDescription})")</a>
+                                </p>
+                                <input type="hidden" asp-for="UploadEvidence1!.EvidenceFileId" />
+                                <input type="hidden" asp-for="UploadEvidence1!.EvidenceFileName" />
+                                <input type="hidden" asp-for="UploadEvidence1!.EvidenceFileSizeDescription" />
+                                <input type="hidden" asp-for="UploadEvidence1!.UploadedEvidenceFileUrl" />
+                            }
+                            <govuk-file-upload asp-for="UploadEvidence1!.EvidenceFile" 
+                                                label-class="govuk-label--m"
+                                                input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
+                                <govuk-file-upload-label>Upload a file</govuk-file-upload-label>
+                                <govuk-file-upload-hint>Must be smaller than 50MB</govuk-file-upload-hint>
+                            </govuk-file-upload>
+                        </govuk-radios-item-conditional>
+                    </govuk-radios-item>
+                    <govuk-radios-item value="@false">
+                        No
+                    </govuk-radios-item>
+                </govuk-radios-fieldset>
+            </govuk-radios>
+
+
+            <vc:upload-evidence asp-for=UploadEvidence2 view-context=ViewContext />
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
