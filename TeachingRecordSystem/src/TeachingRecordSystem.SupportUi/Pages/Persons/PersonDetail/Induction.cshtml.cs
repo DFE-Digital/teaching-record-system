@@ -32,7 +32,7 @@ public class InductionModel(
 
     public DateOnly? CompletedDate { get; set; }
 
-    public Guid[]? PersonLevelExemptionReasonIds { get; set; }
+    public Guid[]? ExemptionReasonIdsHeldOnPerson { get; set; }
 
     public bool ShowStartDate => Status.RequiresStartDate();
 
@@ -73,11 +73,12 @@ public class InductionModel(
         Status = person.InductionStatus;
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
-        PersonLevelExemptionReasonIds = person.InductionExemptionReasonIds;
+        ExemptionReasonIdsHeldOnPerson = person.InductionExemptionReasonIds;
         ExemptionReasonNames = (await referenceDataCache
-            .GetInductionExemptionReasonsAsync())
-            .Where(i => PersonLevelExemptionReasonIds.Contains(i.InductionExemptionReasonId))
-            .Select(i => i.Name);
+            .GetPersonLevelInductionExemptionReasonsAsync())
+            .Where(i => ExemptionReasonIdsHeldOnPerson.Contains(i.InductionExemptionReasonId))
+            .Select(i => i.Name)
+            .OrderDescending();
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         HasQts = result!.Contact.dfeta_QTSDate is not null;
 

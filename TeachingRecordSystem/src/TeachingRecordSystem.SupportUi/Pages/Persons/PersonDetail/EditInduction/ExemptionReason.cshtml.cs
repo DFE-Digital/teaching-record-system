@@ -155,9 +155,8 @@ public class ExemptionReasonModel(
                 .ThenInclude(r => r!.InductionExemptionReason)
                 .Where(
                     p => p.PersonId == PersonId &&
-                    p.RouteToProfessionalStatusType != null &&
                     p.ExemptFromInduction == true &&
-                    p.RouteToProfessionalStatusType.InductionExemptionReason != null)
+                    p.RouteToProfessionalStatusType!.InductionExemptionReason != null)
                 .Select(r => new RouteWithExemption()
                 {
                     InductionExemptionReasonId = r.RouteToProfessionalStatusType!.InductionExemptionReasonId!.Value,

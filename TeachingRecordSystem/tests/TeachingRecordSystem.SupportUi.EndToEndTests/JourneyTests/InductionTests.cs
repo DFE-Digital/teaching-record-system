@@ -55,7 +55,7 @@ public class InductionTests : TestBase
     [Fact]
     public async Task EditInductionStatus_InductionStatusExempt()
     {
-        var exemptionReasonId = (await TestData.ReferenceDataCache.GetInductionExemptionReasonByIdAsync(InductionExemptionReason.ExemptId)).InductionExemptionReasonId;
+        var exemptionReasonId = InductionExemptionReason.ExemptId;
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithQts()

@@ -4,12 +4,12 @@ namespace TeachingRecordSystem.Core.Models;
 
 public enum ProfessionalStatusType
 {
-    [Display(Name = "Qualified Teacher Status")]
+    [Display(Name = "Qualified teacher status")]
     QualifiedTeacherStatus = 0,
-    [Display(Name = "Early Years Teacher Status")]
+    [Display(Name = "Early years teacher status")]
     EarlyYearsTeacherStatus = 1,
-    [Display(Name = "Early Years Professional Status")]
+    [Display(Name = "Early years professional status")]
     EarlyYearsProfessionalStatus = 2,
-    [Display(Name = "Partial Qualified Teacher Status")]
+    [Display(Name = "Partial qualified teacher status")]
     PartialQualifiedTeacherStatus = 3
 }
