@@ -115,7 +115,7 @@ public partial class TestData
         {
             dateOfBirth = DateOnly.FromDateTime(Faker.Identification.DateOfBirth());
         }
-        while (dateOfBirth < new DateOnly(1940, 1, 1));
+        while (dateOfBirth >= DateOnly.FromDateTime(Clock.UtcNow) || dateOfBirth < new DateOnly(1940, 1, 1));
 
         return dateOfBirth;
     }
