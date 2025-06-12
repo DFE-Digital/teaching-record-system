@@ -325,9 +325,19 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
         // then set the induction status to the one being tested
         var person = await TestData.CreatePersonAsync(
             p => p.WithTrn().WithQts());
+
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
+
+            // Force status to `None` so that the SetCpdInductionStatus() call below always has a change to status
+            person.Person.UnsafeSetInductionStatus(
+                InductionStatus.None,
+                InductionStatus.None,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: []);
+
             person.Person.SetCpdInductionStatus(
                 InductionStatus.RequiredToComplete, // CPD induction status can't be Exempt or FailedInWales
                 startDate: null,
@@ -336,6 +346,7 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
                 out _);
+
             person.Person.SetInductionStatus(
                 status,
                 startDate: null,
@@ -347,8 +358,10 @@ public class EditInductionStatusTests(HostFixture hostFixture) : TestBase(hostFi
                 updatedBy: SystemUser.SystemUserId,
                 now: Clock.UtcNow,
                 out _);
+
             await dbContext.SaveChangesAsync();
         });
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
             new EditInductionStateBuilder()

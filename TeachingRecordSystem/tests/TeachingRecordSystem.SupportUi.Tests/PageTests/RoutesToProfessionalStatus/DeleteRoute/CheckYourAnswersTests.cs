@@ -246,7 +246,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var status = RouteToProfessionalStatusStatus.Holds;
         var qtsDate = Clock.Today.AddYears(-1);
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts(qtsDate)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
@@ -302,7 +301,6 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var holdsFromEarliest = Clock.Today.AddYears(-1);
         var holdsFromLatest = holdsFromEarliest.AddMonths(1);
         var person = await TestData.CreatePersonAsync(p => p
-            .WithQts(holdsFromEarliest)
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)

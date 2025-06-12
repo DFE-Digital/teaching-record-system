@@ -256,7 +256,7 @@ public class IndexTests : TestBase
         Assert.Null(doc.GetSummaryListValueForKey("EYTS held since"));
         Assert.Null(doc.GetSummaryListValueForKey("PQTS held since"));
         Assert.Equal("No", doc.GetSummaryListValueForKey("Early years practitioner status (EYPS)"));
-        Assert.Null(doc.GetSummaryListValueForKey("Induction status"));
+        Assert.NotNull(doc.GetSummaryListValueForKey("Induction status"));
     }
 
     [Fact]

@@ -79,8 +79,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
-            .WithQtlsDateInDqt(qtlsDate)
-            .WithDateOfBirth(dateOfBirth));
+            .WithDateOfBirth(dateOfBirth)
+            .WithQtls(qtlsDate));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
         entity[Contact.Fields.dfeta_qtlsdate] = null;
@@ -110,8 +110,8 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
-            .WithQtlsDateInDqt(qtlsDate)
-            .WithDateOfBirth(dateOfBirth));
+            .WithDateOfBirth(dateOfBirth)
+            .WithQtls(qtlsDate));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
@@ -132,6 +132,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         // Arrange
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
@@ -160,12 +161,13 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
         var qtsDate = DateOnly.Parse(qtsDateStr);
         var lastName = "Smith";
         var dateOfBirth = new DateOnly(1990, 1, 1);
+
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
             .WithQts(qtsDate)
-            .WithQtlsDateInDqt(qtlsDate));
+            .WithQtls(qtlsDate));
 
         var status = await ReferenceCache.GetTeacherStatusByValueAsync("71"); //qualified teacher
         var qtsRegistration = new dfeta_qtsregistration() { dfeta_QTSDate = qtsDate.ToDateTime(), dfeta_TeacherStatusId = status.ToEntityReference() };

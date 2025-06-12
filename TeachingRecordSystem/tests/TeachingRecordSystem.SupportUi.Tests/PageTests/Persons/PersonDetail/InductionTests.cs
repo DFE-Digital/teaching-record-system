@@ -290,6 +290,15 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
         await WithDbContext(async dbContext =>
         {
             dbContext.Attach(person.Person);
+
+            // Force status to `None` so that the SetCpdInductionStatus() call below always has a change to status
+            person.Person.UnsafeSetInductionStatus(
+                InductionStatus.None,
+                InductionStatus.None,
+                startDate: null,
+                completedDate: null,
+                exemptionReasonIds: []);
+
             person.Person.SetCpdInductionStatus(
                 status,
                 startDate: status.RequiresStartDate() ? lessThanSevenYearsAgo.AddYears(-1) : null,

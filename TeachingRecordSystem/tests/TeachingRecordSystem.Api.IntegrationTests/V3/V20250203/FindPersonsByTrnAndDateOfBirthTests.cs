@@ -100,9 +100,9 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDateInDqt(qtlsDate)
             .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth));
+            .WithDateOfBirth(dateOfBirth)
+            .WithQtls(qtlsDate));
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"/v3/persons/find")
         {
@@ -174,9 +174,9 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithQtlsDateInDqt(qtlsDate)
             .WithLastName(lastName)
-            .WithDateOfBirth(dateOfBirth));
+            .WithDateOfBirth(dateOfBirth)
+            .WithQtls(qtlsDate));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
         entity[Contact.Fields.dfeta_qtlsdate] = null;
