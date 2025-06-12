@@ -219,7 +219,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var startDate = Clock.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync(ProfessionalStatusType.QualifiedTeacherStatus);
         var status = RouteToProfessionalStatusStatus.Holds;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
