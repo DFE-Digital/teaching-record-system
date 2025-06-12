@@ -11,26 +11,26 @@
 @inject TeachingRecordSystem.SupportUi.IFeatureProvider FeatureProvider
 @using TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence
 
-@model UploadEvidenceViewModel
+@model (UploadEvidenceViewModel Model, string Prefix)
 
-<govuk-radios asp-for="UploadEvidence" data-testid="upload-evidence-options">
+<govuk-radios name="@(Model.Prefix).UploadEvidence" data-testid="upload-evidence-options">
     <govuk-radios-fieldset>
-        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />
+@*        <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m" data-testid="upload-evidence-options-legend" />*@
         <govuk-radios-item value="@true">
             Yes
             <govuk-radios-item-conditional>
-                @if (Model.EvidenceFileId is not null)
+                @if (Model.Model.EvidenceFileId is not null)
                 {
                     <span class="govuk-caption-m">Currently uploaded file</span>
                     <p class="govuk-body">
-                        <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@($"{Model.EvidenceFileName} ({Model.EvidenceFileSizeDescription})")</a>
+                        <a href="@Model.Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-file-link">@($"{Model.Model.EvidenceFileName} ({Model.Model.EvidenceFileSizeDescription})")</a>
                     </p>
-                    <input type="hidden" asp-for="EvidenceFileId" />
-                    <input type="hidden" asp-for="EvidenceFileName" />
-                    <input type="hidden" asp-for="EvidenceFileSizeDescription" />
-                    <input type="hidden" asp-for="UploadedEvidenceFileUrl" />
+                    <input type="hidden" name="@(Model.Prefix).EvidenceFileId" value=@Model.Model.EvidenceFileId />
+                    <input type="hidden" name="@(Model.Prefix).EvidenceFileName" value=@Model.Model.EvidenceFileName />
+                    <input type="hidden" name="@(Model.Prefix).EvidenceFileSizeDescription" value=@Model.Model.EvidenceFileSizeDescription />
+                    <input type="hidden" name="@(Model.Prefix).UploadedEvidenceFileUrl" value=@Model.Model.UploadedEvidenceFileUrl />
                 }
-                <govuk-file-upload asp-for="EvidenceFile" 
+                <govuk-file-upload name="@(Model.Prefix).EvidenceFile" 
                                     label-class="govuk-label--m"
                                     input-accept=".bmp, .csv, .doc, .docx, .eml, .jpeg, .jpg, .mbox, .msg, .ods, .odt, .pdf, .png, .tif, .txt, .xls, .xlsx">
                     <govuk-file-upload-label>Upload a file</govuk-file-upload-label>

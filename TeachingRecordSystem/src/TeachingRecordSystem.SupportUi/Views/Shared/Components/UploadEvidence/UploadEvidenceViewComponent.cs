@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence
 {
     public class UploadEvidenceViewComponent(IFileService fileService) : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync(UploadEvidenceViewModel? model)
+        public async Task<IViewComponentResult> InvokeAsync(UploadEvidenceViewModel? model, string prefix)
         {
             model ??= new UploadEvidenceViewModel();
 
@@ -57,7 +57,7 @@ namespace TeachingRecordSystem.SupportUi.Views.Shared.Components.UploadEvidence
                 //model.EvidenceFileSizeDescription = model.UploadEvidence is true ? model.EvidenceFileSizeDescription : null;
             }
 
-            return View(model);
+            return View((model, prefix));
         }
     }
 }
