@@ -268,7 +268,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
                 && r.DegreeTypeRequired == FieldRequirement.NotApplicable
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
-        var status = RouteToProfessionalStatusStatus.Awarded;
+        var status = RouteToProfessionalStatusStatus.Holds;
         var awardedDate = new DateOnly(2021, 1, 1);
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne()
@@ -294,7 +294,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.SelectStatusAsync(status);
         await page.ClickButtonAsync("Continue");
 
-        await page.AssertOnRouteAddAwardedDatePageAsync();
+        await page.AssertOnRouteAddHoldsFromPageAsync();
         await page.FillDateInputAsync(awardedDate);
         await page.ClickButtonAsync("Continue");
 
@@ -338,7 +338,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnRouteAddInductionExemptionPageAsync();
         await page.ClickBackLink();
 
-        await page.AssertOnRouteAddAwardedDatePageAsync();
+        await page.AssertOnRouteAddHoldsFromPageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddStatusPageAsync();
