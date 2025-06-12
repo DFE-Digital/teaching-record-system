@@ -1,4 +1,4 @@
-﻿@page "/route/add/subjects/{handler?}"
+@page "/route/add/subjects/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.SubjectSpecialismsModel
 @addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
 
@@ -22,7 +22,6 @@
             selectIds.forEach(id => {
                 const selectElement = document.querySelector(`#${id}`);
                 accessibleAutocomplete.enhanceSelectElement({
-                    selectElement: selectElement,
                     defaultValue: '',
                     selectElement: document.querySelector(`#${id}`)
                 });

@@ -119,6 +119,10 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AgeRangeSpecialism", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddAgeRangeSpecialismCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AgeRangeSpecialism", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/ChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddChangeReasonCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/ChangeReason", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
     public string RouteAddPage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId) =>
         page switch
@@ -135,6 +139,7 @@ public partial class TrsLinkGenerator
             AddRoutePage.AgeRangeSpecialism => RouteAddAgeRangeSpecialism(personId, journeyInstanceId),
             AddRoutePage.CheckYourAnswers => RouteAddCheckYourAnswers(personId, journeyInstanceId),
             AddRoutePage.SubjectSpecialisms => RouteAddSubjectSpecialisms(personId, journeyInstanceId),
+            AddRoutePage.ChangeReason => RouteAddChangeReason(personId, journeyInstanceId),
             _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };
 }

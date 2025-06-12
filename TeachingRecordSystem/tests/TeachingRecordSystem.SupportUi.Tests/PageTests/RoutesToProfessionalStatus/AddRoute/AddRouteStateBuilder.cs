@@ -1,3 +1,4 @@
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
@@ -17,6 +18,8 @@ public class AddRouteStateBuilder()
     private Guid? _trainingProviderId;
     private Guid? _degreeTypeId;
     private bool? _isExemptFromInduction;
+    private ChangeReasonOption? _changeReasonOption;
+    private ChangeReasonDetailsState _changeReasonDetail = new();
 
     public AddRouteStateBuilder WithStatusWhereAllFieldsApply()
     {
@@ -122,6 +125,38 @@ public class AddRouteStateBuilder()
         return this;
     }
 
+    public AddRouteStateBuilder WithChangeReasonOption(ChangeReasonOption reason)
+    {
+        _changeReasonOption = reason;
+        return this;
+    }
+
+    public AddRouteStateBuilder WithValidChangeReasonOption()
+    {
+        _changeReasonOption = ChangeReasonOption.AnotherReason;
+        return this;
+    }
+
+    public AddRouteStateBuilder WithChangeReasonDetail(string detail, bool fileUpload)
+    {
+        _changeReasonDetail = new ChangeReasonStateBuilder().WithChangeReasonDetail(detail).WithFileUploadChoice(fileUpload).Build();
+        return this;
+    }
+
+    public AddRouteStateBuilder WithDefaultChangeReasonNoUploadFileDetail()
+    {
+        _changeReasonDetail = new ChangeReasonStateBuilder().WithValidChangeReasonDetail().Build();
+        return this;
+    }
+
+    public AddRouteStateBuilder WithChangeReasonDetail(Action<ChangeReasonStateBuilder> buildChangeReasonDetail)
+    {
+        var builder = new ChangeReasonStateBuilder();
+        buildChangeReasonDetail(builder);
+        _changeReasonDetail = builder.Build();
+        return this;
+    }
+
     public AddRouteState Build()
     {
         return new AddRouteState()
@@ -140,6 +175,8 @@ public class AddRouteStateBuilder()
             TrainingProviderId = _trainingProviderId,
             IsExemptFromInduction = _isExemptFromInduction,
             DegreeTypeId = _degreeTypeId,
+            ChangeReason = _changeReasonOption,
+            ChangeReasonDetail = _changeReasonDetail
         };
     }
 }
