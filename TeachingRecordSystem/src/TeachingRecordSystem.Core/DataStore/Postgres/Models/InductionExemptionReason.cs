@@ -18,7 +18,7 @@ public class InductionExemptionReason
     public static Guid ExemptId = new("a5faff9f-29ce-4a6b-a7b8-0c1f57f15920");
     public static Guid ExemptDataLossOrErrorCriteriaId = new("204f86eb-0383-40eb-b793-6fccb76ecee2");
     public static Guid QualifiedThroughEEAMutualRecognitionRouteId = new("e7118bab-c2b1-4fe8-ad3f-4095d73f5b85");
-    public static Guid RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceneId = new("42bb7bbc-a92c-4886-b319-3c1a5eac319a");
+    public static Guid RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceId = new("42bb7bbc-a92c-4886-b319-3c1a5eac319a");
 
     public required Guid InductionExemptionReasonId { get; init; }
     public required string Name { get; init; }
