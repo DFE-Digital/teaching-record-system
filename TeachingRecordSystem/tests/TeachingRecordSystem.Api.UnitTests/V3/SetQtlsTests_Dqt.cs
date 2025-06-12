@@ -36,7 +36,15 @@ public partial class SetQtlsTests
             DateOnly? existingQtlsDate = hasExistingDate ? new DateOnly(2025, 4, 1) : null;
             DateOnly? newQtlsDate = hasNewDate ? new DateOnly(2025, 4, 10) : null;
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQtlsDateInDqt(existingQtlsDate));
+            var person = await TestData.CreatePersonAsync(p =>
+            {
+                p.WithTrn();
+
+                if (existingQtlsDate is DateOnly qtlsDate)
+                {
+                    p.WithQtls(qtlsDate);
+                }
+            });
 
             var command = new SetQtlsCommand(person.Trn!, QtsDate: newQtlsDate);
 

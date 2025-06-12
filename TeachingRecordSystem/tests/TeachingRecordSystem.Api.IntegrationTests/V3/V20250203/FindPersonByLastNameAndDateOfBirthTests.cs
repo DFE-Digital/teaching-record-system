@@ -78,8 +78,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithLastName(lastName)
-            .WithQtlsDateInDqt(qtlsDate)
+            .WithLastName(lastName).WithQtls(qtlsDate)
             .WithDateOfBirth(dateOfBirth));
 
         var entity = new Microsoft.Xrm.Sdk.Entity() { Id = person.PersonId, LogicalName = Contact.EntityLogicalName };
@@ -109,8 +108,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
 
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
-            .WithLastName(lastName)
-            .WithQtlsDateInDqt(qtlsDate)
+            .WithLastName(lastName).WithQtls(qtlsDate)
             .WithDateOfBirth(dateOfBirth));
 
         var request = new HttpRequestMessage(
@@ -164,8 +162,7 @@ public class FindPersonByLastNameAndDateOfBirthTests : TestBase
             .WithTrn()
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth)
-            .WithQts(qtsDate)
-            .WithQtlsDateInDqt(qtlsDate));
+            .WithQts(qtsDate).WithQtls(qtlsDate));
 
         var status = await ReferenceCache.GetTeacherStatusByValueAsync("71"); //qualified teacher
         var qtsRegistration = new dfeta_qtsregistration() { dfeta_QTSDate = qtsDate.ToDateTime(), dfeta_TeacherStatusId = status.ToEntityReference() };

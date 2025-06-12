@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.TestCommon;
@@ -23,6 +24,7 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
         services.AddSingleton<DbHelper>();
 
         services.AddStartupTask(sp => sp.GetRequiredService<DbHelper>().EnsureSchemaAsync());
+        services.AddStartupTask<SeedLookupData>();
     }
 
     public async Task ClearDataAsync()
@@ -111,7 +113,8 @@ public class DbHelper(IDbContextFactory<TrsDbContext> dbContextFactory)
                     "route_to_professional_status_types",
                     "countries",
                     "training_subjects",
-                    "degree_types"
+                    "degree_types",
+                    "training_providers"
                 ]
             });
 }
