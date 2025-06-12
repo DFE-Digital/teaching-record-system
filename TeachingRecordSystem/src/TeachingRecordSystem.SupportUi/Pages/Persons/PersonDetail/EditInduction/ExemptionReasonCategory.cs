@@ -23,9 +23,9 @@ public static class ExemptionReasonCategories
             InductionExemptionReason.ExemptId,
             InductionExemptionReason.QualifiedThroughEEAMutualRecognitionRouteId} },
         { ExemptionReasonCategory.HistoricalQualificationRoute, new List<Guid> {
-            InductionExemptionReason.QualifiedBetween07May1999And01April2003FirstPostInWalesId,
+            InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId,
             InductionExemptionReason.RegisteredTeacherWithAtLeast2YearsFullTimeTeachingExperienceneId,
-            InductionExemptionReason.QualifiedBefore07May2000Id} },
+            InductionExemptionReason.QualifiedBefore7May2000Id} },
         { ExemptionReasonCategory.InductionCompletedOutsideEngland, new List<Guid> {
             InductionExemptionReason.HasOrIsEligibleForFullRegistrationInScotlandId,
             InductionExemptionReason.PassedInductionInJerseyId,

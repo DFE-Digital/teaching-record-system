@@ -11,8 +11,8 @@ public class InductionExemptionReasonMapping : IEntityTypeConfiguration<Inductio
         builder.Property(x => x.IsActive).IsRequired();
 
         builder.HasData(
-            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBefore07May2000Id, Name = "Qualified before 07 May 2000", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
-            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBetween07May1999And01April2003FirstPostInWalesId, Name = "Qualified between 07 May 1999 and 01 Apr 2003. First post was in Wales and lasted a minimum of two terms.", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
+            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBefore7May2000Id, Name = "Qualified before 07 May 2000", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
+            new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedBetween7May1999And1April2003FirstPostInWalesId, Name = "Qualified between 07 May 1999 and 01 Apr 2003. First post was in Wales and lasted a minimum of two terms.", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id, Name = "Qualified through Further Education route between 1 Sep 2001 and 1 Sep 2004", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.PassedInductionInGuernseyId, Name = "Passed induction in Guernsey", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },
             new InductionExemptionReason { InductionExemptionReasonId = InductionExemptionReason.PassedInductionInIsleOfManId, Name = "Passed induction in Isle of Man", IsActive = true, RouteImplicitExemption = false, RouteOnlyExemption = false },

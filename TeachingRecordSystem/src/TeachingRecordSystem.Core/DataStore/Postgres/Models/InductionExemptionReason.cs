@@ -7,8 +7,8 @@ public class InductionExemptionReason
     public static Guid HasOrIsEligibleForFullRegistrationInScotlandId { get; } = new("a112e691-1694-46a7-8f33-5ec5b845c181");
     public static Guid PassedInWalesId { get; } = new("39550fa9-3147-489d-b808-4feea7f7f979");
     public static Guid QtlsId { get; } = new("35caa6a3-49f2-4a63-bd5a-2ba5fa9dc5db");
-    public static Guid QualifiedBefore07May2000Id = new("5a80cee8-98a8-426b-8422-b0e81cb49b36");
-    public static Guid QualifiedBetween07May1999And01April2003FirstPostInWalesId = new("15014084-2d8d-4f51-9198-b0e1881f8896");
+    public static Guid QualifiedBefore7May2000Id = new("5a80cee8-98a8-426b-8422-b0e81cb49b36");
+    public static Guid QualifiedBetween7May1999And1April2003FirstPostInWalesId = new("15014084-2d8d-4f51-9198-b0e1881f8896");
     public static Guid QualifiedThroughFurtherEducationRouteBetween1Sep2001And1Sep2004Id = new("0997ab13-7412-4560-8191-e51ed4d58d2a");
     public static Guid PassedInductionInGuernseyId = new("fea2db23-93e0-49af-96fd-83c815c17c0b");
     public static Guid PassedInductionInIsleOfManId = new("e5c3847d-8fb6-4b31-8726-812392da8c5c");
