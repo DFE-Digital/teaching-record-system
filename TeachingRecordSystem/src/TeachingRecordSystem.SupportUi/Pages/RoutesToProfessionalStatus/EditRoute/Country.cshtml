@@ -13,10 +13,24 @@
     <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
     <script asp-add-nonce="true">
         window.onload = function () {
+            const selectElement = document.querySelector('#@nameof(Model.TrainingCountryId)');
+            if (!selectElement) return;
+
             accessibleAutocomplete.enhanceSelectElement({
                 defaultValue: '',
-                selectElement: document.querySelector('#@nameof(Model.TrainingCountryId)')
-            })
+                selectElement: selectElement
+            });
+
+            setTimeout(() => {
+                const inputElement = selectElement.parentElement.querySelector('.autocomplete__input');
+                if (!inputElement) return;
+
+                inputElement.addEventListener('input', () => {
+                    if (inputElement.value === '') {
+                        selectElement.value = '';
+                    }
+                });
+            }, 0); // 0ms = defer to next event loop tick
         }
     </script>
 }
@@ -34,7 +48,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var country in Model.TrainingCountries)
                 {
-                    <govuk-select-item value="@country.CountryId" selected="@Model.TrainingCountryId==country.CountryId">@country.Name</govuk-select-item>
+                    <govuk-select-item value="@country.Id" selected="@Model.TrainingCountryId==country.Id">@country.DisplayName</govuk-select-item>
                 }
             </govuk-select>
             <div class="govuk-button-group">

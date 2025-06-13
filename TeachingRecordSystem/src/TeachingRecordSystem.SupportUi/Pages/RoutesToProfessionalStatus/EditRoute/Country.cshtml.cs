@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -23,7 +22,7 @@ public class CountryModel(
 
     public Guid PersonId { get; set; }
 
-    public Country[] TrainingCountries { get; set; } = [];
+    public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
     [BindProperty]
     [Required(ErrorMessage = "Enter a country")]
@@ -60,7 +59,13 @@ public class CountryModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
-        TrainingCountries = await referenceDataCache.GetTrainingCountriesAsync();
+        TrainingCountries = (await referenceDataCache.GetTrainingCountriesAsync())
+            .Select(r => new CountryDisplayInfo()
+            {
+                Id = r.CountryId,
+                DisplayName = $"{r.CountryId} - {r.Name}"
+            })
+            .ToArray();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

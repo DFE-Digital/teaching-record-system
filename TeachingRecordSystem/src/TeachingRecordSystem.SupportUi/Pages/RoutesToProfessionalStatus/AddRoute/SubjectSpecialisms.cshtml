@@ -13,29 +13,30 @@
 @section Scripts {
     <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
     <script asp-add-nonce="true">
-        window.onload = function () {
-            const selectIds = [
-                '@nameof(Model.SubjectId1)',
-                '@nameof(Model.SubjectId2)',
-                '@nameof(Model.SubjectId3)'
-            ];
-            selectIds.forEach(id => {
-                const selectElement = document.querySelector(`#${id}`);
-                accessibleAutocomplete.enhanceSelectElement({
-                    defaultValue: '',
-                    selectElement: document.querySelector(`#${id}`)
-                });
+            window.onload = function () {
+                const selectIds = [
+                    '@nameof(Model.SubjectId1)',
+                    '@nameof(Model.SubjectId2)',
+                    '@nameof(Model.SubjectId3)'
+                ];
+                selectIds.forEach(id => {
+                    const selectElement = document.querySelector(`#${id}`);
+                    accessibleAutocomplete.enhanceSelectElement({
+                        defaultValue: '',
+                        selectElement: selectElement
+                    });
 
-                // Get the newly created input element
-                const inputElement = selectElement.parentElement.querySelector("input");
+                setTimeout(() => {
+                    const inputElement = selectElement.parentElement.querySelector('input');
 
-                // Clear the select element when the input is cleared
-                inputElement.addEventListener("input", function () {
-                    if (inputElement.value === "") {
-                        selectElement.value = "";
-                    }
+                    // Clear the select element when the input is cleared
+                    inputElement.addEventListener('input', function () {
+                        if (inputElement.value === '') {
+                            selectElement.value = '';
+                        }
+                    });
                 });
-            });
+            }, 0); // 0ms = defer to next event loop tick
         }
     </script>
 }
@@ -53,7 +54,7 @@
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var subject in Model.Subjects)
                 {
-                    <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId1==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                    <govuk-select-item value="@subject.Id" selected="@Model.SubjectId1==subject.Id">@subject.DisplayName</govuk-select-item>
                 }
             </govuk-select>
             <govuk-details>
@@ -63,14 +64,14 @@
                         <govuk-select-item value=""></govuk-select-item>
                         @foreach (var subject in Model.Subjects)
                         {
-                            <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId2==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                            <govuk-select-item value="@subject.Id" selected="@Model.SubjectId2==subject.Id">@subject.DisplayName</govuk-select-item>
                         }
                     </govuk-select>
                     <govuk-select asp-for="SubjectId3" label-class="govuk-label--m">
                         <govuk-select-item value=""></govuk-select-item>
                         @foreach (var subject in Model.Subjects)
                         {
-                            <govuk-select-item value="@subject.TrainingSubjectId" selected="@Model.SubjectId3==subject.TrainingSubjectId">@subject.Name</govuk-select-item>
+                            <govuk-select-item value="@subject.Id" selected="@Model.SubjectId3==subject.Id">@subject.DisplayName</govuk-select-item>
                         }
                     </govuk-select>
                 </govuk-details-text>

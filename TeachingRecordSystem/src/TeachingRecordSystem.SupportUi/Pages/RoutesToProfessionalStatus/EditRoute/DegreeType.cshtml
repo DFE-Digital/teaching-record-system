@@ -13,10 +13,24 @@
     <script src="~/Scripts/Components/accessible-autocomplete.min.js" asp-append-version="true"></script>
     <script asp-add-nonce="true">
         window.onload = function () {
+            const selectElement = document.querySelector('#@nameof(Model.DegreeTypeId)');
+            if (!selectElement) return;
+
             accessibleAutocomplete.enhanceSelectElement({
                 defaultValue: '',
-                selectElement: document.querySelector('#@nameof(Model.DegreeTypeId)')
-            })
+                selectElement: selectElement
+            });
+
+            setTimeout(() => {
+                const inputElement = selectElement.parentElement.querySelector('.autocomplete__input');
+                if (!inputElement) return;
+
+                inputElement.addEventListener('input', () => {
+                    if (inputElement.value === '') {
+                        selectElement.value = '';
+                    }
+                });
+            }, 0); // 0ms = defer to next event loop tick
         }
     </script>
 }
