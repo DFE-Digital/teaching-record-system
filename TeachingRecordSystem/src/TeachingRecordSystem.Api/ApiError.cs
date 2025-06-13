@@ -1,9 +1,25 @@
+using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TeachingRecordSystem.Api;
 
-public sealed record ApiError(int ErrorCode, string Title, string? Detail = null)
+public sealed record ApiError
 {
+    private static readonly IReadOnlyDictionary<string, object> _emptyData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
+
+    private ApiError(int errorCode, string title, string? detail = null, params (string Key, object Value)[] data)
+    {
+        ErrorCode = errorCode;
+        Title = title;
+        Detail = detail;
+        Data = data.Length > 0 ? data.ToDictionary(d => d.Key, d => d.Value) : _emptyData;
+    }
+
+    public int ErrorCode { get; }
+    public string Title { get; }
+    public string? Detail { get; }
+    public IReadOnlyDictionary<string, object> Data { get; }
+
     public static class ErrorCodes
     {
         public static int PersonNotFound => 10001;
@@ -36,6 +52,13 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         public static int UnableToChangeFailProfessionalStatusStatus => 10055;
         public static int UnableToChangeWithdrawnProfessionalStatusStatus => 10056;
         public static int PiiUpdatesForbiddenPersonHasEyts => 10057;
+        public static int RecordIsNotActive => 10058;
+        public static int RecordIsMerged => 10059;
+    }
+
+    public static class DataKeys
+    {
+        public const string MergedWithTrn = nameof(MergedWithTrn);
     }
 
     public static ApiError PersonNotFound(string trn, DateOnly? dateOfBirth = null, string? nationalInsuranceNumber = null)
@@ -137,7 +160,13 @@ public sealed record ApiError(int ErrorCode, string Title, string? Detail = null
         new(ErrorCodes.UnableToChangeWithdrawnProfessionalStatusStatus, "Unable to change withdrawn professional status status.", "");
 
     public static ApiError PiiUpdatesForbiddenPersonHasEyts() =>
-    new(ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, "Updates to PII data is not permitted. Person has EYTS.", "");
+        new(ErrorCodes.PiiUpdatesForbiddenPersonHasEyts, "Updates to PII data is not permitted. Person has EYTS.", "");
+
+    public static ApiError RecordIsNotActive(string trn) =>
+        new(ErrorCodes.RecordIsNotActive, $"Record {trn} is not active.");
+
+    public static ApiError RecordIsMerged(string trn, string mergedWithTrn) =>
+        new(ErrorCodes.RecordIsMerged, $"Record {trn} has been merged with {mergedWithTrn}.", data: (DataKeys.MergedWithTrn, mergedWithTrn));
 
     public IActionResult ToActionResult(int statusCode = 400)
     {

@@ -35,4 +35,12 @@ public class DbFixture(DbHelper dbHelper, IServiceProvider serviceProvider)
             await action(dbContext);
             return 0;
         });
+
+    public Task DeleteAllPersonsAsync() =>
+        WithDbContextAsync(dbContext =>
+            dbContext.Database.ExecuteSqlAsync(
+                $"""
+                 update persons set merged_with_person_id = null;
+                 delete from persons;
+                 """));
 }

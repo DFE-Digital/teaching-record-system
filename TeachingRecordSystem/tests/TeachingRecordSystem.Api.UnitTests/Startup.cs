@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using TeachingRecordSystem.Api.Infrastructure.Security;
+using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
 using TeachingRecordSystem.Core.Services.NameSynonyms;
@@ -54,7 +55,8 @@ public class Startup
                     .AddSingleton<IEventObserver>(_ => new ForwardToTestScopedEventObserver())
                     .AddSingleton<WebhookMessageFactory>()
                     .AddSingleton<EventMapperRegistry>()
-                    .AddMemoryCache();
+                    .AddMemoryCache()
+                    .AddTransient<GetPersonHelper>();
             });
     }
 

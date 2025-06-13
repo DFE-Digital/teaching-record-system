@@ -68,7 +68,10 @@ public abstract class TestBase
 
     public virtual HttpClient GetHttpClient(string? version = null)
     {
-        var client = HostFixture.CreateClient();
+        var client = HostFixture.CreateClient(new()
+        {
+            AllowAutoRedirect = false
+        });
 
         if (version is not null)
         {
