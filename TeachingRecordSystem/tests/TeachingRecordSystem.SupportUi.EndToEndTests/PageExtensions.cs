@@ -558,20 +558,27 @@ public static class PageExtensions
 
     public static async Task AssertContentEquals(this IPage page, string content, string label)
     {
-        var dtElement = page.Locator($"dt:has-text('{label}')");
-        var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
-        var ddText = ddElement != null ? await ddElement.InnerTextAsync() : "Not found";
-
+        var ddText = await page.FindContentForLabel(label);
         Assert.Equal(content, ddText);
     }
 
     public static async Task AssertContentContains(this IPage page, string content, string label)
     {
+        var ddText = await page.FindContentForLabel(label);
+        Assert.Contains(content, ddText);
+    }
+
+    public static Task<string> FindContentForLabel(this IPage page, string label)
+    {
         var dtElement = page.Locator($"dt:has-text('{label}')");
         var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
-        var ddText = ddElement != null ? await ddElement.InnerTextAsync() : "Not found";
+        return ddElement.InnerTextAsync();
+    }
 
-        Assert.Contains(content, ddText);
+    public static async Task AssertNoListElementAsync(this IPage page, string label)
+    {
+        var element = page.Locator($"dt:has-text('{label}')");
+        Assert.False(await element.IsVisibleAsync());
     }
 
     public static async Task SubmitAddAlertIndexPageAsync(this IPage page, string alertType, string? details, string link, DateOnly startDate)

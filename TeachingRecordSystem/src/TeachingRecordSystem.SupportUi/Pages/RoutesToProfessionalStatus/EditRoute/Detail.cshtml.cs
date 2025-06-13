@@ -16,13 +16,13 @@ public class DetailModel(
     public string? PersonName { get; set; }
     public Guid PersonId { get; private set; }
 
-    public string BackLink => linkGenerator.PersonQualifications(PersonId);
+    public string BackLink => FromInductions ? linkGenerator.PersonInduction(PersonId) : linkGenerator.PersonQualifications(PersonId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public bool FromInductions { get; set; }
 
     public async Task OnGetAsync()
     {

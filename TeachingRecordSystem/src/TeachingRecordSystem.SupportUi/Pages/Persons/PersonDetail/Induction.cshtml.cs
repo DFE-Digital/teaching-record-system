@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
@@ -13,7 +14,8 @@ public class InductionModel(
     ICrmQueryDispatcher crmQueryDispatcher,
     IClock clock,
     ReferenceDataCache referenceDataCache,
-    IAuthorizationService authorizationService) : PageModel
+    IAuthorizationService authorizationService,
+    IFeatureProvider featureProvider) : PageModel
 {
     private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
     private bool _statusIsManagedByCpd;
@@ -30,13 +32,15 @@ public class InductionModel(
 
     public DateOnly? CompletedDate { get; set; }
 
-    public Guid[]? ExemptionReasonIds { get; set; }
+    public Guid[]? ExemptionReasonIdsHeldOnPerson { get; set; }
 
     public bool ShowStartDate => Status.RequiresStartDate();
 
     public bool ShowCompletedDate => Status.RequiresCompletedDate();
 
-    public IEnumerable<string>? ExemptionReasonValues { get; set; }
+    public IEnumerable<string>? ExemptionReasonNames { get; set; }
+
+    public IEnumerable<RouteToProfessionalStatus>? InductionExemptedRoutes { get; set; }
 
     public string InductionIsManagedByCpdWarning => Status switch
     {
@@ -57,6 +61,7 @@ public class InductionModel(
     public async Task OnGetAsync()
     {
         var person = await dbContext.Persons
+            .Include(p => p.Qualifications)
             .SingleAsync(q => q.PersonId == PersonId);
 
         GetActiveContactDetailByIdQuery query = new(
@@ -68,12 +73,22 @@ public class InductionModel(
         Status = person.InductionStatus;
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
-        ExemptionReasonIds = person.InductionExemptionReasonIds;
+        ExemptionReasonIdsHeldOnPerson = person.InductionExemptionReasonIds;
+        ExemptionReasonNames = (await referenceDataCache
+            .GetPersonLevelInductionExemptionReasonsAsync())
+            .Where(i => ExemptionReasonIdsHeldOnPerson.Contains(i.InductionExemptionReasonId))
+            .Select(i => i.Name)
+            .OrderDescending();
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
         HasQts = result!.Contact.dfeta_QTSDate is not null;
 
-        var allExemptionReasons = await referenceDataCache.GetInductionExemptionReasonsAsync();
-        ExemptionReasonValues = allExemptionReasons.Where(r => ExemptionReasonIds.Contains(r.InductionExemptionReasonId)).Select(r => r.Name);
+        if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
+        {
+            InductionExemptedRoutes = dbContext.RouteToProfessionalStatuses
+                .Include(r => r.RouteToProfessionalStatusType)
+                .ThenInclude(r => r != null ? r.InductionExemptionReason : null)
+                .Where(r => r.PersonId == PersonId && r.RouteToProfessionalStatusType != null && r.ExemptFromInduction == true);
+        }
 
         CanWrite = (await authorizationService.AuthorizeAsync(User, AuthorizationPolicies.InductionReadWrite))
             .Succeeded;

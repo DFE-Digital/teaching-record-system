@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -273,11 +274,14 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         DateOnly? startDate = inductionStatus.RequiresStartDate() ? Clock.Today.AddYears(-2) : null;
         DateOnly? completedDate = inductionStatus.RequiresCompletedDate() ? Clock.Today : null;
 
+        //var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
+        //    ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
+        //    .RandomSelection(2)
+        //    .Select(r => r.InductionExemptionReasonId)
+        //    .ToArray()
+        //    : [];
         var exemptionReasonIds = inductionStatus is InductionStatus.Exempt
-            ? (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(2)
-            .Select(r => r.InductionExemptionReasonId)
-            .ToArray()
+            ? new Guid[] { InductionExemptionReason.ExemptDataLossOrErrorCriteriaId, InductionExemptionReason.ExemptId }
             : [];
 
         var expectedReasons = (await TestData.ReferenceDataCache

@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditInduction;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail.EditInduction;
@@ -34,10 +35,7 @@ public class CommonPageTests : TestBase
     public async Task Post_RedirectsToExpectedPage(string fromPage, InductionStatus inductionStatus, string expectedNextPageUrl)
     {
         // Arrange
-        var exemptionReasonIds = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .Select(e => e.InductionExemptionReasonId)
-            .RandomSelection(1)
-            .ToArray();
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
         var person = await TestData.CreatePersonAsync(
             p => p
                 .WithQts()
@@ -178,10 +176,7 @@ public class CommonPageTests : TestBase
     {
         // Arrange
         InductionStatus inductionStatus = InductionStatus.Passed;
-        var exemptionReasonIds = (await TestData.ReferenceDataCache.GetInductionExemptionReasonsAsync(activeOnly: true))
-            .Select(e => e.InductionExemptionReasonId)
-            .RandomSelection(1)
-            .ToArray();
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
         var person = await TestData.CreatePersonAsync(
             p => p.WithQts()
                 .WithInductionStatus(i => i.WithStatus(inductionStatus).WithStartDate(Clock.Today.AddYears(-2)).WithCompletedDate(Clock.Today)));
@@ -258,12 +253,7 @@ public class CommonPageTests : TestBase
     public async Task FromCheckYourAnswersPage_BacklinkContainsExpected(InductionJourneyPage startPage, string fromPage, InductionStatus inductionStatus, string expectedBackPage)
     {
         // Arrange
-        var exemptionReasonIds = (await TestData
-            .ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(e => e.InductionExemptionReasonId)
-            .ToArray();
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
 
         var person = await TestData.CreatePersonAsync(p => p.WithQts());
 
@@ -326,12 +316,7 @@ public class CommonPageTests : TestBase
         // Arrange
         var startDate = new DateOnly(2000, 2, 1);
         var completedDate = new DateOnly(2002, 2, 2);
-        var exemptionReasonIds = (await TestData
-            .ReferenceDataCache
-            .GetInductionExemptionReasonsAsync(activeOnly: true))
-            .RandomSelection(1)
-            .Select(e => e.InductionExemptionReasonId)
-            .ToArray();
+        var exemptionReasonIds = new Guid[] { InductionExemptionReason.ExemptId };
 
         var person = await TestData.CreatePersonAsync(
             p => p
