@@ -28,7 +28,7 @@ public class DeleteRouteToProfessionalStatusTests(HostFixture hostFixture) : Tes
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDeleteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Delete route");
 
         await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
     }
