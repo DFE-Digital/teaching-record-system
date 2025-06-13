@@ -201,6 +201,8 @@
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0067_TrsRoutesModelChanges.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0068_TrsQualificationsTrainingCountryId.sql" />
     <EmbeddedResource Include="Services\DqtReporting\Migrations\0069_TrsQualificationsDegreeTypeId.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0070_TrsQualificationsExemptFromInductionDueToQtsDate.sql" />
+    <EmbeddedResource Include="Services\DqtReporting\Migrations\0071_TrsQualificationsHoldsFrom.sql" />
   </ItemGroup>
 
   <ItemGroup>
