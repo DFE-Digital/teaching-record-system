@@ -16,7 +16,6 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
 {
     private const int UsersPerPage = 10;
 
-    [FromQuery(Name = "page")]
     [BindProperty(SupportsGet = true)]
     public int? PageNumber { get; set; }
 
@@ -61,7 +60,7 @@ public class IndexModel(TrsDbContext dbContext, TrsLinkGenerator linkGenerator) 
         HasUsers = totalUserCount > 0;
         CurrentPageUsers = paginatedUsers.Select(CreateViewModel);
         Filters = FiltersViewModel.Create(filters, "Find user");
-        Pagination = PaginationViewModel.Create(paginatedUsers, page => linkGenerator.Users(page));
+        Pagination = PaginationViewModel.Create(paginatedUsers, pageNumber => linkGenerator.Users(pageNumber));
     }
 
     private UserViewModel CreateViewModel(User user)

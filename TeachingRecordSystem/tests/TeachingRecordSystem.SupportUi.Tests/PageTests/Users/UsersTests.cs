@@ -95,9 +95,9 @@ public class UsersTests : TestBase, IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("?page=1", 10, "Auser", "Juser")]
-    [InlineData("?page=2", 10, "Kuser", "Tuser")]
-    [InlineData("?page=3", 2, "Uuser", "Vuser")]
+    [InlineData("?pageNumber=1", 10, "Auser", "Juser")]
+    [InlineData("?pageNumber=2", 10, "Kuser", "Tuser")]
+    [InlineData("?pageNumber=3", 2, "Uuser", "Vuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesUsersAndSortsByFirstName(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
         // Arrange
@@ -162,12 +162,12 @@ public class UsersTests : TestBase, IAsyncLifetime
     }
 
     [Theory]
-    [InlineData("?role=AccessManager&page=1", 10, "Auser", "Juser")]
-    [InlineData("?role=AccessManager&page=2", 2, "Kuser", "Luser")]
-    [InlineData("?role=SupportOfficer&page=1", 10, "Muser", "Vuser")]
-    [InlineData("?role=SupportOfficer&page=2", 4, "Wuser", "Zuser")]
-    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&page=1", 10, "Auser", "Suser")]
-    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&page=2", 3, "Uuser", "Yuser")]
+    [InlineData("?role=AccessManager&pageNumber=1", 10, "Auser", "Juser")]
+    [InlineData("?role=AccessManager&pageNumber=2", 2, "Kuser", "Luser")]
+    [InlineData("?role=SupportOfficer&pageNumber=1", 10, "Muser", "Vuser")]
+    [InlineData("?role=SupportOfficer&pageNumber=2", 4, "Wuser", "Zuser")]
+    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&pageNumber=1", 10, "Auser", "Suser")]
+    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&pageNumber=2", 3, "Uuser", "Yuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesFilteredUsers(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
         // Arrange

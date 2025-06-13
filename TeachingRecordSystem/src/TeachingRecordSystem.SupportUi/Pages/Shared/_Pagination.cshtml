@@ -1,4 +1,4 @@
-﻿@model PaginationViewModel
+@model PaginationViewModel
 
 @if (Model.ShowPagination)
 {
@@ -22,7 +22,7 @@
             <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.PreviousPage))">@Model.PreviousPage</govuk-pagination-item>
         }
 
-        <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.CurrentPage))" current="true">@Model.CurrentPage</govuk-pagination-item>
+        <govuk-pagination-item href="@Html.Raw(@Model.GetPageLink(Model.CurrentPage))" current=@true>@Model.CurrentPage</govuk-pagination-item>
 
         @if (Model.ShowNextPage)
         {
