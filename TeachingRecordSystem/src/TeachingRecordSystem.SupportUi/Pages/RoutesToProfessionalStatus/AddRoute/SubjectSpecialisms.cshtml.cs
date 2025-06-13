@@ -49,7 +49,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync(activeOnly: true))
+        Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
             {
                 Id = s.TrainingSubjectId,

@@ -67,7 +67,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Subjects = (await referenceDataCache.GetTrainingSubjectsAsync(activeOnly: true))
+        Subjects = (await referenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
             {
                 Id = s.TrainingSubjectId,
