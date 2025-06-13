@@ -99,8 +99,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQtlsDateInDqt(qtlsDate)
+            .WithTrn().WithQtls(qtlsDate)
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 
@@ -173,8 +172,7 @@ public class FindPersonsByTrnAndDateOfBirthTests : TestBase
         var qtlsDate = new DateOnly(2020, 01, 01);
 
         var person = await TestData.CreatePersonAsync(p => p
-            .WithTrn()
-            .WithQtlsDateInDqt(qtlsDate)
+            .WithTrn().WithQtls(qtlsDate)
             .WithLastName(lastName)
             .WithDateOfBirth(dateOfBirth));
 

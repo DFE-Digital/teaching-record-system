@@ -98,7 +98,6 @@ public sealed class HostFixture(IConfiguration configuration) : IAsyncDisposable
                     services.AddSingleton<IUserInstanceStateProvider, InMemoryInstanceStateProvider>();
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton<IGetAnIdentityApiClient>(Mock.Of<IGetAnIdentityApiClient>());
-                    services.AddStartupTask<SeedLookupData>();
 
                     IFileService GetMockFileService()
                     {

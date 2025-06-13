@@ -85,7 +85,6 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                     services.AddSingleton(GetMockFileService());
                     services.AddSingleton(GetMockAdUserService());
                     services.AddSingleton(GetMockGetAnIdentityApiClient());
-                    services.AddStartupTask<SeedLookupData>();
 
                     IFileService GetMockFileService()
                     {
