@@ -26,6 +26,7 @@ public class CheckYourAnswersModel(
 
     public ChangeReasonOption? ChangeReason;
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public string BackLink => linkGenerator.RouteChangeReason(QualificationId, JourneyInstance!.InstanceId);
 
@@ -139,15 +140,12 @@ public class CheckYourAnswersModel(
             JourneyInstanceId = JourneyInstance.InstanceId
         };
 
+        UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
         await next();
     }
 
-    public async Task<string?> GetEvidenceFileUrlAsync()
-    {
-        return ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
-            null;
-    }
 
     private bool IsComplete(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status)
     {
