@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.Core.Services.Files;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -9,10 +10,15 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
     TrsDbContext dbContext,
     ReferenceDataCache referenceDataCache,
+    IFileService fileService,
     IClock clock) :
     AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     public RouteDetailViewModel RouteDetail { get; set; } = null!;
+
+    public ChangeReasonOption? ChangeReason;
+    public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
+    public string? UploadedEvidenceFileUrl { get; set; }
 
     public string BackLink =>
         LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.CheckYourAnswers) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
@@ -86,6 +92,8 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         Status = JourneyInstance!.State.Status!.Value;
 
         var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
+        ChangeReason = JourneyInstance!.State.ChangeReason;
+        ChangeReasonDetail = JourneyInstance!.State.ChangeReasonDetail;
         RouteDetail = new RouteDetailViewModel
         {
             RouteToProfessionalStatusType = Route,
@@ -106,6 +114,10 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             JourneyInstanceId = JourneyInstance!.InstanceId,
             PersonId = PersonId
         };
+
+        UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
+            null;
 
         await next();
     }

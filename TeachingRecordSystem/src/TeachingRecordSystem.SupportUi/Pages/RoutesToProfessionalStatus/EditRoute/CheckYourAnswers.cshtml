@@ -38,7 +38,7 @@
                     <govuk-summary-list-row-value data-testid="evidence">
                         @if (Model.ChangeReasonDetail.EvidenceFileId is not null)
                         {
-                            <a href="@Model.GetEvidenceFileUrlAsync()" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.ChangeReasonDetail.EvidenceFileName} (opens in new tab)")</a>
+                            <a href="@Model.UploadedEvidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{Model.ChangeReasonDetail.EvidenceFileName} (opens in new tab)")</a>
                         }
                         else
                         {
