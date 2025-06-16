@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
@@ -17,6 +18,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(CountryCode)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -54,6 +57,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(RouteToProfessionalStatusStatus.Deferred)
             .WithTrainingCountryId(CountryCode)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -98,6 +103,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
             .WithInductionExemption(true)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -150,6 +157,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithHoldsFrom(endDate)
             .WithTrainingCountryId(country.CountryId)
             .WithInductionExemption(true)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -189,6 +198,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingCountryId(CountryCode)
             .WithTrainingProviderId(trainingProvider.TrainingProviderId)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -236,6 +247,8 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
             .WithTrainingAgeSpecialismType(ageRange)
             .WithInductionExemption(true)
             .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithValidChangeReasonOption()
+            .WithDefaultChangeReasonNoUploadFileDetail()
             .Build();
 
         var journeyInstance = await CreateJourneyInstanceAsync(
@@ -447,7 +460,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 TrainingCountryId = "GB-SCT",  // Scotland
                 TrainingProviderId = null,
                 IsExemptFromInduction = false,
-                DegreeTypeId = null
+                DegreeTypeId = null,
+                ChangeReason = ChangeReasonOption.AnotherReason,
+                ChangeReasonDetail = new ChangeReasonDetailsState()
+                {
+                    HasAdditionalReasonDetail = false,
+                    UploadEvidence = false
+                }
             },
             ProfessionalStatusType.EarlyYearsTeacherStatus => new()
             {
@@ -464,7 +483,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 TrainingCountryId = null,
                 TrainingProviderId = provider.TrainingProviderId,
                 IsExemptFromInduction = null,
-                DegreeTypeId = null
+                DegreeTypeId = null,
+                ChangeReason = ChangeReasonOption.AnotherReason,
+                ChangeReasonDetail = new ChangeReasonDetailsState()
+                {
+                    HasAdditionalReasonDetail = false,
+                    UploadEvidence = false
+                }
             },
             ProfessionalStatusType.EarlyYearsProfessionalStatus => new()
             {
@@ -481,7 +506,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 TrainingCountryId = null,
                 TrainingProviderId = null,
                 IsExemptFromInduction = null,
-                DegreeTypeId = null
+                DegreeTypeId = null,
+                ChangeReason = ChangeReasonOption.AnotherReason,
+                ChangeReasonDetail = new ChangeReasonDetailsState()
+                {
+                    HasAdditionalReasonDetail = false,
+                    UploadEvidence = false
+                }
             },
             ProfessionalStatusType.PartialQualifiedTeacherStatus => new()
             {
@@ -498,7 +529,13 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
                 TrainingCountryId = null,
                 TrainingProviderId = null,
                 IsExemptFromInduction = null,
-                DegreeTypeId = null
+                DegreeTypeId = null,
+                ChangeReason = ChangeReasonOption.AnotherReason,
+                ChangeReasonDetail = new ChangeReasonDetailsState()
+                {
+                    HasAdditionalReasonDetail = false,
+                    UploadEvidence = false
+                }
             },
             _ => throw new NotImplementedException()
         };
