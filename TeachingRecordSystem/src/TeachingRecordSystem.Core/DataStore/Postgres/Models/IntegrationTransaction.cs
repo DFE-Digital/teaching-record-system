@@ -11,5 +11,5 @@ public class IntegrationTransaction
     public required int DuplicateCount { get; set; }
     public required string FileName { get; set; }
     public required DateTime CreatedDate { get; set; }
-    public ICollection<IntegrationTransactionRecord>? IntegrationTransactionRecords { get; }
+    public ICollection<IntegrationTransactionRecord>? IntegrationTransactionRecords { get; set; }
 }

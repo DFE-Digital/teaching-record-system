@@ -19,7 +19,7 @@
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.IntegrationTransactionId ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.IntegrationTransactionId, direction))">
-                        Id
+                        ID
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.InterfaceType ? Model.SortDirection : null)"
@@ -34,7 +34,7 @@
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.ImportStatus ? Model.SortDirection : null)"
                         link-template="@(direction => LinkGenerator.IntegrationTransactions(IntegrationTransactionSortByOption.ImportStatus, direction))">
-                        Import Status
+                        Import status
                     </th>
                     <th scope="col" class="govuk-table__header"
                         sort-direction="@(Model.SortBy == IntegrationTransactionSortByOption.Total ? Model.SortDirection : null)"
