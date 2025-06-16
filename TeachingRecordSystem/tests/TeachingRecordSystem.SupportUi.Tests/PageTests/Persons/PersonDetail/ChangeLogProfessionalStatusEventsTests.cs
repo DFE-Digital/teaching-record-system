@@ -25,7 +25,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
 
         var person = await TestData.CreatePersonAsync(b => b
             .WithRouteToProfessionalStatus(q => q
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(startDate)
                 .WithTrainingEndDate(endDate)
@@ -77,7 +77,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithRouteToProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(RouteToProfessionalStatusStatus.Holds);
                 q.WithHoldsFrom(Clock.Today);
                 q.WithInductionExemption(true);
@@ -170,7 +170,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
                 q.WithInductionExemption(oldExemptFromInduction);
                 q.WithTrainingStartDate(oldStartDate);
@@ -253,14 +253,16 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     }
 
     [Fact]
-    public async Task ProfessionalStatusUpdatedEvent_StatusChanged_PersonQtsChanged_RendersExpectedContent()
+    public async Task ProfessionalStatusUpdatedEvent_StatusChangedToHolds_PersonQtsChanged_RendersExpectedContent()
     {
         // Arrange
         var oldStatus = RouteToProfessionalStatusStatus.InTraining;
         var startDate = Clock.Today.AddYears(-2);
         var endDate = startDate.AddYears(1);
         var awardDate = endDate.AddDays(1);
-        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync(ProfessionalStatusType.QualifiedTeacherStatus);
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .RandomOne();
         var status = RouteToProfessionalStatusStatus.Holds;
         var subject = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Where(s => s.Name.IndexOf('\'') == -1).RandomOne();
         var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
@@ -271,7 +273,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithTrainingStartDate(startDate);
@@ -362,7 +364,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(oldStatus);
                 q.WithInductionExemption(true);
                 q.WithHoldsFrom(awardDate);
@@ -422,7 +424,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(b => b
             .WithRouteToProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithHoldsFrom(Clock.Today);
                 q.WithInductionExemption(true);

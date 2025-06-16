@@ -25,7 +25,6 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
     public ApiTrnRequestsSortByOption? SortBy { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    [FromQuery(Name = "page")]
     public int? PageNumber { get; set; }
 
     [BindProperty(SupportsGet = true)]
@@ -114,7 +113,7 @@ public class Index(TrsDbContext dbContext, TrsLinkGenerator linkGenerator, IBack
 
         Pagination = PaginationViewModel.Create(
             Results,
-            page => linkGenerator.ApiTrnRequests(Search, SortBy, SortDirection, page));
+            pageNumber => linkGenerator.ApiTrnRequests(Search, SortBy, SortDirection, pageNumber));
 
         return Page();
 
