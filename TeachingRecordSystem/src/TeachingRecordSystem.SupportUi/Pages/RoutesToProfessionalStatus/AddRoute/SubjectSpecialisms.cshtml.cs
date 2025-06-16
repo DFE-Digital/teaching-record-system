@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -13,7 +12,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
         LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.SubjectSpecialisms) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
-    public TrainingSubject[] Subjects { get; set; } = [];
+    public DisplayInfo[] Subjects { get; set; } = [];
 
     [BindProperty]
     [Display(Name = "Enter the subject they specialise in teaching")]
@@ -50,7 +49,13 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        Subjects = await ReferenceDataCache.GetTrainingSubjectsAsync();
+        Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync())
+            .Select(s => new DisplayInfo()
+            {
+                Id = s.TrainingSubjectId,
+                DisplayName = $"{s.Reference} - {s.Name}"
+            })
+            .ToArray();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

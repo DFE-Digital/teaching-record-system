@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -13,7 +12,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
         LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.Country) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
-    public Country[] TrainingCountries { get; set; } = [];
+    public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
     [BindProperty]
     [Required(ErrorMessage = "Enter a country")]
@@ -41,7 +40,13 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        TrainingCountries = await ReferenceDataCache.GetTrainingCountriesAsync();
+        TrainingCountries = (await ReferenceDataCache.GetTrainingCountriesAsync())
+            .Select(r => new CountryDisplayInfo()
+            {
+                Id = r.CountryId,
+                DisplayName = $"{r.CountryId} - {r.Name}"
+            })
+            .ToArray();
         await base.OnPageHandlerExecutionAsync(context, next);
     }
 }
