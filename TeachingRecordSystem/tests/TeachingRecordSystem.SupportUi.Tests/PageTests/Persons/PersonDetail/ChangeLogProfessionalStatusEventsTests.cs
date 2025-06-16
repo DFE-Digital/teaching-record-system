@@ -114,7 +114,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(q =>
             {
-                q.WithRoute(route.RouteToProfessionalStatusTypeId);
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
                 q.WithStatus(status);
                 q.WithInductionExemption(true);
                 q.WithHoldsFrom(awardDate);
