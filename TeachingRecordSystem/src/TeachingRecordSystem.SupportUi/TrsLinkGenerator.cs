@@ -313,6 +313,8 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string EditApiKey(Guid apiKeyId) => GetRequiredPathByPage("/ApiKeys/EditApiKey", routeValues: new { apiKeyId });
 
+    public string IntegrationTransactionDetail(long integrationTransactionId) => GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Detail", routeValues: new { integrationTransactionId });
+
     public string ExpireApiKey(Guid apiKeyId) => GetRequiredPathByPage("/ApiKeys/EditApiKey", handler: "Expire", routeValues: new { apiKeyId });
 
     public string SupportTasks(SupportTaskCategory[]? categories = null, Pages.SupportTasks.IndexModel.SortByOption? sortBy = null, string? reference = null, bool? filtersApplied = null) =>
@@ -341,6 +343,9 @@ public partial class TrsLinkGenerator(LinkGenerator linkGenerator)
 
     public string IntegrationTransactions(IntegrationTransactionSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = null) =>
         GetRequiredPathByPage("/SupportTasks/IntegrationTransactions/Index", routeValues: new { sortBy, sortDirection, pageNumber });
+
+    public string IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption? sortBy = null, SortDirection? sortDirection = null, int? pageNumber = 1, long? IntegrationTransactionId = null) =>
+        GetRequiredPathByPage($"/SupportTasks/IntegrationTransactions/detail", routeValues: new { sortBy, sortDirection, pageNumber, IntegrationTransactionId });
 
     public string ApiTrnRequestMergeCancel(string supportTaskReference, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/SupportTasks/ApiTrnRequests/Resolve/Merge", routeValues: new { supportTaskReference }, journeyInstanceId: journeyInstanceId, handler: "Cancel");
