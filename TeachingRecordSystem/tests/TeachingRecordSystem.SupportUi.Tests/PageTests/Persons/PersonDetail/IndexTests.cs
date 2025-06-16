@@ -48,7 +48,6 @@ public class IndexTests : TestBase
         var updatedFirstName = TestData.GenerateFirstName();
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
-        var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
         var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithTrn()
             .WithEmail((string?)email)
@@ -103,7 +102,6 @@ public class IndexTests : TestBase
         var updatedFirstName = TestData.GenerateFirstName();
         var updatedMiddleName = TestData.GenerateMiddleName();
         var updatedLastName = TestData.GenerateLastName();
-        var previousMiddleNameChangedOn = new DateOnly(2022, 02, 02);
         var createPersonResult = await TestData.CreatePersonAsync(b => b
             .WithTrn()
             .WithEmail((string?)email)

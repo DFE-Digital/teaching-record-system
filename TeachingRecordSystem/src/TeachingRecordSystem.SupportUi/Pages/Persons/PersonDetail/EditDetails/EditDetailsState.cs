@@ -56,7 +56,7 @@ public class EditDetailsState : IRegisterJourney
         NationalInsuranceNumber != OriginalNationalInsuranceNumber;
 
     [JsonIgnore]
-    public bool IsIndexComplete =>
+    public bool IsPersonalDetailsComplete =>
         FirstName is not null &&
         LastName is not null &&
         DateOfBirth.HasValue &&
@@ -79,7 +79,7 @@ public class EditDetailsState : IRegisterJourney
 
     [JsonIgnore]
     public bool IsComplete =>
-        IsIndexComplete &&
+        IsPersonalDetailsComplete &&
         IsNameChangeReasonComplete &&
         IsOtherDetailsChangeReasonComplete;
 

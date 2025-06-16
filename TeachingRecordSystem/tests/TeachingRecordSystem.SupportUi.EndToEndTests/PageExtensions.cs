@@ -26,6 +26,11 @@ public static class PageExtensions
         await page.GotoAsync($"/persons/{personId}");
     }
 
+    public static async Task GoToPersonCreatePageAsync(this IPage page)
+    {
+        await page.GotoAsync($"/persons/create");
+    }
+
     public static async Task GoToPersonQualificationsPageAsync(this IPage page, Guid personId)
     {
         await page.GotoAsync($"/persons/{personId}/qualifications");
@@ -331,6 +336,26 @@ public static class PageExtensions
     public static Task AssertOnPersonEditDetailsCheckAnswersPageAsync(this IPage page, Guid personId)
     {
         return page.WaitForUrlPathAsync($"/persons/{personId}/edit-details/check-answers");
+    }
+
+    public static async Task AssertOnPersonCreateIndexPageAsync(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/persons/create");
+    }
+
+    public static async Task AssertOnPersonCreatePersonalDetailsPageAsync(this IPage page)
+    {
+        await page.WaitForUrlPathAsync($"/persons/create/personal-details");
+    }
+
+    public static Task AssertOnPersonCreateCreateReasonPageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync($"/persons/create/create-reason");
+    }
+
+    public static Task AssertOnPersonCreateCheckAnswersPageAsync(this IPage page)
+    {
+        return page.WaitForUrlPathAsync($"/persons/create/check-answers");
     }
 
     public static async Task AssertOnAddMqProviderPageAsync(this IPage page)

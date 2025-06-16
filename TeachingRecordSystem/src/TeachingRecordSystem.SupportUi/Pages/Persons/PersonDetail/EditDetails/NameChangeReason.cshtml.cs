@@ -47,7 +47,7 @@ public class NameChangeReasonModel(
     public string BackLink => GetPageLink(
         FromCheckAnswers
             ? EditDetailsJourneyPage.CheckAnswers
-            : EditDetailsJourneyPage.Index);
+            : EditDetailsJourneyPage.PersonalDetails);
 
     public string NextPage => GetPageLink(
         FromCheckAnswers

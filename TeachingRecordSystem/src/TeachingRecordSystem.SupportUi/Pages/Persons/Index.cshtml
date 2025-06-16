@@ -2,46 +2,42 @@
 @using TeachingRecordSystem.Core.Dqt.Models;
 @model TeachingRecordSystem.SupportUi.Pages.Persons.IndexModel
 @{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonsSubNavigationTab.FindARecord;
     ViewBag.Title = "Find a record";
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        <div class="govuk-!-margin-bottom-6">
-            <form action="@LinkGenerator.Persons()" method="get" data-testid="search-form" asp-antiforgery="false">
-                <div class="moj-search trs-search govuk-!-margin-bottom-4">
-                    <govuk-input asp-for="Search"
-                                 input-class="moj-search__input"
-                                 label-class="moj-search__label govuk-!-font-weight-bold"
-                                 data-testid="search-input"
-                                 type="search">
-                        <govuk-input-hint class="moj-search__hint" />
-                    </govuk-input>
-                    <input type="hidden" asp-for="SortBy" />
-                    <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
-                </div>
-            </form>
-            @if (!string.IsNullOrEmpty(Model.Search))
-            {
-                <form action="@LinkGenerator.Persons()" method="get" data-testid="search-sortby-form" asp-antiforgery="false">
-                    <div class="moj-search trs-search govuk-!-margin-bottom-4">
-                        <govuk-select asp-for="SortBy">
-                            <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
-                            <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
-                            <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
-                            <govuk-select-item value="@ContactSearchSortByOption.FirstNameDescending">@ContactSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
-                            <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthAscending">@ContactSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
-                            <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthDescending">@ContactSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
-                        </govuk-select>
-                        <input type="hidden" asp-for="Search" />
-                        <govuk-button class="moj-search__button" type="submit">Apply</govuk-button>
-                    </div>
-                </form>
-            }
+<div class="govuk-!-margin-bottom-6">
+    <form action="@LinkGenerator.Persons()" method="get" data-testid="search-form" asp-antiforgery="false">
+        <div class="moj-search trs-search govuk-!-margin-bottom-4">
+            <govuk-input asp-for="Search"
+                            input-class="moj-search__input"
+                            label-class="moj-search__label govuk-!-font-weight-bold"
+                            data-testid="search-input"
+                            type="search">
+                <govuk-input-hint class="moj-search__hint" />
+            </govuk-input>
+            <input type="hidden" asp-for="SortBy" />
+            <govuk-button class="moj-search__button" type="submit">Search</govuk-button>
         </div>
-    </div>
+    </form>
+    @if (!string.IsNullOrEmpty(Model.Search))
+    {
+        <form action="@LinkGenerator.Persons()" method="get" data-testid="search-sortby-form" asp-antiforgery="false">
+            <div class="moj-search trs-search govuk-!-margin-bottom-4">
+                <govuk-select asp-for="SortBy">
+                    <govuk-select-item value="@ContactSearchSortByOption.LastNameAscending">@ContactSearchSortByOption.LastNameAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.LastNameDescending">@ContactSearchSortByOption.LastNameDescending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameAscending">@ContactSearchSortByOption.FirstNameAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.FirstNameDescending">@ContactSearchSortByOption.FirstNameDescending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthAscending">@ContactSearchSortByOption.DateOfBirthAscending.GetDisplayName()</govuk-select-item>
+                    <govuk-select-item value="@ContactSearchSortByOption.DateOfBirthDescending">@ContactSearchSortByOption.DateOfBirthDescending.GetDisplayName()</govuk-select-item>
+                </govuk-select>
+                <input type="hidden" asp-for="Search" />
+                <govuk-button class="moj-search__button" type="submit">Apply</govuk-button>
+            </div>
+        </form>
+    }
 </div>
 @if (!string.IsNullOrEmpty(Model.Search))
 {

@@ -10,7 +10,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full-from-desktop">
-        <form action="@LinkGenerator.InductionCheckYourAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
+        <form action="@LinkGenerator.PersonInductionCheckYourAnswers(Model.PersonId, Model.JourneyInstance!.InstanceId)" method="post">
             <span class="govuk-caption-l">Induction - @Model.PersonName</span>
             <h1 class="govuk-heading-l">@ViewBag.Title</h1>
 
@@ -22,7 +22,7 @@
                     {
                         <govuk-summary-list-row-actions>
                             <govuk-summary-list-row-action
-                                href="@LinkGenerator.InductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                                href="@LinkGenerator.PersonInductionEditStatus(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                                 visually-hidden-text="induction status">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
@@ -36,7 +36,7 @@
                         {
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action
-                                href="@LinkGenerator.InductionEditStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                                href="@LinkGenerator.PersonInductionEditStartDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                                 visually-hidden-text="start date">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
@@ -51,7 +51,7 @@
                         {
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action
-                                href="@LinkGenerator.InductionEditCompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                                href="@LinkGenerator.PersonInductionEditCompletedDate(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                                 visually-hidden-text="completed date">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
@@ -76,7 +76,7 @@
                         {
                             <govuk-summary-list-row-actions>
                                 <govuk-summary-list-row-action
-                                href="@LinkGenerator.InductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                                href="@LinkGenerator.PersonInductionEditExemptionReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                                 visually-hidden-text="exemption reason">Change</govuk-summary-list-row-action>
                             </govuk-summary-list-row-actions>
                         }
@@ -87,7 +87,7 @@
                     <govuk-summary-list-row-value>@Model.ChangeReason.GetDisplayName()</govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action
-                            href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                            href="@LinkGenerator.PersonInductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                             visually-hidden-text="reason for change">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
@@ -105,7 +105,7 @@
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action
-                            href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                            href="@LinkGenerator.PersonInductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                             visually-hidden-text="reason details">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
@@ -123,7 +123,7 @@
                     </govuk-summary-list-row-value>
                     <govuk-summary-list-row-actions>
                         <govuk-summary-list-row-action
-                            href="@LinkGenerator.InductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
+                            href="@LinkGenerator.PersonInductionChangeReason(Model.PersonId, Model.JourneyInstance!.InstanceId, fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers)"
                             visually-hidden-text="evidence">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 </govuk-summary-list-row>
@@ -131,7 +131,7 @@
 
             <div class="govuk-button-group">
                 <govuk-button type="submit" data-testid="confirm-button">Confirm induction details</govuk-button>
-                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.InductionCheckYourAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.PersonInductionCheckYourAnswersCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
             </div>
         </form>
     </div>

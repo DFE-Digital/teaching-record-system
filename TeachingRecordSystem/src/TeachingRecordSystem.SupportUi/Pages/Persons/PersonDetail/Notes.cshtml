@@ -6,7 +6,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.NotesModel
 @{
     Layout = "Layout";
-    ViewBag.SelectedTab = PersonSubNavigationTab.Notes;
+    ViewBag.SelectedTab = PersonDetailSubNavigationTab.Notes;
     var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
 }
 

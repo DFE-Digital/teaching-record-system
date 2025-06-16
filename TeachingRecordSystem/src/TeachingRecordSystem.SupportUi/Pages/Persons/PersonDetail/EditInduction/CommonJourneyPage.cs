@@ -39,12 +39,12 @@ public abstract class CommonJourneyPage(
     {
         return pageName switch
         {
-            InductionJourneyPage.Status => LinkGenerator.InductionEditStatus(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.CompletedDate => LinkGenerator.InductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.ExemptionReason => LinkGenerator.InductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.StartDate => LinkGenerator.InductionEditStartDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.ChangeReasons => LinkGenerator.InductionChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
-            InductionJourneyPage.CheckAnswers => LinkGenerator.InductionCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
+            InductionJourneyPage.Status => LinkGenerator.PersonInductionEditStatus(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.CompletedDate => LinkGenerator.PersonInductionEditCompletedDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.ExemptionReason => LinkGenerator.PersonInductionEditExemptionReason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.StartDate => LinkGenerator.PersonInductionEditStartDate(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.ChangeReasons => LinkGenerator.PersonInductionChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckYourAnswersPage),
+            InductionJourneyPage.CheckAnswers => LinkGenerator.PersonInductionCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonInduction(PersonId)
         };
     }

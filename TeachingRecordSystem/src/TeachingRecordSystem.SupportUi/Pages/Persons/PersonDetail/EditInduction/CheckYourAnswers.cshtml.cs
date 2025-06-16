@@ -68,7 +68,7 @@ public class CheckYourAnswersModel(
         if (JourneyInstance!.State.StartDate > JourneyInstance!.State.CompletedDate)
         {
             return Redirect(
-                LinkGenerator.InductionEditCompletedDate(
+                LinkGenerator.PersonInductionEditCompletedDate(
                     PersonId,
                     JourneyInstance!.InstanceId,
                     fromCheckAnswers: JourneyFromCheckYourAnswersPage.CheckYourAnswers));
