@@ -72,7 +72,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.All(exemptionReasonsElement, checkbox =>
         {
             Assert.Contains(checkbox.Value, exemptionReasonsForDisplay.Select(e => e.guid.ToString()));
-            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id.Replace("'", "\\'")}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
+            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TextContent.Trim(), exemptionReasonsForDisplay.Select(e => e.Name));
         });
     }
 
@@ -111,7 +111,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         Assert.All(exemptionReasonsElement, checkbox =>
         {
             Assert.Contains(checkbox.Value, exemptionReasons.Select(e => e.InductionExemptionReasonId.ToString()));
-            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id.Replace("'", "\\'")}']")!.TrimmedText(), exemptionReasons.Select(e => e.Name));
+            Assert.Contains(checkbox.ParentElement!.QuerySelector<IHtmlLabelElement>($"label[for='{checkbox.Id}']")!.TrimmedText(), exemptionReasons.Select(e => e.Name));
         });
     }
 

@@ -63,8 +63,8 @@ public class ApplicationUserTests(HostFixture hostFixture) : TestBase(hostFixtur
         await page.AssertOnEditApplicationUserPageAsync(applicationUserId);
 
         await page.FillAsync("text=Name", newApplicationUserName);
-        await page.SetCheckedAsync($"label:text-is('{ApiRoles.GetPerson}')", true);
-        await page.SetCheckedAsync($"label:text-is('{ApiRoles.UpdatePerson}')", true);
+        await page.SetCheckedAsync($"label{TextIsSelector(ApiRoles.GetPerson)}", true);
+        await page.SetCheckedAsync($"label{TextIsSelector(ApiRoles.UpdatePerson)}", true);
         await page.SetCheckedAsync($"label:text-is('OIDC client')", true);
         await page.FillAsync("text=Client ID", newClientId);
         await page.FillAsync("text=Client secret", newClientSecret);

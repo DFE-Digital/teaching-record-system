@@ -24,7 +24,7 @@ public static class RouteToProfessionalStatusPageExtensions
 
     public static Task SelectRouteChangeReasonOption(this IPage page, string reason)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{reason?.Replace("'", "\\'")}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 

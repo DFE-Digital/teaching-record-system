@@ -5,7 +5,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
     [Fact]
     public async Task ConnectOneLoginUser_WithSuggestion()
     {
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn());
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithLastName("O'Reilly"));
         var oneLoginUser = await TestData.CreateOneLoginUserAsync(personId: null, verifiedInfo: ([person.FirstName, person.LastName], person.DateOfBirth));
         var supportTask = await TestData.CreateConnectOneLoginUserSupportTaskAsync(oneLoginUser.Subject);
 
@@ -13,10 +13,10 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks");
-        await page.ClickAsync($"a:text-is('{supportTask.SupportTaskReference.Replace("'", "\\'")}')");
+        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
 
-        await page.WaitForUrlPathAsync($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference.Replace("'", "\\'")}");
-        await page.ClickAsync($"label:text-is('{person.FirstName.Replace("'", "\\'")} {person.MiddleName.Replace("'", "\\'")} {person.LastName.Replace("'", "\\'")}')");
+        await page.WaitForUrlPathAsync($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}");
+        await page.ClickAsync($"label{TextIsSelector($"{person.FirstName} {person.MiddleName} {person.LastName}")}");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}/connect");
@@ -36,7 +36,7 @@ public class SupportTaskTests(HostFixture hostFixture) : TestBase(hostFixture)
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/support-tasks");
-        await page.ClickAsync($"a:text-is('{supportTask.SupportTaskReference.Replace("'", "\\'")}')");
+        await page.ClickAsync($"a{TextIsSelector(supportTask.SupportTaskReference)}");
 
         await page.WaitForUrlPathAsync($"/support-tasks/connect-one-login-user/{supportTask.SupportTaskReference}");
         await page.FillAsync($"label:text-is('Connect to TRN (optional)')", person.Trn!);
