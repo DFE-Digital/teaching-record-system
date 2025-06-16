@@ -20,7 +20,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Deferred)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
@@ -66,7 +66,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
 
@@ -107,7 +107,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
@@ -149,7 +149,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();

@@ -34,7 +34,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -245,7 +245,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -281,7 +281,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -339,7 +339,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -398,7 +398,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -444,7 +444,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -507,7 +507,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -570,7 +570,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                     .WithTrainingStartDate(startDate)
                     .WithTrainingEndDate(endDate)
@@ -634,7 +634,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -677,7 +677,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -718,7 +718,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -771,7 +771,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
                 personBuilder => personBuilder
                 .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                    .WithRoute(route.RouteToProfessionalStatusTypeId)
+                    .WithRouteType(route.RouteToProfessionalStatusTypeId)
                     .WithStatus(status)
                 ));
         var personId = person.PersonId;
@@ -815,7 +815,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
@@ -878,7 +878,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
@@ -948,7 +948,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
             ));
         var personId = person.PersonId;
@@ -996,7 +996,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
                 .WithTrainingStartDate(new DateOnly(2021, 2, 1))
                 .WithTrainingEndDate(new DateOnly(2021, 2, 2))
@@ -1061,7 +1061,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)
                 .WithHoldsFrom(holdsFrom)
             ));
@@ -1105,7 +1105,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var person = await TestData.CreatePersonAsync(
             personBuilder => personBuilder
             .WithRouteToProfessionalStatus(professionalStatusBuilder => professionalStatusBuilder
-                .WithRoute(route.RouteToProfessionalStatusTypeId)
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
                 .WithStatus(status)
             ));
         var personId = person.PersonId;

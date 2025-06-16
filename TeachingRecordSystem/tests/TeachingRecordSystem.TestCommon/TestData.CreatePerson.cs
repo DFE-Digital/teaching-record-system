@@ -248,7 +248,7 @@ public partial class TestData
             WithRouteToProfessionalStatus(p => p
                 .WithStatus(RouteToProfessionalStatusStatus.Holds)
                 .WithHoldsFrom(holdsFrom)
-                .WithRoute(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
+                .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
         public CreatePersonBuilder WithTrnRequest(
             Guid applicationUserId,

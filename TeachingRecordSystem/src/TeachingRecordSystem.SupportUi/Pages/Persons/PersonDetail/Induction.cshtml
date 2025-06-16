@@ -31,15 +31,15 @@
                 }
             </govuk-summary-list-row>
 
-            @if (Model.ExemptionReasonIds!.Length > 0)
+            @if (Model.ExemptionReasonIdsHeldOnPerson!.Length > 0)
             {
                 <govuk-summary-list-row class="govuk-list--spaced" data-testid="induction-exemption-reasons">
                     <govuk-summary-list-row-key>Exemption reason</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value>
-                        @if (Model.ExemptionReasonValues is not null)
+                        @if (Model.ExemptionReasonNames is not null)
                         {
                             <ul class="govuk-list">
-                                @foreach (var exemptionReason in Model.ExemptionReasonValues)
+                                @foreach (var exemptionReason in Model.ExemptionReasonNames)
                                 {
                                     <li>@exemptionReason</li>
                                 }
@@ -81,6 +81,19 @@
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>
+            }
+            @if (Model.InductionExemptedRoutes is not null)
+            {
+                foreach (var exemptedRoute in Model.InductionExemptedRoutes)
+                {
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Route induction exemption reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>@($"{exemptedRoute.RouteToProfessionalStatusType?.InductionExemptionReason?.Name} - {exemptedRoute.RouteToProfessionalStatusType?.Name}")</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-actions>
+                            <govuk-summary-list-row-action href="@LinkGenerator.RouteEditDetail(exemptedRoute.QualificationId, null, fromInductions: true)">Change</govuk-summary-list-row-action>
+                        </govuk-summary-list-row-actions>
+                    </govuk-summary-list-row>
+                }
             }
         </govuk-summary-list>
     </govuk-summary-card>

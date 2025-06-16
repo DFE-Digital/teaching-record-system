@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeachingRecordSystem.Core.DataStore.Postgres;
@@ -13,9 +14,11 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
 {
     [DbContext(typeof(TrsDbContext))]
-    partial class TrsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612073703_InductionExemptionReasonsRouteOnlyColumn")]
+    partial class InductionExemptionReasonsRouteOnlyColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3407,99 +3410,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransaction", b =>
-                {
-                    b.Property<long>("IntegrationTransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("integration_transaction_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("IntegrationTransactionId"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<int>("DuplicateCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("duplicate_count");
-
-                    b.Property<int>("FailureCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("failure_count");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
-
-                    b.Property<int>("ImportStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("import_status");
-
-                    b.Property<int>("InterfaceType")
-                        .HasColumnType("integer")
-                        .HasColumnName("interface_type");
-
-                    b.Property<int>("SuccessCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("success_count");
-
-                    b.Property<int>("TotalCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("total_count");
-
-                    b.HasKey("IntegrationTransactionId")
-                        .HasName("pk_integration_transactions");
-
-                    b.ToTable("integration_transactions", (string)null);
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransactionRecord", b =>
-                {
-                    b.Property<long>("IntegrationTransactionRecordId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("integration_transaction_record_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("IntegrationTransactionRecordId"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<bool?>("Duplicate")
-                        .HasColumnType("boolean")
-                        .HasColumnName("duplicate");
-
-                    b.Property<string>("FailureMessage")
-                        .HasMaxLength(3000)
-                        .HasColumnType("character varying(3000)")
-                        .HasColumnName("failure_message");
-
-                    b.Property<long?>("IntegrationTransactionId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("integration_transaction_id");
-
-                    b.Property<Guid>("PersonId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("person_id");
-
-                    b.Property<string>("RowData")
-                        .HasMaxLength(3000)
-                        .HasColumnType("character varying(3000)")
-                        .HasColumnName("row_data");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.HasKey("IntegrationTransactionRecordId")
-                        .HasName("pk_integration_transaction_records");
-
-                    b.ToTable("integration_transaction_records", (string)null);
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.InternationalQtsAwardedEmailsJob", b =>
                 {
                     b.Property<Guid>("InternationalQtsAwardedEmailsJobId")
@@ -4080,10 +3990,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_persons_dqt_contact_id")
                         .HasFilter("dqt_contact_id is not null");
-
-                    b.HasIndex("MergedWithPersonId")
-                        .HasDatabaseName("ix_persons_merged_with_person_id")
-                        .HasFilter("merged_with_person_id is not null");
 
                     b.HasIndex("Trn")
                         .IsUnique()
@@ -17590,25 +17496,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
                     b.Navigation("InductionCompletedEmailsJob");
                 });
 
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransactionRecord", b =>
-                {
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransaction", "IntegrationTransaction")
-                        .WithMany("IntegrationTransactionRecords")
-                        .HasForeignKey("IntegrationTransactionId")
-                        .HasConstraintName("fk_integrationtransactionrecord_integrationtransaction");
-
-                    b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_integration_transaction_records_persons_person_id");
-
-                    b.Navigation("IntegrationTransaction");
-
-                    b.Navigation("Person");
-                });
-
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.InternationalQtsAwardedEmailsJobItem", b =>
                 {
                     b.HasOne("TeachingRecordSystem.Core.DataStore.Postgres.Models.InternationalQtsAwardedEmailsJob", "InternationalQtsAwardedEmailsJob")
@@ -17924,11 +17811,6 @@ namespace TeachingRecordSystem.Core.DataStore.Postgres.Migrations
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.InductionCompletedEmailsJob", b =>
                 {
                     b.Navigation("JobItems");
-                });
-
-            modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.IntegrationTransaction", b =>
-                {
-                    b.Navigation("IntegrationTransactionRecords");
                 });
 
             modelBuilder.Entity("TeachingRecordSystem.Core.DataStore.Postgres.Models.InternationalQtsAwardedEmailsJob", b =>
