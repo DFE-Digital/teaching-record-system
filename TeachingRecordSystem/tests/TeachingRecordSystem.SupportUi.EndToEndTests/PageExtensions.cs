@@ -91,7 +91,7 @@ public static class PageExtensions
         page.GetByTestId(testId).ClickAsync();
 
     public static Task ClickChangeLinkForSummaryListRowWithKeyAsync(this IPage page, string key) =>
-        page.Locator($".govuk-summary-list__row:has(> dt:text('{key}'))").GetByText("Change").ClickAsync();
+        page.Locator($".govuk-summary-list__row:has(> dt:text('{key.Replace("'", "\\'")}'))").GetByText("Change").ClickAsync();
 
     public static async Task ClickAddAlertPersonAlertsPageAsync(this IPage page)
     {
@@ -120,7 +120,7 @@ public static class PageExtensions
 
     public static async Task ClickCaseReferenceLinkChangeRequestsPageAsync(this IPage page, string caseReference)
     {
-        await page.ClickAsync($"a:text-is('{caseReference}')");
+        await page.ClickAsync($"a:text-is('{caseReference.Replace("'", "\\'")}')");
     }
 
     public static async Task AssertOnChangeRequestDetailPageAsync(this IPage page, string caseReference)
@@ -502,11 +502,11 @@ public static class PageExtensions
     {
         if (expectedHeader != null)
         {
-            Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader}')"));
+            Assert.Equal(expectedHeader, await page.InnerTextAsync($".govuk-notification-banner__heading:text-is('{expectedHeader.Replace("'", "\\'")}')"));
         }
         if (expectedMessage != null)
         {
-            Assert.Equal(expectedMessage, await page.InnerTextAsync($".govuk-notification-banner p:text-is('{expectedMessage}')"));
+            Assert.Equal(expectedMessage, await page.InnerTextAsync($".govuk-notification-banner p:text-is('{expectedMessage.Replace("'", "\\'")}')"));
         }
     }
 
@@ -570,14 +570,14 @@ public static class PageExtensions
 
     public static Task<string> FindContentForLabel(this IPage page, string label)
     {
-        var dtElement = page.Locator($"dt:has-text('{label}')");
+        var dtElement = page.Locator($"dt:has-text('{label.Replace("'", "\\'")}')");
         var ddElement = dtElement.Locator("xpath=following-sibling::dd[1]");
         return ddElement.InnerTextAsync();
     }
 
     public static async Task AssertNoListElementAsync(this IPage page, string label)
     {
-        var element = page.Locator($"dt:has-text('{label}')");
+        var element = page.Locator($"dt:has-text('{label.Replace("'", "\\'")}')");
         Assert.False(await element.IsVisibleAsync());
     }
 
@@ -620,7 +620,7 @@ public static class PageExtensions
         => ClickButtonAsync(page, "Remove inactive status");
 
     public static Task ClickButtonAsync(this IPage page, string text) =>
-        page.ClickAsync($".govuk-button:text-is('{text}')");
+        page.ClickAsync($".govuk-button:text-is('{text.Replace("'", "\\'")}')");
 
     public static Task ClickBackLink(this IPage page) =>
         page.ClickAsync($".govuk-back-link");
@@ -629,7 +629,7 @@ public static class PageExtensions
         page.ClickAsync("a.govuk-link:contains('Cancel')");
 
     public static Task ClickRadioAsync(this IPage page, string value) =>
-        page.Locator($"input[type='radio'][value='{value}']")
+        page.Locator($"input[type='radio'][value='{value.Replace("'", "\\'")}']")
         .Locator("xpath=following-sibling::label")
         .ClickAsync();
 

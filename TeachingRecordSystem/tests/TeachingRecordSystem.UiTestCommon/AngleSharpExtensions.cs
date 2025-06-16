@@ -12,7 +12,7 @@ public static class AngleSharpExtensions
     }
 
     public static IReadOnlyList<IElement> GetAllElementsByTestId(this IElement element, string testId) =>
-        element.QuerySelectorAll($"*[data-testid='{testId}']").ToList();
+        element.QuerySelectorAll($"*[data-testid='{testId?.Replace("'", "\\'")}']").ToList();
 
     public static IElement? GetElementByTestId(this IElement element, string testId) =>
         element.GetAllElementsByTestId(testId).SingleOrDefault();

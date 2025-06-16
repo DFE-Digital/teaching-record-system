@@ -33,5 +33,5 @@ public static class PageExtensions
     }
 
     public static Task ClickButtonAsync(this IPage page, string text) =>
-        page.ClickAsync($".govuk-button:text-is('{text}')");
+        page.ClickAsync($".govuk-button:text-is('{text.Replace("'", "\\'")}')");
 }

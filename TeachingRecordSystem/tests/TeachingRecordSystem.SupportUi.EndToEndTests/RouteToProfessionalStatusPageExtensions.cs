@@ -6,25 +6,25 @@ public static class RouteToProfessionalStatusPageExtensions
 {
     public static Task SelectAgeTypeAsync(this IPage page, TrainingAgeSpecialismType ageType)
     {
-        var checkbox = page.Locator($"input[type='radio'][value='{ageType.ToString()}']");
+        var checkbox = page.Locator($"input[type='radio'][value='{ageType}']");
         return checkbox.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
     public static Task SelectStatusAsync(this IPage page, RouteToProfessionalStatusStatus status)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{status}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
     public static Task SelectAgeRangeAsync(this IPage page, TrainingAgeSpecialismType ageRangeType)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{ageRangeType.ToString()}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{ageRangeType}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
     public static Task SelectRouteChangeReasonOption(this IPage page, string reason)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{reason?.Replace("'", "\\'")}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 

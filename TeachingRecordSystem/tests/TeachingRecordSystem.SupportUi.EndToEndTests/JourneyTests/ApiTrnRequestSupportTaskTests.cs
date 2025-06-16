@@ -18,11 +18,11 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
 
         await page.GotoAsync("/support-tasks/api-trn-requests");
 
-        await page.ClickAsync($"a:text-is('{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}')");
+        await page.ClickAsync($"a:text-is('{requestData.FirstName?.Replace("'", "\\'")} {requestData.MiddleName?.Replace("'", "\\'")} {requestData.LastName?.Replace("'", "\\'")}')");
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
 
-        await page.CheckAsync($"label:text-is('I want to create a new record from the {applicationUser.Name} request')");
+        await page.CheckAsync($"label:text-is('I want to create a new record from the {applicationUser.Name.Replace("'", "\\'")} request')");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");
@@ -61,7 +61,7 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
 
         await page.GotoAsync("/support-tasks/api-trn-requests");
 
-        await page.ClickAsync($"a:text-is('{requestData.FirstName} {requestData.MiddleName} {requestData.LastName}')");
+        await page.ClickAsync($"a:text-is('{requestData.FirstName?.Replace("'", "\\'")} {requestData.MiddleName?.Replace("'", "\\'")} {requestData.LastName?.Replace("'", "\\'")}')");
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/matches");
 
@@ -69,7 +69,7 @@ public class ApiTrnRequestSupportTaskTests(HostFixture hostFixture) : TestBase(h
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/merge");
-        await page.CheckAsync($"label:text-is('{requestData.MiddleName}')");
+        await page.CheckAsync($"label:text-is('{requestData.MiddleName?.Replace("'", "\\'")}')");
         await page.ClickContinueButtonAsync();
 
         await page.WaitForUrlPathAsync($"/support-tasks/api-trn-requests/{supportTask.SupportTaskReference}/check-answers");

@@ -39,7 +39,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddMqSpecialismPageAsync();
 
-        await page.CheckAsync($"label:text-is('{specialism.dfeta_name}')");
+        await page.CheckAsync($"label:text-is('{specialism.dfeta_name?.Replace("'", "\\'")}')");
 
         await page.ClickContinueButtonAsync();
 
@@ -95,7 +95,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqProviderReasonPageAsync(qualificationId);
 
-        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
+        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()?.Replace("'", "\\'")}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
 
@@ -143,15 +143,15 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqSpecialismPageAsync(qualificationId);
 
-        await page.IsCheckedAsync($"label:text-is('{oldSpecialism.GetTitle()}')");
+        await page.IsCheckedAsync($"label:text-is('{oldSpecialism.GetTitle()?.Replace("'", "\\'")}')");
 
-        await page.CheckAsync($"label:text-is('{newSpecialism.GetTitle()}')");
+        await page.CheckAsync($"label:text-is('{newSpecialism.GetTitle()?.Replace("'", "\\'")}')");
 
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnEditMqSpecialismReasonPageAsync(qualificationId);
 
-        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
+        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()?.Replace("'", "\\'")}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
 
@@ -205,7 +205,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqStartDateReasonPageAsync(qualificationId);
 
-        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()}')");
+        await page.CheckAsync($"label:text-is('{changeReason.GetDisplayName()?.Replace("'", "\\'")}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
 
@@ -291,9 +291,9 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         if (isStatusChange)
         {
-            await page.IsCheckedAsync($"label:text-is('{oldStatus.GetTitle()}')");
+            await page.IsCheckedAsync($"label:text-is('{oldStatus.GetTitle()?.Replace("'", "\\'")}')");
 
-            await page.CheckAsync($"label:text-is('{newStatus.GetTitle()}')");
+            await page.CheckAsync($"label:text-is('{newStatus.GetTitle()?.Replace("'", "\\'")}')");
         }
 
         if (isEndDateChange)
@@ -305,7 +305,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditMqStatusReasonPageAsync(qualificationId);
 
-        await page.CheckAsync($"label:text-is('{changeReason}')");
+        await page.CheckAsync($"label:text-is('{changeReason.Replace("'", "\\'")}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for change')", changeReasonDetail);
 
@@ -351,7 +351,7 @@ public class MqTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnDeleteMqPageAsync(qualificationId);
 
-        await page.CheckAsync($"label:text-is('{deletionReason.GetDisplayName()}')");
+        await page.CheckAsync($"label:text-is('{deletionReason.GetDisplayName()?.Replace("'", "\\'")}')");
 
         await page.FillAsync("label:text-is('More detail about the reason for deleting')", deletionReasonDetail);
 
