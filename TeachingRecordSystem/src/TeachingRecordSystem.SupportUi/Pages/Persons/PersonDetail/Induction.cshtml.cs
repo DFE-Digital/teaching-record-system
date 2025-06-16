@@ -3,15 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
-using TeachingRecordSystem.Core.Dqt.Models;
-using TeachingRecordSystem.Core.Dqt.Queries;
 using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail;
 
 public class InductionModel(
     TrsDbContext dbContext,
-    ICrmQueryDispatcher crmQueryDispatcher,
     IClock clock,
     ReferenceDataCache referenceDataCache,
     IAuthorizationService authorizationService,
@@ -64,12 +61,6 @@ public class InductionModel(
             .Include(p => p.Qualifications)
             .SingleAsync(q => q.PersonId == PersonId);
 
-        GetActiveContactDetailByIdQuery query = new(
-            person.PersonId,
-            ColumnSet: new ColumnSet(Contact.Fields.dfeta_QTSDate));
-
-        var result = await crmQueryDispatcher.ExecuteQueryAsync(query);
-
         Status = person.InductionStatus;
         StartDate = person.InductionStartDate;
         CompletedDate = person.InductionCompletedDate;
@@ -80,7 +71,7 @@ public class InductionModel(
             .Select(i => i.Name)
             .OrderDescending();
         _statusIsManagedByCpd = person.InductionStatusManagedByCpd(clock.Today);
-        HasQts = result!.Contact.dfeta_QTSDate is not null;
+        HasQts = person.QtsDate is not null;
 
         if (featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
         {
