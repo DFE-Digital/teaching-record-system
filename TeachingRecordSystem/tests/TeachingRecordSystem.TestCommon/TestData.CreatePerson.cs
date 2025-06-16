@@ -665,6 +665,9 @@ public partial class TestData
                                 route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
                                 EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
                                 DateTime.UtcNow,
+                                null,
+                                null,
+                                null,
                                 out var @createdEvent
                                 );
 
