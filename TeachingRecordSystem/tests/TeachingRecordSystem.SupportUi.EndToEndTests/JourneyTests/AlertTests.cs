@@ -34,13 +34,13 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddAlertTypePageAsync();
 
-        await page.CheckAsync($"label:text-is('{alertType.Name}')");
+        await page.CheckAsync($"label{TextIsSelector(alertType.Name)}");
 
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnAddAlertDetailsPageAsync();
 
-        await page.FillAsync($"label:text-is('Enter details about the alert type: {alertType.Name}')", details);
+        await page.FillAsync($"label{TextIsSelector($"Enter details about the alert type: {alertType.Name}")}", details);
 
         await page.ClickContinueButtonAsync();
 
@@ -60,7 +60,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnAddAlertReasonPageAsync();
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re adding this alert?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -112,7 +112,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertDetailsChangeReasonPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the alert details?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -163,7 +163,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertStartDateChangeReasonPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the start date?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -215,7 +215,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertEndDateChangeReasonPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{reason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(reason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the end date?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", reasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -278,7 +278,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnEditAlertLinkChangeReasonPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re changing the panel outcome link?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -329,7 +329,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnCloseAlertChangeReasonPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re adding an end date?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();
@@ -374,7 +374,7 @@ public class AlertTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         await page.AssertOnReopenAlertPageAsync(alertId);
 
-        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label:text-is('{changeReason.GetDisplayName()}')").CheckAsync();
+        await page.Locator("div.govuk-form-group:has-text('Select a reason')").Locator($"label{TextIsSelector(changeReason.GetDisplayName())}").CheckAsync();
         await page.Locator("div.govuk-form-group:has-text('Do you want to add more information about why you’re removing the end date?')").Locator("label:text-is('Yes')").CheckAsync();
         await page.FillAsync("label:text-is('Add additional detail')", changeReasonDetail);
         await page.Locator("div.govuk-form-group:has-text('Do you want to upload evidence?')").Locator("label:text-is('Yes')").CheckAsync();

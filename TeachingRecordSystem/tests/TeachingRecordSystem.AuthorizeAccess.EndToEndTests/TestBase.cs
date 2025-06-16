@@ -23,4 +23,10 @@ public abstract class TestBase(HostFixture hostFixture)
         var currentUserProvider = HostFixture.Services.GetRequiredService<OneLoginCurrentUserProvider>();
         currentUserProvider.CurrentUser = user;
     }
+
+    public static string TextSelector(string? text) => $":text(\"{text}\")";
+
+    public static string TextIsSelector(string? text) => $":text-is(\"{text}\")";
+
+    public static string HasTextSelector(string? text) => $":has-text(\"{text}\")";
 }

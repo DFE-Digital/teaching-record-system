@@ -65,19 +65,19 @@ public static class EditInductionPageExtensions
 
     public static Task AssertInductionStatusSelected(this IPage page, InductionStatus status)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{status}']");
         return radioButton.Locator("xpath=following-sibling::label").IsCheckedAsync();
     }
 
     public static Task SelectStatusAsync(this IPage page, InductionStatus status)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{status.ToString()}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{status}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
     public static Task SelectChangeReasonAsync(this IPage page, InductionChangeReasonOption reason)
     {
-        var radioButton = page.Locator($"input[type='radio'][value='{reason.ToString()}']");
+        var radioButton = page.Locator($"input[type='radio'][value='{reason}']");
         return radioButton.Locator("xpath=following-sibling::label").ClickAsync();
     }
 
