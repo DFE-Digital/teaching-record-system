@@ -118,14 +118,9 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync("/route/add/status");
     }
 
-    public static Task AssertOnRouteAddStartDatePageAsync(this IPage page)
+    public static Task AssertOnRouteAddStartAndEndDatePageAsync(this IPage page)
     {
-        return page.WaitForUrlPathAsync("/route/add/start-date");
-    }
-
-    public static Task AssertOnRouteAddEndDatePageAsync(this IPage page)
-    {
-        return page.WaitForUrlPathAsync("/route/add/end-date");
+        return page.WaitForUrlPathAsync("/route/add/start-and-end-date");
     }
 
     public static Task AssertOnRouteAddTrainingProviderAsync(this IPage page)

@@ -4,8 +4,7 @@ public enum AddRoutePage
 {
     Route = 0,
     Status,
-    StartDate,
-    EndDate,
+    StartAndEndDate,
     AwardDate,
     InductionExemption,
     TrainingProvider,

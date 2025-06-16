@@ -4,30 +4,37 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class EndDateModel : AddRouteCommonPageModel
+public class StartAndEndDateModel : AddRouteCommonPageModel
 {
+    [BindProperty]
+    [DateInput(ErrorMessagePrefix = "Start date")]
+    [Required(ErrorMessage = "Enter a start date")]
+    [Display(Name = "Route start date")]
+    public DateOnly? TrainingStartDate { get; set; }
+
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "End date")]
     [Required(ErrorMessage = "Enter an end date")]
-    [Display(Name = "Enter the route end date")]
+    [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
-    public EndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
+    public StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
     {
     }
 
     public string BackLink => FromCheckAnswers ?
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.EndDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.StartAndEndDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
+        TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
         TrainingEndDate = JourneyInstance!.State.TrainingEndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (TrainingEndDate.HasValue && JourneyInstance!.State.TrainingStartDate is DateOnly startDate && startDate >= TrainingEndDate)
+        if (TrainingStartDate >= TrainingEndDate)
         {
             ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");
         }
@@ -37,10 +44,14 @@ public class EndDateModel : AddRouteCommonPageModel
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            s.TrainingStartDate = TrainingStartDate;
+            s.TrainingEndDate = TrainingEndDate;
+        });
 
         return Redirect(FromCheckAnswers ?
             LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.EndDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.StartAndEndDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 }
