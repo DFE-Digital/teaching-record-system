@@ -464,7 +464,7 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture), IAsync
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
-            $"/support-tasks/api-trn-requests/?page={page}");
+            $"/support-tasks/api-trn-requests/?pageNumber={page}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
