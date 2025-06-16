@@ -95,7 +95,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         }
         if (!JourneyInstance!.State.ChangeReasonIsComplete)
         {
-            context.Result = Redirect(linkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
+            context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
             return;
         }
 
