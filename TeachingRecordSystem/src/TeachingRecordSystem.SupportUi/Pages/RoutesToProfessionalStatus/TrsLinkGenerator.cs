@@ -34,18 +34,14 @@ public partial class TrsLinkGenerator
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Status", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditStatusCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/Status", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string RouteEditStartDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartDate", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteEditStartDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartDate", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
+    public string RouteEditStartAndEndDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartAndEndDates", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
+    public string RouteEditStartAndEndDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/StartAndEndDates", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
     public string RouteEditHoldsFrom(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditHoldsFromCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/HoldsFrom", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
-    public string RouteEditEndDate(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/EndDate", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
-    public string RouteEditEndDateCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/EndDate", "cancel", routeValues: new { qualificationId }, journeyInstanceId: journeyInstanceId);
     public string RouteEditDegreeType(Guid qualificationId, JourneyInstanceId? journeyInstanceId, bool? fromCheckAnswers = null) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/EditRoute/DegreeType", routeValues: new { qualificationId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteEditDegreeTypeCancel(Guid qualificationId, JourneyInstanceId? journeyInstanceId) =>

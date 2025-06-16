@@ -105,7 +105,7 @@ public class StatusModel(
     private string NextCompletingRoutePage(RouteToProfessionalStatusStatus status)
     {
         return (QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, status.GetEndDateRequirement()) != FieldRequirement.NotApplicable) ?
-            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditStartAndEndDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
     }
 

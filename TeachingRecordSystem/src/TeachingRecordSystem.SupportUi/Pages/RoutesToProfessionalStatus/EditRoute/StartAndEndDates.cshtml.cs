@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class EndDateModel(
+public class StartAndEndDateModel(
     TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
@@ -22,35 +22,48 @@ public class EndDateModel(
     public Guid PersonId { get; set; }
 
     [BindProperty]
+    [DateInput(ErrorMessagePrefix = "Start date")]
+    [Required(ErrorMessage = "Enter a start date")]
+    [Display(Name = "Route start date")]
+    public DateOnly? TrainingStartDate { get; set; }
+
+    [BindProperty]
     [DateInput(ErrorMessagePrefix = "End date")]
     [Required(ErrorMessage = "Enter an end date")]
-    [Display(Name = "Enter the route end date")]
+    [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
     public void OnGet()
     {
+        TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
         TrainingEndDate = JourneyInstance!.State.TrainingEndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (TrainingEndDate.HasValue && JourneyInstance!.State.TrainingStartDate is DateOnly startDate && startDate >= TrainingEndDate)
+        if (TrainingStartDate >= TrainingEndDate)
         {
             ModelState.AddModelError(nameof(TrainingEndDate), "End date must be after start date");
         }
-
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
-
-        if (JourneyInstance!.State.IsCompletingRoute) // if user is here as part of the data collection for awarded or approved state
+        if (JourneyInstance!.State.IsCompletingRoute) // if user is here as part of the data collection for "holds" status
         {
-            await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.TrainingEndDate = TrainingEndDate);
+            await JourneyInstance!.UpdateStateAsync(s =>
+            {
+                s.EditStatusState!.TrainingStartDate = TrainingStartDate;
+                s.EditStatusState!.TrainingEndDate = TrainingEndDate;
+            });
         }
-        else // user is simply editing the end date
+        else // user is simply editing the start and date
         {
-            await JourneyInstance!.UpdateStateAsync(s => s.TrainingEndDate = TrainingEndDate);
+            await JourneyInstance!.UpdateStateAsync(s =>
+            {
+                s.TrainingStartDate = TrainingStartDate;
+                s.TrainingEndDate = TrainingEndDate;
+            });
         }
 
         return Redirect(JourneyInstance!.State.IsCompletingRoute ?
@@ -66,21 +79,16 @@ public class EndDateModel(
         return Redirect(linkGenerator.PersonQualifications(PersonId));
     }
 
+    private string NextCompletingRoutePage()
+    {
+        return linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
+    }
+
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
     }
-
-    public string BackLink => FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
-            JourneyInstance!.State.IsCompletingRoute ?
-                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
-                linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
-
-    private string NextCompletingRoutePage()
-    {
-        return linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
-    }
 }
+

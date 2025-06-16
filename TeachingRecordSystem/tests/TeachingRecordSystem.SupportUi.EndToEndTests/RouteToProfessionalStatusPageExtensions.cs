@@ -53,14 +53,9 @@ public static class RouteToProfessionalStatusPageExtensions
         return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/status");
     }
 
-    public static Task AssertOnRouteEditStartDatePageAsync(this IPage page, Guid qualificationId)
+    public static Task AssertOnRouteEditStartAndEndDatePageAsync(this IPage page, Guid qualificationId)
     {
-        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/start-date");
-    }
-
-    public static Task AssertOnRouteEditEndDatePageAsync(this IPage page, Guid qualificationId)
-    {
-        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/end-date");
+        return page.WaitForUrlPathAsync($"/route/{qualificationId}/edit/start-and-end-date");
     }
 
     public static Task AssertOnRouteEditHoldsFromPageAsync(this IPage page, Guid qualificationId)

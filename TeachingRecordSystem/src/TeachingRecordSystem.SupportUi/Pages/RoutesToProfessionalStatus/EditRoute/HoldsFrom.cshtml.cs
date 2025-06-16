@@ -126,6 +126,6 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
 
     private string PreviousCompletingRoutePage =>
         QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
-            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditStartAndEndDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
 }

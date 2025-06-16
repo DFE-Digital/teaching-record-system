@@ -1,0 +1,39 @@
+@page "/route/{qualificationId}/edit/start-and-end-date/{handler?}"
+@model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute.StartAndEndDateModel
+@{
+    ViewBag.Title = "Route start and end dates";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@(Model.FromCheckAnswers == false ? LinkGenerator.RouteEditDetail(Model.QualificationId, Model.JourneyInstance!.InstanceId) :LinkGenerator.RouteCheckYourAnswers(Model.QualificationId, Model.JourneyInstance!.InstanceId))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <form action="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+            <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
+            <govuk-fieldset>
+                <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Enter the route start and end dates</govuk-fieldset-legend>
+            <govuk-date-input asp-for="TrainingStartDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--m"/>
+                    <govuk-date-input-hint>For example, 27 3 2023</govuk-date-input-hint>
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <govuk-date-input asp-for="TrainingEndDate">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--m"/>
+                    <govuk-date-input-hint>For example, 27 3 2024</govuk-date-input-hint>
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+            </govuk-fieldset>
+
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.RouteEditStartAndEndDateCancel(Model.QualificationId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>
