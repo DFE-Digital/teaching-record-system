@@ -1,4 +1,5 @@
 using TeachingRecordSystem.Core.Events.Models;
+using File = TeachingRecordSystem.Core.Events.Models.File;
 
 namespace TeachingRecordSystem.Core.Events;
 
@@ -6,6 +7,10 @@ public record RouteToProfessionalStatusCreatedEvent : EventBase, IEventWithPerso
 {
     public required Guid PersonId { get; init; }
     public required RouteToProfessionalStatus RouteToProfessionalStatus { get; init; }
+    public required string? ChangeReason { get; init; }
+    public required string? ChangeReasonDetail { get; init; }
+    public required File? EvidenceFile { get; init; }
+
     public required RouteToProfessionalStatusCreatedEventChanges Changes { get; init; }
     public required ProfessionalStatusPersonAttributes PersonAttributes { get; init; }
     public required ProfessionalStatusPersonAttributes OldPersonAttributes { get; init; }

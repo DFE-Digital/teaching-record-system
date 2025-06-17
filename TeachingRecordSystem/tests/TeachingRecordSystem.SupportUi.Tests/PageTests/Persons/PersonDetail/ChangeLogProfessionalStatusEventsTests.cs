@@ -101,6 +101,47 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
     }
 
     [Fact]
+    public async Task ProfessionalStatusCreatedEvent_RendersExpectedChangeReasonContent()
+    {
+        // Arrange
+        var awardDate = Clock.Today.AddYears(-2).AddDays(1);
+        var route = await ReferenceDataCache.GetRouteWhereAllFieldsApplyAsync();
+        var status = RouteToProfessionalStatusStatus.Holds;
+        var changeReason = "Text from change reason selection";
+        var changeReasonDetail = TestData.GenerateLoremIpsum();
+        var filename = "filename.txt";
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(q =>
+            {
+                q.WithRouteType(route.RouteToProfessionalStatusTypeId);
+                q.WithStatus(status);
+                q.WithInductionExemption(true);
+                q.WithHoldsFrom(awardDate);
+                q.WithChangeReason(changeReason, changeReasonDetail);
+                q.WithEvidenceFile(filename);
+            }));
+
+        var professionalStatus = person.Person.Qualifications!.OfType<RouteToProfessionalStatus>().Single();
+
+        var updatedByUser = await TestData.CreateUserAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/change-history");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+
+        var timelineItem = doc.GetElementByTestId("timeline-item-route-created-event");
+        Assert.NotNull(timelineItem);
+        Assert.Equal(changeReason, timelineItem.GetElementByTestId("reason")?.TrimmedText());
+        Assert.Equal(changeReasonDetail, timelineItem.GetElementByTestId("reason-detail")?.TrimmedText());
+        Assert.Equal($"{filename} (opens in new tab)", timelineItem.GetElementByTestId("uploaded-evidence-link")?.TrimmedText());
+    }
+
+    [Fact]
     public async Task ProfessionalStatusUpdatedEvent_RendersExpectedContent()
     {
         // Arrange

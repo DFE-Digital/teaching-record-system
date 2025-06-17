@@ -15,18 +15,6 @@
     var ageRangeType = professionalStatus.TrainingAgeSpecialismType;
     var ageRangeFromTo = (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeTo is not null) ?
         $"From {professionalStatus.TrainingAgeSpecialismRangeFrom} to {professionalStatus.TrainingAgeSpecialismRangeTo}" : null;
-    // var subjects = professionalStatus.TrainingSubjectIds is not null
-    //      ? professionalStatus.TrainingSubjectIds
-    //          .Join(
-    //              await ReferenceDataCache.GetTrainingSubjectsAsync(),
-    //              id => id,
-    //              subject => subject.TrainingSubjectId,
-    //              (id, subject) => subject
-    //          )
-    //          .OrderBy(subject => subject.Name)
-    //          .Select(subject => $"{subject.Reference} - {subject.Name}")
-    //          .ToArray()
-    //          : null;
     var subjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(professionalStatus.TrainingSubjectIds, ReferenceDataCache);
     var oldTrainingProvider = oldDetails.TrainingProviderId.HasValue ? await ReferenceDataCache.GetTrainingProviderByIdAsync(oldDetails.TrainingProviderId.Value) : null;
     var oldCountry = !string.IsNullOrEmpty(oldDetails.TrainingCountryId) ? await ReferenceDataCache.GetTrainingCountryByIdAsync(oldDetails.TrainingCountryId) : null;
