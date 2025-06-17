@@ -63,6 +63,16 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             JourneyInstance!.State.IsExemptFromInduction,
             User.GetUserId(),
             clock.UtcNow,
+            JourneyInstance!.State.ChangeReason!.GetDisplayName(),
+            JourneyInstance!.State.ChangeReasonDetail!.ChangeReasonDetail,
+            evidenceFile: JourneyInstance!.State.ChangeReasonDetail!.EvidenceFileId is Guid fileId ?
+            new EventModels.File()
+            {
+                FileId = fileId,
+                Name = JourneyInstance.State.ChangeReasonDetail.EvidenceFileName!
+            } :
+            null,
+
             out var @event);
 
         dbContext.Qualifications.Add(professionalStatus);
@@ -83,6 +93,12 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             context.Result = new BadRequestResult();
             return;
         }
+        if (!JourneyInstance!.State.ChangeReasonIsComplete)
+        {
+            context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
+            return;
+        }
+
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;

@@ -69,6 +69,9 @@ public class SetQtlsHandler(
                     isExemptFromInduction: true,
                     createdBy: currentUserId,
                     now: clock.UtcNow,
+                    null,
+                    null,
+                    null,
                     out var @event);
 
                 dbContext.Qualifications.Add(professionalStatus);

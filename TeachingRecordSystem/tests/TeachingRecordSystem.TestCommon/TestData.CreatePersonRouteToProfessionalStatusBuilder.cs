@@ -21,6 +21,9 @@ public partial class TestData
         private Guid? _degreeTypeId;
         private bool? _exemptFromInduction;
         private EventModels.RaisedByUserInfo? _createdByUser;
+        private string? _changeReason;
+        private string? _changeReasonDetail;
+        private Core.Events.Models.File? _evidenceFile { get; set; }
 
         public CreatePersonRouteToProfessionalStatusBuilder WithStatus(RouteToProfessionalStatusStatus status)
         {
@@ -100,6 +103,23 @@ public partial class TestData
             return this;
         }
 
+        public CreatePersonRouteToProfessionalStatusBuilder WithChangeReason(string reason, string reasonDetail)
+        {
+            _changeReason = reason;
+            _changeReasonDetail = reasonDetail;
+            return this;
+        }
+
+        public CreatePersonRouteToProfessionalStatusBuilder WithEvidenceFile(string name)
+        {
+            _evidenceFile = new Core.Events.Models.File()
+            {
+                FileId = Guid.NewGuid(),
+                Name = name
+            };
+            return this;
+        }
+
         public CreatePersonRouteToProfessionalStatusBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
         {
             _createdByUser = user;
@@ -141,6 +161,9 @@ public partial class TestData
                 _exemptFromInduction,
                 _createdByUser,
                 DateTime.UtcNow,
+                _changeReason,
+                _changeReasonDetail,
+                _evidenceFile,
                 out var @createdEvent);
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
