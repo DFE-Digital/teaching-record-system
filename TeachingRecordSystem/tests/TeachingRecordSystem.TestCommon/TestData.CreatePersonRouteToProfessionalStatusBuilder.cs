@@ -103,14 +103,14 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithChangeReason(string reason, string reasonDetail)
+        public CreatePersonRouteToProfessionalStatusBuilder WithChangeReason(string reason, string reasonDetail)
         {
             _changeReason = reason;
             _changeReasonDetail = reasonDetail;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithEvidenceFile(string name)
+        public CreatePersonRouteToProfessionalStatusBuilder WithEvidenceFile(string name)
         {
             _evidenceFile = new Core.Events.Models.File()
             {
