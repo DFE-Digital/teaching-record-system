@@ -38,7 +38,7 @@ public class StatusTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Theory]
-    [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-date")]
+    [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.InTraining, "start-and-end-date")]
     [InlineData("Apprenticeship", RouteToProfessionalStatusStatus.Failed, "country")]
     public async Task Post_Status_PersistsDataAndRedirectsToExpected(string routeName, RouteToProfessionalStatusStatus status, string expected)
     {
