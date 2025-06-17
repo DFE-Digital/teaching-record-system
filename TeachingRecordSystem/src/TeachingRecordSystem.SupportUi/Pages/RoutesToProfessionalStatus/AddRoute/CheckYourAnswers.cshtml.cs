@@ -29,11 +29,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await ReferenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await ReferenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
         RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await ReferenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
-        RouteDetail.TrainingSubjects = RouteDetail.TrainingSubjectIds is not null ?
-            RouteDetail.TrainingSubjectIds
-                .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
-                .OrderByDescending(name => name)
-                .ToArray() : null;
+        RouteDetail.TrainingSubjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(RouteDetail.TrainingSubjectIds, ReferenceDataCache);
     }
 
     public async Task<IActionResult> OnPostAsync()

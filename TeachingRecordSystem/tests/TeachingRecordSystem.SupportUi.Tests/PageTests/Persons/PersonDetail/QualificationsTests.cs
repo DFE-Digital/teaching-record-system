@@ -141,7 +141,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
 
         var professionalStatus = doc.GetElementByTestId($"professionalstatus-id-{qualificationid}");
         Assert.NotNull(professionalStatus);
-        Assert.Equal(route.Name, professionalStatus.GetElementByTestId($"training-route-{qualificationid}")!.TrimmedText());
+        Assert.Equal(route.Name, professionalStatus.GetElementByTestId($"route-type-{qualificationid}")!.TrimmedText());
         Assert.Equal(startDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"training-start-date-{qualificationid}")!.TrimmedText());
         Assert.Equal(endDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"training-end-date-{qualificationid}")!.TrimmedText());
         Assert.Equal(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), professionalStatus.GetElementByTestId($"award-date-{qualificationid}")!.TrimmedText());

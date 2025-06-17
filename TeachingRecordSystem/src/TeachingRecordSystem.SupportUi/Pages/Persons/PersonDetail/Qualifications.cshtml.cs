@@ -35,7 +35,7 @@ public class QualificationsModel(TrsDbContext dbContext, ReferenceDataCache refe
             .Distinct()
             .ToArray();
         var trainingSubjectsLookup = (await referenceDataCache.GetTrainingSubjectsAsync())
-            .ToDictionary(subject => subject.TrainingSubjectId, subject => subject.Name);
+            .ToDictionary(subject => subject.TrainingSubjectId, subject => $"{subject.Reference} - {subject.Name}");
         TrainingSubjects = uniqueSubjectIds.ToDictionary(
             id => id,
             id => trainingSubjectsLookup[id]
