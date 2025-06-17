@@ -15,9 +15,8 @@ public static class TestDataHelper
                 && r.DegreeTypeRequired != FieldRequirement.NotApplicable
                 && r.TrainingSubjectsRequired != FieldRequirement.NotApplicable
                 && r.InductionExemptionRequired != FieldRequirement.NotApplicable
-                && r.TrainingStartDateRequired != FieldRequirement.NotApplicable
-                && r.TrainingEndDateRequired != FieldRequirement.NotApplicable
-                && r.HoldsFromRequired != FieldRequirement.NotApplicable)
+                && r.TrainingStartAndEndDatesRequired != FieldRequirement.NotApplicable
+                 && r.HoldsFromRequired != FieldRequirement.NotApplicable)
             .Where(r => professionalStatusType is null || professionalStatusType == r.ProfessionalStatusType)
             .RandomOne();
     }
@@ -31,8 +30,7 @@ public static class TestDataHelper
                 && r.DegreeTypeRequired == fieldRequirement
                 && r.TrainingSubjectsRequired == fieldRequirement
                 && r.InductionExemptionRequired == fieldRequirement
-                && r.TrainingStartDateRequired == fieldRequirement
-                && r.TrainingEndDateRequired == fieldRequirement)
+                && r.TrainingStartAndEndDatesRequired == fieldRequirement)
             .RandomOne();
     }
 
@@ -43,10 +41,9 @@ public static class TestDataHelper
                 && s.HoldsFromRequired != FieldRequirement.NotApplicable
                 && s.TrainingCountryRequired != FieldRequirement.NotApplicable
                 && s.DegreeTypeRequired != FieldRequirement.NotApplicable
-                && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingStartAndEndDateRequired != FieldRequirement.NotApplicable
                 && s.InductionExemptionRequired != FieldRequirement.NotApplicable
                 && s.TrainingProviderRequired != FieldRequirement.NotApplicable
-                && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
                 && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;

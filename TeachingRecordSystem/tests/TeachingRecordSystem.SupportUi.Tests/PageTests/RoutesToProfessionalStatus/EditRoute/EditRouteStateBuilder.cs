@@ -31,10 +31,9 @@ public class EditRouteStateBuilder()
                 && s.HoldsFromRequired != FieldRequirement.NotApplicable
                 && s.TrainingCountryRequired != FieldRequirement.NotApplicable
                 && s.DegreeTypeRequired != FieldRequirement.NotApplicable
-                && s.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && s.TrainingStartAndEndDateRequired != FieldRequirement.NotApplicable
                 && s.InductionExemptionRequired != FieldRequirement.NotApplicable
                 && s.TrainingProviderRequired != FieldRequirement.NotApplicable
-                && s.TrainingStartDateRequired != FieldRequirement.NotApplicable
                 && s.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;

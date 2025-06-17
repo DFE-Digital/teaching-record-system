@@ -150,11 +150,11 @@ public class CheckYourAnswersModel(
     private bool IsComplete(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status)
     {
         var errors = NotCompleteError.None |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory
-                && JourneyInstance!.State.TrainingEndDate is null) ? NotCompleteError.StartDate : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.TrainingEndDateRequired, status.GetEndDateRequirement()) == FieldRequirement.Mandatory
+            ((QuestionDriverHelper.FieldRequired(route.TrainingStartAndEndDatesRequired, status.GetStartAndEndDateRequirement()) == FieldRequirement.Mandatory
+                && JourneyInstance!.State.TrainingStartDate is null) ? NotCompleteError.StartDate : NotCompleteError.None) |
+            ((QuestionDriverHelper.FieldRequired(route.TrainingStartAndEndDatesRequired, status.GetStartAndEndDateRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.TrainingEndDate is null) ? NotCompleteError.EndDate : NotCompleteError.None) |
-            ((QuestionDriverHelper.FieldRequired(route.HoldsFromRequired, status.GetAwardDateRequirement()) == FieldRequirement.Mandatory
+            ((QuestionDriverHelper.FieldRequired(route.HoldsFromRequired, status.GetHoldsFromRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.HoldsFrom is null) ? NotCompleteError.AwardDate : NotCompleteError.None) |
             ((QuestionDriverHelper.FieldRequired(route.DegreeTypeRequired, status.GetDegreeTypeRequirement()) == FieldRequirement.Mandatory
                 && JourneyInstance!.State.DegreeTypeId is null) ? NotCompleteError.DegreeType : NotCompleteError.None) |

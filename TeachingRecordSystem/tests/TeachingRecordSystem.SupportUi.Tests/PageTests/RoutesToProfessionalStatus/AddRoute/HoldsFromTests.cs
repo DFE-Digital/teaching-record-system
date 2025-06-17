@@ -216,10 +216,10 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingStartAndEndDatesRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingStartAndEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync();

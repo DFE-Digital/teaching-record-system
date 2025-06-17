@@ -5,9 +5,8 @@ namespace TeachingRecordSystem.Core.Models;
 public enum RouteToProfessionalStatusStatus
 {
     [ProfessionalStatusStatusInfo("In training",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
-        awardDate: FieldRequirement.NotApplicable,
+        startAndEndDates: FieldRequirement.Mandatory,
+        holdsFrom: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
@@ -17,9 +16,8 @@ public enum RouteToProfessionalStatusStatus
     InTraining = 0,
 
     [ProfessionalStatusStatusInfo("Holds",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
-        awardDate: FieldRequirement.Mandatory,
+        startAndEndDates: FieldRequirement.Mandatory,
+        holdsFrom: FieldRequirement.Mandatory,
         inductionExemption: FieldRequirement.Mandatory,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
@@ -29,9 +27,8 @@ public enum RouteToProfessionalStatusStatus
     Holds = 1,
 
     [ProfessionalStatusStatusInfo("Deferred",
-        startDate: FieldRequirement.NotApplicable,
-        endDate: FieldRequirement.NotApplicable,
-        awardDate: FieldRequirement.NotApplicable,
+        startAndEndDates: FieldRequirement.NotApplicable,
+        holdsFrom: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
@@ -41,9 +38,8 @@ public enum RouteToProfessionalStatusStatus
     Deferred = 2,
 
     [ProfessionalStatusStatusInfo("Deferred for skills tests",
-        startDate: FieldRequirement.NotApplicable,
-        endDate: FieldRequirement.NotApplicable,
-        awardDate: FieldRequirement.NotApplicable,
+        startAndEndDates: FieldRequirement.NotApplicable,
+        holdsFrom: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
@@ -53,9 +49,8 @@ public enum RouteToProfessionalStatusStatus
     DeferredForSkillsTest = 3,
 
     [ProfessionalStatusStatusInfo("Failed",
-        startDate: FieldRequirement.NotApplicable,
-        endDate: FieldRequirement.NotApplicable,
-        awardDate: FieldRequirement.NotApplicable,
+        startAndEndDates: FieldRequirement.NotApplicable,
+        holdsFrom: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
@@ -65,9 +60,8 @@ public enum RouteToProfessionalStatusStatus
     Failed = 4,
 
     [ProfessionalStatusStatusInfo("Withdrawn",
-        startDate: FieldRequirement.NotApplicable,
-        endDate: FieldRequirement.NotApplicable,
-        awardDate: FieldRequirement.NotApplicable,
+        startAndEndDates: FieldRequirement.NotApplicable,
+        holdsFrom: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.NotApplicable,
         degreeType: FieldRequirement.NotApplicable,
@@ -77,9 +71,8 @@ public enum RouteToProfessionalStatusStatus
     Withdrawn = 5,
 
     [ProfessionalStatusStatusInfo("Under assessment",
-        startDate: FieldRequirement.Mandatory,
-        endDate: FieldRequirement.Mandatory,
-        awardDate: FieldRequirement.NotApplicable,
+        startAndEndDates: FieldRequirement.Mandatory,
+        holdsFrom: FieldRequirement.NotApplicable,
         inductionExemption: FieldRequirement.NotApplicable,
         trainingProvider: FieldRequirement.Optional,
         degreeType: FieldRequirement.Optional,
@@ -100,11 +93,9 @@ public static class ProfessionalStatusStatusRegistry
 
     public static string GetTitle(this RouteToProfessionalStatusStatus status) => _info[status].Title;
 
-    public static FieldRequirement GetStartDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingStartDateRequired;
+    public static FieldRequirement GetStartAndEndDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingStartAndEndDateRequired;
 
-    public static FieldRequirement GetEndDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].TrainingEndDateRequired;
-
-    public static FieldRequirement GetAwardDateRequirement(this RouteToProfessionalStatusStatus status) => _info[status].HoldsFromRequired;
+    public static FieldRequirement GetHoldsFromRequirement(this RouteToProfessionalStatusStatus status) => _info[status].HoldsFromRequired;
 
     public static FieldRequirement GetInductionExemptionRequirement(this RouteToProfessionalStatusStatus status) => _info[status].InductionExemptionRequired;
 
@@ -127,15 +118,14 @@ public static class ProfessionalStatusStatusRegistry
            throw new Exception($"{nameof(RouteToProfessionalStatusStatus)}.{status} is missing the {nameof(ProfessionalStatusStatusInfoAttribute)} attribute.");
 
         return new ProfessionalStatusStatusInfo(
-            status, attr.Name, attr.StartDate, attr.EndDate, attr.AwardDate, attr.InductionExemption, attr.TrainingProvider, attr.DegreeType, attr.Country, attr.AgeRange, attr.Subjects);
+            status, attr.Name, attr.StartAndEndDates, attr.HoldsDate, attr.InductionExemption, attr.TrainingProvider, attr.DegreeType, attr.Country, attr.AgeRange, attr.Subjects);
     }
 }
 
 public sealed record ProfessionalStatusStatusInfo(
     RouteToProfessionalStatusStatus Value,
     string Name,
-    FieldRequirement TrainingStartDateRequired,
-    FieldRequirement TrainingEndDateRequired,
+    FieldRequirement TrainingStartAndEndDateRequired,
     FieldRequirement HoldsFromRequired,
     FieldRequirement InductionExemptionRequired,
     FieldRequirement TrainingProviderRequired,
@@ -150,9 +140,8 @@ public sealed record ProfessionalStatusStatusInfo(
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 file sealed class ProfessionalStatusStatusInfoAttribute(
         string name,
-        FieldRequirement startDate,
-        FieldRequirement endDate,
-        FieldRequirement awardDate,
+        FieldRequirement startAndEndDates,
+        FieldRequirement holdsFrom,
         FieldRequirement inductionExemption,
         FieldRequirement trainingProvider,
         FieldRequirement degreeType,
@@ -162,9 +151,8 @@ file sealed class ProfessionalStatusStatusInfoAttribute(
     ) : Attribute
 {
     public string Name => name;
-    public FieldRequirement StartDate => startDate;
-    public FieldRequirement EndDate => endDate;
-    public FieldRequirement AwardDate => awardDate;
+    public FieldRequirement StartAndEndDates => startAndEndDates;
+    public FieldRequirement HoldsDate => holdsFrom;
     public FieldRequirement InductionExemption => inductionExemption;
     public FieldRequirement TrainingProvider => trainingProvider;
     public FieldRequirement DegreeType => degreeType;

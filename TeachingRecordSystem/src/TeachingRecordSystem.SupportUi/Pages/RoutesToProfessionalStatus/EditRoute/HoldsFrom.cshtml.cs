@@ -124,7 +124,7 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
             linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
 
     private string PreviousCompletingRoutePage =>
-        QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
+        QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingStartAndEndDatesRequired, JourneyInstance!.State.EditStatusState!.Status.GetStartAndEndDateRequirement()) != FieldRequirement.NotApplicable ?
             linkGenerator.RouteEditStartAndEndDate(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
 }

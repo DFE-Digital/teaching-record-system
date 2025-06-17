@@ -23,8 +23,7 @@ public class RouteToProfessionalStatusType
     public required string Name { get; init; }
     public required ProfessionalStatusType ProfessionalStatusType { get; init; }
     public required bool IsActive { get; set; }
-    public required FieldRequirement TrainingStartDateRequired { get; init; }
-    public required FieldRequirement TrainingEndDateRequired { get; init; }
+    public required FieldRequirement TrainingStartAndEndDatesRequired { get; init; }
     public required FieldRequirement HoldsFromRequired { get; init; }
     public required FieldRequirement InductionExemptionRequired { get; init; }
     public required FieldRequirement TrainingProviderRequired { get; init; }

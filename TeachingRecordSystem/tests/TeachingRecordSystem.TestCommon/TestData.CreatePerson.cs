@@ -651,8 +651,8 @@ public partial class TestData
                                 route.RouteToProfessionalStatusTypeId,
                                 RouteToProfessionalStatusStatus.Holds,
                                 testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
-                                route.TrainingStartDateRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
-                                route.TrainingEndDateRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
+                                route.TrainingStartAndEndDatesRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
+                                route.TrainingStartAndEndDatesRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
                                 route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
                                 new[] { allSubjects.RandomOne().TrainingSubjectId } :
                                 [],
