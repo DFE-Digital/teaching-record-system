@@ -1,24 +1,21 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
-namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
+namespace TeachingRecordSystem.SupportUi.Pages.Persons.Create;
 
 [RequireFeatureEnabledFilterFactory(FeatureNames.ContactsMigrated)]
-[Journey(JourneyNames.EditDetails), ActivatesJourney, RequireJourneyInstance]
-public class IndexModel(
+[Journey(JourneyNames.CreatePerson), ActivatesJourney, RequireJourneyInstance]
+public class PersonalDetailsModel(
     TrsDbContext dbContext,
     IClock clock,
     TrsLinkGenerator linkGenerator,
     IFileService fileService)
     : CommonJourneyPage(dbContext, linkGenerator, fileService)
 {
-    private Person? _person;
-
     [BindProperty]
     [Display(Name = "First name")]
     [Required(ErrorMessage = "Enter the person\u2019s first name")]
@@ -55,32 +52,15 @@ public class IndexModel(
     [Display(Name = "National Insurance number (optional)")]
     public string? NationalInsuranceNumber { get; set; }
 
-    public bool NameChanged =>
-        (FirstName ?? "") != JourneyInstance!.State.OriginalFirstName ||
-        (MiddleName ?? "") != JourneyInstance!.State.OriginalMiddleName ||
-        (LastName ?? "") != JourneyInstance!.State.OriginalLastName;
-
-    public bool OtherDetailsChanged =>
-        DateOfBirth != JourneyInstance!.State.OriginalDateOfBirth ||
-        EditDetailsFieldState<EmailAddress>.FromRawValue(EmailAddress) != JourneyInstance!.State.OriginalEmailAddress ||
-        EditDetailsFieldState<MobileNumber>.FromRawValue(MobileNumber) != JourneyInstance!.State.OriginalMobileNumber ||
-        EditDetailsFieldState<NationalInsuranceNumber>.FromRawValue(NationalInsuranceNumber) != JourneyInstance!.State.OriginalNationalInsuranceNumber;
-
     public string BackLink => GetPageLink(
         FromCheckAnswers
-            ? EditDetailsJourneyPage.CheckAnswers
+            ? CreateJourneyPage.CheckAnswers
             : null);
 
     public string NextPage => GetPageLink(
         FromCheckAnswers
-            ? !JourneyInstance!.State.NameChanged && NameChanged
-                ? EditDetailsJourneyPage.NameChangeReason
-                : !JourneyInstance!.State.OtherDetailsChanged && OtherDetailsChanged
-                    ? EditDetailsJourneyPage.OtherDetailsChangeReason
-                    : EditDetailsJourneyPage.CheckAnswers
-            : NameChanged
-                ? EditDetailsJourneyPage.NameChangeReason
-                : EditDetailsJourneyPage.OtherDetailsChangeReason,
+            ? CreateJourneyPage.CheckAnswers
+            : CreateJourneyPage.CreateReason,
         FromCheckAnswers is true ? true : null);
 
     public IActionResult OnGet()
@@ -98,11 +78,6 @@ public class IndexModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!NameChanged && !OtherDetailsChanged)
-        {
-            ModelState.AddModelError("", "Please change one or more of the person\u2019s details");
-        }
-
         if (DateOfBirth.HasValue && DateOfBirth.Value > clock.Today)
         {
             ModelState.AddModelError(nameof(DateOfBirth), "Person\u2019s date of birth must be in the past");
@@ -142,38 +117,8 @@ public class IndexModel(
             state.EmailAddress = new(EmailAddress ?? "", emailAddress);
             state.MobileNumber = new(MobileNumber ?? "", mobileNumber);
             state.NationalInsuranceNumber = new(NationalInsuranceNumber ?? "", nationalInsuranceNumber);
-
-            if (!NameChanged && state.NameChangeReason is not null)
-            {
-                state.NameChangeReason = null;
-                state.NameChangeUploadEvidence = null;
-                state.NameChangeEvidenceFileId = null;
-                state.NameChangeEvidenceFileName = null;
-                state.NameChangeEvidenceFileSizeDescription = null;
-            }
-
-            if (!OtherDetailsChanged && state.OtherDetailsChangeReason is not null)
-            {
-                state.OtherDetailsChangeReason = null;
-                state.OtherDetailsChangeReasonDetail = null;
-                state.OtherDetailsChangeUploadEvidence = null;
-                state.OtherDetailsChangeEvidenceFileId = null;
-                state.OtherDetailsChangeEvidenceFileName = null;
-                state.OtherDetailsChangeEvidenceFileSizeDescription = null;
-            }
         });
 
         return Redirect(nextPage);
-    }
-
-    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
-    {
-        _person = await DbContext.Persons.SingleOrDefaultAsync(u => u.PersonId == PersonId);
-
-        if (_person is null)
-        {
-            context.Result = NotFound();
-            return;
-        }
     }
 }

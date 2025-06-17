@@ -39,17 +39,17 @@ public abstract class CommonJourneyPage(
     {
         return pageName switch
         {
-            EditDetailsJourneyPage.Index => LinkGenerator.EditDetailsIndex(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.NameChangeReason => LinkGenerator.EditDetailsNameChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.OtherDetailsChangeReason => LinkGenerator.EditDetailsOtherDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
-            EditDetailsJourneyPage.CheckAnswers => LinkGenerator.EditDetailsCheckAnswers(PersonId, JourneyInstance!.InstanceId),
+            EditDetailsJourneyPage.PersonalDetails => LinkGenerator.PersonEditDetailsPersonalDetails(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.NameChangeReason => LinkGenerator.PersonEditDetailsNameChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.OtherDetailsChangeReason => LinkGenerator.PersonEditDetailsOtherDetailsChangeReason(PersonId, JourneyInstance!.InstanceId, fromCheckAnswers),
+            EditDetailsJourneyPage.CheckAnswers => LinkGenerator.PersonEditDetailsCheckAnswers(PersonId, JourneyInstance!.InstanceId),
             _ => LinkGenerator.PersonDetail(PersonId)
         };
     }
 
     public EditDetailsJourneyPage NextIncompletePage =>
-        !JourneyInstance!.State.IsIndexComplete
-            ? EditDetailsJourneyPage.Index
+        !JourneyInstance!.State.IsPersonalDetailsComplete
+            ? EditDetailsJourneyPage.PersonalDetails
             : !JourneyInstance!.State.IsNameChangeReasonComplete
                 ? EditDetailsJourneyPage.NameChangeReason
                 : !JourneyInstance!.State.IsOtherDetailsChangeReasonComplete

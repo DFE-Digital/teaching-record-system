@@ -56,7 +56,7 @@ public class OtherDetailsChangeReasonModel(
             ? EditDetailsJourneyPage.CheckAnswers
             : JourneyInstance!.State.NameChanged
                 ? EditDetailsJourneyPage.NameChangeReason
-                : EditDetailsJourneyPage.Index);
+                : EditDetailsJourneyPage.PersonalDetails);
 
     public string NextPage => GetPageLink(
         EditDetailsJourneyPage.CheckAnswers,

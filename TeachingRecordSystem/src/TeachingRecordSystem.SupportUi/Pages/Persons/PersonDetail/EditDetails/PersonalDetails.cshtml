@@ -1,0 +1,66 @@
+@page "/persons/{personId}/edit-details"
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@using TeachingRecordSystem.SupportUi.Pages.Shared
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails.PersonalDetailsModel
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "Edit personal details";
+}
+
+@section BeforeContent {
+    <govuk-back-link data-testid="back-link" href="@Model.BackLink">Back</govuk-back-link>
+}
+
+@if (ModelState.ErrorCount > 0)
+{
+    //Re-implement the form error summary to handle validation errors that do not apply to a specific field
+    <govuk-error-summary>
+        @if (ModelState.ContainsKey("") && ModelState[""] is ModelStateEntry entry && entry.Errors.Count > 0)
+        {
+            <govuk-error-summary-item>@entry.Errors.First().ErrorMessage</govuk-error-summary-item>
+        }
+        <govuk-error-summary-item for="FirstName" />
+        <govuk-error-summary-item for="MiddleName" />
+        <govuk-error-summary-item for="LastName" />
+        <govuk-error-summary-item for="DateOfBirth" />
+        <govuk-error-summary-item for="EmailAddress" />
+        <govuk-error-summary-item for="MobileNumber" />
+        <govuk-error-summary-item for="NationalInsuranceNumber" />
+    </govuk-error-summary>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action=@LinkGenerator.PersonEditDetailsPersonalDetails(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers) method="post" data-testid="submit-form">
+            <span class="govuk-caption-l" data-testid="edit-details-caption">@Model.PersonName</span>
+            <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+
+            <govuk-input asp-for="FirstName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-first-name" />
+
+            <govuk-input asp-for="MiddleName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-middle-name" />
+
+            <govuk-input asp-for="LastName" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-last-name"/>
+
+            <govuk-date-input asp-for="DateOfBirth" data-testid="edit-details-date-of-birth">
+                <govuk-date-input-fieldset>
+                    <govuk-date-input-hint>For example, 31 3 1980</govuk-date-input-hint>
+                    <govuk-date-input-fieldset-legend class="govuk-fieldset__legend--s" />
+                </govuk-date-input-fieldset>
+            </govuk-date-input>
+
+            <govuk-input asp-for="EmailAddress" type="email" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-email-address"/>
+
+            <govuk-input asp-for="MobileNumber" type="tel" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-mobile-number"/>
+
+            <govuk-input asp-for="NationalInsuranceNumber" label-class="govuk-label--s" input-class="govuk-input--width-20" data-testid="edit-details-national-insurance-number">
+                <govuk-input-hint>For example, &lsquo;QQ 12 34 5 C&rsquo;</govuk-input-hint>
+            </govuk-input>
+
+            <div class="govuk-button-group">
+                <govuk-button type="submit" data-testid="continue-button">Continue</govuk-button>
+                <govuk-button data-testid="cancel-button" formaction="@LinkGenerator.PersonEditDetailsCancel(Model.PersonId, Model.JourneyInstance!.InstanceId)" class="govuk-button--secondary" type="submit">Cancel and return to record</govuk-button>
+            </div>
+        </form>
+    </div>
+</div>

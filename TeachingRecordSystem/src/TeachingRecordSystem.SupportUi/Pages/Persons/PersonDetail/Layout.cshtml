@@ -1,0 +1,66 @@
+@using TeachingRecordSystem.Core.Dqt.Models;
+@using TeachingRecordSystem.SupportUi.Pages.Common;
+@{
+    Layout = "_Layout";
+    var selectedTab = (PersonDetailSubNavigationTab)ViewBag.SelectedTab;
+    var person = Context.Features.GetRequiredFeature<CurrentPersonFeature>();
+    var personId = person.PersonId;
+    ViewBag.Title = person.Name;
+}
+
+@section BeforeContent {
+    @RenderSection("BeforeContent", required: false)
+}
+
+<h1 class="govuk-heading-l" data-testid="page-title">@person.Name</h1>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <nav class="moj-sub-navigation" aria-label="Sub navigation">
+            <ul class="moj-sub-navigation__list">
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.General ? "page" : null)" href="@LinkGenerator.PersonDetail(personId)">General</a>
+                </li>
+
+                @if (FeatureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus))
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Routes and qualifications</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Qualifications ? "page" : null)" href="@LinkGenerator.PersonQualifications(personId)">Qualifications</a>
+                    </li>
+                }
+
+                @if (FeatureProvider.IsEnabled(FeatureNames.Induction))
+                {
+                    <li class="moj-sub-navigation__item" data-testid="induction-tab">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Induction ? "page" : null)" href="@LinkGenerator.PersonInduction(personId)">Induction</a>
+                    </li>
+                }
+
+                @if (FeatureProvider.IsEnabled(FeatureNames.Alerts))
+                {
+                    <li class="moj-sub-navigation__item">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Alerts ? "page" : null)" href="@LinkGenerator.PersonAlerts(personId)">Alerts</a>
+                    </li>
+                }
+
+                <li class="moj-sub-navigation__item">
+                    <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.ChangeHistory ? "page" : null)" href="@LinkGenerator.PersonChangeHistory(personId)">Change history</a>
+                </li>
+
+                @if (FeatureProvider.IsEnabled(FeatureNames.DqtNotes))
+                {
+                    <li class="moj-sub-navigation__item" data-testid="dqtnotes-tab">
+                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonDetailSubNavigationTab.Notes ? "page" : null)" href="@LinkGenerator.PersonNotes(personId)">Notes</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+        @RenderBody()
+    </div>
+</div>

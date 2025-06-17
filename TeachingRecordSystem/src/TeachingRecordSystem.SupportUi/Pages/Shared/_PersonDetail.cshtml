@@ -6,7 +6,7 @@
     <govuk-summary-card-actions>
         @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
         {
-            <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator.EditDetailsIndex(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
+            <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator.PersonEditDetailsPersonalDetails(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
         }
     </govuk-summary-card-actions>
     <govuk-summary-list>

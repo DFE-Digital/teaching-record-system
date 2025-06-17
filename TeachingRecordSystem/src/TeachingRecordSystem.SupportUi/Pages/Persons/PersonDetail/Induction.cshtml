@@ -3,7 +3,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.InductionModel;
 @{
     Layout = "Layout";
-    ViewBag.SelectedTab = PersonSubNavigationTab.Induction;
+    ViewBag.SelectedTab = PersonDetailSubNavigationTab.Induction;
     var person = HttpContext.Features.GetRequiredFeature<CurrentPersonFeature>();
 }
 
@@ -26,7 +26,7 @@
                 @if (Model.CanWrite)
                 {
                     <govuk-summary-list-row-actions>
-                        <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.InductionEditStatus(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change status">Change</govuk-summary-list-row-action>
+                        <govuk-summary-list-row-action data-testid="change-induction-status" href="@LinkGenerator.PersonInductionEditStatus(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change status">Change</govuk-summary-list-row-action>
                     </govuk-summary-list-row-actions>
                 }
             </govuk-summary-list-row>
@@ -49,7 +49,7 @@
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.InductionEditExemptionReason(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change exemption reason">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-induction-exemption-reason" href="@LinkGenerator.PersonInductionEditExemptionReason(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change exemption reason">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>
@@ -63,7 +63,7 @@
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.InductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change start date">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-induction-start-date" href="@LinkGenerator.PersonInductionEditStartDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change start date">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>
@@ -77,7 +77,7 @@
                     @if (Model.CanWrite)
                     {
                         <govuk-summary-list-row-actions>
-                            <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.InductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change completed date">Change</govuk-summary-list-row-action>
+                            <govuk-summary-list-row-action data-testid="change-induction-completed-date" href="@LinkGenerator.PersonInductionEditCompletedDate(person.PersonId, journeyInstanceId: null)" visually-hidden-text="change completed date">Change</govuk-summary-list-row-action>
                         </govuk-summary-list-row-actions>
                     }
                 </govuk-summary-list-row>

@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 public enum EditDetailsJourneyPage
 {
-    Index,
+    PersonalDetails,
     NameChangeReason,
     OtherDetailsChangeReason,
     CheckAnswers

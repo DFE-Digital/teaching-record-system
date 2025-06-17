@@ -1,4 +1,3 @@
-
 namespace TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.EditDetails;
 
 public class EditDetailsFieldState<T>(string raw, T? parsed) where T : class, IParsable<T>

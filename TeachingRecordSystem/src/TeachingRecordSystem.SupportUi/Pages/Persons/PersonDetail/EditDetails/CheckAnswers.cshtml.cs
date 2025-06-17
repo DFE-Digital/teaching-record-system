@@ -21,7 +21,6 @@ public class CheckAnswersModel(
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
     public string? LastName { get; set; }
-    public string? Trn { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public EmailAddress? EmailAddress { get; set; }
     public MobileNumber? MobileNumber { get; set; }
@@ -41,7 +40,7 @@ public class CheckAnswersModel(
     public string Name => StringHelper.JoinNonEmpty(' ', FirstName, MiddleName, LastName);
 
     public string? ChangePersonalDetailsLink =>
-        GetPageLink(EditDetailsJourneyPage.Index, true);
+        GetPageLink(EditDetailsJourneyPage.PersonalDetails, true);
 
     public string? ChangeNameChangeReasonLink =>
         GetPageLink(EditDetailsJourneyPage.NameChangeReason, true);
@@ -61,6 +60,7 @@ public class CheckAnswersModel(
     public async Task<IActionResult> OnPostAsync()
     {
         var now = clock.UtcNow;
+
         _person!.UpdateDetails(
             FirstName ?? string.Empty,
             MiddleName ?? string.Empty,
@@ -136,7 +136,6 @@ public class CheckAnswersModel(
             return;
         }
 
-        Trn = _person.Trn;
         FirstName = JourneyInstance!.State.FirstName;
         MiddleName = JourneyInstance.State.MiddleName;
         LastName = JourneyInstance.State.LastName;

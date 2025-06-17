@@ -1,0 +1,10 @@
+@page "/persons/create"
+@using TeachingRecordSystem.Core.Dqt.Models;
+@model TeachingRecordSystem.SupportUi.Pages.Persons.Create.IndexModel
+@{
+    Layout = "Layout";
+    ViewBag.SelectedTab = PersonsSubNavigationTab.CreateARecord;
+    ViewBag.Title = "Create a record";
+}
+
+<govuk-button-link href="@LinkGenerator.PersonCreatePersonalDetails()">Add a record</govuk-button-link>

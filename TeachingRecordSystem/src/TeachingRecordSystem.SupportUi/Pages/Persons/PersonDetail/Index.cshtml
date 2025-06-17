@@ -4,7 +4,7 @@
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.IndexModel
 @{
     Layout = "Layout";
-    ViewBag.SelectedTab = PersonSubNavigationTab.General;
+    ViewBag.SelectedTab = PersonDetailSubNavigationTab.General;
 }
 
 @if (FeatureProvider.IsEnabled(FeatureNames.Alerts) && Model.HasOpenAlert)

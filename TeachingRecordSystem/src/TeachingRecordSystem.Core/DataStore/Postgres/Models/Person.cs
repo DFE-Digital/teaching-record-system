@@ -631,6 +631,52 @@ public class Person
         return false;
     }
 
+    public static Person Create(
+        string trn,
+        string firstName,
+        string middleName,
+        string lastName,
+        DateOnly? dateOfBirth,
+        EmailAddress? emailAddress,
+        MobileNumber? mobileNumber,
+        NationalInsuranceNumber? nationalInsuranceNumber,
+        string? createReason,
+        string? createReasonDetail,
+        EventModels.File? evidenceFile,
+        EventModels.RaisedByUserInfo updatedBy,
+        DateTime now,
+        out PersonCreatedEvent @event)
+    {
+        var person = new Person
+        {
+            PersonId = Guid.NewGuid(),
+            Trn = trn,
+            FirstName = firstName,
+            MiddleName = middleName,
+            LastName = lastName,
+            DateOfBirth = dateOfBirth,
+            MobileNumber = (string?)mobileNumber,
+            EmailAddress = (string?)emailAddress,
+            NationalInsuranceNumber = (string?)nationalInsuranceNumber,
+            CreatedOn = now,
+            UpdatedOn = now,
+        };
+
+        @event = new PersonCreatedEvent
+        {
+            EventId = Guid.NewGuid(),
+            CreatedUtc = now,
+            RaisedBy = updatedBy,
+            PersonId = person.PersonId,
+            Details = EventModels.PersonDetails.FromModel(person),
+            CreateReason = createReason,
+            CreateReasonDetail = createReasonDetail,
+            EvidenceFile = evidenceFile,
+        };
+
+        return person;
+    }
+
     private static void AssertInductionChangeIsValid(
         InductionStatus status,
         DateOnly? startDate,
