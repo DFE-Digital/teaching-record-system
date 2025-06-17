@@ -149,7 +149,7 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         Assert.Contains(degreeType.Name, professionalStatus.GetElementByTestId($"training-degreetype-{qualificationid}")!.TrimmedText());
         Assert.Equal(country.Name, professionalStatus.GetElementByTestId($"training-country-{qualificationid}")!.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), professionalStatus.GetElementByTestId($"training-agespecialism-{qualificationid}")!.TrimmedText());
-        doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
+        doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
     [Theory]
