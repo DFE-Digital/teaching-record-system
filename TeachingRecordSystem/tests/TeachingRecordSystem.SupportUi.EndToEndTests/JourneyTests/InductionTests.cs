@@ -502,18 +502,15 @@ public class InductionTests : TestBase
         var routeType = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReasonId == exemptionReasonId)
             .Single();
-        var person = await TestData.CreatePersonAsync(
-                personBuilder => personBuilder
-                .WithQts()
-                .WithInductionStatus(inductionBuilder => inductionBuilder
-                    .WithStatus(InductionStatus.Exempt)
-                    .WithExemptionReasons(exemptionReasonId))
-                .WithRouteToProfessionalStatus(r => r
-                    .WithRouteType(routeType.RouteToProfessionalStatusTypeId)
-                    .WithStatus(RouteToProfessionalStatusStatus.Holds)
-                    .WithInductionExemption(true)
-                    .WithHoldsFrom(holdsFromDate))
-                );
+        var person = await TestData.CreatePersonAsync(personBuilder => personBuilder
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(routeType.RouteToProfessionalStatusTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithInductionExemption(true)
+                .WithHoldsFrom(holdsFromDate))
+            .WithInductionStatus(inductionBuilder => inductionBuilder
+                .WithStatus(InductionStatus.Exempt)
+                .WithExemptionReasons(exemptionReasonId)));
         var personId = person.ContactId;
 
         await using var context = await HostFixture.CreateBrowserContext();

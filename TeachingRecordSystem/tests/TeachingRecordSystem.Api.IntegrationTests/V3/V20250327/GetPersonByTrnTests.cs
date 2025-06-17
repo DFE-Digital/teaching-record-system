@@ -12,12 +12,10 @@ public class GetPersonByTrnTests : TestBase
     public async Task Get_PersonWithQtlsAndQtsViaAnotherRoute_ReturnsExpectedAwardedOrApprovedCount()
     {
         // Arrange
-
-
         var person = await TestData.CreatePersonAsync(p => p
             .WithTrn()
             .WithQts()
-            .WithQtlsDateInDqt(Clock.Today));
+            .WithQtls(Clock.Today));
 
         var request = new HttpRequestMessage(
             HttpMethod.Get,
