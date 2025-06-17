@@ -141,13 +141,11 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.NotApplicable)
+            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.Value.GetInductionExemptionRequirement() == FieldRequirement.Mandatory)
             .RandomOne();
-        var exemptionReason = (await ReferenceDataCache.GetInductionExemptionReasonsAsync()).RandomOne();
-
         var person = await TestData.CreatePersonAsync();
         var addRouteState = new AddRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
