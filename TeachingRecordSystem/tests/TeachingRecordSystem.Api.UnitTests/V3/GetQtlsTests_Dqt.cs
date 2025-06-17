@@ -51,7 +51,7 @@ public partial class GetQtlsTests
 
             var qtlsDate = new DateOnly(2025, 5, 1);
 
-            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQtlsDateInDqt(qtlsDate));
+            var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQtls(qtlsDate));
 
             var command = new GetQtlsCommand(person.Trn!);
 

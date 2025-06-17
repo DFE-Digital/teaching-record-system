@@ -1,5 +1,7 @@
-﻿@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
 @inject ReferenceDataCache ReferenceDataCache
+@inject IFileService FileService
 @model TimelineItem<TimelineEvent<RouteToProfessionalStatusCreatedEvent>>
 @{
     var createdEvent = Model.ItemModel.Event;
@@ -16,6 +18,8 @@
                 .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
                 .OrderByDescending(name => name)
                 .ToArray() : null;
+    var evidenceFileUrl = createdEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
+
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-route-created-event">
@@ -108,6 +112,43 @@
                 <govuk-summary-list-row-value data-testid="subjects"><list-text-items text-items="@subjects"/></govuk-summary-list-row-value>
             </govuk-summary-list-row>
         </govuk-summary-list>
+        <govuk-details class="govuk-!-margin-bottom-2">
+            <govuk-details-summary>Reason for change</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="reason" use-empty-fallback>@createdEvent.ChangeReason</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (createdEvent.ChangeReasonDetail is not null)
+                            {
+                                <multi-line-text text="@createdEvent.ChangeReasonDetail" data-testid="reason-detail" />
+                            }
+                            else
+                            {
+                                <span use-empty-fallback data-testid="reason-detail"></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value>
+                            @if (evidenceFileUrl is not null)
+                            {
+                                <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" data-testid="uploaded-evidence-link">@($"{createdEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                            }
+                            else
+                            {
+                                <span data-testid="uploaded-evidence-link" use-empty-fallback></span>
+                            }
+                        </govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
         @if(createdEvent.Changes != RouteToProfessionalStatusCreatedEventChanges.None)
         {
             <govuk-details class="govuk-!-margin-bottom-2">

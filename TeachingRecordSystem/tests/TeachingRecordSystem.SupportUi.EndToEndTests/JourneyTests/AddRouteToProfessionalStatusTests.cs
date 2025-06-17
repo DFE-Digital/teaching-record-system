@@ -174,7 +174,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and add route");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
@@ -243,7 +243,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and add route");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }

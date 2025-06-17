@@ -56,6 +56,9 @@ public class RouteToProfessionalStatus : Qualification
         bool? isExemptFromInduction,
         EventModels.RaisedByUserInfo createdBy,
         DateTime now,
+        string? changeReason,
+        string? changeReasonDetail,
+        EventModels.File? evidenceFile,
         out RouteToProfessionalStatusCreatedEvent @event)
     {
         Debug.Assert(person.Qualifications is not null);
@@ -122,6 +125,9 @@ public class RouteToProfessionalStatus : Qualification
             RaisedBy = createdBy,
             RouteToProfessionalStatus = EventModels.RouteToProfessionalStatus.FromModel(route),
             PersonAttributes = EventModels.ProfessionalStatusPersonAttributes.FromModel(person),
+            ChangeReason = changeReason,
+            ChangeReasonDetail = changeReasonDetail,
+            EvidenceFile = evidenceFile,
             OldPersonAttributes = oldPersonAttributes,
             Changes = changes,
             Induction = induction,

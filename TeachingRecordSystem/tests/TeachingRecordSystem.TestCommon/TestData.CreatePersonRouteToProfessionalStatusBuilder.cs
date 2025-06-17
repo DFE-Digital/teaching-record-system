@@ -5,9 +5,8 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public class CreatePersonProfessionalStatusBuilder
+    public class CreatePersonRouteToProfessionalStatusBuilder
     {
-        private Guid? _personId = null;
         private Guid? _routeToProfessionalStatusTypeId;
         private RouteToProfessionalStatusStatus _status;
         private DateOnly? _holdsFrom;
@@ -22,97 +21,106 @@ public partial class TestData
         private Guid? _degreeTypeId;
         private bool? _exemptFromInduction;
         private EventModels.RaisedByUserInfo? _createdByUser;
+        private string? _changeReason;
+        private string? _changeReasonDetail;
+        private Core.Events.Models.File? _evidenceFile { get; set; }
 
-        public CreatePersonProfessionalStatusBuilder WithPersonId(Guid personId)
-        {
-            if (_personId is not null && _personId != personId)
-            {
-                throw new InvalidOperationException("PersonId has already been set");
-            }
-
-            _personId = personId;
-            return this;
-        }
-
-        public CreatePersonProfessionalStatusBuilder WithStatus(RouteToProfessionalStatusStatus status)
+        public CreatePersonRouteToProfessionalStatusBuilder WithStatus(RouteToProfessionalStatusStatus status)
         {
             _status = status;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithHoldsFrom(DateOnly holdsFrom)
+        public CreatePersonRouteToProfessionalStatusBuilder WithHoldsFrom(DateOnly holdsFrom)
         {
             _holdsFrom = holdsFrom;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingStartDate(DateOnly trainingStartDate)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingStartDate(DateOnly trainingStartDate)
         {
             _trainingStartDate = trainingStartDate;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingEndDate(DateOnly trainingEndDate)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingEndDate(DateOnly trainingEndDate)
         {
             _trainingEndDate = trainingEndDate;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingSubjectIds(Guid[] trainingSubjectIds)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingSubjectIds(Guid[] trainingSubjectIds)
         {
             _trainingSubjectIds = trainingSubjectIds;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingAgeSpecialismType(TrainingAgeSpecialismType trainingAgeSpecialismType)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingAgeSpecialismType(TrainingAgeSpecialismType trainingAgeSpecialismType)
         {
             _trainingAgeSpecialismType = trainingAgeSpecialismType;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingAgeSpecialismRangeFrom(int trainingAgeSpecialismRangeFrom)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingAgeSpecialismRangeFrom(int trainingAgeSpecialismRangeFrom)
         {
             _trainingAgeSpecialismRangeFrom = trainingAgeSpecialismRangeFrom;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingAgeSpecialismRangeTo(int trainingAgeSpecialismRangeTo)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingAgeSpecialismRangeTo(int trainingAgeSpecialismRangeTo)
         {
             _trainingAgeSpecialismRangeTo = trainingAgeSpecialismRangeTo;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithRouteType(Guid routeTypeId)
+        public CreatePersonRouteToProfessionalStatusBuilder WithRouteType(Guid routeTypeId)
         {
             _routeToProfessionalStatusTypeId = routeTypeId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingCountryId(string trainingCountryId)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingCountryId(string trainingCountryId)
         {
             _trainingCountryId = trainingCountryId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithTrainingProviderId(Guid trainingProviderId)
+        public CreatePersonRouteToProfessionalStatusBuilder WithTrainingProviderId(Guid trainingProviderId)
         {
             _trainingProviderId = trainingProviderId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithDegreeTypeId(Guid degreeTypeId)
+        public CreatePersonRouteToProfessionalStatusBuilder WithDegreeTypeId(Guid degreeTypeId)
         {
             _degreeTypeId = degreeTypeId;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithInductionExemption(bool? isExempt)
+        public CreatePersonRouteToProfessionalStatusBuilder WithInductionExemption(bool? isExempt)
         {
             _exemptFromInduction = isExempt;
             return this;
         }
 
-        public CreatePersonProfessionalStatusBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
+        public CreatePersonRouteToProfessionalStatusBuilder WithChangeReason(string reason, string reasonDetail)
+        {
+            _changeReason = reason;
+            _changeReasonDetail = reasonDetail;
+            return this;
+        }
+
+        public CreatePersonRouteToProfessionalStatusBuilder WithEvidenceFile(string name)
+        {
+            _evidenceFile = new Core.Events.Models.File()
+            {
+                FileId = Guid.NewGuid(),
+                Name = name
+            };
+            return this;
+        }
+
+        public CreatePersonRouteToProfessionalStatusBuilder WithCreatedByUser(EventModels.RaisedByUserInfo user)
         {
             _createdByUser = user;
             return this;
@@ -130,10 +138,9 @@ public partial class TestData
             }
             if (_createdByUser is null)
             {
-                _createdByUser = EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId);
+                _createdByUser = EventModels.RaisedByUserInfo.FromUserId(SystemUser.SystemUserId);
             }
 
-            var personId = createPersonBuilder.PersonId;
             var allRouteTypes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
 
             var professionalStatus = RouteToProfessionalStatus.Create(
@@ -154,6 +161,9 @@ public partial class TestData
                 _exemptFromInduction,
                 _createdByUser,
                 DateTime.UtcNow,
+                _changeReason,
+                _changeReasonDetail,
+                _evidenceFile,
                 out var @createdEvent);
 
             dbContext.RouteToProfessionalStatuses.Add(professionalStatus);

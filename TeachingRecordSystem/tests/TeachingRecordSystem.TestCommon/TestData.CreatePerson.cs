@@ -16,11 +16,18 @@ namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
 {
-    public Task<CreatePersonResult> CreatePersonAsync(Action<CreatePersonBuilder>? configure = null)
+    public async Task<CreatePersonResult> CreatePersonAsync(Action<CreatePersonBuilder>? configure = null)
     {
-        var builder = new CreatePersonBuilder();
+        var referenceData = new CreatePersonBuilder.ReferenceData(
+            await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(),
+            await ReferenceDataCache.GetDegreeTypesAsync(),
+            await ReferenceDataCache.GetTrainingProvidersAsync(),
+            await ReferenceDataCache.GetTrainingSubjectsAsync(),
+            await ReferenceDataCache.GetTrainingCountriesAsync());
+
+        var builder = new CreatePersonBuilder(referenceData);
         configure?.Invoke(builder);
-        return builder.ExecuteAsync(this);
+        return await builder.ExecuteAsync(this);
     }
 
     public class CreatePersonBuilder
@@ -29,6 +36,7 @@ public partial class TestData
 
         private static readonly DateOnly _defaultQtsDate = new DateOnly(2022, 9, 1);
 
+        private readonly ReferenceData _referenceData;
         private bool? _syncEnabledOverride;
         private DateOnly? _dateOfBirth;
         private bool? _hasTrn;
@@ -44,8 +52,7 @@ public partial class TestData
         private readonly List<QtsRegistration> _qtsRegistrations = new();
         private readonly List<CreatePersonAlertBuilder> _alertBuilders = [];
         private readonly List<CreatePersonMandatoryQualificationBuilder> _mqBuilders = [];
-        private readonly List<CreatePersonProfessionalStatusBuilder> _professionalStatusBuilders = [];
-        private readonly List<ProfessionalStatusType> _awardedProfessionalStatuses = [];
+        private readonly List<CreatePersonRouteToProfessionalStatusBuilder> _routeToProfessionalStatusBuilders = [];
         private readonly List<(string FirstName, string MiddleName, string LastName, DateTime Created)> _previousNames = [];
         private DateOnly? _qtlsDate;
         private (Guid ApplicationUserId, string RequestId, bool WriteMetadata, bool? IdentityVerified, string? OneLoginUserSubject, bool? PotentialDuplicate)? _trnRequest;
@@ -53,6 +60,11 @@ public partial class TestData
         private string? _slugId;
         private int? _loginFailedCounter;
         private CreatePersonInductionBuilder? _inductionBuilder;
+
+        internal CreatePersonBuilder(ReferenceData referenceData)
+        {
+            _referenceData = referenceData;
+        }
 
         public Guid PersonId { get; } = Guid.NewGuid();
 
@@ -137,22 +149,86 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithRouteToProfessionalStatus(Action<CreatePersonProfessionalStatusBuilder>? configure = null)
+        public CreatePersonBuilder WithRouteToProfessionalStatus(Action<CreatePersonRouteToProfessionalStatusBuilder> configure)
         {
             EnsureTrn();
 
-            var builder = new CreatePersonProfessionalStatusBuilder();
-            configure?.Invoke(builder);
-            _professionalStatusBuilders.Add(builder);
+            var builder = new CreatePersonRouteToProfessionalStatusBuilder();
+            configure.Invoke(builder);
+            _routeToProfessionalStatusBuilders.Add(builder);
 
             return this;
         }
 
-        public CreatePersonBuilder WithHoldsRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType)
+        public CreatePersonBuilder WithHoldsRouteToProfessionalStatus(ProfessionalStatusType professionalStatusType) =>
+            WithHoldsRouteToProfessionalStatus(professionalStatusType, _defaultQtsDate);
+
+        public CreatePersonBuilder WithHoldsRouteToProfessionalStatus(
+            ProfessionalStatusType professionalStatusType,
+            DateOnly holdsFrom)
+        {
+            var routeType = _referenceData.RouteTypes
+                .Where(r => r.ProfessionalStatusType == professionalStatusType)
+                .RandomOne();
+
+            return WithHoldsRouteToProfessionalStatus(routeType.RouteToProfessionalStatusTypeId, holdsFrom);
+        }
+
+        public CreatePersonBuilder WithHoldsRouteToProfessionalStatus(
+            Guid routeToProfessionalStatusTypeId,
+            DateOnly holdsFrom)
         {
             EnsureTrn();
-            _awardedProfessionalStatuses.Add(professionalStatusType);
-            return this;
+
+            var routeType = _referenceData.RouteTypes.Single(r => r.RouteToProfessionalStatusTypeId == routeToProfessionalStatusTypeId);
+
+            return WithRouteToProfessionalStatus(b =>
+            {
+                b
+                    .WithRouteType(routeToProfessionalStatusTypeId)
+                    .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                    .WithHoldsFrom(holdsFrom);
+
+                ConfigureUnlessNotApplicable(
+                    routeType.TrainingStartAndEndDatesRequired,
+                    () => b.WithTrainingStartDate(new(2021, 10, 1)));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.TrainingStartAndEndDatesRequired,
+                    () => b.WithTrainingEndDate(new(2022, 7, 5)));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.TrainingSubjectsRequired,
+                    () => b.WithTrainingSubjectIds([_referenceData.TrainingSubjects.RandomOne().TrainingSubjectId]));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.TrainingAgeSpecialismTypeRequired,
+                    () => b.WithTrainingAgeSpecialismType(TrainingAgeSpecialismType.FoundationStage));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.TrainingCountryRequired,
+                    () => b.WithTrainingCountryId(_referenceData.Countries.RandomOne().CountryId));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.TrainingProviderRequired,
+                    () => b.WithTrainingProviderId(_referenceData.TrainingProviders.RandomOne().TrainingProviderId));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.DegreeTypeRequired,
+                    () => b.WithDegreeTypeId(_referenceData.DegreeTypes.RandomOne().DegreeTypeId));
+
+                ConfigureUnlessNotApplicable(
+                    routeType.InductionExemptionRequired,
+                    () => b.WithInductionExemption(false));
+
+                void ConfigureUnlessNotApplicable(FieldRequirement requirement, Action configure)
+                {
+                    if (requirement is not FieldRequirement.NotApplicable)
+                    {
+                        configure();
+                    }
+                }
+            });
         }
 
         public CreatePersonBuilder WithoutTrn()
@@ -162,6 +238,7 @@ public partial class TestData
                 _qtlsDate.HasValue ||
                 _qtsRegistrations.Any() ||
                 _qualifications.Any() ||
+                _routeToProfessionalStatusBuilders.Any() ||
                 _inductionBuilder?.HasStatusRequiringQts == true)
             {
                 throw new InvalidOperationException("Person requires a TRN.");
@@ -202,26 +279,50 @@ public partial class TestData
             return this;
         }
 
-        public CreatePersonBuilder WithQts(DateOnly? qtsDate = null)
+        public CreatePersonBuilder WithQts() => WithQts(_defaultQtsDate);
+
+        public CreatePersonBuilder WithQts(DateOnly holdsFrom)
         {
             EnsureTrn();
 
             _qtsRegistrations.Add(
                 new QtsRegistration(
-                    qtsDate ?? _defaultQtsDate,
+                    holdsFrom,
                     TeacherStatusValue: TeacherStatusQualifiedTeacherTrained,
                     CreatedOn: null,
                     EytsDate: null,
                     EytsStatusValue: null));
 
+            WithHoldsRouteToProfessionalStatus(
+                routeToProfessionalStatusTypeId: new("4163C2FB-6163-409F-85FD-56E7C70A54DD"),
+                holdsFrom);
+
             return this;
         }
 
-        public CreatePersonBuilder WithQtlsDateInDqt(DateOnly? qtlsDate)
+        public CreatePersonBuilder WithQtls() => WithQtls(_defaultQtsDate);
+
+        public CreatePersonBuilder WithQtls(DateOnly holdsFrom)
         {
             EnsureTrn();
 
-            _qtlsDate = qtlsDate;
+            _qtlsDate = holdsFrom;
+
+            WithRouteToProfessionalStatus(p => p
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithHoldsFrom(holdsFrom)
+                .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
+
+            return this;
+        }
+
+        public CreatePersonBuilder WithEyts(DateOnly holdsFrom)
+        {
+            EnsureTrn();
+
+            _qtsRegistrations.Add(new QtsRegistration(null, null, null, holdsFrom, "222"));
+
+            WithHoldsRouteToProfessionalStatus(ProfessionalStatusType.EarlyYearsTeacherStatus, holdsFrom);
 
             return this;
         }
@@ -243,12 +344,6 @@ public partial class TestData
 
             return this;
         }
-
-        public CreatePersonBuilder WithQtls(DateOnly holdsFrom) =>
-            WithRouteToProfessionalStatus(p => p
-                .WithStatus(RouteToProfessionalStatusStatus.Holds)
-                .WithHoldsFrom(holdsFrom)
-                .WithRouteType(RouteToProfessionalStatusType.QtlsAndSetMembershipId));
 
         public CreatePersonBuilder WithTrnRequest(
             Guid applicationUserId,
@@ -571,8 +666,7 @@ public partial class TestData
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
                 var mqIds = await AddMqsAsync();
                 var alertIds = await AddAlertsAsync();
-                var professionalStatusIds = await AddProfessionalStatusRoutesAsync(person);
-                var awardedProfessionalStatusIds = await AddAwardedProfessionalStatusRoutesAsync();
+                var routeIds = await AddProfessionalStatusRoutesAsync(person);
                 var previousNameIds = await AddPreviousNamesAsync();
 
                 await dbContext.SaveChangesAsync();
@@ -589,15 +683,15 @@ public partial class TestData
                     .Where(q => q.PersonId == PersonId)
                     .ToArrayAsync();
 
-                var personProfessionalStatuses = await dbContext.RouteToProfessionalStatuses
+                var personRoutes = await dbContext.RouteToProfessionalStatuses
                     .Where(p => p.PersonId == PersonId)
                     .ToArrayAsync();
 
                 // Get MQs, Alerts and Professional Statuses that we've added *in the same order they were specified*.
                 var mqs = mqIds.Select(id => personMqs.Single(q => q.QualificationId == id)).AsReadOnly();
                 var alerts = alertIds.Select(id => person.Alerts!.Single(a => a.AlertId == id)).AsReadOnly();
-                var routesToProfessionalStatus = professionalStatusIds.Concat(awardedProfessionalStatusIds)
-                    .Select(id => personProfessionalStatuses.Single(q => q.QualificationId == id))
+                var routesToProfessionalStatus = routeIds
+                    .Select(id => personRoutes.Single(q => q.QualificationId == id))
                     .AsReadOnly();
                 var previousNames = previousNameIds.Select(id => person.PreviousNames!.Single(a => a.PreviousNameId == id)).AsReadOnly();
 
@@ -621,7 +715,7 @@ public partial class TestData
                 {
                     var routeIds = new List<Guid>();
 
-                    foreach (var builder in _professionalStatusBuilders)
+                    foreach (var builder in _routeToProfessionalStatusBuilders)
                     {
                         var (routeId, createdEvents) = await builder.ExecuteAsync(this, person, testData, dbContext);
                         routeIds.Add(routeId);
@@ -629,52 +723,6 @@ public partial class TestData
                     }
 
                     return routeIds;
-                }
-
-                async Task<IReadOnlyCollection<Guid>> AddAwardedProfessionalStatusRoutesAsync()
-                {
-                    var allRoutes = await testData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
-                    var allSubjects = await testData.ReferenceDataCache.GetTrainingSubjectsAsync();
-                    var allCountries = await testData.ReferenceDataCache.GetTrainingCountriesAsync();
-                    var allProviders = await testData.ReferenceDataCache.GetTrainingProvidersAsync();
-                    var allDegreeTypes = await testData.ReferenceDataCache.GetDegreeTypesAsync();
-
-                    var createdProfessionalStatusIds = new List<Guid>();
-
-                    foreach (var professionalStatusType in _awardedProfessionalStatuses)
-                    {
-                        var route = allRoutes.Where(r => r.ProfessionalStatusType == professionalStatusType).RandomOne();
-
-                        var professionalStatus = RouteToProfessionalStatus.Create(
-                                person,
-                                allRoutes,
-                                route.RouteToProfessionalStatusTypeId,
-                                RouteToProfessionalStatusStatus.Holds,
-                                testData.GenerateDate(min: new(2022, 8, 1), max: new(2025, 1, 1)),
-                                route.TrainingStartAndEndDatesRequired is not FieldRequirement.NotApplicable ? new(2021, 10, 1) : null,
-                                route.TrainingStartAndEndDatesRequired is not FieldRequirement.NotApplicable ? new(2022, 7, 5) : null,
-                                route.TrainingSubjectsRequired is not FieldRequirement.NotApplicable ?
-                                new[] { allSubjects.RandomOne().TrainingSubjectId } :
-                                [],
-                                route.TrainingAgeSpecialismTypeRequired is not FieldRequirement.NotApplicable ? TrainingAgeSpecialismType.FoundationStage : null,
-                                null,
-                                null,
-                                route.TrainingCountryRequired is not FieldRequirement.NotApplicable ? allCountries.RandomOne().CountryId : null,
-                                allProviders.RandomOne().TrainingProviderId,
-                                route.DegreeTypeRequired is not FieldRequirement.NotApplicable ? allDegreeTypes.RandomOne().DegreeTypeId : null,
-                                route.InductionExemptionRequired is not FieldRequirement.NotApplicable ? false : null,
-                                EventModels.RaisedByUserInfo.FromUserId(Core.DataStore.Postgres.Models.SystemUser.SystemUserId),
-                                DateTime.UtcNow,
-                                out var @createdEvent
-                                );
-
-                        dbContext.RouteToProfessionalStatuses.Add(professionalStatus);
-                        dbContext.AddEventWithoutBroadcast(createdEvent);
-
-                        createdProfessionalStatusIds.Add(professionalStatus.QualificationId);
-                    }
-
-                    return createdProfessionalStatusIds;
                 }
 
                 async Task<IReadOnlyCollection<Guid>> AddAlertsAsync()
@@ -818,6 +866,13 @@ public partial class TestData
 
         internal DateOnly EnsureQts() => GetQtsDate() ??
             throw new InvalidOperationException("Person requires QTS.");
+
+        internal record ReferenceData(
+            IReadOnlyCollection<RouteToProfessionalStatusType> RouteTypes,
+            IReadOnlyCollection<DegreeType> DegreeTypes,
+            IReadOnlyCollection<TrainingProvider> TrainingProviders,
+            IReadOnlyCollection<TrainingSubject> TrainingSubjects,
+            IReadOnlyCollection<Country> Countries);
     }
 
     public class CreatePersonAlertBuilder

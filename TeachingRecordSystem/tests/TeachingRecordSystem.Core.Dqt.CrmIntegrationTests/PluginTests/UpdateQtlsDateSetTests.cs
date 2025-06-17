@@ -28,7 +28,7 @@ public class UpdateQtlsDateSetTests : IAsyncLifetime
         // Act
         var createPersonResult = await _dataScope.TestData.CreatePersonAsync(x =>
         {
-            x.WithQtlsDateInDqt(new DateOnly(2021, 01, 1));
+            x.WithQtls(new DateOnly(2021, 01, 1));
         });
         var person = await _crmQueryDispatcher.ExecuteQueryAsync(new GetActiveContactDetailByIdQuery(createPersonResult.PersonId, ColumnSet: new(
             Contact.Fields.dfeta_QtlsDateHasBeenSet)));
