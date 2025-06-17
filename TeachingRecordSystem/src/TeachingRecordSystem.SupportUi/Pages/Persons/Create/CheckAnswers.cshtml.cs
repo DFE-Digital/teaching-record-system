@@ -22,7 +22,6 @@ public class CheckAnswersModel(
     public string? FirstName { get; set; }
     public string? MiddleName { get; set; }
     public string? LastName { get; set; }
-    public string? Trn { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public EmailAddress? EmailAddress { get; set; }
     public MobileNumber? MobileNumber { get; set; }
@@ -77,12 +76,9 @@ public class CheckAnswersModel(
             now,
             out var createdEvent);
 
-        if (createdEvent is not null)
-        {
-            DbContext.Add(person);
-            await DbContext.AddEventAndBroadcastAsync(createdEvent);
-            await DbContext.SaveChangesAsync();
-        }
+        DbContext.Add(person);
+        await DbContext.AddEventAndBroadcastAsync(createdEvent);
+        await DbContext.SaveChangesAsync();
 
         await JourneyInstance!.CompleteAsync();
 

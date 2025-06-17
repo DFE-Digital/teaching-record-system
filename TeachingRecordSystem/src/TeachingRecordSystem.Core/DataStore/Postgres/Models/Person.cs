@@ -645,7 +645,7 @@ public class Person
         EventModels.File? evidenceFile,
         EventModels.RaisedByUserInfo updatedBy,
         DateTime now,
-        out PersonCreatedEvent? @event)
+        out PersonCreatedEvent @event)
     {
         var person = new Person
         {
