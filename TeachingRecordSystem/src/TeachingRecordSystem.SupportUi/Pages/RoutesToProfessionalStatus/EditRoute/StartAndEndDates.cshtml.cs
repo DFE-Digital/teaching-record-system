@@ -49,22 +49,11 @@ public class StartAndEndDateModel(
         {
             return this.PageWithErrors();
         }
-        if (JourneyInstance!.State.IsCompletingRoute) // if user is here as part of the data collection for "holds" status
+        await JourneyInstance!.UpdateStateAsync(s =>
         {
-            await JourneyInstance!.UpdateStateAsync(s =>
-            {
-                s.EditStatusState!.TrainingStartDate = TrainingStartDate;
-                s.EditStatusState!.TrainingEndDate = TrainingEndDate;
-            });
-        }
-        else // user is simply editing the start and date
-        {
-            await JourneyInstance!.UpdateStateAsync(s =>
-            {
-                s.TrainingStartDate = TrainingStartDate;
-                s.TrainingEndDate = TrainingEndDate;
-            });
-        }
+            s.TrainingStartDate = TrainingStartDate;
+            s.TrainingEndDate = TrainingEndDate;
+        });
 
         return Redirect(JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage() :

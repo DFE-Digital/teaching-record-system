@@ -38,7 +38,7 @@ public class EditRouteState : IRegisterJourney
     public bool ChangeReasonIsComplete => ChangeReason is not null && ChangeReasonDetail is not null && ChangeReasonDetail.IsComplete;
 
     [JsonIgnore]
-    public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to awarded / approved
+    public bool IsCompletingRoute => EditStatusState != null; // status page initialises EditStatusState when the status is set to 'holds'
 
     public void EnsureInitialized(RouteToProfessionalStatus routeToProfessionalStatus)
     {

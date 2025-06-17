@@ -299,7 +299,7 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
     }
 
     [Fact]
-    public async Task Post_StatusHoldsJourney_StartAndEndDateIsEntered_SavesDatesAndRedirectsToHoldsFromDate()
+    public async Task Post_StatusHoldsJourney_StartAndEndDateIsEntered_SavesDatesAndRedirectsToHoldsDate()
     {
         // Arrange
         var status = RouteToProfessionalStatusStatus.Holds;
@@ -347,8 +347,8 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationid}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(startDate, journeyInstance.State.EditStatusState!.TrainingStartDate);
-        Assert.Equal(endDate, journeyInstance.State.EditStatusState!.TrainingEndDate);
+        Assert.Equal(startDate, journeyInstance.State.TrainingStartDate);
+        Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
     }
 
     [Fact]

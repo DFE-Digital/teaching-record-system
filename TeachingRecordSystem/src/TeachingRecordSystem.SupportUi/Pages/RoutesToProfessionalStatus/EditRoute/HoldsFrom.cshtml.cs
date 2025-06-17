@@ -54,7 +54,6 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
                 await JourneyInstance!.UpdateStateAsync(s => // update the main journey state with the data
                 {
                     s.Status = s.EditStatusState!.Status;
-                    s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
                     s.HoldsFrom = HoldsFrom;
                     s.IsExemptFromInduction = s.EditStatusState.InductionExemption;
                     s.EditStatusState = null;

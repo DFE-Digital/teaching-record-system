@@ -136,7 +136,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         // check each edit link from cya page
         var editEndDate = setEndDate.AddDays(1);
         var editStartDate = setStartDate.AddDays(1);
-        var editAwardDate = editEndDate.AddDays(1);
+        var editHoldDate = editEndDate.AddDays(1);
         var editDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("c584eb2f-1419-4870-a230-5d81ae9b5f77"));
         var editAgeRange = TrainingAgeSpecialismType.KeyStage2;
         var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
@@ -1043,7 +1043,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     }
 
     [Fact]
-    public async Task EditStatus_Awarded_Continue_Exemption_Back()
+    public async Task EditStatus_Holds_Continue_Exemption_Back()
     {
         var holdsFrom = new DateOnly(2021, 1, 1);
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
