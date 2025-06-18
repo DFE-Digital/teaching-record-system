@@ -5,7 +5,7 @@ public class IndexTests : TestBase
     public IndexTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.SupportOfficer));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class IndexTests : TestBase
     }
 
     [Theory]
-    [RoleNamesData(except: [UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])]
+    [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_UserWithoutSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange

@@ -6,7 +6,7 @@ namespace TeachingRecordSystem.Core;
 public static class UserRoles
 {
     [Display(Name = "Viewer")]
-    public const string Viewer = "Viewer";
+    public const string Viewer = nameof(Viewer);
 
     public static readonly IReadOnlyCollection<UserPermission> ViewerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.View),
@@ -14,10 +14,10 @@ public static class UserRoles
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
     ];
 
-    [Display(Name = "Support officer")]
-    public const string SupportOfficer = "SupportOfficer";
+    [Display(Name = "Record manager")]
+    public const string RecordManager = nameof(RecordManager);
 
-    public static readonly IReadOnlyCollection<UserPermission> SupportOfficerPermissions = [
+    public static readonly IReadOnlyCollection<UserPermission> RecordManagerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonPersonOrAlertData, UserPermissionLevel.Edit),
         new(UserPermissionTypes.NonDbsAlerts, UserPermissionLevel.View),
@@ -25,7 +25,7 @@ public static class UserRoles
     ];
 
     [Display(Name = "Alerts manager (TRA decisions)")]
-    public const string AlertsManagerTra = "AlertsManagerTra";
+    public const string AlertsManagerTra = nameof(AlertsManagerTra);
 
     public static readonly IReadOnlyCollection<UserPermission> AlertsManagerTraPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
@@ -35,7 +35,7 @@ public static class UserRoles
     ];
 
     [Display(Name = "Alerts manager (TRA and DBS decisions)")]
-    public const string AlertsManagerTraDbs = "AlertsManagerTraDbs";
+    public const string AlertsManagerTraDbs = nameof(AlertsManagerTraDbs);
 
     public static readonly IReadOnlyCollection<UserPermission> AlertsManagerTraDbsPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
@@ -45,7 +45,7 @@ public static class UserRoles
     ];
 
     [Display(Name = "Access manager")]
-    public const string AccessManager = "AccessManager";
+    public const string AccessManager = nameof(AccessManager);
 
     public static readonly IReadOnlyCollection<UserPermission> AccessManagerPermissions = [
         new(UserPermissionTypes.PersonData, UserPermissionLevel.Edit),
@@ -56,12 +56,12 @@ public static class UserRoles
     ];
 
     [Display(Name = "Administrator")]
-    public const string Administrator = "Administrator";
+    public const string Administrator = nameof(Administrator);
 
     public static IReadOnlyCollection<string> All { get; } = new[]
     {
         Viewer,
-        SupportOfficer,
+        RecordManager,
         AlertsManagerTra,
         AlertsManagerTraDbs,
         AccessManager,

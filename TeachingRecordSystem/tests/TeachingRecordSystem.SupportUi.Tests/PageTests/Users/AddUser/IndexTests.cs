@@ -24,7 +24,7 @@ public class IndexTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var request = new HttpRequestMessage(HttpMethod.Get, "/users/add");
@@ -56,7 +56,7 @@ public class IndexTests : TestBase, IAsyncLifetime
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/users/add");

@@ -460,7 +460,7 @@ public class CommonPageTests : TestBase
         };
 
         var rolesWithoutWritePermission = UserRoles.All
-            .Except([UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])
+            .Except([UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])
             .Append(null)
             .ToArray();
 

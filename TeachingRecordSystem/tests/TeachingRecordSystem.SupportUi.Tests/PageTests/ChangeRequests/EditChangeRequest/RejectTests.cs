@@ -5,7 +5,7 @@ public class RejectTests : TestBase
     public RejectTests(HostFixture hostFixture)
         : base(hostFixture)
     {
-        SetCurrentUser(TestUsers.GetUser(UserRoles.SupportOfficer));
+        SetCurrentUser(TestUsers.GetUser(UserRoles.RecordManager));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class RejectTests : TestBase
     }
 
     [Theory]
-    [RoleNamesData(except: [UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])]
+    [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Get_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange
@@ -94,7 +94,7 @@ public class RejectTests : TestBase
     }
 
     [Theory]
-    [RoleNamesData(except: [UserRoles.SupportOfficer, UserRoles.AccessManager, UserRoles.Administrator])]
+    [RoleNamesData(except: [UserRoles.RecordManager, UserRoles.AccessManager, UserRoles.Administrator])]
     public async Task Post_WhenUserDoesNotHaveSupportOfficerOrAccessManagerOrAdministratorRole_ReturnsForbidden(string role)
     {
         // Arrange

@@ -27,7 +27,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var existingUser = await TestData.CreateUserAsync();
@@ -62,7 +62,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var existingUser = await TestData.CreateUserAsync();
@@ -115,7 +115,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
-        var existingUser = await TestData.CreateUserAsync(active: false, role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(active: false, role: UserRoles.RecordManager);
 
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
@@ -570,7 +570,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
             Content = new MultipartFormDataContentBuilder
@@ -615,7 +615,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
             Content = new MultipartFormDataContentBuilder
@@ -664,7 +664,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var evidenceFileId = Guid.NewGuid();
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {
@@ -712,7 +712,7 @@ public class DeactivateTests : TestBase, IAsyncLifetime
         var user = await TestData.CreateUserAsync(role: UserRoles.AccessManager);
         SetCurrentUser(user);
 
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var evidenceFileId = Guid.NewGuid();
         var request = new HttpRequestMessage(HttpMethod.Post, GetRequestPath(existingUser.UserId))
         {

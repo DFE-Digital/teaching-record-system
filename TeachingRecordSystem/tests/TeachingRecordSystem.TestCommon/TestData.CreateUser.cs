@@ -20,7 +20,7 @@ public partial class TestData
             active ??= true;
             name ??= GenerateName();
             email ??= GenerateUniqueEmail();
-            role ??= UserRoles.SupportOfficer;
+            role ??= UserRoles.RecordManager;
 
             var user = new User()
             {
@@ -54,7 +54,7 @@ public partial class TestData
                 var active = spec.Active ?? true;
                 var name = spec.Name ?? GenerateName();
                 var email = spec.Email ?? GenerateUniqueEmail();
-                var role = spec.Role ?? UserRoles.SupportOfficer;
+                var role = spec.Role ?? UserRoles.RecordManager;
 
                 var user = new User()
                 {
@@ -85,7 +85,7 @@ public partial class TestData
                 var active = spec.Active ?? true;
                 var name = spec.Name ?? GenerateName();
                 var email = spec.Email ?? GenerateUniqueEmail();
-                var role = spec.Role ?? UserRoles.SupportOfficer;
+                var role = spec.Role ?? UserRoles.RecordManager;
 
                 var user = new User()
                 {

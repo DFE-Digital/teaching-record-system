@@ -24,7 +24,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
@@ -133,14 +133,14 @@ public class ConfirmTests : TestBase, IAsyncLifetime
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid().ToString();
         var newName = Faker.Name.FullName();
-        var role = UserRoles.SupportOfficer;
+        var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
         {
@@ -174,7 +174,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
 
         var userId = Guid.NewGuid().ToString();
         var newName = Faker.Name.FullName();
-        var role = UserRoles.SupportOfficer;
+        var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, null);
 
@@ -204,7 +204,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         var email = Faker.Internet.Email();
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid().ToString();
-        var role = UserRoles.SupportOfficer;
+        var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
         {
@@ -376,7 +376,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
         var name = Faker.Name.FullName();
         var userId = Guid.NewGuid().ToString();
         var newName = Faker.Name.FullName();
-        var role = UserRoles.SupportOfficer;
+        var role = UserRoles.RecordManager;
 
         ConfigureUserServiceMock(userId, new Services.AzureActiveDirectory.User()
         {
@@ -422,7 +422,7 @@ public class ConfirmTests : TestBase, IAsyncLifetime
 
         var redirectResponse = await response.FollowRedirectAsync(HttpClient);
         var redirectDoc = await redirectResponse.GetDocumentAsync();
-        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{newName} has been added as a support officer.");
+        AssertEx.HtmlDocumentHasFlashSuccess(redirectDoc, expectedMessage: $"{newName} has been added as a record manager.");
     }
 
     private void ConfigureUserServiceMock(string userId, Services.AzureActiveDirectory.User? user) =>
