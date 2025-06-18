@@ -15,7 +15,6 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
     [BindProperty]
-    [Required(ErrorMessage = "Select a training provider")]
     [Display(Name = "Enter the training provider for this route")]
     public Guid? TrainingProviderId { get; set; }
 
@@ -26,6 +25,11 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var fieldRequirement = QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
+        if (fieldRequirement == FieldRequirement.Mandatory && TrainingProviderId is null)
+        {
+            ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
