@@ -16,7 +16,7 @@ public static class TestDataHelper
                 && r.TrainingSubjectsRequired != FieldRequirement.NotApplicable
                 && r.InductionExemptionRequired != FieldRequirement.NotApplicable
                 && r.TrainingStartAndEndDatesRequired != FieldRequirement.NotApplicable
-                 && r.HoldsFromRequired != FieldRequirement.NotApplicable)
+                && r.HoldsFromRequired != FieldRequirement.NotApplicable)
             .Where(r => professionalStatusType is null || professionalStatusType == r.ProfessionalStatusType)
             .RandomOne();
     }

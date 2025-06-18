@@ -155,7 +155,9 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var country = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory && r.TrainingProviderRequired == FieldRequirement.NotApplicable)
+            .Where(r => r.InductionExemptionRequired == FieldRequirement.Mandatory
+                && r.HoldsFromRequired == FieldRequirement.Mandatory
+                && r.TrainingProviderRequired == FieldRequirement.NotApplicable)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.Value.GetInductionExemptionRequirement() == FieldRequirement.Mandatory)
