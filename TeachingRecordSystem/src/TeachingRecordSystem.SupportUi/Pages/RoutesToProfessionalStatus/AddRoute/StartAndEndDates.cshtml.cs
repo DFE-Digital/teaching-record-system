@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class StartAndEndDateModel : AddRouteCommonPageModel
+public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Start date")]
@@ -17,10 +17,6 @@ public class StartAndEndDateModel : AddRouteCommonPageModel
     [Required(ErrorMessage = "Enter an end date")]
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
-
-    public StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
-    {
-    }
 
     public string BackLink => FromCheckAnswers ?
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :

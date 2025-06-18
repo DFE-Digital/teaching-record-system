@@ -975,6 +975,19 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteEditStatusPageAsync(qualificationId);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditHoldsFromPageAsync(qualificationId);
+        await page.FillDateInputAsync(holdsFrom);
+        await page.ClickContinueButtonAsync();
+
+        await page.AssertOnRouteEditInductionExemptionPageAsync(qualificationId);
         await page.SetCheckedAsync($"label:text-is('Yes')", true);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();

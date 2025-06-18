@@ -32,7 +32,7 @@ public class StatusModel(
 
     public void OnGet()
     {
-        Status = JourneyInstance!.State.Status;
+        Status = JourneyInstance!.State.EditStatusState is null ? JourneyInstance!.State.Status : JourneyInstance!.State.EditStatusState.Status;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -48,16 +48,24 @@ public class StatusModel(
             var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
 
             // initialise a temporary part of journey state for the data collection for a completing route
-            await JourneyInstance!.UpdateStateAsync(
-                s =>
-                {
-                    s.EditStatusState = new EditRouteStatusState
+            if (JourneyInstance!.State.EditStatusState is null)
+            {
+                await JourneyInstance!.UpdateStateAsync(
+                    s =>
                     {
-                        Status = Status,
-                        RouteImplicitExemption = hasImplicitExemption,
-                        InductionExemption = hasImplicitExemption ? true : null
-                    };
-                });
+                        s.EditStatusState = new EditRouteStatusState
+                        {
+                            Status = Status,
+                            RouteImplicitExemption = hasImplicitExemption,
+                            InductionExemption = hasImplicitExemption ? true : null
+                        };
+                    });
+            }
+            else
+            {
+                await JourneyInstance!.UpdateStateAsync(
+                    s => s.EditStatusState!.Status = Status);
+            }
         }
         else // the status has been changed to something other than 'holds'
         {

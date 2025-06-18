@@ -93,7 +93,7 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
     public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
-                PreviousCompletingRoutePage :
+                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
@@ -122,9 +122,4 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
         IsLastCompletingRoutePage() ?
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
-
-    private string PreviousCompletingRoutePage =>
-        QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
-            linkGenerator.RouteEditStartAndEndDate(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
 }
