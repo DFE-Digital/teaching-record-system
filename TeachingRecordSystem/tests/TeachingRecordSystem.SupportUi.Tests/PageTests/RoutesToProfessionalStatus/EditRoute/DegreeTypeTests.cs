@@ -54,7 +54,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task NoDegreeTypeSelected_ShowsError()
+    public async Task DegreeTypeMandatory_NoDegreeTypeSelected_ShowsError()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -92,6 +92,51 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         await AssertEx.HtmlResponseHasErrorAsync(response, "DegreeTypeId", "Select a degree type");
+    }
+
+    [Fact]
+    public async Task DegreeTypOptional_NoDegreeTypeSelected_ClearsDegreeTypeAndNoError()
+    {
+        // Arrange
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.DegreeTypeRequired == FieldRequirement.Optional)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(status)
+                ));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .Build();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "DegreeTypeId", "" }
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Null(journeyInstance.State.DegreeTypeId);
     }
 
     [Fact]

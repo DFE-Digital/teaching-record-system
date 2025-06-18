@@ -2,10 +2,12 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
-[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
+[Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance, CheckRouteToProfessionalStatusExistsFilterFactory()]
 public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
@@ -21,8 +23,9 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public DisplayInfo[] Subjects { get; set; } = [];
 
+    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
+
     [BindProperty]
-    [Required(ErrorMessage = "Enter a subject")]
     [Display(Name = "Enter the subject they specialise in teaching")]
     public Guid? SubjectId1 { get; set; }
     [BindProperty]
@@ -47,6 +50,11 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public async Task<IActionResult> OnPostAsync()
     {
+        var fieldRequirement = QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingSubjectsRequired, JourneyInstance!.State.Status.GetSubjectsRequirement());
+        if (fieldRequirement == FieldRequirement.Mandatory && SubjectId1 is null && SubjectId2 is null && SubjectId3 is null)
+        {
+            ModelState.AddModelError(nameof(SubjectId1), "Enter a subject");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -66,6 +74,8 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
+        RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType;
 
         Subjects = (await referenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
