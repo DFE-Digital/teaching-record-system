@@ -145,7 +145,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertChangeLinkExists("Degree type");
         doc.AssertRowContentMatches("Country of training", country.Name);
         doc.AssertRowContentMatches("Age range", ageRange.GetDisplayName()!);
-        doc.AssertRowContentMatches("Subjects", subjects.Select(s => s.Name));
+        doc.AssertRowContentMatches("Subjects", subjects.Select(s => $"{s.Reference} - {s.Name}"));
     }
 
     [Fact]
