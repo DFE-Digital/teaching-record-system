@@ -15,7 +15,9 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
             .Where(r => r.TrainingStartDateRequired == FieldRequirement.Mandatory && r.TrainingEndDateRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Mandatory && s.TrainingEndDateRequired == FieldRequirement.Mandatory)
+            .Where(s => s.TrainingStartDateRequired == FieldRequirement.Mandatory
+                && s.TrainingEndDateRequired == FieldRequirement.Mandatory
+                && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
