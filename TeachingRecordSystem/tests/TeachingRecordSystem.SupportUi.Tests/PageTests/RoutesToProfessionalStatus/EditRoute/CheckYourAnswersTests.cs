@@ -5,6 +5,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
 
+[Collection(nameof(DisableParallelization))]
 public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     private static string _countryCode = "AG";
