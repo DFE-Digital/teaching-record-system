@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -28,8 +27,11 @@ public class TrainingProviderModel(
 
     public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
 
+    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingProviderRequired, JourneyInstance!.State.Status.GetTrainingProviderRequirement())
+            == FieldRequirement.Mandatory;
+    public string PageHeading => "Enter the training provider for this route" + (!TrainingProviderRequired ? " (optional)" : "");
+
     [BindProperty]
-    [Display(Name = "Enter the training provider for this route")]
     public Guid? TrainingProviderId { get; set; }
 
     public void OnGet()
@@ -39,8 +41,7 @@ public class TrainingProviderModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var fieldRequirement = QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingProviderRequired, JourneyInstance!.State.Status.GetTrainingProviderRequirement());
-        if (fieldRequirement == FieldRequirement.Mandatory && TrainingProviderId is null)
+        if (TrainingProviderRequired && TrainingProviderId is null)
         {
             ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
         }

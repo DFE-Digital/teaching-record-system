@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
@@ -14,8 +13,11 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
+    public string PageHeading => "Enter the training provider for this route" + (!TrainingProviderRequired ? " (optional)" : "");
+    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement())
+        == FieldRequirement.Mandatory;
+
     [BindProperty]
-    [Display(Name = "Enter the training provider for this route")]
     public Guid? TrainingProviderId { get; set; }
 
     public void OnGet()
@@ -25,8 +27,7 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var fieldRequirement = QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
-        if (fieldRequirement == FieldRequirement.Mandatory && TrainingProviderId is null)
+        if (TrainingProviderRequired && TrainingProviderId is null)
         {
             ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
         }

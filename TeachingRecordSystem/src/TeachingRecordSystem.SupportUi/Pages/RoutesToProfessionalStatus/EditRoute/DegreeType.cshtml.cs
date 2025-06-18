@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -28,8 +27,11 @@ public class DegreeTypeModel(
 
     public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
 
+    public string PageHeading => "Enter the degree type awarded as part of this route" + (!DegreeTypeRequired ? " (optional)" : "");
+    public bool DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.DegreeTypeRequired, JourneyInstance!.State.Status.GetDegreeTypeRequirement())
+        == FieldRequirement.Mandatory;
+
     [BindProperty]
-    [Display(Name = "Enter the degree type awarded as part of this route")]
     public Guid? DegreeTypeId { get; set; }
 
     public void OnGet()

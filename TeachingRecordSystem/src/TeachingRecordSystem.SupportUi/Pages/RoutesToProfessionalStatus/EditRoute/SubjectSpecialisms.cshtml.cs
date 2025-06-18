@@ -25,8 +25,11 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
 
+    public string PageHeading => "Enter the subject they specialise in teaching" + (!SubjectSpecialismRequired ? " (optional)" : "");
+    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingSubjectsRequired, JourneyInstance!.State.Status.GetSubjectsRequirement())
+        == FieldRequirement.Mandatory;
+
     [BindProperty]
-    [Display(Name = "Enter the subject they specialise in teaching")]
     public Guid? SubjectId1 { get; set; }
     [BindProperty]
     [Display(Name = "Second subject (optional)")]
@@ -50,8 +53,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var fieldRequirement = QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingSubjectsRequired, JourneyInstance!.State.Status.GetSubjectsRequirement());
-        if (fieldRequirement == FieldRequirement.Mandatory && SubjectId1 is null && SubjectId2 is null && SubjectId3 is null)
+        if (SubjectSpecialismRequired && SubjectId1 is null && SubjectId2 is null && SubjectId3 is null)
         {
             ModelState.AddModelError(nameof(SubjectId1), "Enter a subject");
         }
