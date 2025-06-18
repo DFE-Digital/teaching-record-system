@@ -211,7 +211,7 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
     csvWriter.WriteField("Route ID");
     csvWriter.WriteField("Route Name");
     csvWriter.WriteField("Status");
-    csvWriter.WriteField("Awarded Date");
+    csvWriter.WriteField("Holds From");
     csvWriter.WriteField("Teacher Status Value");
     csvWriter.WriteField("Teacher Status Name");
     csvWriter.WriteField("QTS Date");
@@ -231,34 +231,36 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
     csvWriter.WriteField("ITT Qual Derived Route ID");
     csvWriter.WriteField("ITT Qual Derived Route Name");
     csvWriter.WriteField("Multiple compatible ITT records");
+    csvWriter.WriteField("Contact ITT Row Count");
+    csvWriter.WriteField("Contact QTS Row Count");
     csvWriter.NextRecord();
 
     await foreach (var block in results)
     {
         foreach (var r in block)
         {
-            RouteToProfessionalStatus? route = null;
+            RouteToProfessionalStatusType? route = null;
             if (r.ProfessionalStatus is not null)
             {
-                route = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(r.ProfessionalStatus.RouteToProfessionalStatusId);
+                route = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(r.ProfessionalStatus.RouteToProfessionalStatusTypeId);
             }
 
-            RouteToProfessionalStatus? statusDerivedRoute = null;
+            RouteToProfessionalStatusType? statusDerivedRoute = null;
             if (r.StatusDerivedRouteId is not null)
             {
-                statusDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(r.StatusDerivedRouteId.Value);
+                statusDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(r.StatusDerivedRouteId.Value);
             }
 
-            RouteToProfessionalStatus? programmeTypeDerivedRoute = null;
+            RouteToProfessionalStatusType? programmeTypeDerivedRoute = null;
             if (r.ProgrammeTypeDerivedRouteId is not null)
             {
-                programmeTypeDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(r.ProgrammeTypeDerivedRouteId.Value);
+                programmeTypeDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(r.ProgrammeTypeDerivedRouteId.Value);
             }
 
-            RouteToProfessionalStatus? ittQualificationDerivedRoute = null;
+            RouteToProfessionalStatusType? ittQualificationDerivedRoute = null;
             if (r.IttQualificationDerivedRouteId is not null)
             {
-                ittQualificationDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusByIdAsync(r.IttQualificationDerivedRouteId.Value);
+                ittQualificationDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(r.IttQualificationDerivedRouteId.Value);
             }
 
             csvWriter.WriteField(r.ContactId);
@@ -266,10 +268,10 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
             csvWriter.WriteField(r.FailedReason);
             csvWriter.WriteField(r.IttId);
             csvWriter.WriteField(r.QtsRegistrationId);
-            csvWriter.WriteField(route?.RouteToProfessionalStatusId);
+            csvWriter.WriteField(route?.RouteToProfessionalStatusTypeId);
             csvWriter.WriteField(route?.Name);
             csvWriter.WriteField(r.ProfessionalStatus?.Status.ToString());
-            csvWriter.WriteField(r.ProfessionalStatus?.AwardedDate?.ToString("dd/MM/yyyy"));
+            csvWriter.WriteField(r.ProfessionalStatus?.HoldsFrom?.ToString("dd/MM/yyyy"));
             csvWriter.WriteField(r.TeacherStatus?.dfeta_Value);
             csvWriter.WriteField(r.TeacherStatus?.dfeta_name);
             csvWriter.WriteField(r.QtsDate?.ToString("dd/MM/yyyy"));
@@ -289,6 +291,8 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
             csvWriter.WriteField(r.IttQualificationDerivedRouteId);
             csvWriter.WriteField(ittQualificationDerivedRoute?.Name);
             csvWriter.WriteField(JsonSerializer.Serialize(r.MultiplePotentialCompatibleIttRecords));
+            csvWriter.WriteField(r.ContactIttRowCount);
+            csvWriter.WriteField(r.ContactQtsRowCount);
             csvWriter.NextRecord();
         }
 

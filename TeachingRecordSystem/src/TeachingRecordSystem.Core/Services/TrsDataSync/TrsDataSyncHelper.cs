@@ -2327,7 +2327,7 @@ public class TrsDataSyncHelper(
         //IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
         bool createMigratedEvent)
     {
-        var allRoutes = await referenceDataCache.GetRoutesToProfessionalStatusAsync(activeOnly: false);
+        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
         var earlyYearsProfessionalStatus = await referenceDataCache.GetEarlyYearsStatusByValueAsync("222");
         var noQualificationRestrictedByGtc = await referenceDataCache.GetIttQualificationByValueAsync("998");
         var partiallyQualifiedTeacherStatus = await referenceDataCache.GetTeacherStatusByValueAsync("214");
@@ -2366,6 +2366,8 @@ public class TrsDataSyncHelper(
             var qtlsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
             var contactItt = ittByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
             var contactQts = qtsByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
+            var contactIttRowCount = contactItt.Count;
+            var contactQtsRowCount = contactQts.Count;
 
             var hasMatchedIttQtsCombo = false;
             var hasWelshItt = false;
@@ -2378,8 +2380,8 @@ public class TrsDataSyncHelper(
                     clock,
                     allRoutes,
                     contactId,
-                    RouteToProfessionalStatus.QtlsAndSetMembershipId,
-                    ProfessionalStatusStatus.Awarded,
+                    RouteToProfessionalStatusType.QtlsAndSetMembershipId,
+                    RouteToProfessionalStatusStatus.Holds,
                     InductionExemptionReason.QtlsId,
                     qtlsDate,
                     qts: null,
@@ -2414,7 +2416,9 @@ public class TrsDataSyncHelper(
                     statusDerivedRouteId: null,
                     programmeTypeDerivedRouteId: null,
                     ittQualificationDerivedRouteId: null,
-                    multiplePotentialCompatibleIttRecords: null));
+                    multiplePotentialCompatibleIttRecords: null,
+                    contactIttRowCount,
+                    contactQtsRowCount));
                 contactItt.Remove(itt!);
             }
 
@@ -2436,7 +2440,9 @@ public class TrsDataSyncHelper(
                     statusDerivedRouteId: null,
                     programmeTypeDerivedRouteId: null,
                     ittQualificationDerivedRouteId: null,
-                    multiplePotentialCompatibleIttRecords: null));
+                    multiplePotentialCompatibleIttRecords: null,
+                    contactIttRowCount,
+                    contactQtsRowCount));
                 contactQts.Remove(qts);
             }
 
@@ -2471,21 +2477,23 @@ public class TrsDataSyncHelper(
                         (qts.dfeta_DateofRecognition is not null && (qts.dfeta_QTSDate is not null || qts.dfeta_EYTSDate is not null)))
                     {
                         mapped.Add(IttQtsMapResult.Failed(
-                                contactId,
-                                IttQtsMapResultFailedReason.PartialRecognitionIsInvalid,
-                                qts.Id,
-                                itt: null,
-                                teacherStatus,
-                                qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                                eyStatus,
-                                qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                                qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                                qtlsDate,
-                                ittQualification: null,
-                                statusDerivedRouteId: null,
-                                programmeTypeDerivedRouteId: null,
-                                ittQualificationDerivedRouteId: null,
-                                multiplePotentialCompatibleIttRecords: null));
+                            contactId,
+                            IttQtsMapResultFailedReason.PartialRecognitionIsInvalid,
+                            qts.Id,
+                            itt: null,
+                            teacherStatus,
+                            qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            eyStatus,
+                            qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification: null,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount));
                         continue;
                     }
 
@@ -2572,7 +2580,9 @@ public class TrsDataSyncHelper(
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
                             ittQualificationDerivedRouteId: null,
-                            mutlipleCompatibleIttIds));
+                            mutlipleCompatibleIttIds,
+                            contactIttRowCount,
+                            contactQtsRowCount));
                         continue;
                     }
 
@@ -2584,7 +2594,7 @@ public class TrsDataSyncHelper(
                         (itt?.dfeta_ProgrammeType is null or dfeta_ITTProgrammeType.HEI) &&
                         itt?.dfeta_ITTQualificationId is not null)
                     {
-                        welshDerivedRouteId = RouteToProfessionalStatus.WelshRId;
+                        welshDerivedRouteId = RouteToProfessionalStatusType.WelshRId;
                     }
 
                     var ittQualification = itt?.dfeta_ITTQualificationId is not null
@@ -2592,7 +2602,7 @@ public class TrsDataSyncHelper(
                         : null;
 
                     var status = (isEy && (qts.dfeta_EYTSDate is not null || eyStatus?.dfeta_Value == earlyYearsProfessionalStatus.dfeta_Value)) || (!isEy && (qts.dfeta_QTSDate is not null || qts.dfeta_DateofRecognition is not null))
-                        ? ProfessionalStatusStatus.Awarded
+                        ? RouteToProfessionalStatusStatus.Holds
                         : MapStatus(itt, qts, ittQualification, teacherStatus, eyStatus);
 
                     // Map ITT, QTS & ITT Qual and check they resolve to the same route type (where mapping is possible)
@@ -2650,7 +2660,9 @@ public class TrsDataSyncHelper(
                                     statusDerivedRouteId,
                                     programmeTypeDerivedRouteId,
                                     ittQualificationDerivedRouteId,
-                                    mutlipleCompatibleIttIds));
+                                    mutlipleCompatibleIttIds,
+                                    contactIttRowCount,
+                                    contactQtsRowCount));
                         }
                     }
 
@@ -2660,7 +2672,7 @@ public class TrsDataSyncHelper(
                         hasMatchedIttQtsCombo = true;
                     }
 
-                    if (routeId == RouteToProfessionalStatus.WelshRId)
+                    if (routeId == RouteToProfessionalStatusType.WelshRId)
                     {
                         hasWelshItt = true;
                     }
@@ -2691,7 +2703,9 @@ public class TrsDataSyncHelper(
                         statusDerivedRouteId,
                         programmeTypeDerivedRouteId,
                         ittQualificationDerivedRouteId,
-                        mutlipleCompatibleIttIds));
+                        mutlipleCompatibleIttIds,
+                        contactIttRowCount,
+                        contactQtsRowCount));
                 }
             }
 
@@ -2723,7 +2737,9 @@ public class TrsDataSyncHelper(
                         statusDerivedRouteId: null,
                         programmeTypeDerivedRouteId: null,
                         ittQualificationDerivedRouteId: null,
-                        multiplePotentialCompatibleIttRecords: null));
+                        multiplePotentialCompatibleIttRecords: null,
+                        contactIttRowCount,
+                        contactQtsRowCount));
                     continue;
                 }
 
@@ -2752,7 +2768,9 @@ public class TrsDataSyncHelper(
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
                             ittQualificationDerivedRouteId: null,
-                            multiplePotentialCompatibleIttRecords: null));
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount));
                     continue;
                 }
 
@@ -2812,7 +2830,9 @@ public class TrsDataSyncHelper(
                                 statusDerivedRouteId: null,
                                 programmeTypeDerivedRouteId,
                                 ittQualificationDerivedRouteId,
-                                multiplePotentialCompatibleIttRecords: null));
+                                multiplePotentialCompatibleIttRecords: null,
+                                contactIttRowCount,
+                                contactQtsRowCount));
                     }
                 }
 
@@ -2844,7 +2864,9 @@ public class TrsDataSyncHelper(
                     statusDerivedRouteId: null,
                     programmeTypeDerivedRouteId,
                     ittQualificationDerivedRouteId,
-                    multiplePotentialCompatibleIttRecords: null));
+                    multiplePotentialCompatibleIttRecords: null,
+                    contactIttRowCount,
+                    contactQtsRowCount));
             }
 
             return mapped;
@@ -2977,7 +2999,7 @@ public class TrsDataSyncHelper(
                 return false;
             }
 
-            ProfessionalStatusStatus MapStatus(
+            RouteToProfessionalStatusStatus MapStatus(
                 dfeta_initialteachertraining? itt,
                 dfeta_qtsregistration? qts,
                 dfeta_ittqualification? ittQualification,
@@ -3000,11 +3022,13 @@ public class TrsDataSyncHelper(
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
                             ittQualificationDerivedRouteId: null,
-                            multiplePotentialCompatibleIttRecords: null)),
-                    dfeta_ITTResult.Deferred => ProfessionalStatusStatus.Deferred,
-                    dfeta_ITTResult.DeferredforSkillsTests => ProfessionalStatusStatus.DeferredForSkillsTest,
-                    dfeta_ITTResult.Fail => ProfessionalStatusStatus.Failed,
-                    dfeta_ITTResult.InTraining => ProfessionalStatusStatus.InTraining,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount)),
+                    dfeta_ITTResult.Deferred => RouteToProfessionalStatusStatus.Deferred,
+                    dfeta_ITTResult.DeferredforSkillsTests => RouteToProfessionalStatusStatus.DeferredForSkillsTest,
+                    dfeta_ITTResult.Fail => RouteToProfessionalStatusStatus.Failed,
+                    dfeta_ITTResult.InTraining => RouteToProfessionalStatusStatus.InTraining,
                     dfeta_ITTResult.Pass => throw new IttQtsMapException(
                         IttQtsMapResult.Failed(
                             contactId,
@@ -3021,9 +3045,11 @@ public class TrsDataSyncHelper(
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
                             ittQualificationDerivedRouteId: null,
-                            multiplePotentialCompatibleIttRecords: null)),
-                    dfeta_ITTResult.UnderAssessment => ProfessionalStatusStatus.UnderAssessment,
-                    dfeta_ITTResult.Withdrawn => ProfessionalStatusStatus.Withdrawn,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount)),
+                    dfeta_ITTResult.UnderAssessment => RouteToProfessionalStatusStatus.UnderAssessment,
+                    dfeta_ITTResult.Withdrawn => RouteToProfessionalStatusStatus.Withdrawn,
                     _ => throw new IttQtsMapException(
                         IttQtsMapResult.Failed(
                             contactId,
@@ -3040,15 +3066,17 @@ public class TrsDataSyncHelper(
                             statusDerivedRouteId: null,
                             programmeTypeDerivedRouteId: null,
                             ittQualificationDerivedRouteId: null,
-                            multiplePotentialCompatibleIttRecords: null))
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount))
                 };
 
-            static ProfessionalStatus CreateProfessionalStatus(
+            static RouteToProfessionalStatus CreateProfessionalStatus(
                 IClock clock,
-                RouteToProfessionalStatus[] allRoutes,
+                RouteToProfessionalStatusType[] allRoutes,
                 Guid personId,
                 Guid routeId,
-                ProfessionalStatusStatus status,
+                RouteToProfessionalStatusStatus status,
                 Guid? inductionExemptionReasonId,
                 DateOnly? awardedDate,
                 dfeta_qtsregistration? qts,
@@ -3057,9 +3085,9 @@ public class TrsDataSyncHelper(
                 dfeta_teacherstatus? teacherStatus,
                 dfeta_earlyyearsstatus? eyStatus)
             {
-                var route = allRoutes.Single(r => r.RouteToProfessionalStatusId == routeId);
+                var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeId);
 
-                return new ProfessionalStatus
+                return new RouteToProfessionalStatus
                 {
                     QualificationId = (qts?.Id ?? itt?.Id ?? personId), // allows for QTLS which is not linked to QTS or ITT
                     // TODO Should these dates be Clock.Now instead?
@@ -3073,14 +3101,14 @@ public class TrsDataSyncHelper(
                         clock.UtcNow),
                     DeletedOn = null,
                     PersonId = personId,
-                    RouteToProfessionalStatusId = routeId,
+                    RouteToProfessionalStatusTypeId = routeId,
                     Status = status,
                     TrainingStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     TrainingEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     TrainingAgeSpecialismType = default, // TODO
                     TrainingAgeSpecialismRangeFrom = default, // itt?.dfeta_AgeRangeFrom
                     TrainingAgeSpecialismRangeTo = default, // itt?.dfeta_AgeRangeTo
-                    AwardedDate = awardedDate,
+                    HoldsFrom = awardedDate,
                     DegreeTypeId = null, // TODO
                     ExemptFromInduction = false,  // TODO  
                     //InductionExemptionReasonId = inductionExemptionReasonId,  // FIXME
@@ -3109,7 +3137,7 @@ public class TrsDataSyncHelper(
 
         public bool Success { get; private set; }
 
-        public ProfessionalStatus? ProfessionalStatus { get; private set; }
+        public RouteToProfessionalStatus? ProfessionalStatus { get; private set; }
 
         public Guid ContactId { get; private set; }
 
@@ -3145,7 +3173,11 @@ public class TrsDataSyncHelper(
 
         public Guid[]? MultiplePotentialCompatibleIttRecords { get; private set; }
 
-        public static IttQtsMapResult Succeeded(ProfessionalStatus ps)
+        public int ContactIttRowCount { get; private set; }
+
+        public int ContactQtsRowCount { get; private set; }
+
+        public static IttQtsMapResult Succeeded(RouteToProfessionalStatus ps)
         {
             return new IttQtsMapResult()
             {
@@ -3158,7 +3190,7 @@ public class TrsDataSyncHelper(
         }
 
         public static IttQtsMapResult Succeeded(
-            ProfessionalStatus ps,
+            RouteToProfessionalStatus ps,
             dfeta_initialteachertraining? itt,
             dfeta_teacherstatus? teacherStatus,
             DateOnly? qtsDate,
@@ -3170,7 +3202,9 @@ public class TrsDataSyncHelper(
             Guid? statusDerivedRouteId,
             Guid? programmeTypeDerivedRouteId,
             Guid? ittQualificationDerivedRouteId,
-            Guid[]? multiplePotentialCompatibleIttRecords)
+            Guid[]? multiplePotentialCompatibleIttRecords,
+            int contactIttRowCount,
+            int contactQtsRowCount)
         {
             return new IttQtsMapResult()
             {
@@ -3191,7 +3225,9 @@ public class TrsDataSyncHelper(
                 StatusDerivedRouteId = statusDerivedRouteId,
                 ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
                 IttQualificationDerivedRouteId = ittQualificationDerivedRouteId,
-                MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords
+                MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords,
+                ContactIttRowCount = contactIttRowCount,
+                ContactQtsRowCount = contactQtsRowCount
             };
         }
 
@@ -3210,7 +3246,9 @@ public class TrsDataSyncHelper(
             Guid? statusDerivedRouteId,
             Guid? programmeTypeDerivedRouteId,
             Guid? ittQualificationDerivedRouteId,
-            Guid[]? multiplePotentialCompatibleIttRecords)
+            Guid[]? multiplePotentialCompatibleIttRecords,
+            int contactIttRowCount,
+            int contactQtsRowCount)
         {
             return new IttQtsMapResult()
             {
@@ -3231,7 +3269,9 @@ public class TrsDataSyncHelper(
                 StatusDerivedRouteId = statusDerivedRouteId,
                 ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
                 IttQualificationDerivedRouteId = ittQualificationDerivedRouteId,
-                MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords
+                MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords,
+                ContactIttRowCount = contactIttRowCount,
+                ContactQtsRowCount = contactQtsRowCount
             };
         }
     }
