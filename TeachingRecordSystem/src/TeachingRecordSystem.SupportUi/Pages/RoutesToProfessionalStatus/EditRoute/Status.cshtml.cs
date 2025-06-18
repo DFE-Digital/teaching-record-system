@@ -59,22 +59,18 @@ public class StatusModel(
                     };
                 });
         }
-        else if (NotCompletedRoute) // the status has been changed to something other than awarded or approved
+        else // the status has been changed to something other than 'holds'
         {
             await JourneyInstance!.UpdateStateAsync(s =>
             {
-                s.HoldsFrom = null; // clear any previous awarded date and exemption
+                s.HoldsFrom = null; // clear any previous 'holds' date and exemption
                 s.IsExemptFromInduction = null;
                 s.Status = Status;
             });
         }
-        else // going from approved to awarded or vice versa
-        {
-            await JourneyInstance!.UpdateStateAsync(s => s.Status = Status);
-        }
 
         return Redirect(CompletingRoute ?
-            NextCompletingRoutePage(Status) :
+            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
@@ -101,13 +97,6 @@ public class StatusModel(
          FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
-
-    private string NextCompletingRoutePage(RouteToProfessionalStatusStatus status)
-    {
-        return (QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, status.GetEndDateRequirement()) != FieldRequirement.NotApplicable) ?
-            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
-    }
 
     private bool CompletingRoute => Status is RouteToProfessionalStatusStatus.Holds && (JourneyInstance!.State.CurrentStatus is not RouteToProfessionalStatusStatus.Holds);
 
