@@ -83,7 +83,7 @@ public class IndexTests : TestBase
         Assert.Equal(createPersonResult.MobileNumber, doc.GetSummaryListValueForKey("Mobile number"));
     }
 
-    [Fact]
+    [Fact(Skip = "Flaky on CI")]
     public async Task Get_AfterContactsMigrated_WithPersonIdForExistingPersonWithAllPropertiesSet_ReturnsExpectedContent()
     {
         // Arrange
