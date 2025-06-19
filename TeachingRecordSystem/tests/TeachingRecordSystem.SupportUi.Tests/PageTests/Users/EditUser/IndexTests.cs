@@ -24,7 +24,7 @@ public class IndexTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var userId = Guid.NewGuid();
@@ -105,7 +105,7 @@ public class IndexTests : TestBase, IAsyncLifetime
     public async Task Post_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         var existingUser = await TestData.CreateUserAsync();
@@ -138,7 +138,7 @@ public class IndexTests : TestBase, IAsyncLifetime
             Content = new FormUrlEncodedContentBuilder()
             {
                 { "Name", "Some Name" },
-                { "Role", UserRoles.SupportOfficer }
+                { "Role", UserRoles.RecordManager }
             }
         };
 
@@ -291,7 +291,7 @@ public class IndexTests : TestBase, IAsyncLifetime
         SetCurrentUser(user);
 
         // Arrange
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         var newName = changeName ? TestData.GenerateChangedName(existingUser.Name) : existingUser.Name;
         var newRole = changeRole ? UserRoles.AlertsManagerTra : existingUser.Role;
 
@@ -348,10 +348,10 @@ public class IndexTests : TestBase, IAsyncLifetime
     public async Task PostActivate_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
-        var existingUser = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var existingUser = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{GetRequestPath(existingUser.UserId)}/activate");
 

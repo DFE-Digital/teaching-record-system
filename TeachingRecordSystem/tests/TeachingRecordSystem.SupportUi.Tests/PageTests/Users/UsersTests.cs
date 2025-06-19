@@ -47,7 +47,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     public async Task Get_UserWithoutAccessManagerRole_ReturnsForbidden()
     {
         // Arrange
-        var user = await TestData.CreateUserAsync(role: UserRoles.SupportOfficer);
+        var user = await TestData.CreateUserAsync(role: UserRoles.RecordManager);
         SetCurrentUser(user);
 
         // Act
@@ -124,23 +124,23 @@ public class UsersTests : TestBase, IAsyncLifetime
     [InlineData("?keywords=user%20laSTName1", new string[] { "Auser", "Buser", "Cuser", "Duser" })]
     [InlineData("?keywords=USER%40org2", new string[] { "Duser", "Euser", "Fuser" })]
     [InlineData("?role=AccessManager", new string[] { "Auser", "Buser" })]
-    [InlineData("?role=SupportOfficer", new string[] { "Cuser", "Duser", "Euser" })]
+    [InlineData("?role=RecordManager", new string[] { "Cuser", "Duser", "Euser" })]
     [InlineData("?role=Viewer", new string[] { "Fuser", "Guser", "Huser", "Iuser" })]
-    [InlineData("?role=AccessManager&role=SupportOfficer", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
+    [InlineData("?role=AccessManager&role=RecordManager", new string[] { "Auser", "Buser", "Cuser", "Duser", "Euser" })]
     [InlineData("?status=active", new string[] { "Auser", "Cuser", "Euser", "Guser", "Iuser" })]
     [InlineData("?status=deactivated", new string[] { "Buser", "Duser", "Fuser", "Huser" })]
     [InlineData("?role=AccessManager&status=active", new string[] { "Auser" })]
     [InlineData("?role=Viewer&status=deactivated", new string[] { "Fuser", "Huser" })]
-    [InlineData("?keywords=org1&role=AccessManager&role=SupportOfficer&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
+    [InlineData("?keywords=org1&role=AccessManager&role=RecordManager&status=active&status=deactivated", new string[] { "Auser", "Buser", "Cuser" })]
     public async Task Get_ValidRequestAndUsersFound_FiltersUsersByKeywordsRoleAndStatus(string query, string[] expectedUserFirstNames)
     {
         // Arrange
         var users = await TestData.CreateMultipleUsersAsync(
             new() { Name = $"Auser Lastname1", Email = "auser@org1.com", Role = UserRoles.AccessManager, Active = true },
             new() { Name = $"Buser Lastname1", Email = "buser@org1.com", Role = UserRoles.AccessManager, Active = false },
-            new() { Name = $"Cuser Lastname1", Email = "cuser@org1.com", Role = UserRoles.SupportOfficer, Active = true },
-            new() { Name = $"Duser Lastname1", Email = "duser@org2.com", Role = UserRoles.SupportOfficer, Active = false },
-            new() { Name = $"Euser Lastname2", Email = "euser@org2.com", Role = UserRoles.SupportOfficer, Active = true },
+            new() { Name = $"Cuser Lastname1", Email = "cuser@org1.com", Role = UserRoles.RecordManager, Active = true },
+            new() { Name = $"Duser Lastname1", Email = "duser@org2.com", Role = UserRoles.RecordManager, Active = false },
+            new() { Name = $"Euser Lastname2", Email = "euser@org2.com", Role = UserRoles.RecordManager, Active = true },
             new() { Name = $"Fuser Lastname2", Email = "fuser@org2.com", Role = UserRoles.Viewer, Active = false },
             new() { Name = $"Guser Lastname2", Email = "guser@org3.com", Role = UserRoles.Viewer, Active = true },
             new() { Name = $"Huser Lastname2", Email = "huser@org3.com", Role = UserRoles.Viewer, Active = false },
@@ -164,17 +164,17 @@ public class UsersTests : TestBase, IAsyncLifetime
     [Theory]
     [InlineData("?role=AccessManager&pageNumber=1", 10, "Auser", "Juser")]
     [InlineData("?role=AccessManager&pageNumber=2", 2, "Kuser", "Luser")]
-    [InlineData("?role=SupportOfficer&pageNumber=1", 10, "Muser", "Vuser")]
-    [InlineData("?role=SupportOfficer&pageNumber=2", 4, "Wuser", "Zuser")]
-    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&pageNumber=1", 10, "Auser", "Suser")]
-    [InlineData("?role=AccessManager&role=SupportOfficer&status=active&pageNumber=2", 3, "Uuser", "Yuser")]
+    [InlineData("?role=RecordManager&pageNumber=1", 10, "Muser", "Vuser")]
+    [InlineData("?role=RecordManager&pageNumber=2", 4, "Wuser", "Zuser")]
+    [InlineData("?role=AccessManager&role=RecordManager&status=active&pageNumber=1", 10, "Auser", "Suser")]
+    [InlineData("?role=AccessManager&role=RecordManager&status=active&pageNumber=2", 3, "Uuser", "Yuser")]
     public async Task Get_ValidRequestAndUsersFound_PaginatesFilteredUsers(string query, int expectedUserCount, string expectedFirstUserOnPage, string expectedLastUserOnPage)
     {
         // Arrange
         var users = await TestData.CreateMultipleUsersAsync(26, i => new()
         {
             Name = $"{(char)('A' + i)}user {Faker.Name.Last()}",
-            Role = i < 12 ? UserRoles.AccessManager : UserRoles.SupportOfficer,
+            Role = i < 12 ? UserRoles.AccessManager : UserRoles.RecordManager,
             Active = i % 2 == 0
         });
         SetCurrentUser(users.First(u => u.Role == UserRoles.AccessManager && u.Active));
@@ -197,7 +197,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     [Theory]
     [InlineData("?", new string[] {
         "Viewer (4)",
-        "Support officer (3)",
+        "Record manager (3)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
         "Access manager (2)"
@@ -207,7 +207,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     })]
     [InlineData("?status=active", new string[] {
         "Viewer (2)",
-        "Support officer (2)",
+        "Record manager (2)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
         "Access manager (1)"
@@ -215,9 +215,9 @@ public class UsersTests : TestBase, IAsyncLifetime
         "Active (5)",
         "Deactivated (0)"
     })]
-    [InlineData("?role=AccessManager&role=SupportOfficer&status=deactivated", new string[] {
+    [InlineData("?role=AccessManager&role=RecordManager&status=deactivated", new string[] {
         "Viewer (0)",
-        "Support officer (1)",
+        "Record manager (1)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
         "Access manager (1)"
@@ -231,9 +231,9 @@ public class UsersTests : TestBase, IAsyncLifetime
         var users = await TestData.CreateMultipleUsersAsync(
             new() { Name = $"Auser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = true },
             new() { Name = $"Buser {Faker.Name.Last()}", Role = UserRoles.AccessManager, Active = false },
-            new() { Name = $"Cuser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = true },
-            new() { Name = $"Duser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = false },
-            new() { Name = $"Euser {Faker.Name.Last()}", Role = UserRoles.SupportOfficer, Active = true },
+            new() { Name = $"Cuser {Faker.Name.Last()}", Role = UserRoles.RecordManager, Active = true },
+            new() { Name = $"Duser {Faker.Name.Last()}", Role = UserRoles.RecordManager, Active = false },
+            new() { Name = $"Euser {Faker.Name.Last()}", Role = UserRoles.RecordManager, Active = true },
             new() { Name = $"Fuser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = false },
             new() { Name = $"Guser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = true },
             new() { Name = $"Huser {Faker.Name.Last()}", Role = UserRoles.Viewer, Active = false },
@@ -311,7 +311,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     [Theory]
     [InlineData("?", new string[] {
         "Viewer (0)",
-        "Support officer (0)",
+        "Record manager (0)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
         "Access manager (2)",
@@ -322,7 +322,7 @@ public class UsersTests : TestBase, IAsyncLifetime
     })]
     [InlineData("?role=Administrator&status=active", new string[] {
         "Viewer (0)",
-        "Support officer (0)",
+        "Record manager (0)",
         "Alerts manager (TRA decisions) (0)",
         "Alerts manager (TRA and DBS decisions) (0)",
         "Access manager (0)",

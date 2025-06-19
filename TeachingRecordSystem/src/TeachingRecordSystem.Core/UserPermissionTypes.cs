@@ -6,22 +6,22 @@ namespace TeachingRecordSystem.Core;
 public static class UserPermissionTypes
 {
     [Display(Name = "Person data")]
-    public const string PersonData = "PersonData";
+    public const string PersonData = nameof(PersonData);
 
     [Display(Name = "Non-person or alert data", Description = "All data in the TRS console excluding alerts")]
-    public const string NonPersonOrAlertData = "NonPersonOrAlertData";
+    public const string NonPersonOrAlertData = nameof(NonPersonOrAlertData);
 
     [Display(Name = "Non-DBS alerts")]
-    public const string NonDbsAlerts = "NonDbsAlerts";
+    public const string NonDbsAlerts = nameof(NonDbsAlerts);
 
     [Display(Name = "DBS alerts")]
-    public const string DbsAlerts = "DbsAlerts";
+    public const string DbsAlerts = nameof(DbsAlerts);
 
     [Display(Name = "Manage users", Description = "Add, manage, and remove other users from the TRS console")]
-    public const string ManageUsers = "ManageUsers";
+    public const string ManageUsers = nameof(ManageUsers);
 
     [Display(Name = "Support tasks", Description = "Access to the Support tasks area of the console")]
-    public const string SupportTasks = "SupportTasks";
+    public const string SupportTasks = nameof(SupportTasks);
 
     public static IReadOnlyCollection<string> All { get; } = new[]
     {

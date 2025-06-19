@@ -29,13 +29,13 @@ public class UserTests : TestBase
 
         await page.AssertOnAddUserConfirmPageAsync();
 
-        await page.SetCheckedAsync("label:has-text('Support officer')", true);
+        await page.SetCheckedAsync("label:has-text('Record manager')", true);
 
         await page.ClickButtonAsync("Add user");
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{testAzAdUser.Name} has been added as a support officer.");
+        await page.AssertFlashMessageAsync(expectedMessage: $"{testAzAdUser.Name} has been added as a record manager.");
     }
 
     [Fact]
@@ -55,13 +55,13 @@ public class UserTests : TestBase
 
         await page.AssertOnEditUserPageAsync(user.UserId);
 
-        await page.SetCheckedAsync("label:has-text('Support officer')", true);
+        await page.SetCheckedAsync("label:has-text('Record manager')", true);
 
         await page.ClickButtonAsync("Save changes");
 
         await page.AssertOnUsersPageAsync();
 
-        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been changed to a support officer.");
+        await page.AssertFlashMessageAsync(expectedMessage: $"{user.Name} has been changed to a record manager.");
     }
 
     [Fact]
