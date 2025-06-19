@@ -1312,7 +1312,7 @@ public class TrsDataSyncHelper(
             """;
 
         //artitrary date of now-1 day because there are no rows in dqt_note
-        var getLastModifiedOnStatement = $"SELECT COALESCE(MAX(updated_on), NOW() - INTERVAL '1 day') FROM {tableName}";
+        var getLastModifiedOnStatement = $"SELECT (NOW() - INTERVAL '10 years')";
 
         var deleteStatement = $"DELETE FROM {tableName} WHERE note_id = ANY({IdsParameterName})";
 
