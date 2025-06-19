@@ -53,8 +53,8 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_NotStatusHoldsJourney_HoldsFromIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
-        var startDate = new DateOnly(2024, 01, 01);
-        var endDate = new DateOnly(2025, 01, 01);
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
@@ -105,8 +105,8 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var status = RouteToProfessionalStatusStatus.Holds;
-        var startDate = new DateOnly(2024, 01, 01);
-        var endDate = new DateOnly(2025, 01, 01);
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.Name == "NI R") // an induction exemption route that requires the exemption question
@@ -157,8 +157,8 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var status = RouteToProfessionalStatusStatus.Holds;
-        var startDate = new DateOnly(2024, 01, 01);
-        var endDate = new DateOnly(2025, 01, 01);
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = startDate.AddMonths(1);
         var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()) // an induction exemption route who's exemption is implicit and therefore doesn't require the exemption question
             .Where(r => r.InductionExemptionReasonId.HasValue)
@@ -255,9 +255,9 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenFutureHoldsFromDateIsEntered_ReturnsError()
     {
         // Arrange
-        var startDate = new DateOnly(2024, 01, 01);
-        var endDate = new DateOnly(2025, 01, 01);
-        var holdsFrom = Clock.Today.AddDays(1);
+        var startDate = Clock.Today.AddYears(-1);
+        var endDate = startDate.AddMonths(1);
+        var holdsFrom = endDate;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne();

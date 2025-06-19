@@ -49,7 +49,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_WhenAwardDateIsEntered_SavesDateAndRedirectsToInductionExemptionPage()
     {
         // Arrange
-        var holdsFrom = new DateOnly(2024, 01, 01);
+        var holdsFrom = Clock.Today.AddYears(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory
                 && r.InductionExemptionRequired == FieldRequirement.Mandatory
@@ -95,7 +95,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_ImplicitExemptionRoute_WhenAwardDateIsEntered_SavesDateAndRedirectsToNextPage()
     {
         // Arrange
-        var holdsFrom = new DateOnly(2024, 01, 01);
+        var holdsFrom = Clock.Today.AddYears(-1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.InductionExemptionReason is not null && r.InductionExemptionReason.RouteImplicitExemption)
             .RandomOne();
@@ -138,7 +138,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     public async Task Post_FromCya_WhenAwardDateIsEntered_RedirectsToCya()
     {
         // Arrange
-        var holdsFrom = new DateOnly(2024, 01, 01);
+        var holdsFrom = Clock.Today.AddYears(-1);
         var newAwardDate = holdsFrom.AddMonths(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
