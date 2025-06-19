@@ -562,12 +562,23 @@ public static class PageExtensions
         Assert.Empty(await page.InputValueAsync("label:text-is('Year')"));
     }
 
+    public static async Task FillDateInputAsync(this IPage page, string id, DateOnly date)
+    {
+        var dateInputScope = page.Locator($"#{id}");
+        await dateInputScope.GetByLabel("Day").FillAsync(date.Day.ToString());
+        await dateInputScope.GetByLabel("Month").FillAsync(date.Month.ToString());
+        await dateInputScope.GetByLabel("Year").FillAsync(date.Year.ToString());
+        //await page.FillAsync("label:text-is('Month')", date.Month.ToString());
+        //await page.FillAsync("label:text-is('Year')", date.Year.ToString());
+    }
+
     public static async Task FillDateInputAsync(this IPage page, DateOnly date)
     {
         await page.FillAsync("label:text-is('Day')", date.Day.ToString());
         await page.FillAsync("label:text-is('Month')", date.Month.ToString());
         await page.FillAsync("label:text-is('Year')", date.Year.ToString());
     }
+
 
     public static async Task FillNameInputsAsync(this IPage page, string firstName, string middleName, string lastName)
     {

@@ -44,7 +44,6 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
             await JourneyInstance!.UpdateStateAsync(s =>
             {
                 s.Status = s.EditStatusState!.Status;
-                s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
                 s.HoldsFrom = s.EditStatusState.HoldsFrom;
                 s.IsExemptFromInduction = IsExemptFromInduction;
                 s.EditStatusState = null;

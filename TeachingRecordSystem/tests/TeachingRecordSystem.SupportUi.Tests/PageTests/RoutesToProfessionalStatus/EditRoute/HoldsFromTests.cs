@@ -50,7 +50,48 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_NotStatusHoldsJourney_HoldsFromIsEntered_SavesDateAndRedirectsToDetail()
+    public async Task Get_MovingToAHoldsStatusJourney_BackLinkContainsExpected()
+    {
+        // Arrange
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = new DateOnly(2025, 01, 01);
+        var holdsFrom = endDate;
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(RouteToProfessionalStatusStatus.InTraining)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .WithEditRouteStatusState(builder => builder
+                .WithStatus(RouteToProfessionalStatusStatus.Holds)
+                .WithEndDate(endDate))
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var document = await response.GetDocumentAsync();
+        var backlink = document.QuerySelector(".govuk-back-link") as IHtmlAnchorElement;
+        Assert.Contains($"/route/{qualificationId}/edit/status?{journeyInstance.GetUniqueIdQueryParameter()}", backlink!.Href);
+    }
+
+    [Fact]
+    public async Task Post_StatusIsAlreadyHoldsJourney_HoldsFromIsEntered_SavesDateAndRedirectsToDetail()
     {
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
@@ -60,13 +101,14 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(status)));
+                .WithStatus(status)
+                .WithHoldsFrom(holdsFrom.AddDays(-1))));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -101,7 +143,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task Post_StatusHoldsJourney_RouteAllowsExemption_HoldsFromIsEntered_SavesDateAndRedirectsToInductionExemptionPage()
+    public async Task Post_StatusChangedToHoldsJourney_RouteAllowsExemption_HoldsFromIsEntered_SavesDateAndRedirectsToInductionExemptionPage()
     {
         // Arrange
         var status = RouteToProfessionalStatusStatus.Holds;

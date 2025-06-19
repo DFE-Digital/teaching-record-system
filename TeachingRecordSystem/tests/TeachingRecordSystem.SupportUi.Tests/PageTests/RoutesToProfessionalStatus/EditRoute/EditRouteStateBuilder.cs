@@ -266,7 +266,7 @@ public class EditRouteStatusStateBuilder
             InductionExemption = _inductionExemption,
             RouteImplicitExemption = _routeImplicitExemption,
             Status = _status,
-            TrainingEndDate = _trainingEndDate
+            //TrainingEndDate = _trainingEndDate
         };
     }
 }
