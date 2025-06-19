@@ -11,14 +11,15 @@ public static class AngleSharpExtensions
         return element as T;
     }
 
-    public static IReadOnlyList<IElement> GetAllElementsByTestId(this IElement element, string testId) =>
-        element.QuerySelectorAll($"*[data-testid='{testId}']").ToList();
+    public static IReadOnlyList<IElement> GetAllElementsByTestId(this IElement element, params string[] testIds) =>
+        //element.QuerySelectorAll(string.Join(',', testIds.Select(testId => $"*[data-testid='{testId}']"))).ToList();
+        testIds.SelectMany(testId => element.QuerySelectorAll($"*[data-testid='{testId}']")).ToList();
 
     public static IElement? GetElementByTestId(this IElement element, string testId) =>
         element.GetAllElementsByTestId(testId).SingleOrDefault();
 
-    public static IReadOnlyList<IElement> GetAllElementsByTestId(this IHtmlDocument doc, string testId) =>
-        doc.Body!.GetAllElementsByTestId(testId);
+    public static IReadOnlyList<IElement> GetAllElementsByTestId(this IHtmlDocument doc, params string[] testIds) =>
+        doc.Body!.GetAllElementsByTestId(testIds);
 
     public static IElement? GetElementByLabel(this IHtmlDocument doc, string label)
     {
