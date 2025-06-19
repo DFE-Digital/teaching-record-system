@@ -15,7 +15,7 @@ public class ResyncAllPersonsJob(TrsDataSyncHelper syncHelper, IDbContextFactory
             .Select(p => p.PersonId)
             .AsAsyncEnumerable();
 
-        await foreach (var personIds in personsToSync.ChunkAsync(200).WithCancellation(cancellationToken))
+        await foreach (var personIds in personsToSync.ChunkAsync(500).WithCancellation(cancellationToken))
         {
             await syncHelper.SyncPersonsAsync(personIds, syncAudit: false, cancellationToken: cancellationToken);
         }
