@@ -54,7 +54,7 @@ public class BackfillDqtNotesJob([FromKeyedServices(TrsDataSyncService.CrmClient
         query.Criteria.AddCondition(Annotation.Fields.ObjectId, ConditionOperator.NotNull);
         query.Criteria.AddCondition(Annotation.Fields.ObjectTypeCode, ConditionOperator.Equal, Contact.EntityLogicalName);
         query.Criteria.AddCondition(Annotation.Fields.CreatedOn, ConditionOperator.GreaterThan, minCreatedOn ?? defaultMinCreatedOn);
-        query.Criteria.AddCondition(Annotation.Fields.NoteText, ConditionOperator.Contains, "£");
+        query.Criteria.AddCondition(Annotation.Fields.NoteText, ConditionOperator.Like, "%£%");
 
         var fetched = 0;
 
