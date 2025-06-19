@@ -299,7 +299,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var startDate = Clock.Today.AddYears(-1);
         var endDate = startDate.AddMonths(1);
-        var holdsFrom = endDate;
+        var holdsFrom = Clock.Today.AddDays(1);
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
             .RandomOne();
