@@ -627,7 +627,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditDegreeType_CanClearField_BackLinkReturnsToDetails()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
@@ -841,7 +841,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditSubjectSpecialisms_CanClearField_BackLinkReturnsToDetails()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Mandatory)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())

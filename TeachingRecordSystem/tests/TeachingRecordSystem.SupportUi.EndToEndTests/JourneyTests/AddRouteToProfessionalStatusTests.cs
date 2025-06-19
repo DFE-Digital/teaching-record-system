@@ -409,9 +409,11 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddAgeRangeAsync();
+        // test that page is optional so don't fill it in
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddSubjectsPageAsync();
+        // test that page is optional so don't fill it in
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddChangeReasonPage();

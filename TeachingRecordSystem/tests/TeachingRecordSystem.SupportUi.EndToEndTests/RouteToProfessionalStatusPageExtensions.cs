@@ -30,22 +30,22 @@ public static class RouteToProfessionalStatusPageExtensions
 
     public static Task EnterDegreeTypeAsync(this IPage page, string name)
     {
-        return page.FillAsync($"label:text-is('Enter the degree type awarded as part of this route')", name);
+        return page.FillAsync("#DegreeTypeId", name);
     }
 
     public static Task EnterCountryAsync(this IPage page, string name)
     {
-        return page.FillAsync("label:text-is('Enter the country associated with their route')", name);
+        return page.FillAsync("#TrainingCountryId", name);
     }
 
     public static Task EnterSubjectAsync(this IPage page, string name)
     {
-        return page.FillAsync("label:text-is('Enter the subject they specialise in teaching')", name);
+        return page.FillAsync("#SubjectId1", name);
     }
 
     public static Task EnterTrainingProviderAsync(this IPage page, string name)
     {
-        return page.FillAsync("label:text-is('Enter the training provider for this route')", name);
+        return page.FillAsync("#TrainingProviderId", name);
     }
 
     public static Task AssertOnRouteEditStatusPageAsync(this IPage page, Guid qualificationId)
