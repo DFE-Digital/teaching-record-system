@@ -180,6 +180,64 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
     }
 
     [Fact]
+    public async Task Route_AddJourney_OnlyCountryApplicable()
+    {
+        var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))
+            .Single(r => r.Name == "Apprenticeship");
+        var status = RouteToProfessionalStatusStatus.Deferred;
+        var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
+            .RandomOne()
+            .Name;
+        var person = await TestData.CreatePersonAsync();
+        var personId = person.PersonId;
+
+        await using var context = await HostFixture.CreateBrowserContext();
+        var page = await context.NewPageAsync();
+
+        await page.GoToPersonQualificationsPageAsync(person.PersonId);
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+        await page.ClickButtonAsync("Add a route");
+
+        await page.AssertOnRouteAddRoutePageAsync();
+        await page.FillAsync($"label:text-is('Route type')", setRoute.Name);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddStatusPageAsync();
+        await page.SelectStatusAsync(status);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddCountryAsync();
+        await page.EnterCountryAsync(setCountry);
+        await page.FocusAsync("button:text-is('Continue')");
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddChangeReasonPage();
+        await page.SelectRouteChangeReasonOption(ChangeReasonOption.AnotherReason.ToString());
+        await page.SelectReasonMoreDetailsAsync(false);
+        await page.SelectReasonFileUploadAsync(false);
+        await page.ClickButtonAsync("Continue");
+
+        await page.AssertOnRouteAddCheckYourAnswersPage();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddChangeReasonPage();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddCountryAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddStatusPageAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnRouteAddRoutePageAsync();
+        await page.ClickBackLink();
+
+        await page.AssertOnPersonQualificationsPageAsync(person.PersonId);
+    }
+
+    [Fact]
     public async Task Route_Add_HoldsJourney()
     {
         var setRoute = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync(true))

@@ -238,7 +238,6 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);
@@ -582,6 +581,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditDegreeType_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route-status combo makes the degree type field mandatory
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .First();
@@ -637,8 +637,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditCountry_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route - status combo makes the country field mandatory
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
@@ -680,11 +681,14 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
         await page.EnterCountryAsync("");
+        await page.ClickContinueButtonAsync();
+        page.AssertErrorSummary();
+        await page.EnterCountryAsync(setCountry.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
-        await page.AssertContentContains("Not provided", "Country");
+        await page.AssertContentContains(setCountry.Name, "Country");
     }
 
     [Fact]
@@ -742,6 +746,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditTrainingProvider_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route - status combo makes the provider field optional
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
             .First();
@@ -794,6 +799,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditSubjectSpecialisms_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route-status combo makes the subjects field optional
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
