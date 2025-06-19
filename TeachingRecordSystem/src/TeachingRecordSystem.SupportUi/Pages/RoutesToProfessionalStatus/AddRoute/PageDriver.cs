@@ -76,12 +76,11 @@ public static class PageDriver
     {
         return page switch
         {
-            AddRoutePage.EndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
+            AddRoutePage.StartAndEndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()), // CML TODO combine FieldRequirements on route type
             AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
             AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
             AddRoutePage.Route => FieldRequirement.Mandatory,
             AddRoutePage.Status => FieldRequirement.Mandatory,
-            AddRoutePage.StartDate => QuestionDriverHelper.FieldRequired(Route.TrainingStartDateRequired, Status.GetStartDateRequirement()),
             AddRoutePage.TrainingProvider => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement()),
             AddRoutePage.DegreeType => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement()),
             AddRoutePage.Country => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement()),

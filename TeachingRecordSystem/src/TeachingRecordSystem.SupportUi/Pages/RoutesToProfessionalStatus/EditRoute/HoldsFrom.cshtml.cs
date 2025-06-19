@@ -54,7 +54,6 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
                 await JourneyInstance!.UpdateStateAsync(s => // update the main journey state with the data
                 {
                     s.Status = s.EditStatusState!.Status;
-                    s.TrainingEndDate = s.EditStatusState.TrainingEndDate.HasValue ? s.EditStatusState.TrainingEndDate.Value : s.TrainingEndDate;
                     s.HoldsFrom = HoldsFrom;
                     s.IsExemptFromInduction = s.EditStatusState.InductionExemption;
                     s.EditStatusState = null;
@@ -94,7 +93,7 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
     public string BackLink => FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
-                PreviousCompletingRoutePage :
+                linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
 
@@ -123,9 +122,4 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
         IsLastCompletingRoutePage() ?
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditInductionExemption(QualificationId, JourneyInstance!.InstanceId);
-
-    private string PreviousCompletingRoutePage =>
-        QuestionDriverHelper.FieldRequired(RouteToProfessionalStatus!.TrainingEndDateRequired, JourneyInstance!.State.EditStatusState!.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable ?
-            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId);
 }
