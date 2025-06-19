@@ -4,12 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel : AddRouteCommonPageModel
+public class HoldsFromModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public HoldsFromModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : base(linkGenerator, referenceDataCache)
-    {
-    }
-
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Award date")]
     [Required(ErrorMessage = "Enter the professional status award date")]

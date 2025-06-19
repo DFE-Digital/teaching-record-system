@@ -32,7 +32,7 @@ public class StatusModel(
 
     public void OnGet()
     {
-        Status = JourneyInstance!.State.Status;
+        Status = JourneyInstance!.State.EditStatusState is null ? JourneyInstance!.State.Status : JourneyInstance!.State.EditStatusState.Status;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -48,33 +48,37 @@ public class StatusModel(
             var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
 
             // initialise a temporary part of journey state for the data collection for a completing route
-            await JourneyInstance!.UpdateStateAsync(
-                s =>
-                {
-                    s.EditStatusState = new EditRouteStatusState
+            if (JourneyInstance!.State.EditStatusState is null)
+            {
+                await JourneyInstance!.UpdateStateAsync(
+                    s =>
                     {
-                        Status = Status,
-                        RouteImplicitExemption = hasImplicitExemption,
-                        InductionExemption = hasImplicitExemption ? true : null
-                    };
-                });
+                        s.EditStatusState = new EditRouteStatusState
+                        {
+                            Status = Status,
+                            RouteImplicitExemption = hasImplicitExemption,
+                            InductionExemption = hasImplicitExemption ? true : null
+                        };
+                    });
+            }
+            else
+            {
+                await JourneyInstance!.UpdateStateAsync(
+                    s => s.EditStatusState!.Status = Status);
+            }
         }
-        else if (NotCompletedRoute) // the status has been changed to something other than awarded or approved
+        else // the status has been changed to something other than 'holds'
         {
             await JourneyInstance!.UpdateStateAsync(s =>
             {
-                s.HoldsFrom = null; // clear any previous awarded date and exemption
+                s.HoldsFrom = null; // clear any previous 'holds' date and exemption
                 s.IsExemptFromInduction = null;
                 s.Status = Status;
             });
         }
-        else // going from approved to awarded or vice versa
-        {
-            await JourneyInstance!.UpdateStateAsync(s => s.Status = Status);
-        }
 
         return Redirect(CompletingRoute ?
-            NextCompletingRoutePage(Status) :
+            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
             FromCheckAnswers ?
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
@@ -101,13 +105,6 @@ public class StatusModel(
          FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
-
-    private string NextCompletingRoutePage(RouteToProfessionalStatusStatus status)
-    {
-        return (QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, status.GetEndDateRequirement()) != FieldRequirement.NotApplicable) ?
-            linkGenerator.RouteEditEndDate(QualificationId, JourneyInstance!.InstanceId) :
-            linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId);
-    }
 
     private bool CompletingRoute => Status is RouteToProfessionalStatusStatus.Holds && (JourneyInstance!.State.CurrentStatus is not RouteToProfessionalStatusStatus.Holds);
 

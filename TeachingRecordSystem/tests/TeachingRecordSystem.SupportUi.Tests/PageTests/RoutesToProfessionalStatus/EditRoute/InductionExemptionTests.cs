@@ -104,15 +104,15 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(status)
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)
                 .WithHoldsFrom(holdsFrom)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
+            .WithTrainingEndDate(endDate)
                 .WithEditRouteStatusState(builder => builder
                 .WithStatus(status)
-                .WithEndDate(endDate)
                 .WithHoldsFrom(holdsFrom)
                 .WithHasInductionExemption(true))
             .Build();

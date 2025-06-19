@@ -1,4 +1,5 @@
 @using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
 @using TeachingRecordSystem.Core.Services.Files
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
@@ -13,13 +14,8 @@
     var ageRangeType = professionalStatus.TrainingAgeSpecialismType;
     var ageRangeFromTo = (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeTo is not null) ?
         $"From {professionalStatus.TrainingAgeSpecialismRangeFrom} to {professionalStatus.TrainingAgeSpecialismRangeTo}" : null;
-    var subjects = professionalStatus.TrainingSubjectIds is not null ?
-            professionalStatus.TrainingSubjectIds
-                .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
-                .OrderByDescending(name => name)
-                .ToArray() : null;
+    var subjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(professionalStatus.TrainingSubjectIds, ReferenceDataCache);
     var evidenceFileUrl = createdEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(createdEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
-
 }
 
 <div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-route-created-event">

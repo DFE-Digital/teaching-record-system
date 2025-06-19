@@ -13,7 +13,7 @@
         <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="add-start-date-link" href="@LinkGenerator.RouteAddStartDate(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+            <govuk-summary-list-row-action data-testid="add-start-date-link" href="@LinkGenerator.RouteAddStartAndEndDate(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
     </govuk-summary-list-row>
 
@@ -21,7 +21,7 @@
         <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
         <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
         <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="add-end-date-link" href="@LinkGenerator.RouteAddEndDate(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+            <govuk-summary-list-row-action data-testid="add-end-date-link" href="@LinkGenerator.RouteAddStartAndEndDate(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
         </govuk-summary-list-row-actions>
     </govuk-summary-list-row>
 

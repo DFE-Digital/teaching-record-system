@@ -61,7 +61,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
         Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TrimmedText());
-        Assert.Equal(subjects.Single().Name, timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal($"{subjects.Single().Reference} - {subjects.Single().Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
         Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TrimmedText());
-        Assert.Equal(subject.Name, timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal($"{subject.Reference} - {subject.Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
 
         Assert.Equal(oldAwardDate.ToString(UiDefaults.DateOnlyDisplayFormat), timelineItem.GetElementByTestId("old-award-date")?.TrimmedText());
         Assert.Null(timelineItem.GetElementByTestId("status"));
@@ -249,7 +249,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(oldDegreeType.Name, timelineItem.GetElementByTestId("old-degree-type")?.TrimmedText());
         Assert.Equal(oldCountry.Name, timelineItem.GetElementByTestId("old-country")?.TrimmedText());
         Assert.Equal(oldAgeRange.GetDisplayName(), timelineItem.GetElementByTestId("old-age-range-type")?.TrimmedText());
-        Assert.Equal(oldSubject.Name, timelineItem.GetElementByTestId("old-subjects")?.TrimmedText());
+        Assert.Equal($"{oldSubject.Reference} - {oldSubject.Name}", timelineItem.GetElementByTestId("old-subjects")?.TrimmedText());
     }
 
     [Fact]
@@ -484,7 +484,7 @@ public class ChangeLogProfessionalStatusEventsTests(HostFixture hostFixture) : T
         Assert.Equal(degreeType.Name, timelineItem.GetElementByTestId("degree-type")?.TrimmedText());
         Assert.Equal(country.Name, timelineItem.GetElementByTestId("country")?.TrimmedText());
         Assert.Equal(ageRange.GetDisplayName(), timelineItem.GetElementByTestId("age-range-type")?.TrimmedText());
-        Assert.Equal(subjects.Single().Name, timelineItem.GetElementByTestId("subjects")?.TrimmedText());
+        Assert.Equal($"{subjects.Single().Reference} - {subjects.Single().Name}", timelineItem.GetElementByTestId("subjects")?.TrimmedText());
     }
 
     [Fact]

@@ -41,12 +41,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.SelectStatusAsync(status);
         await page.ClickButtonAsync("Continue");
 
-        await page.AssertOnRouteAddStartDatePageAsync();
-        await page.FillDateInputAsync(startDate);
-        await page.ClickButtonAsync("Continue");
-
-        await page.AssertOnRouteAddEndDatePageAsync();
-        await page.FillDateInputAsync(endDate);
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
+        await page.FillDateInputAsync("TrainingStartDate", startDate);
+        await page.FillDateInputAsync("TrainingEndDate", endDate);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
@@ -97,10 +94,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnRouteAddTrainingProviderAsync();
         await page.ClickBackLink();
 
-        await page.AssertOnRouteAddEndDatePageAsync();
-        await page.ClickBackLink();
-
-        await page.AssertOnRouteAddStartDatePageAsync();
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddStatusPageAsync();
@@ -147,12 +141,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.SelectStatusAsync(status);
         await page.ClickButtonAsync("Continue");
 
-        await page.AssertOnRouteAddStartDatePageAsync();
-        await page.FillDateInputAsync(startDate);
-        await page.ClickButtonAsync("Continue");
-
-        await page.AssertOnRouteAddEndDatePageAsync();
-        await page.FillDateInputAsync(endDate);
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
+        await page.FillDateInputAsync("TrainingStartDate", startDate);
+        await page.FillDateInputAsync("TrainingEndDate", endDate);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
@@ -269,7 +260,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
                 && r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
         var status = RouteToProfessionalStatusStatus.Holds;
-        var awardedDate = new DateOnly(2021, 1, 1);
+        var holdsFrom = new DateOnly(2021, 1, 1);
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
             .RandomOne()
             .Name;
@@ -295,7 +286,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddHoldsFromPageAsync();
-        await page.FillDateInputAsync(awardedDate);
+        await page.FillDateInputAsync(holdsFrom);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddInductionExemptionPageAsync();
@@ -385,12 +376,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.SelectStatusAsync(status);
         await page.ClickButtonAsync("Continue");
 
-        await page.AssertOnRouteAddStartDatePageAsync();
-        await page.FillDateInputAsync(startDate);
-        await page.ClickButtonAsync("Continue");
-
-        await page.AssertOnRouteAddEndDatePageAsync();
-        await page.FillDateInputAsync(endDate);
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
+        await page.FillDateInputAsync("TrainingStartDate", startDate);
+        await page.FillDateInputAsync("TrainingEndDate", endDate);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddTrainingProviderAsync();
@@ -436,22 +424,22 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
             .RandomOne();
 
         await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
-        await page.AssertOnRouteAddStartDatePageAsync();
-        await page.FillDateInputAsync(editStartDate);
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
+        await page.FillDateInputAsync("TrainingStartDate", editStartDate);
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-start-date-link");
-        await page.AssertOnRouteAddStartDatePageAsync();
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-end-date-link");
-        await page.AssertOnRouteAddEndDatePageAsync();
-        await page.FillDateInputAsync(editEndDate);
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
+        await page.FillDateInputAsync("TrainingEndDate", editEndDate);
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-end-date-link");
-        await page.AssertOnRouteAddEndDatePageAsync();
+        await page.AssertOnRouteAddStartAndEndDatePageAsync();
         await page.ClickBackLink();
 
         await page.AssertOnRouteAddCheckYourAnswersPage();

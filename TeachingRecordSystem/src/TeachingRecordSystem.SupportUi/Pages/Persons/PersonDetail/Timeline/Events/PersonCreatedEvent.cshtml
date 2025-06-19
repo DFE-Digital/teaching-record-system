@@ -1,0 +1,104 @@
+@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Services.Files
+@inject IFileService FileService
+@inject ReferenceDataCache ReferenceDataCache
+@model TimelineItem<TimelineEvent<PersonCreatedEvent>>
+@{
+    var updatedEvent = Model.ItemModel.Event;
+    var details = updatedEvent.Details;
+    var name = StringHelper.JoinNonEmpty(' ', details.FirstName, details.MiddleName, details.LastName);
+    var email = EmailAddress.TryParse(details.EmailAddress, out var parsedEmail)
+        ? parsedEmail.ToDisplayString()
+        : details.EmailAddress;
+    var mobile = MobileNumber.TryParse(details.MobileNumber, out var parsedMobile)
+        ? parsedMobile.ToDisplayString()
+        : details.MobileNumber;
+    var nino = NationalInsuranceNumber.TryParse(details.NationalInsuranceNumber, out var parsedNino)
+        ? parsedNino.ToDisplayString()
+        : details.NationalInsuranceNumber;
+    var evidenceFileUrl = updatedEvent.EvidenceFile is not null 
+        ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) 
+        : null;
+}
+<div class="moj-timeline__item govuk-!-padding-bottom-2" data-testid="timeline-item-created-event">
+    <div class="moj-timeline__header">
+        <h2 class="moj-timeline__title">Record created</h2>
+    </div>
+    <p class="moj-timeline__date">
+        <span data-testid="raised-by">By @Model.ItemModel.RaisedByUser.Name on</span>
+        <time datetime="@Model.Timestamp.ToString("O")" data-testid="timeline-item-time">@Model.FormattedTimestamp</time>
+    </p>
+    <div class="moj-timeline__description">
+        <div data-testid="details">
+            <govuk-summary-list>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Name</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@name</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    <govuk-summary-list-row>
+                        <govuk-summary-list-row-key>Date of birth</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value use-empty-fallback>@details.DateOfBirth?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+                    </govuk-summary-list-row>
+                    @if (email is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Email address</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@email</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (mobile is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Mobile number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@mobile</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (nino is not null)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>National Insurance number</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@nino</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+            </govuk-summary-list>
+        </div>
+
+        <govuk-details class="govuk-!-margin-bottom-2" data-testid="create-reason">
+            <govuk-details-summary>Reason for creating record</govuk-details-summary>
+            <govuk-details-text>
+                <govuk-summary-list>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback>@updatedEvent.CreateReason</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Reason details</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (updatedEvent.CreateReasonDetail is not null)
+                                {
+                                    <multi-line-text text="@updatedEvent.CreateReasonDetail" />
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Evidence</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value>
+                                @if (evidenceFileUrl is not null)
+                                {
+                                    <a href="@evidenceFileUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@($"{updatedEvent.EvidenceFile!.Name} (opens in new tab)")</a>
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                </govuk-summary-list>
+            </govuk-details-text>
+        </govuk-details>
+    </div>
+</div>

@@ -1,5 +1,6 @@
-﻿@using TeachingRecordSystem.Core.Events
+@using TeachingRecordSystem.Core.Events
 @using TeachingRecordSystem.Core.Services.Files
+@using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
 @inject ReferenceDataCache ReferenceDataCache
 @inject IFileService FileService
 @model TimelineItem<TimelineEvent<RouteToProfessionalStatusUpdatedEvent>>
@@ -14,22 +15,14 @@
     var ageRangeType = professionalStatus.TrainingAgeSpecialismType;
     var ageRangeFromTo = (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeTo is not null) ?
         $"From {professionalStatus.TrainingAgeSpecialismRangeFrom} to {professionalStatus.TrainingAgeSpecialismRangeTo}" : null;
-    var subjects = professionalStatus.TrainingSubjectIds is not null ?
-            professionalStatus.TrainingSubjectIds
-                .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
-                .OrderByDescending(name => name)
-                .ToArray() : null;
+    var subjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(professionalStatus.TrainingSubjectIds, ReferenceDataCache);
     var oldTrainingProvider = oldDetails.TrainingProviderId.HasValue ? await ReferenceDataCache.GetTrainingProviderByIdAsync(oldDetails.TrainingProviderId.Value) : null;
     var oldCountry = !string.IsNullOrEmpty(oldDetails.TrainingCountryId) ? await ReferenceDataCache.GetTrainingCountryByIdAsync(oldDetails.TrainingCountryId) : null;
     var oldDegreeType = oldDetails.DegreeTypeId.HasValue ? await ReferenceDataCache.GetDegreeTypeByIdAsync(oldDetails.DegreeTypeId.Value) : null;
     var oldAgeRangeType = oldDetails.TrainingAgeSpecialismType;
     var oldAgeRangeFromTo = (oldDetails.TrainingAgeSpecialismRangeFrom is not null && oldDetails.TrainingAgeSpecialismRangeTo is not null) ?
         $"From {oldDetails.TrainingAgeSpecialismRangeFrom} to {oldDetails.TrainingAgeSpecialismRangeTo}" : null;
-    var oldSubjects = oldDetails.TrainingSubjectIds is not null ?
-            oldDetails.TrainingSubjectIds
-                .Join((await ReferenceDataCache.GetTrainingSubjectsAsync()), id => id, subject => subject.TrainingSubjectId, (_, subject) => subject.Name)
-                .OrderByDescending(name => name)
-                .ToArray() : null;
+    var oldSubjects = await SubjectDisplayHelper.GetFormattedSubjectNamesAsync(oldDetails.TrainingSubjectIds, ReferenceDataCache);
     var evidenceFileUrl = updatedEvent.EvidenceFile is not null ? await FileService.GetFileUrlAsync(updatedEvent.EvidenceFile!.FileId, TimeSpan.FromMinutes(15)) : null;
 }
 
