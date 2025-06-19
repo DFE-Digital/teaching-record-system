@@ -619,6 +619,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(setDegreeType, "Degree type");
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
@@ -674,18 +675,16 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(setCountry.Name, "Country");
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
 
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
         await page.EnterCountryAsync("");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
-        await page.EnterCountryAsync(setCountry.Name);
-        await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains("Not provided", "Country");
     }
 
     [Fact]
@@ -780,24 +779,23 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(newTrainingProvider.Name, "Training provider");
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
         await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
         await page.EnterTrainingProviderAsync("");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
-        await page.EnterTrainingProviderAsync(newTrainingProvider.Name);
-        await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButtonAsync();
+
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains("Not provided", "Training provider");
     }
 
     [Fact]
     public async Task EditSubjectSpecialisms_CanClearField_BackLinkReturnsToDetails()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Mandatory)
+            .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var country = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
@@ -841,10 +839,6 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditSubjectsPageAsync(qualificationId);
         await page.EnterSubjectAsync("");
-        await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
-        await page.EnterSubjectAsync(newSubject.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
