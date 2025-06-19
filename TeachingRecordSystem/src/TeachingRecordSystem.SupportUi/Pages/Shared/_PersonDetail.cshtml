@@ -1,10 +1,14 @@
 @using TeachingRecordSystem.SupportUi.Pages.Common
+@using TeachingRecordSystem.SupportUi.Infrastructure.Security;
+@using Microsoft.AspNetCore.Authorization;
+@inject IAuthorizationService AuthorizationService
 @model PersonDetailViewModel
 
 <govuk-summary-card>
     <govuk-summary-card-title>Personal details</govuk-summary-card-title>
     <govuk-summary-card-actions>
-        @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
+        @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated) &&
+           (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.PersonDataEdit)).Succeeded)
         {
             <govuk-summary-card-action data-testid="change-details-link" href=@LinkGenerator.PersonEditDetailsPersonalDetails(Model.PersonId) visually-hidden-text="personal details">Change</govuk-summary-card-action>
         }

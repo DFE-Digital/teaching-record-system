@@ -387,4 +387,38 @@ public class IndexTests : TestBase
         var doc = await AssertEx.HtmlResponseAsync(response);
         Assert.Empty(doc.GetAllElementsByTestId("professional-status-details"));
     }
+
+    [Theory]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.AlertsManagerTra, true)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(UserRoles.AccessManager, true)]
+    public async Task Get_UserRolesWithViewOrEditPersonDataPermissions_ChangeDetailsLinkShownAsExpected(string userRole, bool canSeeChangeDetailsLink)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        var user = await TestData.CreateUserAsync(role: userRole);
+        SetCurrentUser(user);
+
+        var person = await TestData.CreatePersonAsync(p =>
+            p.WithQts());
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var changeDetailsLink = doc.GetElementByTestId("change-details-link");
+        if (canSeeChangeDetailsLink)
+        {
+            Assert.NotNull(changeDetailsLink);
+        }
+        else
+        {
+            Assert.Null(changeDetailsLink);
+        }
+    }
 }

@@ -14,4 +14,6 @@ public static class AuthorizationPolicies
     public const string AlertWrite = nameof(AlertWrite);
     public const string InductionReadWrite = nameof(InductionReadWrite);
     public const string PersonDataEdit = nameof(PersonDataEdit);
+    public const string RoutesView = nameof(RoutesView);
+    public const string RoutesEdit = nameof(RoutesEdit);
 }
