@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
+public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     [BindProperty]
     [DateInput(ErrorMessagePrefix = "Award date")]
@@ -23,6 +23,10 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator, ReferenceDataCache r
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (HoldsFrom > clock.Today)
+        {
+            ModelState.AddModelError(nameof(HoldsFrom), "Professional Status Date must not be in the future");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();

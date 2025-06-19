@@ -7,7 +7,7 @@ using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 [Journey(JourneyNames.EditRouteToProfessionalStatus), RequireJourneyInstance]
-public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
+public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : PageModel
 {
     public JourneyInstance<EditRouteState>? JourneyInstance { get; set; }
 
@@ -36,6 +36,10 @@ public class HoldsFromModel(TrsLinkGenerator linkGenerator) : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (HoldsFrom > clock.Today)
+        {
+            ModelState.AddModelError(nameof(HoldsFrom), "Professional Status Date must not be in the future");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
