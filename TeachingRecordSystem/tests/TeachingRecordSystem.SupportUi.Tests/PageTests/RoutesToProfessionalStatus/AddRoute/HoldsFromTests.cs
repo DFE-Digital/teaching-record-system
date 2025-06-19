@@ -212,6 +212,47 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_WhenFutureDateIsEntered_ReturnsError()
+    {
+        // Arrange
+        var holdsDate = Clock.UtcNow.AddDays(1);
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.HoldsFromRequired == FieldRequirement.Mandatory)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync();
+
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            person.PersonId,
+            addRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/holds-from?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "HoldsFrom.Day", $"{holdsDate:%d}" },
+                { "HoldsFrom.Month", $"{holdsDate:%M}" },
+                { "HoldsFrom.Year", $"{holdsDate:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Professional Status Date must not be in the future");
+    }
+
+    [Fact]
     public async Task Cancel_RedirectsToExpectedPage()
     {
         // Arrange

@@ -252,6 +252,50 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
+    public async Task Post_WhenFutureHoldsFromDateIsEntered_ReturnsError()
+    {
+        // Arrange
+        var startDate = new DateOnly(2024, 01, 01);
+        var endDate = new DateOnly(2025, 01, 01);
+        var holdsFrom = Clock.Today.AddDays(1);
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.HoldsFromRequired == FieldRequirement.Mandatory)
+            .RandomOne();
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+                .WithRouteType(route.RouteToProfessionalStatusTypeId)
+                .WithStatus(RouteToProfessionalStatusStatus.InTraining)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(RouteToProfessionalStatusStatus.Holds)
+            .WithTrainingStartDate(startDate)
+            .WithTrainingEndDate(endDate)
+            .Build();
+
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            editRouteState
+            );
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/holds-from?{journeyInstance.GetUniqueIdQueryParameter()}")
+        {
+            Content = new FormUrlEncodedContentBuilder()
+            {
+                { "HoldsFrom.Day", $"{holdsFrom:%d}" },
+                { "HoldsFrom.Month", $"{holdsFrom:%M}" },
+                { "HoldsFrom.Year", $"{holdsFrom:yyyy}" },
+            }
+        };
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Professional Status Date must not be in the future");
+    }
+
+    [Fact]
     public async Task Cancel_DeleteJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
