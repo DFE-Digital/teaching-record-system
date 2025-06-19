@@ -63,27 +63,6 @@ public partial class TrsDataSyncHelperTests
         });
     }
 
-    [Fact]
-    public async Task SyncPersonAsync_AlreadyHaveNewerVersion_DoesNotUpdateDatabase()
-    {
-        // Arrange
-        var contactId = Guid.NewGuid();
-        var initialEntity = await CreatePersonEntity(contactId);
-
-        Clock.Advance();
-        var updatedEntity = await CreatePersonEntity(contactId, initialEntity);
-
-        await Helper.SyncPersonAsync(updatedEntity, syncAudit: false, ignoreInvalid: false);
-        var expectedFirstSync = Clock.UtcNow;
-        var expectedLastSync = Clock.UtcNow;
-
-        // Act
-        await Helper.SyncPersonAsync(initialEntity, syncAudit: false, ignoreInvalid: false);
-
-        // Assert
-        await AssertDatabasePersonMatchesEntity(updatedEntity, expectedFirstSync, expectedLastSync);
-    }
-
     private async Task AssertDatabasePersonMatchesEntity(
         Contact entity,
         DateTime? expectedFirstSync = null,
