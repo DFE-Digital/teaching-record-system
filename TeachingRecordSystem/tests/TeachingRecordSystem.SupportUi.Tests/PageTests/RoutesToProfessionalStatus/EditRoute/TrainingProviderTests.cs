@@ -179,25 +179,23 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
     public async Task Post_TrainingProviderIsOptional_WhenNoTrainingProviderIsEntered_RedirectsToNextPage()
     {
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional && r.DegreeTypeRequired != FieldRequirement.NotApplicable)
+            .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
             .RandomOne();
         var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.DegreeTypeRequired != FieldRequirement.NotApplicable)
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
             .RandomOne()
             .Value;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
-                .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(status)));
-
+            .WithRouteType(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)));
         var qualificationId = person.ProfessionalStatuses.First().QualificationId;
-        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).RandomOne();
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
             .WithStatus(status)
             .Build();
         var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
+            qualificationId,
             editRouteState
             );
 
@@ -208,7 +206,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
 
         // Assert
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/{qualificationId}/edit/degree-type?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>
