@@ -38,7 +38,7 @@ public class InductionTests(HostFixture hostFixture) : TestBase(hostFixture)
     {
         // Arrange
         var person = await TestData.CreatePersonAsync();
-        var expectedWarning = "This teacher has not been awarded QTS ";
+        var expectedWarning = "This teacher does not hold QTS ";
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.ContactId}/induction");
 
