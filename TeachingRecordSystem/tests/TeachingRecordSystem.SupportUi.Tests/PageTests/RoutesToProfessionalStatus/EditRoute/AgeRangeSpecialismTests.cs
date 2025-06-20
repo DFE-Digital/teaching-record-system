@@ -6,11 +6,9 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
-    public async Task Post_WhenAgeRangeNotProvidedIsSelected_FromToIsEntered_DisplaysError()
+    public async Task Post_WhenNothingIsSelected_DisplaysError()
     {
         // Arrange
-        var ageFrom = 4;
-        var ageTo = 8;
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
             .RandomOne();
@@ -33,21 +31,13 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { nameof(AgeRangeSpecialismModel.NotProvided), true },
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom },
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeTo), ageTo }
-            }
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/age-range?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(AgeRangeSpecialismModel.NotProvided), "To provide an age specialism, deselect 'Not provided'");
+        await AssertEx.HtmlResponseHasErrorAsync(response, nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), "Enter an age specialism or select 'Not provided'");
     }
 
     [Fact]
