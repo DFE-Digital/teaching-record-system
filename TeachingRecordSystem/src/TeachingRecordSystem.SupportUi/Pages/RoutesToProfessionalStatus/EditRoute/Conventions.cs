@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TeachingRecordSystem.SupportUi.Infrastructure.Filters;
+using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -12,6 +14,10 @@ public class Conventions : IConfigureFolderConventions
             model =>
             {
                 model.Filters.Add(new CheckRouteToProfessionalStatusExistsFilterFactory());
+                model.EndpointMetadata.Add(new AuthorizeAttribute()
+                {
+                    Policy = AuthorizationPolicies.RoutesEdit
+                });
             });
     }
 }

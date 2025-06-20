@@ -4,6 +4,14 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.Persons.PersonDetail;
 
 public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
+    public override void Dispose()
+    {
+        FeatureProvider.Features.Remove(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Remove(FeatureNames.RoutesToProfessionalStatus);
+
+        base.Dispose();
+    }
+
     [Fact]
     public async Task Get_WithPersonIdForNonExistentPerson_ReturnsNotFound()
     {
@@ -187,5 +195,113 @@ public class QualificationsTests(HostFixture hostFixture) : TestBase(hostFixture
         var professionalStatus = doc.GetElementByTestId($"professionalstatus-id-{qualificationid}");
         Assert.NotNull(professionalStatus);
         Assert.Equal(expectedContent, professionalStatus.GetElementByTestId($"training-exemption-{qualificationid}")!.TrimmedText());
+    }
+
+    [Theory]
+    [InlineData(UserRoles.AccessManager, false)]
+    [InlineData(UserRoles.Viewer, true)]
+    [InlineData(UserRoles.AlertsManagerTra, true)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, true)]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.Administrator, true)]
+    public async Task Get_RoutesPage_UserRoles_CanViewPageAsExpected(string userRole, bool canViewPage)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var user = await TestData.CreateUserAsync(role: userRole);
+        SetCurrentUser(user);
+
+        var person = await TestData.CreatePersonAsync();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        Assert.Equal(canViewPage ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(UserRoles.Viewer, false)]
+    [InlineData(UserRoles.AlertsManagerTra, false)]
+    [InlineData(UserRoles.AlertsManagerTraDbs, false)]
+    [InlineData(UserRoles.RecordManager, true)]
+    [InlineData(UserRoles.Administrator, true)]
+    public async Task Get_RoutesPage_UserRolesWithViewOrEditRoutesPermissions_EditLinkShownAsExpected(string userRole, bool canSeeEditLinks)
+    {
+        // Arrange
+        FeatureProvider.Features.Add(FeatureNames.ContactsMigrated);
+        FeatureProvider.Features.Add(FeatureNames.RoutesToProfessionalStatus);
+        var user = await TestData.CreateUserAsync(role: userRole);
+        SetCurrentUser(user);
+
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).Take(1);
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).Take(1).First();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).First();
+        var status = RouteToProfessionalStatusStatus.InTraining;
+        var ageRange = TrainingAgeSpecialismType.KeyStage3;
+        DateOnly? startDate = new DateOnly(2022, 01, 01);
+        DateOnly? endDate = new DateOnly(2023, 01, 01);
+        DateOnly holdsFrom = new DateOnly(2024, 01, 01);
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Where(r => r.Name == "NI R").Single();
+
+        var qualificationProvider = MandatoryQualificationProvider.All.Single(p => p.Name == "University of Birmingham");
+        var qualificationSpecialism = MandatoryQualificationSpecialism.Hearing;
+        var qualificationStatus = MandatoryQualificationStatus.Passed;
+        DateOnly? qualificationStartDate = DateOnly.Parse("2022-01-05");
+        DateOnly? qualificationEndDate = DateOnly.Parse("2022-07-13");
+
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r =>
+            {
+                r.WithRouteType(route.RouteToProfessionalStatusTypeId);
+                r.WithStatus(status);
+                r.WithTrainingStartDate(startDate.Value);
+                r.WithTrainingEndDate(endDate.Value);
+                r.WithTrainingProviderId(trainingProvider.TrainingProviderId);
+                r.WithTrainingSubjectIds(subjects.Select(s => s.TrainingSubjectId).ToArray());
+                r.WithTrainingCountryId(country.CountryId);
+                r.WithTrainingAgeSpecialismType(ageRange);
+                r.WithDegreeTypeId(degreeType.DegreeTypeId);
+                r.WithHoldsFrom(holdsFrom);
+            })
+            .WithMandatoryQualification(q => q
+                .WithProvider(qualificationProvider?.MandatoryQualificationProviderId)
+                .WithSpecialism(qualificationSpecialism)
+                .WithStartDate(qualificationStartDate)
+                .WithStatus(qualificationStatus, qualificationEndDate)));
+        var professionalStatusQualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var mandatoryQualificationId = person.MandatoryQualifications.First().QualificationId;
+
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/persons/{person.PersonId}/qualifications");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        var doc = await AssertEx.HtmlResponseAsync(response);
+        var editLinks = doc.GetAllElementsByTestId(
+            "add-route",
+            $"edit-route-link-{professionalStatusQualificationId}",
+            $"delete-route-link-{professionalStatusQualificationId}",
+            "add-mandatory-qualification",
+            $"delete-link-{mandatoryQualificationId}",
+            $"provider-change-link-{mandatoryQualificationId}",
+            $"specialism-change-link-{mandatoryQualificationId}",
+            $"start-date-change-link-{mandatoryQualificationId}",
+            $"status-change-link-{mandatoryQualificationId}",
+            $"end-date-change-link-{mandatoryQualificationId}");
+
+        if (canSeeEditLinks)
+        {
+            Assert.NotEmpty(editLinks);
+        }
+        else
+        {
+            Assert.Empty(editLinks);
+        }
     }
 }

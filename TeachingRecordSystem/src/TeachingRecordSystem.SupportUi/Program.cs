@@ -92,7 +92,8 @@ builder.Services.AddAuthorizationBuilder()
     .AddUserManagementPolicies()
     .AddAlertPolicies()
     .AddInductionPolicies()
-    .AddPersonDataPolicies();
+    .AddPersonDataPolicies()
+    .AddRoutesPolicies();
 
 builder.Services
     .AddRazorPages(options =>
