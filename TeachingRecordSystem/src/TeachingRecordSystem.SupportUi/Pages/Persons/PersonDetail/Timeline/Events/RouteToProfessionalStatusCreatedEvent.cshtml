@@ -45,7 +45,7 @@
             @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate))
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>PQTS date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="pqts-date" use-empty-fallback>@createdEvent.PersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
