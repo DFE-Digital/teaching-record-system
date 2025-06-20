@@ -13,7 +13,9 @@
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-radios asp-for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
-                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
+                    <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">@Model.PageHeading</govuk-radios-fieldset-legend>
+                    <govuk-radios-item value="@TrainingAgeSpecialismType.None">Not provided</govuk-radios-item>
+                    <govuk-radios-divider>or</govuk-radios-divider>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.FoundationStage">@TrainingAgeSpecialismType.FoundationStage.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage1">@TrainingAgeSpecialismType.KeyStage1.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage2">@TrainingAgeSpecialismType.KeyStage2.GetDisplayName()</govuk-radios-item>

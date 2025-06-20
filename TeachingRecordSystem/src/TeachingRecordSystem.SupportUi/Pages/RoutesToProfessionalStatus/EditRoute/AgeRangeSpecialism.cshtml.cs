@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,9 +21,13 @@ public class AgeRangeSpecialismModel(
 
     public Guid PersonId { get; set; }
 
+    public string PageHeading => "Edit age range specialism (optional)";
+
+    [BindProperty]
+    public bool? NotProvided { get; set; }
+
     [BindProperty]
     [AgeRangeRequiredValidation("Select an age range")]
-    [Display(Name = "Edit age range specialism")]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
     public void OnGet()
