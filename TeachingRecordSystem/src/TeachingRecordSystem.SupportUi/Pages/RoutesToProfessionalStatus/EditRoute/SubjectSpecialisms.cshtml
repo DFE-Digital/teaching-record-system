@@ -50,7 +50,7 @@
         <form action="@LinkGenerator.RouteEditTrainingSubjects(Model.QualificationId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-select asp-for="SubjectId1" label-class="govuk-label--l">
-                <govuk-select-label is-page-heading="true" />
+                <govuk-select-label is-page-heading="true">@Model.PageHeading</govuk-select-label>
                 <govuk-select-item value=""></govuk-select-item>
                 @foreach (var subject in Model.Subjects)
                 {

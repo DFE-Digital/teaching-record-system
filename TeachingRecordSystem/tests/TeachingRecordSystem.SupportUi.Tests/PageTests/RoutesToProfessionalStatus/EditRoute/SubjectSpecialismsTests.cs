@@ -94,9 +94,10 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
     }
 
     [Fact]
-    public async Task Post_WhenNoSubjectIsEntered_ReturnsError()
+    public async Task Post_SubjectIsOptional_WhenNoSubjectsAreEntered_RedirectsToDetail()
     {
         // Arrange
+        var subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync()).RandomSelection(3).Select(s => s.TrainingSubjectId).ToArray();
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .RandomOne();
@@ -107,7 +108,8 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)
-                .WithStatus(status)));
+                .WithStatus(status)
+                .WithTrainingSubjectIds(subjects)));
         var qualificationid = person.ProfessionalStatuses.First().QualificationId;
         var editRouteState = new EditRouteStateBuilder()
             .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
@@ -119,18 +121,16 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
             editRouteState
             );
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>())
-        };
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationid}/edit/subjects?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        Assert.Equal(StatusCodes.Status400BadRequest, (int)response.StatusCode);
-        var doc = await ReadContentAsync(response);
-        Assert.Equal("Enter a subject", GetErrorMessage(doc, "SubjectId1-error"));
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/route/{qualificationid}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+        journeyInstance = await ReloadJourneyInstance(journeyInstance);
+        Assert.Empty(journeyInstance.State.TrainingSubjectIds);
     }
 
     [Fact]

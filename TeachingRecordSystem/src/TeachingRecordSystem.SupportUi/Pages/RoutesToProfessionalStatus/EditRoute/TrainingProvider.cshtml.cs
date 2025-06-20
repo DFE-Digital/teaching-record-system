@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,9 +24,13 @@ public class TrainingProviderModel(
 
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
+    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
+
+    public bool TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingProviderRequired, JourneyInstance!.State.Status.GetTrainingProviderRequirement())
+            == FieldRequirement.Mandatory;
+    public string PageHeading => "Enter the training provider for this route" + (!TrainingProviderRequired ? " (optional)" : "");
+
     [BindProperty]
-    [Required(ErrorMessage = "Select a training provider")]
-    [Display(Name = "Enter the training provider for this route")]
     public Guid? TrainingProviderId { get; set; }
 
     public void OnGet()
@@ -37,6 +40,10 @@ public class TrainingProviderModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (TrainingProviderRequired && TrainingProviderId is null)
+        {
+            ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -60,6 +67,8 @@ public class TrainingProviderModel(
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
+        RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType;
         TrainingProviders = await referenceDataCache.GetTrainingProvidersAsync();
         await base.OnPageHandlerExecutionAsync(context, next);
     }

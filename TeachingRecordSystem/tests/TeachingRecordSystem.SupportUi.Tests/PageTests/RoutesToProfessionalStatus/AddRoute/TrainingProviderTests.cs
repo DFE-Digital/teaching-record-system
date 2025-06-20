@@ -181,13 +181,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
             addRouteState
             );
 
-        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}")
-        {
-            Content = new FormUrlEncodedContentBuilder()
-            {
-                { "TrainingProviderId" , trainingProvider.TrainingProviderId.ToString()}
-            }
-        };
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);

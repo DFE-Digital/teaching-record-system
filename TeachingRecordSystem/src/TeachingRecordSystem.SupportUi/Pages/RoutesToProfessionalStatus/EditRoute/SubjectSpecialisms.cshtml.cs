@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
@@ -21,9 +22,13 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public DisplayInfo[] Subjects { get; set; } = [];
 
+    public RouteToProfessionalStatusType? RouteToProfessionalStatusType { get; set; }
+
+    public string PageHeading => "Enter the subject they specialise in teaching" + (!SubjectSpecialismRequired ? " (optional)" : "");
+    public bool SubjectSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType!.TrainingSubjectsRequired, JourneyInstance!.State.Status.GetSubjectsRequirement())
+        == FieldRequirement.Mandatory;
+
     [BindProperty]
-    [Required(ErrorMessage = "Enter a subject")]
-    [Display(Name = "Enter the subject they specialise in teaching")]
     public Guid? SubjectId1 { get; set; }
     [BindProperty]
     [Display(Name = "Second subject (optional)")]
@@ -47,6 +52,10 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (SubjectSpecialismRequired && SubjectId1 is null && SubjectId2 is null && SubjectId3 is null)
+        {
+            ModelState.AddModelError(nameof(SubjectId1), "Enter a subject");
+        }
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -66,6 +75,8 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
+        var routeInfo = context.HttpContext.GetCurrentProfessionalStatusFeature();
+        RouteToProfessionalStatusType = routeInfo.RouteToProfessionalStatus.RouteToProfessionalStatusType;
 
         Subjects = (await referenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
