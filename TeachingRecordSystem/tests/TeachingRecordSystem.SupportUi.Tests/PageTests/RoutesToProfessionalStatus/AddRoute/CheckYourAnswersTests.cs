@@ -124,7 +124,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Status", status.GetTitle());
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Award date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Professional qualification date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
@@ -174,7 +174,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Award date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Professional qualification date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Has exemption", "Yes");
     }
 

@@ -138,7 +138,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         doc.AssertRowContentMatches("Status", status.GetTitle());
         doc.AssertRowContentMatches("Start date", startDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Award date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Professional qualification date", holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
         doc.AssertRowContentMatches("Country of training", country.Name);
@@ -194,7 +194,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Award date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Professional qualification date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Has exemption", "Yes");
     }
 
@@ -450,7 +450,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         });
     }
 
-    // N.B. There's no test for EYPS since our one EYPS route has to have an award date
+    // N.B. There's no test for EYPS since our one EYPS route has to have a Professional qualification date
     // (so there's no edit that can be made through this journey that can affect Person.HasEyps)
 
     [Fact]
