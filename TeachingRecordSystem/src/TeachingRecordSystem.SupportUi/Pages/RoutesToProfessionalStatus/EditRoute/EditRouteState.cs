@@ -13,7 +13,7 @@ public class EditRouteState : IRegisterJourney
 
     public bool Initialized { get; set; }
 
-    public EditRouteStatusState? EditStatusState { get; set; } // store temp data while completing a route (moving it to awarded or approved)
+    public EditRouteStatusState? EditStatusState { get; set; } // store temp data while completing a route (moving it to 'holds')
 
     public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }

@@ -14,7 +14,7 @@ public class InductionModel(
     IAuthorizationService authorizationService,
     IFeatureProvider featureProvider) : PageModel
 {
-    private const string NoQualifiedTeacherStatusWarning = "This teacher has not been awarded QTS and is therefore ineligible for induction.";
+    private const string NoQualifiedTeacherStatusWarning = "This teacher does not hold QTS and is therefore ineligible for induction.";
     private bool _statusIsManagedByCpd;
 
     public bool HasQts { get; set; }

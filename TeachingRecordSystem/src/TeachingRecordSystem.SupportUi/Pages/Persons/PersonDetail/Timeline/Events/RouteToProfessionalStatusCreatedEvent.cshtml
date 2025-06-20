@@ -38,7 +38,7 @@
             @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate))
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="eyts-date" use-empty-fallback>@createdEvent.PersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
@@ -52,7 +52,7 @@
             @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate))
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="qts-date" use-empty-fallback>@createdEvent.PersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
@@ -73,7 +73,7 @@
                 <govuk-summary-list-row-value data-testid="end-date" use-empty-fallback>@professionalStatus.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
-                <govuk-summary-list-row-key>Professional Status award date</govuk-summary-list-row-key>
+                <govuk-summary-list-row-key>Professional Status date</govuk-summary-list-row-key>
                 <govuk-summary-list-row-value data-testid="award-date" use-empty-fallback>@professionalStatus.HoldsFrom?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
             </govuk-summary-list-row>
             <govuk-summary-list-row>
@@ -161,21 +161,21 @@
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonEytsDate))
                         {
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>EYTS award date</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-key>EYTS date</govuk-summary-list-row-key>
                                     <govuk-summary-list-row-value data-testid="old-eyts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.EytsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonPqtsDate))
                         {
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>PQTS award date</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-key>PQTS date</govuk-summary-list-row-key>
                                     <govuk-summary-list-row-value data-testid="old-pqts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.PqtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
                         @if (createdEvent.Changes.HasFlag(RouteToProfessionalStatusCreatedEventChanges.PersonQtsDate))
                         {
                             <govuk-summary-list-row>
-                                <govuk-summary-list-row-key>QTS award date</govuk-summary-list-row-key>
+                                <govuk-summary-list-row-key>QTS date</govuk-summary-list-row-key>
                                     <govuk-summary-list-row-value data-testid="old-qts-date" use-empty-fallback>@createdEvent.OldPersonAttributes.QtsDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
                             </govuk-summary-list-row>
                         }
