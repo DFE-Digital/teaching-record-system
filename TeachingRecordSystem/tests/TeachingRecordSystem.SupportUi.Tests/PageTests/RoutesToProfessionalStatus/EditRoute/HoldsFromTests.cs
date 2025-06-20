@@ -290,7 +290,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter an award date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter a professional status date");
     }
 
     [Fact]
