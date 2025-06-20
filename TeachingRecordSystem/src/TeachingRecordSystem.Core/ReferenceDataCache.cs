@@ -201,11 +201,23 @@ public class ReferenceDataCache(
         return countries.FirstOrDefault(at => at.dfeta_Value == countryCode);
     }
 
+    public async Task<dfeta_country> GetCountryByIdAsync(Guid countryId)
+    {
+        var countries = await EnsureCountriesAsync();
+        return countries.Single(c => c.Id == countryId, $"Could not find country with ID: '{countryId}'.");
+    }
+
     public async Task<dfeta_ittsubject?> GetIttSubjectBySubjectCodeAsync(string subjectCode)
     {
         var ittSubjects = await EnsureIttSubjectsAsync();
         // build environment has duplicate ITT Subjects, which prevent us using Single() here
         return ittSubjects.FirstOrDefault(at => at.dfeta_Value == subjectCode);
+    }
+
+    public async Task<dfeta_ittsubject> GetIttSubjectBySubjectIdAsync(Guid subjectId)
+    {
+        var ittSubjects = await EnsureIttSubjectsAsync();
+        return ittSubjects.Single(s => s.Id == subjectId, $"Could not find ITT subject with ID: '{subjectId}'.");
     }
 
     public async Task<dfeta_ittqualification[]> GetIttQualificationsAsync(bool activeOnly = true)
@@ -237,6 +249,12 @@ public class ReferenceDataCache(
     {
         var ittProviders = await EnsureIttProvidersAsync();
         return ittProviders.SingleOrDefault(p => p.Name == name);
+    }
+
+    public async Task<Account?> GetIttProviderByIdAsync(Guid providerId)
+    {
+        var ittProviders = await EnsureIttProvidersAsync();
+        return ittProviders.Single(p => p.AccountId == providerId, $"Could not find ITT provider with ID: '{providerId}'.");
     }
 
     public async Task<InductionExemptionReason[]> GetPersonLevelInductionExemptionReasonsAsync(bool activeOnly = false)
@@ -281,6 +299,12 @@ public class ReferenceDataCache(
         return trainingSubjects.Single(e => e.TrainingSubjectId == id, $"Could not find subject with ID: '{id}'.");
     }
 
+    public async Task<TrainingSubject?> GetTrainingSubjectsByReferenceAsync(string reference)
+    {
+        var trainingSubjects = await EnsureTrainingSubjectsAsync();
+        return trainingSubjects.Single(e => e.Reference == reference, $"Could not find subject with reference: '{reference}'.");
+    }
+
     public async Task<Country[]> GetTrainingCountriesAsync()
     {
         return (await EnsureTrainingCountriesAsync()).OrderBy(x => x.Name).ToArray();
@@ -313,6 +337,12 @@ public class ReferenceDataCache(
     {
         var trainingProviders = await EnsureTrainingProvidersAsync();
         return trainingProviders.Single(tp => tp.TrainingProviderId == trainingProviderId, $"Could not find training provider with ID: '{trainingProviderId}'.");
+    }
+
+    public async Task<TrainingProvider?> GetTrainingProviderByUkprnAsync(string ukprn)
+    {
+        var trainingProviders = await EnsureTrainingProvidersAsync();
+        return trainingProviders.SingleOrDefault(tp => tp.Ukprn == ukprn);
     }
 
     private Task<dfeta_sanctioncode[]> EnsureSanctionCodesAsync() =>

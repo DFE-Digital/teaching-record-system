@@ -2376,8 +2376,9 @@ public class TrsDataSyncHelper(
             // QTLS is stored directly on Contact record
             if (qtlsDate is not null)
             {
-                var ps = CreateProfessionalStatus(
+                var ps = await CreateProfessionalStatus(
                     clock,
+                    referenceDataCache,
                     allRoutes,
                     contactId,
                     RouteToProfessionalStatusType.QtlsAndSetMembershipId,
@@ -2677,8 +2678,9 @@ public class TrsDataSyncHelper(
                         hasWelshItt = true;
                     }
 
-                    var ps = CreateProfessionalStatus(
+                    var ps = await CreateProfessionalStatus(
                         clock,
+                        referenceDataCache,
                         allRoutes,
                         contactId,
                         routeId,
@@ -2838,8 +2840,9 @@ public class TrsDataSyncHelper(
 
                 var routeId = derivedRouteIds.Single();
 
-                var ps = CreateProfessionalStatus(
+                var ps = await CreateProfessionalStatus(
                         clock,
+                        referenceDataCache,
                         allRoutes,
                         contactId,
                         routeId,
@@ -3071,8 +3074,9 @@ public class TrsDataSyncHelper(
                             contactQtsRowCount))
                 };
 
-            static RouteToProfessionalStatus CreateProfessionalStatus(
+            static async Task<RouteToProfessionalStatus> CreateProfessionalStatus(
                 IClock clock,
+                ReferenceDataCache referenceDataCache,
                 RouteToProfessionalStatusType[] allRoutes,
                 Guid personId,
                 Guid routeId,
@@ -3086,19 +3090,45 @@ public class TrsDataSyncHelper(
                 dfeta_earlyyearsstatus? eyStatus)
             {
                 var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeId);
+                var degreeTypeId = ittQualification?.ConvertToTrsDegreeTypeId() ?? null;
+                var country = itt?.dfeta_CountryId is not null ? await itt.dfeta_CountryId.Id.ConvertToTrsCountryAsync(referenceDataCache) : null;
+                var trainingSubjectIds = new List<Guid>();
+                if (itt?.dfeta_Subject1Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject1Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                if (itt?.dfeta_Subject2Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject2Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                if (itt?.dfeta_Subject3Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject3Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                var trainingProvider = itt?.dfeta_EstablishmentId is not null
+                    ? await itt.dfeta_EstablishmentId.Id.ConvertToTrsTrainingProviderAsync(referenceDataCache)
+                    : null;
 
                 return new RouteToProfessionalStatus
                 {
                     QualificationId = (qts?.Id ?? itt?.Id ?? personId), // allows for QTLS which is not linked to QTS or ITT
-                    // TODO Should these dates be Clock.Now instead?
-                    CreatedOn = MinDate(
-                        qts?.GetAttributeValue<DateTime>("createdon"),
-                        itt?.GetAttributeValue<DateTime>("createdon"),
-                        clock.UtcNow),
-                    UpdatedOn = MaxDate(
-                        qts?.GetAttributeValue<DateTime>("createdon"),
-                        itt?.GetAttributeValue<DateTime>("createdon"),
-                        clock.UtcNow),
+                    CreatedOn = clock.UtcNow,
+                    UpdatedOn = clock.UtcNow,
                     DeletedOn = null,
                     PersonId = personId,
                     RouteToProfessionalStatusTypeId = routeId,
@@ -3109,12 +3139,12 @@ public class TrsDataSyncHelper(
                     TrainingAgeSpecialismRangeFrom = default, // itt?.dfeta_AgeRangeFrom
                     TrainingAgeSpecialismRangeTo = default, // itt?.dfeta_AgeRangeTo
                     HoldsFrom = awardedDate,
-                    DegreeTypeId = null, // TODO
+                    DegreeTypeId = degreeTypeId,
                     ExemptFromInduction = false,  // TODO  
                     //InductionExemptionReasonId = inductionExemptionReasonId,  // FIXME
-                    TrainingSubjectIds = [], // TODO
-                    TrainingCountryId = null, // TODO
-                    TrainingProviderId = null, // TODO
+                    TrainingSubjectIds = trainingSubjectIds.ToArray(), // TODO
+                    TrainingCountryId = country is not null ? country.CountryId : null,
+                    TrainingProviderId = trainingProvider is not null ? trainingProvider.TrainingProviderId : null,
                     DqtTeacherStatusName = teacherStatus?.dfeta_name,
                     DqtTeacherStatusValue = teacherStatus?.dfeta_Value,
                     DqtEarlyYearsStatusName = eyStatus?.dfeta_name,
@@ -3123,6 +3153,11 @@ public class TrsDataSyncHelper(
                     DqtQtsRegistrationId = qts?.Id
                 };
             }
+
+            ////static bool TryConvertToTrainingAgeSpecialism(dfeta_AgeRange ageRangeFrom, dfeta_AgeRange ageRangeTo, out (TrainingAgeSpecialismType, int?, int?))
+            ////{
+
+            ////}
         }
 
         static DateTime MinDate(params DateTime?[] dts) => dts.Where(d => d.HasValue).Min(d => d!.Value);
