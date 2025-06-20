@@ -54,7 +54,7 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
     }
 
     [Fact]
-    public async Task NoTrainingProviderSelected_ShowsError()
+    public async Task RouteMandatesProvider_NoTrainingProviderSelected_ShowsError()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
@@ -166,6 +166,40 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
                 { "TrainingProviderId" , trainingProvider.TrainingProviderId.ToString()}
             }
         };
+
+        // Act
+        var response = await HttpClient.SendAsync(postRequest);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
+        Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task Post_TrainingProviderIsOptional_WhenNoTrainingProviderIsEntered_RedirectsToNextPage()
+    {
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
+            .RandomOne();
+        var status = ProfessionalStatusStatusRegistry.All
+            .Where(s => s.TrainingProviderRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
+            .RandomOne()
+            .Value;
+        var person = await TestData.CreatePersonAsync(p => p
+            .WithRouteToProfessionalStatus(r => r
+            .WithRouteType(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)));
+        var qualificationId = person.ProfessionalStatuses.First().QualificationId;
+        var editRouteState = new EditRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(status)
+            .Build();
+        var journeyInstance = await CreateJourneyInstanceAsync(
+            qualificationId,
+            editRouteState
+            );
+
+        var postRequest = new HttpRequestMessage(HttpMethod.Post, $"/route/{qualificationId}/edit/training-provider?{journeyInstance.GetUniqueIdQueryParameter()}");
 
         // Act
         var response = await HttpClient.SendAsync(postRequest);

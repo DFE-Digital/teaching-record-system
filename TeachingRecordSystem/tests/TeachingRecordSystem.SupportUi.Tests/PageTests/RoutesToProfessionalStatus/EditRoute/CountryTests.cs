@@ -54,16 +54,13 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
     }
 
     [Fact]
-    public async Task NoCountrySelected_ShowsError()
+    public async Task CountryIsMandatory_NoCountrySelected_ShowsError()
     {
         // Arrange
         var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingCountryRequired == FieldRequirement.Mandatory && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
-            .Value;
+        var status = RouteToProfessionalStatusStatus.InTraining;
         var person = await TestData.CreatePersonAsync(p => p
             .WithRouteToProfessionalStatus(r => r
                 .WithRouteType(route.RouteToProfessionalStatusTypeId)

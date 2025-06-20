@@ -238,7 +238,6 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
             .First();
-
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
         var endDate = startDate.AddDays(1);
@@ -582,8 +581,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditDegreeType_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route-status combo makes the degree type field mandatory
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r => r.DegreeTypeRequired == FieldRequirement.Mandatory)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var setDegreeType = "BSc (Hons) with Intercalated PGCE";
@@ -619,6 +619,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(setDegreeType, "Degree type");
         await page.ClickLinkForElementWithTestIdAsync("edit-degree-type-link");
 
         await page.AssertOnRouteEditDegreeTypePageAsync(qualificationId);
@@ -636,8 +637,9 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditCountry_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route - status combo makes the country field mandatory
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingCountryRequired == FieldRequirement.Optional)
+            .Where(r => r.TrainingCountryRequired == FieldRequirement.Mandatory)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var setCountry = (await TestData.ReferenceDataCache.GetTrainingCountriesAsync())
@@ -674,11 +676,11 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(setCountry.Name, "Country");
         await page.ClickLinkForElementWithTestIdAsync("edit-country-link");
 
         await page.AssertOnRouteEditCountryPageAsync(qualificationId);
         await page.EnterCountryAsync("");
-        await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
         page.AssertErrorSummary();
         await page.EnterCountryAsync(setCountry.Name);
@@ -686,6 +688,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(setCountry.Name, "Country");
     }
 
     [Fact]
@@ -743,6 +746,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
     [Fact]
     public async Task EditTrainingProvider_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route - status combo makes the provider field optional
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingProviderRequired == FieldRequirement.Optional)
             .First();
@@ -780,22 +784,22 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains(newTrainingProvider.Name, "Training provider");
         await page.ClickLinkForElementWithTestIdAsync("edit-training-provider-link");
 
         await page.AssertOnRouteEditTrainingProviderPageAsync(qualificationId);
         await page.EnterTrainingProviderAsync("");
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
-        await page.EnterTrainingProviderAsync(newTrainingProvider.Name);
-        await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButtonAsync();
+
         await page.AssertOnRouteDetailPageAsync(qualificationId);
+        await page.AssertContentContains("Not provided", "Training provider");
     }
 
     [Fact]
     public async Task EditSubjectSpecialisms_CanClearField_BackLinkReturnsToDetails()
     {
+        // this route-status combo makes the subjects field optional
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
@@ -841,10 +845,6 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditSubjectsPageAsync(qualificationId);
         await page.EnterSubjectAsync("");
-        await page.FocusAsync("button:text-is('Continue')");
-        await page.ClickContinueButtonAsync();
-        page.AssertErrorSummary();
-        await page.EnterSubjectAsync(newSubject.Name);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 

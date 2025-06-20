@@ -70,7 +70,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
     {
         var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         Routes = allRoutes.Where(r => r.IsActive).ToArray();
-        ArchivedRoutes = Routes.Where(r => !r.IsActive).ToArray();
+        ArchivedRoutes = allRoutes.Where(r => !r.IsActive).ToArray();
         var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
         if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))
         {
