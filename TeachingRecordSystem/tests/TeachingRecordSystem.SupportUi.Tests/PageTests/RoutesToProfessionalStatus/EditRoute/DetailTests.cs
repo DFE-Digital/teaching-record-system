@@ -137,7 +137,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertChangeLinkExists("Start date");
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertChangeLinkExists("End date");
-        doc.AssertRowContentMatches("Professional qualification date", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
+        doc.AssertRowContentMatches("Professional status date", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertRowContentMatches("Has exemption", "Not provided");
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertChangeLinkExists("Training provider");
