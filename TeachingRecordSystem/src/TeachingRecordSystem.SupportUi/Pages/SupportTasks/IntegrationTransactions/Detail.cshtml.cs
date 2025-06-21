@@ -112,19 +112,17 @@ public class DetailModel(TrsDbContext context) : PageModel
         var header = records.FirstOrDefault();
         if (header != null)
         {
-            using (var stringReader = new StringReader(header.RowData!))
-            {
-                var headerStr = stringReader.ReadLine();
+            using var stringReader = new StringReader(header.RowData!);
+            var headerStr = stringReader.ReadLine();
 
-                if (headerStr != null)
+            if (headerStr != null)
+            {
+                var headers = headerStr.Split(',');
+                foreach (var h in headers)
                 {
-                    var headers = headerStr.Split(',');
-                    foreach (var h in headers)
-                    {
-                        csv.WriteField(h);
-                    }
-                    csv.NextRecord();
+                    csv.WriteField(h);
                 }
+                csv.NextRecord();
             }
         }
 

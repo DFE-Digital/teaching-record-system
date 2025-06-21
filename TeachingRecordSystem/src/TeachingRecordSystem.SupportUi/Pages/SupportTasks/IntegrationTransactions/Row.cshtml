@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <span class="govuk-caption-l">@Model.Row.InterfaceType.GetDisplayName()!</span>
+        <span class="govuk-caption-l">@Model.Row!.InterfaceType.GetDisplayName()</span>
         <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Row Details</h1>
     </div>
 
@@ -25,7 +25,7 @@
         <div>
             <span>Status:</span>
             <span class="govuk-!-font-weight-bold" data-testid="integration-transaction-record-status">
-                @Model.Row.Status.GetDisplayName()
+                @Model.Row!.Status.GetDisplayName()
             </span>
         </div>
     </div>
@@ -37,7 +37,7 @@
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Row data</td>
-                        <td class="govuk-table__cell">@Model.Row.RowData</td>
+                        <td class="govuk-table__cell">@Model.Row!.RowData</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Failure message</td>
