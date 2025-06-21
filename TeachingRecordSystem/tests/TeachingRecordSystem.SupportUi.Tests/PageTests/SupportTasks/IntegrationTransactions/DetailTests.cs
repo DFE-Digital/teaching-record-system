@@ -375,7 +375,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         response.EnsureSuccessStatusCode();
         var doc = await response.GetDocumentAsync();
-        var integrationSummary= doc.GetElementByTestId("integration-record");
+        var integrationSummary = doc.GetElementByTestId("integration-record");
         Assert.NotNull(integrationSummary);
         Assert.Equal(integrationSummary.GetSummaryListValueForKey("Date and time"), createdOn1.ToString(UiDefaults.DateTimeDisplayFormat));
         Assert.Equal(integrationSummary.GetSummaryListValueForKey("File name"), fileName1);
