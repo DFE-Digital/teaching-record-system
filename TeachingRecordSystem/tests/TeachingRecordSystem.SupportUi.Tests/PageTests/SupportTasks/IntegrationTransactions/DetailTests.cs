@@ -333,8 +333,59 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
-}
 
+    [Fact]
+    public async Task Get_ValidIntegrationTransaction_RendersCorrectSummaryCard()
+    {
+        // Arrange
+        var person1 = await TestData.CreatePersonAsync();
+        var totalCount1 = 1;
+        var successCount1 = 1;
+        var failureCount1 = 0;
+        var duplicateCount1 = 0;
+        var fileName1 = "FileName.csv";
+        var importStatus1 = IntegrationTransactionImportStatus.Failed;
+        var interfaceType1 = IntegrationTransactionInterfaceType.EwcWales;
+        var createdOn1 = Clock.UtcNow;
+        var integrationTransaction1 = await TestData.CreateIntegrationTransactionAsync(p =>
+        {
+            p.WithTotalCount(totalCount1);
+            p.WithSuccesCount(successCount1);
+            p.WithFailureCount(failureCount1);
+            p.WithDuplicateCount(duplicateCount1);
+            p.WithFileName(fileName1);
+            p.WithImportStatus(importStatus1);
+            p.WithInterfaceType(interfaceType1);
+            p.WithCreatedOn(createdOn1);
+            p.WithRow(x =>
+            {
+                x.WithPersonId(person1.PersonId);
+                x.WithRowData("some,random,csv,data");
+                x.WithFailureMessage("Some failure message");
+                x.WithStatus(IntegrationTransactionRecordStatus.Success);
+            });
+        });
+        var itr1 = integrationTransaction1.Records.First();
+        var id = integrationTransaction1.IntegrationTransactionId;
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/integration-transactions/{integrationTransaction1.IntegrationTransactionId}/detail");
+
+        // Act
+        var response = await HttpClient.SendAsync(request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var doc = await response.GetDocumentAsync();
+        var integrationSummary= doc.GetElementByTestId("integration-record");
+        Assert.NotNull(integrationSummary);
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("Date and time"), createdOn1.ToString(UiDefaults.DateTimeDisplayFormat));
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("File name"), fileName1);
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("Interface ID"), id.ToString());
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("Total count"), totalCount1.ToString());
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("Successes"), successCount1.ToString());
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("Failures"), failureCount1.ToString());
+        Assert.Equal(integrationSummary.GetSummaryListValueForKey("Duplicates"), duplicateCount1.ToString());
+    }
+}
 
 file static class Extensions
 {
