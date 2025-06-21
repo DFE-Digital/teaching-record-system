@@ -1,0 +1,69 @@
+@page "/support-tasks/integration-transactions/{integrationTransactionId}/row"
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+@model TeachingRecordSystem.SupportUi.Pages.SupportTasks.IntegrationTransactions.RowModel;
+@{
+    ViewBag.Title = "Row Details";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@LinkGenerator.IntegrationTransactionDetail(Model.IntegrationTransactionId)" />
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds-from-desktop">
+        <span class="govuk-caption-l">@Model.Row!.InterfaceType.GetDisplayName()</span>
+        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">Row Details</h1>
+    </div>
+
+    <div class="govuk-grid-column-full govuk-!-padding-bottom-4 govuk-body-m">
+        <div>
+            <span>Row ID:</span>
+            <span class="govuk-!-font-weight-bold" data-testid="integration-transaction-record-id">
+                @Model.Row.IntegrationTransactionRecordId
+            </span>
+        </div>
+        <div>
+            <span>Status:</span>
+            <span class="govuk-!-font-weight-bold" data-testid="integration-transaction-record-status">
+                @Model.Row!.Status.GetDisplayName()
+            </span>
+        </div>
+    </div>
+
+    @if (Model.Row.Status == IntegrationTransactionRecordStatus.Failure)
+    {
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table">
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Row data</td>
+                        <td class="govuk-table__cell">@Model.Row!.RowData</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Failure message</td>
+                        <td class="govuk-table__cell">@Model.Row.FailureMessage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model.Row.Status == IntegrationTransactionRecordStatus.Success && Model.Row.Duplicate == true)
+    {
+        <div class="govuk-grid-column-full">
+            <table class="govuk-table">
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell govuk-!-font-weight-bold" data-testid="name">Duplicate status</td>
+                        <td class="govuk-table__cell">Duplicate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="govuk-grid-column-full">
+        <govuk-back-link href="@LinkGenerator.IntegrationTransactionDetail(Model.IntegrationTransactionId)">
+            Back to file details
+        </govuk-back-link>
+    </div>
+</div>

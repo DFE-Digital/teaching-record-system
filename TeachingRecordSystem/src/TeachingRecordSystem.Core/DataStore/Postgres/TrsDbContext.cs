@@ -127,6 +127,8 @@ public class TrsDbContext : DbContext
 
     public DbSet<IntegrationTransaction> IntegrationTransactions => Set<IntegrationTransaction>();
 
+    public DbSet<IntegrationTransactionRecord> IntegrationTransactionRecords => Set<IntegrationTransactionRecord>();
+
     public static void ConfigureOptions(DbContextOptionsBuilder optionsBuilder, string? connectionString = null, int? commandTimeout = null)
     {
         Action<NpgsqlDbContextOptionsBuilder> configureOptions = o => o.CommandTimeout(commandTimeout);

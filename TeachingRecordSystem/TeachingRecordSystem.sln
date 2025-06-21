@@ -52,7 +52,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.UiTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.AuthorizeAccess.EndToEndTests", "tests\TeachingRecordSystem.AuthorizeAccess.EndToEndTests\TeachingRecordSystem.AuthorizeAccess.EndToEndTests.csproj", "{2D7946CB-44D2-431D-A9E1-A4472FACC1DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeachingRecordSystem.Api.UnitTests", "tests\TeachingRecordSystem.Api.UnitTests\TeachingRecordSystem.Api.UnitTests.csproj", "{6AC91DA6-EBC0-4820-AD1C-2137A4188F57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeachingRecordSystem.Api.UnitTests", "tests\TeachingRecordSystem.Api.UnitTests\TeachingRecordSystem.Api.UnitTests.csproj", "{6AC91DA6-EBC0-4820-AD1C-2137A4188F57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

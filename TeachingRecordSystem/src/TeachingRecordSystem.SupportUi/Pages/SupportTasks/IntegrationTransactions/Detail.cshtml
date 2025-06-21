@@ -5,41 +5,145 @@
     ViewBag.Title = "Interfaces";
 }
 
-
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
         <span class="govuk-caption-l">Integration transactions</span>
-        <h1 class="govuk-heading-l">Capita Import</h1>
+        <h1 class="govuk-heading-l" data-testid="integration-transaction-interface-type">@Model.IntegrationTransaction!.InterfaceType.GetDisplayName() - File details</h1>
     </div>
 
+    @if (Model.IntegrationTransaction.ImportStatus == IntegrationTransactionImportStatus.Failed)
+    {
+        <div class="govuk-grid-column-full govuk-body-m ">
+            <div class="govuk-error-message  govuk-!-padding-1 govuk-!-padding-top-2 govuk-!-padding-left-2" style="border-left:10px solid #d4351c; background-color:#f3dbdb">
+            <h1 class="govuk-heading-l">Upload unsuccessful</h1>
+            <p class="govuk-body-m">
+                The file loaded incorrectly due to invalid formatting.
+            </p>
+            <p class="govuk-body-m">
+                You need to fix the formatting and re-upload the file.
+            </p>
+        </div>
+    </div>
+    }
 
+    <div class="govuk-grid-column-full">
+        <govuk-summary-card data-testid="integration-record">
+            <govuk-summary-card-title>Record information</govuk-summary-card-title>
+            <govuk-summary-list>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Date and time</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value>@Model.IntegrationTransaction!.CreatedOn.ToString(UiDefaults.DateTimeDisplayFormat)</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>File name</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.FileName</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Interface ID</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.IntegrationTransactionId</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Total count</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.TotalCount</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Successes</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>
+                        @Model.IntegrationTransaction!.SuccessesCount
+                    </govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Failures</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.FailuresCount</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+                <govuk-summary-list-row>
+                    <govuk-summary-list-row-key>Duplicates</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-value use-empty-fallback>@Model.IntegrationTransaction!.DuplicatesCount</govuk-summary-list-row-value>
+                </govuk-summary-list-row>
+            </govuk-summary-list>
+        </govuk-summary-card>
+
+
+        @if (Model.HasFailures)
+        {
+            <div data-testid="export-integration-record-failures">
+                <govuk-button-link asp-page-handler="DownloadFailures">
+                    Export failures
+                </govuk-button-link>
+            </div>
+        }
+
+        <div class="govuk-grid-column-full-from-desktop" data-testid="results">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header"
+                            sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.IntegrationTransactionRecordId,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            ID
+                        </th>
+
+                        <th scope="col" class="govuk-table__header"
+                            sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.Name ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.Name,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            Person
+                        </th>
+                        <th scope="col" class="govuk-table__header"
+                            sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.Duplicate ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.Duplicate,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            Duplicate
+                        </th>
+                        <th scope="col" class="govuk-table__header"
+                            sort-direction="@(Model.SortBy == IntegrationTransactionRecordSortByOption.Status ? Model.SortDirection : null)"
+                            link-template="@(direction => LinkGenerator.IntegrationTransactionDetail(IntegrationTransactionRecordSortByOption.Status,  direction, pageNumber: null, Model.IntegrationTransactionId))">
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @if (Model.IntegrationTransactionRecords!.Count == 0)
+                    {
+                        <tr class="govuk-table__row" data-testid="no-integration-transaction-records-message">
+                            <td class="govuk-table__cell" colspan="4">No integration transaction records</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var result in Model.IntegrationTransactionRecords)
+                        {
+                            <tr class="govuk-table__row" data-testid="integration-transaction-record:@result.IntegrationTransactionRecordId">
+                                <td class="govuk-table__cell"
+                                    data-testid="integration-transaction-record:@result.IntegrationTransactionRecordId:id">
+                                    @result.IntegrationTransactionRecordId
+                                </td>
+                                <td class="govuk-table__cell"
+                                    data-testid="integration-transaction-record:@result.IntegrationTransactionRecordId:contactid">
+                                    <a class="govuk-link" href="row?integrationtransactionrecordid=@result.IntegrationTransactionRecordId"> @result.ContactName</a>
+                                </td>
+                                <td class="govuk-table__cell"
+                                    data-testid="integration-transaction-record:@result.IntegrationTransactionRecordId:duplicate">
+
+                                    @if (result.Duplicate == true)
+                                    {
+                                        <span class="govuk-tag--orange govuk-!-static-padding-1">Duplicate</span>
+                                    }
+                                </td>
+                                <td class="govuk-table__cell"
+                                    data-testid="integration-transaction-record:@result.IntegrationTransactionRecordId:status">
+                                    @if (result.Status == IntegrationTransactionRecordStatus.Success)
+                                    {
+                                        <span class="govuk-tag--green govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
+                                    }
+                                    else @if (result.Status == IntegrationTransactionRecordStatus.Failure)
+                                    {
+                                        <span class="govuk-tag--red govuk-!-static-padding-1">@result.Status.GetDisplayName()</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-<govuk-summary-card>
-    <govuk-summary-card-title>Record information</govuk-summary-card-title>
-    <govuk-summary-list>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Date and time</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value>test</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>File name</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Interface ID</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Total count</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Successes</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-        <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Failures</govuk-summary-list-row-key>
-            <govuk-summary-list-row-value use-empty-fallback>test</govuk-summary-list-row-value>
-        </govuk-summary-list-row>
-    </govuk-summary-list>
-</govuk-summary-card>
