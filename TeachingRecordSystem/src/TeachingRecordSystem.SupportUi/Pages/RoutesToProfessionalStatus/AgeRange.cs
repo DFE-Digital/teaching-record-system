@@ -28,7 +28,7 @@ public enum AgeSpecializationOption
     [Display(Name = "Key stage 4")]
     KeyStage4 = 6,
     [Description("None")]
-    [Display(Name = "None")]
+    [Display(Name = "Not provided")]
     None = 7
 }
 

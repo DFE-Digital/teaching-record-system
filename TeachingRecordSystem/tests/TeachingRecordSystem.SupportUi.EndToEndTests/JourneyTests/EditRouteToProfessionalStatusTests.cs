@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Common;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
@@ -25,7 +26,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setStartDate = startDate.AddDays(1);
         var setHoldsFrom = setEndDate.AddDays(1);
         var setDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("2f7a914f-f95f-421a-a55e-60ed88074cf2"));
-        var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
+        var setAgeRange = AgeSpecializationOption.KeyStage1;
         var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
         var setSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("015d862e-2aed-49df-9e5f-d17b0d426972"));
         var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
@@ -87,7 +88,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickLinkForElementWithTestIdAsync("edit-age-range-link");
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        await page.SelectAgeTypeAsync(setAgeRange);
+        await page.SelectAgeRangeAsync(setAgeRange);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
@@ -138,7 +139,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var editStartDate = setStartDate.AddDays(1);
         var editHoldDate = editEndDate.AddDays(1);
         var editDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("c584eb2f-1419-4870-a230-5d81ae9b5f77"));
-        var editAgeRange = TrainingAgeSpecialismType.KeyStage2;
+        var editAgeRange = AgeSpecializationOption.KeyStage2;
         var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
         var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
         var editTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
@@ -200,7 +201,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.ClickLinkForElementWithTestIdAsync("edit-age-range-link");
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
-        await page.SelectAgeTypeAsync(editAgeRange);
+        await page.SelectAgeRangeAsync(editAgeRange);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
@@ -723,7 +724,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
         page.AssertErrorSummary();
-        await page.SelectAgeTypeAsync(TrainingAgeSpecialismType.Range);
+        await page.SelectAgeRangeAsync(AgeSpecializationOption.Range);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 

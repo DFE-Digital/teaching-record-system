@@ -14,7 +14,7 @@
             <govuk-radios asp-for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l"/>
-                    <govuk-radios-item value="@AgeSpecializationOption.None">Not provided</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.None">@AgeSpecializationOption.None.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-divider>or</govuk-radios-divider>
                     <govuk-radios-item value="@AgeSpecializationOption.FoundationStage">@AgeSpecializationOption.FoundationStage.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-item value="@AgeSpecializationOption.KeyStage1">@AgeSpecializationOption.KeyStage1.GetDisplayName()</govuk-radios-item>
