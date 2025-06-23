@@ -30,20 +30,20 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         return Redirect(LinkGenerator.PersonQualifications(PersonId));
     }
 
-    public AddRoutePage? NextPage(AddRoutePage currentPage)
+    public RoutePage? NextPage(RoutePage currentPage)
     {
         return PageDriver.NextPage(Route, Status, currentPage);
     }
 
-    public AddRoutePage? PreviousPage(AddRoutePage currentPage)
+    public RoutePage? PreviousPage(RoutePage currentPage)
     {
         return PageDriver.PreviousPage(Route, Status, currentPage);
     }
 
-    public bool IsLastPage(AddRoutePage currentPage)
-    {
-        return PageDriver.IsLastPage(currentPage);
-    }
+    //public bool IsLastPage(AddRoutePage currentPage)
+    //{
+    //    return PageDriver.IsLastPage(currentPage);
+    //}
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {

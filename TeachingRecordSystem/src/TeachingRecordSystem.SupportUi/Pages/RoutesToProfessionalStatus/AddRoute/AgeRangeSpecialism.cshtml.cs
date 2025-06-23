@@ -9,7 +9,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
 {
     public string BackLink => FromCheckAnswers ?
          LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-         LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AgeRangeSpecialism) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+         LinkGenerator.RouteAddPage(PreviousPage(RoutePage.AgeRangeSpecialism) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     [BindProperty]
     [Display(Name = "Add age range specialism")]
@@ -40,7 +40,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
         return Redirect(FromCheckAnswers ?
             LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.AgeRangeSpecialism) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddPage(NextPage(RoutePage.AgeRangeSpecialism) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

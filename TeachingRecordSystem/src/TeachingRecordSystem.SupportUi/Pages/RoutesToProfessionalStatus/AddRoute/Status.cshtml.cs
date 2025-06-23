@@ -53,7 +53,7 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
                     : null;
             });
 
-        var nextPage = PageDriver.NextPage(Route, Status!.Value, AddRoutePage.Status) ?? AddRoutePage.CheckYourAnswers;
+        var nextPage = PageDriver.NextPage(Route, Status!.Value, RoutePage.Status) ?? RoutePage.CheckYourAnswers;
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
             linkGenerator.RouteAddPage(nextPage, PersonId, JourneyInstance!.InstanceId));

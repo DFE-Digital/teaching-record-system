@@ -14,7 +14,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
 
     public string BackLink => FromCheckAnswers ?
         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AwardDate) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.HoldsFrom) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public void OnGet()
     {
@@ -35,6 +35,6 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
 
         return Redirect(FromCheckAnswers ?
             LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.AwardDate) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddPage(NextPage(RoutePage.HoldsFrom) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 }

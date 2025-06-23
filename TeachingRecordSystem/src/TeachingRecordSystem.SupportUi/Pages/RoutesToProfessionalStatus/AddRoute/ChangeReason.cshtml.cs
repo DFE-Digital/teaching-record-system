@@ -47,7 +47,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string BackLink => FromCheckAnswers == true
         ? LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
-        : LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.ChangeReason) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        : LinkGenerator.RouteAddPage(PreviousPage(RoutePage.ChangeReason) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {
@@ -115,7 +115,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
         return Redirect(FromCheckAnswers ?
             LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(AddRoutePage.ChangeReason) ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+            LinkGenerator.RouteAddPage(NextPage(RoutePage.ChangeReason) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

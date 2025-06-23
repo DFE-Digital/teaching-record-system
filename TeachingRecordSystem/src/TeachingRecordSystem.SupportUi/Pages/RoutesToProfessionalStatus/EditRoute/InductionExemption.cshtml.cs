@@ -55,7 +55,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
         }
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
@@ -82,7 +82,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
     }
 
     public string BackLink => FromCheckAnswers ?
-        linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+        linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
         JourneyInstance!.State.IsCompletingRoute ?
             linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);

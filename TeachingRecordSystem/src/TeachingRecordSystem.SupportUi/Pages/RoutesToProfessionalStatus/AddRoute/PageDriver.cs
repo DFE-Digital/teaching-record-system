@@ -4,10 +4,10 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 public static class PageDriver
 {
-    public static AddRoutePage? NextPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, AddRoutePage currentPage)
+    public static RoutePage? NextPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, RoutePage currentPage)
     {
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
+        var pagesInOrder = Enum.GetValues(typeof(RoutePage))
+            .Cast<RoutePage>()
             .Where(p => p > currentPage)
             .OrderBy(p => p);
 
@@ -18,7 +18,7 @@ public static class PageDriver
             if (pageRequired != FieldRequirement.NotApplicable)
             {
                 // if the route has an implicit exemption, don't show the induction exemption page
-                if (page == AddRoutePage.InductionExemption
+                if (page == RoutePage.InductionExemption
                     && route.InductionExemptionReason is not null
                     && route.InductionExemptionReason.RouteImplicitExemption)
                 {
@@ -30,13 +30,14 @@ public static class PageDriver
                 }
             }
         }
+
         return null;
     }
 
-    public static AddRoutePage? PreviousPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, AddRoutePage currentPage)
+    public static RoutePage? PreviousPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, RoutePage currentPage)
     {
-        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
+        var pagesInOrder = Enum.GetValues(typeof(RoutePage))
+            .Cast<RoutePage>()
             .Where(p => p < currentPage)
             .OrderByDescending(p => p);
 
@@ -47,7 +48,7 @@ public static class PageDriver
             if (pageRequired != FieldRequirement.NotApplicable)
             {
                 // if the route has an implicit exemption, don't show the induction exemption page
-                if (page == AddRoutePage.InductionExemption
+                if (page == RoutePage.InductionExemption
                     && route.InductionExemptionReason is not null
                     && route.InductionExemptionReason.RouteImplicitExemption)
                 {
@@ -63,31 +64,32 @@ public static class PageDriver
         return null;
     }
 
-    public static bool IsLastPage(AddRoutePage currentPage)
-    {
-        var lastPage = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
-            .OrderByDescending(p => p)
-            .First();
-        return lastPage == currentPage;
-    }
+    //public static bool IsLastPage(AddRoutePage currentPage)
+    //{
+    //    var lastPage = Enum.GetValues(typeof(AddRoutePage))
+    //        .Cast<AddRoutePage>()
+    //        .OrderByDescending(p => p)
+    //        .First();
 
-    public static FieldRequirement FieldRequirementForPage(this AddRoutePage page, RouteToProfessionalStatusType Route, RouteToProfessionalStatusStatus Status)
+    //    return lastPage == currentPage;
+    //}
+
+    public static FieldRequirement FieldRequirementForPage(this RoutePage page, RouteToProfessionalStatusType Route, RouteToProfessionalStatusStatus Status)
     {
         return page switch
         {
-            AddRoutePage.StartAndEndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-            AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
-            AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
-            AddRoutePage.Route => FieldRequirement.Mandatory,
-            AddRoutePage.Status => FieldRequirement.Mandatory,
-            AddRoutePage.TrainingProvider => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement()),
-            AddRoutePage.DegreeType => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement()),
-            AddRoutePage.Country => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement()),
-            AddRoutePage.AgeRangeSpecialism => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement()),
-            AddRoutePage.SubjectSpecialisms => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement()),
-            AddRoutePage.ChangeReason => FieldRequirement.Mandatory,
-            AddRoutePage.CheckYourAnswers => FieldRequirement.Mandatory,
+            RoutePage.StartAndEndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
+            RoutePage.HoldsFrom => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
+            RoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
+            RoutePage.Route => FieldRequirement.Mandatory,
+            RoutePage.Status => FieldRequirement.Mandatory,
+            RoutePage.TrainingProvider => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement()),
+            RoutePage.DegreeType => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement()),
+            RoutePage.Country => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement()),
+            RoutePage.AgeRangeSpecialism => QuestionDriverHelper.FieldRequired(Route.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement()),
+            RoutePage.SubjectSpecialisms => QuestionDriverHelper.FieldRequired(Route.TrainingSubjectsRequired, Status.GetSubjectsRequirement()),
+            RoutePage.ChangeReason => FieldRequirement.Mandatory,
+            RoutePage.CheckYourAnswers => FieldRequirement.Mandatory,
             _ => throw new ArgumentOutOfRangeException(nameof(page))
         };
     }

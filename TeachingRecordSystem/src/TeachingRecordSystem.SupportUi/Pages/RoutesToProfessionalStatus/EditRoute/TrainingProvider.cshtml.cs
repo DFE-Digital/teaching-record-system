@@ -52,7 +52,7 @@ public class TrainingProviderModel(
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 

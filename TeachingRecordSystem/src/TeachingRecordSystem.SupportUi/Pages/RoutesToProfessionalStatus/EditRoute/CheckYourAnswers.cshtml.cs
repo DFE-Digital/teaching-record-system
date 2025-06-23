@@ -28,7 +28,7 @@ public class CheckYourAnswersModel(
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string BackLink => linkGenerator.RouteChangeReason(QualificationId, JourneyInstance!.InstanceId);
+    public string BackLink => linkGenerator.RouteEditChangeReason(QualificationId, JourneyInstance!.InstanceId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }

@@ -1,11 +1,11 @@
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
-public enum AddRoutePage
+public enum RoutePage
 {
     Route = 0,
     Status,
     StartAndEndDate,
-    AwardDate,
+    HoldsFrom,
     InductionExemption,
     TrainingProvider,
     DegreeType,

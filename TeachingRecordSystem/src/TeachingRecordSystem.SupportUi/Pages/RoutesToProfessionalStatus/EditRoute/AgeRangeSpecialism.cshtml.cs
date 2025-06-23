@@ -47,7 +47,7 @@ public class AgeRangeSpecialismModel(
                 s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
             });
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId));
     }
 

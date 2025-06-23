@@ -56,10 +56,10 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string NextPage => linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
+    public string NextPage => linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId);
 
     public string BackLink => FromCheckAnswers == true
-        ? linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
+        ? linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId)
         : linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()

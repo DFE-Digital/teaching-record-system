@@ -21,7 +21,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
     public string? UploadedEvidenceFileUrl { get; set; }
 
     public string BackLink =>
-        LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.CheckYourAnswers) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.CheckYourAnswers) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     public async Task OnGetAsync()
     {
