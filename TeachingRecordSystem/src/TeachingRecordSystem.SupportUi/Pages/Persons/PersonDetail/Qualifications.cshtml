@@ -27,10 +27,7 @@
         @foreach (var professionalStatus in Model.ProfessionalStatuses)
         {
             var statusTitle = ProfessionalStatusStatusRegistry.GetTitle(professionalStatus.Status);
-            var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.Name} {statusTitle}" +
-            (professionalStatus.HoldsFrom.HasValue && professionalStatus.TrainingEndDate.HasValue
-            ? $" {professionalStatus.TrainingEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat)}"
-            : "");
+            var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.Name}";
 
             <govuk-summary-card data-testid="professionalstatus-id-@professionalStatus.QualificationId">
                 <govuk-summary-card-title>@cardTitle</govuk-summary-card-title>
