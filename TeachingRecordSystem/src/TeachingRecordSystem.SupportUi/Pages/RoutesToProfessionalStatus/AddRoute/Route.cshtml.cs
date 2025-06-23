@@ -18,6 +18,8 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public RouteToProfessionalStatusType[] ArchivedRoutes { get; set; } = [];
 
+    public bool ShowOpen { get; set; } = false;
+
     [FromQuery]
     public Guid PersonId { get; set; }
 
