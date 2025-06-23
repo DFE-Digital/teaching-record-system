@@ -12,7 +12,7 @@ public class AgeRangeValidationAttribute(string errorMessage) : ValidationAttrib
         {
             throw new InvalidOperationException($"The {nameof(AgeRangeValidationAttribute)} must be applied to {nameof(AgeRange)} types.");
         }
-        else if (ageRange.AgeRangeType == TrainingAgeSpecialismType.None)
+        else if (ageRange.AgeRangeType == TrainingAgeSpecialismType.Range)
         {
             if (ageRange.AgeRangeFrom == null && ageRange.AgeRangeTo == null)
             {
