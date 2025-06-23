@@ -61,11 +61,11 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
 
         _route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
             .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && r.InductionExemptionRequired != FieldRequirement.NotApplicable)
-            .RandomOne();
+            .First();
 
         _status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional && s.HoldsFromRequired == FieldRequirement.NotApplicable)
-            .RandomOne()
+            .First()
             .Value;
 
         var person = await TestData.CreatePersonAsync(p => p
@@ -114,7 +114,7 @@ public class PermissionsTests(HostFixture hostFixture) : TestBase(hostFixture), 
                 JourneyNames.DeleteRouteToProfessionalStatus,
                 new DeleteRouteState()
                 {
-                    ChangeReason = Pages.RoutesToProfessionalStatus.DeleteRoute.ChangeReasonOption.RemovedQtlsStatus,
+                    ChangeReason = ChangeReasonOption.RemovedQtlsStatus,
                     ChangeReasonDetail = new ChangeReasonStateBuilder()
                         .WithValidChangeReasonDetail()
                         .Build()
