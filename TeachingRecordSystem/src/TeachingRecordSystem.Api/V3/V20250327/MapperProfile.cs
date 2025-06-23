@@ -6,6 +6,7 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<Implementation.Dtos.QtsInfo, QtsInfo>();
+        CreateMap<Implementation.Dtos.QtsInfo, QtsInfo>()
+            .ForMember(i => i.Awarded, m => m.MapFrom(i => i.HoldsFrom));
     }
 }

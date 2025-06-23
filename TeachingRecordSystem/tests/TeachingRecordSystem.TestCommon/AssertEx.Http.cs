@@ -12,12 +12,6 @@ public static partial class AssertEx
     {
         ArgumentNullException.ThrowIfNull(response);
 
-        var contentType = response.Content.Headers.ContentType?.MediaType;
-        if (contentType is not "application/json" and not "application/problem+json")
-        {
-            throw new XunitException($"Content type '{contentType}' is not a JSON content type");
-        }
-
         if (expectedStatusCode != (int)response.StatusCode)
         {
             throw new XunitException(
@@ -25,12 +19,17 @@ public static partial class AssertEx
                 Response status code does not match
                 Expected: {expectedStatusCode}
                 Actual:   {(int)response.StatusCode}
-                
+
                 Response body:
                 {await response.Content.ReadAsStringAsync()}
                 """);
         }
 
+        var contentType = response.Content.Headers.ContentType?.MediaType;
+        if (contentType is not "application/json" and not "application/problem+json")
+        {
+            throw new XunitException($"Content type '{contentType}' is not a JSON content type");
+        }
 
         var result = await response.Content.ReadFromJsonAsync<JsonDocument>(SerializerOptions);
         Assert.NotNull(result);

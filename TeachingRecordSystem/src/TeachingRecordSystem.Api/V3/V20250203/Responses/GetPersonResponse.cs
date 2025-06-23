@@ -1,3 +1,4 @@
+using AutoMapper.Configuration.Annotations;
 using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
@@ -23,7 +24,7 @@ public record GetPersonResponse
     public required GetPersonResponseQts? Qts { get; init; }
     public required GetPersonResponseEyts? Eyts { get; init; }
     public required Option<InductionInfo> Induction { get; init; }
-    public required Option<IReadOnlyCollection<OneOf<GetPersonResponseInitialTeacherTraining, GetPersonResponseInitialTeacherTrainingForAppropriateBody>>> InitialTeacherTraining { get; init; }
+    public required Option<OneOf<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingForAppropriateBody>>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
@@ -36,6 +37,7 @@ public record GetPersonResponse
 [AutoMap(typeof(Implementation.Dtos.QtsInfo))]
 public record GetPersonResponseQts
 {
+    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string? StatusDescription { get; init; }
 }
@@ -43,6 +45,7 @@ public record GetPersonResponseQts
 [AutoMap(typeof(Implementation.Dtos.EytsInfo))]
 public record GetPersonResponseEyts
 {
+    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string? StatusDescription { get; init; }
 }

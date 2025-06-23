@@ -27,7 +27,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var setDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("2f7a914f-f95f-421a-a55e-60ed88074cf2"));
         var setAgeRange = TrainingAgeSpecialismType.KeyStage1;
         var setCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
-        var setSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("015d862e-2aed-49df-9e5f-d17b0d426972"));
+        var setSubject = await TestData.ReferenceDataCache.GetTrainingSubjectByIdAsync(new Guid("015d862e-2aed-49df-9e5f-d17b0d426972"));
         var setTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
             .RandomOne();
 
@@ -140,7 +140,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         var editDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("c584eb2f-1419-4870-a230-5d81ae9b5f77"));
         var editAgeRange = TrainingAgeSpecialismType.KeyStage2;
         var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
-        var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
+        var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
         var editTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
             .RandomOne();
 

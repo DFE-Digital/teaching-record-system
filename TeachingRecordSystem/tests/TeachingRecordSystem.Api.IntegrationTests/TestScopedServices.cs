@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
@@ -10,13 +11,14 @@ public class TestScopedServices
 {
     private static readonly AsyncLocal<TestScopedServices> _current = new();
 
-    public TestScopedServices()
+    public TestScopedServices(IServiceProvider serviceProvider)
     {
         Clock = new();
         DataverseAdapterMock = new();
         GetAnIdentityApiClientMock = new();
         CrmQueryDispatcherSpy = new();
         BlobStorageFileServiceMock = new();
+        FeatureProvider = ActivatorUtilities.CreateInstance<TestableFeatureProvider>(serviceProvider);
 
         AccessYourTeachingQualificationsOptions = Options.Create(new AccessYourTeachingQualificationsOptions()
         {
@@ -27,14 +29,14 @@ public class TestScopedServices
     public static TestScopedServices GetCurrent() =>
         TryGetCurrent(out var current) ? current : throw new InvalidOperationException("No current instance has been set.");
 
-    public static TestScopedServices Reset()
+    public static TestScopedServices Reset(IServiceProvider serviceProvider)
     {
         if (_current.Value is not null)
         {
             throw new InvalidOperationException("Current instance has already been set.");
         }
 
-        return _current.Value = new();
+        return _current.Value = new(serviceProvider);
     }
 
     public static bool TryGetCurrent([NotNullWhen(true)] out TestScopedServices? current)
@@ -60,4 +62,6 @@ public class TestScopedServices
     public CrmQueryDispatcherSpy CrmQueryDispatcherSpy { get; }
 
     public Mock<IFileService> BlobStorageFileServiceMock { get; }
+
+    public TestableFeatureProvider FeatureProvider { get; }
 }

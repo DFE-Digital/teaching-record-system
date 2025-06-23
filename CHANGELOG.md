@@ -2,16 +2,25 @@
 
 ## vNext
 
+### `PUT /v3/persons/<trn>/professional-statuses/<reference>`
+- This endpoint has been moved to `/v3/persons/<trn>/routes-to-professional-statuses/<reference>`.
+- The `routeTypeId` property has been renamed to `routeToProfessionalStatusTypeId`.
+- The `Awarded` and `Approved` statuses have been replaced with `Holds`.
+- The `awardedDate` property has been replaced with `holdsFrom`.
+
 ### `GET /v3/persons/<trn>` and `GET /v3/person` changes
 - The `awarded` property in each member of `mandatoryQualifications` has been renamed to `endDate`.
 - A `qualificationId` property has been added to each member of `mandatoryQualifications`.
 - `NpqQualifications` and `InitialTeacherTraining` can no longer be requested in the `include` query parameter.
 - `RoutesToProfessionalStatuses` can be requested in the `include` query parameter.
 - An `exemptions` property has been added to the `induction` property.
-- The `awarded`, `certificateUrl` and `statusDescription` properties are no longer present on the `qts` and `eyts` objects. In their place is `qtsDate` and `eytsDate` respectively.
+- The `awarded`, `certificateUrl` and `statusDescription` properties are no longer present on the `qts` and `eyts` objects.
+In their place is `holdsFrom` and a list of the route types that apply.
 
 ### `GET /v3/persons?findBy=LastNameAndDateOfBirth` and `GET /v3/persons/find`
 - The `inductionStatus` property has been replaced by an `induction` object.
+- The `awarded`, `certificateUrl` and `statusDescription` properties are no longer present on the `qts` and `eyts` objects.
+In their place is `holdsFrom` and a list of the route types that apply.
 
 The following new endpoints have been added:
 - `PUT /v3/persons/<trn>/welsh-induction` - to set a person's induction for teachers in Wales.

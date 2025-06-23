@@ -18,9 +18,9 @@ namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 public record SetRouteToProfessionalStatusCommand(
     string Trn,
     string SourceApplicationReference,
-    Guid RouteTypeId,
+    Guid RouteToProfessionalStatusTypeId,
     ProfessionalStatusStatus Status,
-    DateOnly? AwardedDate,
+    DateOnly? HoldsFrom,
     DateOnly? TrainingStartDate,
     DateOnly? TrainingEndDate,
     string[]? TrainingSubjectReferences,
@@ -79,9 +79,9 @@ public class SetRouteToProfessionalStatusHandler(
         }
 
         dfeta_ITTProgrammeType? mappedIttProgrammeType = null;
-        if (!command.RouteTypeId.IsOverseas() && !command.RouteTypeId.TryConvertFromTrsRouteType(out mappedIttProgrammeType))
+        if (!command.RouteToProfessionalStatusTypeId.IsOverseas() && !command.RouteToProfessionalStatusTypeId.TryConvertFromTrsRouteType(out mappedIttProgrammeType))
         {
-            return ApiError.InvalidRouteType(command.RouteTypeId);
+            return ApiError.InvalidRouteType(command.RouteToProfessionalStatusTypeId);
         }
 
         if (!command.Status.TryConvertToITTResult(out var ittResult))
@@ -89,9 +89,9 @@ public class SetRouteToProfessionalStatusHandler(
             return ApiError.InvalidProfessionalStatusStatus(command.Status.ToString());
         }
 
-        var lookupData = await LookupDataAsync(dqtContact, command.SourceApplicationReference, command.RouteTypeId, command.Status);
-        var isEarlyYears = command.RouteTypeId.IsEarlyYears();
-        var inductionExemptionId = command.IsExemptFromInduction.HasValue && command.IsExemptFromInduction.Value ? DeriveInductionExemptionId(command.RouteTypeId) : null;
+        var lookupData = await LookupDataAsync(dqtContact, command.SourceApplicationReference, command.RouteToProfessionalStatusTypeId, command.Status);
+        var isEarlyYears = command.RouteToProfessionalStatusTypeId.IsEarlyYears();
+        var inductionExemptionId = command.IsExemptFromInduction.HasValue && command.IsExemptFromInduction.Value ? DeriveInductionExemptionId(command.RouteToProfessionalStatusTypeId) : null;
 
         (dfeta_AgeRange From, dfeta_AgeRange To)? ageRange = null;
         if (command.TrainingAgeSpecialism is not null && !command.TrainingAgeSpecialism.TryConvertToAgeRange(out ageRange))
@@ -159,9 +159,9 @@ public class SetRouteToProfessionalStatusHandler(
             providerId = Result!.Id;
         }
 
-        if (command.RouteTypeId.IsOverseas())
+        if (command.RouteToProfessionalStatusTypeId.IsOverseas())
         {
-            providerId = await DeriveIttProviderForOverseasQualifiedTeacherAsync(command.RouteTypeId);
+            providerId = await DeriveIttProviderForOverseasQualifiedTeacherAsync(command.RouteToProfessionalStatusTypeId);
         }
 
         Guid? ittQualificationId = null;
@@ -193,9 +193,9 @@ public class SetRouteToProfessionalStatusHandler(
         else
         {
             // No current provision for changing overseas
-            if (command.RouteTypeId.IsOverseas())
+            if (command.RouteToProfessionalStatusTypeId.IsOverseas())
             {
-                return ApiError.UpdatesNotAllowedForRouteType(command.RouteTypeId);
+                return ApiError.UpdatesNotAllowedForRouteType(command.RouteToProfessionalStatusTypeId);
             }
 
             // Can't change between Early Years and non-Early Years
@@ -296,7 +296,7 @@ public class SetRouteToProfessionalStatusHandler(
                 qtsRegistration!.dfeta_EarlyYearsStatusId = lookupData.DerivedEarlyYearsTeacherStatus!.Id.ToEntityReference(dfeta_earlyyearsstatus.EntityLogicalName);
                 if (command.Status == ProfessionalStatusStatus.Awarded)
                 {
-                    qtsRegistration.dfeta_EYTSDate = command.AwardedDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
+                    qtsRegistration.dfeta_EYTSDate = command.HoldsFrom!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
                 }
             }
             else
@@ -304,7 +304,7 @@ public class SetRouteToProfessionalStatusHandler(
                 qtsRegistration!.dfeta_TeacherStatusId = lookupData.DerivedTeacherStatus!.Id.ToEntityReference(dfeta_teacherstatus.EntityLogicalName);
                 if (command.Status == ProfessionalStatusStatus.Awarded || command.Status == ProfessionalStatusStatus.Approved)
                 {
-                    qtsRegistration.dfeta_QTSDate = command.AwardedDate!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
+                    qtsRegistration.dfeta_QTSDate = command.HoldsFrom!.Value.ToDateTimeWithDqtBstFix(isLocalTime: true);
                 }
             }
         }

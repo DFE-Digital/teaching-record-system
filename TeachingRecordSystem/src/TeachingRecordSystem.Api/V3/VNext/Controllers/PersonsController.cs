@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Optional.Unsafe;
 using Swashbuckle.AspNetCore.Annotations;
 using TeachingRecordSystem.Api.Infrastructure.ModelBinding;
 using TeachingRecordSystem.Api.Infrastructure.Security;
 using TeachingRecordSystem.Api.V3.Implementation.Operations;
 using TeachingRecordSystem.Api.V3.VNext.Requests;
 using TeachingRecordSystem.Api.V3.VNext.Responses;
+using TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Controllers;
 
 [Route("persons")]
-public partial class PersonsController : ControllerBase
+public partial class PersonsController(IMapper mapper) : ControllerBase
 {
     [HttpGet("{trn}")]
     [SwaggerOperation(
@@ -21,14 +23,37 @@ public partial class PersonsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = $"{ApiRoles.GetPerson},{ApiRoles.AppropriateBody}")]
-    public Task<IActionResult> GetAsync(
+    public async Task<IActionResult> GetAsync(
         [FromRoute] string trn,
         [FromQuery, ModelBinder(typeof(FlagsEnumStringListModelBinder)), SwaggerParameter("The additional properties to include in the response.")] GetPersonRequestIncludes? include,
         [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified dateOfBirth, if provided.")] DateOnly? dateOfBirth,
         [FromQuery, SwaggerParameter("Adds an additional check that the record has the specified nationalInsuranceNumber, if provided.")] string? nationalInsuranceNumber,
         [FromServices] GetPersonHandler handler)
     {
-        throw new NotImplementedException();
+        include ??= GetPersonRequestIncludes.None;
+
+        // For now we don't support both a DOB and NINO being passed
+        if (dateOfBirth is not null && nationalInsuranceNumber is not null)
+        {
+            return BadRequest();
+        }
+
+        var command = new GetPersonCommand(
+            trn,
+            (GetPersonCommandIncludes)include,
+            dateOfBirth,
+            nationalInsuranceNumber,
+            new GetPersonCommandOptions()
+            {
+                ApplyAppropriateBodyUserRestrictions = User.IsInRole(ApiRoles.AppropriateBody)
+            });
+
+        var result = await handler.HandleAsync(command);
+
+        return result
+            .ToActionResult(r => Ok(mapper.Map<GetPersonResponse>(r)))
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound)
+            .MapErrorCode(ApiError.ErrorCodes.ForbiddenForAppropriateBody, StatusCodes.Status403Forbidden);
     }
 
     [HttpPost("find")]
@@ -39,11 +64,13 @@ public partial class PersonsController : ControllerBase
     [ProducesResponseType(typeof(FindPersonsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public Task<IActionResult> FindPersonsAsync(
+    public async Task<IActionResult> FindPersonsAsync(
         [FromBody] FindPersonsRequest request,
         [FromServices] FindPersonsByTrnAndDateOfBirthHandler handler)
     {
-        throw new NotImplementedException();
+        var command = new FindPersonsByTrnAndDateOfBirthCommand(request.Persons.Select(p => (p.Trn, p.DateOfBirth)));
+        var result = await handler.HandleAsync(command);
+        return result.ToActionResult(r => Ok(mapper.Map<FindPersonsResponse>(r)));
     }
 
     [HttpGet("")]
@@ -54,10 +81,64 @@ public partial class PersonsController : ControllerBase
     [ProducesResponseType(typeof(FindPersonResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.GetPerson)]
-    public Task<IActionResult> FindPersonsAsync(
+    public async Task<IActionResult> FindPersonsAsync(
         FindPersonRequest request,
         [FromServices] FindPersonByLastNameAndDateOfBirthHandler handler)
     {
-        throw new NotImplementedException();
+        var command = new FindPersonByLastNameAndDateOfBirthCommand(request.LastName!, request.DateOfBirth!.Value);
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(r =>
+            Ok(new FindPersonResponse()
+            {
+                Total = r.Total,
+                Query = request,
+                Results = r.Items.Select(mapper.Map<FindPersonResponseResult>).AsReadOnly()
+            }));
+    }
+
+    [HttpPut("{trn}/professional-statuses/{reference}")]
+    [RemovesFromApi]
+    public IActionResult SetProfessionalStatus() => throw null!;
+
+    [RequireRouteWritesEnabled]
+    [HttpPut("{trn}/routes-to-professional-statuses/{reference}")]
+    [SwaggerOperation(
+        OperationId = "SetRouteToProfessionalStatus",
+        Summary = "Sets a route to professional status",
+        Description = "Sets a route to professional status for the person with the given TRN.")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [Authorize(Policy = AuthorizationPolicies.ApiKey, Roles = ApiRoles.SetProfessionalStatus)]
+    public async Task<IActionResult> SetRouteToProfessionalStatusAsync(
+        [FromRoute] string trn,
+        [FromRoute(Name = "reference")] string sourceApplicationReference,
+        [FromBody] SetRouteToProfessionalStatusRequest request,
+        [FromServices] SetRouteToProfessionalStatusHandler handler)
+    {
+        var command = new SetRouteToProfessionalStatusCommand(
+            trn,
+            sourceApplicationReference,
+            request.RouteToProfessionalStatusTypeId,
+            mapper.Map<Implementation.Dtos.ProfessionalStatusStatus>(request.Status),
+            request.HoldsFrom,
+            request.TrainingStartDate,
+            request.TrainingEndDate,
+            request.TrainingSubjectReferences.HasValue ? request.TrainingSubjectReferences.ValueOrDefault() : null,
+            request.TrainingAgeSpecialism is null
+                ? null
+                : new SetRouteToProfessionalStatusCommandTrainingAgeSpecialism(
+                    request.TrainingAgeSpecialism.Type.ConvertToTrainingAgeSpecialismType(),
+                    request.TrainingAgeSpecialism.From,
+                    request.TrainingAgeSpecialism.To),
+            request.TrainingCountryReference,
+            request.TrainingProviderUkprn,
+            request.DegreeTypeId,
+            request.IsExemptFromInduction);
+
+        var result = await handler.HandleAsync(command);
+
+        return result.ToActionResult(_ => NoContent())
+            .MapErrorCode(ApiError.ErrorCodes.PersonNotFound, StatusCodes.Status404NotFound);
     }
 }

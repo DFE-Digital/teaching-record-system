@@ -29,8 +29,11 @@ public class TeacherController(IMapper mapper) : ControllerBase
             Trn: User.FindFirstValue("trn")!,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
             DateOfBirth: null,
-            ApplyLegacyAlertsBehavior: true,
-            ApplyAppropriateBodyUserRestrictions: false);
+            NationalInsuranceNumber: null,
+            new GetPersonCommandOptions()
+            {
+                ApplyLegacyAlertsBehavior = true
+            });
 
         var result = await handler.HandleAsync(command);
 

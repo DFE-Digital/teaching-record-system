@@ -29,6 +29,7 @@ public record FindPersonsResponseResult
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
     public required IReadOnlyCollection<Alert> Alerts { get; init; }
+    [SourceMember("Induction.Status")]
     public required InductionStatus InductionStatus { get; init; }
     public required QtlsStatus QtlsStatus { get; set; }
 }

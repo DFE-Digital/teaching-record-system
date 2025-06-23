@@ -35,6 +35,7 @@ public record GetPersonResponse
 [AutoMap(typeof(Implementation.Dtos.QtsInfo))]
 public record GetPersonResponseQts
 {
+    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
@@ -43,6 +44,7 @@ public record GetPersonResponseQts
 [AutoMap(typeof(Implementation.Dtos.EytsInfo))]
 public record GetPersonResponseEyts
 {
+    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
