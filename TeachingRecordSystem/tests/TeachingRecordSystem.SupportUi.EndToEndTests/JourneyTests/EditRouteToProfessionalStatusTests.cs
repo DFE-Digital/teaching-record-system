@@ -228,7 +228,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.AssertContentContains(editSubject.Name, "Subjects");
         await page.AssertContentContains(editTrainingProvider.Name, "Training provider");
 
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
 
@@ -322,7 +322,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
     }
 
     [Fact]
@@ -380,7 +380,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
@@ -445,7 +445,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
     }
 
     [Fact]
@@ -508,7 +508,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
     }
 
     [Fact]
@@ -573,7 +573,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
 
         await page.AssertOnPersonQualificationsPageAsync(personId);
     }
@@ -927,7 +927,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickBackLink();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
     }
 
     [Fact]
@@ -1060,7 +1060,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.AssertContentEquals("Deferred", "Status");
-        await page.ClickButtonAsync("Confirm and commit changes");
+        await page.ClickButtonAsync("Confirm and update route");
     }
 
     [Theory]
