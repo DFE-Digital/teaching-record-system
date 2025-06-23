@@ -40,11 +40,6 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         return PageDriver.PreviousPage(Route, Status, currentPage);
     }
 
-    public bool IsLastPage(AddRoutePage currentPage)
-    {
-        return PageDriver.IsLastPage(currentPage);
-    }
-
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))

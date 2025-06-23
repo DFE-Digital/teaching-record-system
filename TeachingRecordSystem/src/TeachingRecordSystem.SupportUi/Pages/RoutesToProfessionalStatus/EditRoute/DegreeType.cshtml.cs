@@ -53,7 +53,7 @@ public class DegreeTypeModel(
         await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 

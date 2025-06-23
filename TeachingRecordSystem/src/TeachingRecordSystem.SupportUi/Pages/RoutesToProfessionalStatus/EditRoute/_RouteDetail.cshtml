@@ -4,6 +4,7 @@
         <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.RouteToProfessionalStatusType.Name</govuk-summary-list-row-value>
     </govuk-summary-list-row>
+
     <govuk-summary-list-row>
         <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
         <govuk-summary-list-row-value>@Model.Status.GetTitle()</govuk-summary-list-row-value>
@@ -12,21 +13,27 @@
         </govuk-summary-list-row-actions>
     </govuk-summary-list-row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-start-date-link" href="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
+    @if (Model.StartDateRequired != FieldRequirement.NotApplicable)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingStartDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-start-date-link" href="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="start date">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-end-date-link" href="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
+    @if (Model.EndDateRequired != FieldRequirement.NotApplicable)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingEndDate?.ToString(UiDefaults.DateOnlyDisplayFormat)</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-end-date-link" href="@LinkGenerator.RouteEditStartAndEndDate(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="end date">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
 
     @if (Model.AwardDateRequired != FieldRequirement.NotApplicable)
     {
@@ -38,6 +45,7 @@
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
+
     @if (Model.HasInductionExemptionRequired != FieldRequirement.NotApplicable)
     {
         <govuk-summary-list-row>
@@ -52,67 +60,82 @@
         </govuk-summary-list-row>
     }
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingProvider</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-training-provider-link" href="@LinkGenerator.RouteEditTrainingProvider(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
-
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-degree-type-link" href="@LinkGenerator.RouteEditDegreeType(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
-
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-country-link" href="@LinkGenerator.RouteEditTrainingCountry(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
-
-    <govuk-summary-list-row>
-    <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
-    @if (Model.TrainingAgeSpecialismRangeFrom is not null && Model.TrainingAgeSpecialismRangeTo is not null)
+    @if (Model.TrainingProviderRequired != FieldRequirement.NotApplicable)
     {
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingProvider</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-training-provider-link" href="@LinkGenerator.RouteEditTrainingProvider(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
     }
-    else
-    {
-        <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-        }
-    </govuk-summary-list-row>
 
-    <govuk-summary-list-row>
-        <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
-        <govuk-summary-list-row-value>
-            @if (Model.TrainingSubjects is not null && Model.TrainingSubjects.Any())
+    @if (Model.DegreeTypeRequired != FieldRequirement.NotApplicable)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-degree-type-link" href="@LinkGenerator.RouteEditDegreeType(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
+
+    @if (Model.TrainingCountryRequired != FieldRequirement.NotApplicable)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-country-link" href="@LinkGenerator.RouteEditTrainingCountry(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
+
+    @if (Model.AgeSpecialismRequired != FieldRequirement.NotApplicable)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+            @if (Model.TrainingAgeSpecialismRangeFrom is not null && Model.TrainingAgeSpecialismRangeTo is not null)
             {
-                <ul class="govuk-list">
-                    @foreach (var subject in Model.TrainingSubjects)
-                    {
-                        <li>@subject</li>
-                    }
-                </ul>
+                <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
+                <govuk-summary-list-row-actions>
+                    <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                </govuk-summary-list-row-actions>
             }
             else
             {
-                <span use-empty-fallback></span>
+                <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
+                <govuk-summary-list-row-actions>
+                    <govuk-summary-list-row-action data-testid="edit-age-range-link" href="@LinkGenerator.RouteEditAgeRangeSpecialism(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                </govuk-summary-list-row-actions>
             }
-        </govuk-summary-list-row-value>
-        <govuk-summary-list-row-actions>
-            <govuk-summary-list-row-action data-testid="edit-subjects-link" href="@LinkGenerator.RouteEditTrainingSubjects(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
-        </govuk-summary-list-row-actions>
-    </govuk-summary-list-row>
+        </govuk-summary-list-row>
+    }
+
+    @if (Model.TrainingSubjectsRequired != FieldRequirement.NotApplicable)
+    {
+        <govuk-summary-list-row>
+            <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
+            <govuk-summary-list-row-value>
+                @if (Model.TrainingSubjects is not null && Model.TrainingSubjects.Any())
+                {
+                    <ul class="govuk-list">
+                        @foreach (var subject in Model.TrainingSubjects)
+                        {
+                            <li>@subject</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span use-empty-fallback></span>
+                }
+            </govuk-summary-list-row-value>
+            <govuk-summary-list-row-actions>
+                <govuk-summary-list-row-action data-testid="edit-subjects-link" href="@LinkGenerator.RouteEditTrainingSubjects(Model.QualificationId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
+            </govuk-summary-list-row-actions>
+        </govuk-summary-list-row>
+    }
 </govuk-summary-list>

@@ -51,7 +51,7 @@ public class CountryModel(
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 

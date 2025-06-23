@@ -58,7 +58,7 @@ public class StartAndEndDateModel(
         return Redirect(JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage() :
             FromCheckAnswers ?
-                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 

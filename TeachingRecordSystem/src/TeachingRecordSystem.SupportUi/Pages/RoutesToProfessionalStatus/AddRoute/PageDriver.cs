@@ -30,6 +30,7 @@ public static class PageDriver
                 }
             }
         }
+
         return null;
     }
 
@@ -63,21 +64,12 @@ public static class PageDriver
         return null;
     }
 
-    public static bool IsLastPage(AddRoutePage currentPage)
-    {
-        var lastPage = Enum.GetValues(typeof(AddRoutePage))
-            .Cast<AddRoutePage>()
-            .OrderByDescending(p => p)
-            .First();
-        return lastPage == currentPage;
-    }
-
     public static FieldRequirement FieldRequirementForPage(this AddRoutePage page, RouteToProfessionalStatusType Route, RouteToProfessionalStatusStatus Status)
     {
         return page switch
         {
             AddRoutePage.StartAndEndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
-            AddRoutePage.AwardDate => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
+            AddRoutePage.HoldsFrom => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
             AddRoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
             AddRoutePage.Route => FieldRequirement.Mandatory,
             AddRoutePage.Status => FieldRequirement.Mandatory,
