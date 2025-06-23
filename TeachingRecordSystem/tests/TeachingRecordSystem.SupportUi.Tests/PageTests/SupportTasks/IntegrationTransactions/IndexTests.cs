@@ -23,6 +23,8 @@ public class IndexTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Get, $"/support-tasks/integration-transactions");
         await WithDbContext(dbContext =>
+            dbContext.IntegrationTransactionRecords.ExecuteDeleteAsync());
+        await WithDbContext(dbContext =>
             dbContext.IntegrationTransactions.ExecuteDeleteAsync());
 
         // Act
