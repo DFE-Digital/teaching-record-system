@@ -23,18 +23,18 @@
                 accessibleAutocomplete.enhanceSelectElement({
                     selectElement: selectElement,
                     defaultValue: '',
-                    selectElement: document.querySelector(`#${id}`)
                 });
 
-                // Get the newly created input element
-                const inputElement = selectElement.parentElement.querySelector("input");
+            setTimeout(() => {
+                const inputElement = selectElement.parentElement.querySelector('input');
+                if (!inputElement) return;
 
-                // Clear the select element when the input is cleared
-                inputElement.addEventListener("input", function () {
-                    if (inputElement.value === "") {
-                        selectElement.value = "";
+                inputElement.addEventListener('input', function () {
+                    if (inputElement.value === '') {
+                        selectElement.value = '';
                     }
                 });
+            }, 0); // 0ms = defer to next event loop tick
             });
         }
     </script>
@@ -57,7 +57,7 @@
                     <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
                 }
             </govuk-select>
-            <govuk-details open="false">
+            <govuk-details open="true">
                 <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
                     <govuk-details-text>
                         <govuk-select asp-for=@Model.ArchivedRouteId label-class="govuk-label--m">
