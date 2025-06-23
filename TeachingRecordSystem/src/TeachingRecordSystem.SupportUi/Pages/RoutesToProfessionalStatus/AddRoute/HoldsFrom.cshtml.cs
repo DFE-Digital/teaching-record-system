@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Award date")]
-    [Required(ErrorMessage = "Enter the professional status award date")]
-    [Display(Name = "Enter an award date")]
+    [DateInput(ErrorMessagePrefix = "Professional status date")]
+    [Required(ErrorMessage = "Enter the professional status date")]
+    [Display(Name = "Enter a professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
     public string BackLink => FromCheckAnswers ?
@@ -25,7 +25,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
     {
         if (HoldsFrom > clock.Today)
         {
-            ModelState.AddModelError(nameof(HoldsFrom), "Professional Status Date must not be in the future");
+            ModelState.AddModelError(nameof(HoldsFrom), "Professional status date must not be in the future");
         }
         if (!ModelState.IsValid)
         {

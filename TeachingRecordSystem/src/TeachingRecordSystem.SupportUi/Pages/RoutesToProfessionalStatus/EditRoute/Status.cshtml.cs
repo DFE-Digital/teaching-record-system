@@ -42,7 +42,7 @@ public class StatusModel(
             return this.PageWithErrors();
         }
 
-        if (CompletingRoute) // if user has set the status to awarded or approved from another status
+        if (CompletingRoute) // if user has set the status to 'holds' from another status
         {
             // if the route has an implicit exemption it needs to be set now
             var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
