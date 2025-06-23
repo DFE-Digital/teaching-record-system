@@ -13,6 +13,7 @@ namespace TeachingRecordSystem.Api.V3.V20250425.Controllers;
 [Route("persons")]
 public class PersonsController(IMapper mapper) : ControllerBase
 {
+    [RequireRouteWritesEnabled]
     [HttpPut("{trn}/professional-statuses/{reference}")]
     [SwaggerOperation(
         OperationId = "SetProfessionalStatus",

@@ -208,7 +208,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the professional status award date");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Enter the professional status date");
     }
 
     [Fact]
@@ -249,7 +249,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         var response = await HttpClient.SendAsync(request);
 
         // Assert
-        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Professional Status Date must not be in the future");
+        await AssertEx.HtmlResponseHasErrorAsync(response, "HoldsFrom", "Professional status date must not be in the future");
     }
 
     [Fact]

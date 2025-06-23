@@ -38,9 +38,9 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator) : PageModel
             return this.PageWithErrors();
         }
 
-        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
+        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
         {
-            // this is definitely the final page of the data collection for an awarded or approved status
+            // this is definitely the final page of the data collection for a 'holds' status
             await JourneyInstance!.UpdateStateAsync(s =>
             {
                 s.Status = s.EditStatusState!.Status;

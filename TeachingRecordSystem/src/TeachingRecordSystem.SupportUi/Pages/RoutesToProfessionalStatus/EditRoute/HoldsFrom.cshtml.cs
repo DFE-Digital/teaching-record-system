@@ -24,9 +24,9 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
     public RouteToProfessionalStatusType? RouteToProfessionalStatus { get; set; }
 
     [BindProperty]
-    [DateInput(ErrorMessagePrefix = "Award date")]
-    [Required(ErrorMessage = "Enter an award date")]
-    [Display(Name = "Enter the professional status award date")]
+    [DateInput(ErrorMessagePrefix = "Professional status date")]
+    [Required(ErrorMessage = "Enter a professional status date")]
+    [Display(Name = "Enter the professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
     public void OnGet()
@@ -51,7 +51,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
                 linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
-        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to awarded or approved from another status
+        if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
         {
             if (IsLastCompletingRoutePage()) // if this is the last page of the data collection for the status
             {
@@ -68,7 +68,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
                 await JourneyInstance!.UpdateStateAsync(s => s.EditStatusState!.HoldsFrom = HoldsFrom);
             }
         }
-        else // user is editing the awarded date on an already-completed route
+        else // user is editing the Professional status 'hold' date on an already-completed route
         {
             await JourneyInstance!.UpdateStateAsync(s => s.HoldsFrom = HoldsFrom);
         }

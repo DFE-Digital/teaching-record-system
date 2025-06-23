@@ -176,7 +176,7 @@ public class EditExemptionReasonTests(HostFixture hostFixture) : TestBase(hostFi
         var exemptionReasons = (await TestData.ReferenceDataCache.GetPersonLevelInductionExemptionReasonsAsync(activeOnly: true))
             .ToArray();
         var exemptionReasonsForDisplay = allGuidsToDisplay
-            .Where(guid => guid != route.InductionExemptionReason?.InductionExemptionReasonId) // exclude the awarded route exemption reason 
+            .Where(guid => guid != route.InductionExemptionReason?.InductionExemptionReasonId) // exclude the holds route exemption reason 
             .Join(exemptionReasons,
                 guid => guid,
                 exemption => exemption.InductionExemptionReasonId,

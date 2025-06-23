@@ -23,5 +23,7 @@ public class RouteToProfessionalStatusMapping : IEntityTypeConfiguration<RouteTo
             .IsUnique()
             .HasFilter("source_application_user_id is not null and source_application_reference is not null");
         builder.Property(q => q.ExemptFromInductionDueToQtsDate);
+        builder.Property(q => q.DqtAgeRangeFrom).HasMaxLength(16);
+        builder.Property(q => q.DqtAgeRangeTo).HasMaxLength(16);
     }
 }

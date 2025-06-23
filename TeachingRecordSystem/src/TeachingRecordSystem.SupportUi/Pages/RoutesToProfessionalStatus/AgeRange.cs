@@ -45,7 +45,7 @@ public static class AgeSpecialisationOptionsExtension
             AgeSpecializationOption.KeyStage2 => TrainingAgeSpecialismType.KeyStage2,
             AgeSpecializationOption.KeyStage3 => TrainingAgeSpecialismType.KeyStage3,
             AgeSpecializationOption.KeyStage4 => TrainingAgeSpecialismType.KeyStage4,
-            AgeSpecializationOption.Range => TrainingAgeSpecialismType.None,
+            AgeSpecializationOption.Range => TrainingAgeSpecialismType.Range,
             AgeSpecializationOption.None => null,
             _ => null
         };
@@ -62,7 +62,7 @@ public static class AgeSpecialisationOptionsExtension
             TrainingAgeSpecialismType.KeyStage2 => AgeSpecializationOption.KeyStage2,
             TrainingAgeSpecialismType.KeyStage3 => AgeSpecializationOption.KeyStage3,
             TrainingAgeSpecialismType.KeyStage4 => AgeSpecializationOption.KeyStage4,
-            TrainingAgeSpecialismType.None => AgeSpecializationOption.Range,
+            TrainingAgeSpecialismType.Range => AgeSpecializationOption.Range,
             _ => null
         };
     }

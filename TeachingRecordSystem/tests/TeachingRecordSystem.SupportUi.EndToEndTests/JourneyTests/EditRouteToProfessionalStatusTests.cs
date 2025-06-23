@@ -723,7 +723,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
         page.AssertErrorSummary();
-        await page.SelectAgeTypeAsync(TrainingAgeSpecialismType.None);
+        await page.SelectAgeTypeAsync(TrainingAgeSpecialismType.Range);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 
@@ -1050,7 +1050,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
         await page.ClickContinueButtonAsync();
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
-        await page.AssertContentEquals(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), "Award date");
+        await page.AssertContentEquals(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), "Professional status date");
         await page.AssertContentEquals("Yes", "Has exemption");
 
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");

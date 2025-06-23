@@ -37,6 +37,8 @@ public class RouteToProfessionalStatus : Qualification
     public string? DqtEarlyYearsStatusValue { get; init; }
     public Guid? DqtInitialTeacherTrainingId { get; init; }
     public Guid? DqtQtsRegistrationId { get; init; }
+    public string? DqtAgeRangeFrom { get; init; }
+    public string? DqtAgeRangeTo { get; init; }
 
     public static RouteToProfessionalStatus Create(
         Person person,

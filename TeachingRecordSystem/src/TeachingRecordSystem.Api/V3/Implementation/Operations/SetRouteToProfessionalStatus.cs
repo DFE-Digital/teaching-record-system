@@ -583,7 +583,7 @@ public static class SetRouteToProfessionalStatusCommandTrainingAgeSpecialismExte
     {
         var mapped = input.Type switch
         {
-            TrainingAgeSpecialismType.None => (AgeRange.ConvertFromValue(input.From!.Value), AgeRange.ConvertFromValue(input.To!.Value)),
+            TrainingAgeSpecialismType.Range => (AgeRange.ConvertFromValue(input.From!.Value), AgeRange.ConvertFromValue(input.To!.Value)),
             TrainingAgeSpecialismType.FoundationStage => (dfeta_AgeRange.FoundationStage, dfeta_AgeRange.FoundationStage),
             TrainingAgeSpecialismType.FurtherEducation => (dfeta_AgeRange.FurtherEducation, dfeta_AgeRange.FurtherEducation),
             TrainingAgeSpecialismType.KeyStage1 => (dfeta_AgeRange.KeyStage1, dfeta_AgeRange.KeyStage1),
