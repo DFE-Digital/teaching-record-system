@@ -723,7 +723,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteEditAgeRangePageAsync(qualificationId);
         page.AssertErrorSummary();
-        await page.SelectAgeTypeAsync(TrainingAgeSpecialismType.None);
+        await page.SelectAgeTypeAsync(TrainingAgeSpecialismType.Range);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickContinueButtonAsync();
 

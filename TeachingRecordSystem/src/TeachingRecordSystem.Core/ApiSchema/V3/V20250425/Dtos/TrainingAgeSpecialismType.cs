@@ -37,7 +37,7 @@ public static class TrainingAgeSpecialismTypeExtensions
     {
         var mapped = input switch
         {
-            Models.TrainingAgeSpecialismType.None => TrainingAgeSpecialismType.Range,
+            Models.TrainingAgeSpecialismType.Range => TrainingAgeSpecialismType.Range,
             Models.TrainingAgeSpecialismType.FoundationStage => TrainingAgeSpecialismType.FoundationStage,
             Models.TrainingAgeSpecialismType.FurtherEducation => TrainingAgeSpecialismType.FurtherEducation,
             Models.TrainingAgeSpecialismType.KeyStage1 => TrainingAgeSpecialismType.KeyStage1,
@@ -61,7 +61,7 @@ public static class TrainingAgeSpecialismTypeExtensions
     {
         var mapped = input switch
         {
-            TrainingAgeSpecialismType.Range => Models.TrainingAgeSpecialismType.None,
+            TrainingAgeSpecialismType.Range => Models.TrainingAgeSpecialismType.Range,
             TrainingAgeSpecialismType.FoundationStage => Models.TrainingAgeSpecialismType.FoundationStage,
             TrainingAgeSpecialismType.FurtherEducation => Models.TrainingAgeSpecialismType.FurtherEducation,
             TrainingAgeSpecialismType.KeyStage1 => Models.TrainingAgeSpecialismType.KeyStage1,
