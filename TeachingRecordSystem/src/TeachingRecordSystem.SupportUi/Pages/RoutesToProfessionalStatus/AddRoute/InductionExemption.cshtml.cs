@@ -8,9 +8,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.InductionExemption) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.InductionExemption;
+
+    public string BackLink => PreviousPage;
 
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
@@ -32,9 +32,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
         await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.InductionExemption) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

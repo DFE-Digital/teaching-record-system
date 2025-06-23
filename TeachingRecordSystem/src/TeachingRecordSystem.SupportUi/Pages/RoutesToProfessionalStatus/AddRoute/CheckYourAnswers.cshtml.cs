@@ -20,8 +20,9 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string BackLink =>
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.CheckYourAnswers) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.CheckYourAnswers;
+
+    public string BackLink => PreviousPage;
 
     public async Task OnGetAsync()
     {
@@ -79,7 +80,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
 
         TempData.SetFlashSuccess("Route to professional status added");
 
-        return Redirect(LinkGenerator.PersonQualifications(PersonId));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -89,12 +90,12 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             context.Result = new BadRequestResult();
             return;
         }
+
         if (!JourneyInstance!.State.ChangeReasonIsComplete)
         {
             context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
             return;
         }
-
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;

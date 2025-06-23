@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-         LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-         LinkGenerator.RouteAddPage(PreviousPage(RoutePage.AgeRangeSpecialism) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.AgeRangeSpecialism;
+
+    public string BackLink => PreviousPage;
 
     [BindProperty]
     [Display(Name = "Add age range specialism")]
@@ -31,6 +31,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             return this.PageWithErrors();
         }
+
         await JourneyInstance!.UpdateStateAsync(s =>
         {
             s.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
@@ -38,9 +39,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
             s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
         });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.AgeRangeSpecialism) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)

@@ -15,7 +15,7 @@ public class EditRouteState : IRegisterJourney
 
     public EditRouteStatusState? EditStatusState { get; set; } // store temp data while completing a route (moving it to 'holds')
 
-    public QualificationType? QualificationType { get; set; }
+    //public QualificationType? QualificationType { get; set; }
     public Guid RouteToProfessionalStatusId { get; set; }
     public RouteToProfessionalStatusStatus CurrentStatus { get; set; }
     public RouteToProfessionalStatusStatus Status { get; set; }
@@ -47,7 +47,7 @@ public class EditRouteState : IRegisterJourney
             return;
         }
 
-        QualificationType = routeToProfessionalStatus.QualificationType;
+        //QualificationType = routeToProfessionalStatus.QualificationType;
         RouteToProfessionalStatusId = routeToProfessionalStatus.RouteToProfessionalStatusTypeId;
         CurrentStatus = routeToProfessionalStatus.Status;
         Status = routeToProfessionalStatus.Status;

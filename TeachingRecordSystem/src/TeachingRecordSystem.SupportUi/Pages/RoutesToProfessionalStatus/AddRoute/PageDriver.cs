@@ -4,8 +4,13 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 
 public static class PageDriver
 {
-    public static RoutePage? NextPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, RoutePage currentPage)
+    public static RoutePage NextPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, RoutePage currentPage, bool fromCheckAnswers)
     {
+        if (fromCheckAnswers)
+        {
+            return RoutePage.CheckYourAnswers;
+        }
+
         var pagesInOrder = Enum.GetValues(typeof(RoutePage))
             .Cast<RoutePage>()
             .Where(p => p > currentPage)
@@ -31,11 +36,16 @@ public static class PageDriver
             }
         }
 
-        return null;
+        return RoutePage.CheckYourAnswers;
     }
 
-    public static RoutePage? PreviousPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, RoutePage currentPage)
+    public static RoutePage PreviousPage(RouteToProfessionalStatusType route, RouteToProfessionalStatusStatus status, RoutePage currentPage, bool fromCheckAnswers)
     {
+        if (fromCheckAnswers)
+        {
+            return RoutePage.CheckYourAnswers;
+        }
+
         var pagesInOrder = Enum.GetValues(typeof(RoutePage))
             .Cast<RoutePage>()
             .Where(p => p < currentPage)
@@ -61,7 +71,7 @@ public static class PageDriver
             }
         }
 
-        return null;
+        return RoutePage.Route;
     }
 
     //public static bool IsLastPage(AddRoutePage currentPage)
@@ -78,11 +88,11 @@ public static class PageDriver
     {
         return page switch
         {
+            RoutePage.Route => FieldRequirement.Mandatory,
+            RoutePage.Status => FieldRequirement.Mandatory,
             RoutePage.StartAndEndDate => QuestionDriverHelper.FieldRequired(Route.TrainingEndDateRequired, Status.GetEndDateRequirement()),
             RoutePage.HoldsFrom => QuestionDriverHelper.FieldRequired(Route.HoldsFromRequired, Status.GetAwardDateRequirement()),
             RoutePage.InductionExemption => QuestionDriverHelper.FieldRequired(Route.InductionExemptionRequired, Status.GetInductionExemptionRequirement()),
-            RoutePage.Route => FieldRequirement.Mandatory,
-            RoutePage.Status => FieldRequirement.Mandatory,
             RoutePage.TrainingProvider => QuestionDriverHelper.FieldRequired(Route.TrainingProviderRequired, Status.GetTrainingProviderRequirement()),
             RoutePage.DegreeType => QuestionDriverHelper.FieldRequired(Route.DegreeTypeRequired, Status.GetDegreeTypeRequirement()),
             RoutePage.Country => QuestionDriverHelper.FieldRequired(Route.TrainingCountryRequired, Status.GetCountryRequirement()),

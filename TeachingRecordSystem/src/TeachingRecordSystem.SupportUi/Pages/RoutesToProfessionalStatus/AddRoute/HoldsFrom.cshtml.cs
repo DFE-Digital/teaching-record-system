@@ -12,9 +12,9 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
     [Display(Name = "Enter a professional status date")]
     public DateOnly? HoldsFrom { get; set; }
 
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.HoldsFrom) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.HoldsFrom;
+
+    public string BackLink => PreviousPage;
 
     public void OnGet()
     {
@@ -27,14 +27,14 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
         {
             ModelState.AddModelError(nameof(HoldsFrom), "Professional status date must not be in the future");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
         }
+
         await JourneyInstance!.UpdateStateAsync(state => state.HoldsFrom = HoldsFrom);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.HoldsFrom) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 }

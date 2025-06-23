@@ -5,7 +5,7 @@ namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalSta
 
 public class EditRouteStateBuilder()
 {
-    private QualificationType? _qualificationType;
+    //private QualificationType? _qualificationType;
     private Guid? _routeToProfessionalStatusId;
     private RouteToProfessionalStatusStatus? _status;
     private RouteToProfessionalStatusStatus? _currentStatus;
@@ -50,11 +50,11 @@ public class EditRouteStateBuilder()
         return this;
     }
 
-    public EditRouteStateBuilder WithQualificationType(QualificationType qualificationType)
-    {
-        _qualificationType = qualificationType;
-        return this;
-    }
+    //public EditRouteStateBuilder WithQualificationType(QualificationType qualificationType)
+    //{
+    //    _qualificationType = qualificationType;
+    //    return this;
+    //}
 
     public EditRouteStateBuilder WithRouteToProfessionalStatusId(Guid routeToProfessionalStatusId)
     {
@@ -204,7 +204,7 @@ public class EditRouteStateBuilder()
             TrainingProviderId = _trainingProviderId,
             IsExemptFromInduction = _isExemptFromInduction,
             ChangeReason = _changeReasonOption,
-            QualificationType = _qualificationType,
+            //QualificationType = _qualificationType,
             DegreeTypeId = _degreeTypeId,
             ChangeReasonDetail = new ChangeReasonDetailsState()
             {

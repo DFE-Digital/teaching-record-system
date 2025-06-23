@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.DegreeType) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.DegreeType;
+
+    public string BackLink => PreviousPage;
 
     public DegreeType[] DegreeTypes { get; set; } = [];
 
@@ -31,6 +31,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
         {
             ModelState.AddModelError("DegreeTypeId", "Select a degree type");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -38,9 +39,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 
         await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.DegreeType) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

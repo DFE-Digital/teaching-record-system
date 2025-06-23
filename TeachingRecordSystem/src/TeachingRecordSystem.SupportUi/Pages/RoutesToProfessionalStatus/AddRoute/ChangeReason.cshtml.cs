@@ -45,9 +45,9 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     public string? UploadedEvidenceFileUrl { get; set; }
 
-    public string BackLink => FromCheckAnswers == true
-        ? LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId)
-        : LinkGenerator.RouteAddPage(PreviousPage(RoutePage.ChangeReason) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.ChangeReason;
+
+    public string BackLink => PreviousPage;
 
     public async Task OnGetAsync()
     {
@@ -66,6 +66,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         {
             ModelState.AddModelError(nameof(ChangeReasonDetail), "Enter additional detail");
         }
+
         if (UploadEvidence == true && EvidenceFileId is null && EvidenceFile is null)
         {
             ModelState.AddModelError(nameof(EvidenceFile), "Select a file");
@@ -113,9 +114,7 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
             state.ChangeReasonDetail.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
         });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.ChangeReason) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

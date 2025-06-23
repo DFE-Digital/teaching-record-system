@@ -8,9 +8,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.SubjectSpecialisms) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.SubjectSpecialisms;
+
+    public string BackLink => PreviousPage;
 
     public DisplayInfo[] Subjects { get; set; } = [];
 
@@ -40,6 +40,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             ModelState.AddModelError(nameof(SubjectId1), "Enter a subject");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -49,9 +50,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingSubjectIds = subjects);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.SubjectSpecialisms) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

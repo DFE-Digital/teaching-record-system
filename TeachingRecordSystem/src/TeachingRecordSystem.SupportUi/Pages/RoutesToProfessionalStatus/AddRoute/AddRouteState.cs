@@ -25,6 +25,7 @@ public class AddRouteState : IRegisterJourney
     public Guid? TrainingProviderId { get; set; }
     public bool? IsExemptFromInduction { get; set; }
     public Guid? DegreeTypeId { get; set; }
+
     public ChangeReasonOption? ChangeReason { get; set; }
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 

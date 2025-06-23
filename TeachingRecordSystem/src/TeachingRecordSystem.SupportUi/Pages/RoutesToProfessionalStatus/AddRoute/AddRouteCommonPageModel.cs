@@ -30,15 +30,17 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         return Redirect(LinkGenerator.PersonQualifications(PersonId));
     }
 
-    public RoutePage? NextPage(RoutePage currentPage)
-    {
-        return PageDriver.NextPage(Route, Status, currentPage);
-    }
+    protected abstract RoutePage CurrentPage { get; }
 
-    public RoutePage? PreviousPage(RoutePage currentPage)
-    {
-        return PageDriver.PreviousPage(Route, Status, currentPage);
-    }
+    protected string NextPage =>
+        PageDriver.NextPage(Route, Status, CurrentPage, FromCheckAnswers) is RoutePage nextPage && nextPage == CurrentPage
+            ? LinkGenerator.PersonQualifications(PersonId)
+            : LinkGenerator.RouteAddPage(nextPage, PersonId, JourneyInstance!.InstanceId);
+
+    protected string PreviousPage =>
+        PageDriver.PreviousPage(Route, Status, CurrentPage, FromCheckAnswers) is RoutePage previousPage && previousPage == CurrentPage
+            ? LinkGenerator.PersonQualifications(PersonId)
+            : LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId);
 
     //public bool IsLastPage(AddRoutePage currentPage)
     //{
@@ -47,7 +49,8 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
-        if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
+        if (CurrentPage > RoutePage.Route && !JourneyInstance!.State.RouteToProfessionalStatusId.HasValue ||
+            CurrentPage > RoutePage.Status && !JourneyInstance!.State.Status.HasValue)
         {
             context.Result = new BadRequestResult();
             return;
@@ -57,8 +60,16 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-        Status = JourneyInstance!.State.Status!.Value;
+        if (JourneyInstance!.State.RouteToProfessionalStatusId.HasValue)
+        {
+            Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
+        }
+
+        if (JourneyInstance!.State.Status.HasValue)
+        {
+            Status = JourneyInstance!.State.Status.Value;
+        }
+
         await next();
     }
 }

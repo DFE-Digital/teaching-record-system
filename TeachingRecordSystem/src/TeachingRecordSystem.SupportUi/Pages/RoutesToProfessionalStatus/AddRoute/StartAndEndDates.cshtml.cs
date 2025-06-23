@@ -18,9 +18,9 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
     [Display(Name = "Route end date")]
     public DateOnly? TrainingEndDate { get; set; }
 
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.StartAndEndDate) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.StartAndEndDate;
+
+    public string BackLink => PreviousPage;
 
     public void OnGet()
     {
@@ -46,8 +46,6 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
             s.TrainingEndDate = TrainingEndDate;
         });
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.StartAndEndDate) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 }

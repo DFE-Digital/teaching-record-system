@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache)
     : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.Country) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.Country;
+
+    public string BackLink => PreviousPage;
 
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
@@ -31,6 +31,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
         {
             ModelState.AddModelError("TrainingCountryId", "Enter a country");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -38,9 +39,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.Country) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)

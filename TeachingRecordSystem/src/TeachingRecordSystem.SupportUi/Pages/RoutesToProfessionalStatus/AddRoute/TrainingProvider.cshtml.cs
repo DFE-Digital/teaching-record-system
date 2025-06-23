@@ -7,9 +7,9 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 [Journey(JourneyNames.AddRouteToProfessionalStatus), RequireJourneyInstance]
 public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceDataCache referenceDataCache) : AddRouteCommonPageModel(linkGenerator, referenceDataCache)
 {
-    public string BackLink => FromCheckAnswers ?
-        LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId) :
-        LinkGenerator.RouteAddPage(PreviousPage(RoutePage.TrainingProvider) ?? RoutePage.Status, PersonId, JourneyInstance!.InstanceId);
+    protected override RoutePage CurrentPage => RoutePage.TrainingProvider;
+
+    public string BackLink => PreviousPage;
 
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
@@ -31,6 +31,7 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
         {
             ModelState.AddModelError(nameof(TrainingProviderId), "Select a training provider");
         }
+
         if (!ModelState.IsValid)
         {
             return this.PageWithErrors();
@@ -38,9 +39,7 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
 
-        return Redirect(FromCheckAnswers ?
-            LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance.InstanceId) :
-            LinkGenerator.RouteAddPage(NextPage(RoutePage.TrainingProvider) ?? RoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId));
+        return Redirect(NextPage);
     }
 
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
