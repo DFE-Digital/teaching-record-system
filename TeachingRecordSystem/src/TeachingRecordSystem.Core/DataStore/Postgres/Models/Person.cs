@@ -631,6 +631,8 @@ public class Person
         return false;
     }
 
+    public void UnsafeSetQtlsStatus(QtlsStatus qtlsStatus) => QtlsStatus = qtlsStatus;
+
     public static Person Create(
         string trn,
         string firstName,
@@ -689,7 +691,7 @@ public class Person
         }
     }
 
-    private IReadOnlyCollection<Guid> GetAllInductionExemptionReasonIds(
+    public IReadOnlyCollection<Guid> GetAllInductionExemptionReasonIds(
         IEnumerable<RouteToProfessionalStatus>? routesHint = null)
     {
         var routes = routesHint ??

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
@@ -5,10 +6,45 @@ namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 public record QtsInfo
 {
-    public required DateOnly Awarded { get; init; }
+    public required DateOnly HoldsFrom { get; init; }
     public required string CertificateUrl { get; init; }
     public required string StatusDescription { get; init; }
     public required int AwardedOrApprovedCount { get; init; }
+    public required IReadOnlyCollection<QtsInfoRoute> Routes { get; init; }
+
+    public static QtsInfo? Create(PostgresModels.Person person)
+    {
+        if (person.QtsDate is null)
+        {
+            return null;
+        }
+
+        var routes = person.Qualifications?.OfType<PostgresModels.RouteToProfessionalStatus>()
+            ?? throw new InvalidOperationException("Qualifications not loaded.");
+
+        var holdsRoutes = routes
+            .Where(r => r.Status is RouteToProfessionalStatusStatus.Holds)
+            .ToArray();
+
+        var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).First();
+        Debug.Assert(oldestRoute.HoldsFrom == person.QtsDate);
+
+        return new QtsInfo()
+        {
+            HoldsFrom = oldestRoute.HoldsFrom.Value,
+            CertificateUrl = "/v3/certificates/qts",
+            StatusDescription = oldestRoute.RouteToProfessionalStatusTypeId == PostgresModels.RouteToProfessionalStatusType.QtlsAndSetMembershipId
+                ? "Qualified Teacher Learning and Skills status"
+                : "Qualified",
+            AwardedOrApprovedCount = holdsRoutes.Length,
+            Routes = holdsRoutes
+                .Select(r => new QtsInfoRoute()
+                {
+                    RouteToProfessionalStatusType = r.RouteToProfessionalStatusType!
+                })
+                .AsReadOnly()
+        };
+    }
 
     public static async Task<QtsInfo?> CreateAsync(dfeta_qtsregistration[] qtsRegistrations, DateTime? qtlsDate, ReferenceDataCache referenceDataCache)
     {
@@ -36,10 +72,11 @@ public record QtsInfo
 
         return new()
         {
-            Awarded = effectiveQts.Date,
+            HoldsFrom = effectiveQts.Date,
             CertificateUrl = "/v3/certificates/qts",
             StatusDescription = effectiveQts.Description,
-            AwardedOrApprovedCount = awardedQts.Count
+            AwardedOrApprovedCount = awardedQts.Count,
+            Routes = []
         };
     }
 
@@ -66,4 +103,9 @@ public record QtsInfo
             _ when teacherStatus.dfeta_name.StartsWith("Qualified teacher", StringComparison.OrdinalIgnoreCase) => "Qualified",
             _ => throw new ArgumentException($"Unrecognized QTS status: '{teacherStatus.dfeta_Value}'.", nameof(teacherStatus))
         };
+}
+
+public record QtsInfoRoute
+{
+    public required PostgresModels.RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
 }

@@ -68,9 +68,11 @@ public class PersonsController(IMapper mapper) : ControllerBase
             trn,
             (GetPersonCommandIncludes)include,
             dateOfBirth,
-            ApplyLegacyAlertsBehavior: false,
-            ApplyAppropriateBodyUserRestrictions: User.IsInRole(ApiRoles.AppropriateBody),
-            nationalInsuranceNumber);
+            nationalInsuranceNumber,
+            new GetPersonCommandOptions()
+            {
+                ApplyAppropriateBodyUserRestrictions = User.IsInRole(ApiRoles.AppropriateBody)
+            });
 
         var result = await handler.HandleAsync(command);
 

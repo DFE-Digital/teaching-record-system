@@ -2,7 +2,7 @@ namespace TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 
 public record QtsInfo
 {
-    public required DateOnly QtsDate { get; init; }
+    public required DateOnly HoldsFrom { get; init; }
     public required IReadOnlyCollection<QtsInfoRoute> Routes { get; init; }
 }
 

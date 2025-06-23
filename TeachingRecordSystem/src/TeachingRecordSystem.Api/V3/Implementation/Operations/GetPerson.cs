@@ -1,23 +1,36 @@
 using System.Text;
 using Microsoft.Xrm.Sdk.Query;
+using OneOf;
 using Optional;
 using TeachingRecordSystem.Api.V3.Implementation.Dtos;
+using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using IttResult = OneOf.OneOf<TeachingRecordSystem.Api.V3.Implementation.Operations.GetPersonResultInitialTeacherTraining, TeachingRecordSystem.Api.V3.Implementation.Operations.GetPersonResultInitialTeacherTrainingForAppropriateBody>;
-using QtlsStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.QtlsStatus;
+using EytsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.EytsInfo;
+using InductionInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.InductionInfo;
+using QtlsStatus = TeachingRecordSystem.Core.Models.QtlsStatus;
+using QtsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.QtsInfo;
+using TrainingAgeSpecialism = TeachingRecordSystem.Api.V3.Implementation.Dtos.TrainingAgeSpecialism;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
+
+using IttResult = OneOf<IReadOnlyCollection<GetPersonResultInitialTeacherTraining>, IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>>;
+using RoutesResult = OneOf<IReadOnlyCollection<GetPersonResultRouteToProfessionalStatus>, IReadOnlyCollection<GetPersonResultRouteToProfessionalStatusForAppropriateBody>>;
 
 public record GetPersonCommand(
     string Trn,
     GetPersonCommandIncludes Include,
     DateOnly? DateOfBirth,
-    bool ApplyLegacyAlertsBehavior,
-    bool ApplyAppropriateBodyUserRestrictions,
-    string? NationalInsuranceNumber = null);
+    string? NationalInsuranceNumber,
+    GetPersonCommandOptions? Options = null);
+
+public record GetPersonCommandOptions
+{
+    public bool ApplyLegacyAlertsBehavior { get; init; }
+    public bool ApplyAppropriateBodyUserRestrictions { get; init; }
+}
 
 [Flags]
 public enum GetPersonCommandIncludes
@@ -31,6 +44,7 @@ public enum GetPersonCommandIncludes
     Alerts = 1 << 7,
     PreviousNames = 1 << 8,
     AllowIdSignInWithProhibitions = 1 << 9,
+    RoutesToProfessionalStatuses = 1 << 10
 }
 
 public record GetPersonResult
@@ -48,7 +62,8 @@ public record GetPersonResult
     public required EytsInfo? Eyts { get; init; }
     public required Option<GetPersonResultInduction> Induction { get; init; }
     public required Option<GetPersonResultDqtInduction?> DqtInduction { get; init; }
-    public required Option<IReadOnlyCollection<IttResult>> InitialTeacherTraining { get; init; }
+    public required Option<IttResult> InitialTeacherTraining { get; init; }
+    public required Option<RoutesResult> RoutesToProfessionalStatuses { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResultMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<SanctionInfo>> Sanctions { get; init; }
     public required Option<IReadOnlyCollection<Alert>> Alerts { get; init; }
@@ -135,16 +150,47 @@ public record GetPersonResultMandatoryQualification
     public required string Specialism { get; init; }
 }
 
+public record GetPersonResultRouteToProfessionalStatus
+{
+    public required Guid RouteToProfessionalStatusId { get; init; }
+    public required PostgresModels.RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
+    public required RouteToProfessionalStatusStatus Status { get; init; }
+    public required DateOnly? HoldsFrom { get; init; }
+    public required DateOnly? TrainingStartDate { get; init; }
+    public required DateOnly? TrainingEndDate { get; init; }
+    public required IReadOnlyCollection<TrainingSubject> TrainingSubjects { get; init; }
+    public required TrainingAgeSpecialism? TrainingAgeSpecialism { get; init; }
+    public required TrainingCountry? TrainingCountry { get; init; }
+    public required TrainingProvider? TrainingProvider { get; init; }
+    public required DegreeType? DegreeType { get; init; }
+    public required GetPersonResultRouteToProfessionalStatusInductionExemption InductionExemption { get; init; }
+}
+
+public record GetPersonResultRouteToProfessionalStatusForAppropriateBody
+{
+    public required TrainingProvider TrainingProvider { get; init; }
+}
+
+public record GetPersonResultRouteToProfessionalStatusInductionExemption
+{
+    public required bool IsExempt { get; init; }
+    public required IReadOnlyCollection<PostgresModels.InductionExemptionReason> ExemptionReasons { get; init; }
+}
+
 public class GetPersonHandler(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     ReferenceDataCache referenceDataCache,
     IDataverseAdapter dataverseAdapter,
-    PreviousNameHelper previousNameHelper)
+    PreviousNameHelper previousNameHelper,
+    IFeatureProvider featureProvider)
 {
     public async Task<ApiResult<GetPersonResult>> HandleAsync(GetPersonCommand command)
     {
-        if (command.ApplyAppropriateBodyUserRestrictions)
+        var options = command.Options ?? new GetPersonCommandOptions();
+        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
+
+        if (options.ApplyAppropriateBodyUserRestrictions)
         {
             if ((command.Include & ~(GetPersonCommandIncludes.Induction | GetPersonCommandIncludes.Alerts |
                 GetPersonCommandIncludes.InitialTeacherTraining)) != 0)
@@ -213,7 +259,7 @@ public class GetPersonHandler(
         }
 
         // DataverseAdapter operations share an IOrganizationService, which is not thread-safe in our setup.
-        // This lock should be used around all calls to DataverseAdatper.
+        // This lock should be used around all calls to DataverseAdapter.
         using var dataverseLock = new SemaphoreSlim(1, 1);
 
         async Task<T> WithDataverseAdapterLockAsync<T>(Func<Task<T>> action)
@@ -229,29 +275,14 @@ public class GetPersonHandler(
             }
         }
 
-        using var trsDbLock = new SemaphoreSlim(1, 1);
-
-        async Task<T> WithTrsDbLockAsync<T>(Func<Task<T>> action)
-        {
-            await trsDbLock.WaitAsync();
-            try
-            {
-                return await action();
-            }
-            finally
-            {
-                trsDbLock.Release();
-            }
-        }
-
         var contact = contactDetail.Contact;
         var personId = contact.Id;
 
-        var getPersonTask = command.Include.HasFlag(GetPersonCommandIncludes.Induction)
-            ? WithTrsDbLockAsync(() => dbContext.Persons.SingleAsync(p => p.PersonId == personId))
-            : null;
+        var personQuery = dbContext.Persons
+            .Where(p => p.PersonId == personId)
+            .Include(p => p.Qualifications).AsSplitQuery();
 
-        var getIttTask = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
+        var getIttTask = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) && !routesMigrated ?
             WithDataverseAdapterLockAsync(() => dataverseAdapter.GetInitialTeacherTrainingByTeacherAsync(
                 contact.Id,
                 columnNames:
@@ -286,10 +317,6 @@ public class GetPersonHandler(
                 activeOnly: true)) :
             null;
 
-        var getMqsTask = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
-            WithTrsDbLockAsync(() => dbContext.MandatoryQualifications.Where(q => q.PersonId == personId).ToArrayAsync()) :
-            null;
-
         async Task<(bool PendingNameRequest, bool PendingDateOfBirthRequest)> GetPendingDetailChangesAsync()
         {
             var nameChangeSubject = await referenceDataCache.GetSubjectByTitleAsync("Change of Name");
@@ -310,9 +337,10 @@ public class GetPersonHandler(
             GetPendingDetailChangesAsync() :
             null;
 
-        var getAlertsTask = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-            WithTrsDbLockAsync(() => dbContext.Alerts.Where(a => a.PersonId == contact.Id).ToArrayAsync()) :
-            null;
+        if (command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) || command.Include.HasFlag(GetPersonCommandIncludes.Alerts))
+        {
+            personQuery = personQuery.Include(p => p.Alerts).AsSplitQuery();
+        }
 
         IEnumerable<NameInfo> previousNames = previousNameHelper.GetFullPreviousNames(contactDetail.PreviousNames, contactDetail.Contact)
             .Select(name => new NameInfo()
@@ -323,22 +351,32 @@ public class GetPersonHandler(
             })
             .AsReadOnly();
 
+        var person = await personQuery.SingleAsync();
+
         var firstName = contact.ResolveFirstName();
         var middleName = contact.ResolveMiddleName();
         var lastName = contact.ResolveLastName();
 
-        var qtsRegistrations = (await crmQueryDispatcher.ExecuteQueryAsync(
-            new GetActiveQtsRegistrationsByContactIdsQuery(
-                [contact.Id],
-                new ColumnSet(
-                    dfeta_qtsregistration.Fields.dfeta_QTSDate,
-                    dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
-                    dfeta_qtsregistration.Fields.dfeta_name,
-                    dfeta_qtsregistration.Fields.dfeta_EYTSDate,
-                    dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
-                    dfeta_qtsregistration.Fields.dfeta_PersonId))))[contact.Id];
+        var qtsRegistrations = !routesMigrated
+            ? (await crmQueryDispatcher.ExecuteQueryAsync(
+                new GetActiveQtsRegistrationsByContactIdsQuery(
+                    [contact.Id],
+                    new ColumnSet(
+                        dfeta_qtsregistration.Fields.dfeta_QTSDate,
+                        dfeta_qtsregistration.Fields.dfeta_TeacherStatusId,
+                        dfeta_qtsregistration.Fields.dfeta_name,
+                        dfeta_qtsregistration.Fields.dfeta_EYTSDate,
+                        dfeta_qtsregistration.Fields.dfeta_EarlyYearsStatusId,
+                        dfeta_qtsregistration.Fields.dfeta_PersonId))))[contact.Id]
+            : null;
 
-        var eyts = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
+        var qtsInfo = routesMigrated
+            ? QtsInfo.Create(person)
+            : await QtsInfo.CreateAsync(qtsRegistrations!, contact.dfeta_qtlsdate, referenceDataCache);
+
+        var eytsInfo = routesMigrated
+            ? EytsInfo.Create(person)
+            : await EytsInfo.CreateAsync(qtsRegistrations!, referenceDataCache);
 
         var allowIdSignInWithProhibitions = command.Include.HasFlag(GetPersonCommandIncludes.AllowIdSignInWithProhibitions) ?
             Option.Some(contact.dfeta_AllowIDSignInWithProhibitions == true) :
@@ -348,12 +386,12 @@ public class GetPersonHandler(
         Option<GetPersonResultInduction> induction = default;
         if (command.Include.HasFlag(GetPersonCommandIncludes.Induction))
         {
-            var mappedInduction = MapInduction((await getPersonTask!));
+            var mappedInduction = await MapInductionAsync(person);
             dqtInduction = Option.Some(mappedInduction.DqtInduction);
             induction = Option.Some(mappedInduction.Induction);
         }
 
-        var qtlsStatus = MapQtlsStatus(contact.dfeta_qtlsdate, contact.dfeta_QtlsDateHasBeenSet);
+        var qtlsStatus = routesMigrated ? person.QtlsStatus : MapQtlsStatus_Dqt(contact.dfeta_qtlsdate, contact.dfeta_QtlsDateHasBeenSet);
 
         return new GetPersonResult()
         {
@@ -365,21 +403,42 @@ public class GetPersonHandler(
             NationalInsuranceNumber = contact.dfeta_NINumber,
             PendingNameChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingNameRequest) : default,
             PendingDateOfBirthChange = command.Include.HasFlag(GetPersonCommandIncludes.PendingDetailChanges) ? Option.Some((await getPendingDetailChangesTask!).PendingDateOfBirthRequest) : default,
-            Qts = await QtsInfo.CreateAsync(qtsRegistrations, contact.dfeta_qtlsdate, referenceDataCache),
+            Qts = qtsInfo,
             QtlsStatus = qtlsStatus,
-            Eyts = await EytsInfo.CreateAsync(eyts, referenceDataCache),
+            Eyts = eytsInfo,
             EmailAddress = contact.EMailAddress1,
             Induction = induction,
             DqtInduction = dqtInduction,
             InitialTeacherTraining = command.Include.HasFlag(GetPersonCommandIncludes.InitialTeacherTraining) ?
-                Option.Some(ApplyRoleBasedResponseFilters(MapInitialTeacherTraining((await getIttTask!)), command.ApplyAppropriateBodyUserRestrictions)) :
+                Option.Some(
+                    ApplyRoleBasedResponseFilters(
+                        routesMigrated
+                            ? await MapInitialTeacherTrainingAsync(
+                                person.Qualifications!
+                                    .OfType<PostgresModels.RouteToProfessionalStatus>()
+                                    .OrderBy(q => q.CreatedOn))
+                            : MapInitialTeacherTrainingFromDqt((await getIttTask!)),
+                        options.ApplyAppropriateBodyUserRestrictions)) :
+                default,
+            RoutesToProfessionalStatuses = command.Include.HasFlag(GetPersonCommandIncludes.RoutesToProfessionalStatuses) ?
+                Option.Some(
+                    ApplyRoleBasedResponseFilters(
+                        await MapRoutesToProfessionalStatusesAsync(
+                            person.Qualifications!
+                                .OfType<PostgresModels.RouteToProfessionalStatus>()
+                                .OrderBy(q => q.CreatedOn)),
+                        options.ApplyAppropriateBodyUserRestrictions)) :
                 default,
             MandatoryQualifications = command.Include.HasFlag(GetPersonCommandIncludes.MandatoryQualifications) ?
-                Option.Some(MapMandatoryQualifications((await getMqsTask!))) :
+                Option.Some(MapMandatoryQualifications(
+                    person.Qualifications!
+                        .OfType<PostgresModels.MandatoryQualification>()
+                        .OrderBy(q => q.CreatedOn))) :
                 default,
             Sanctions = command.Include.HasFlag(GetPersonCommandIncludes.Sanctions) ?
-                Option.Some((await getAlertsTask!)
+                Option.Some(person.Alerts!
                     .Where(a => Constants.LegacyExposableSanctionCodes.Contains(a.AlertType!.DqtSanctionCode) && a.IsOpen)
+                    .OrderBy(a => a.CreatedOn)
                     .Select(s => new SanctionInfo()
                     {
                         Code = s.AlertType!.DqtSanctionCode!,
@@ -388,17 +447,18 @@ public class GetPersonHandler(
                     .AsReadOnly()) :
                 default,
             Alerts = command.Include.HasFlag(GetPersonCommandIncludes.Alerts) ?
-                Option.Some((await getAlertsTask!)
+                Option.Some(person.Alerts!
                     .Where(a =>
                     {
                         // The Legacy behavior is to only return prohibition-type alerts
-                        if (command.ApplyLegacyAlertsBehavior)
+                        if (options.ApplyLegacyAlertsBehavior)
                         {
                             return Constants.LegacyProhibitionSanctionCodes.Contains(a.AlertType!.DqtSanctionCode);
                         }
 
                         return !a.AlertType!.InternalOnly;
                     })
+                    .OrderBy(a => a.CreatedOn)
                     .Select(a => new Alert()
                     {
                         AlertId = a.AlertId,
@@ -426,7 +486,7 @@ public class GetPersonHandler(
         };
     }
 
-    private static QtlsStatus MapQtlsStatus(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
+    private static QtlsStatus MapQtlsStatus_Dqt(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
     {
         return (qtlsDate, qtlsDateHasBeenSet) switch
         {
@@ -436,8 +496,7 @@ public class GetPersonHandler(
         };
     }
 
-    private static (GetPersonResultDqtInduction? DqtInduction, GetPersonResultInduction Induction) MapInduction(
-        PostgresModels.Person person)
+    private async Task<(GetPersonResultDqtInduction? DqtInduction, GetPersonResultInduction Induction)> MapInductionAsync(PostgresModels.Person person)
     {
         var status = person.InductionStatus;
         var dqtStatusName = status.ToDqtInductionStatus(out var dqtStatusDescription);
@@ -467,26 +526,101 @@ public class GetPersonHandler(
             Status = status,
             StartDate = startDate,
             CompletedDate = completedDate,
-            CertificateUrl = certificateUrl
+            CertificateUrl = certificateUrl,
+            ExemptionReasons = await person.GetAllInductionExemptionReasonIds()
+                .ToAsyncEnumerable()
+                .SelectAwait(async id => await referenceDataCache.GetInductionExemptionReasonByIdAsync(id))
+                .ToArrayAsync(),
         };
 
         return (dqtInduction, inductionInfo);
     }
 
-    private static IReadOnlyCollection<IttResult> ApplyRoleBasedResponseFilters(
+    private static IttResult ApplyRoleBasedResponseFilters(
         IEnumerable<GetPersonResultInitialTeacherTraining> itt,
         bool userIsAppropriateBody) =>
-        (userIsAppropriateBody
-            ? itt
+        userIsAppropriateBody
+            ? IttResult.FromT1(itt
                 .Where(i => i.Provider is not null)
-                .Select(i => IttResult.FromT1(new GetPersonResultInitialTeacherTrainingForAppropriateBody()
+                .Select(i => new GetPersonResultInitialTeacherTrainingForAppropriateBody()
                 {
                     Provider = new GetPersonResultInitialTeacherTrainingProvider() { Name = i.Provider!.Name, Ukprn = i.Provider.Ukprn }
-                }))
-            : itt.Select(IttResult.FromT0))
-        .AsReadOnly();
+                })
+                .AsReadOnly())
+            : IttResult.FromT0(itt.AsReadOnly());
 
-    private static IEnumerable<GetPersonResultInitialTeacherTraining> MapInitialTeacherTraining(dfeta_initialteachertraining[] itt) =>
+    private static RoutesResult ApplyRoleBasedResponseFilters(
+        IEnumerable<GetPersonResultRouteToProfessionalStatus> routes,
+        bool userIsAppropriateBody) =>
+        userIsAppropriateBody
+            ? RoutesResult.FromT1(routes
+                .Where(i => i.TrainingProvider is not null)
+                .Select(i => new GetPersonResultRouteToProfessionalStatusForAppropriateBody()
+                {
+                    TrainingProvider = i.TrainingProvider!
+                })
+                .AsReadOnly())
+            : RoutesResult.FromT0(routes.AsReadOnly());
+
+    private async Task<IEnumerable<GetPersonResultRouteToProfessionalStatus>> MapRoutesToProfessionalStatusesAsync(
+        IEnumerable<PostgresModels.RouteToProfessionalStatus> routes) =>
+        await routes
+            .ToAsyncEnumerable()
+            .SelectAwait(async r => new GetPersonResultRouteToProfessionalStatus()
+            {
+                RouteToProfessionalStatusId = r.QualificationId,
+                RouteToProfessionalStatusType = r.RouteToProfessionalStatusType!,
+                Status = r.Status,
+                HoldsFrom = r.HoldsFrom,
+                TrainingStartDate = r.TrainingStartDate,
+                TrainingEndDate = r.TrainingEndDate,
+                TrainingSubjects = await r.TrainingSubjectIds.ToAsyncEnumerable()
+                    .SelectAwait(async id => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
+                    .Select(TrainingSubject.FromModel)
+                    .ToArrayAsync(),
+                TrainingAgeSpecialism = TrainingAgeSpecialismExtensions.FromRoute(r),
+                TrainingCountry = TrainingCountry.FromModel(r.TrainingCountry),
+                TrainingProvider = TrainingProvider.FromModel(r.TrainingProvider),
+                DegreeType = DegreeType.FromModel(r.DegreeType),
+                InductionExemption = new GetPersonResultRouteToProfessionalStatusInductionExemption()
+                {
+                    IsExempt = r.ExemptFromInduction == true || r.ExemptFromInductionDueToQtsDate == true,
+                    ExemptionReasons = Array.Empty<PostgresModels.InductionExemptionReason>()
+                        .AppendIf(
+                            r.ExemptFromInduction == true,
+                            r.RouteToProfessionalStatusType!.InductionExemptionReason!)
+                        .AppendIf(
+                            r.ExemptFromInductionDueToQtsDate == true,
+                            await referenceDataCache.GetInductionExemptionReasonByIdAsync(PostgresModels.InductionExemptionReason.QualifiedBefore7May2000Id))
+                        .AsReadOnly()
+                }
+            })
+            .ToArrayAsync();
+
+    private async Task<IEnumerable<GetPersonResultInitialTeacherTraining>> MapInitialTeacherTrainingAsync(
+        IEnumerable<PostgresModels.RouteToProfessionalStatus> routes) =>
+        await routes
+            .ToAsyncEnumerable()
+            .SelectAwait(async r => new GetPersonResultInitialTeacherTraining()
+            {
+                Qualification = null,
+                StartDate = r.TrainingStartDate,
+                EndDate = r.TrainingEndDate,
+                ProgrammeType = null,
+                ProgrammeTypeDescription = null,
+                Result = null,
+                AgeRange = MapAgeRange(r.TrainingAgeSpecialismType, r.TrainingAgeSpecialismRangeFrom, r.TrainingAgeSpecialismRangeTo),
+                Provider = r.TrainingProvider is { Ukprn: not null } trainingProvider
+                    ? new GetPersonResultInitialTeacherTrainingProvider { Name = trainingProvider.Name, Ukprn = trainingProvider.Ukprn }
+                    : null,
+                Subjects = await r.TrainingSubjectIds.ToAsyncEnumerable()
+                    .SelectAwait(async id => await referenceDataCache.GetTrainingSubjectByIdAsync(id))
+                    .Select(subject => new GetPersonResultInitialTeacherTrainingSubject() { Code = subject.Reference, Name = subject.Name })
+                    .ToArrayAsync()
+            })
+            .ToArrayAsync();
+
+    private static IEnumerable<GetPersonResultInitialTeacherTraining> MapInitialTeacherTrainingFromDqt(dfeta_initialteachertraining[] itt) =>
         itt
             .Select(i => new GetPersonResultInitialTeacherTraining()
             {
@@ -513,6 +647,25 @@ public class GetPersonHandler(
                 Name = qualification.dfeta_name
             } :
             null;
+    }
+
+    private static GetPersonResultInitialTeacherTrainingAgeRange? MapAgeRange(
+        TrainingAgeSpecialismType? trainingAge,
+        int? from,
+        int? to)
+    {
+        if (trainingAge is null)
+        {
+            return null;
+        }
+
+        return new GetPersonResultInitialTeacherTrainingAgeRange
+        {
+            Description = from is not null && to is not null ? $"{from} to {to}" :
+                from is not null ? $"{from}" :
+                to is not null ? $"{to}" :
+                trainingAge.GetDisplayName()!
+        };
     }
 
     private static GetPersonResultInitialTeacherTrainingAgeRange? MapAgeRange(dfeta_AgeRange? ageRangeFrom, dfeta_AgeRange? ageRangeTo)
@@ -578,13 +731,20 @@ public class GetPersonHandler(
         return subjects;
     }
 
-    private static IReadOnlyCollection<GetPersonResultMandatoryQualification> MapMandatoryQualifications(PostgresModels.MandatoryQualification[] qualifications) =>
+    private static IReadOnlyCollection<GetPersonResultMandatoryQualification> MapMandatoryQualifications(
+            IEnumerable<PostgresModels.MandatoryQualification> qualifications) =>
         qualifications
-            .Where(q => q.EndDate.HasValue && q.Specialism.HasValue)
+            .Where(q => q is { EndDate: not null, Specialism: not null })
             .Select(mq => new GetPersonResultMandatoryQualification()
             {
                 Awarded = mq.EndDate!.Value,
                 Specialism = mq.Specialism!.Value.GetTitle()
             })
             .ToArray();
+}
+
+file static class Extensions
+{
+    public static IEnumerable<T> AppendIf<T>(this IEnumerable<T> source, bool condition, T item) where T : notnull =>
+        condition ? source.Append(item) : source;
 }

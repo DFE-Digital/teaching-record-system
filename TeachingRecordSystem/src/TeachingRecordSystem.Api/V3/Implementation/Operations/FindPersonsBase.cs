@@ -4,7 +4,6 @@ using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 using TeachingRecordSystem.Core.Dqt.Queries;
-using QtlsStatus = TeachingRecordSystem.Api.V3.Implementation.Dtos.QtlsStatus;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;
 
@@ -20,7 +19,7 @@ public record FindPersonsResultItem
     public required IReadOnlyCollection<SanctionInfo> Sanctions { get; init; }
     public required IReadOnlyCollection<Alert> Alerts { get; init; }
     public required IReadOnlyCollection<NameInfo> PreviousNames { get; init; }
-    public required InductionStatus InductionStatus { get; init; }
+    public required InductionInfo Induction { get; init; }
     public required DqtInductionStatusInfo? DqtInductionStatus { get; init; }
     public required QtsInfo? Qts { get; init; }
     public required EytsInfo? Eyts { get; init; }
@@ -31,7 +30,8 @@ public abstract class FindPersonsHandlerBase(
     TrsDbContext dbContext,
     ICrmQueryDispatcher crmQueryDispatcher,
     PreviousNameHelper previousNameHelper,
-    ReferenceDataCache referenceDataCache)
+    ReferenceDataCache referenceDataCache,
+    IFeatureProvider featureProvider)
 {
     protected TrsDbContext DbContext => dbContext;
     protected ICrmQueryDispatcher CrmQueryDispatcher => crmQueryDispatcher;
@@ -51,7 +51,7 @@ public abstract class FindPersonsHandlerBase(
         Contact.Fields.dfeta_qtlsdate,
         Contact.Fields.dfeta_QtlsDateHasBeenSet);
 
-    private static QtlsStatus MapQtlsStatus(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
+    private static QtlsStatus MapQtlsStatusFromDqt(DateTime? qtlsDate, bool? qtlsDateHasBeenSet)
     {
         return (qtlsDate, qtlsDateHasBeenSet) switch
         {
@@ -61,15 +61,15 @@ public abstract class FindPersonsHandlerBase(
         };
     }
 
-    protected async Task<FindPersonsResult> CreateResultAsync(IEnumerable<Contact> matched)
+    protected async Task<FindPersonsResult> CreateResultAsync(IReadOnlyCollection<Contact> matched)
     {
+        var routesMigrated = featureProvider.IsEnabled(FeatureNames.RoutesToProfessionalStatus);
+
         var contactsById = matched.ToDictionary(r => r.Id, r => r);
 
         var getPersonsTask = dbContext.Persons
-            .Include(p => p.Alerts!)
-            .ThenInclude(a => a.AlertType)
-            .ThenInclude(at => at!.AlertCategory)
-            .AsSplitQuery()
+            .Include(p => p.Alerts!).AsSplitQuery()
+            .Include(p => p.Qualifications!).AsSplitQuery()
             .Where(p => contactsById.Keys.Contains(p.PersonId))
             .ToDictionaryAsync(p => p.PersonId, p => p);
 
@@ -138,7 +138,7 @@ public abstract class FindPersonsHandlerBase(
                         LastName = name.LastName
                     })
                     .AsReadOnly(),
-                InductionStatus = persons[r.Id].InductionStatus,
+                Induction = await InductionInfo.CreateAsync(persons[r.Id], referenceDataCache),
                 DqtInductionStatus = persons[r.Id].InductionStatus.ToDqtInductionStatus(out var statusDescription) is string inductionStatus ?
                     new DqtInductionStatusInfo()
                     {
@@ -146,9 +146,9 @@ public abstract class FindPersonsHandlerBase(
                         StatusDescription = statusDescription!
                     } :
                     null,
-                Qts = await QtsInfo.CreateAsync(qtsRegistrations[r.Id], r.dfeta_qtlsdate, referenceDataCache),
-                Eyts = await EytsInfo.CreateAsync(qtsRegistrations[r.Id].OrderBy(qr => qr.CreatedOn).FirstOrDefault(s => s.dfeta_EYTSDate is not null), referenceDataCache),
-                QtlsStatus = MapQtlsStatus(r.dfeta_qtlsdate, r.dfeta_QtlsDateHasBeenSet),
+                Qts = routesMigrated ? QtsInfo.Create(persons[r.Id]) : await QtsInfo.CreateAsync(qtsRegistrations[r.Id], r.dfeta_qtlsdate, referenceDataCache),
+                Eyts = routesMigrated ? EytsInfo.Create(persons[r.Id]) : await EytsInfo.CreateAsync(qtsRegistrations[r.Id], referenceDataCache),
+                QtlsStatus = routesMigrated ? persons[r.Id].QtlsStatus : MapQtlsStatusFromDqt(r.dfeta_qtlsdate, r.dfeta_QtlsDateHasBeenSet)
             })
             .OrderBy(c => c.Trn)
             .ToArrayAsync();

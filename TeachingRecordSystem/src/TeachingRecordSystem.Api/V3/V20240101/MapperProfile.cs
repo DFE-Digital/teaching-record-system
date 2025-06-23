@@ -13,11 +13,16 @@ public class MapperProfile : Profile
         CreateMap<Implementation.Dtos.Alert, AlertInfo>().ConvertUsing<AlertInfoTypeConverter>();
         CreateMap<Implementation.Dtos.NameInfo, NameInfo>();
         CreateMap<Implementation.Dtos.SanctionInfo, SanctionInfo>();
-        CreateMap<OneOf<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody>,
-                GetTeacherResponseInitialTeacherTraining>()
+        CreateMap<
+                OneOf<
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>>,
+                IReadOnlyCollection<GetTeacherResponseInitialTeacherTraining>>()
             .ConvertUsing(
-                new FromOneOfT0TypeConverter<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody,
-                    GetTeacherResponseInitialTeacherTraining>());
+                new FromOneOfT0TypeConverter<
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>,
+                    IReadOnlyCollection<GetTeacherResponseInitialTeacherTraining>>());
     }
 }
 

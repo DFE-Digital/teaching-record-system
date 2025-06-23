@@ -31,8 +31,11 @@ public class PersonsController(IMapper mapper) : ControllerBase
             trn,
             include is not null ? (GetPersonCommandIncludes)include : GetPersonCommandIncludes.None,
             dateOfBirth,
-            ApplyLegacyAlertsBehavior: true,
-            ApplyAppropriateBodyUserRestrictions: false);
+            NationalInsuranceNumber: null,
+            new GetPersonCommandOptions()
+            {
+                ApplyLegacyAlertsBehavior = true
+            });
 
         var result = await handler.HandleAsync(command);
 

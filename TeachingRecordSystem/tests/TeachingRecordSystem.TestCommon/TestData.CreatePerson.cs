@@ -35,6 +35,7 @@ public partial class TestData
         private const string TeacherStatusQualifiedTeacherTrained = "71";
 
         private static readonly DateOnly _defaultQtsDate = new DateOnly(2022, 9, 1);
+        private static readonly DateOnly _defaultEytsDate = new DateOnly(2023, 4, 13);
 
         private readonly ReferenceData _referenceData;
         private bool? _syncEnabledOverride;
@@ -60,6 +61,7 @@ public partial class TestData
         private string? _slugId;
         private int? _loginFailedCounter;
         private CreatePersonInductionBuilder? _inductionBuilder;
+        private QtlsStatus? _qtlsStatus;
 
         internal CreatePersonBuilder(ReferenceData referenceData)
         {
@@ -315,6 +317,22 @@ public partial class TestData
 
             return this;
         }
+
+        public CreatePersonBuilder WithQtlsStatus(QtlsStatus qtlsStatus)
+        {
+            EnsureTrn();
+
+            if (qtlsStatus is QtlsStatus.Active)
+            {
+                return WithQtls();
+            }
+
+            _qtlsStatus = qtlsStatus;
+
+            return this;
+        }
+
+        public CreatePersonBuilder WithEyts() => WithEyts(_defaultEytsDate);
 
         public CreatePersonBuilder WithEyts(DateOnly holdsFrom)
         {
@@ -661,6 +679,11 @@ public partial class TestData
                 var person = await dbContext.Persons
                     .Include(p => p.Qualifications)
                     .SingleAsync(p => p.PersonId == PersonId);
+
+                if (_qtlsStatus is QtlsStatus qtlsStatus)
+                {
+                    person.UnsafeSetQtlsStatus(qtlsStatus);
+                }
 
                 AddTrnRequestMetadata();
                 _inductionBuilder?.Execute(person, this, testData, dbContext);
