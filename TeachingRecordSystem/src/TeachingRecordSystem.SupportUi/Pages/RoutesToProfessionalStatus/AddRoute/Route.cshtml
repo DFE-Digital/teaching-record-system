@@ -15,26 +15,27 @@
     <script asp-add-nonce="true">
         window.onload = function () {
             const selectIds = [
-                '@nameof(Model.RouteId)',
-                '@nameof(Model.ArchivedRouteId)'
+            '@nameof(Model.RouteId)',
+            '@nameof(Model.ArchivedRouteId)'
             ];
+
             selectIds.forEach(id => {
                 const selectElement = document.querySelector(`#${id}`);
                 accessibleAutocomplete.enhanceSelectElement({
-                    selectElement: selectElement,
-                    defaultValue: '',
-                    selectElement: document.querySelector(`#${id}`)
-                });
+                selectElement: selectElement,
+                defaultValue: '',
+            });
 
-                // Get the newly created input element
-                const inputElement = selectElement.parentElement.querySelector("input");
+            setTimeout(() => {
+                const inputElement = selectElement.parentElement.querySelector('input');
+                if (!inputElement) return;
 
-                // Clear the select element when the input is cleared
-                inputElement.addEventListener("input", function () {
-                    if (inputElement.value === "") {
-                        selectElement.value = "";
+                inputElement.addEventListener('input', function () {
+                    if (inputElement.value === '') {
+                        selectElement.value = '';
                     }
                 });
+                }, 0); // 0ms = defer to next event loop tick
             });
         }
     </script>
@@ -57,19 +58,38 @@
                     <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
                 }
             </govuk-select>
-            <govuk-details open="false">
-                <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
+            @if (@Model.ArchivedRouteId is not null)
+            {
+                <govuk-details open="true">
+                    <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
                     <govuk-details-text>
                         <govuk-select asp-for=@Model.ArchivedRouteId label-class="govuk-label--m">
-                        <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
-                        <govuk-select-item value=""></govuk-select-item>
-                        @foreach (var route in Model.ArchivedRoutes)
-                        {
-                            <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
-                        }
+                            <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
+                            <govuk-select-item value=""></govuk-select-item>
+                            @foreach (var route in Model.ArchivedRoutes)
+                            {
+                                <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
+                            }
                         </govuk-select>
                     </govuk-details-text>
-            </govuk-details> 
+                </govuk-details>
+            }
+            else
+            {
+                <govuk-details open="false">
+                    <govuk-details-summary>I cannot see the route I am looking for</govuk-details-summary>
+                    <govuk-details-text>
+                        <govuk-select asp-for=@Model.ArchivedRouteId label-class="govuk-label--m">
+                            <govuk-select-hint>Start typing to search inactive or historical routes</govuk-select-hint>
+                            <govuk-select-item value=""></govuk-select-item>
+                            @foreach (var route in Model.ArchivedRoutes)
+                            {
+                                <govuk-select-item value="@route.RouteToProfessionalStatusTypeId">@route.Name</govuk-select-item>
+                            }
+                        </govuk-select>
+                    </govuk-details-text>
+                </govuk-details>
+            }
 
             <div class="govuk-button-group">
                 <govuk-button type="submit">Continue</govuk-button>
