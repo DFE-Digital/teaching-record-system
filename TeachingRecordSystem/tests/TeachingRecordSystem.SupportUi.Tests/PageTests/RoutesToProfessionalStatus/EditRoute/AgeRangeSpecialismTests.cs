@@ -1,4 +1,5 @@
 using AngleSharp.Html.Dom;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.EditRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.EditRoute;
@@ -37,6 +38,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         {
             Content = new FormUrlEncodedContentBuilder()
             {
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), AgeSpecializationOption.Range },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeFrom), ageFrom },
                 { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeTo), ageTo }
             }
@@ -48,7 +50,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
         Assert.Equal(ageFrom, journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-        Assert.Equal(ageFrom, journeyInstance.State.TrainingAgeSpecialismRangeTo);
+        Assert.Equal(ageTo, journeyInstance.State.TrainingAgeSpecialismRangeTo);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/{qualificationId}/edit/detail?{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -83,7 +85,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
         {
             Content = new FormUrlEncodedContentBuilder()
             {
-                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), TrainingAgeSpecialismType.KeyStage4 },
+                { nameof(AgeRangeSpecialismModel.TrainingAgeSpecialism.AgeRangeType), AgeSpecializationOption.KeyStage4 },
             }
         };
 
