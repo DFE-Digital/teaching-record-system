@@ -72,7 +72,7 @@
                     @if (QuestionDriverHelper.FieldRequired(@professionalStatus.RouteToProfessionalStatusType.InductionExemptionRequired, professionalStatus.Status.GetInductionExemptionRequirement()) != FieldRequirement.NotApplicable)
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value use-empty-fallback data-testid="training-exemption-@professionalStatus.QualificationId">@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value == true ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }
