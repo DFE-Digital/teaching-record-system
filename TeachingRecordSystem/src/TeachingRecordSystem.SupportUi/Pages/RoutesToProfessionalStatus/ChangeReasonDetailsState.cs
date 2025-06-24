@@ -13,5 +13,6 @@ public class ChangeReasonDetailsState
     public string? EvidenceFileName { get; set; }
 
     public string? EvidenceFileSizeDescription { get; set; }
+
     public bool IsComplete => UploadEvidence == false || UploadEvidence == true && !string.IsNullOrWhiteSpace(EvidenceFileName);
 }

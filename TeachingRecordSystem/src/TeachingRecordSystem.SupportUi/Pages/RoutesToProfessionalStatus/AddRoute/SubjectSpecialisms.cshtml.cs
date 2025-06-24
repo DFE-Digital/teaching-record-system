@@ -10,7 +10,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 {
     protected override RoutePage CurrentPage => RoutePage.SubjectSpecialisms;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public DisplayInfo[] Subjects { get; set; } = [];
 
@@ -29,9 +29,12 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public void OnGet()
     {
-        SubjectId1 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(0);
-        SubjectId2 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(1);
-        SubjectId3 = JourneyInstance!.State.TrainingSubjectIds?.ElementAtOrDefault(2);
+        var trainingSubjectIds = JourneyInstance!.State.NewRouteToProfessionalStatusId != null
+            ? JourneyInstance!.State.NewTrainingSubjectIds
+            : JourneyInstance!.State.TrainingSubjectIds;
+        SubjectId1 = trainingSubjectIds.ElementAtOrDefault(0);
+        SubjectId2 = trainingSubjectIds.ElementAtOrDefault(1);
+        SubjectId3 = trainingSubjectIds.ElementAtOrDefault(2);
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -48,12 +51,20 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
         Guid[] subjects = new Guid?[] { SubjectId1, SubjectId2, SubjectId3 }.Where(s => s.HasValue).Select(s => s!.Value).ToArray();
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingSubjectIds = subjects);
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                s.Begin();
+            }
 
-        return Redirect(NextPage);
+            s.NewTrainingSubjectIds = subjects;
+        });
+
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         Subjects = (await ReferenceDataCache.GetTrainingSubjectsAsync())
             .Select(s => new DisplayInfo()
@@ -62,6 +73,5 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
                 DisplayName = $"{s.Reference} - {s.Name}"
             })
             .ToArray();
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

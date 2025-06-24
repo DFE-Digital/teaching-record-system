@@ -17,11 +17,11 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
 
     protected override RoutePage CurrentPage => RoutePage.Status;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public void OnGet()
     {
-        Status = JourneyInstance!.State.Status;
+        Status = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewStatus : JourneyInstance!.State.Status;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -34,19 +34,24 @@ public class StatusModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refe
         await JourneyInstance!.UpdateStateAsync(
             x =>
             {
-                x.Status = Status;
-                x.IsExemptFromInduction = Status is RouteToProfessionalStatusStatus.Holds ?
+                if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+                {
+                    x.Begin();
+                }
+
+                x.NewStatus = Status;
+                x.NewIsExemptFromInduction = Status is RouteToProfessionalStatusStatus.Holds ?
                     Route.InductionExemptionReason?.RouteImplicitExemption
                     : null;
             });
 
-        return Redirect(NextPage);
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         Statuses = ProfessionalStatusStatusRegistry.All.ToArray();
 
-        await base.OnPageHandlerExecutionAsync(context, next);
+        return Task.CompletedTask;
     }
 }

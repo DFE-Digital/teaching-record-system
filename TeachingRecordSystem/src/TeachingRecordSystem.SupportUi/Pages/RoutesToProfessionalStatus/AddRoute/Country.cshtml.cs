@@ -9,7 +9,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 {
     protected override RoutePage CurrentPage => RoutePage.Country;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public CountryDisplayInfo[] TrainingCountries { get; set; } = [];
 
@@ -22,7 +22,7 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
 
     public void OnGet()
     {
-        TrainingCountryId = JourneyInstance!.State.TrainingCountryId;
+        TrainingCountryId = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewTrainingCountryId : JourneyInstance!.State.TrainingCountryId;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -37,12 +37,20 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingCountryId = TrainingCountryId);
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                s.Begin();
+            }
 
-        return Redirect(NextPage);
+            s.NewTrainingCountryId = TrainingCountryId;
+        });
+
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         TrainingCountries = (await ReferenceDataCache.GetTrainingCountriesAsync())
             .Select(r => new CountryDisplayInfo()
@@ -51,6 +59,5 @@ public class CountryModel(TrsLinkGenerator linkGenerator, ReferenceDataCache ref
                 DisplayName = $"{r.CountryId} - {r.Name}"
             })
             .ToArray();
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

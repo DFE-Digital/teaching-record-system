@@ -10,7 +10,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
 {
     protected override RoutePage CurrentPage => RoutePage.InductionExemption;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     [BindProperty]
     [Display(Name = "Does this route provide them with an induction exemption?")]
@@ -19,7 +19,7 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public IActionResult OnGet()
     {
-        IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
+        IsExemptFromInduction = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewIsExemptFromInduction : JourneyInstance!.State.IsExemptFromInduction;
         return Page();
     }
 
@@ -30,27 +30,27 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.IsExemptFromInduction = IsExemptFromInduction);
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                s.Begin();
+            }
 
-        return Redirect(NextPage);
+            s.NewIsExemptFromInduction = IsExemptFromInduction;
+        });
+
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
-        {
-            context.Result = BadRequest();
-            return;
-        }
-
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
             || (Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption))
         {
             context.Result = BadRequest();
-            return;
         }
 
-        await base.OnPageHandlerExecutionAsync(context, next);
+        return Task.CompletedTask;
     }
 }

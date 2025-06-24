@@ -22,11 +22,11 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
 
     protected override RoutePage CurrentPage => RoutePage.CheckYourAnswers;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public async Task OnGetAsync()
     {
-        RouteDetail.IsExemptFromInduction = JourneyInstance!.State.IsExemptFromInduction;
+        RouteDetail.IsExemptFromInduction = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewIsExemptFromInduction : JourneyInstance!.State.IsExemptFromInduction;
         RouteDetail.TrainingProvider = RouteDetail.TrainingProviderId is not null ? (await ReferenceDataCache.GetTrainingProviderByIdAsync(RouteDetail.TrainingProviderId!.Value))?.Name : null;
         RouteDetail.TrainingCountry = RouteDetail.TrainingCountryId is not null ? (await ReferenceDataCache.GetTrainingCountryByIdAsync(RouteDetail.TrainingCountryId))?.Name : null;
         RouteDetail.DegreeType = RouteDetail.DegreeTypeId is not null ? (await ReferenceDataCache.GetDegreeTypeByIdAsync(RouteDetail.DegreeTypeId!.Value))?.Name : null;
@@ -80,29 +80,16 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
 
         TempData.SetFlashSuccess("Route to professional status added");
 
-        return Redirect(NextPage);
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
-        {
-            context.Result = new BadRequestResult();
-            return;
-        }
-
         if (!JourneyInstance!.State.ChangeReasonIsComplete)
         {
             context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
             return;
         }
-
-        var personInfo = context.HttpContext.GetCurrentPersonFeature();
-        PersonName = personInfo.Name;
-        PersonId = personInfo.PersonId;
-
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
-        Status = JourneyInstance!.State.Status!.Value;
 
         var hasImplicitExemption = Route.InductionExemptionReason?.RouteImplicitExemption ?? false;
         ChangeReason = JourneyInstance!.State.ChangeReason;
@@ -110,7 +97,7 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         RouteDetail = new RouteDetailViewModel
         {
             RouteToProfessionalStatusType = Route,
-            Status = JourneyInstance!.State.Status.Value,
+            Status = JourneyInstance!.State.Status!.Value,
             HoldsFrom = JourneyInstance!.State.HoldsFrom,
             TrainingStartDate = JourneyInstance!.State.TrainingStartDate,
             TrainingEndDate = JourneyInstance!.State.TrainingEndDate,
@@ -131,7 +118,5 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
         UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?
             await fileService.GetFileUrlAsync(ChangeReasonDetail.EvidenceFileId!.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
-
-        await next();
     }
 }

@@ -20,12 +20,12 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
 
     protected override RoutePage CurrentPage => RoutePage.StartAndEndDate;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public void OnGet()
     {
-        TrainingStartDate = JourneyInstance!.State.TrainingStartDate;
-        TrainingEndDate = JourneyInstance!.State.TrainingEndDate;
+        TrainingStartDate = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewTrainingStartDate : JourneyInstance!.State.TrainingStartDate;
+        TrainingEndDate = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewTrainingEndDate : JourneyInstance!.State.TrainingEndDate;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -42,10 +42,15 @@ public class StartAndEndDateModel(TrsLinkGenerator linkGenerator, ReferenceDataC
 
         await JourneyInstance!.UpdateStateAsync(s =>
         {
-            s.TrainingStartDate = TrainingStartDate;
-            s.TrainingEndDate = TrainingEndDate;
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                s.Begin();
+            }
+
+            s.NewTrainingStartDate = TrainingStartDate;
+            s.NewTrainingEndDate = TrainingEndDate;
         });
 
-        return Redirect(NextPage);
+        return await ContinueAsync();
     }
 }

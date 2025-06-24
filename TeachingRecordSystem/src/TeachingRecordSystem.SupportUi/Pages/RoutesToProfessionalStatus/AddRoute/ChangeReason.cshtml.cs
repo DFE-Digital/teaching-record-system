@@ -47,16 +47,18 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
 
     protected override RoutePage CurrentPage => RoutePage.ChangeReason;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public async Task OnGetAsync()
     {
-        ChangeReason = JourneyInstance!.State.ChangeReason;
-        HasAdditionalReasonDetail = JourneyInstance!.State.ChangeReasonDetail.HasAdditionalReasonDetail;
-        ChangeReasonDetail = JourneyInstance?.State.ChangeReasonDetail.ChangeReasonDetail;
-        UploadEvidence = JourneyInstance?.State.ChangeReasonDetail.UploadEvidence;
-        UploadedEvidenceFileUrl = JourneyInstance?.State.ChangeReasonDetail.EvidenceFileId is not null ?
-            await fileService.GetFileUrlAsync(JourneyInstance.State.ChangeReasonDetail.EvidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
+        ChangeReason = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewChangeReason : JourneyInstance!.State.ChangeReason;
+        HasAdditionalReasonDetail = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewChangeReasonDetail.HasAdditionalReasonDetail : JourneyInstance!.State.ChangeReasonDetail.HasAdditionalReasonDetail;
+        ChangeReasonDetail = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance?.State.NewChangeReasonDetail.ChangeReasonDetail : JourneyInstance?.State.ChangeReasonDetail.ChangeReasonDetail;
+        UploadEvidence = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance?.State.NewChangeReasonDetail.UploadEvidence : JourneyInstance?.State.ChangeReasonDetail.UploadEvidence;
+
+        var evidenceFileId = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance?.State.NewChangeReasonDetail.EvidenceFileId : JourneyInstance?.State.ChangeReasonDetail.EvidenceFileId;
+        UploadedEvidenceFileUrl = evidenceFileId is not null ?
+            await fileService.GetFileUrlAsync(evidenceFileId.Value, FileUploadDefaults.FileUrlExpiry) :
             null;
     }
 
@@ -104,25 +106,30 @@ public class ChangeReasonModel(TrsLinkGenerator linkGenerator,
         }
         await JourneyInstance!.UpdateStateAsync(state =>
         {
-            state.ChangeReason = ChangeReason;
-            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
-            state.ChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
-            state.ChangeReasonDetail.UploadEvidence = UploadEvidence;
-            state.ChangeReasonDetail.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
-            state.ChangeReasonDetail.EvidenceFileName = UploadEvidence is true ? EvidenceFileName : null;
-            state.ChangeReasonDetail.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                state.Begin();
+            }
+
+            state.NewChangeReason = ChangeReason;
+            state.NewChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+            state.NewChangeReasonDetail.ChangeReasonDetail = ChangeReasonDetail;
+            state.NewChangeReasonDetail.HasAdditionalReasonDetail = HasAdditionalReasonDetail;
+            state.NewChangeReasonDetail.UploadEvidence = UploadEvidence;
+            state.NewChangeReasonDetail.EvidenceFileId = UploadEvidence is true ? EvidenceFileId : null;
+            state.NewChangeReasonDetail.EvidenceFileName = UploadEvidence is true ? EvidenceFileName : null;
+            state.NewChangeReasonDetail.EvidenceFileSizeDescription = UploadEvidence is true ? EvidenceFileSizeDescription : null;
         });
 
-        return Redirect(NextPage);
+        return await ContinueAsync();
     }
 
-    public override Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        EvidenceFileId = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
-        EvidenceFileName = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
-        EvidenceFileSizeDescription = JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
+        EvidenceFileId = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewChangeReasonDetail.EvidenceFileId : JourneyInstance!.State.ChangeReasonDetail.EvidenceFileId;
+        EvidenceFileName = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewChangeReasonDetail.EvidenceFileName : JourneyInstance!.State.ChangeReasonDetail.EvidenceFileName;
+        EvidenceFileSizeDescription = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewChangeReasonDetail.EvidenceFileSizeDescription : JourneyInstance!.State.ChangeReasonDetail.EvidenceFileSizeDescription;
 
-        return base.OnPageHandlerExecutionAsync(context, next);
+        return Task.CompletedTask;
     }
 }

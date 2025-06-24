@@ -117,7 +117,7 @@ public partial class InductionExemptionTests(HostFixture hostFixture) : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/{page}?personId={personId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(true, journeyInstance.State.IsExemptFromInduction);
+        Assert.Equal(true, journeyInstance.State.NewIsExemptFromInduction);
     }
 
     [Fact]

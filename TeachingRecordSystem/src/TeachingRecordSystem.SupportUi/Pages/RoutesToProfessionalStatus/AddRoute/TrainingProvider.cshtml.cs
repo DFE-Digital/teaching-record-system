@@ -9,7 +9,7 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 {
     protected override RoutePage CurrentPage => RoutePage.TrainingProvider;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public TrainingProvider[] TrainingProviders { get; set; } = [];
 
@@ -22,7 +22,7 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
 
     public void OnGet()
     {
-        TrainingProviderId = JourneyInstance!.State.TrainingProviderId;
+        TrainingProviderId = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewTrainingProviderId : JourneyInstance!.State.TrainingProviderId;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -37,15 +37,22 @@ public class TrainingProviderModel(TrsLinkGenerator linkGenerator, ReferenceData
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.TrainingProviderId = TrainingProviderId);
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                s.Begin();
+            }
 
-        return Redirect(NextPage);
+            s.NewTrainingProviderId = TrainingProviderId;
+        });
+
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         TrainingProviders = await ReferenceDataCache.GetTrainingProvidersAsync();
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 
 }

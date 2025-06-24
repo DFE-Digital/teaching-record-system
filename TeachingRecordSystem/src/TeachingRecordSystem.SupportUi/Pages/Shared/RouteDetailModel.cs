@@ -28,7 +28,7 @@ public class RouteDetailModel()
 
     public FieldRequirement StartDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingStartDateRequired, Status.GetStartDateRequirement());
     public FieldRequirement EndDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingEndDateRequired, Status.GetEndDateRequirement());
-    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.HoldsFromRequired, Status.GetAwardDateRequirement());
+    public FieldRequirement AwardDateRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.HoldsFromRequired, Status.GetHoldsFromRequirement());
     public FieldRequirement DegreeTypeRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.DegreeTypeRequired, Status.GetDegreeTypeRequirement());
     public FieldRequirement TrainingProviderRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingProviderRequired, Status.GetTrainingProviderRequirement());
     public FieldRequirement AgeSpecialismRequired => QuestionDriverHelper.FieldRequired(RouteToProfessionalStatusType.TrainingAgeSpecialismTypeRequired, Status.GetAgeSpecialismRequirement());

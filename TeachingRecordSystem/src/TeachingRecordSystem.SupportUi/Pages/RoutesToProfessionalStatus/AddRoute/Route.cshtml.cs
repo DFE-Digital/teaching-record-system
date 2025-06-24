@@ -23,7 +23,7 @@ public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refer
 
     protected override RoutePage CurrentPage => RoutePage.Route;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public void OnGet()
     {
@@ -48,19 +48,24 @@ public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refer
         await JourneyInstance!.UpdateStateAsync(
             state =>
             {
-                state.RouteToProfessionalStatusId = RouteId.HasValue ? RouteId.Value : ArchivedRouteId!.Value;
+                if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+                {
+                    state.Begin();
+                }
+
+                state.NewRouteToProfessionalStatusId = RouteId.HasValue ? RouteId.Value : ArchivedRouteId!.Value;
             });
 
-        return Redirect(NextPage);
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         var allRoutes = await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         Routes = allRoutes.Where(r => r.IsActive).ToArray();
         ArchivedRoutes = allRoutes.Where(r => !r.IsActive).ToArray();
 
-        var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+        var preselectedRouteId = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewRouteToProfessionalStatusId : JourneyInstance!.State.RouteToProfessionalStatusId;
         if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))
         {
             RouteId = preselectedRouteId;
@@ -69,7 +74,5 @@ public class RouteModel(TrsLinkGenerator linkGenerator, ReferenceDataCache refer
         {
             ArchivedRouteId = preselectedRouteId;
         }
-
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

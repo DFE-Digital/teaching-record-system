@@ -9,7 +9,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 {
     protected override RoutePage CurrentPage => RoutePage.DegreeType;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public DegreeType[] DegreeTypes { get; set; } = [];
 
@@ -22,7 +22,7 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
 
     public void OnGet()
     {
-        DegreeTypeId = JourneyInstance!.State.DegreeTypeId;
+        DegreeTypeId = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewDegreeTypeId : JourneyInstance!.State.DegreeTypeId;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -37,14 +37,21 @@ public class DegreeTypeModel(TrsLinkGenerator linkGenerator, ReferenceDataCache 
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(s => s.DegreeTypeId = DegreeTypeId);
+        await JourneyInstance!.UpdateStateAsync(s =>
+        {
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                s.Begin();
+            }
 
-        return Redirect(NextPage);
+            s.NewDegreeTypeId = DegreeTypeId;
+        });
+
+        return await ContinueAsync();
     }
 
-    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    protected override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         DegreeTypes = await ReferenceDataCache.GetDegreeTypesAsync();
-        await base.OnPageHandlerExecutionAsync(context, next);
     }
 }

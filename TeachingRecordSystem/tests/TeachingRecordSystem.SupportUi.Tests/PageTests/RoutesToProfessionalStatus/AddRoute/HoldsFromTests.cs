@@ -4,7 +4,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.Tests.PageTests.RoutesToProfessionalStatus.AddRoute;
 
-public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
+public class HoldsFromTests(HostFixture hostFixture) : TestBase(hostFixture)
 {
     [Fact]
     public async Task Get_ShowsPreviouslyStoredEntry()
@@ -88,7 +88,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/induction-exemption?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
+        Assert.Equal(holdsFrom, journeyInstance.State.NewHoldsFrom);
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class AwardDateTests(HostFixture hostFixture) : TestBase(hostFixture)
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(holdsFrom, journeyInstance.State.HoldsFrom);
+        Assert.Equal(holdsFrom, journeyInstance.State.NewHoldsFrom);
     }
 
     [Fact]

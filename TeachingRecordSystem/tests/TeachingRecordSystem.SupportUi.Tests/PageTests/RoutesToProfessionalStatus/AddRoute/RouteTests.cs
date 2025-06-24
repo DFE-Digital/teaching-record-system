@@ -155,7 +155,7 @@ public class RouteTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(route.RouteToProfessionalStatusTypeId, journeyInstance.State.RouteToProfessionalStatusId);
+        Assert.Equal(route.RouteToProfessionalStatusTypeId, journeyInstance.State.NewRouteToProfessionalStatusId);
     }
 
     [Fact]

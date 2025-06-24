@@ -40,7 +40,7 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(TrainingAgeSpecialismType.KeyStage4, journeyInstance.State.TrainingAgeSpecialismType);
+        Assert.Equal(TrainingAgeSpecialismType.KeyStage4, journeyInstance.State.NewTrainingAgeSpecialismType);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }
@@ -74,9 +74,9 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(addRouteState.TrainingAgeSpecialismType, journeyInstance.State.TrainingAgeSpecialismType);
-        Assert.Equal(addRouteState.TrainingAgeSpecialismRangeFrom, journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-        Assert.Equal(addRouteState.TrainingAgeSpecialismRangeTo, journeyInstance.State.TrainingAgeSpecialismRangeTo);
+        Assert.Equal(addRouteState.TrainingAgeSpecialismType, journeyInstance.State.NewTrainingAgeSpecialismType);
+        Assert.Equal(addRouteState.TrainingAgeSpecialismRangeFrom, journeyInstance.State.NewTrainingAgeSpecialismRangeFrom);
+        Assert.Equal(addRouteState.TrainingAgeSpecialismRangeTo, journeyInstance.State.NewTrainingAgeSpecialismRangeTo);
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
     }

@@ -14,11 +14,11 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
 
     protected override RoutePage CurrentPage => RoutePage.HoldsFrom;
 
-    public string BackLink => PreviousPage;
+    public string BackLink => PreviousPageUrl;
 
     public void OnGet()
     {
-        HoldsFrom = JourneyInstance!.State.HoldsFrom;
+        HoldsFrom = JourneyInstance!.State.NewRouteToProfessionalStatusId != null ? JourneyInstance!.State.NewHoldsFrom : JourneyInstance!.State.HoldsFrom;
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -33,8 +33,16 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator, Refere
             return this.PageWithErrors();
         }
 
-        await JourneyInstance!.UpdateStateAsync(state => state.HoldsFrom = HoldsFrom);
+        await JourneyInstance!.UpdateStateAsync(state =>
+        {
+            if (JourneyInstance!.State.NewRouteToProfessionalStatusId == null)
+            {
+                state.Begin();
+            }
 
-        return Redirect(NextPage);
+            state.NewHoldsFrom = HoldsFrom;
+        });
+
+        return await ContinueAsync();
     }
 }

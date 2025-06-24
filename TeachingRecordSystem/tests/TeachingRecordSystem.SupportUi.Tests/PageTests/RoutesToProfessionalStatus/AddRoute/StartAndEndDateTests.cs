@@ -91,7 +91,8 @@ public class StartAndEndDateTests(HostFixture hostFixture) : TestBase(hostFixtur
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/training-provider?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(endDate, journeyInstance.State.TrainingEndDate);
+        Assert.Equal(startDate, journeyInstance.State.NewTrainingStartDate);
+        Assert.Equal(endDate, journeyInstance.State.NewTrainingEndDate);
     }
 
     [Fact]

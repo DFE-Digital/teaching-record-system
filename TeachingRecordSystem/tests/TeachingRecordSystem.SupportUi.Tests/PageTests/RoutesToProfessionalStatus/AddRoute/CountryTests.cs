@@ -113,7 +113,7 @@ public class CountryTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(country.CountryId, journeyInstance.State.TrainingCountryId);
+        Assert.Equal(country.CountryId, journeyInstance.State.NewTrainingCountryId);
     }
 
     [Fact]

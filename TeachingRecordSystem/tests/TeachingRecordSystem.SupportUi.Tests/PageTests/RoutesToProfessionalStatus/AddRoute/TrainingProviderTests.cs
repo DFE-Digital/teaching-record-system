@@ -118,9 +118,10 @@ public class TrainingProviderTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Act
         var response = await HttpClient.SendAsync(postRequest);
 
+
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(trainingProvider.TrainingProviderId, journeyInstance.State.TrainingProviderId);
+        Assert.Equal(trainingProvider.TrainingProviderId, journeyInstance.State.NewTrainingProviderId);
     }
 
     [Fact]

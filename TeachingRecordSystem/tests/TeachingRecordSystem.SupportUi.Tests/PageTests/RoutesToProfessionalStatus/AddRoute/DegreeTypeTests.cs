@@ -142,7 +142,7 @@ public class DegreeTypeTests(HostFixture hostFixture) : TestBase(hostFixture)
 
         // Assert
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(degreeType.DegreeTypeId, journeyInstance.State.DegreeTypeId);
+        Assert.Equal(degreeType.DegreeTypeId, journeyInstance.State.NewDegreeTypeId);
     }
 
     [Fact]

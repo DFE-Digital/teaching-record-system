@@ -82,7 +82,7 @@ public partial class SubjectSpecialismsTests(HostFixture hostFixture) : TestBase
         Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
         Assert.Equal($"/route/add/change-reason?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
         journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), journeyInstance.State.TrainingSubjectIds);
+        Assert.Equal(subjects.Select(s => s.TrainingSubjectId), journeyInstance.State.NewTrainingSubjectIds);
     }
 
     [Fact]
