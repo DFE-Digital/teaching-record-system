@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using TeachingRecordSystem.Core.Dqt;
 using TeachingRecordSystem.Core.Dqt.Models;
 
@@ -5,12 +6,48 @@ namespace TeachingRecordSystem.Api.V3.Implementation.Dtos;
 
 public record EytsInfo
 {
-    public required DateOnly Awarded { get; init; }
+    public required DateOnly HoldsFrom { get; init; }
     public required string CertificateUrl { get; init; }
     public required string StatusDescription { get; init; }
+    public required IReadOnlyCollection<EytsInfoRoute> Routes { get; init; }
 
-    public static async Task<EytsInfo?> CreateAsync(dfeta_qtsregistration? qtsRegistration, ReferenceDataCache referenceDataCache)
+    public static EytsInfo? Create(PostgresModels.Person person)
     {
+        if (person.EytsDate is null)
+        {
+            return null;
+        }
+
+        var routes = person.Qualifications?.OfType<PostgresModels.RouteToProfessionalStatus>()
+            ?? throw new InvalidOperationException("Qualifications not loaded.");
+
+        var holdsRoutes = routes
+            .Where(r => r.Status is RouteToProfessionalStatusStatus.Holds)
+            .ToArray();
+
+        var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).First();
+        Debug.Assert(oldestRoute.HoldsFrom == person.EytsDate);
+
+        return person.EytsDate is not null
+            ? new EytsInfo()
+            {
+                HoldsFrom = person.EytsDate.Value,
+                CertificateUrl = "/v3/certificates/eyts",
+                StatusDescription = "Qualified",
+                Routes = holdsRoutes
+                    .Select(r => new EytsInfoRoute()
+                    {
+                        RouteToProfessionalStatusType = r.RouteToProfessionalStatusType!
+                    })
+                    .AsReadOnly()
+            }
+            : null;
+    }
+
+    public static async Task<EytsInfo?> CreateAsync(IEnumerable<dfeta_qtsregistration> qtsRegistrations, ReferenceDataCache referenceDataCache)
+    {
+        var qtsRegistration = qtsRegistrations.OrderByDescending(x => x.CreatedOn).FirstOrDefault(qts => qts.dfeta_EYTSDate is not null);
+
         if (qtsRegistration is null)
         {
             return null;
@@ -27,9 +64,10 @@ public record EytsInfo
 
         return new()
         {
-            Awarded = awardedDate!.Value,
+            HoldsFrom = awardedDate.Value,
             CertificateUrl = "/v3/certificates/eyts",
             StatusDescription = statusDescription,
+            Routes = []
         };
     }
 
@@ -41,3 +79,9 @@ public record EytsInfo
         _ => throw new ArgumentException($"Unregonized EYTS status: '{earlyYearsStatus.dfeta_Value}'.", nameof(earlyYearsStatus))
     };
 }
+
+public record EytsInfoRoute
+{
+    public required PostgresModels.RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
+}
+

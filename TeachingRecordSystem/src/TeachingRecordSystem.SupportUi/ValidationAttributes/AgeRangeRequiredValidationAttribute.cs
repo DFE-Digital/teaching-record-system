@@ -3,7 +3,7 @@ using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 
 namespace TeachingRecordSystem.SupportUi.ValidationAttributes;
 
-public class AgeRangeRequiredValidationAttribute(string errorMessage) : ValidationAttribute(errorMessage)
+public class AgeRangeRequiredValidationAttribute() : ValidationAttribute()
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
@@ -13,7 +13,7 @@ public class AgeRangeRequiredValidationAttribute(string errorMessage) : Validati
         }
         else if (ageRange.AgeRangeType is null)
         {
-            return new ValidationResult("Select an age range", new List<string> { nameof(ageRange.AgeRangeType) });
+            return new ValidationResult("Enter an age range specialism or select 'Not provided'", new List<string> { nameof(ageRange.AgeRangeType) });
         }
 
         return ValidationResult.Success;

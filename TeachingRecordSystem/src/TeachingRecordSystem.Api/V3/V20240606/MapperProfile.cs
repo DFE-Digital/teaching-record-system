@@ -11,10 +11,15 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         CreateMap<Implementation.Dtos.TrnRequestInfo, TrnRequestInfo>();
-        CreateMap<OneOf<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody>,
-                GetPersonResponseInitialTeacherTraining>()
+        CreateMap<
+                OneOf<
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>>,
+                IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>>()
             .ConvertUsing(
-                new FromOneOfT0TypeConverter<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody,
-                    GetPersonResponseInitialTeacherTraining>());
+                new FromOneOfT0TypeConverter<
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>,
+                    IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>>());
     }
 }

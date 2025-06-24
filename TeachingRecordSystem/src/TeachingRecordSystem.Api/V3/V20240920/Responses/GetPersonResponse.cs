@@ -24,7 +24,7 @@ public record GetPersonResponse
     public required GetPersonResponseEyts? Eyts { get; init; }
     [SourceMember(nameof(GetPersonResult.DqtInduction))]
     public required Option<GetPersonResponseInduction?> Induction { get; init; }
-    public required Option<IReadOnlyCollection<OneOf<GetPersonResponseInitialTeacherTraining, GetPersonResponseInitialTeacherTrainingForAppropriateBody>>> InitialTeacherTraining { get; init; }
+    public required Option<OneOf<IReadOnlyCollection<GetPersonResponseInitialTeacherTraining>, IReadOnlyCollection<GetPersonResponseInitialTeacherTrainingForAppropriateBody>>> InitialTeacherTraining { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseNpqQualification>> NpqQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseMandatoryQualification>> MandatoryQualifications { get; init; }
     public required Option<IReadOnlyCollection<GetPersonResponseHigherEducationQualification>> HigherEducationQualifications { get; init; }
@@ -37,6 +37,7 @@ public record GetPersonResponse
 [AutoMap(typeof(Implementation.Dtos.QtsInfo))]
 public record GetPersonResponseQts
 {
+    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }
@@ -45,6 +46,7 @@ public record GetPersonResponseQts
 [AutoMap(typeof(Implementation.Dtos.EytsInfo))]
 public record GetPersonResponseEyts
 {
+    [SourceMember(nameof(Implementation.Dtos.QtsInfo.HoldsFrom))]
     public required DateOnly? Awarded { get; init; }
     public required string CertificateUrl { get; init; }
     public required string? StatusDescription { get; init; }

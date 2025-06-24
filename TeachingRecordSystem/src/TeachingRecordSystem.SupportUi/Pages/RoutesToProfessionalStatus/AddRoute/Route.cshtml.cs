@@ -34,6 +34,15 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
 
     public void OnGet()
     {
+        var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
+        if (Routes.Any(r => r.RouteToProfessionalStatusTypeId == preselectedRouteId))
+        {
+            RouteId = preselectedRouteId;
+        }
+        else if (ArchivedRoutes.Any(r => r.RouteToProfessionalStatusTypeId == preselectedRouteId))
+        {
+            ArchivedRouteId = preselectedRouteId;
+        }
     }
 
     public async Task<IActionResult> OnPostCancelAsync()
@@ -71,15 +80,6 @@ public class RouteModel(TrsLinkGenerator linkGenerator,
         var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync();
         Routes = allRoutes.Where(r => r.IsActive).ToArray();
         ArchivedRoutes = allRoutes.Where(r => !r.IsActive).ToArray();
-        var preselectedRouteId = JourneyInstance!.State.RouteToProfessionalStatusId;
-        if (!Routes.Any(r => r.InductionExemptionReasonId == preselectedRouteId))
-        {
-            RouteId = preselectedRouteId;
-        }
-        else
-        {
-            ArchivedRouteId = preselectedRouteId;
-        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;

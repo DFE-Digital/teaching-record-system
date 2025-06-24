@@ -9,10 +9,15 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<OneOf<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody>,
-                GetTeacherResponseInitialTeacherTraining>()
+        CreateMap<
+                OneOf<
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>>,
+                IReadOnlyCollection<GetTeacherResponseInitialTeacherTraining>>()
             .ConvertUsing(
-                new FromOneOfT0TypeConverter<GetPersonResultInitialTeacherTraining, GetPersonResultInitialTeacherTrainingForAppropriateBody,
-                    GetTeacherResponseInitialTeacherTraining>());
+                new FromOneOfT0TypeConverter<
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTraining>,
+                    IReadOnlyCollection<GetPersonResultInitialTeacherTrainingForAppropriateBody>,
+                    IReadOnlyCollection<GetTeacherResponseInitialTeacherTraining>>());
     }
 }

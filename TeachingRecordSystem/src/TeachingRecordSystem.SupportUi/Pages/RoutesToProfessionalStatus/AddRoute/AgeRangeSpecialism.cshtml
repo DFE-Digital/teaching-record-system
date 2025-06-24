@@ -1,4 +1,4 @@
-﻿@page "/route/add/age-range/{handler?}"
+@page "/route/add/age-range/{handler?}"
 @model TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute.AgeRangeSpecialismModel
 
 @{
@@ -16,14 +16,16 @@
             <govuk-radios asp-for="@Model.TrainingAgeSpecialism.AgeRangeType">
                 <govuk-radios-fieldset>
                     <govuk-radios-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l" />
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.FoundationStage">@TrainingAgeSpecialismType.FoundationStage.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage1">@TrainingAgeSpecialismType.KeyStage1.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage2">@TrainingAgeSpecialismType.KeyStage2.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage3">@TrainingAgeSpecialismType.KeyStage3.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.KeyStage4">@TrainingAgeSpecialismType.KeyStage4.GetDisplayName()</govuk-radios-item>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.FurtherEducation">@TrainingAgeSpecialismType.FurtherEducation.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.None">@AgeSpecializationOption.None.GetDisplayName()</govuk-radios-item>
                     <govuk-radios-divider>or</govuk-radios-divider>
-                    <govuk-radios-item value="@TrainingAgeSpecialismType.None">
+                    <govuk-radios-item value="@AgeSpecializationOption.FoundationStage">@AgeSpecializationOption.FoundationStage.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.KeyStage1">@AgeSpecializationOption.KeyStage1.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.KeyStage2">@AgeSpecializationOption.KeyStage2.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.KeyStage3">@AgeSpecializationOption.KeyStage3.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.KeyStage4">@AgeSpecializationOption.KeyStage4.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-item value="@AgeSpecializationOption.FurtherEducation">@AgeSpecializationOption.FurtherEducation.GetDisplayName()</govuk-radios-item>
+                    <govuk-radios-divider>or</govuk-radios-divider>
+                    <govuk-radios-item value="@AgeSpecializationOption.Range">
                         I want to provide an age range
                         <govuk-radios-item-conditional>
                             <govuk-input asp-for="TrainingAgeSpecialism.AgeRangeFrom" />

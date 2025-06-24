@@ -1,4 +1,5 @@
 using TeachingRecordSystem.SupportUi.Pages.Common;
+using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus;
 using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
 namespace TeachingRecordSystem.SupportUi.EndToEndTests.JourneyTests;
@@ -62,6 +63,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddAgeRangeAsync();
+        await page.SelectAgeRangeAsync(AgeSpecializationOption.FoundationStage);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddSubjectsPageAsync();
@@ -162,6 +164,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddAgeRangeAsync();
+        await page.SelectAgeRangeAsync(AgeSpecializationOption.None);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddSubjectsPageAsync();
@@ -289,6 +292,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddAgeRangeAsync();
+        await page.SelectAgeRangeAsync(AgeSpecializationOption.None);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddSubjectsPageAsync();
@@ -358,6 +362,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddAgeRangeAsync();
+        await page.SelectAgeRangeAsync(AgeSpecializationOption.None);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddSubjectsPageAsync();
@@ -455,7 +460,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddAgeRangeAsync();
-        // test that page is optional so don't fill it in
+        await page.SelectAgeRangeAsync(AgeSpecializationOption.None);
         await page.ClickButtonAsync("Continue");
 
         await page.AssertOnRouteAddSubjectsPageAsync();
@@ -475,9 +480,9 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         var editStartDate = startDate.AddDays(1);
         var editAwardDate = editEndDate.AddDays(1);
         var editDegreeType = await TestData.ReferenceDataCache.GetDegreeTypeByIdAsync(new Guid("c584eb2f-1419-4870-a230-5d81ae9b5f77"));
-        var editAgeRange = TrainingAgeSpecialismType.KeyStage2;
+        var editAgeRange = AgeSpecializationOption.KeyStage2;
         var editCountry = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync("XQZ");
-        var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectsByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
+        var editSubject = await TestData.ReferenceDataCache.GetTrainingSubjectByIdAsync(new Guid("4b574f13-25c8-4d72-9bcb-1b36dca347e3"));
         var editTrainingProvider = (await TestData.ReferenceDataCache.GetTrainingProvidersAsync())
             .RandomOne();
 
@@ -536,7 +541,7 @@ public class AddRouteToProfessionalStatusTests(HostFixture hostFixture) : TestBa
         await page.AssertOnRouteAddCheckYourAnswersPage();
         await page.ClickLinkForElementWithTestIdAsync("add-age-range-link");
         await page.AssertOnRouteAddAgeRangeAsync();
-        await page.SelectAgeTypeAsync(editAgeRange);
+        await page.SelectAgeRangeAsync(editAgeRange);
         await page.FocusAsync("button:text-is('Continue')");
         await page.ClickButtonAsync("Continue");
         await page.AssertOnRouteAddCheckYourAnswersPage();

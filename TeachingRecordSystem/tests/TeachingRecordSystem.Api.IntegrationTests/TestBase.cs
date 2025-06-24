@@ -12,6 +12,7 @@ using TeachingRecordSystem.Core.Infrastructure.Json;
 using TeachingRecordSystem.Core.Services.DqtOutbox;
 using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.GetAnIdentityApi;
+using TeachingRecordSystem.TestCommon.Infrastructure;
 
 namespace TeachingRecordSystem.Api.IntegrationTests;
 
@@ -37,7 +38,7 @@ public abstract class TestBase
     protected TestBase(HostFixture hostFixture)
     {
         HostFixture = hostFixture;
-        _testServices = TestScopedServices.Reset();
+        _testServices = TestScopedServices.Reset(hostFixture.Services);
         SetCurrentApiClient([]);
     }
 
@@ -60,6 +61,8 @@ public abstract class TestBase
     public TestData TestData => HostFixture.Services.GetRequiredService<TestData>();
 
     public IXrmFakedContext XrmFakedContext => HostFixture.Services.GetRequiredService<IXrmFakedContext>();
+
+    public TestableFeatureProvider FeatureProvider => _testServices.FeatureProvider;
 
     public JsonContent CreateJsonContent(object requestBody) =>
         JsonContent.Create(requestBody, options: _jsonSerializerOptions);

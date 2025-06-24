@@ -23,15 +23,15 @@ public class AgeRangeSpecialismModel(
     public Guid PersonId { get; set; }
 
     [BindProperty]
-    [AgeRangeRequiredValidation("Select an age range")]
-    [Display(Name = "Edit age range specialism")]
+    [AgeRangeRequiredValidation]
+    [Display(Name = "Enter age range specialism")]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
     public void OnGet()
     {
         TrainingAgeSpecialism.AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom;
         TrainingAgeSpecialism.AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo;
-        TrainingAgeSpecialism.AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType;
+        TrainingAgeSpecialism.AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType.ToAgeSpecializationOption();
     }
 
     public async Task<IActionResult> OnPostAsync()
@@ -44,7 +44,7 @@ public class AgeRangeSpecialismModel(
             {
                 s.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
                 s.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
-                s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
+                s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType.ToTrainingAgeSpecialismType();
             });
         return Redirect(FromCheckAnswers ?
             linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :

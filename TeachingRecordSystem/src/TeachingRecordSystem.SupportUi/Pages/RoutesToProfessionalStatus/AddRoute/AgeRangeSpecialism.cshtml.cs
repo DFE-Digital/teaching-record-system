@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using TeachingRecordSystem.SupportUi.ValidationAttributes;
 
 namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRoute;
 
@@ -12,6 +13,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
          LinkGenerator.RouteAddPage(PreviousPage(AddRoutePage.AgeRangeSpecialism) ?? AddRoutePage.Status, PersonId, JourneyInstance!.InstanceId);
 
     [BindProperty]
+    [AgeRangeRequiredValidation]
     [Display(Name = "Add age range specialism")]
     public AgeRange TrainingAgeSpecialism { get; set; } = new();
 
@@ -21,7 +23,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             AgeRangeFrom = JourneyInstance!.State.TrainingAgeSpecialismRangeFrom,
             AgeRangeTo = JourneyInstance!.State.TrainingAgeSpecialismRangeTo,
-            AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType
+            AgeRangeType = JourneyInstance!.State.TrainingAgeSpecialismType.ToAgeSpecializationOption()
         };
     }
 
@@ -35,7 +37,7 @@ public class AgeRangeSpecialismModel(TrsLinkGenerator linkGenerator, ReferenceDa
         {
             s.TrainingAgeSpecialismRangeFrom = TrainingAgeSpecialism!.AgeRangeFrom;
             s.TrainingAgeSpecialismRangeTo = TrainingAgeSpecialism!.AgeRangeTo;
-            s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType;
+            s.TrainingAgeSpecialismType = TrainingAgeSpecialism!.AgeRangeType.ToTrainingAgeSpecialismType();
         });
 
         return Redirect(FromCheckAnswers ?

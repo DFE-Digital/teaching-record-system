@@ -1,3 +1,5 @@
+using TeachingRecordSystem.Core.DataStore.Postgres.Models;
+
 namespace TeachingRecordSystem.TestCommon;
 
 public partial class TestData
@@ -11,14 +13,16 @@ public partial class TestData
 
     public class CreateIntegrationTransactionBuilder
     {
-        public int? _totalCount;
-        public int? _successCount;
-        public int? _failureCount;
-        public int? _duplicateCount;
-        public string? _fileName;
-        public IntegrationTransactionImportStatus? _importStatus;
-        public IntegrationTransactionInterfaceType? _interfaceType;
-        public DateTime? _createdOn;
+        private int? _totalCount;
+        private int? _successCount;
+        private int? _failureCount;
+        private int? _duplicateCount;
+        private string? _fileName;
+        private IntegrationTransactionImportStatus? _importStatus;
+        private IntegrationTransactionInterfaceType? _interfaceType;
+        private DateTime? _createdOn;
+
+        private readonly List<Action<CreateIntegrationTransactionRecordBuilder>> _rowConfigurations = new();
 
         public CreateIntegrationTransactionBuilder WithTotalCount(int totalCount)
         {
@@ -90,7 +94,7 @@ public partial class TestData
         {
             if (_interfaceType is not null && _interfaceType != interfaceType)
             {
-                throw new InvalidOperationException("WithFileName has already been set");
+                throw new InvalidOperationException("WithInterfaceType has already been set");
             }
 
             _interfaceType = interfaceType;
@@ -99,7 +103,7 @@ public partial class TestData
 
         public CreateIntegrationTransactionBuilder WithCreatedOn(DateTime createdOn)
         {
-            if (_createdOn is not null && _createdOn != createdOn)
+            if (_createdOn is not null && _createdOn != createdOn && _createdOn != DateTime.MinValue)
             {
                 throw new InvalidOperationException("WithCreatedOn has already been set");
             }
@@ -108,14 +112,20 @@ public partial class TestData
             return this;
         }
 
+        public CreateIntegrationTransactionBuilder WithRow(Action<CreateIntegrationTransactionRecordBuilder> configure)
+        {
+            _rowConfigurations.Add(configure);
+            return this;
+        }
 
         public async Task<CreateIntegrationTransactionResult> ExecuteAsync(TestData testData)
         {
-            Int64 integrationId = 0;
+            long integrationId = 0;
+            var createdRecords = new List<CreateIntegrationTransactionRecords>();
 
             await testData.WithDbContextAsync(async dbContext =>
             {
-                var inegrationTransaction = new Core.DataStore.Postgres.Models.IntegrationTransaction()
+                var integrationTransaction = new IntegrationTransaction()
                 {
                     IntegrationTransactionId = 0,
                     CreatedDate = _createdOn!.Value,
@@ -126,24 +136,46 @@ public partial class TestData
                     FileName = _fileName!,
                     InterfaceType = _interfaceType!.Value,
                     ImportStatus = _importStatus!.Value,
+                    IntegrationTransactionRecords = new List<IntegrationTransactionRecord>()
                 };
-                dbContext.IntegrationTransactions.Add(inegrationTransaction);
+
+                foreach (var configure in _rowConfigurations)
+                {
+                    var builder = new CreateIntegrationTransactionRecordBuilder();
+                    configure(builder);
+
+                    var record = builder.Execute(); // Don't set IntegrationTransactionId manually
+                    integrationTransaction.IntegrationTransactionRecords.Add(record);
+                }
+
+                dbContext.IntegrationTransactions.Add(integrationTransaction);
                 await dbContext.SaveChangesAsync();
 
-                integrationId = inegrationTransaction.IntegrationTransactionId;
+                integrationId = integrationTransaction.IntegrationTransactionId;
 
+                createdRecords.AddRange(
+                    integrationTransaction.IntegrationTransactionRecords.Select(r => new CreateIntegrationTransactionRecords
+                    {
+                        IntegrationTransactionRecordId = r.IntegrationTransactionRecordId
+                    }));
             });
 
-            return new CreateIntegrationTransactionResult()
+            return new CreateIntegrationTransactionResult
             {
-                IntegrationTransactionId = integrationId
-
+                IntegrationTransactionId = integrationId,
+                Records = createdRecords
             };
         }
     }
-}
 
-public record CreateIntegrationTransactionResult
-{
-    public required long IntegrationTransactionId { get; init; }
+    public record CreateIntegrationTransactionResult
+    {
+        public required long IntegrationTransactionId { get; init; }
+        public required List<CreateIntegrationTransactionRecords> Records { get; init; }
+    }
+
+    public record CreateIntegrationTransactionRecords
+    {
+        public required long IntegrationTransactionRecordId { get; init; }
+    }
 }
