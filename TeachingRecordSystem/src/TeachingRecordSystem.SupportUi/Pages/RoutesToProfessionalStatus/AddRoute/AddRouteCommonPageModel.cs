@@ -113,8 +113,8 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(next);
 
-        if (CurrentPage > RoutePage.Route && !JourneyInstance!.State.RouteToProfessionalStatusId.HasValue ||
-            CurrentPage > RoutePage.Status && !JourneyInstance!.State.Status.HasValue)
+        if (CurrentPage > RoutePage.Route && !JourneyInstance!.State.NewRouteToProfessionalStatusId.HasValue && !JourneyInstance!.State.RouteToProfessionalStatusId.HasValue ||
+            CurrentPage > RoutePage.Status && !JourneyInstance!.State.NewStatus.HasValue && !JourneyInstance!.State.Status.HasValue)
         {
             context.Result = new BadRequestResult();
             return;
@@ -124,12 +124,20 @@ public abstract class AddRouteCommonPageModel(TrsLinkGenerator linkGenerator, Re
         PersonName = personInfo.Name;
         PersonId = personInfo.PersonId;
 
-        if (JourneyInstance!.State.RouteToProfessionalStatusId.HasValue)
+        if (JourneyInstance!.State.NewRouteToProfessionalStatusId.HasValue)
+        {
+            Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.NewRouteToProfessionalStatusId.Value);
+        }
+        else if (JourneyInstance!.State.RouteToProfessionalStatusId.HasValue)
         {
             Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         }
 
-        if (JourneyInstance!.State.Status.HasValue)
+        if (JourneyInstance!.State.NewStatus.HasValue)
+        {
+            Status = JourneyInstance!.State.NewStatus.Value;
+        }
+        else if (JourneyInstance!.State.Status.HasValue)
         {
             Status = JourneyInstance!.State.Status.Value;
         }
