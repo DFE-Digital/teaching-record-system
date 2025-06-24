@@ -76,8 +76,15 @@
                         <govuk-summary-list-row-value data-testid="training-country-@professionalStatus.QualificationId">@(professionalStatus.TrainingCountry?.Name ?? string.Empty)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-agespecialism-@professionalStatus.QualificationId">@(professionalStatus.TrainingAgeSpecialismType.HasValue ? professionalStatus.TrainingAgeSpecialismType.GetDisplayName() : "None")</govuk-summary-list-row-value>
+                    <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
+                        @if (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeFrom is not null)
+                        {
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-agespecialism-@professionalStatus.QualificationId">From @professionalStatus.TrainingAgeSpecialismRangeFrom to @professionalStatus.TrainingAgeSpecialismRangeTo</govuk-summary-list-row-value>
+                        }
+                        else
+                        {
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-agespecialism-@professionalStatus.QualificationId">@professionalStatus.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
+                        }
                     </govuk-summary-list-row>
                     <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
