@@ -1,3 +1,5 @@
 wwwroot/lib
 wwwroot/Styles/*.css
 wwwroot/Styles/*.css.map
+wwwroot/assets
+wwwroot/govuk-frontend.min.js
