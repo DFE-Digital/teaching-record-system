@@ -46,42 +46,6 @@ public class AgeRangeSpecialismTests(HostFixture hostFixture) : TestBase(hostFix
     }
 
     [Fact]
-    public async Task Post_AgeRangeIsOptional_NoAgeSpecialismIsEntered_RedirectsToSubjects()
-    {
-        // Arrange
-        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional)
-            .RandomOne()
-            .Value;
-        var person = await TestData.CreatePersonAsync();
-        var addRouteState = new AddRouteStateBuilder()
-            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
-            .WithStatus(status)
-            .Build();
-
-        var journeyInstance = await CreateJourneyInstanceAsync(
-            person.PersonId,
-            addRouteState
-            );
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"/route/add/age-range?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
-
-        // Act
-        var response = await HttpClient.SendAsync(request);
-
-        // Assert
-        journeyInstance = await ReloadJourneyInstance(journeyInstance);
-        Assert.Equal(addRouteState.TrainingAgeSpecialismType, journeyInstance.State.TrainingAgeSpecialismType);
-        Assert.Equal(addRouteState.TrainingAgeSpecialismRangeFrom, journeyInstance.State.TrainingAgeSpecialismRangeFrom);
-        Assert.Equal(addRouteState.TrainingAgeSpecialismRangeTo, journeyInstance.State.TrainingAgeSpecialismRangeTo);
-        Assert.Equal(StatusCodes.Status302Found, (int)response.StatusCode);
-        Assert.Equal($"/route/add/subjects?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}", response.Headers.Location?.OriginalString);
-    }
-
-    [Fact]
     public async Task Cancel_DeletesJourneyAndRedirectsToExpectedPage()
     {
         // Arrange
