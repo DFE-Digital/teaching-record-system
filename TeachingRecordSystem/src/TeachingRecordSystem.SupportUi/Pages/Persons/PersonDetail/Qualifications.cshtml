@@ -2,6 +2,7 @@
 @using TeachingRecordSystem.SupportUi.Pages.Common;
 @using TeachingRecordSystem.SupportUi.Infrastructure.Security;
 @using Microsoft.AspNetCore.Authorization;
+@using TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus
 @inject IAuthorizationService AuthorizationService
 @model TeachingRecordSystem.SupportUi.Pages.Persons.PersonDetail.QualificationsModel
 @{
@@ -27,10 +28,7 @@
         @foreach (var professionalStatus in Model.ProfessionalStatuses)
         {
             var statusTitle = ProfessionalStatusStatusRegistry.GetTitle(professionalStatus.Status);
-            var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.Name} {statusTitle}" +
-            (professionalStatus.HoldsFrom.HasValue && professionalStatus.TrainingEndDate.HasValue
-            ? $" {professionalStatus.TrainingEndDate.Value.ToString(UiDefaults.DateOnlyDisplayFormat)}"
-            : "");
+            var cardTitle = $"{professionalStatus.RouteToProfessionalStatusType?.Name}";
 
             <govuk-summary-card data-testid="professionalstatus-id-@professionalStatus.QualificationId">
                 <govuk-summary-card-title>@cardTitle</govuk-summary-card-title>
@@ -46,63 +44,97 @@
                         <govuk-summary-list-row-key>Route</govuk-summary-list-row-key>
                         <govuk-summary-list-row-value data-testid="route-type-@professionalStatus.QualificationId">@(professionalStatus.RouteToProfessionalStatusType!.Name)</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
-                    <govuk-summary-list-row-value data-testid="route-status-@professionalStatus.QualificationId">@statusTitle</govuk-summary-list-row-value>
-                </govuk-summary-list-row>
-                <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-start-date-@professionalStatus.QualificationId">@(professionalStatus.TrainingStartDate.HasValue ? professionalStatus.TrainingStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
                     <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-end-date-@professionalStatus.QualificationId">@(professionalStatus.TrainingEndDate.HasValue ? professionalStatus.TrainingEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
+                        <govuk-summary-list-row-key>Status</govuk-summary-list-row-key>
+                        <govuk-summary-list-row-value data-testid="route-status-@professionalStatus.QualificationId">@statusTitle</govuk-summary-list-row-value>
                     </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Professional status date</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="award-date-@professionalStatus.QualificationId">@(professionalStatus.HoldsFrom.HasValue ? professionalStatus.HoldsFrom!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-exemption-@professionalStatus.QualificationId" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value == true ? "Yes" : "No" : null)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-provider-@professionalStatus.QualificationId">@(professionalStatus.TrainingProvider?.Name ?? string.Empty)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-degreetype-@professionalStatus.QualificationId">@(professionalStatus.DegreeType?.Name ?? string.Empty)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-country-@professionalStatus.QualificationId">@(professionalStatus.TrainingCountry?.Name ?? string.Empty)</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType!.TrainingStartDateRequired, professionalStatus.Status.GetStartDateRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Start date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-start-date-@professionalStatus.QualificationId">@(professionalStatus.TrainingStartDate.HasValue ? professionalStatus.TrainingStartDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.TrainingEndDateRequired, professionalStatus.Status.GetEndDateRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>End date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-end-date-@professionalStatus.QualificationId">@(professionalStatus.TrainingEndDate.HasValue ? professionalStatus.TrainingEndDate!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.HoldsFromRequired, professionalStatus.Status.GetAwardDateRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Professional status date</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="holdsfrom-date-@professionalStatus.QualificationId">@(professionalStatus.HoldsFrom.HasValue ? professionalStatus.HoldsFrom!.Value.ToString(UiDefaults.DateOnlyDisplayFormat) : string.Empty)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.InductionExemptionRequired, professionalStatus.Status.GetInductionExemptionRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-exemption-@professionalStatus.QualificationId">@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value == true ? "Yes" : "No" : null)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.TrainingProviderRequired, professionalStatus.Status.GetTrainingProviderRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-provider-@professionalStatus.QualificationId">@(professionalStatus.TrainingProvider?.Name ?? string.Empty)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.DegreeTypeRequired, professionalStatus.Status.GetDegreeTypeRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-degreetype-@professionalStatus.QualificationId">@(professionalStatus.DegreeType?.Name ?? string.Empty)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.TrainingCountryRequired, professionalStatus.Status.GetCountryRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value use-empty-fallback data-testid="training-country-@professionalStatus.QualificationId">@(professionalStatus.TrainingCountry?.Name ?? string.Empty)</govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.TrainingAgeSpecialismTypeRequired, professionalStatus.Status.GetAgeSpecialismRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
                         <govuk-summary-list-row-key>Age range</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-agespecialism-@professionalStatus.QualificationId">@(professionalStatus.TrainingAgeSpecialismType.HasValue ? professionalStatus.TrainingAgeSpecialismType.GetDisplayName() : "None")</govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
-                    <govuk-summary-list-row>
-                        <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
-                        <govuk-summary-list-row-value data-testid="training-subjects-@professionalStatus.QualificationId">
-                            @if (professionalStatus.TrainingSubjectIds is not null)
+                            @if (professionalStatus.TrainingAgeSpecialismRangeFrom is not null && professionalStatus.TrainingAgeSpecialismRangeFrom is not null)
                             {
-                                <ul class="govuk-list">
-                                    @foreach (var subjectid in professionalStatus.TrainingSubjectIds)
-                                    {
-                                        if (Model.TrainingSubjects != null && Model.TrainingSubjects.TryGetValue(subjectid, out var subjectName))
-                                        {
-                                            <li>@subjectName</li>
-                                        }
-                                    }
-                                </ul>
+                                <govuk-summary-list-row-value use-empty-fallback data-testid="training-agespecialism-@professionalStatus.QualificationId">From @professionalStatus.TrainingAgeSpecialismRangeFrom to @professionalStatus.TrainingAgeSpecialismRangeTo</govuk-summary-list-row-value>
                             }
                             else
                             {
-                                <span use-empty-fallback></span>
+                                <govuk-summary-list-row-value use-empty-fallback data-testid="training-agespecialism-@professionalStatus.QualificationId">@professionalStatus.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
                             }
-                        </govuk-summary-list-row-value>
-                    </govuk-summary-list-row>
+                        </govuk-summary-list-row>
+                    }
+                    @if (QuestionDriverHelper.FieldRequired(professionalStatus.RouteToProfessionalStatusType.TrainingSubjectsRequired, professionalStatus.Status.GetSubjectsRequirement()) != FieldRequirement.NotApplicable)
+                    {
+                        <govuk-summary-list-row>
+                            <govuk-summary-list-row-key>Subjects</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-value data-testid="training-subjects-@professionalStatus.QualificationId">
+                                @if (professionalStatus.TrainingSubjectIds is not null && professionalStatus.TrainingSubjectIds.Length > 0)
+                                {
+                                    <ul class="govuk-list">
+                                        @foreach (var subjectid in professionalStatus.TrainingSubjectIds)
+                                        {
+                                            if (Model.TrainingSubjects != null && Model.TrainingSubjects.TryGetValue(subjectid, out var subjectName))
+                                            {
+                                                <li>@subjectName</li>
+                                            }
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span use-empty-fallback></span>
+                                }
+                            </govuk-summary-list-row-value>
+                        </govuk-summary-list-row>
+                    }
                 </govuk-summary-list>
             </govuk-summary-card>
         }
