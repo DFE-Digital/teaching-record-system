@@ -138,7 +138,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         doc.AssertRowContentMatches("End date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
         doc.AssertChangeLinkExists("End date");
         doc.AssertRowContentMatches("Professional status date", awardDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Has exemption", "Not provided");
+        doc.AssertRowContentMatches("Induction exemption", "Not provided");
         doc.AssertRowContentMatches("Training provider", trainingProvider.Name);
         doc.AssertChangeLinkExists("Training provider");
         doc.AssertRowContentMatches("Degree type", degreeType.Name);
@@ -192,7 +192,7 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
 
     [Theory]
     [InlineData("Awarded date", "HoldsFromRequired")]
-    [InlineData("Has exemption", "InductionExemptionRequired")]
+    [InlineData("Induction exemption", "InductionExemptionRequired")]
     public async Task Get_FieldNotApplicable_FieldNotShown(string elementText, string propertySelector)
     {
         // Arrange
@@ -272,8 +272,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Has exemption", expectedContent);
-        doc.AssertChangeLinkExists("Has exemption");
+        doc.AssertRowContentMatches("Induction exemption", expectedContent);
+        doc.AssertChangeLinkExists("Induction exemption");
     }
 
     [Fact]
@@ -320,8 +320,8 @@ public class DetailTests(HostFixture hostFixture) : TestBase(hostFixture)
         // Assert
         var doc = await AssertEx.HtmlResponseAsync(response);
 
-        doc.AssertRowContentMatches("Has exemption", "Yes");
-        doc.AssertNoChangeLink("Has exemption");
+        doc.AssertRowContentMatches("Induction exemption", "Yes");
+        doc.AssertNoChangeLink("Induction exemption");
     }
 
     private Task<JourneyInstance<EditRouteState>> CreateJourneyInstanceAsync(Guid qualificationId, EditRouteState? state = null) =>

@@ -95,7 +95,7 @@
             @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
             {
                 <govuk-summary-list-row>
-                    <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
+                    <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
                     <govuk-summary-list-row-value data-testid="exemption" use-empty-fallback>@(professionalStatus.ExemptFromInduction.HasValue ? professionalStatus.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                 </govuk-summary-list-row>
             }
@@ -242,7 +242,7 @@
                     @if (updatedEvent.Changes.HasFlag(RouteToProfessionalStatusUpdatedEventChanges.ExemptFromInduction))
                     {
                         <govuk-summary-list-row>
-                            <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
+                            <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
                             <govuk-summary-list-row-value data-testid="old-exemption" use-empty-fallback>@(oldDetails.ExemptFromInduction.HasValue ? oldDetails.ExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
                         </govuk-summary-list-row>
                     }

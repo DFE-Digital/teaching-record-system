@@ -175,7 +175,7 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         var doc = await AssertEx.HtmlResponseAsync(response);
 
         doc.AssertRowContentMatches("Professional status date", endDate.ToString(UiDefaults.DateOnlyDisplayFormat));
-        doc.AssertRowContentMatches("Has exemption", "Yes");
+        doc.AssertRowContentMatches("Induction exemption", "Yes");
     }
 
     [Fact]

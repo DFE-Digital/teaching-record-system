@@ -50,7 +50,6 @@ if (builder.Environment.IsDevelopment())
 
 builder.Services.AddGovUkFrontend(options =>
 {
-    options.Rebrand = true;
     options.DefaultButtonPreventDoubleClick = true;
     options.DefaultFileUploadJavaScriptEnhancements = true;
 });
