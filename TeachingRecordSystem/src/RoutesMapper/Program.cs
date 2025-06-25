@@ -76,36 +76,6 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> MapAsync()
     const int pageSize = 1000;
 
     var columns = new ColumnSet(Contact.Fields.dfeta_qtlsdate);
-    //// 000cbf52-d2ae-e311-b8ed-005056822391 - 1 ITT and 1 QTS = 1 entity total returned (attributes for ITT and QTS all in that one entity)
-    //// bc9a990f-298f-e811-9100-000d3a269589 - 2 ITT and 2  = 4 entities returned (cross join?)
-    //// 75900ee5-e10a-e811-b75f-000d3a2a80d5 - 2 ITT and 1 QTS
-    //// c25d47dd-8221-e511-abb0-005056822390 - 1 ITT and 2 QTS
-    //// aff3fe76-5eca-e511-bff9-00505682090b - 4 ITT and 4 QTS = 16 entities returned (cross join?)
-    ////var contactFilter = new FilterExpression();
-    ////contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.In, [
-    ////    Guid.Parse("143de155-ac21-e811-af06-000d3a2a80d5"),
-    ////    Guid.Parse("fd408cd9-46ad-e711-bf26-000d3a2a80d5"),
-    ////    Guid.Parse("c25d47dd-8221-e511-abb0-005056822390"),
-    ////    Guid.Parse("841e52bc-d6ae-e311-b8ed-005056822391"),
-    ////    Guid.Parse("0723ffe5-0baf-e311-b8ed-005056822391"),
-    ////    Guid.Parse("84e845f4-0eaf-e311-b8ed-005056822391"),
-    ////    Guid.Parse("f796a972-5e35-e411-95b5-005056822390"),
-    ////    Guid.Parse("b012e564-e7ce-e411-8070-005056822391"),
-    ////    Guid.Parse("2b16355d-eeae-e311-b8ed-005056822391"),
-    ////    Guid.Parse("13ec29b4-faae-e311-b8ed-005056822391"),
-    ////    Guid.Parse("ef97c2e9-10af-e311-b8ed-005056822391"),
-    ////    Guid.Parse("38a1c26c-18af-e311-b8ed-005056822391"),
-    ////    Guid.Parse("1684e32e-7be1-e711-bf26-000d3a2a80d5"),
-    ////    Guid.Parse("9b114d60-c8d5-e911-a956-000d3a2aadac"),
-    ////    Guid.Parse("bf6f7fc5-ccae-e311-b8ed-005056822391"),
-    ////    Guid.Parse("5d1c38a5-d7ae-e311-b8ed-005056822391"),
-    ////    Guid.Parse("d8aa477f-02af-e311-b8ed-005056822391")
-    ////]);
-    ////contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, Guid.Parse("143de155-ac21-e811-af06-000d3a2a80d5"));
-    ////ff5f0542-08af-e311-b8ed-005056822391 - has EYTS (training) and QTS
-    ////05946d87-05af-e311-b8ed-005056822391 - has EYPS and a deffered QTS (not training)
-    ////12ee469c-01af-e311-b8ed-005056822391 - has Early Years Trainee + QTS
-    ////contactFilter.AddCondition(Contact.PrimaryIdAttribute, ConditionOperator.Equal, Guid.Parse("aff3fe76-5eca-e511-bff9-00505682090b"));
 
     var query = new QueryExpression(Contact.EntityLogicalName)
     {
@@ -118,8 +88,7 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> MapAsync()
         {
             Count = pageSize,
             PageNumber = 1
-        },
-        ////Criteria = contactFilter
+        }
     };
 
     var ittLink = query.AddLink(
@@ -187,7 +156,6 @@ async IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[]> MapAsync()
 
         if (result.MoreRecords)
         {
-            //break;
             query.PageInfo.PageNumber++;
             query.PageInfo.PagingCookie = result.PagingCookie;
         }
@@ -215,8 +183,15 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
     csvWriter.WriteField("QTS ID");
     csvWriter.WriteField("Route ID");
     csvWriter.WriteField("Route Name");
+    csvWriter.WriteField("Age Specialism Type");
+    csvWriter.WriteField("Age Specialism Range From");
+    csvWriter.WriteField("Age Specialism Range To");
     csvWriter.WriteField("Status");
     csvWriter.WriteField("Holds From");
+    csvWriter.WriteField("Degree Type");
+    csvWriter.WriteField("Training Provider Name");
+    csvWriter.WriteField("Training Country");
+    csvWriter.WriteField("Training Subject Codes");
     csvWriter.WriteField("Teacher Status Value");
     csvWriter.WriteField("Teacher Status Name");
     csvWriter.WriteField("QTS Date");
@@ -226,9 +201,16 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
     csvWriter.WriteField("Partial Recognition Date");
     csvWriter.WriteField("QTLS Date");
     csvWriter.WriteField("Programme Type");
+    csvWriter.WriteField("DQT Age Range From");
+    csvWriter.WriteField("DQT Age Range To");
     csvWriter.WriteField("ITT Result");
     csvWriter.WriteField("ITT Qual Value");
     csvWriter.WriteField("ITT Qual Name");
+    csvWriter.WriteField("ITT Provider Name");
+    csvWriter.WriteField("ITT Country");
+    csvWriter.WriteField("ITT Subject 1");
+    csvWriter.WriteField("ITT Subject 2");
+    csvWriter.WriteField("ITT Subject 3");
     csvWriter.WriteField("Teacher Status Derived Route ID");
     csvWriter.WriteField("Teacher Status Derived Route Name");
     csvWriter.WriteField("Programme Type Derived Route ID");
@@ -268,6 +250,42 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
                 ittQualificationDerivedRoute = await referenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(r.IttQualificationDerivedRouteId.Value);
             }
 
+            var degreeType = r.ProfessionalStatus?.DegreeTypeId is not null
+                ? await referenceDataCache.GetDegreeTypeByIdAsync(r.ProfessionalStatus.DegreeTypeId!.Value)
+                : null;
+
+            var trainingProvider = r.ProfessionalStatus?.TrainingProviderId is not null
+                ? await referenceDataCache.GetTrainingProviderByIdAsync(r.ProfessionalStatus.TrainingProviderId.Value)
+                : null;
+
+            var trainingCountry = r.ProfessionalStatus?.TrainingCountryId is not null
+                ? await referenceDataCache.GetTrainingCountryByIdAsync(r.ProfessionalStatus.TrainingCountryId)
+                : null;
+
+            var trainingSubjects = r.ProfessionalStatus?.TrainingSubjectIds is not null
+                ? await Task.WhenAll(r.ProfessionalStatus.TrainingSubjectIds.Select(id => referenceDataCache.GetTrainingSubjectsByIdAsync(id)))
+                : [];
+
+            var ittProvider = r.IttProviderId is not null
+                ? await referenceDataCache.GetIttProviderByIdAsync(r.IttProviderId.Value)
+                : null;
+
+            var ittCountry = r.IttCountryId is not null
+                ? await referenceDataCache.GetCountryByIdAsync(r.IttCountryId.Value)
+                : null;
+
+            var ittSubject1 = r.IttSubjectId1 is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(r.IttSubjectId1.Value)
+                : null;
+
+            var ittSubject2 = r.IttSubjectId2 is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(r.IttSubjectId2.Value)
+                : null;
+
+            var ittSubject3 = r.IttSubjectId3 is not null
+                ? await referenceDataCache.GetIttSubjectBySubjectIdAsync(r.IttSubjectId3.Value)
+                : null;
+
             csvWriter.WriteField(r.ContactId);
             csvWriter.WriteField(r.Success);
             csvWriter.WriteField(r.FailedReason);
@@ -275,8 +293,15 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
             csvWriter.WriteField(r.QtsRegistrationId);
             csvWriter.WriteField(route?.RouteToProfessionalStatusTypeId);
             csvWriter.WriteField(route?.Name);
+            csvWriter.WriteField(r.ProfessionalStatus?.TrainingAgeSpecialismType);
+            csvWriter.WriteField(r.ProfessionalStatus?.TrainingAgeSpecialismRangeFrom);
+            csvWriter.WriteField(r.ProfessionalStatus?.TrainingAgeSpecialismRangeTo);
             csvWriter.WriteField(r.ProfessionalStatus?.Status.ToString());
             csvWriter.WriteField(r.ProfessionalStatus?.HoldsFrom?.ToString("dd/MM/yyyy"));
+            csvWriter.WriteField(degreeType?.Name);
+            csvWriter.WriteField(trainingProvider?.Name);
+            csvWriter.WriteField(trainingCountry?.CountryId);
+            csvWriter.WriteField(JsonSerializer.Serialize(trainingSubjects.Select(s => s.Reference).ToArray()));
             csvWriter.WriteField(r.TeacherStatus?.dfeta_Value);
             csvWriter.WriteField(r.TeacherStatus?.dfeta_name);
             csvWriter.WriteField(r.QtsDate?.ToString("dd/MM/yyyy"));
@@ -286,9 +311,16 @@ async Task WriteResultsAsync(IAsyncEnumerable<TrsDataSyncHelper.IttQtsMapResult[
             csvWriter.WriteField(r.PartialRecognitionDate?.ToString("dd/MM/yyyy"));
             csvWriter.WriteField(r.QtlsDate?.ToString("dd/MM/yyyy"));
             csvWriter.WriteField(r.ProgrammeType);
+            csvWriter.WriteField(r.ProfessionalStatus?.DqtAgeRangeFrom);
+            csvWriter.WriteField(r.ProfessionalStatus?.DqtAgeRangeTo);
             csvWriter.WriteField(r.IttResult);
             csvWriter.WriteField(r.IttQualification?.dfeta_Value);
             csvWriter.WriteField(r.IttQualification?.dfeta_name);
+            csvWriter.WriteField(ittProvider?.Name);
+            csvWriter.WriteField(ittCountry?.dfeta_Value);
+            csvWriter.WriteField(ittSubject1?.dfeta_Value);
+            csvWriter.WriteField(ittSubject2?.dfeta_Value);
+            csvWriter.WriteField(ittSubject3?.dfeta_Value);
             csvWriter.WriteField(r.StatusDerivedRouteId);
             csvWriter.WriteField(statusDerivedRoute?.Name);
             csvWriter.WriteField(r.ProgrammeTypeDerivedRouteId);

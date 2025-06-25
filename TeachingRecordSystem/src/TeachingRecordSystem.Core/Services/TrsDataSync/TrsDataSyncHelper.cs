@@ -2375,7 +2375,7 @@ public class TrsDataSyncHelper(
             // QTLS is stored directly on Contact record
             if (qtlsDate is not null)
             {
-                var ps = CreateProfessionalStatus(
+                var ps = await CreateProfessionalStatusAsync(
                     clock,
                     allRoutes,
                     contactId,
@@ -2676,7 +2676,7 @@ public class TrsDataSyncHelper(
                         hasWelshItt = true;
                     }
 
-                    var ps = CreateProfessionalStatus(
+                    var ps = await CreateProfessionalStatusAsync(
                         clock,
                         allRoutes,
                         contactId,
@@ -2837,7 +2837,7 @@ public class TrsDataSyncHelper(
 
                 var routeId = derivedRouteIds.Single();
 
-                var ps = CreateProfessionalStatus(
+                var ps = await CreateProfessionalStatusAsync(
                         clock,
                         allRoutes,
                         contactId,
@@ -3070,7 +3070,7 @@ public class TrsDataSyncHelper(
                             contactQtsRowCount))
                 };
 
-            static RouteToProfessionalStatus CreateProfessionalStatus(
+            static async Task<RouteToProfessionalStatus> CreateProfessionalStatusAsync(
                 IClock clock,
                 RouteToProfessionalStatusType[] allRoutes,
                 Guid personId,
@@ -3085,6 +3085,40 @@ public class TrsDataSyncHelper(
                 dfeta_earlyyearsstatus? eyStatus)
             {
                 var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeId);
+                var trainingAgeSpecialism = AgeRange.ConvertToTrsTrainingAgeSpecialism(itt?.dfeta_AgeRangeFrom, itt?.dfeta_AgeRangeTo);
+                var degreeTypeId = ittQualification?.ConvertToTrsDegreeTypeId() ?? null;
+                var country = itt?.dfeta_CountryId is not null ? await itt.dfeta_CountryId.Id.ConvertToTrsCountryAsync(referenceDataCache) : null;
+                var trainingSubjectIds = new List<Guid>();
+                if (itt?.dfeta_Subject1Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject1Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                if (itt?.dfeta_Subject2Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject2Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                if (itt?.dfeta_Subject3Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject3Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                var trainingProvider = itt?.dfeta_EstablishmentId is not null
+                    ? await itt.dfeta_EstablishmentId.Id.ConvertToTrsTrainingProviderAsync(referenceDataCache)
+                    : null;
 
                 return new RouteToProfessionalStatus
                 {
@@ -3104,28 +3138,27 @@ public class TrsDataSyncHelper(
                     Status = status,
                     TrainingStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
                     TrainingEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
-                    TrainingAgeSpecialismType = default, // TODO
-                    TrainingAgeSpecialismRangeFrom = default, // itt?.dfeta_AgeRangeFrom
-                    TrainingAgeSpecialismRangeTo = default, // itt?.dfeta_AgeRangeTo
+                    TrainingAgeSpecialismType = trainingAgeSpecialism?.TrainingAgeSpecialismType,
+                    TrainingAgeSpecialismRangeFrom = trainingAgeSpecialism?.TrainingAgeSpecialismRangeFrom,
+                    TrainingAgeSpecialismRangeTo = trainingAgeSpecialism?.TrainingAgeSpecialismRangeTo,
                     HoldsFrom = awardedDate,
                     DegreeTypeId = null, // TODO
                     ExemptFromInduction = false,  // TODO  
                     //InductionExemptionReasonId = inductionExemptionReasonId,  // FIXME
-                    TrainingSubjectIds = [], // TODO
-                    TrainingCountryId = null, // TODO
-                    TrainingProviderId = null, // TODO
+                    TrainingSubjectIds = trainingSubjectIds.ToArray(),
+                    TrainingCountryId = country?.CountryId,
+                    TrainingProviderId = trainingProvider?.TrainingProviderId,
                     DqtTeacherStatusName = teacherStatus?.dfeta_name,
                     DqtTeacherStatusValue = teacherStatus?.dfeta_Value,
                     DqtEarlyYearsStatusName = eyStatus?.dfeta_name,
                     DqtEarlyYearsStatusValue = eyStatus?.dfeta_Value,
                     DqtInitialTeacherTrainingId = itt?.Id,
-                    DqtQtsRegistrationId = qts?.Id
+                    DqtQtsRegistrationId = qts?.Id,
+                    DqtAgeRangeFrom = itt?.dfeta_AgeRangeFrom.ToString(),
+                    DqtAgeRangeTo = itt?.dfeta_AgeRangeTo.ToString(),
                 };
             }
         }
-
-        static DateTime MinDate(params DateTime?[] dts) => dts.Where(d => d.HasValue).Min(d => d!.Value);
-        static DateTime MaxDate(params DateTime?[] dts) => dts.Where(d => d.HasValue).Max(d => d!.Value);
     }
 
     public sealed class IttQtsMapResult
@@ -3163,6 +3196,16 @@ public class TrsDataSyncHelper(
         public dfeta_ITTResult? IttResult { get; private set; }
 
         public dfeta_ittqualification? IttQualification { get; private set; }
+
+        public Guid? IttProviderId { get; private set; }
+
+        public Guid? IttSubjectId1 { get; private set; }
+
+        public Guid? IttSubjectId2 { get; private set; }
+
+        public Guid? IttSubjectId3 { get; private set; }
+
+        public Guid? IttCountryId { get; private set; }
 
         public Guid? StatusDerivedRouteId { get; private set; }
 
@@ -3220,6 +3263,11 @@ public class TrsDataSyncHelper(
                 QtlsDate = qtlsDate,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
                 IttResult = itt?.dfeta_Result,
+                IttProviderId = itt?.dfeta_EstablishmentId?.Id,
+                IttSubjectId1 = itt?.dfeta_Subject1Id?.Id,
+                IttSubjectId2 = itt?.dfeta_Subject2Id?.Id,
+                IttSubjectId3 = itt?.dfeta_Subject3Id?.Id,
+                IttCountryId = itt?.dfeta_CountryId?.Id,
                 IttQualification = ittQualification,
                 StatusDerivedRouteId = statusDerivedRouteId,
                 ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
@@ -3264,6 +3312,11 @@ public class TrsDataSyncHelper(
                 QtlsDate = qtlsDate,
                 ProgrammeType = itt?.dfeta_ProgrammeType,
                 IttResult = itt?.dfeta_Result,
+                IttProviderId = itt?.dfeta_EstablishmentId?.Id,
+                IttSubjectId1 = itt?.dfeta_Subject1Id?.Id,
+                IttSubjectId2 = itt?.dfeta_Subject2Id?.Id,
+                IttSubjectId3 = itt?.dfeta_Subject3Id?.Id,
+                IttCountryId = itt?.dfeta_CountryId?.Id,
                 IttQualification = ittQualification,
                 StatusDerivedRouteId = statusDerivedRouteId,
                 ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,

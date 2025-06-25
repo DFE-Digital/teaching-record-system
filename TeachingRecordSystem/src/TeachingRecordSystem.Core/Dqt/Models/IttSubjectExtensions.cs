@@ -23,4 +23,38 @@ public static class IttSubjectExtensions
 
         return (false, default);
     }
+
+    public static async Task<TrainingSubject> ConvertToTrsTrainingSubjectAsync(this Guid ittSubjectId, ReferenceDataCache referenceDataCache)
+    {
+        var result = await ittSubjectId.TryConvertToTrsTrainingSubjectAsync(referenceDataCache);
+        if (result.IsSuccess)
+        {
+            return result.Result!;
+        }
+        throw new ArgumentException($"{ittSubjectId} cannot be converted to {nameof(TrainingSubject)}.", nameof(TrainingSubject));
+    }
+
+    public static async Task<(bool IsSuccess, TrainingSubject? Result)> TryConvertToTrsTrainingSubjectAsync(this Guid ittSubjectId, ReferenceDataCache referenceDataCache)
+    {
+        var ittSubject = await referenceDataCache.GetIttSubjectBySubjectIdAsync(ittSubjectId);
+        if (ittSubject is null)
+        {
+            return (false, default);
+        }
+
+        // Very specific mapping to avoid duplicate references
+        var trsReference = ittSubject.dfeta_Value;
+        if (trsReference == "C600" && ittSubject.dfeta_name == "Physical Education")
+        {
+            trsReference = "C600PE";
+        }
+
+        var trainingSubject = await referenceDataCache.GetTrainingSubjectsByReferenceAsync(trsReference);
+        if (trainingSubject is not null)
+        {
+            return (true, trainingSubject);
+        }
+
+        return (false, default);
+    }
 }

@@ -1,3 +1,5 @@
+using System.ServiceModel;
+using Microsoft.Xrm.Sdk;
 using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Dqt;
@@ -381,7 +383,7 @@ public class ReferenceDataCache(
     private Task<dfeta_ittsubject[]> EnsureIttSubjectsAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttSubjectsTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllActiveIttSubjectsQuery()));
+            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttSubjectsQuery()));
 
     private Task<dfeta_ittqualification[]> EnsureIttQualificationsAsync() =>
         LazyInitializer.EnsureInitialized(
@@ -391,7 +393,38 @@ public class ReferenceDataCache(
     private Task<Account[]> EnsureIttProvidersAsync() =>
         LazyInitializer.EnsureInitialized(
             ref _getIttProvidersTask,
-            () => crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttProvidersQuery()));
+            async () =>
+            {
+                var crmQuery = new GetAllIttProvidersWithCorrespondingIttRecordsPagedQuery(PageNumber: 1, Pagesize: 1000);
+                var ittProviders = new List<Account>();
+
+                while (true)
+                {
+                    PagedProviderResults result;
+                    try
+                    {
+                        result = await crmQueryDispatcher.ExecuteQueryAsync(crmQuery);
+                    }
+                    catch (FaultException<OrganizationServiceFault> e) when (e.IsCrmRateLimitException(out var retryAfter))
+                    {
+                        await Task.Delay(retryAfter);
+                        continue;
+                    }
+
+                    ittProviders.AddRange(result.Providers);
+
+                    if (result.MoreRecords)
+                    {
+                        crmQuery = crmQuery with { PageNumber = crmQuery.PageNumber + 1, PagingCookie = result.PagingCookie };
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                return ittProviders.ToArray();
+            });
 
     private Task<InductionExemptionReason[]> EnsureInductionExemptionReasonsAsync() =>
         LazyInitializer.EnsureInitialized(
