@@ -2154,16 +2154,16 @@
       },
       "System.Text.Encodings.Web": {
         "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "Vg8eB5Tawm1IFqj4TVK1czJX89rhFxJo9ELqc/Eiq0eXy13RK00eubyU6TJE6y+GQXjyV5gSfiewDUZjQgSE0w==",
-        "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
-        }
+        "resolved": "8.0.0",
+        "contentHash": "yev/k9GHAEGx2Rg3/tU6MQh4HGBXJs70y7j1LaM1i/ER9po+6nnQ6RRqTJn1E7Xu0fbIFK80Nh5EoODxrbxwBQ=="
       },
       "System.Text.Json": {
         "type": "Transitive",
-        "resolved": "8.0.5",
-        "contentHash": "0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg=="
+        "resolved": "8.0.0",
+        "contentHash": "OdrZO2WjkiEG6ajEFRABTRCi/wuXQPxeV6g8xvUJqdxMvvuCCEk86zPla8UiIQJz3durtUEbNyY/3lIhS0yZvQ==",
+        "dependencies": {
+          "System.Text.Encodings.Web": "8.0.0"
+        }
       },
       "System.Text.RegularExpressions": {
         "type": "Transitive",
@@ -2356,7 +2356,7 @@
         "dependencies": {
           "DartSassBuilder": "[1.1.0, )",
           "Dfe.Analytics": "[0.2.5, )",
-          "GovUk.Frontend.AspNetCore": "[3.2.1-alpha.0.1, )",
+          "GovUk.Frontend.AspNetCore": "[3.2.1-alpha.0.2, )",
           "GovUk.OneLogin.AspNetCore": "[0.3.1, )",
           "Humanizer.Core": "[2.14.1, )",
           "Joonasw.AspNetCore.SecurityHeaders": "[5.0.0, )",
@@ -2628,14 +2628,12 @@
       },
       "GovUk.Frontend.AspNetCore": {
         "type": "CentralTransitive",
-        "requested": "[3.2.1-alpha.0.1, )",
-        "resolved": "3.2.1-alpha.0.1",
-        "contentHash": "+HJJ7cLtsC02DUObaN6k54AZIWlmMOpqAd8dhX5/D1wjMu8wXLxbvbZ1o1NeQexXIi8ipKcux4xU63FaA1tpCw==",
+        "requested": "[3.2.1-alpha.0.2, )",
+        "resolved": "3.2.1-alpha.0.2",
+        "contentHash": "zcCaxxB6DSXvqLuY//6Y5tALfM57JdZkp8AswQqqVk9L46XLZnHKjpwkMQjSJiinhVJHEfwHvfmC1jA8vKvZbQ==",
         "dependencies": {
           "Fluid.Core": "[2.15.0, 3.0.0)",
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.17",
-          "Microsoft.Extensions.FileSystemGlobbing": "8.0.0",
-          "System.Text.Json": "8.0.5"
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.17"
         }
       },
       "GovUk.OneLogin.AspNetCore": {
