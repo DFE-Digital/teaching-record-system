@@ -14,7 +14,8 @@ public class GetAllIttQualificationsHandler : ICrmQueryHandler<GetAllIttQualific
             EntityName = dfeta_ittqualification.EntityLogicalName,
             ColumnSet = new ColumnSet(
                 dfeta_ittqualification.Fields.dfeta_name,
-                dfeta_ittqualification.Fields.dfeta_Value)
+                dfeta_ittqualification.Fields.dfeta_Value,
+                dfeta_ittqualification.Fields.StateCode)
         };
 
         var request = new RetrieveMultipleRequest()
