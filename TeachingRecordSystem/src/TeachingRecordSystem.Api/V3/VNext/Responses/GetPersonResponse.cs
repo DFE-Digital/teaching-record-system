@@ -6,9 +6,9 @@ using Alert = TeachingRecordSystem.Core.ApiSchema.V3.V20240920.Dtos.Alert;
 using EytsInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.EytsInfo;
 using InductionInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.InductionInfo;
 using NameInfo = TeachingRecordSystem.Core.ApiSchema.V3.V20240101.Dtos.NameInfo;
-using ProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.ProfessionalStatusStatus;
 using QtlsStatus = TeachingRecordSystem.Core.ApiSchema.V3.V20250203.Dtos.QtlsStatus;
 using QtsInfo = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.QtsInfo;
+using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.RouteToProfessionalStatusStatus;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Responses;
 
@@ -48,7 +48,7 @@ public record GetPersonResponseRouteToProfessionalStatus
 {
     public required Guid RouteToProfessionalStatusId { get; init; }
     public required RouteToProfessionalStatusType RouteToProfessionalStatusType { get; init; }
-    public required ProfessionalStatusStatus Status { get; init; }
+    public required RouteToProfessionalStatusStatus Status { get; init; }
     public required DateOnly? HoldsFrom { get; init; }
     public required DateOnly? TrainingStartDate { get; init; }
     public required DateOnly? TrainingEndDate { get; init; }

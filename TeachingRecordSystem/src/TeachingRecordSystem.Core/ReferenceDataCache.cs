@@ -402,7 +402,7 @@ public class ReferenceDataCache(
             async () =>
             {
                 using var dbContext = dbContextFactory.CreateDbContext();
-                return await dbContext.RoutesToProfessionalStatus.AsNoTracking().ToArrayAsync();
+                return await dbContext.RouteToProfessionalStatusTypes.AsNoTracking().ToArrayAsync();
             });
 
     private Task<Country[]> EnsureTrainingCountriesAsync() =>

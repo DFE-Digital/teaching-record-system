@@ -10,7 +10,9 @@ public class MapperProfile : Profile
         CreateMap<Core.DataStore.Postgres.Models.InductionExemptionReason, InductionExemptionReason>();
         CreateMap<Implementation.Dtos.InductionInfo, InductionInfo>();
         CreateMap<Implementation.Dtos.QtsInfo, QtsInfo>();
+        CreateMap<Implementation.Dtos.QtsInfoRoute, QtsInfoRoute>();
         CreateMap<Implementation.Dtos.EytsInfo, EytsInfo>();
+        CreateMap<Implementation.Dtos.EytsInfoRoute, EytsInfoRoute>();
         CreateMap<Implementation.Dtos.TrainingAgeSpecialism, TrainingAgeSpecialism>();
     }
 }

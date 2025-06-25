@@ -120,11 +120,11 @@ public partial class PersonsController(IMapper mapper) : ControllerBase
             trn,
             sourceApplicationReference,
             request.RouteToProfessionalStatusTypeId,
-            mapper.Map<Implementation.Dtos.ProfessionalStatusStatus>(request.Status),
+            mapper.Map<RouteToProfessionalStatusStatus>(request.Status),
             request.HoldsFrom,
             request.TrainingStartDate,
             request.TrainingEndDate,
-            request.TrainingSubjectReferences.HasValue ? request.TrainingSubjectReferences.ValueOrDefault() : null,
+            request.TrainingSubjectReferences.HasValue ? request.TrainingSubjectReferences.ValueOrDefault() : [],
             request.TrainingAgeSpecialism is null
                 ? null
                 : new SetRouteToProfessionalStatusCommandTrainingAgeSpecialism(

@@ -22,7 +22,7 @@ public record EytsInfo
             ?? throw new InvalidOperationException("Qualifications not loaded.");
 
         var holdsRoutes = routes
-            .Where(r => r.Status is RouteToProfessionalStatusStatus.Holds)
+            .Where(r => r.RouteToProfessionalStatusType!.ProfessionalStatusType is ProfessionalStatusType.EarlyYearsTeacherStatus && r.Status is RouteToProfessionalStatusStatus.Holds)
             .ToArray();
 
         var oldestRoute = holdsRoutes.OrderBy(r => r.HoldsFrom).First();
