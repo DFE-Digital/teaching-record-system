@@ -44,13 +44,7 @@ builder.AddServiceDefaults(dataProtectionBlobName: "AuthorizeAccess");
 
 builder.ConfigureLogging();
 
-builder.Services.AddGovUkFrontend(options =>
-{
-    options.Rebrand = true;
-    options.DefaultButtonPreventDoubleClick = true;
-    options.DefaultFileUploadJavaScriptEnhancements = true;
-});
-
+builder.Services.AddGovUkFrontend();
 builder.Services.AddCsp(nonceByteAmount: 32);
 
 builder.Services.AddAuthentication(options =>
