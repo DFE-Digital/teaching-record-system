@@ -453,6 +453,11 @@ public class ReferenceDataCache(
                     }
                 }
 
+                // Also get any active ITT providers (some of which may not have an ITT record in DQT)
+                var activeIttProviders = await crmQueryDispatcher.ExecuteQueryAsync(new GetAllIttProvidersQuery());
+                var ittProviderIds = ittProviders.Select(p => p.AccountId).ToHashSet();
+                ittProviders.AddRange(activeIttProviders.Where(a => !ittProviderIds.Contains(a.Id)));
+
                 return ittProviders.ToArray();
             });
 
