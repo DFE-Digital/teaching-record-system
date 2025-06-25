@@ -11013,6 +11013,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 		public static class Fields
 		{
 			public const string CreatedOn = "createdon";
+			public const string dfeta_DateofRecognition = "dfeta_dateofrecognition";
 			public const string dfeta_EarlyYearsStatusId = "dfeta_earlyyearsstatusid";
 			public const string dfeta_EYTSDate = "dfeta_eytsdate";
 			public const string dfeta_InductionId = "dfeta_inductionid";
@@ -11098,6 +11099,26 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 				this.OnPropertyChanging("CreatedOn");
 				this.SetAttributeValue("createdon", value);
 				this.OnPropertyChanged("CreatedOn");
+			}
+		}
+		
+		/// <summary>
+		/// Date field for EEA teachers to teach SEN children
+		/// </summary>
+		[Microsoft.Xrm.Sdk.AttributeLogicalNameAttribute("dfeta_dateofrecognition")]
+		public System.Nullable<System.DateTime> dfeta_DateofRecognition
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.GetAttributeValue<System.Nullable<System.DateTime>>("dfeta_dateofrecognition");
+			}
+			[System.Diagnostics.DebuggerNonUserCode()]
+			set
+			{
+				this.OnPropertyChanging("dfeta_DateofRecognition");
+				this.SetAttributeValue("dfeta_dateofrecognition", value);
+				this.OnPropertyChanged("dfeta_DateofRecognition");
 			}
 		}
 		
@@ -16561,7 +16582,7 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string modifiedby_plugintype = "modifiedby_plugintype";
 		}
 		
-		public const string AlternateKeys = "overwritetime,plugintypeexportkey,componentstate";
+		public const string AlternateKeys = "overwritetime,componentstate,plugintypeexportkey";
 		
 		/// <summary>
 		/// Default Constructor.
@@ -17402,8 +17423,8 @@ namespace TeachingRecordSystem.Core.Dqt.Models
 			public const string Referencingrole_parent_root_role = "role_parent_root_role";
 		}
 		
-		public const string AlternateKeys = "overwritetime,businessunitid,componentstate,parentrootroleid|overwritetime,rolete" +
-			"mplateid,componentstate,businessunitid";
+		public const string AlternateKeys = "overwritetime,businessunitid,parentrootroleid,componentstate|componentstate,rolet" +
+			"emplateid,businessunitid,overwritetime";
 		
 		/// <summary>
 		/// Default Constructor.

@@ -4,9 +4,9 @@ using Microsoft.Xrm.Sdk.Query;
 
 namespace TeachingRecordSystem.Core.Dqt.QueryHandlers;
 
-public class GetAllActiveIttSubjectsHandler : ICrmQueryHandler<GetAllActiveIttSubjectsQuery, dfeta_ittsubject[]>
+public class GetAllIttSubjectsHandler : ICrmQueryHandler<GetAllIttSubjectsQuery, dfeta_ittsubject[]>
 {
-    public async Task<dfeta_ittsubject[]> ExecuteAsync(GetAllActiveIttSubjectsQuery query, IOrganizationServiceAsync organizationService)
+    public async Task<dfeta_ittsubject[]> ExecuteAsync(GetAllIttSubjectsQuery query, IOrganizationServiceAsync organizationService)
     {
         var queryExpression = new QueryExpression()
         {
@@ -15,8 +15,6 @@ public class GetAllActiveIttSubjectsHandler : ICrmQueryHandler<GetAllActiveIttSu
                 dfeta_hesubject.Fields.dfeta_name,
                 dfeta_hesubject.Fields.dfeta_Value)
         };
-
-        queryExpression.Criteria.AddCondition(dfeta_ittsubject.Fields.StateCode, ConditionOperator.Equal, (int)dfeta_ittsubjectState.Active);
 
         var request = new RetrieveMultipleRequest()
         {

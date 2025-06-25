@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reactive.Subjects;
 using System.ServiceModel;
@@ -42,6 +43,362 @@ public class TrsDataSyncHelper(
         { ModelTypes.Induction, GetModelTypeSyncInfoForInduction() },
         { ModelTypes.DqtNote, GetModelTypeSyncInfoForNotes() },
     };
+
+    private static IReadOnlyDictionary<dfeta_ITTProgrammeType, Guid> _programmeTypeRouteMapping = new Dictionary<dfeta_ITTProgrammeType, Guid>()
+    {
+        { dfeta_ITTProgrammeType.Apprenticeship, new("6987240E-966E-485F-B300-23B54937FB3A") },
+        { dfeta_ITTProgrammeType.AssessmentOnlyRoute, new("57B86CEF-98E2-4962-A74A-D47C7A34B838") },
+        { dfeta_ITTProgrammeType.Core, new("4163C2FB-6163-409F-85FD-56E7C70A54DD") },
+        { dfeta_ITTProgrammeType.CoreFlexible, new("4BD7A9F0-28CA-4977-A044-A7B7828D469B") },
+        { dfeta_ITTProgrammeType.EYITTAssessmentOnly, new("D9EEF3F8-FDE6-4A3F-A361-F6655A42FA1E") },
+        { dfeta_ITTProgrammeType.EYITTGraduateEmploymentBased, new("4477E45D-C531-4C63-9F4B-E157766366FB") },
+        { dfeta_ITTProgrammeType.EYITTGraduateEntry, new("DBC4125B-9235-41E4-ABD2-BAABBF63F829") },
+        { dfeta_ITTProgrammeType.EYITTSchoolDirect_EarlyYears, new("7F09002C-5DAD-4839-9693-5E030D037AE9") },
+        { dfeta_ITTProgrammeType.EYITTUndergraduate, new("C97C0FD2-FD84-4949-97C7-B0E2422FB3C8") },
+        { dfeta_ITTProgrammeType.FutureTeachingScholars, new("F85962C9-CF0C-415D-9DE5-A397F95AE261") },
+        { dfeta_ITTProgrammeType.HEI, new("10078157-E8C3-42F7-A050-D8B802E83F7B") },
+        { dfeta_ITTProgrammeType.HighpotentialITT, new("BFEF20B2-5AC4-486D-9493-E5A4538E1BE9") },
+        { dfeta_ITTProgrammeType.Internationalqualifiedteacherstatus, new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1") },
+        { dfeta_ITTProgrammeType.LicensedTeacherProgramme, new("2B4862CA-BD30-4A3A-BFCE-52B57C2946C7") },
+        { dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, new("51756384-CFEA-4F63-80E5-F193686E0F71") },
+        { dfeta_ITTProgrammeType.Primaryandsecondarypostgraduatefeefunded, new("EF46FF51-8DC0-481E-B158-61CCEA9943D9") },
+        { dfeta_ITTProgrammeType.Primaryandsecondaryundergraduatefeefunded, new("321D5F9A-9581-4936-9F63-CFDDD2A95FE2") },
+        { dfeta_ITTProgrammeType.Providerled_postgrad, new("97497716-5AC5-49AA-A444-27FA3E2C152A") },
+        { dfeta_ITTProgrammeType.Providerled_undergrad, new("53A7FBDA-25FD-4482-9881-5CF65053888D") },
+        { dfeta_ITTProgrammeType.RegisteredTeacherProgramme, new("70368FF2-8D2B-467E-AD23-EFE7F79995D7") },
+        { dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, new("D9490E58-ACDC-4A38-B13E-5A5C21417737") },
+        { dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, new("12A742C3-1CD4-43B7-A2FA-1000BD4CC373") },
+        { dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Selffunded, new("97E1811B-D46C-483E-AEC3-4A2DD51A55FE") },
+        { dfeta_ITTProgrammeType.TeachFirstProgramme, new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8") },
+        { dfeta_ITTProgrammeType.TeachFirstProgramme_CC, new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8") },
+        { dfeta_ITTProgrammeType.UndergraduateOptIn, new("20f67e38-f117-4b42-bbfc-5812aa717b94") },
+    };
+
+    private static IReadOnlyDictionary<string, Guid?> _statusRouteIdMapping = new Dictionary<string, Guid?>()
+    {
+        { "71", null },
+        { "49", new("34222549-ED59-4C4A-811D-C0894E78D4C3") },
+        { "67", new("F4DA123B-5C37-4060-AB00-52DE4BD3599E") },
+        { "72", new("88867B43-897B-49B5-97CC-F4F81A1D5D44") },
+        { "213", new("877ba701-fe26-4951-9f15-171f3755d50d") },
+        { "211", null },
+        { "77", new("ABCB0A14-0C21-4598-A42C-A007D4B048AC") },
+        { "79", new("88867B43-897B-49B5-97CC-F4F81A1D5D44") },
+        { "103", new("51756384-CFEA-4F63-80E5-F193686E0F71") },
+        { "100", new("57B86CEF-98E2-4962-A74A-D47C7A34B838") },
+        { "222", new("8F5C0431-D006-4EDA-9336-16DFC6A26A78") },
+        { "80", new("700EC96F-6BBF-4080-87BD-94EF65A6A879") },
+        { "68", new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") },
+        { "52", new("51756384-CFEA-4F63-80E5-F193686E0F71") },
+        { "221", null },
+        { "104", new("6F27BDEB-D00A-4EF9-B0EA-26498CE64713") },
+        { "45", new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8") },
+        { "51", new("51756384-CFEA-4F63-80E5-F193686E0F71") },
+        { "69", new("3604EF30-8F11-4494-8B52-A2F9C5371E03") },
+        { "47", new("70368FF2-8D2B-467E-AD23-EFE7F79995D7") },
+        { "223", new("2B106B9D-BA39-4E2D-A42E-0CE827FDC324") },
+        { "62", new("2B4862CA-BD30-4A3A-BFCE-52B57C2946C7") },
+        { "76", new("4B6FC697-BE67-43D3-9021-CC662C4A559F") },
+        { "63", new("779BD3C6-6B3A-4204-9489-1BBB381B52BF") },
+        { "220", null },
+        { "90", new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1") },
+        { "74", new("E5C198FA-35F0-4A13-9D07-8B0239B4957A") },
+        { "65", new("D5EB09CC-C64F-45DF-A46D-08277A25DE7A") },
+        { "214", new("EC95C276-25D9-491F-99A2-8D92F10E1E94") },
+        { "212", new("57B86CEF-98E2-4962-A74A-D47C7A34B838") },
+        { "64", new("64C28594-4B63-42B3-8B47-E3F140879E66") },
+        { "101", new("5B7F5E90-1CA6-4529-BAA0-DFBA68E698B8") },
+        { "53", new("45C93B5B-B4DC-4D0F-B0DE-D612521E0A13") },
+        { "89", new("88867B43-897B-49B5-97CC-F4F81A1D5D44") },
+        { "82", new("88867B43-897B-49B5-97CC-F4F81A1D5D44") },
+        { "92", new("88867B43-897B-49B5-97CC-F4F81A1D5D44") },
+        { "73", new("AA1EFD16-D59C-4E18-A496-16E39609B389") },
+        { "66", new("FC16290C-AC1E-4830-B7E9-35708F1BDED3") },
+        { "99", new("88867B43-897B-49B5-97CC-F4F81A1D5D44") },
+        { "58", new("82AA14D3-EF6A-4B46-A10C-DC850DDCEF5F") },
+        { "87", new("F4DA123B-5C37-4060-AB00-52DE4BD3599E") },
+        { "78", new("5748D41D-7B53-4EE6-833A-83080A3BD8EF") },
+        { "48", new("34222549-ED59-4C4A-811D-C0894E78D4C3") },
+        { "97", new("F4DA123B-5C37-4060-AB00-52DE4BD3599E") },
+        { "28", new("52835B1F-1F2E-4665-ABC6-7FB1EF0A80BB") },
+        { "83", new("AA1EFD16-D59C-4E18-A496-16E39609B389") },
+        { "24", new("64C28594-4B63-42B3-8B47-E3F140879E66") },
+        { "102", new("50D18F17-EE26-4DAD-86CA-1AAE3F956BFC") },
+    };
+
+    private static IReadOnlyDictionary<string, Guid?> _ittQualificationRouteIdMapping = new Dictionary<string, Guid?>()
+    {
+        { "051", new("57B86CEF-98E2-4962-A74A-D47C7A34B838") },
+        { "007", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "008", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "010", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "014", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "009", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "018", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "011", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "001", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "002", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "016", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "003", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "004", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "013", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "017", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "015", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "006", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "005", new("32017D68-9DA4-43B2-AE91-4F24C68F6F78") },
+        { "030", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
+        { "040", null },
+        { "400", new("10078157-E8C3-42F7-A050-D8B802E83F7B") },
+        { "402", null },
+        { "105", null },
+        { "116", null },
+        { "114", null },
+        { "115", null },
+        { "111", new("700EC96F-6BBF-4080-87BD-94EF65A6A879") },
+        { "110", new("700EC96F-6BBF-4080-87BD-94EF65A6A879") },
+        { "113", new("700EC96F-6BBF-4080-87BD-94EF65A6A879") },
+        { "033", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
+        { "025", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
+        { "024", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
+        { "997", null }, // there is only one of these in prod and it is an inactive ITT qual
+        { "100", new("34222549-ED59-4C4A-811D-C0894E78D4C3") },
+        { "401", null },
+        { "055", new("D0B60864-AB1C-4D49-A5C2-FF4BD9872EE1") },
+        { "112", new("2B4862CA-BD30-4A3A-BFCE-52B57C2946C7") },
+        { "032", null },
+        { "998", null },
+        { "107", new("3604EF30-8F11-4494-8B52-A2F9C5371E03") },
+        { "102", null },
+        { "103", null },
+        { "054", new("CE61056E-E681-471E-AF48-5FFBF2653500") },
+        { "026", new("4514EC65-20B0-4465-B66F-4718963C5B80") },
+        { "022", new("F5390BE5-8336-4951-B97B-5B45D00B7A76") },
+        { "023", new("1C626BE0-5A64-47EC-8349-75008F52BC2C") },
+        { "020", new("02A2135C-AC34-4481-A293-8A00AAB7EE69") },
+        { "019", new("700EC96F-6BBF-4080-87BD-94EF65A6A879") },
+        { "041", null },
+        { "021", new("7721655F-165F-4737-97D4-17FC6991C18C") },
+        { "031", new("002F7C96-F6AE-4E67-8F8B-D2F1C1317273") },
+        { "050", new("9A6F368F-06E7-4A74-B269-6886C48A49DA") },
+        { "029", null },
+        { "027", null },
+        { "049", null },
+        { "101", new("70368FF2-8D2B-467E-AD23-EFE7F79995D7") },
+        { "106", null },
+        { "104", null },
+        { "052", null },
+        { "043", new("BED14B00-5D08-4580-83B5-86D71A4F1A24") },
+        { "042", null },
+        { "028", new("7C04865F-FA39-458A-BC39-07DD46B88154") },
+        { "999", null }
+    };
+
+    private static IReadOnlyDictionary<(string? TeacherStatus, dfeta_ITTProgrammeType? IttProgrammeType, string? IttQualificationValue), Guid?> _hardcodedRouteIdMapping
+        = new Dictionary<(string? TeacherStatusValue, dfeta_ITTProgrammeType? IttProgrammeType, string? IttQualificationValue), Guid?>()
+    {
+        { ("71", null, "029"), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("71", null, "999"), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("71", null, null), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("71", null, "042"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non ITT
+        { ("71", null, "040"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non ITT
+        { ("71", null, "049"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non ITT
+        { ("71", null, "041"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non ITT
+        { ("85", null, "999"), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("91", null, "999"), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("81", null, "999"), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("91", null, null), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("81", null, null), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Legacy Migration
+        { ("85", null, "042"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non ITT
+        { ("91", null, "042"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non ITT
+        { ("81", null, "042"), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // Other Qualifications non
+        { ("221", null, null), new("5B7D1C4E-FB2B-479C-BDEE-5818DAAA8A07") }, // EYTS ITT Migrated
+    };
+
+    private static IReadOnlyDictionary<(string? TeacherStatus, dfeta_ITTProgrammeType? IttProgrammeType, string? IttQualificationValue, dfeta_ITTResult? IttResult), Guid?> _hardcodedIncludingResultRouteIdMapping
+        = new Dictionary<(string? TeacherStatusValue, dfeta_ITTProgrammeType? IttProgrammeType, string? IttQualificationValue, dfeta_ITTResult? IttResult), Guid?>()
+    {
+        { ("221", null, "114", dfeta_ITTResult.Pass), new("5B7D1C4E-FB2B-479C-BDEE-5818DAAA8A07") }, // Early Years Teacher Status | EYTS Only | Pass -> EYTS ITT Migrated
+        { ("211", null, "029", dfeta_ITTResult.Deferred), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Trainee Teacher | QTS Assessment only | Deferred -> Legacy Migration
+        { ("211", null, "029", dfeta_ITTResult.InTraining), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Trainee Teacher | QTS Assessment only | InTraining -> Legacy Migration
+        { ("211", null, "027", dfeta_ITTResult.Deferred), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // Trainee Teacher | QTS Award | Deferred -> Legacy Migration
+        { (null, null, "040", dfeta_ITTResult.Fail), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // NULL | Certificate in Education (Further Education) | Fail -> Other Qualifications non ITT
+        { (null, null, "040", dfeta_ITTResult.Withdrawn), new("88867B43-897B-49B5-97CC-F4F81A1D5D44") }, // NULL | Certificate in Education (Further Education) | Withdrawn -> Other Qualifications non ITT
+        { (null, null, "102", dfeta_ITTResult.DeferredforSkillsTests), new("51756384-CFEA-4F63-80E5-F193686E0F71") }, // NULL | OTT | DeferredforSkillsTests -> Overseas Trained Teacher Programme
+        { (null, null, "102", dfeta_ITTResult.Fail), new("51756384-CFEA-4F63-80E5-F193686E0F71") }, // NULL | OTT | Fail -> Overseas Trained Teacher Programme
+        { (null, null, "102", dfeta_ITTResult.Withdrawn), new("51756384-CFEA-4F63-80E5-F193686E0F71") }, // NULL | OTT | Withdrawn -> Overseas Trained Teacher Programme
+        { (null, null, "029", dfeta_ITTResult.Deferred), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | QTS Assessment only | Deferred -> Legacy Migration
+        { (null, null, "029", dfeta_ITTResult.DeferredforSkillsTests), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | QTS Assessment only | DeferredforSkillsTests -> Legacy Migration
+        { (null, null, "029", dfeta_ITTResult.Fail), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | QTS Assessment only | Fail -> Legacy Migration
+        { (null, null, "029", dfeta_ITTResult.Withdrawn), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | QTS Assessment only | Withdrawn -> Legacy Migration
+        { (null, null, "027", dfeta_ITTResult.Fail), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | QTS Award | Fail -> Legacy Migration
+        { (null, null, "027", dfeta_ITTResult.Withdrawn), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | QTS Award | Withdrawn -> Legacy Migration
+        { (null, null, "999", dfeta_ITTResult.Deferred), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | Unknown | Deferred -> Legacy Migration
+        { (null, null, "999", dfeta_ITTResult.DeferredforSkillsTests), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | Unknown | DeferredforSkillsTests -> Legacy Migration
+        { (null, null, "999", dfeta_ITTResult.Fail), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | Unknown | Fail -> Legacy Migration
+        { (null, null, "999", dfeta_ITTResult.Withdrawn), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | Unknown | Withdrawn -> Legacy Migration
+        { (null, null, null, dfeta_ITTResult.Withdrawn), new("C80CB763-0D61-4CF1-A749-37C1D0AB85F8") }, // NULL | Unknown | Withdrawn -> Legacy Migration
+    };
+
+    private static IReadOnlyDictionary<(string? TeacherStatus, dfeta_ITTProgrammeType? IttProgrammeType, string? IttQualificationValue), RouteMappingPrecedence> _manualRouteMappingPrecedence
+        = new Dictionary<(string? TeacherStatusValue, dfeta_ITTProgrammeType? IttProgrammeType, string? IttQualificationValue), RouteMappingPrecedence>()
+    {
+       { ("77", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", dfeta_ITTProgrammeType.AssessmentOnlyRoute, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "031"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.HEI, "110"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.HEI, "113"), RouteMappingPrecedence.TeachingStatus },
+       { ("72", null, "020"), RouteMappingPrecedence.IttQualification },
+       { ("80", null, "031"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.HEI, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.Core, "113"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.HEI, "031"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("79", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("79", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "113"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.HEI, "111"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "400"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "001"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("63", dfeta_ITTProgrammeType.LicensedTeacherProgramme, "112"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "002"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.Core, "110"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.Core, "111"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "07"), RouteMappingPrecedence.TeachingStatus },
+       { ("72", null, "030"), RouteMappingPrecedence.IttQualification },
+       { ("80", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "002"), RouteMappingPrecedence.TeachingStatus },
+       { ("62", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("53", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("223", null, "054"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "010"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "004"), RouteMappingPrecedence.TeachingStatus },
+       { ("74", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("63", dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, "102"), RouteMappingPrecedence.TeachingStatus },
+       { ("53", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.GraduateTeacherProgramme, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("74", dfeta_ITTProgrammeType.LicensedTeacherProgramme, "112"), RouteMappingPrecedence.TeachingStatus },
+       { ("52", dfeta_ITTProgrammeType.GraduateTeacherProgramme, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", dfeta_ITTProgrammeType.HEI, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("45", dfeta_ITTProgrammeType.GraduateTeacherProgramme, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", dfeta_ITTProgrammeType.HEI, "105"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "022"), RouteMappingPrecedence.TeachingStatus },
+       { ("51", dfeta_ITTProgrammeType.GraduateTeacherProgramme, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "003"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "054"), RouteMappingPrecedence.TeachingStatus },
+       { ("103", dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, null), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "002"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", dfeta_ITTProgrammeType.HEI, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("58", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("65", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("65", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("74", null, "002"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "026"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "001"), RouteMappingPrecedence.TeachingStatus },
+       { ("45", dfeta_ITTProgrammeType.AssessmentOnlyRoute, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("101", null, "054"), RouteMappingPrecedence.TeachingStatus },
+       { ("72", null, "110"), RouteMappingPrecedence.IttQualification },
+       { ("76", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("76", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("76", dfeta_ITTProgrammeType.LicensedTeacherProgramme, "112"), RouteMappingPrecedence.ProgrammeType },
+       { ("78", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", dfeta_ITTProgrammeType.TeachFirstProgramme, "105"), RouteMappingPrecedence.TeachingStatus },
+       { ("223", dfeta_ITTProgrammeType.Providerled_postgrad, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("53", null, "043"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "023"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.AssessmentOnlyRoute, "100"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", dfeta_ITTProgrammeType.HEI, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", dfeta_ITTProgrammeType.Core, "0029"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", dfeta_ITTProgrammeType.TeachFirstProgramme, "104"), RouteMappingPrecedence.ProgrammeType },
+       { ("62", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("62", null, "043"), RouteMappingPrecedence.TeachingStatus },
+       { ("62", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("24", dfeta_ITTProgrammeType.LicensedTeacherProgramme, "112"), RouteMappingPrecedence.TeachingStatus },
+       { ("51", null, "002"), RouteMappingPrecedence.TeachingStatus },
+       { ("103", dfeta_ITTProgrammeType.HEI, "054"), RouteMappingPrecedence.TeachingStatus },
+       { ("103", dfeta_ITTProgrammeType.OverseasTrainedTeacherProgramme, "103"), RouteMappingPrecedence.TeachingStatus },
+       { ("47", null, "008"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", dfeta_ITTProgrammeType.HEI, "007"), RouteMappingPrecedence.TeachingStatus },
+       { ("77", null, "022"), RouteMappingPrecedence.TeachingStatus },
+       { ("102", null, "020"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "025"), RouteMappingPrecedence.TeachingStatus },
+       { ("67", null, "015"), RouteMappingPrecedence.TeachingStatus },
+       { ("53", null, "024"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "400"), RouteMappingPrecedence.TeachingStatus },
+       { ("80", null, "004"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", null, "002"), RouteMappingPrecedence.TeachingStatus },
+       { ("74", null, "001"), RouteMappingPrecedence.TeachingStatus },
+       { ("63", null, "112"), RouteMappingPrecedence.TeachingStatus },
+       { ("72", null, "400"), RouteMappingPrecedence.TeachingStatus },
+       { ("72", null, "026"), RouteMappingPrecedence.IttQualification },
+       { ("104", null, "054"), RouteMappingPrecedence.IttQualification },
+       { ("49", null, "054"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", null, "030"), RouteMappingPrecedence.TeachingStatus },
+       { ("49", null, "400"), RouteMappingPrecedence.TeachingStatus },
+       { ("71", dfeta_ITTProgrammeType.HEI, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.Providerled_postgrad, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.Apprenticeship, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.Apprenticeship, "031"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.HEI, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.Core, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, "031"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.HEI, "031"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.Providerled_postgrad, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.Primaryandsecondarypostgraduatefeefunded, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.Core, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("211", dfeta_ITTProgrammeType.Apprenticeship, "020"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.HEI, "008"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.HEI, "004"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.HEI, "013"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Salaried, "031"), RouteMappingPrecedence.ProgrammeType },
+       { ("71", dfeta_ITTProgrammeType.SchoolDirecttrainingprogramme_Selffunded, "031"), RouteMappingPrecedence.ProgrammeType }
+    };
+
+    private static IReadOnlyDictionary<Guid, (Guid QtsIttId, Guid EyIttId)> HardcodedQtsEyMappings = new Dictionary<Guid, (Guid QtsIttId, Guid EyIttId)>
+    {
+        { new("2cbbe3f2-05af-e311-b8ed-005056822391"), (new("3f5b2a42-35b0-e311-b8ed-005056822391"), new("69d3722c-bb91-e911-a958-000d3a2aa275")) },
+        { new("C13E84ED-CAAE-E311-B8ED-005056822391"), (new("04ECD95D-DEAF-E311-B8ED-005056822391"), new("03C8B2AE-3789-E911-A958-000D3A2AA275")) },
+        { new("DE813D0C-DAAE-E311-B8ED-005056822391"), (new("4FD469D2-AEAF-E311-B8ED-005056822391"), new("7302FCBA-3589-E911-A958-000D3A2AA275")) },
+        { new("2962393F-1BAF-E311-B8ED-005056822391"), (new("DACA45E8-474B-F011-877A-7C1E52203527"), new("F729CBBE-3989-E911-A958-000D3A2AA275")) },
+    };
+
+    private static IReadOnlyList<Guid> WelshIttProviderIds = [
+        new("EAC72DD3-C7AE-E311-B8ED-005056822391"), // Aberystwyth University
+        new("5EF135C7-C7AE-E311-B8ED-005056822391"), // Bangor University
+        new("EB993DC1-C7AE-E311-B8ED-005056822391"), // Cardiff Institute Of Higher Educatio
+        new("157135CD-C7AE-E311-B8ED-005056822391"), // Glyndwr University
+        new("039A3DC1-C7AE-E311-B8ED-005056822391"), // Glyndwr University Wrexham ITT
+        new("2C7135CD-C7AE-E311-B8ED-005056822391"), // Swansea Institute of Higher Educatio
+        new("099A3DC1-C7AE-E311-B8ED-005056822391"), // Swansea Metropolitan University ITT
+        new("C8993DC1-C7AE-E311-B8ED-005056822391"), // University College Cardiff
+        new("D6F135C7-C7AE-E311-B8ED-005056822391"), // University College of North Wales
+        new("0F7135CD-C7AE-E311-B8ED-005056822391"), // University of Wales College, Newport
+        new("1D9A3DC1-C7AE-E311-B8ED-005056822391"), // University of Wales Institute, Cardi
+        new("4D056786-C8AE-E311-B8ED-005056822391"), // University Of Wales Institute, Cardi
+        new("9C993DC1-C7AE-E311-B8ED-005056822391"), // University Of Wales ITT
+        new("119A3DC1-C7AE-E311-B8ED-005056822391"), // University of Wales Newport
+        new("706F35CD-C7AE-E311-B8ED-005056822391"), // University of Wales Trinity Saint Da
+        new("52F135C7-C7AE-E311-B8ED-005056822391"), // University of Wales, Aberystwyth ITT
+        new("C5993DC1-C7AE-E311-B8ED-005056822391"), // University Of Wales, Cardiff ITT
+        new("6AF135C7-C7AE-E311-B8ED-005056822391"), // University of Wales, Swansea ITT
+    ];
+
+    private static IReadOnlyList<dfeta_ITTResult> IttResultsToIgnore = [
+        dfeta_ITTResult.ApplicationReceived,
+        dfeta_ITTResult.ApplicationUnsuccessful,
+        dfeta_ITTResult.NoResultSubmitted
+    ];
 
     private readonly ISubject<object[]> _syncedEntitiesSubject = new Subject<object[]>();
 
@@ -1962,6 +2319,1031 @@ public class TrsDataSyncHelper(
         };
     }
 
+    public async Task<IttQtsMapResult[]> MapIttAndQtsRegistrationsAsync(
+        IEnumerable<Contact> contacts,
+        IEnumerable<dfeta_qtsregistration> qts,
+        IEnumerable<dfeta_initialteachertraining> itt,
+        //IReadOnlyDictionary<Guid, AuditDetailCollection> auditDetails,
+        bool createMigratedEvent)
+    {
+        var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
+        var earlyYearsProfessionalStatus = await referenceDataCache.GetEarlyYearsStatusByValueAsync("222");
+        var noQualificationRestrictedByGtc = await referenceDataCache.GetIttQualificationByValueAsync("998");
+        var partiallyQualifiedTeacherStatus = await referenceDataCache.GetTeacherStatusByValueAsync("214");
+        var qualifiedTeacherTrainedTeacherStatus = await referenceDataCache.GetTeacherStatusByValueAsync("71");
+
+        // TODO Events, inc. for deactivated
+
+        var ittByContact = itt.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
+        var qtsByContact = qts.Where(i => i.StateCode == 0).GroupBy(i => i.dfeta_PersonId.Id).ToDictionary(g => g.Key, g => g.ToArray());
+
+        var result = new List<IttQtsMapResult>();
+
+        if (!contacts.Any())
+        {
+            return [];
+        }
+
+        foreach (var contact in contacts)
+        {
+            try
+            {
+                var succeeded = await MapContactIttAndQtsAsync(contact);
+                result.AddRange(succeeded);
+            }
+            catch (IttQtsMapException ex)
+            {
+                result.Add(ex.Result);
+            }
+        }
+
+        return result.ToArray();
+
+        async Task<IEnumerable<IttQtsMapResult>> MapContactIttAndQtsAsync(Contact contact)
+        {
+            var contactId = contact.Id;
+            var qtlsDate = contact.dfeta_qtlsdate.ToDateOnlyWithDqtBstFix(isLocalTime: true);
+            var contactItt = ittByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
+            var contactQts = qtsByContact.GetValueOrDefault(contactId)?.ToList() ?? [];
+            var contactIttRowCount = contactItt.Count;
+            var contactQtsRowCount = contactQts.Count;
+
+            var hasMatchedIttQtsCombo = false;
+            var hasWelshItt = false;
+            var mapped = new List<IttQtsMapResult>();
+
+            // QTLS is stored directly on Contact record
+            if (qtlsDate is not null)
+            {
+                var ps = await CreateProfessionalStatusAsync(
+                    clock,
+                    referenceDataCache,
+                    allRoutes,
+                    contactId,
+                    RouteToProfessionalStatusType.QtlsAndSetMembershipId,
+                    RouteToProfessionalStatusStatus.Holds,
+                    InductionExemptionReason.QtlsId,
+                    qtlsDate,
+                    qts: null,
+                    itt: null,
+                    ittQualification: null,
+                    teacherStatus: null,
+                    eyStatus: null);
+                mapped.Add(IttQtsMapResult.Succeeded(ps));
+            }
+
+            // Filter out ITT which we aren't migrating to TRS            
+            foreach (var itt in contactItt.Where(i => i.dfeta_Result is not null && IttResultsToIgnore.Contains(i.dfeta_Result!.Value)).ToArray())
+            {
+                var failedReason = IttQtsMapResultFailedReason.DoNotMigrateIttResult;
+                if (itt is not null && itt.dfeta_Result is null && itt.dfeta_ITTQualificationId?.Id == noQualificationRestrictedByGtc.Id)
+                {
+                    failedReason = IttQtsMapResultFailedReason.DoNotMigrateNoQualificationRestrictedByGtc;
+                }
+
+                mapped.Add(IttQtsMapResult.Failed(
+                    contactId,
+                    failedReason,
+                    qtsRegistrationId: null,
+                    itt: itt,
+                    teacherStatus: null,
+                    qtsDate: null,
+                    earlyYearsStatus: null,
+                    eytsDate: null,
+                    partialRecognitionDate: null,
+                    qtlsDate,
+                    ittQualification: null,
+                    statusDerivedRouteId: null,
+                    programmeTypeDerivedRouteId: null,
+                    ittQualificationDerivedRouteId: null,
+                    multiplePotentialCompatibleIttRecords: null,
+                    contactIttRowCount,
+                    contactQtsRowCount));
+                contactItt.Remove(itt!);
+            }
+
+            // Filter out QTS registrations which we aren't migrating to TRS
+            foreach (var qts in contactQts.Where(q => q.dfeta_TeacherStatusId is null && q.dfeta_EarlyYearsStatusId is null).ToArray())
+            {
+                mapped.Add(IttQtsMapResult.Failed(
+                    contactId,
+                    IttQtsMapResultFailedReason.DoNotMigrateQtsRegistrationHasNoStatus,
+                    qts.Id,
+                    itt: null,
+                    teacherStatus: null,
+                    qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    earlyYearsStatus: null,
+                    qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    qtlsDate,
+                    ittQualification: null,
+                    statusDerivedRouteId: null,
+                    programmeTypeDerivedRouteId: null,
+                    ittQualificationDerivedRouteId: null,
+                    multiplePotentialCompatibleIttRecords: null,
+                    contactIttRowCount,
+                    contactQtsRowCount));
+                contactQts.Remove(qts);
+            }
+
+            // Match QTS then Partial QTS then EYTS then EYPS
+            foreach (var qts in contactQts.OrderBy(q => q.dfeta_QTSDate is not null).ThenBy(q => q.dfeta_DateofRecognition is not null).ThenBy(q => q.dfeta_EYTSDate is not null).ThenBy(q => q.dfeta_EarlyYearsStatusId?.Id == earlyYearsProfessionalStatus.Id))
+            {
+                // A qtsregistration can have a teacher status, EY status or both
+                foreach (var isEy in new[] { false, true })
+                {
+                    Guid[]? mutlipleCompatibleIttIds = null;
+                    var teacherStatus = !isEy && qts.dfeta_TeacherStatusId is not null
+                        ? await referenceDataCache.GetTeacherStatusByIdAsync(qts.dfeta_TeacherStatusId.Id)
+                        : null;
+
+                    if (!isEy && teacherStatus is null)
+                    {
+                        continue;
+                    }
+
+                    var eyStatus = isEy && qts.dfeta_EarlyYearsStatusId is not null
+                        ? await referenceDataCache.GetEarlyYearsStatusByIdAsync(qts.dfeta_EarlyYearsStatusId.Id)
+                        : null;
+
+                    if (isEy && eyStatus is null)
+                    {
+                        continue;
+                    }
+
+                    // Validate for partial recognition
+                    if ((qts.dfeta_TeacherStatusId?.Id == partiallyQualifiedTeacherStatus.Id && qts.dfeta_DateofRecognition is null) ||
+                        (qts.dfeta_TeacherStatusId?.Id != partiallyQualifiedTeacherStatus.Id && qts.dfeta_DateofRecognition is not null) ||
+                        (qts.dfeta_DateofRecognition is not null && (qts.dfeta_QTSDate is not null || qts.dfeta_EYTSDate is not null)))
+                    {
+                        mapped.Add(IttQtsMapResult.Failed(
+                            contactId,
+                            IttQtsMapResultFailedReason.PartialRecognitionIsInvalid,
+                            qts.Id,
+                            itt: null,
+                            teacherStatus,
+                            qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            eyStatus,
+                            qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification: null,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount));
+                        continue;
+                    }
+
+                    Guid? inductionExemptionReasonId = null;
+
+                    var compatibleProgrammeTypes = Enum.GetValues<dfeta_ITTProgrammeType>()
+                        .Where(i => isEy == i.IsEarlyYears())
+                        .ToArray();
+
+                    dfeta_initialteachertraining? itt = null;
+
+                    var specifiedItt = contactItt.Where(i => i.GetAttributeValue<EntityReference>("dfeta_qtsregistration")?.Id == qts.Id && (i.dfeta_ProgrammeType is null || compatibleProgrammeTypes.Contains(i.dfeta_ProgrammeType!.Value))).ToArray();
+
+                    var matchingItt = specifiedItt.Length > 0
+                        ? specifiedItt
+                        : contactItt
+                            .Where(itt => (itt.dfeta_ProgrammeType is null || compatibleProgrammeTypes.Contains(itt.dfeta_ProgrammeType!.Value)))
+                            .ToArray();
+
+                    mutlipleCompatibleIttIds = matchingItt.Length > 1
+                        ? matchingItt.Select(i => i.Id).ToArray()
+                        : null;
+
+                    // Very specific overrides for contacts which have multiple potential ITT records but we know which one to use
+                    if (HardcodedQtsEyMappings.TryGetValue(contactId, out var hardcodedItt))
+                    {
+                        if (isEy)
+                        {
+                            itt = matchingItt
+                                .Where(i => i.Id == hardcodedItt.EyIttId)
+                                .FirstOrDefault();
+                        }
+                        else
+                        {
+                            itt = matchingItt
+                                .Where(i => i.Id == hardcodedItt.QtsIttId)
+                                .FirstOrDefault();
+                        }
+                    }
+                    else
+                    {
+                        // Match ITT on ones which are associated with being awarded QTS or EYTS first, then EYPS, then ones with programme type, then createdon date (as createdon is unreliable due to it being reset from previous data migrations)
+                        itt = matchingItt
+                            .OrderBy(itt => (itt.dfeta_Result == dfeta_ITTResult.Pass || itt.dfeta_Result == dfeta_ITTResult.Approved) && ((!isEy && (qts.dfeta_QTSDate is not null || qts.dfeta_DateofRecognition is not null)) || (isEy && (qts.dfeta_EYTSDate is not null || eyStatus == earlyYearsProfessionalStatus))) ? 0 : 1)
+                            .ThenBy(itt => isEy && (eyStatus == earlyYearsProfessionalStatus && (itt.dfeta_AgeRangeFrom == dfeta_AgeRange._00 && itt.dfeta_AgeRangeTo == dfeta_AgeRange._05) || (itt.dfeta_AgeRangeFrom is null && itt.dfeta_AgeRangeTo is null)) ? 0 : 1)
+                            .ThenBy(itt => itt.dfeta_ProgrammeType is not null ? 0 : 1)
+                            .ThenBy(itt => itt.GetAttributeValue<DateTime>("createdon"))
+                            .FirstOrDefault();
+                    }
+
+                    // Prevent this ITT record from being mapped again
+                    if (itt is not null)
+                    {
+                        contactItt.Remove(itt);
+                    }
+
+                    DateOnly? awardedDate = isEy
+                        ? qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                        : teacherStatus!.Id != partiallyQualifiedTeacherStatus.Id
+                            ? qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true)
+                            : qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true);
+
+                    // Do Not Migrate
+                    if ((awardedDate is null && itt?.dfeta_Result is null))
+                    {
+                        var failedReason = IttQtsMapResultFailedReason.DoNotMigrateIttResult;
+                        if (itt is not null && itt.dfeta_Result is null && itt.dfeta_ITTQualificationId?.Id == noQualificationRestrictedByGtc.Id)
+                        {
+                            failedReason = IttQtsMapResultFailedReason.DoNotMigrateNoQualificationRestrictedByGtc;
+                        }
+
+                        mapped.Add(IttQtsMapResult.Failed(
+                            contactId,
+                            failedReason,
+                            qts.Id,
+                            itt: itt,
+                            teacherStatus,
+                            qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            eyStatus,
+                            qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification: null,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            mutlipleCompatibleIttIds,
+                            contactIttRowCount,
+                            contactQtsRowCount));
+                        continue;
+                    }
+
+                    // Re-map teachers who have Qualified teacher (trained) gained at a Welsh ITT provider -> Welsh R route
+                    Guid? welshDerivedRouteId = null;
+                    if (itt?.dfeta_EstablishmentId is not null && WelshIttProviderIds.Contains(itt!.dfeta_EstablishmentId!.Id) &&
+                        teacherStatus?.dfeta_Value == qualifiedTeacherTrainedTeacherStatus.dfeta_Value &&
+                        itt?.dfeta_Result == dfeta_ITTResult.Pass &&
+                        (itt?.dfeta_ProgrammeType is null or dfeta_ITTProgrammeType.HEI) &&
+                        itt?.dfeta_ITTQualificationId is not null)
+                    {
+                        welshDerivedRouteId = RouteToProfessionalStatusType.WelshRId;
+                    }
+
+                    var ittQualification = itt?.dfeta_ITTQualificationId is not null
+                        ? await referenceDataCache.GetIttQualificationByIdAsync(itt.dfeta_ITTQualificationId.Id)
+                        : null;
+
+                    var status = (isEy && (qts.dfeta_EYTSDate is not null || eyStatus?.dfeta_Value == earlyYearsProfessionalStatus.dfeta_Value)) || (!isEy && (qts.dfeta_QTSDate is not null || qts.dfeta_DateofRecognition is not null))
+                        ? RouteToProfessionalStatusStatus.Holds
+                        : MapStatus(itt, qts, ittQualification, teacherStatus, eyStatus);
+
+                    // Map ITT, QTS & ITT Qual and check they resolve to the same route type (where mapping is possible)
+                    // If not, use precedence rules (see 'Manual cases' tab)
+                    // hardcoded first ( in route type) then the logic in the new rules column (manual cases, then the other cases in there) then the lookups from route type column
+                    var ittQualificationDerivedRouteId = ittQualification is not null
+                        ? (_ittQualificationRouteIdMapping.TryGetValue(ittQualification.dfeta_Value, out var id) ? id : null)
+                        : (Guid?)null;
+
+                    var programmeTypeDerivedRouteId = itt?.dfeta_ProgrammeType is dfeta_ITTProgrammeType pt
+                        ? (_programmeTypeRouteMapping.TryGetValue(pt, out var id2) ? id2 : null)
+                        : (Guid?)null;
+
+                    var statusCode = isEy ? eyStatus!.dfeta_Value : teacherStatus!.dfeta_Value;
+
+                    var statusDerivedRouteId = _statusRouteIdMapping.GetValueOrDefault(statusCode, null);
+
+                    Guid[] derivedRouteIds = welshDerivedRouteId is not null ? [welshDerivedRouteId!.Value] : new[] { programmeTypeDerivedRouteId, statusDerivedRouteId, ittQualificationDerivedRouteId }
+                        .Where(s => s is not null)
+                        .Distinct()
+                        .Cast<Guid>()
+                        .ToArray();
+                    if (derivedRouteIds.Length != 1)
+                    {
+                        if (TryDeriveRouteId(
+                            teacherStatus,
+                            eyStatus,
+                            statusDerivedRouteId,
+                            itt?.dfeta_ProgrammeType,
+                            programmeTypeDerivedRouteId,
+                            ittQualification,
+                            ittQualificationDerivedRouteId,
+                            itt?.dfeta_Result,
+                            hasMatchedIttQtsCombo,
+                            isEy,
+                            out var derivedRouteId))
+                        {
+                            derivedRouteIds = [derivedRouteId!.Value];
+                        }
+                        else
+                        {
+                            throw new IttQtsMapException(
+                                IttQtsMapResult.Failed(
+                                    contactId,
+                                    IttQtsMapResultFailedReason.CannotDeriveRoute,
+                                    qts.Id,
+                                    itt,
+                                    teacherStatus,
+                                    qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                    eyStatus,
+                                    qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                    qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                                    qtlsDate,
+                                    ittQualification,
+                                    statusDerivedRouteId,
+                                    programmeTypeDerivedRouteId,
+                                    ittQualificationDerivedRouteId,
+                                    mutlipleCompatibleIttIds,
+                                    contactIttRowCount,
+                                    contactQtsRowCount));
+                        }
+                    }
+
+                    var routeId = derivedRouteIds.Single();
+                    if (!isEy)
+                    {
+                        hasMatchedIttQtsCombo = true;
+                    }
+
+                    if (routeId == RouteToProfessionalStatusType.WelshRId)
+                    {
+                        hasWelshItt = true;
+                    }
+
+                    var ps = await CreateProfessionalStatusAsync(
+                        clock,
+                        referenceDataCache,
+                        allRoutes,
+                        contactId,
+                        routeId,
+                        status,
+                        inductionExemptionReasonId,
+                        awardedDate,
+                        qts,
+                        itt,
+                        ittQualification,
+                        teacherStatus,
+                        eyStatus);
+                    mapped.Add(IttQtsMapResult.Succeeded(
+                        ps,
+                        itt,
+                        teacherStatus,
+                        qts.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        eyStatus,
+                        qts.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        qts.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                        qtlsDate,
+                        ittQualification,
+                        statusDerivedRouteId,
+                        programmeTypeDerivedRouteId,
+                        ittQualificationDerivedRouteId,
+                        mutlipleCompatibleIttIds,
+                        contactIttRowCount,
+                        contactQtsRowCount));
+                }
+            }
+
+            foreach (var itt in contactItt)
+            {
+                // If we get here, we have an ITT record which has not been matched to a QTS record
+
+                // Do Not Migrate
+                if (itt.dfeta_Result is null)
+                {
+                    var failedReason = IttQtsMapResultFailedReason.DoNotMigrateIttResult;
+                    if (itt.dfeta_ITTQualificationId?.Id == noQualificationRestrictedByGtc.Id)
+                    {
+                        failedReason = IttQtsMapResultFailedReason.DoNotMigrateNoQualificationRestrictedByGtc;
+                    }
+
+                    mapped.Add(IttQtsMapResult.Failed(
+                        contactId,
+                        failedReason,
+                        qtsRegistrationId: null,
+                        itt: itt,
+                        teacherStatus: null,
+                        qtsDate: null,
+                        earlyYearsStatus: null,
+                        eytsDate: null,
+                        partialRecognitionDate: null,
+                        qtlsDate,
+                        ittQualification: null,
+                        statusDerivedRouteId: null,
+                        programmeTypeDerivedRouteId: null,
+                        ittQualificationDerivedRouteId: null,
+                        multiplePotentialCompatibleIttRecords: null,
+                        contactIttRowCount,
+                        contactQtsRowCount));
+                    continue;
+                }
+
+                // If we have ITT records which are Pass or Approved then this might be because of duplicate records
+                // i.e. if we've already matched to QTS for a contact, we shouldn't have another ITT record with a Pass or Approved result for the same thing
+                if (itt.dfeta_Result is dfeta_ITTResult.Pass or dfeta_ITTResult.Approved)
+                {
+                    var failedReason = IttQtsMapResultFailedReason.PassResultHasNoAwardDate;
+                    if (mapped.Any(r => r.IttResult == dfeta_ITTResult.Pass || r.IttResult == dfeta_ITTResult.Approved))
+                    {
+                        failedReason = hasWelshItt ? IttQtsMapResultFailedReason.DoNotMigrateQtsAwardedInWalesDuplicateIttRecords : IttQtsMapResultFailedReason.PotentialDuplicateIttRecords;
+                    }
+
+                    mapped.Add(IttQtsMapResult.Failed(
+                            contactId,
+                            failedReason,
+                            qtsRegistrationId: null,
+                            itt: itt,
+                            teacherStatus: null,
+                            qtsDate: null,
+                            earlyYearsStatus: null,
+                            eytsDate: null,
+                            partialRecognitionDate: null,
+                            qtlsDate,
+                            ittQualification: null,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount));
+                    continue;
+                }
+
+                var ittQualification = itt?.dfeta_ITTQualificationId is not null
+                        ? await referenceDataCache.GetIttQualificationByIdAsync(itt.dfeta_ITTQualificationId.Id)
+                        : null;
+
+                var status = MapStatus(itt, qts: null, ittQualification, teacherStatus: null, earlyYearsStatus: null);
+
+                var ittQualificationDerivedRouteId = ittQualification is not null
+                        ? (_ittQualificationRouteIdMapping.TryGetValue(ittQualification.dfeta_Value, out var id) ? id : null)
+                        : (Guid?)null;
+
+                var programmeTypeDerivedRouteId = itt?.dfeta_ProgrammeType is dfeta_ITTProgrammeType pt
+                    ? (_programmeTypeRouteMapping.TryGetValue(pt, out var id2) ? id2 : null)
+                    : (Guid?)null;
+
+                var isEy = itt?.dfeta_ProgrammeType?.IsEarlyYears() ?? false;
+
+                var derivedRouteIds = new[] { programmeTypeDerivedRouteId, ittQualificationDerivedRouteId }
+                        .Where(s => s is not null)
+                        .Distinct()
+                        .Cast<Guid>()
+                        .ToArray();
+                if (derivedRouteIds.Length != 1)
+                {
+                    if (TryDeriveRouteId(
+                        null,
+                        null,
+                        null,
+                        itt?.dfeta_ProgrammeType,
+                        programmeTypeDerivedRouteId,
+                        ittQualification,
+                        ittQualificationDerivedRouteId,
+                        itt?.dfeta_Result,
+                        hasMatchedIttQtsCombo,
+                        isEy,
+                        out var derivedRouteId))
+                    {
+                        derivedRouteIds = [derivedRouteId!.Value];
+                    }
+                    else
+                    {
+                        throw new IttQtsMapException(
+                            IttQtsMapResult.Failed(
+                                contactId,
+                                IttQtsMapResultFailedReason.CannotDeriveRoute,
+                                qtsRegistrationId: null,
+                                itt,
+                                teacherStatus: null,
+                                qtsDate: null,
+                                earlyYearsStatus: null,
+                                eytsDate: null,
+                                partialRecognitionDate: null,
+                                qtlsDate,
+                                ittQualification,
+                                statusDerivedRouteId: null,
+                                programmeTypeDerivedRouteId,
+                                ittQualificationDerivedRouteId,
+                                multiplePotentialCompatibleIttRecords: null,
+                                contactIttRowCount,
+                                contactQtsRowCount));
+                    }
+                }
+
+                var routeId = derivedRouteIds.Single();
+
+                var ps = await CreateProfessionalStatusAsync(
+                        clock,
+                        referenceDataCache,
+                        allRoutes,
+                        contactId,
+                        routeId,
+                        status,
+                        inductionExemptionReasonId: null,
+                        awardedDate: null,
+                        qts: null,
+                        itt,
+                        ittQualification,
+                        teacherStatus: null,
+                        eyStatus: null);
+                mapped.Add(IttQtsMapResult.Succeeded(
+                    ps,
+                    itt,
+                    teacherStatus: null,
+                    qtsDate: null,
+                    earlyYearsStatus: null,
+                    eytsDate: null,
+                    partialRecognitionDate: null,
+                    qtlsDate,
+                    ittQualification,
+                    statusDerivedRouteId: null,
+                    programmeTypeDerivedRouteId,
+                    ittQualificationDerivedRouteId,
+                    multiplePotentialCompatibleIttRecords: null,
+                    contactIttRowCount,
+                    contactQtsRowCount));
+            }
+
+            return mapped;
+
+            bool TryDeriveRouteId(
+                dfeta_teacherstatus? teacherStatus,
+                dfeta_earlyyearsstatus? earlyYearsStatus,
+                Guid? statusDerivedRouteId,
+                dfeta_ITTProgrammeType? ittProgrammeType,
+                Guid? programmeTypeDerivedRouteId,
+                dfeta_ittqualification? ittQualification,
+                Guid? ittQualificationDerivedRouteId,
+                dfeta_ITTResult? ittResult,
+                bool hasMatchedIttQtsCombo,
+                bool isEarlyYears,
+                out Guid? routeId)
+            {
+                // Based on rules defined in spreadsheet try and derive which routeId to map to where there are conflicts from mapping from ITT, QTS and ITT Qualification 
+                RouteMappingPrecedence[] defaultPrecedenceOrder = [RouteMappingPrecedence.TeachingStatus, RouteMappingPrecedence.ProgrammeType, RouteMappingPrecedence.IttQualification];
+                RouteMappingPrecedence[] precedenceOrder = defaultPrecedenceOrder;
+
+                if (_hardcodedRouteIdMapping.TryGetValue((isEarlyYears ? earlyYearsStatus?.dfeta_Value : teacherStatus?.dfeta_Value, ittProgrammeType, ittQualification?.dfeta_Value), out routeId))
+                {
+                    return true;
+                }
+
+                // Additional hardcoded mappings suggested by Rob
+                if (_hardcodedIncludingResultRouteIdMapping.TryGetValue((isEarlyYears ? earlyYearsStatus?.dfeta_Value : teacherStatus?.dfeta_Value, ittProgrammeType, ittQualification?.dfeta_Value, ittResult), out routeId))
+                {
+                    return true;
+                }
+
+                if (!isEarlyYears)
+                {
+                    precedenceOrder = TryDeriveRouteMappingPrecedence(teacherStatus, ittProgrammeType, ittQualification, hasMatchedIttQtsCombo, out var derivedPrecendenceOrder)
+                        ? derivedPrecendenceOrder
+                        : defaultPrecedenceOrder;
+                }
+
+                foreach (var precedence in precedenceOrder)
+                {
+                    switch (precedence)
+                    {
+                        case RouteMappingPrecedence.TeachingStatus:
+                            if (statusDerivedRouteId is not null)
+                            {
+                                routeId = statusDerivedRouteId;
+                                return true;
+                            }
+                            break;
+                        case RouteMappingPrecedence.ProgrammeType:
+                            if (programmeTypeDerivedRouteId is not null)
+                            {
+                                routeId = programmeTypeDerivedRouteId;
+                                return true;
+                            }
+                            break;
+                        case RouteMappingPrecedence.IttQualification:
+                            if (ittQualificationDerivedRouteId is not null)
+                            {
+                                routeId = ittQualificationDerivedRouteId;
+                                return true;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                routeId = null;
+                return false;
+            }
+
+            bool TryDeriveRouteMappingPrecedence(
+                dfeta_teacherstatus? teacherStatus,
+                dfeta_ITTProgrammeType? ittProgrammeType,
+                dfeta_ittqualification? ittQualification,
+                bool hasMatchedIttQtsCombo,
+                out RouteMappingPrecedence[] precendenceOrder)
+            {
+                if (hasMatchedIttQtsCombo && ittProgrammeType is null)
+                {
+                    precendenceOrder = [RouteMappingPrecedence.IttQualification];
+                    return true;
+                }
+
+                if (_manualRouteMappingPrecedence.TryGetValue((teacherStatus?.dfeta_Value, ittProgrammeType, ittQualification?.dfeta_Value), out var manualPrecendence))
+                {
+                    precendenceOrder = manualPrecendence == RouteMappingPrecedence.TeachingStatus && hasMatchedIttQtsCombo ? [RouteMappingPrecedence.ProgrammeType, RouteMappingPrecedence.IttQualification] : [manualPrecendence];
+                    return true;
+                }
+
+                if (hasMatchedIttQtsCombo)
+                {
+                    precendenceOrder = [RouteMappingPrecedence.ProgrammeType, RouteMappingPrecedence.IttQualification];
+                    return true;
+                }
+
+                if (teacherStatus?.dfeta_Value == "77" && ittProgrammeType == dfeta_ITTProgrammeType.Core)
+                {
+                    precendenceOrder = [RouteMappingPrecedence.ProgrammeType];
+                    return true;
+                }
+
+                string[] combo1TeacherStatuses = ["72", "79", "89", "82", "92", "99"];
+                string[] combo1IttQualifications = ["7", "8", "10", "14", "9", "18", "11", "1", "2", "16", "3", "4", "13", "17", "15", "6", "5"];
+                string[] combo2TeacherStatuses = ["51", "52"];
+
+                if ((combo1TeacherStatuses.Contains(teacherStatus?.dfeta_Value) && combo1IttQualifications.Contains(ittQualification?.dfeta_Value)) ||
+                    (combo2TeacherStatuses.Contains(teacherStatus?.dfeta_Value) && ittQualification?.dfeta_Value == "54"))
+                {
+                    precendenceOrder = [RouteMappingPrecedence.IttQualification];
+                    return true;
+                }
+
+                string[] combo3TeacherStatuses = ["213", "68", "69", "28"];
+                if (combo3TeacherStatuses.Contains(teacherStatus?.dfeta_Value))
+                {
+                    precendenceOrder = [RouteMappingPrecedence.TeachingStatus];
+                    return true;
+                }
+
+                if (ittProgrammeType is not null)
+                {
+                    precendenceOrder = [RouteMappingPrecedence.TeachingStatus, RouteMappingPrecedence.ProgrammeType];
+                    return true;
+                }
+
+                precendenceOrder = [];
+                return false;
+            }
+
+            RouteToProfessionalStatusStatus MapStatus(
+                dfeta_initialteachertraining? itt,
+                dfeta_qtsregistration? qts,
+                dfeta_ittqualification? ittQualification,
+                dfeta_teacherstatus? teacherStatus,
+                dfeta_earlyyearsstatus? earlyYearsStatus) => itt?.dfeta_Result switch
+                {
+                    dfeta_ITTResult.Approved => throw new IttQtsMapException(
+                        IttQtsMapResult.Failed(
+                            contactId,
+                            IttQtsMapResultFailedReason.ApprovedResultHasNoAwardDate,
+                            qts?.Id,
+                            itt,
+                            teacherStatus,
+                            qts?.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            earlyYearsStatus,
+                            qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount)),
+                    dfeta_ITTResult.Deferred => RouteToProfessionalStatusStatus.Deferred,
+                    dfeta_ITTResult.DeferredforSkillsTests => RouteToProfessionalStatusStatus.DeferredForSkillsTest,
+                    dfeta_ITTResult.Fail => RouteToProfessionalStatusStatus.Failed,
+                    dfeta_ITTResult.InTraining => RouteToProfessionalStatusStatus.InTraining,
+                    dfeta_ITTResult.Pass => throw new IttQtsMapException(
+                        IttQtsMapResult.Failed(
+                            contactId,
+                            IttQtsMapResultFailedReason.PassResultHasNoAwardDate,
+                            qts?.Id,
+                            itt,
+                            teacherStatus,
+                            qts?.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            earlyYearsStatus,
+                            qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount)),
+                    dfeta_ITTResult.UnderAssessment => RouteToProfessionalStatusStatus.UnderAssessment,
+                    dfeta_ITTResult.Withdrawn => RouteToProfessionalStatusStatus.Withdrawn,
+                    _ => throw new IttQtsMapException(
+                        IttQtsMapResult.Failed(
+                            contactId,
+                            IttQtsMapResultFailedReason.CannotMapStatus,
+                            qts?.Id,
+                            itt,
+                            teacherStatus,
+                            qts?.dfeta_QTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            earlyYearsStatus,
+                            qts?.dfeta_EYTSDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qts?.dfeta_DateofRecognition.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                            qtlsDate,
+                            ittQualification,
+                            statusDerivedRouteId: null,
+                            programmeTypeDerivedRouteId: null,
+                            ittQualificationDerivedRouteId: null,
+                            multiplePotentialCompatibleIttRecords: null,
+                            contactIttRowCount,
+                            contactQtsRowCount))
+                };
+
+            static async Task<RouteToProfessionalStatus> CreateProfessionalStatusAsync(
+                IClock clock,
+                ReferenceDataCache referenceDataCache,
+                RouteToProfessionalStatusType[] allRoutes,
+                Guid personId,
+                Guid routeId,
+                RouteToProfessionalStatusStatus status,
+                Guid? inductionExemptionReasonId,
+                DateOnly? awardedDate,
+                dfeta_qtsregistration? qts,
+                dfeta_initialteachertraining? itt,
+                dfeta_ittqualification? ittQualification,
+                dfeta_teacherstatus? teacherStatus,
+                dfeta_earlyyearsstatus? eyStatus)
+            {
+                var route = allRoutes.Single(r => r.RouteToProfessionalStatusTypeId == routeId);
+                var trainingAgeSpecialism = AgeRange.ConvertToTrsTrainingAgeSpecialism(itt?.dfeta_AgeRangeFrom, itt?.dfeta_AgeRangeTo);
+                var degreeTypeId = ittQualification?.ConvertToTrsDegreeTypeId() ?? null;
+                var country = itt?.dfeta_CountryId is not null ? await itt.dfeta_CountryId.Id.ConvertToTrsCountryAsync(referenceDataCache) : null;
+                var trainingSubjectIds = new List<Guid>();
+                if (itt?.dfeta_Subject1Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject1Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                if (itt?.dfeta_Subject2Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject2Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                if (itt?.dfeta_Subject3Id is not null)
+                {
+                    var subject = await itt.dfeta_Subject3Id.Id.ConvertToTrsTrainingSubjectAsync(referenceDataCache);
+                    if (subject is not null)
+                    {
+                        trainingSubjectIds.Add(subject.TrainingSubjectId);
+                    }
+                }
+
+                var trainingProvider = itt?.dfeta_EstablishmentId is not null
+                    ? await itt.dfeta_EstablishmentId.Id.ConvertToTrsTrainingProviderAsync(referenceDataCache)
+                    : null;
+
+                return new RouteToProfessionalStatus
+                {
+                    QualificationId = (qts?.Id ?? itt?.Id ?? personId), // allows for QTLS which is not linked to QTS or ITT
+                    CreatedOn = clock.UtcNow,
+                    UpdatedOn = clock.UtcNow,
+                    DeletedOn = null,
+                    PersonId = personId,
+                    RouteToProfessionalStatusTypeId = routeId,
+                    Status = status,
+                    TrainingStartDate = itt?.dfeta_ProgrammeStartDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    TrainingEndDate = itt?.dfeta_ProgrammeEndDate.ToDateOnlyWithDqtBstFix(isLocalTime: true),
+                    TrainingAgeSpecialismType = trainingAgeSpecialism?.TrainingAgeSpecialismType,
+                    TrainingAgeSpecialismRangeFrom = trainingAgeSpecialism?.TrainingAgeSpecialismRangeFrom,
+                    TrainingAgeSpecialismRangeTo = trainingAgeSpecialism?.TrainingAgeSpecialismRangeTo,
+                    HoldsFrom = awardedDate,
+                    DegreeTypeId = degreeTypeId,
+                    ExemptFromInduction = false,  // TODO  
+                    //InductionExemptionReasonId = inductionExemptionReasonId,  // FIXME
+                    TrainingSubjectIds = trainingSubjectIds.ToArray(),
+                    TrainingCountryId = country?.CountryId,
+                    TrainingProviderId = trainingProvider?.TrainingProviderId,
+                    DqtTeacherStatusName = teacherStatus?.dfeta_name,
+                    DqtTeacherStatusValue = teacherStatus?.dfeta_Value,
+                    DqtEarlyYearsStatusName = eyStatus?.dfeta_name,
+                    DqtEarlyYearsStatusValue = eyStatus?.dfeta_Value,
+                    DqtInitialTeacherTrainingId = itt?.Id,
+                    DqtQtsRegistrationId = qts?.Id,
+                    DqtAgeRangeFrom = itt?.dfeta_AgeRangeFrom.ToString(),
+                    DqtAgeRangeTo = itt?.dfeta_AgeRangeTo.ToString(),
+                };
+            }
+        }
+    }
+
+    public sealed class IttQtsMapResult
+    {
+        private IttQtsMapResult()
+        {
+        }
+
+        public bool Success { get; private set; }
+
+        public RouteToProfessionalStatus? ProfessionalStatus { get; private set; }
+
+        public Guid ContactId { get; private set; }
+
+        public IttQtsMapResultFailedReason? FailedReason { get; private set; }
+
+        public Guid? QtsRegistrationId { get; private set; }
+
+        public Guid? IttId { get; private set; }
+
+        public dfeta_teacherstatus? TeacherStatus { get; private set; }
+
+        public DateOnly? QtsDate { get; private set; }
+
+        public dfeta_earlyyearsstatus? EarlyYearsStatus { get; private set; }
+
+        public DateOnly? EytsDate { get; private set; }
+
+        public DateOnly? PartialRecognitionDate { get; private set; }
+
+        public DateOnly? QtlsDate { get; private set; }
+
+        public dfeta_ITTProgrammeType? ProgrammeType { get; private set; }
+
+        public dfeta_ITTResult? IttResult { get; private set; }
+
+        public dfeta_ittqualification? IttQualification { get; private set; }
+
+        public Guid? IttProviderId { get; private set; }
+
+        public Guid? IttSubjectId1 { get; private set; }
+
+        public Guid? IttSubjectId2 { get; private set; }
+
+        public Guid? IttSubjectId3 { get; private set; }
+
+        public Guid? IttCountryId { get; private set; }
+
+        public Guid? StatusDerivedRouteId { get; private set; }
+
+        public Guid? ProgrammeTypeDerivedRouteId { get; private set; }
+
+        public Guid? IttQualificationDerivedRouteId { get; private set; }
+
+        public Guid[]? MultiplePotentialCompatibleIttRecords { get; private set; }
+
+        public int ContactIttRowCount { get; private set; }
+
+        public int ContactQtsRowCount { get; private set; }
+
+        public static IttQtsMapResult Succeeded(RouteToProfessionalStatus ps)
+        {
+            return new IttQtsMapResult()
+            {
+                Success = true,
+                ProfessionalStatus = ps,
+                ContactId = ps.PersonId,
+                QtsRegistrationId = ps.DqtQtsRegistrationId,
+                IttId = ps.DqtInitialTeacherTrainingId
+            };
+        }
+
+        public static IttQtsMapResult Succeeded(
+            RouteToProfessionalStatus ps,
+            dfeta_initialteachertraining? itt,
+            dfeta_teacherstatus? teacherStatus,
+            DateOnly? qtsDate,
+            dfeta_earlyyearsstatus? earlyYearsStatus,
+            DateOnly? eytsDate,
+            DateOnly? partialRecognitionDate,
+            DateOnly? qtlsDate,
+            dfeta_ittqualification? ittQualification,
+            Guid? statusDerivedRouteId,
+            Guid? programmeTypeDerivedRouteId,
+            Guid? ittQualificationDerivedRouteId,
+            Guid[]? multiplePotentialCompatibleIttRecords,
+            int contactIttRowCount,
+            int contactQtsRowCount)
+        {
+            return new IttQtsMapResult()
+            {
+                Success = true,
+                ProfessionalStatus = ps,
+                ContactId = ps.PersonId,
+                QtsRegistrationId = ps.DqtQtsRegistrationId,
+                IttId = ps.DqtInitialTeacherTrainingId,
+                TeacherStatus = teacherStatus,
+                QtsDate = qtsDate,
+                EarlyYearsStatus = earlyYearsStatus,
+                EytsDate = eytsDate,
+                PartialRecognitionDate = partialRecognitionDate,
+                QtlsDate = qtlsDate,
+                ProgrammeType = itt?.dfeta_ProgrammeType,
+                IttResult = itt?.dfeta_Result,
+                IttProviderId = itt?.dfeta_EstablishmentId?.Id,
+                IttSubjectId1 = itt?.dfeta_Subject1Id?.Id,
+                IttSubjectId2 = itt?.dfeta_Subject2Id?.Id,
+                IttSubjectId3 = itt?.dfeta_Subject3Id?.Id,
+                IttCountryId = itt?.dfeta_CountryId?.Id,
+                IttQualification = ittQualification,
+                StatusDerivedRouteId = statusDerivedRouteId,
+                ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
+                IttQualificationDerivedRouteId = ittQualificationDerivedRouteId,
+                MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords,
+                ContactIttRowCount = contactIttRowCount,
+                ContactQtsRowCount = contactQtsRowCount
+            };
+        }
+
+        public static IttQtsMapResult Failed(
+            Guid contactId,
+            IttQtsMapResultFailedReason reason,
+            Guid? qtsRegistrationId,
+            dfeta_initialteachertraining? itt,
+            dfeta_teacherstatus? teacherStatus,
+            DateOnly? qtsDate,
+            dfeta_earlyyearsstatus? earlyYearsStatus,
+            DateOnly? eytsDate,
+            DateOnly? partialRecognitionDate,
+            DateOnly? qtlsDate,
+            dfeta_ittqualification? ittQualification,
+            Guid? statusDerivedRouteId,
+            Guid? programmeTypeDerivedRouteId,
+            Guid? ittQualificationDerivedRouteId,
+            Guid[]? multiplePotentialCompatibleIttRecords,
+            int contactIttRowCount,
+            int contactQtsRowCount)
+        {
+            return new IttQtsMapResult()
+            {
+                Success = false,
+                ContactId = contactId,
+                FailedReason = reason,
+                QtsRegistrationId = qtsRegistrationId,
+                IttId = itt?.Id,
+                TeacherStatus = teacherStatus,
+                QtsDate = qtsDate,
+                EarlyYearsStatus = earlyYearsStatus,
+                EytsDate = eytsDate,
+                PartialRecognitionDate = partialRecognitionDate,
+                QtlsDate = qtlsDate,
+                ProgrammeType = itt?.dfeta_ProgrammeType,
+                IttResult = itt?.dfeta_Result,
+                IttProviderId = itt?.dfeta_EstablishmentId?.Id,
+                IttSubjectId1 = itt?.dfeta_Subject1Id?.Id,
+                IttSubjectId2 = itt?.dfeta_Subject2Id?.Id,
+                IttSubjectId3 = itt?.dfeta_Subject3Id?.Id,
+                IttCountryId = itt?.dfeta_CountryId?.Id,
+                IttQualification = ittQualification,
+                StatusDerivedRouteId = statusDerivedRouteId,
+                ProgrammeTypeDerivedRouteId = programmeTypeDerivedRouteId,
+                IttQualificationDerivedRouteId = ittQualificationDerivedRouteId,
+                MultiplePotentialCompatibleIttRecords = multiplePotentialCompatibleIttRecords,
+                ContactIttRowCount = contactIttRowCount,
+                ContactQtsRowCount = contactQtsRowCount
+            };
+        }
+    }
+
+    public enum IttQtsMapResultFailedReason
+    {
+        CannotMapStatus,
+        PassResultHasNoAwardDate,
+        ApprovedResultHasNoAwardDate,
+        CannotDeriveRoute,
+        PartialRecognitionIsInvalid,
+        PotentialDuplicateIttRecords,
+        DoNotMigrateIttResult,
+        DoNotMigrateNoQualificationRestrictedByGtc,
+        DoNotMigrateQtsRegistrationHasNoStatus,
+        DoNotMigrateQtsAwardedInWalesDuplicateIttRecords,
+    }
+
+    private class IttQtsMapException(IttQtsMapResult result) : Exception
+    {
+        public IttQtsMapResult Result { get; } = result;
+    }
+
     private record ModelTypeSyncInfo
     {
         public required string? CreateTempTableStatement { get; init; }
@@ -2061,6 +3443,13 @@ public class TrsDataSyncHelper(
         public const string Event = "Event";
         public const string Induction = "Induction";
         public const string DqtNote = "Annotation";
+    }
+
+    private enum RouteMappingPrecedence
+    {
+        TeachingStatus,
+        ProgrammeType,
+        IttQualification
     }
 }
 
