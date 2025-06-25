@@ -38,7 +38,7 @@
     @if (Model.HasInductionExemptionRequired != FieldRequirement.NotApplicable)
     {
         <govuk-summary-list-row>
-            <govuk-summary-list-row-key>Has exemption</govuk-summary-list-row-key>
+            <govuk-summary-list-row-key>Induction exemption</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@(Model.IsExemptFromInduction.HasValue ? Model.IsExemptFromInduction.Value ? "Yes" : "No" : null)</govuk-summary-list-row-value>
             @if (!Model.HasImplicitExemption.HasValue || Model.HasImplicitExemption.HasValue && !Model.HasImplicitExemption.Value)
             {

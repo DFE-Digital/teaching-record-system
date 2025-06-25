@@ -1052,7 +1052,7 @@ public class EditRouteToProfessionalStatusTests : TestBase
 
         await page.AssertOnRouteCheckYourAnswersPageAsync(qualificationId);
         await page.AssertContentEquals(holdsFrom.ToString(UiDefaults.DateOnlyDisplayFormat), "Professional status date");
-        await page.AssertContentEquals("Yes", "Has exemption");
+        await page.AssertContentEquals("Yes", "Induction exemption");
 
         await page.ClickLinkForElementWithTestIdAsync("edit-status-link");
         await page.AssertOnRouteEditStatusPageAsync(qualificationId);
