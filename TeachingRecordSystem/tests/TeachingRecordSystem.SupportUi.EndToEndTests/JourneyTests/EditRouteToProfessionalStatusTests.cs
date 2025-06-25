@@ -17,7 +17,16 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditEachField_Cya_ShowsEditedContent()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r =>
+                r.TrainingStartDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingCountryRequired != FieldRequirement.NotApplicable
+                && r.HoldsFromRequired != FieldRequirement.NotApplicable
+                && r.InductionExemptionRequired != FieldRequirement.NotApplicable
+                && r.DegreeTypeRequired != FieldRequirement.NotApplicable
+                && r.TrainingSubjectsRequired != FieldRequirement.NotApplicable
+                && r.TrainingProviderRequired != FieldRequirement.NotApplicable
+                && r.TrainingAgeSpecialismTypeRequired != FieldRequirement.NotApplicable)
             .First();
         var status = RouteToProfessionalStatusStatus.Holds;
         var startDate = new DateOnly(2021, 1, 1);
@@ -272,7 +281,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditEndDate_ToCya_EditEndDate_Continue()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r =>
+                r.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingProviderRequired == FieldRequirement.Optional
+                && r.DegreeTypeRequired == FieldRequirement.Optional
+                && r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional
+                && r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var country = await TestData.ReferenceDataCache.GetTrainingCountryByIdAsync(_countryCode);
@@ -330,7 +344,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditStartDate_ToCya_EditStartDate_Continue()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r =>
+                r.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingProviderRequired == FieldRequirement.Optional
+                && r.DegreeTypeRequired == FieldRequirement.Optional
+                && r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional
+                && r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
@@ -390,7 +409,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditEndDate_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r =>
+                r.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingProviderRequired == FieldRequirement.Optional
+                && r.DegreeTypeRequired == FieldRequirement.Optional
+                && r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional
+                && r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
@@ -453,7 +477,12 @@ public class EditRouteToProfessionalStatusTests : TestBase
     public async Task EditStartDate_BackLinks()
     {
         var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
-            .Where(r => r.ProfessionalStatusType == ProfessionalStatusType.QualifiedTeacherStatus)
+            .Where(r =>
+                r.TrainingEndDateRequired != FieldRequirement.NotApplicable
+                && r.TrainingProviderRequired == FieldRequirement.Optional
+                && r.DegreeTypeRequired == FieldRequirement.Optional
+                && r.TrainingAgeSpecialismTypeRequired == FieldRequirement.Optional
+                && r.TrainingSubjectsRequired == FieldRequirement.Optional)
             .First();
         var status = RouteToProfessionalStatusStatus.InTraining;
         var startDate = new DateOnly(2021, 1, 1);
