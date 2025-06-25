@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
@@ -254,18 +253,15 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         var expectedDuplicateRowCount = 0;
         var expectedFailureRowCount = 1;
         var person1AwardedDate = new DateOnly(2011, 01, 04);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId)
-            .RandomOne();
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .First(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId);
         var status = ProfessionalStatusStatusRegistry.All
             .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
             .RandomOne()
             .Value;
         var person1 = await TestData.CreatePersonAsync(p => p.WithTrn()
             .WithQts()
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
+            .WithHoldsRouteToProfessionalStatus(route.ProfessionalStatusType, person1AwardedDate));
         var person2 = await TestData.CreatePersonAsync(p => p.WithTrn());
         var expectedValueMessage = $"Teacher with TRN {person1.Trn} has QTS already.";
         var csvContent = $"QTS_REF_NO,FORENAME,SURNAME,DATE_OF_BIRTH,QTS_STATUS,QTS_DATE,ITT StartMONTH,ITT START YY,ITT End Date,ITT Course Length,ITT Estab LEA code,ITT Estab Code,ITT Qual Code,ITT Class Code,ITT Subject Code 1,ITT Subject Code 2,ITT Min Age Range,ITT Max Age Range,ITT Min Sp Age Range,ITT Max Sp Age Range,ITT Course Length,PQ Year of Award,COUNTRY,PQ Estab Code,PQ Qual Code,HONOURS,PQ Class Code,PQ Subject Code 1,PQ Subject Code 2,PQ Subject Code 3\r\n{person1.Trn},firstname,lastname,{person1.DateOfBirth.ToString("dd/MM/yyyy")},49,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n{person2.Trn},firstname,lastname,{person2.DateOfBirth.ToString("dd/MM/yyyy")},49,04/04/2014,,,,,,,,,,,,,,,,,,,,,,,,\r\n";
@@ -305,21 +301,14 @@ public class EwcWalesImportJobTests : IClassFixture<EwcWalesImportJobFixture>
         // Arrange
         var person1AwardedDate = new DateOnly(2011, 01, 04);
         var person2AwardedDate = new DateOnly(2000, 01, 07);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId)
-            .RandomOne();
-        var status = ProfessionalStatusStatusRegistry.All
-            .Where(s => s.DegreeTypeRequired == FieldRequirement.Optional)
-            .RandomOne()
-            .Value;
-        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
-        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person2AwardedDate)));
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .First(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId);
+        var person1 = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithQts()
+            .WithHoldsRouteToProfessionalStatus(route.ProfessionalStatusType, person1AwardedDate));
+        var person2 = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithQts()
+            .WithHoldsRouteToProfessionalStatus(route.ProfessionalStatusType, person2AwardedDate));
         var person3 = await TestData.CreatePersonAsync(x => x.WithTrn());
         var person4 = await TestData.CreatePersonAsync(x => x.WithTrn());
         var expectedTotalRowCount = 4;

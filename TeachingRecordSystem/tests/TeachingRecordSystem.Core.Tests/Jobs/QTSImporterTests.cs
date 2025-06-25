@@ -85,12 +85,11 @@ public class QtsImporterTests : IAsyncLifetime
     {
         // Arrange
         var person1AwardedDate = new DateOnly(2011, 01, 04);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .First(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId);
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+            .First(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithQts()
+            .WithHoldsRouteToProfessionalStatus(route.ProfessionalStatusType, person1AwardedDate));
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;
@@ -977,13 +976,11 @@ public class QtsImporterTests : IAsyncLifetime
             x.WithAccountNumber(accountNumber);
         });
         var person1AwardedDate = new DateOnly(2011, 01, 04);
-        var route = (await TestData.ReferenceDataCache.GetRoutesToProfessionalStatusAsync())
-            .Where(r => r.RouteToProfessionalStatusId == RouteToProfessionalStatus.WelshRId)
-            .RandomOne();
-        var person = await TestData.CreatePersonAsync(p => p.WithTrn().WithQts()
-            .WithProfessionalStatus(r => r
-                .WithRoute(route.RouteToProfessionalStatusId)
-                .WithStatus(ProfessionalStatusStatus.Approved).WithAwardedDate(person1AwardedDate)));
+        var route = (await TestData.ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync())
+           .First(r => r.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId);
+        var person = await TestData.CreatePersonAsync(p => p.WithTrn()
+            .WithQts()
+            .WithHoldsRouteToProfessionalStatus(route.ProfessionalStatusType, person1AwardedDate));
         var row = GetDefaultRow(x =>
         {
             x.QtsRefNo = person.Trn!;

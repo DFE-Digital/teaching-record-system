@@ -1,4 +1,3 @@
-using Faker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +12,6 @@ using TeachingRecordSystem.Core.Services.Files;
 using TeachingRecordSystem.Core.Services.TrnRequests;
 using TeachingRecordSystem.Core.Services.TrsDataSync;
 using TeachingRecordSystem.Core.Services.Webhooks;
-using Country = TeachingRecordSystem.Core.DataStore.Postgres.Models.Country;
 using SystemUser = TeachingRecordSystem.Core.DataStore.Postgres.Models.SystemUser;
 
 namespace TeachingRecordSystem.Core.Tests.Services.DqtOutbox;
@@ -236,9 +234,9 @@ public class OutboxMessageHandlerTests : IClassFixture<OutboxMessageHandlerFixtu
         // Assert
         await WithDbContextAsync(async dbContext =>
         {
-            var professionalStatus = await dbContext.ProfessionalStatuses.SingleAsync(p => p.PersonId == person.PersonId);
+            var professionalStatus = await dbContext.RouteToProfessionalStatuses.SingleAsync(p => p.PersonId == person.PersonId);
             Assert.NotNull(professionalStatus);
-            Assert.Equal(awardedDate, professionalStatus.AwardedDate);
+            Assert.Equal(awardedDate, professionalStatus.HoldsFrom);
             Assert.Null(professionalStatus.TrainingProviderId);
         });
     }

@@ -1,4 +1,4 @@
-﻿using TeachingRecordSystem.Core.DataStore.Postgres;
+using TeachingRecordSystem.Core.DataStore.Postgres;
 using TeachingRecordSystem.Core.DataStore.Postgres.Models;
 using TeachingRecordSystem.Core.Services.DqtOutbox.Messages;
 
@@ -10,13 +10,14 @@ public class AddWelshRMessageHandler(TrsDbContext dbContext, IClock clock) : IMe
     {
         var person = await dbContext.Persons.Include(i => i.Qualifications).SingleAsync(p => p.PersonId == message.PersonId);
         var allRoutes = await dbContext.RoutesToProfessionalStatus.ToArrayAsync();
+        var welshrRoute = allRoutes.Single(x => x.RouteToProfessionalStatusTypeId == RouteToProfessionalStatusType.WelshRId);
 
-        dbContext.ProfessionalStatuses.Add(ProfessionalStatus.Create(
+        dbContext.RouteToProfessionalStatuses.Add(RouteToProfessionalStatus.Create(
             person: person,
-            allRoutes: allRoutes,
-            routeToProfessionalStatusId: RouteToProfessionalStatus.WelshRId,
-            status: ProfessionalStatusStatus.Awarded,
-            awardedDate: message.AwardedDate,
+            allRouteTypes: allRoutes,
+            routeToProfessionalStatusTypeId: welshrRoute.RouteToProfessionalStatusTypeId,
+            status: RouteToProfessionalStatusStatus.Holds,
+            holdsFrom: message.AwardedDate,
             trainingStartDate: null,
             trainingEndDate: null,
             trainingSubjectIds: null,
@@ -29,9 +30,11 @@ public class AddWelshRMessageHandler(TrsDbContext dbContext, IClock clock) : IMe
             isExemptFromInduction: null,
             createdBy: DataStore.Postgres.Models.SystemUser.SystemUserId,
             now: clock.UtcNow,
+            changeReason: null,
+            changeReasonDetail: null,
+            evidenceFile: null,
             out var addEvent));
 
         await dbContext.SaveChangesAsync();
-
     }
 }
