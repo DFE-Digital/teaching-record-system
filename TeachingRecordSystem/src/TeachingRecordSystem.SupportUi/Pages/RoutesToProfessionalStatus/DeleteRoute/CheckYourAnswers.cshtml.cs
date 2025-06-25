@@ -25,7 +25,7 @@ public class CheckYourAnswersModel(
     public ChangeReasonOption? ChangeReason;
     public ChangeReasonDetailsState ChangeReasonDetail { get; set; } = new();
 
-    public string BackLink => linkGenerator.RouteChangeReason(QualificationId, JourneyInstance!.InstanceId);
+    public string BackLink => linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance!.InstanceId);
 
     [FromRoute]
     public Guid QualificationId { get; set; }
@@ -42,7 +42,7 @@ public class CheckYourAnswersModel(
     {
         if (!JourneyInstance!.State.Completed)
         {
-            return Redirect(linkGenerator.DeleteRouteChangeReason(QualificationId, JourneyInstance!.InstanceId, fromCheckAnswers: true));
+            return Redirect(linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance!.InstanceId, fromCheckAnswers: true));
         }
         var professionalStatus = HttpContext.GetCurrentProfessionalStatusFeature().RouteToProfessionalStatus;
         var allRoutes = await referenceDataCache.GetRouteToProfessionalStatusTypesAsync(activeOnly: false);
@@ -85,7 +85,7 @@ public class CheckYourAnswersModel(
     {
         if (!JourneyInstance!.State.ChangeReasonIsComplete)
         {
-            context.Result = Redirect(linkGenerator.DeleteRouteChangeReason(QualificationId, JourneyInstance.InstanceId));
+            context.Result = Redirect(linkGenerator.RouteDeleteChangeReason(QualificationId, JourneyInstance.InstanceId));
             return;
         }
 

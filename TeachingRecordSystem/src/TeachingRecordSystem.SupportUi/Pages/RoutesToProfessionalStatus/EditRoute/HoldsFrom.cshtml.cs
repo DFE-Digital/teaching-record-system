@@ -48,7 +48,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
         var nextPage = JourneyInstance!.State.IsCompletingRoute ?
             NextCompletingRoutePage :
             FromCheckAnswers ?
-                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
         if (JourneyInstance!.State.IsCompletingRoute) // if user has set the status to 'holds' from another status
@@ -95,7 +95,7 @@ public class HoldsFromModel(IClock clock, TrsLinkGenerator linkGenerator) : Page
     }
 
     public string BackLink => FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             JourneyInstance!.State.IsCompletingRoute ?
                 linkGenerator.RouteEditStatus(QualificationId, JourneyInstance!.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);

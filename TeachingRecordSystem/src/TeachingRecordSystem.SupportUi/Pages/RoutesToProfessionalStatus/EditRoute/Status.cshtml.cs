@@ -80,7 +80,7 @@ public class StatusModel(
         return Redirect(CompletingRoute ?
             linkGenerator.RouteEditHoldsFrom(QualificationId, JourneyInstance!.InstanceId) :
             FromCheckAnswers ?
-                linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+                linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
                 linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 
@@ -103,7 +103,7 @@ public class StatusModel(
 
     public string BackLink =>
          FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance!.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance!.InstanceId);
 
     private bool CompletingRoute => Status is RouteToProfessionalStatusStatus.Holds && (JourneyInstance!.State.CurrentStatus is not RouteToProfessionalStatusStatus.Holds);

@@ -66,7 +66,7 @@ public class SubjectSpecialismsModel(TrsLinkGenerator linkGenerator, ReferenceDa
         await JourneyInstance!.UpdateStateAsync(s => s.TrainingSubjectIds = subjects);
 
         return Redirect(FromCheckAnswers ?
-            linkGenerator.RouteCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
+            linkGenerator.RouteEditCheckYourAnswers(QualificationId, JourneyInstance.InstanceId) :
             linkGenerator.RouteEditDetail(QualificationId, JourneyInstance.InstanceId));
     }
 

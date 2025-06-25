@@ -5,7 +5,7 @@ public enum AddRoutePage
     Route = 0,
     Status,
     StartAndEndDate,
-    AwardDate,
+    HoldsFrom,
     InductionExemption,
     TrainingProvider,
     DegreeType,
