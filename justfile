@@ -16,11 +16,13 @@ default:
 # Install local tools
 install-tools:
   @cd {{solution-root}} && dotnet tool restore
+  @npm install -g sass
 
 # Restore dependencies
 restore:
   @cd {{solution-root}} && dotnet restore --locked-mode
   @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi" }} && dotnet libman restore --verbosity quiet
+  @cd {{solution-root / "src" / "TeachingRecordSystem.AuthorizeAccess" }} && dotnet libman restore --verbosity quiet
 
 # Install Playwright
 install-playwright:
@@ -88,7 +90,7 @@ watch-ui:
 
 # Watch for file changes and compile any SASS files that have changed
 watch-ui-sass:
-  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch msbuild /t:DartSass_Build
+  @cd {{solution-root / "src" / "TeachingRecordSystem.SupportUi"}} && dotnet watch msbuild /t:CompileSass
 
 # Run the Worker project in Development mode and watch for file changes
 watch-worker:

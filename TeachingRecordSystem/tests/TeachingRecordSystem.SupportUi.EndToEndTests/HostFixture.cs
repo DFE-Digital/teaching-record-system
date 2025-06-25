@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Playwright;
@@ -69,8 +68,6 @@ public sealed class HostFixture : IAsyncDisposable, IStartupTask
                 builder.ConfigureServices((context, services) =>
                 {
                     DbHelper.ConfigureDbServices(services, context.Configuration.GetRequiredConnectionString("DefaultConnection"));
-
-                    services.Configure<GovUkFrontendOptions>(options => options.DefaultFileUploadJavaScriptEnhancements = false);
 
                     services.AddAuthentication()
                         .AddScheme<TestAuthenticationOptions, TestAuthenticationHandler>("Test", options => { });
