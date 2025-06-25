@@ -8,22 +8,18 @@
 
 <h1 class="govuk-heading-l" data-testid="page-title">@ViewBag.Title</h1>
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds-from-desktop">
-        @if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
-        {
-            <nav class="moj-sub-navigation" aria-label="Sub navigation">
-                <ul class="moj-sub-navigation__list">
-                    <li class="moj-sub-navigation__item">
-                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.FindARecord ? "page" : null)" href="@LinkGenerator.Persons()">Find a record</a>
-                    </li>
-                    <li class="moj-sub-navigation__item">
-                        <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.CreateARecord ? "page" : null)" href="@LinkGenerator.PersonCreate()">Create a record</a>
-                    </li>
-                </ul>
-            </nav>
-        }
+@if (FeatureProvider.IsEnabled(FeatureNames.ContactsMigrated))
+{
+    <nav class="moj-sub-navigation" aria-label="Sub navigation">
+        <ul class="moj-sub-navigation__list">
+            <li class="moj-sub-navigation__item">
+                <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.FindARecord ? "page" : null)" href="@LinkGenerator.Persons()">Find a record</a>
+            </li>
+            <li class="moj-sub-navigation__item">
+                <a class="moj-sub-navigation__link" aria-current="@(selectedTab == PersonsSubNavigationTab.CreateARecord ? "page" : null)" href="@LinkGenerator.PersonCreate()">Create a record</a>
+            </li>
+        </ul>
+    </nav>
+}
 
-        @RenderBody()
-    </div>
-</div>
+@RenderBody()
