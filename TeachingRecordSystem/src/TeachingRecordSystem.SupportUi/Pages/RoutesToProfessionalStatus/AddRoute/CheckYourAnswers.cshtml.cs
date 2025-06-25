@@ -89,12 +89,39 @@ public class CheckYourAnswersModel(TrsLinkGenerator linkGenerator,
             context.Result = new BadRequestResult();
             return;
         }
-        if (!JourneyInstance!.State.ChangeReasonIsComplete)
-        {
-            context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
-            return;
-        }
 
+        //if (!JourneyInstance!.State.ChangeReasonIsComplete)
+        //{
+        //    context.Result = Redirect(LinkGenerator.RouteAddChangeReason(PersonId, JourneyInstance.InstanceId));
+        //    return;
+        //}
+
+        var pagesInOrder = Enum.GetValues(typeof(AddRoutePage))
+            .Cast<AddRoutePage>()
+            .OrderBy(p => p);
+
+        foreach (var page in pagesInOrder)
+        {
+            var pageRequired = PageDriver.FieldRequirementForPage(page, Route, Status);
+
+            if (pageRequired == FieldRequirement.Mandatory && !JourneyInstance!.State.IsComplete(page))
+            {
+                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId));
+                return;
+
+                //// if the route has an implicit exemption, don't show the induction exemption page
+                //if (page == AddRoutePage.InductionExemption
+                //    && route.InductionExemptionReason is not null
+                //    && route.InductionExemptionReason.RouteImplicitExemption)
+                //{
+                //    continue;
+                //}
+                //else
+                //{
+                //    return page;
+                //}
+            }
+        }
 
         var personInfo = context.HttpContext.GetCurrentPersonFeature();
         PersonName = personInfo.Name;
