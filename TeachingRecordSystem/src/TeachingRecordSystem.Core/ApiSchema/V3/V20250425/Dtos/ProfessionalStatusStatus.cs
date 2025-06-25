@@ -14,19 +14,9 @@ public enum ProfessionalStatusStatus
 
 public static class ProfessionalStatusStatusExtensions
 {
-    public static ProfessionalStatusStatus ConvertFromProfessionalStatusStatus(this RouteToProfessionalStatusStatus input)
+    public static RouteToProfessionalStatusStatus ConvertToRouteToProfessionalStatusStatus(this ProfessionalStatusStatus input)
     {
-        if (!input.TryConvertFromProfessionalStatusStatus(out var result))
-        {
-            throw new FormatException($"Unknown {typeof(RouteToProfessionalStatusStatus).Name}: '{input}'.");
-        }
-
-        return result;
-    }
-
-    public static RouteToProfessionalStatusStatus ConvertToProfessionalStatusStatus(this ProfessionalStatusStatus input)
-    {
-        if (!input.TryConvertToProfessionalStatusStatus(out var result))
+        if (!input.TryConvertToRouteToProfessionalStatusStatus(out var result))
         {
             throw new FormatException($"Unknown {typeof(ProfessionalStatusStatus).Name}: '{input}'.");
         }
@@ -34,33 +24,7 @@ public static class ProfessionalStatusStatusExtensions
         return result;
     }
 
-    public static bool TryConvertFromProfessionalStatusStatus(this RouteToProfessionalStatusStatus input, out ProfessionalStatusStatus result)
-    {
-        var mapped = input switch
-        {
-            RouteToProfessionalStatusStatus.InTraining => ProfessionalStatusStatus.InTraining,
-            RouteToProfessionalStatusStatus.Holds => ProfessionalStatusStatus.Awarded,
-            RouteToProfessionalStatusStatus.Deferred => ProfessionalStatusStatus.Deferred,
-            RouteToProfessionalStatusStatus.DeferredForSkillsTest => ProfessionalStatusStatus.DeferredForSkillsTest,
-            RouteToProfessionalStatusStatus.Failed => ProfessionalStatusStatus.Failed,
-            RouteToProfessionalStatusStatus.Withdrawn => ProfessionalStatusStatus.Withdrawn,
-            RouteToProfessionalStatusStatus.UnderAssessment => ProfessionalStatusStatus.UnderAssessment,
-            _ => (ProfessionalStatusStatus?)null
-        };
-
-        if (mapped.HasValue)
-        {
-            result = mapped.Value;
-            return true;
-        }
-        else
-        {
-            result = default;
-            return false;
-        }
-    }
-
-    public static bool TryConvertToProfessionalStatusStatus(this ProfessionalStatusStatus input, out RouteToProfessionalStatusStatus result)
+    public static bool TryConvertToRouteToProfessionalStatusStatus(this ProfessionalStatusStatus input, out RouteToProfessionalStatusStatus result)
     {
         var mapped = input switch
         {

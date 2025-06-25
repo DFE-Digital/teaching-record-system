@@ -12,6 +12,7 @@ using EytsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.EytsInfo;
 using InductionInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.InductionInfo;
 using QtlsStatus = TeachingRecordSystem.Core.Models.QtlsStatus;
 using QtsInfo = TeachingRecordSystem.Api.V3.Implementation.Dtos.QtsInfo;
+using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.Models.RouteToProfessionalStatusStatus;
 using TrainingAgeSpecialism = TeachingRecordSystem.Api.V3.Implementation.Dtos.TrainingAgeSpecialism;
 
 namespace TeachingRecordSystem.Api.V3.Implementation.Operations;

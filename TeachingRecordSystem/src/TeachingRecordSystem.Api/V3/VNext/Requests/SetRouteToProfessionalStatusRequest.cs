@@ -1,5 +1,5 @@
 using Optional;
-using TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos;
+using RouteToProfessionalStatusStatus = TeachingRecordSystem.Core.ApiSchema.V3.VNext.Dtos.RouteToProfessionalStatusStatus;
 using TrainingAgeSpecialismType = TeachingRecordSystem.Core.ApiSchema.V3.V20250425.Dtos.TrainingAgeSpecialismType;
 
 namespace TeachingRecordSystem.Api.V3.VNext.Requests;
@@ -7,7 +7,7 @@ namespace TeachingRecordSystem.Api.V3.VNext.Requests;
 public record SetRouteToProfessionalStatusRequest
 {
     public required Guid RouteToProfessionalStatusTypeId { get; init; }
-    public required ProfessionalStatusStatus Status { get; init; }
+    public required RouteToProfessionalStatusStatus Status { get; init; }
     public DateOnly? HoldsFrom { get; init; }
     public DateOnly? TrainingStartDate { get; init; }
     public DateOnly? TrainingEndDate { get; init; }

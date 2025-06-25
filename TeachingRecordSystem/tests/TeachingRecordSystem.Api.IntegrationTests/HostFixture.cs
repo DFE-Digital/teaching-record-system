@@ -75,6 +75,7 @@ public class HostFixture : WebApplicationFactory<Program>
             services.AddTestScoped<IGetAnIdentityApiClient>(tss => tss.GetAnIdentityApiClientMock.Object);
             services.AddTestScoped<IOptions<AccessYourTeachingQualificationsOptions>>(tss => tss.AccessYourTeachingQualificationsOptions);
             services.AddTestScoped<IFileService>(tss => tss.BlobStorageFileServiceMock.Object);
+            services.AddTestScoped<IFeatureProvider>(tss => tss.FeatureProvider);
             services.AddSingleton<TestData>(
                 sp => ActivatorUtilities.CreateInstance<TestData>(
                     sp,

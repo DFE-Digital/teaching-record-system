@@ -113,7 +113,7 @@ public class TrsDbContext : DbContext
 
     public DbSet<TrainingSubject> TrainingSubjects => Set<TrainingSubject>();
 
-    public DbSet<RouteToProfessionalStatusType> RoutesToProfessionalStatus => Set<RouteToProfessionalStatusType>();
+    public DbSet<RouteToProfessionalStatusType> RouteToProfessionalStatusTypes => Set<RouteToProfessionalStatusType>();
 
     public DbSet<OutboxMessageProcessorMetadata> OutboxMessageProcessorMetadata => Set<OutboxMessageProcessorMetadata>();
 

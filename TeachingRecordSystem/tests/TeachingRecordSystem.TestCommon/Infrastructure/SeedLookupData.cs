@@ -35,6 +35,22 @@ public class SeedLookupData(IDbContextFactory<TrsDbContext> dbContextFactory) : 
             Ukprn = "23456789"
         });
 
+        dbContext.TrainingProviders.Add(new TrainingProvider()
+        {
+            IsActive = true,
+            Name = "Non-UK establishment",
+            TrainingProviderId = Guid.NewGuid(),
+            Ukprn = null
+        });
+
+        dbContext.TrainingProviders.Add(new TrainingProvider()
+        {
+            IsActive = true,
+            Name = "UK establishment (Scotland/Northern Ireland)",
+            TrainingProviderId = Guid.NewGuid(),
+            Ukprn = null
+        });
+
         await dbContext.SaveChangesAsync();
     }
 }
