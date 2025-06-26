@@ -55,16 +55,6 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
         return Task.FromResult(nextPage);
     }
 
-    public AddRoutePage? NextPage(AddRoutePage currentPage)
-    {
-        return PageDriver.NextPage(Route, Status, currentPage);
-    }
-
-    public AddRoutePage? PreviousPage(AddRoutePage currentPage)
-    {
-        return PageDriver.PreviousPage(Route, Status, currentPage);
-    }
-
     public async Task<IActionResult> OnPostCancelAsync()
     {
         await JourneyInstance!.DeleteAsync();

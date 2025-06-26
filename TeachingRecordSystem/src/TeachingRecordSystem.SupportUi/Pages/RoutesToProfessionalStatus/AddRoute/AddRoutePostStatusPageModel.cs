@@ -14,8 +14,6 @@ public abstract class AddRoutePostStatusPageModel(AddRoutePage currentPage, TrsL
 
     public override AddRoutePage? PreviousPage => PageDriver.PreviousPage(Route, Status, CurrentPage);
 
-    public bool IsLastPage => PageDriver.IsLastPage(CurrentPage);
-
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
         if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))

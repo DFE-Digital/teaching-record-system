@@ -69,7 +69,7 @@
             <govuk-summary-list-row-key>Training provider</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingProvider</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-training-provider-link" href="@LinkGenerator.RouteAddTrainingProvider(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers, Model.ChangeLinkHistory, Model.ChangeLinkPreviousHistory)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-training-provider-link" href="@LinkGenerator.RouteAddTrainingProvider(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training provider">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -80,18 +80,18 @@
             <govuk-summary-list-row-key>Degree type</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.DegreeType</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-degree-type-link" href="@LinkGenerator.RouteAddDegreeType(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers, Model.ChangeLinkHistory, Model.ChangeLinkPreviousHistory)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-degree-type-link" href="@LinkGenerator.RouteAddDegreeType(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="degree type">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
-  
+
     @if (Model.TrainingCountryRequired != FieldRequirement.NotApplicable)
     {
         <govuk-summary-list-row>
             <govuk-summary-list-row-key>Country of training</govuk-summary-list-row-key>
             <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingCountry</govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-country-link" href="@LinkGenerator.RouteAddCountry(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers, Model.ChangeLinkHistory, Model.ChangeLinkPreviousHistory)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-country-link" href="@LinkGenerator.RouteAddCountry(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training country">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
@@ -104,14 +104,14 @@
             {
                 <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismRange</govuk-summary-list-row-value>
                 <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action data-testid="add-age-range-link" href="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers, Model.ChangeLinkHistory, Model.ChangeLinkPreviousHistory)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                    <govuk-summary-list-row-action data-testid="add-age-range-link" href="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
                 </govuk-summary-list-row-actions>
             }
             else
             {
                 <govuk-summary-list-row-value use-empty-fallback>@Model.TrainingAgeSpecialismType?.GetDisplayName()</govuk-summary-list-row-value>
                 <govuk-summary-list-row-actions>
-                    <govuk-summary-list-row-action data-testid="add-age-range-link" href="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers, Model.ChangeLinkHistory, Model.ChangeLinkPreviousHistory)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
+                    <govuk-summary-list-row-action data-testid="add-age-range-link" href="@LinkGenerator.RouteAddAgeRangeSpecialism(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="age range">Change</govuk-summary-list-row-action>
                 </govuk-summary-list-row-actions>
             }
         </govuk-summary-list-row>
@@ -137,7 +137,7 @@
                 }
             </govuk-summary-list-row-value>
             <govuk-summary-list-row-actions>
-                <govuk-summary-list-row-action data-testid="add-subjects-link" href="@LinkGenerator.RouteAddSubjectSpecialisms(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers, Model.ChangeLinkHistory, Model.ChangeLinkPreviousHistory)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
+                <govuk-summary-list-row-action data-testid="add-subjects-link" href="@LinkGenerator.RouteAddSubjectSpecialisms(Model.PersonId, Model.JourneyInstanceId, Model.FromCheckAnswers)" visually-hidden-text="training subjects">Change</govuk-summary-list-row-action>
             </govuk-summary-list-row-actions>
         </govuk-summary-list-row>
     }
