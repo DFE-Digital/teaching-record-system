@@ -346,9 +346,25 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).First(r => r.Name == "Early Years ITT Assessment Only");
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var trainingProvider = (await ReferenceDataCache.GetTrainingProvidersAsync()).First();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(RouteToProfessionalStatusStatus.Holds)
+            .WithHoldsStatusFields(Clock)
+            .WithTrainingCountryId(country.CountryId)
+            .WithInductionExemption(true)
+            .WithTrainingProviderId(trainingProvider.TrainingProviderId)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithValidChangeReasonOption()
+            .Build();
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            ProfessionalStatusType.EarlyYearsTeacherStatus);
+            addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post,
             $"/route/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -377,9 +393,23 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).Single(r => r.Name == "EYPS");
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+        var degreeType = (await ReferenceDataCache.GetDegreeTypesAsync()).RandomOne();
+
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(RouteToProfessionalStatusStatus.Holds)
+            .WithHoldsStatusFields(Clock)
+            .WithTrainingCountryId(country.CountryId)
+            .WithInductionExemption(true)
+            .WithDegreeTypeId(degreeType.DegreeTypeId)
+            .WithValidChangeReasonOption()
+            .Build();
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            ProfessionalStatusType.EarlyYearsProfessionalStatus);
+            addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post,
             $"/route/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");
@@ -408,9 +438,20 @@ public class CheckYourAnswersTests(HostFixture hostFixture) : TestBase(hostFixtu
         // Arrange
         var person = await TestData.CreatePersonAsync();
 
+        var route = (await ReferenceDataCache.GetRouteToProfessionalStatusTypesAsync()).First(r => r.Name == "European Recognition - PQTS");
+        var country = (await ReferenceDataCache.GetTrainingCountriesAsync()).RandomOne();
+
+        var addRouteState = new AddRouteStateBuilder()
+            .WithRouteToProfessionalStatusId(route.RouteToProfessionalStatusTypeId)
+            .WithStatus(RouteToProfessionalStatusStatus.Holds)
+            .WithHoldsStatusFields(Clock)
+            .WithTrainingCountryId(country.CountryId)
+            .WithValidChangeReasonOption()
+            .Build();
+
         var journeyInstance = await CreateJourneyInstanceAsync(
             person.PersonId,
-            ProfessionalStatusType.PartialQualifiedTeacherStatus);
+            addRouteState);
 
         var request = new HttpRequestMessage(HttpMethod.Post,
             $"/route/add/check-answers?personId={person.PersonId}&{journeyInstance.GetUniqueIdQueryParameter()}");

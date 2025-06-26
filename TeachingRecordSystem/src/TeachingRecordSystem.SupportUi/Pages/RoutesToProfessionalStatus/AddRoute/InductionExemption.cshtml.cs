@@ -36,20 +36,13 @@ public class InductionExemptionModel(TrsLinkGenerator linkGenerator, ReferenceDa
 
     public override async Task OnPageHandlerExecutingAsync(PageHandlerExecutingContext context)
     {
-        if (JourneyInstance!.State.RouteToProfessionalStatusId is null)
-        {
-            context.Result = BadRequest();
-            return;
-        }
+        await base.OnPageHandlerExecutingAsync(context);
 
-        Route = await ReferenceDataCache.GetRouteToProfessionalStatusTypeByIdAsync(JourneyInstance!.State.RouteToProfessionalStatusId.Value);
         if (Route.InductionExemptionRequired == FieldRequirement.NotApplicable
             || (Route.InductionExemptionReason is not null && Route.InductionExemptionReason.RouteImplicitExemption))
         {
             context.Result = BadRequest();
             return;
         }
-
-        // NB: Don't call base method as we're overriding the default behaviour
     }
 }

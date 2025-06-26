@@ -17,12 +17,12 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
         get
         {
             var previousPage = PreviousPage ??
-                               (FromCheckAnswers ? AddRoutePage.CheckYourAnswers : AddRoutePage.Route);
+                               (FromCheckAnswers ?? false ? AddRoutePage.CheckYourAnswers : AddRoutePage.Route);
 
             return (currentPage, FromCheckAnswers) switch
             {
-                // (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
-                (AddRoutePage.Route, false) => LinkGenerator.PersonQualifications(PersonId),
+                (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
+                (AddRoutePage.Route, _) => LinkGenerator.PersonQualifications(PersonId),
                 _ => LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers),
             };
         }
@@ -35,7 +35,7 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
     public JourneyInstance<AddRouteState>? JourneyInstance { get; set; }
 
     [FromQuery]
-    public bool FromCheckAnswers { get; set; }
+    public bool? FromCheckAnswers { get; set; }
 
     [FromQuery]
 
