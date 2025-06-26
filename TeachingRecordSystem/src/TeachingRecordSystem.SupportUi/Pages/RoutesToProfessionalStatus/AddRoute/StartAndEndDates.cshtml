@@ -11,7 +11,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteAddStartAndEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.RouteAddStartAndEndDate(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers, Model.History, Model.PreviousHistory)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-fieldset>
                 <govuk-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--l">Enter the route start and end dates</govuk-fieldset-legend>

@@ -41,7 +41,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds-from-desktop">
-        <form action="@LinkGenerator.RouteAddTrainingProvider(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers)" method="post">
+        <form action="@LinkGenerator.RouteAddTrainingProvider(Model.PersonId, Model.JourneyInstance!.InstanceId, Model.FromCheckAnswers, Model.History, Model.PreviousHistory)" method="post">
             <span class="govuk-caption-l">Routes and professional status - @Model.PersonName</span>
             <govuk-select asp-for="TrainingProviderId" label-class="govuk-label--l">
                 <govuk-select-label is-page-heading="true">@Model.PageHeading</govuk-select-label>
