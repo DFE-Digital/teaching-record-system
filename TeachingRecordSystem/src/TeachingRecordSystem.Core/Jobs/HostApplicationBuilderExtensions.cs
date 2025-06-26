@@ -242,6 +242,11 @@ public static class HostApplicationBuilderExtensions
                     job => job.ExecuteAsync(new DateTime(2025, 6, 6, 0, 0, 0, DateTimeKind.Utc), CancellationToken.None),
                     Cron.Never);
 
+                recurringJobManager.AddOrUpdate<MigrateRoutesFromCrmJob>(
+                    nameof(MigrateRoutesFromCrmJob),
+                    job => job.ExecuteAsync(/*dryRun: */false, CancellationToken.None),
+                    Cron.Never);
+
                 return Task.CompletedTask;
             });
         }
