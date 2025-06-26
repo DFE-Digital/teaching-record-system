@@ -5,6 +5,4 @@ namespace TeachingRecordSystem.SupportUi.Pages.RoutesToProfessionalStatus.AddRou
 public class RouteDetailViewModel : RouteDetailModel
 {
     public required Guid PersonId { get; init; }
-    public required List<AddRoutePage> ChangeLinkHistory { get; init; }
-    public required List<AddRoutePage> ChangeLinkPreviousHistory { get; init; }
 }

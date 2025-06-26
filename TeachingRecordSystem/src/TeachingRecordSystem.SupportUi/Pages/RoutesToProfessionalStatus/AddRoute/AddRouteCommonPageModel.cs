@@ -16,22 +16,14 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
     {
         get
         {
-            var previousPage = GetPreviousPage() ??
+            var previousPage = PreviousPage ??
                                (FromCheckAnswers ? AddRoutePage.CheckYourAnswers : AddRoutePage.Route);
 
             return (currentPage, FromCheckAnswers) switch
             {
                 // (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
-
-                (AddRoutePage.Route, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId,
-                    JourneyInstance!.InstanceId,
-                    PreviousHistory.Any() ? PreviousHistory : History, []),
-
                 (AddRoutePage.Route, false) => LinkGenerator.PersonQualifications(PersonId),
-
-                _ => previousPage == AddRoutePage.CheckYourAnswers
-                    ? LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers, PreviousHistory.Any() ? PreviousHistory : History, [])
-                    : LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers, History, PreviousHistory),
+                _ => LinkGenerator.RouteAddPage(previousPage, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers),
             };
         }
     }
@@ -46,48 +38,21 @@ public abstract class AddRouteCommonPageModel(AddRoutePage currentPage, TrsLinkG
     public bool FromCheckAnswers { get; set; }
 
     [FromQuery]
-    public List<AddRoutePage> History { get; set; } = new();
-
-    [FromQuery]
-    public List<AddRoutePage> PreviousHistory { get; set; } = new();
-
-    private AddRoutePage? GetPreviousPage() =>
-        History.OrderByDescending(p => p).Select(p => (AddRoutePage?)p).FirstOrDefault(p => p < currentPage);
-
-    [FromQuery]
 
     public Guid PersonId { get; set; }
 
     public string? PersonName { get; set; }
 
-    protected async Task<IActionResult> ContinueAsync()
+    protected Task<IActionResult> ContinueAsync()
     {
-        await JourneyInstance!.UpdateStateAsync(state =>
-        {
-            // if (state.History.Contains(AddRoutePage.CheckYourAnswers))
-            // {
-            //     state.History.Clear();
-            //     state.History.Add(CurrentPage);
-            // }
-            //
-            // if (CurrentPage != AddRoutePage.CheckYourAnswers)
-            // {
-            //     var nextPage = FromCheckAnswers
-            //         ? AddRoutePage.CheckYourAnswers
-            //         : NextPage;
-            //
-            //     state.History.Add(nextPage ?? AddRoutePage.CheckYourAnswers);
-            // }
-        });
-
-        var history = History.Union([CurrentPage]).ToList();
-
-        return Redirect((currentPage, FromCheckAnswers) switch
+        IActionResult nextPage = Redirect((currentPage, FromCheckAnswers) switch
         {
             (AddRoutePage.CheckYourAnswers, _) => LinkGenerator.PersonQualifications(PersonId),
-            (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId, history, PreviousHistory),
-            _ => LinkGenerator.RouteAddPage(NextPage ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers, history, PreviousHistory)
+            (_, true) => LinkGenerator.RouteAddCheckYourAnswers(PersonId, JourneyInstance!.InstanceId),
+            _ => LinkGenerator.RouteAddPage(NextPage ?? AddRoutePage.CheckYourAnswers, PersonId, JourneyInstance!.InstanceId, FromCheckAnswers)
         });
+
+        return Task.FromResult(nextPage);
     }
 
     public AddRoutePage? NextPage(AddRoutePage currentPage)

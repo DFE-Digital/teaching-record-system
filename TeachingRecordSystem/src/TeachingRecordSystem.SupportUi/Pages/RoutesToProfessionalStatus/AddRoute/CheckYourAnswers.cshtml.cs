@@ -80,9 +80,6 @@ public class CheckYourAnswersModel(
         return await ContinueAsync();
     }
 
-    public List<AddRoutePage> ChangeLinkHistory => [CurrentPage];
-    public List<AddRoutePage> ChangeLinkPreviousHistory => History;
-
     public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
     {
         if (!(JourneyInstance!.State.RouteToProfessionalStatusId.HasValue && JourneyInstance!.State.Status.HasValue))
@@ -120,7 +117,7 @@ public class CheckYourAnswersModel(
                  Route.InductionExemptionReason is null ||
                  !Route.InductionExemptionReason.RouteImplicitExemption))
             {
-                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true, History, PreviousHistory));
+                context.Result = Redirect(LinkGenerator.RouteAddPage(page, PersonId, JourneyInstance.InstanceId, fromCheckAnswers: true));
                 return;
             }
         }
@@ -147,8 +144,6 @@ public class CheckYourAnswersModel(
             FromCheckAnswers = true,
             JourneyInstanceId = JourneyInstance!.InstanceId,
             PersonId = PersonId,
-            ChangeLinkHistory = ChangeLinkHistory,
-            ChangeLinkPreviousHistory = ChangeLinkPreviousHistory,
         };
 
         UploadedEvidenceFileUrl = ChangeReasonDetail.EvidenceFileId is not null ?

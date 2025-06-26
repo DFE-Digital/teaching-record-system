@@ -81,81 +81,81 @@ public partial class TrsLinkGenerator
     public string RouteAdd(Guid personId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Index", routeValues: new { personId });
 
-    public string RouteAddRoute(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Route", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddRoute(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Route", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddRouteCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Route", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddStatus(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Status", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddStatus(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Status", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddStatusCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Status", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddStartAndEndDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/StartAndEndDates", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddStartAndEndDate(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/StartAndEndDates", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddStartAndEndDateCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/StartAndEndDates", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddHoldsFrom(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/HoldsFrom", routeValues: new { personId, fromCheckAnswers , history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddHoldsFrom(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/HoldsFrom", routeValues: new { personId, fromCheckAnswers  }, journeyInstanceId: journeyInstanceId);
     public string RouteAddHoldsFromCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/HoldsFrom", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddInductionExemption(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/InductionExemption", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddInductionExemption(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/InductionExemption", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddInductionExemptionCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/InductionExemption", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddTrainingProvider(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddTrainingProvider(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddTrainingProviderCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/TrainingProvider", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddDegreeType(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddDegreeType(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddDegreeTypeCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/DegreeType", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddCountry(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Country", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddCountry(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Country", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddCountryCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/Country", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddSubjectSpecialisms(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddSubjectSpecialisms(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddSubjectSpecialismsCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/SubjectSpecialisms", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddAgeRangeSpecialism(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AgeRangeSpecialism", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddAgeRangeSpecialism(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AgeRangeSpecialism", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddAgeRangeSpecialismCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/AgeRangeSpecialism", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/ChangeReason", routeValues: new { personId, fromCheckAnswers, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddChangeReason(Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/ChangeReason", routeValues: new { personId, fromCheckAnswers }, journeyInstanceId: journeyInstanceId);
     public string RouteAddChangeReasonCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/ChangeReason", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddCheckYourAnswers(Guid personId, JourneyInstanceId journeyInstanceId, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
-        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckYourAnswers", routeValues: new { personId, history, previousHistory }, journeyInstanceId: journeyInstanceId);
+    public string RouteAddCheckYourAnswers(Guid personId, JourneyInstanceId journeyInstanceId) =>
+        GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckYourAnswers", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
     public string RouteAddCheckAnswersCancel(Guid personId, JourneyInstanceId journeyInstanceId) =>
         GetRequiredPathByPage("/RoutesToProfessionalStatus/AddRoute/CheckYourAnswers", "cancel", routeValues: new { personId }, journeyInstanceId: journeyInstanceId);
 
-    public string RouteAddPage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null, List<AddRoutePage>? history = null, List<AddRoutePage>? previousHistory = null) =>
+    public string RouteAddPage(AddRoutePage page, Guid personId, JourneyInstanceId journeyInstanceId, bool? fromCheckAnswers = null) =>
         page switch
         {
-            AddRoutePage.Route => RouteAddRoute(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.StartAndEndDate => RouteAddStartAndEndDate(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.HoldsFrom => RouteAddHoldsFrom(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.InductionExemption => RouteAddInductionExemption(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.TrainingProvider => RouteAddTrainingProvider(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.DegreeType => RouteAddDegreeType(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.Country => RouteAddCountry(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.AgeRangeSpecialism => RouteAddAgeRangeSpecialism(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.SubjectSpecialisms => RouteAddSubjectSpecialisms(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.ChangeReason => RouteAddChangeReason(personId, journeyInstanceId, fromCheckAnswers, history, previousHistory),
-            AddRoutePage.CheckYourAnswers => RouteAddCheckYourAnswers(personId, journeyInstanceId, history, previousHistory),
+            AddRoutePage.Route => RouteAddRoute(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.Status => RouteAddStatus(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.StartAndEndDate => RouteAddStartAndEndDate(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.HoldsFrom => RouteAddHoldsFrom(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.InductionExemption => RouteAddInductionExemption(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.TrainingProvider => RouteAddTrainingProvider(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.DegreeType => RouteAddDegreeType(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.Country => RouteAddCountry(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.AgeRangeSpecialism => RouteAddAgeRangeSpecialism(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.SubjectSpecialisms => RouteAddSubjectSpecialisms(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.ChangeReason => RouteAddChangeReason(personId, journeyInstanceId, fromCheckAnswers),
+            AddRoutePage.CheckYourAnswers => RouteAddCheckYourAnswers(personId, journeyInstanceId),
             _ => throw new ArgumentOutOfRangeException($"{nameof(AddRoutePage)}: {page.ToString()}")
         };
 
