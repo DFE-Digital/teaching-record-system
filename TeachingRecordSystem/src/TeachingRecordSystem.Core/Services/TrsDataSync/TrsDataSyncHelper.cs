@@ -2027,7 +2027,7 @@ public class TrsDataSyncHelper(
             $"""
             INSERT INTO {tableName} AS t ({columnList})
             SELECT {columnList} FROM {tempTableName}
-            ON CONFLICT ON CONSTRAINT fk_qualifications_person DO NOTHING
+            WHERE EXISTS (SELECT 1 FROM persons WHERE person_id = {tempTableName}.person_id)            
             """;        
 
         Action<NpgsqlBinaryImporter, RouteToProfessionalStatus> writeRecord = (writer, route) =>
