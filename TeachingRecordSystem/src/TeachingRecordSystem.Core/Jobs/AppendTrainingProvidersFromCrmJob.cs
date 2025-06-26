@@ -14,13 +14,17 @@ public class AppendTrainingProvidersFromCrmJob(TrsDbContext dbContext, ICrmQuery
 
     private async Task ProcessPagedResultAsync(Account[] providersInCrm)
     {
-        var providersInTrs = await dbContext.TrainingProviders.ToListAsync();
+        var providersInTrs = await dbContext
+            .TrainingProviders
+            .AsNoTracking()
+            .ToListAsync();
         var providersWithNoUkprnToAdd = providersInCrm
             .Where(p => string.IsNullOrEmpty(p.dfeta_UKPRN) && !providersInTrs.Any(t => t.TrainingProviderId == p.Id));
         var uniqueUnmatchedUkprnProviders = providersInCrm
             .Where(p =>
                 !string.IsNullOrEmpty(p.dfeta_UKPRN) &&
-                !providersInTrs.Any(t => t.Ukprn == p.dfeta_UKPRN))
+                !providersInTrs.Any(t => t.Ukprn == p.dfeta_UKPRN) &&
+                !providersInTrs.Any(t => t.TrainingProviderId == p.Id))
             .GroupBy(p => p.dfeta_UKPRN)
             .Select(g => g.First());
 
